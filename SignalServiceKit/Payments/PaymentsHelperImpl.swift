@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import LibSignalClient
 import BreezSdkSpark
+public import LibSignalClient
 
 public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
 
@@ -13,10 +13,12 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
     }
 
     private func observeNotifications() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(registrationStateDidChange),
-                                               name: .registrationStateDidChange,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(registrationStateDidChange),
+            name: .registrationStateDidChange,
+            object: nil,
+        )
     }
 
     @objc
@@ -25,70 +27,28 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
         warmCaches()
     }
 
-    public var isKillSwitchActive: Bool {
-        RemoteConfig.current.paymentsResetKillSwitch || !hasValidPhoneNumberForPayments
-    }
-
-    public var hasValidPhoneNumberForPayments: Bool {
-        guard DependenciesBridge.shared.tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered else {
+    private func hasValidPhoneNumberForPayments() -> Bool {
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        guard let registeredState = try? tsAccountManager.registeredStateWithMaybeSneakyTransaction() else {
             return false
         }
-        guard let localNumber = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.phoneNumber else {
-            return false
-        }
+        let localNumber = registeredState.localIdentifiers.phoneNumber
         let paymentsDisabledRegions = RemoteConfig.current.paymentsDisabledRegions
-        if paymentsDisabledRegions.isEmpty {
-            return Self.isValidPhoneNumberForPayments_fixedAllowlist(localNumber)
-        } else {
-            return Self.isValidPhoneNumberForPayments_remoteConfigBlocklist(localNumber, paymentsDisabledRegions: paymentsDisabledRegions)
-        }
+        return !paymentsDisabledRegions.contains(e164: localNumber)
     }
 
-    private static func isValidPhoneNumberForPayments_fixedAllowlist(_ e164: String) -> Bool {
-        guard let phoneNumber = SSKEnvironment.shared.phoneNumberUtilRef.parseE164(e164) else {
-            owsFailDebug("Could not parse phone number: \(e164).")
+    public func canUsePayments() -> Bool {
+        if RemoteConfig.current.paymentsResetKillSwitch {
             return false
         }
-        guard let callingCode = phoneNumber.getCallingCode() else {
-            owsFailDebug("Missing callingCode: \(e164).")
-            return false
-        }
-        let validCallingCodes: [Int] = [
-            // France
-            33,
-            // Switzerland
-            41,
-            // Parts of UK.
-            44,
-            // Germany
-            49
-        ]
-        return validCallingCodes.contains(callingCode)
-    }
-
-    internal static func isValidPhoneNumberForPayments_remoteConfigBlocklist(
-        _ e164: String,
-        paymentsDisabledRegions: PhoneNumberRegions
-    ) -> Bool {
-        owsAssertDebug(
-            !paymentsDisabledRegions.isEmpty,
-            "Missing paymentsDisabledRegions. Used the fixed allowlist instead."
-        )
-        return !paymentsDisabledRegions.contains(e164: e164)
-    }
-
-    public var canEnablePayments: Bool {
-        guard !isKillSwitchActive else {
-            return false
-        }
-        return hasValidPhoneNumberForPayments
+        return hasValidPhoneNumberForPayments()
     }
 
     // MARK: - PaymentsState
 
     // NOTE: This k-v store is shared by PaymentsHelperImpl and PaymentsImpl.
     fileprivate static let keyValueStore = KeyValueStore(collection: "Payments")
-    public var keyValueStore: KeyValueStore { Self.keyValueStore}
+    public var keyValueStore: KeyValueStore { Self.keyValueStore }
 
     private static let arePaymentsEnabledKey = "isPaymentEnabled"
     private static let paymentsEntropyKey = "paymentsEntropy"
@@ -139,12 +99,16 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             owsFailDebug("paymentsEntropy is already set.")
             return false
         }
-        let paymentsState = PaymentsState.build(arePaymentsEnabled: true,
-                                                paymentsEntropy: newPaymentsEntropy)
+        let paymentsState = PaymentsState.build(
+            arePaymentsEnabled: true,
+            paymentsEntropy: newPaymentsEntropy,
+        )
         owsAssertDebug(paymentsState.isEnabled)
-        setPaymentsState(paymentsState,
-                         originatedLocally: true,
-                         transaction: transaction)
+        setPaymentsState(
+            paymentsState,
+            originatedLocally: true,
+            transaction: transaction,
+        )
         owsAssertDebug(arePaymentsEnabled)
         return true
     }
@@ -152,9 +116,11 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
     public func disablePayments(transaction: DBWriteTransaction) {
         switch paymentsState {
         case .enabled(let paymentsEntropy):
-            setPaymentsState(.disabledWithPaymentsEntropy(paymentsEntropy: paymentsEntropy),
-                             originatedLocally: true,
-                             transaction: transaction)
+            setPaymentsState(
+                .disabledWithPaymentsEntropy(paymentsEntropy: paymentsEntropy),
+                originatedLocally: true,
+                transaction: transaction,
+            )
         case .disabled, .disabledWithPaymentsEntropy:
             owsFailDebug("Payments already disabled.")
         }
@@ -184,9 +150,11 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
         }
     }
 
-    public func setPaymentsState(_ newPaymentsState: PaymentsState,
-                                 originatedLocally: Bool,
-                                 transaction: DBWriteTransaction) {
+    public func setPaymentsState(
+        _ newPaymentsState: PaymentsState,
+        originatedLocally: Bool,
+        transaction: DBWriteTransaction,
+    ) {
         let oldPaymentsState = self.paymentsState
         var newPaymentsState = newPaymentsState
 
@@ -194,9 +162,9 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
         // to enable it even if the current device no longer supports enabling payments. This will
         // behave as if the payments kill switch is turned on until the user is on a payments enabled
         // install, but preserve their access to payments in the UI.
-        let canEnablePaymentsLocallyOrRemotely = self.canEnablePayments || !originatedLocally
+        let canEnablePaymentsLocallyOrRemotely = self.canUsePayments() || !originatedLocally
 
-        if newPaymentsState.isEnabled && !canEnablePaymentsLocallyOrRemotely {
+        if newPaymentsState.isEnabled, !canEnablePaymentsLocallyOrRemotely {
             // If we cannot enable payments, ensure that any new entropy is always preserved.
             if let paymentsEntropy = newPaymentsState.paymentsEntropy {
                 newPaymentsState = .disabledWithPaymentsEntropy(paymentsEntropy: paymentsEntropy)
@@ -208,19 +176,25 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
         guard newPaymentsState != oldPaymentsState else {
             return
         }
-        if let oldPaymentsEntropy = oldPaymentsState.paymentsEntropy,
-           let newPaymentsEntropy = newPaymentsState.paymentsEntropy,
-           oldPaymentsEntropy != newPaymentsEntropy {
+        if
+            let oldPaymentsEntropy = oldPaymentsState.paymentsEntropy,
+            let newPaymentsEntropy = newPaymentsState.paymentsEntropy,
+            oldPaymentsEntropy != newPaymentsEntropy
+        {
             owsFailDebug("paymentsEntropy does not match.")
         }
 
-        Self.keyValueStore.setBool(newPaymentsState.isEnabled,
-                                   key: Self.arePaymentsEnabledKey,
-                                   transaction: transaction)
+        Self.keyValueStore.setBool(
+            newPaymentsState.isEnabled,
+            key: Self.arePaymentsEnabledKey,
+            transaction: transaction,
+        )
         if let paymentsEntropy = newPaymentsState.paymentsEntropy {
-            Self.keyValueStore.setData(paymentsEntropy,
-                                       key: Self.paymentsEntropyKey,
-                                       transaction: transaction)
+            Self.keyValueStore.setData(
+                paymentsEntropy,
+                key: Self.paymentsEntropyKey,
+                transaction: transaction,
+            )
         }
 
         self.paymentStateCache.set(newPaymentsState)
@@ -234,7 +208,7 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             Self.keyValueStore.setData(
                 nil,
                 key: Self.lastKnownLocalPaymentAddressProtoDataKey,
-                transaction: transaction
+                transaction: transaction,
             )
         }
 
@@ -244,13 +218,13 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             .forEach { thread in
                 // Only send out payments activated messages from the originating device.
                 if originatedLocally {
-                    let message = OWSPaymentActivationRequestFinishedMessage(thread: thread, transaction: transaction)
+                    let message = OutgoingPaymentActivationRequestFinishedMessage(thread: thread, tx: transaction)
                     let preparedMessage = PreparedOutgoingMessage.preprepared(
-                        transientMessageWithoutAttachments: message
+                        transientMessageWithoutAttachments: message,
                     )
                     SSKEnvironment.shared.messageSenderJobQueueRef.add(
                         message: preparedMessage,
-                        transaction: transaction
+                        transaction: transaction,
                     )
                 }
                 // But always insert an info message wherever we were requested.
@@ -259,8 +233,8 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
                         thread: thread,
                         messageType: .paymentsActivated,
                         infoMessageUserInfo: [
-                            .paymentActivatedAci: localAci.serviceIdString
-                        ]
+                            .paymentActivatedAci: localAci.serviceIdString,
+                        ],
                     )
                     infoMessage.anyInsert(transaction: transaction)
                 }
@@ -283,8 +257,8 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
                                 PaymentsConstants.bitcoinLightningProfileKeyVersion,
                                 unsavedRotatedProfileKey: nil,
                                 mustReuploadAvatar: false,
-                                authedAccount: .implicit(),
-                                tx: tx
+                                authedAccount: .implicit,
+                                tx: tx,
                             )
                         }
                     }
@@ -302,11 +276,15 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             return .disabled
         }
         let paymentsEntropy = keyValueStore.getData(paymentsEntropyKey, transaction: transaction)
-        let arePaymentsEnabled = keyValueStore.getBool(Self.arePaymentsEnabledKey,
-                                                       defaultValue: false,
-                                                       transaction: transaction)
-        return PaymentsState.build(arePaymentsEnabled: arePaymentsEnabled,
-                                   paymentsEntropy: paymentsEntropy)
+        let arePaymentsEnabled = keyValueStore.getBool(
+            Self.arePaymentsEnabledKey,
+            defaultValue: false,
+            transaction: transaction,
+        )
+        return PaymentsState.build(
+            arePaymentsEnabled: arePaymentsEnabled,
+            paymentsEntropy: paymentsEntropy,
+        )
     }
 
     private static func generateRandomPaymentsEntropy() -> Data {
@@ -332,26 +310,6 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
         return Self.keyValueStore.getData(Self.lastKnownLocalPaymentAddressProtoDataKey, transaction: transaction)
     }
 
-    // MARK: -
-
-    private static let arePaymentsEnabledForUserStore = KeyValueStore(collection: "arePaymentsEnabledForUserStore")
-
-    public func setArePaymentsEnabled(for serviceId: ServiceId, hasPaymentsEnabled: Bool, transaction tx: DBWriteTransaction) {
-        Self.arePaymentsEnabledForUserStore.setBool(hasPaymentsEnabled, key: serviceId.serviceIdUppercaseString, transaction: tx)
-    }
-
-    public func arePaymentsEnabled(for address: SignalServiceAddress, transaction tx: DBReadTransaction) -> Bool {
-        guard let serviceId = address.serviceId else {
-            Logger.warn("User is missing serviceId.")
-            return false
-        }
-        return Self.arePaymentsEnabledForUserStore.getBool(
-            serviceId.serviceIdUppercaseString,
-            defaultValue: false,
-            transaction: tx
-        )
-    }
-
     // MARK: - Version Compatibility
 
     private let isPaymentsVersionOutdatedCache = AtomicValue<Bool>(false, lock: .sharedGlobal)
@@ -372,27 +330,29 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
         thread: TSThread,
         paymentNotification: TSPaymentNotification,
         senderAci: Aci,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) {
         Logger.info("")
         guard paymentNotification.isValid else {
             owsFailDebug("Invalid paymentNotification.")
             return
         }
-        upsertPaymentModelForIncomingPaymentNotification(paymentNotification,
-                                                         thread: thread,
-                                                         senderAci: senderAci,
-                                                         transaction: transaction)
+        upsertPaymentModelForIncomingPaymentNotification(
+            paymentNotification,
+            thread: thread,
+            senderAci: senderAci,
+            transaction: transaction,
+        )
         NotificationCenter.default.post(
             name: Notification.Name("processIncomingPaymentNotification"),
-            object: nil
+            object: nil,
         )
     }
 
     public func processIncomingPaymentsActivationRequest(
         thread: TSThread,
         senderAci: Aci,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) {
         Logger.info("")
 
@@ -403,9 +363,9 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             Self.loadPaymentsState(transaction: transaction).isEnabled
         {
             if DependenciesBridge.shared.tsAccountManager.registrationState(tx: transaction).isPrimaryDevice ?? false {
-                let message = OWSPaymentActivationRequestFinishedMessage(thread: thread, transaction: transaction)
+                let message = OutgoingPaymentActivationRequestFinishedMessage(thread: thread, tx: transaction)
                 let preparedMessage = PreparedOutgoingMessage.preprepared(
-                    transientMessageWithoutAttachments: message
+                    transientMessageWithoutAttachments: message,
                 )
                 SSKEnvironment.shared.messageSenderJobQueueRef.add(message: preparedMessage, transaction: transaction)
             }
@@ -418,12 +378,12 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
         TSPaymentsActivationRequestModel.createIfNotExists(
             threadUniqueId: thread.uniqueId,
             senderAci: senderAci,
-            transaction: transaction
+            transaction: transaction,
         )
         // Insert the info message to display in chat.
         let infoMessage: TSInfoMessage = .paymentsActivationRequestMessage(
             thread: thread,
-            senderAci: senderAci
+            senderAci: senderAci,
         )
         infoMessage.anyInsert(transaction: transaction)
     }
@@ -431,22 +391,25 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
     public func processIncomingPaymentsActivatedMessage(
         thread: TSThread,
         senderAci: Aci,
-        transaction: DBWriteTransaction
+        localIdentifiers: LocalIdentifiers,
+        tx: DBWriteTransaction,
     ) {
         Logger.info("")
         let infoMessage: TSInfoMessage = .paymentsActivatedMessage(
             thread: thread,
-            senderAci: senderAci
+            senderAci: senderAci,
         )
-        infoMessage.anyInsert(transaction: transaction)
+        infoMessage.anyInsert(transaction: tx)
 
-        setArePaymentsEnabled(
-            for: senderAci,
-            hasPaymentsEnabled: true,
-            transaction: transaction
+        let profileManager = SSKEnvironment.shared.profileManagerRef
+        profileManager.setHasPaymentAddress(
+            aci: senderAci,
+            localIdentifiers: localIdentifiers,
+            userProfileWriter: .paymentActivation,
+            tx: tx,
         )
 
-        transaction.addSyncCompletion {
+        tx.addSyncCompletion {
             Task {
                 await Self.fetchBitcoinLightningProfileWithRetry(for: senderAci)
             }
@@ -462,12 +425,11 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             do {
                 let fetched = try await SSKEnvironment.shared.profileFetcherRef
                     .fetchProfileWithLightningBitcoinAddress(for: senderAci)
-                let paymentAddress = fetched.decryptedProfile?
-                    .paymentAddress(identityKey: fetched.identityKey)
+                let paymentAddress = try? fetched.decryptedProfile?.paymentAddress()
                 if paymentAddress != nil {
                     NotificationCenter.default.postOnMainThread(
                         name: PaymentsConstants.paymentsActivatedForRecipient,
-                        object: senderAci
+                        object: senderAci,
                     )
                     return
                 }
@@ -483,7 +445,7 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
         thread: TSThread,
         paymentNotification: TSPaymentNotification,
         messageTimestamp: UInt64,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) {
         Logger.info("Ignoring payment notification from sync transcript.")
     }
@@ -491,7 +453,7 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
     public func processIncomingPaymentSyncMessage(
         _ paymentProto: SSKProtoSyncMessageOutgoingPayment,
         messageTimestamp: UInt64,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) {
         Logger.info("")
         do {
@@ -517,7 +479,7 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             let memoMessage = paymentProto.note?.nilIfEmpty.map {
                 DependenciesBridge.shared.attachmentContentValidator.truncatedMessageBodyForInlining(
                     MessageBody(text: $0, ranges: .empty),
-                    tx: transaction
+                    tx: transaction,
                 )
             }
 
@@ -531,10 +493,12 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             guard !outputPublicKeys.isEmpty else {
                 throw OWSAssertionError("Invalid payment sync message: Missing outputPublicKeys.")
             }
-            guard let mcReceiptData = mobileCoinProto.receipt,
-                  !mcReceiptData.isEmpty else {
-                      throw OWSAssertionError("Invalid payment sync message: Missing or invalid receipt.")
-                  }
+            guard
+                let mcReceiptData = mobileCoinProto.receipt,
+                !mcReceiptData.isEmpty
+            else {
+                throw OWSAssertionError("Invalid payment sync message: Missing or invalid receipt.")
+            }
             _ = try SSKEnvironment.shared.mobileCoinHelperRef.info(forReceiptData: mcReceiptData)
             let ledgerBlockIndex = mobileCoinProto.ledgerBlockIndex
             guard ledgerBlockIndex > 0 else {
@@ -554,10 +518,12 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
                 guard recipientPublicAddressData == nil else {
                     throw OWSAssertionError("Invalid payment sync message: unexpected recipientPublicAddressData.")
                 }
-                guard paymentAmount.isValidAmount(canBeEmpty: true),
-                      paymentAmount.picoMob == 0 else {
-                          throw OWSAssertionError("Invalid payment sync message: invalid paymentAmount.")
-                      }
+                guard
+                    paymentAmount.isValidAmount(canBeEmpty: true),
+                    paymentAmount.picoMob == 0
+                else {
+                    throw OWSAssertionError("Invalid payment sync message: invalid paymentAmount.")
+                }
                 guard memoMessage == nil else {
                     throw OWSAssertionError("Invalid payment sync message: unexpected memoMessage.")
                 }
@@ -573,24 +539,28 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
                 paymentType = .outgoingPaymentNotFromLocalDevice
             }
 
-            let mobileCoin = MobileCoinPayment(recipientPublicAddressData: recipientPublicAddressData,
-                                               transactionData: nil,
-                                               receiptData: mcReceiptData,
-                                               incomingTransactionPublicKeys: nil,
-                                               spentKeyImages: spentKeyImages,
-                                               outputPublicKeys: outputPublicKeys,
-                                               ledgerBlockTimestamp: ledgerBlockTimestamp,
-                                               ledgerBlockIndex: ledgerBlockIndex,
-                                               feeAmount: feeAmount)
-            let paymentModel = TSPaymentModel(paymentType: paymentType,
-                                              paymentState: paymentState,
-                                              paymentAmount: paymentAmount,
-                                              createdDate: Date(millisecondsSince1970: messageTimestamp),
-                                              senderOrRecipientAci: recipientAci.map { AciObjC($0) },
-                                              memoMessage: memoMessage?.inlinedBody.text,
-                                              isUnread: false,
-                                              interactionUniqueId: nil,
-                                              mobileCoin: mobileCoin)
+            let mobileCoin = MobileCoinPayment(
+                recipientPublicAddressData: recipientPublicAddressData,
+                transactionData: nil,
+                receiptData: mcReceiptData,
+                incomingTransactionPublicKeys: nil,
+                spentKeyImages: spentKeyImages,
+                outputPublicKeys: outputPublicKeys,
+                ledgerBlockTimestamp: ledgerBlockTimestamp,
+                ledgerBlockIndex: ledgerBlockIndex,
+                feeAmount: feeAmount,
+            )
+            let paymentModel = TSPaymentModel(
+                paymentType: paymentType,
+                paymentState: paymentState,
+                paymentAmount: paymentAmount,
+                createdDate: Date(millisecondsSince1970: messageTimestamp),
+                senderOrRecipientAci: recipientAci,
+                memoMessage: memoMessage?.inlinedBody.text,
+                isUnread: false,
+                interactionUniqueId: nil,
+                mobileCoin: mobileCoin,
+            )
 
             try tryToInsertPaymentModel(paymentModel, transaction: transaction)
 
@@ -603,11 +573,11 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             {
                 let thread = TSContactThread.getOrCreateThread(
                     withContactAddress: SignalServiceAddress(recipientAci),
-                    transaction: transaction
+                    transaction: transaction,
                 )
                 let paymentNotification = TSPaymentNotification(
                     memoMessage: memoMessage?.inlinedBody.text,
-                    mcReceiptData: mcReceiptData
+                    mcReceiptData: mcReceiptData,
                 )
                 let dmConfigurationStore = DependenciesBridge.shared.disappearingMessagesConfigurationStore
                 let dmConfig = dmConfigurationStore.fetchOrBuildDefault(for: .thread(thread), tx: transaction)
@@ -617,7 +587,7 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
                     paymentNotification: paymentNotification,
                     expiresInSeconds: dmConfig.durationSeconds,
                     expireTimerVersion: dmConfig.timerVersion,
-                    tx: transaction
+                    tx: transaction,
                 )
                 message.anyInsert(transaction: transaction)
                 paymentModel.update(withInteractionUniqueId: message.uniqueId, transaction: transaction)
@@ -631,7 +601,7 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
     // This method enforces invariants around TSPaymentModel.
     public func tryToInsertPaymentModel(
         _ paymentModel: TSPaymentModel,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) throws {
 
         Logger.info("Trying to insert: \(paymentModel.descriptionForLogs)")
@@ -640,8 +610,10 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
             throw OWSAssertionError("Invalid paymentModel.")
         }
 
-        let isRedundant = try isProposedPaymentModelRedundant(paymentModel,
-                                                              transaction: transaction)
+        let isRedundant = try isProposedPaymentModelRedundant(
+            paymentModel,
+            transaction: transaction,
+        )
         guard !isRedundant else {
             throw OWSAssertionError("Duplicate paymentModel.")
         }
@@ -652,7 +624,7 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
     // This method enforces invariants around TSPaymentModel.
     private func isProposedPaymentModelRedundant(
         _ paymentModel: TSPaymentModel,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) throws -> Bool {
         guard paymentModel.isValid else {
             throw OWSAssertionError("Invalid paymentModel.")
@@ -661,8 +633,10 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
         // Only one model in the database should have a given transaction.
         if paymentModel.canHaveMCTransaction {
             if let transactionData = paymentModel.mobileCoin?.transactionData {
-                let existingPaymentModels = PaymentFinder.paymentModels(forMcTransactionData: transactionData,
-                                                                        transaction: transaction)
+                let existingPaymentModels = PaymentFinder.paymentModels(
+                    forMcTransactionData: transactionData,
+                    transaction: transaction,
+                )
                 if existingPaymentModels.count > 1 {
                     owsFailDebug("More than one conflict.")
                 }
@@ -678,8 +652,10 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
         // Only one model in the database should have a given receipt.
         if paymentModel.shouldHaveMCReceipt {
             if let receiptData = paymentModel.mobileCoin?.receiptData {
-                let existingPaymentModels = PaymentFinder.paymentModels(forMcReceiptData: receiptData,
-                                                                        transaction: transaction)
+                let existingPaymentModels = PaymentFinder.paymentModels(
+                    forMcReceiptData: receiptData,
+                    transaction: transaction,
+                )
                 if existingPaymentModels.count > 1 {
                     owsFailDebug("More than one conflict.")
                 }
@@ -700,11 +676,15 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
         let mcLedgerBlockIndex = paymentModel.mobileCoin?.ledgerBlockIndex ?? 0
         let spentKeyImages = Set(paymentModel.mobileCoin?.spentKeyImages ?? [])
         let outputPublicKeys = Set(paymentModel.mobileCoin?.outputPublicKeys ?? [])
-        if !paymentModel.isUnidentified,
-           mcLedgerBlockIndex > 0 {
+        if
+            !paymentModel.isUnidentified,
+            mcLedgerBlockIndex > 0
+        {
 
-            let otherPaymentModels = PaymentFinder.paymentModels(forMcLedgerBlockIndex: mcLedgerBlockIndex,
-                                                                 transaction: transaction)
+            let otherPaymentModels = PaymentFinder.paymentModels(
+                forMcLedgerBlockIndex: mcLedgerBlockIndex,
+                transaction: transaction,
+            )
             for otherPaymentModel in otherPaymentModels {
                 guard !otherPaymentModel.isUnidentified else {
                     continue
@@ -731,10 +711,12 @@ public class PaymentsHelperImpl: PaymentsHelperSwift, PaymentsHelper {
 
     // MARK: - Upsert Payment Records
 
-    private func upsertPaymentModelForIncomingPaymentNotification(_ paymentNotification: TSPaymentNotification,
-                                                                  thread: TSThread,
-                                                                  senderAci: Aci,
-                                                                  transaction: DBWriteTransaction) {
+    private func upsertPaymentModelForIncomingPaymentNotification(
+        _ paymentNotification: TSPaymentNotification,
+        thread: TSThread,
+        senderAci: Aci,
+        transaction: DBWriteTransaction,
+    ) {
         // BreezReceiptParser understands the current SDK layout and the frozen 0.14.0 layout, so
         // a receipt from a sender on an old-breez build still yields a payment model instead of
         // leaving the bubble amount-less ("UNAVAILABLE sats").

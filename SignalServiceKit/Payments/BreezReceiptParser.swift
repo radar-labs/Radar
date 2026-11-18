@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import BreezSdkSpark
 public import Foundation
 import LibSignalClient
-import BreezSdkSpark
 
 // MARK: - ParsedBreezReceipt
 
@@ -77,7 +77,7 @@ public enum BreezReceiptParser {
             amountSats: amountSats,
             feeSats: feeSats,
             timestampSeconds: payment.timestamp,
-            isFailed: payment.status == .failed
+            isFailed: payment.status == .failed,
         )
     }
 }
@@ -195,7 +195,7 @@ enum Breez014ReceiptReader {
                 amountSats: amountSats,
                 feeSats: feeSats,
                 timestampSeconds: timestamp,
-                isFailed: status == 3
+                isFailed: status == 3,
             )
         }
 
@@ -380,24 +380,28 @@ extension TSPaymentNotification {
         } else {
             incomingTransactionPublicKeys = []
         }
-        let mobileCoin = MobileCoinPayment(recipientPublicAddressData: nil,
-                                           transactionData: nil,
-                                           receiptData: mcReceiptData,
-                                           incomingTransactionPublicKeys: incomingTransactionPublicKeys,
-                                           spentKeyImages: nil,
-                                           outputPublicKeys: nil,
-                                           ledgerBlockTimestamp: 0,
-                                           ledgerBlockIndex: 0,
-                                           feeAmount: nil)
-        return TSPaymentModel(paymentType: .incomingPayment,
-                              paymentState: .incomingUnverified,
-                              paymentAmount: receipt.tsPaymentAmount,
-                              createdDate: Date(timeIntervalSince1970: TimeInterval(receipt.timestampSeconds)),
-                              senderOrRecipientAci: AciObjC(senderAci),
-                              memoMessage: memoMessage?.nilIfEmpty,
-                              isUnread: isUnread,
-                              interactionUniqueId: nil,
-                              mobileCoin: mobileCoin)
+        let mobileCoin = MobileCoinPayment(
+            recipientPublicAddressData: nil,
+            transactionData: nil,
+            receiptData: mcReceiptData,
+            incomingTransactionPublicKeys: incomingTransactionPublicKeys,
+            spentKeyImages: nil,
+            outputPublicKeys: nil,
+            ledgerBlockTimestamp: 0,
+            ledgerBlockIndex: 0,
+            feeAmount: nil,
+        )
+        return TSPaymentModel(
+            paymentType: .incomingPayment,
+            paymentState: .incomingUnverified,
+            paymentAmount: receipt.tsPaymentAmount,
+            createdDate: Date(timeIntervalSince1970: TimeInterval(receipt.timestampSeconds)),
+            senderOrRecipientAci: senderAci,
+            memoMessage: memoMessage?.nilIfEmpty,
+            isUnread: isUnread,
+            interactionUniqueId: nil,
+            mobileCoin: mobileCoin,
+        )
     }
 }
 
@@ -430,9 +434,11 @@ public enum BreezPaymentBackfill {
         SELECT * FROM \(InteractionRecord.databaseTableName)
         WHERE \(interactionColumn: .recordType) = ?
         """
-        let cursor = TSInteraction.grdbFetchCursor(sql: sql,
-                                                   arguments: [SDSRecordType.incomingPaymentMessage.rawValue],
-                                                   transaction: transaction)
+        let cursor = TSInteraction.grdbFetchCursor(
+            sql: sql,
+            arguments: [SDSRecordType.incomingPaymentMessage.rawValue],
+            transaction: transaction,
+        )
         var repaired = 0
         var skipped = 0
         do {
@@ -445,8 +451,12 @@ public enum BreezPaymentBackfill {
                     else {
                         return
                     }
-                    guard PaymentFinder.paymentModels(forMcReceiptData: paymentNotification.mcReceiptData,
-                                                      transaction: transaction).isEmpty else {
+                    guard
+                        PaymentFinder.paymentModels(
+                            forMcReceiptData: paymentNotification.mcReceiptData,
+                            transaction: transaction,
+                        ).isEmpty
+                    else {
                         return // Model already exists; nothing to repair.
                     }
                     // isUnread false: these payments were already seen in the chat; repairing

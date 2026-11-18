@@ -12,10 +12,12 @@ public struct TSRequest: CustomDebugStringConvertible {
     public var headers: HttpHeaders
     public var body: Body
     public var timeoutInterval: TimeInterval = OWSRequestFactory.textSecureHTTPTimeOut
+    public var maxResponseSize: UInt64 = .max
     public let logger: PrefixedLogger
 
     public enum Body {
         case parameters([String: Any])
+        case encodable(any Encodable)
         case data(Data)
 
         static func encodedParameters(_ parameters: [String: Any]) throws -> Data {
@@ -27,13 +29,13 @@ public struct TSRequest: CustomDebugStringConvertible {
         url: URL,
         method: String = "GET",
         parameters: [String: Any]? = [:],
-        logger: PrefixedLogger? = nil
+        logger: PrefixedLogger? = nil,
     ) {
         self.init(
             url: url,
             method: method,
             body: .parameters(parameters ?? [:]),
-            logger: logger
+            logger: logger,
         )
     }
 
@@ -41,9 +43,9 @@ public struct TSRequest: CustomDebugStringConvertible {
         url: URL,
         method: String,
         body: Body,
-        logger: PrefixedLogger? = nil
+        logger: PrefixedLogger? = nil,
     ) {
-        owsAssertDebug(method.isEmpty.negated)
+        owsAssertDebug(!method.isEmpty)
 
         self.url = url
         self.method = method
@@ -79,10 +81,7 @@ public struct TSRequest: CustomDebugStringConvertible {
                 switch self {
                 case .identified:
                     return .identified
-                case .registration:
-                    // TODO: Migrate registration requests to LibSignal.
-                    throw OWSAssertionError("Can't send registration requests via either web socket.")
-                case .anonymous, .sealedSender, .backup:
+                case .anonymous, .backup, .sealedSender, .registration:
                     return .unidentified
                 }
             }
@@ -90,8 +89,10 @@ public struct TSRequest: CustomDebugStringConvertible {
 
         var logTag: String {
             switch self {
-            case .identified, .registration:
+            case .identified:
                 return "ID"
+            case .registration:
+                return "RG"
             case .anonymous, .sealedSender, .backup:
                 return "UD"
             }
@@ -172,12 +173,26 @@ public struct TSRequest: CustomDebugStringConvertible {
 
     public enum RedactionStrategy {
         case none
-        case redactURL(replacement: String = "[REDACTED]")
+        /// Redacts the given sensitive values wherever they appear in the URL
+        /// when logging, leaving the rest of the URL intact.
+        case redactURL(sensitiveValues: [String])
     }
+
+    private static let redactionReplacement = "[REDACTED]"
 
     private var redactionStrategy = RedactionStrategy.none
 
     public mutating func applyRedactionStrategy(_ strategy: RedactionStrategy) {
+        switch strategy {
+        case .none:
+            break
+        case .redactURL(let sensitiveValues):
+            owsAssertDebug(
+                sensitiveValues.allSatisfy { !$0.isEmpty && self.url.relativeString.contains($0) },
+                "Sensitive value missing from URL!",
+                logger: self.logger,
+            )
+        }
         self.redactionStrategy = strategy
     }
 
@@ -186,8 +201,14 @@ public struct TSRequest: CustomDebugStringConvertible {
         switch redactionStrategy {
         case .none:
             result += " \(self.url.relativeString)"
-        case .redactURL(let replacement):
-            result += " \(replacement)"
+        case .redactURL(let sensitiveValues):
+            let redactedURL = sensitiveValues.reduce(self.url.relativeString) { partialResult, sensitiveValue in
+                return partialResult.replacingOccurrences(
+                    of: sensitiveValue,
+                    with: Self.redactionReplacement,
+                )
+            }
+            result += " \(redactedURL)"
         }
         if !self.headers.headers.isEmpty {
             let formattedHeaderFields = self.headers.headers.keys.sorted().joined(separator: "; ")
@@ -196,14 +217,16 @@ public struct TSRequest: CustomDebugStringConvertible {
         return result
     }
 
-    #if TESTABLE_BUILD
+#if TESTABLE_BUILD
     var parameters: [String: Any] {
         switch body {
-        case .data(_):
+        case .data:
             fatalError()
+        case .encodable(let bodyValue):
+            return try! JSONSerialization.jsonObject(with: try JSONEncoder().encode(bodyValue)) as! [String: Any]
         case .parameters(let bodyParameters):
             return bodyParameters
         }
     }
-    #endif
+#endif
 }

@@ -7,7 +7,9 @@ import Foundation
 
 @objc
 public enum SSKWebSocketState: UInt {
-    case open, connecting, disconnected
+    case open
+    case connecting
+    case disconnected
 }
 
 // MARK: -
@@ -42,8 +44,6 @@ public protocol SSKWebSocket: AnyObject {
     func disconnect(code: URLSessionWebSocketTask.CloseCode?)
 
     func write(data: Data)
-
-    func writePing()
 }
 
 // MARK: -
@@ -54,27 +54,6 @@ public enum WebSocketError: Error {
 
     case httpError(statusCode: Int, retryAfter: Date?)
     case closeError(statusCode: Int, closeReason: Data?)
-}
-
-// MARK: -
-
-public extension SSKWebSocket {
-    func sendResponse(for request: WebSocketProtoWebSocketRequestMessage,
-                      status: UInt32,
-                      message: String) throws {
-        let responseBuilder = WebSocketProtoWebSocketResponseMessage.builder(requestID: request.requestID,
-                                                                             status: status)
-        responseBuilder.setMessage(message)
-        let response = try responseBuilder.build()
-
-        let messageBuilder = WebSocketProtoWebSocketMessage.builder()
-        messageBuilder.setType(.response)
-        messageBuilder.setResponse(response)
-
-        let messageData = try messageBuilder.buildSerializedData()
-
-        write(data: messageData)
-    }
 }
 
 // MARK: -
@@ -112,7 +91,7 @@ public struct WebSocketRequest {
                 urlString,
                 overrideUrlScheme: "wss",
                 method: .get,
-                headers: extraHeaders
+                headers: extraHeaders,
             )
         } catch {
             Logger.warn("Couldn't build web socket request: \(error)")
@@ -162,7 +141,7 @@ public class SSKWebSocketNative: SSKWebSocket {
     public init?(
         request: WebSocketRequest,
         signalService: OWSSignalServiceProtocol,
-        callbackScheduler: Scheduler
+        callbackScheduler: Scheduler,
     ) {
         let signalServiceInfo = request.signalService.signalServiceInfo()
 
@@ -183,7 +162,6 @@ public class SSKWebSocketNative: SSKWebSocket {
             for: signalServiceInfo,
             endpoint: endpoint,
             configuration: configuration,
-            maxResponseSize: nil
         )
         self.requestUrl = urlRequest.url!
         self.callbackScheduler = callbackScheduler
@@ -199,7 +177,6 @@ public class SSKWebSocketNative: SSKWebSocket {
     private var hasEverConnected = false
     private var isConnected = false
     private var shouldReportError = true
-    private var hasUnansweredPing = false
 
     // This method is thread-safe.
     public var state: SSKWebSocketState {
@@ -223,7 +200,7 @@ public class SSKWebSocketNative: SSKWebSocket {
             webSocketTask = urlSession.webSocketTask(
                 requestUrl: requestUrl,
                 didOpenBlock: { [weak self] _ in self?.didOpen() },
-                didCloseBlock: { [weak self] error in self?.didClose(error: error) }
+                didCloseBlock: { [weak self] error in self?.didClose(error: error) },
             )
             return webSocketTask
         }
@@ -307,7 +284,6 @@ public class SSKWebSocketNative: SSKWebSocket {
             DispatchQueue.global().asyncAfter(deadline: .now() + 10) { [weak self] in
                 self?.reportReceivedMessageError(error)
             }
-
             // Don't try to listen again.
         }
     }
@@ -345,32 +321,6 @@ public class SSKWebSocketNative: SSKWebSocket {
         }
         taskToSendTo?.send(.data(data)) { [weak self] error in
             self?.reportError(error, context: "write")
-        }
-    }
-
-    public func writePing() {
-        let taskToPing = lock.withLock { () -> URLSessionWebSocketTask? in
-            owsAssertDebug(hasEverConnected, "Must connect before sending a ping.")
-            guard let webSocketTask else {
-                reportErrorWithLock(OWSGenericError("Missing webSocketTask."), context: "ping")
-                return nil
-            }
-            guard !hasUnansweredPing else {
-                reportErrorWithLock(OWSGenericError("Ping didn't get a response."), context: "ping")
-                return nil
-            }
-            hasUnansweredPing = true
-            return webSocketTask
-        }
-        taskToPing?.sendPing(pongReceiveHandler: { [weak self] error in
-            self?.receivedPong(error)
-        })
-    }
-
-    private func receivedPong(_ error: Error?) {
-        lock.withLock {
-            hasUnansweredPing = false
-            reportErrorWithLock(error, context: "pong")
         }
     }
 

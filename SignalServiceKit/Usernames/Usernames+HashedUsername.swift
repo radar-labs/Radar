@@ -4,70 +4,10 @@
 //
 
 import Foundation
-import LibSignalClient
+public import LibSignalClient
 
 extension Usernames {
-    public class HashedUsername {
-        private typealias LibSignalUsername = LibSignalClient.Username
-
-        // MARK: Init
-
-        private let libSignalUsername: LibSignalUsername
-
-        public convenience init(forUsername username: String) throws {
-            self.init(libSignalUsername: try .init(username))
-        }
-
-        private init(libSignalUsername: LibSignalUsername) {
-            self.libSignalUsername = libSignalUsername
-        }
-
-        // MARK: Getters
-
-        /// The raw username.
-        public var usernameString: String {
-            libSignalUsername.value
-        }
-
-        /// The hash of this username, as bytes.
-        var rawHash: Data {
-             libSignalUsername.hash
-         }
-
-        /// The hash of this username, base64url-encoded.
-        lazy var hashString: String = {
-            libSignalUsername.hash.asBase64Url
-        }()
-
-        /// The ZKProof string for this username's hash.
-        lazy var proofString: String = {
-            libSignalUsername.generateProof().asBase64Url
-        }()
-    }
-}
-
-// MARK: - Generate candidates
-
-public extension Usernames.HashedUsername {
-    struct GeneratedCandidates {
-        private let candidates: [Usernames.HashedUsername]
-
-        fileprivate init(candidates: [Usernames.HashedUsername]) {
-            self.candidates = candidates
-        }
-
-        public var candidateHashes: [String] {
-            candidates.map { $0.hashString }
-        }
-
-        public func candidate(matchingHash hashString: String) -> Usernames.HashedUsername? {
-            candidates.first(where: { candidate in
-                candidate.hashString == hashString
-            })
-        }
-    }
-
-    enum CandidateGenerationError: Error {
+    public enum CandidateGenerationError: Error {
         case nicknameCannotBeEmpty
         case nicknameCannotStartWithDigit
         case nicknameContainsInvalidCharacters
@@ -94,27 +34,23 @@ public extension Usernames.HashedUsername {
         }
     }
 
-    static func generateCandidates(
+    public static func generateCandidates(
         forNickname nickname: String,
         minNicknameLength: UInt32,
         maxNicknameLength: UInt32,
-        desiredDiscriminator: String?
-    ) throws -> GeneratedCandidates {
+        desiredDiscriminator: String?,
+    ) throws -> [LibSignalClient.Username] {
         do {
             let nicknameLengthRange = minNicknameLength...maxNicknameLength
             if let desiredDiscriminator {
-                let username = try LibSignalUsername(nickname: nickname, discriminator: desiredDiscriminator, withValidLengthWithin: nicknameLengthRange)
-                return .init(candidates: [.init(libSignalUsername: username)])
+                let username = try LibSignalClient.Username(nickname: nickname, discriminator: desiredDiscriminator, withValidLengthWithin: nicknameLengthRange)
+                return [username]
             }
 
-            let candidates: [Usernames.HashedUsername] = try LibSignalUsername.candidates(
+            return try LibSignalClient.Username.candidates(
                 from: nickname,
-                withValidLengthWithin: nicknameLengthRange
-            ).map { candidate -> Usernames.HashedUsername in
-                return .init(libSignalUsername: candidate)
-            }
-
-            return GeneratedCandidates(candidates: candidates)
+                withValidLengthWithin: nicknameLengthRange,
+            )
         } catch let error {
             if
                 let libSignalError = error as? SignalError,
@@ -125,13 +61,5 @@ public extension Usernames.HashedUsername {
 
             throw error
         }
-    }
-}
-
-// MARK: - Equatable
-
-extension Usernames.HashedUsername: Equatable {
-    public static func == (lhs: Usernames.HashedUsername, rhs: Usernames.HashedUsername) -> Bool {
-        lhs.libSignalUsername.value == rhs.libSignalUsername.value
     }
 }

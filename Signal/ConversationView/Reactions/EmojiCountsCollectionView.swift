@@ -4,11 +4,9 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
-// MARK: -
-
-public struct EmojiItem {
+struct EmojiItem {
     // If a specific emoji is not specified, this item represents "all" emoji
     let emoji: String?
     let count: Int
@@ -16,18 +14,18 @@ public struct EmojiItem {
     let didSelect: () -> Void
 }
 
-public class EmojiCountsCollectionView: UICollectionView {
+class EmojiCountsCollectionView: UICollectionView, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 
     let itemHeight: CGFloat = 36
 
-    public var items = [EmojiItem]() {
+    var items = [EmojiItem]() {
         didSet {
             AssertIsOnMainThread()
             reloadData()
         }
     }
 
-    public init() {
+    init() {
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
@@ -50,15 +48,13 @@ public class EmojiCountsCollectionView: UICollectionView {
         selectItem(at: IndexPath(item: index, section: 0), animated: true, scrollPosition: .centeredHorizontally)
     }
 
-    required public init(coder: NSCoder) {
+    required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-}
 
-// MARK: - UICollectionViewDelegateFlowLayout
+    // MARK: - UICollectionViewDelegateFlowLayout
 
-extension EmojiCountsCollectionView: UICollectionViewDelegateFlowLayout {
-    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         Logger.debug("")
 
         guard let item = items[safe: indexPath.row] else {
@@ -68,21 +64,18 @@ extension EmojiCountsCollectionView: UICollectionViewDelegateFlowLayout {
 
         item.didSelect()
     }
-}
 
-// MARK: - UICollectionViewDataSource
+    // MARK: - UICollectionViewDataSource
 
-extension EmojiCountsCollectionView: UICollectionViewDataSource {
-
-    public func numberOfSections(in collectionView: UICollectionView) -> Int {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
 
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection sectionIdx: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection sectionIdx: Int) -> Int {
         return items.count
     }
 
-    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EmojiCountCell.reuseIdentifier, for: indexPath)
 
         guard let item = items[safe: indexPath.row] else {
@@ -139,10 +132,12 @@ class EmojiCountCell: UICollectionViewCell {
         if item.emoji != nil {
             count.text = item.count.abbreviatedString
         } else {
-            count.text = String(
-                format: OWSLocalizedString("REACTION_DETAIL_ALL_FORMAT",
-                                          comment: "The header used to indicate All reactions to a given message. Embeds {{number of reactions}}"),
-                item.count.abbreviatedString
+            count.text = String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
+                    "REACTION_DETAIL_ALL_FORMAT",
+                    comment: "The header used to indicate All reactions to a given message. Embeds {{number of reactions}}",
+                ),
+                item.count.abbreviatedString,
             )
         }
     }

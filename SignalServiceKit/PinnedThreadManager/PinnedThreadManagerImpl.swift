@@ -4,161 +4,328 @@
 //
 
 import Foundation
+import LibSignalClient
 
-public enum PinnedThreadError: Error {
-    case tooManyPinnedThreads
-}
-
-// MARK: -
-
-public class PinnedThreadManagerImpl: PinnedThreadManager {
+public class PinnedThreadManagerImpl: PinnedThreadManager, PinnedThreadMerger {
 
     private let db: any DB
-    private let pinnedThreadStore: PinnedThreadStoreWrite
+    private let pinnedThreadStore: PinnedThreadStore
+    private let recipientFetcher: RecipientFetcher
+    private let recipientStore: RecipientDatabaseTable
     private let storageServiceManager: StorageServiceManager
     private let threadStore: ThreadStore
 
-    public init(
+    init(
         db: any DB,
-        pinnedThreadStore: PinnedThreadStoreWrite,
+        pinnedThreadStore: PinnedThreadStore,
+        recipientFetcher: RecipientFetcher,
+        recipientStore: RecipientDatabaseTable,
         storageServiceManager: StorageServiceManager,
-        threadStore: ThreadStore
+        threadStore: ThreadStore,
     ) {
         self.db = db
         self.pinnedThreadStore = pinnedThreadStore
+        self.recipientFetcher = recipientFetcher
+        self.recipientStore = recipientStore
         self.storageServiceManager = storageServiceManager
         self.threadStore = threadStore
     }
 
-    public func pinnedThreadIds(tx: DBReadTransaction) -> [String] {
-        return pinnedThreadStore.pinnedThreadIds(tx: tx)
+    public func pinnedThreadOrder(forThread thread: TSThread, tx: DBReadTransaction) -> Int64? {
+        guard let threadId = fetchPinnedThreadId(forThread: thread, tx: tx) else {
+            return nil
+        }
+        return pinnedThreadStore.fetchPinnedThreadRecord(forThreadId: threadId, tx: tx)?.id
     }
 
-    public func pinnedThreads(tx: DBReadTransaction) -> [TSThread] {
-        return pinnedThreadIds(tx: tx).compactMap { threadId in
-            guard let thread = threadStore.fetchThread(uniqueId: threadId, tx: tx) else {
-                Logger.warn("pinned thread record no longer exists \(threadId)")
+    private func fetchPinnedThreadId(
+        forThread thread: TSThread,
+        tx: DBReadTransaction,
+    ) -> PinnedThreadId? {
+        return _fetchPinnedThreadId(
+            forThread: thread,
+            fetchOrCreateRecipient: { recipientStore.fetchRecipient(contactThread: $0, tx: tx) },
+        )
+    }
+
+    private func insertPinnedThreadId(
+        forThread thread: TSThread,
+        tx: DBWriteTransaction,
+    ) -> PinnedThreadId? {
+        return _fetchPinnedThreadId(
+            forThread: thread,
+            fetchOrCreateRecipient: {
+                if let aci = $0.contactAddress.serviceId as? Aci {
+                    return recipientFetcher.fetchOrCreate(serviceId: aci, tx: tx)
+                }
+                if let phoneNumber = E164($0.contactAddress.phoneNumber) {
+                    return recipientFetcher.fetchOrCreate(phoneNumber: phoneNumber, tx: tx)
+                }
+                if let pni = $0.contactAddress.serviceId as? Pni {
+                    return recipientFetcher.fetchOrCreate(serviceId: pni, tx: tx)
+                }
+                return nil
+            },
+        )
+    }
+
+    private func _fetchPinnedThreadId(
+        forThread thread: TSThread,
+        fetchOrCreateRecipient: (TSContactThread) -> SignalRecipient?,
+    ) -> PinnedThreadId? {
+        switch thread {
+        case let thread as TSContactThread:
+            guard let recipient = fetchOrCreateRecipient(thread) else {
+                return nil
+            }
+            return .recipientId(recipient.id)
+        case let thread as TSGroupThread:
+            return .groupId(thread.groupId)
+        case is TSReleaseNotesThread:
+            return .releaseNotes
+        case is TSPrivateStoryThread:
+            // Can't be pinned.
+            return nil
+        default:
+            owsFailDebug("unknown type: \(type(of: thread))")
+            return nil
+        }
+    }
+
+    private func _pinnedThread(
+        forThreadId threadId: PinnedThreadId,
+        tx: DBReadTransaction,
+    ) -> TSThread? {
+        switch threadId {
+        case .releaseNotes:
+            return threadStore.fetchThread(uniqueId: TSReleaseNotesThread.releaseNotesUniqueId, tx: tx)
+        case .groupId(let groupId):
+            return threadStore.fetchThread(forGroupIdData: groupId, tx: tx)
+        case .recipientId(let recipientId):
+            guard let recipient = recipientStore.fetchRecipient(rowId: recipientId, tx: tx) else {
+                owsFailDebug("missing recipient specified via foreign key")
+                return nil
+            }
+            return threadStore.fetchContactThread(recipient: recipient, tx: tx)
+        }
+    }
+
+    private func _isVisiblePinnedThread(_ thread: TSThread) -> Bool {
+        return thread.shouldThreadBeVisible && !thread.isArchived
+    }
+
+    public func pinnedThreads(
+        filterToVisible: Bool,
+        tx: DBReadTransaction,
+    ) -> [TSThread] {
+        return pinnedThreadStore.fetchPinnedThreadRecords(tx: tx).compactMap {
+            guard let thread = _pinnedThread(forThreadId: $0.threadId, tx: tx) else {
                 return nil
             }
 
-            let associatedData = threadStore.fetchOrDefaultAssociatedData(for: thread, tx: tx)
-
-            // Ignore deleted or archived pinned threads. These should exist, but it's
-            // possible they are incorrectly received from linked devices.
-            guard canPin(thread, with: associatedData) else {
-                Logger.warn("Ignoring deleted or archived pinned thread \(threadId)")
+            if
+                filterToVisible,
+                !_isVisiblePinnedThread(thread)
+            {
+                Logger.warn("Ignoring deleted or archived pinned thread \(thread.uniqueId)")
                 return nil
             }
+
             return thread
         }
     }
 
-    public func isThreadPinned(_ thread: TSThread, tx: DBReadTransaction) -> Bool {
-        return pinnedThreadStore.isThreadPinned(thread, tx: tx)
+    public func setPinnedThreads(
+        _ newThreads: [TSThread],
+        updateStorageService: Bool,
+        tx: DBWriteTransaction,
+    ) {
+        setPinnedThreadIds(
+            newThreads.compactMap({
+                let threadId = fetchPinnedThreadId(forThread: $0, tx: tx)
+                owsAssertDebug(threadId != nil, "can't pin un-pinnable thread: \(type(of: $0))")
+                return threadId
+            }),
+            updateStorageService: updateStorageService,
+            tx: tx,
+        )
     }
 
-    public func updatePinnedThreadIds(
-        _ pinnedThreadIds: [String],
+    public func setPinnedThreadIds(
+        _ threadIds: [PinnedThreadId],
         updateStorageService: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
-        let previousPinnedThreadIds = pinnedThreadStore.pinnedThreadIds(tx: tx)
-        pinnedThreadStore.updatePinnedThreadIds(pinnedThreadIds, tx: tx)
-        // Read again to get the final new value.
-        let pinnedThreadIds = pinnedThreadStore.pinnedThreadIds(tx: tx)
-
-        if previousPinnedThreadIds != pinnedThreadIds {
-            let changedThreadIds = Set(previousPinnedThreadIds).symmetricDifference(pinnedThreadIds)
-
-            // Touch any threads whose pin state changed, so we update the UI
-            for threadId in changedThreadIds {
-                guard let thread = threadStore.fetchThread(uniqueId: threadId, tx: tx) else {
-                    // In some legitimate cases, we may not yet have a thread for a pinned
-                    // thread. For example, if you received a pinned GV2 thread via a storage
-                    // sync, but have not yet fetched the GV2 thread. We'll update the UI to
-                    // reflect it when the thread is ready.
-                    continue
+        var didUpdate = false
+        var oldPinnedThreads = pinnedThreadStore.fetchPinnedThreadRecords(tx: tx)[...]
+        threadIds.removingDuplicates().forEach { threadId in
+            // Iterate through existing pinned threads, removing any that don't match.
+            // (Some of these may appear later in `threadIds`, and if that's the case,
+            // we'll remove them and then re-insert them in the right order.)
+            while !oldPinnedThreads.isEmpty {
+                let oldPinnedThread = oldPinnedThreads.removeFirst()
+                if oldPinnedThread.threadId == threadId {
+                    // It's already pinned; woo hoo!
+                    return /* aka continue threadIds.forEach */
                 }
-
-                let associatedData = threadStore.fetchOrDefaultAssociatedData(for: thread, tx: tx)
-
-                if pinnedThreadIds.contains(threadId) && (associatedData.isArchived || !thread.shouldThreadBeVisible) {
-                    // Pinning a thread should unarchive it and make it visible if it was not already so.
-                    threadStore.updateAssociatedData(
-                        associatedData,
-                        isArchived: false,
-                        updateStorageService: updateStorageService,
-                        tx: tx
-                    )
-                    threadStore.update(thread, withShouldThreadBeVisible: true, tx: tx)
-                } else {
-                    self.db.touch(thread: thread, shouldReindex: false, shouldUpdateChatListUi: true, tx: tx)
-                }
+                _unpinThread(oldPinnedThread, tx: tx)
+                didUpdate = true
             }
+            // If we didn't find a match, we have unpinned everything after the point
+            // where this thread should be pinned, and we can now pin this thread.
+            _pinThread(threadId: threadId, updateStorageService: updateStorageService, tx: tx)
+            didUpdate = true
+        }
+        // If we matched all the intended threads and there are any pinned threads
+        // left over, unpin them.
+        for oldPinnedThread in oldPinnedThreads {
+            _unpinThread(oldPinnedThread, tx: tx)
+            didUpdate = true
+        }
+        if didUpdate {
+            didUpdatePinnedThreads(updateStorageService: updateStorageService, tx: tx)
         }
     }
 
     public func pinThread(
         _ thread: TSThread,
         updateStorageService: Bool,
-        tx: DBWriteTransaction
-    ) throws {
-        // When pinning a thread, we want to treat the existing list of pinned
-        // threads as only those that actually have current threads. Otherwise,
-        // there may be a pinned thread that you can't see preventing you from
-        // pinning a new conversation (e.g. a v2 group we haven't created yet)
-        var pinnedThreadIds = pinnedThreads(tx: tx).map { $0.uniqueId }
-
-        guard !pinnedThreadIds.contains(thread.uniqueId) else {
-            throw OWSGenericError("Attempted to pin thread that is already pinned.")
+        tx: DBWriteTransaction,
+    ) throws(TooManyPinnedThreadsError) {
+        guard let threadId = insertPinnedThreadId(forThread: thread, tx: tx) else {
+            owsFailDebug("can't pin thread without threadId: \(type(of: thread))")
+            return
         }
 
-        guard pinnedThreadIds.count < PinnedThreads.maxPinnedThreads else { throw PinnedThreadError.tooManyPinnedThreads }
+        let pinnedThreads = pinnedThreadStore.fetchPinnedThreadRecords(tx: tx)
 
-        pinnedThreadIds.append(thread.uniqueId)
-        updatePinnedThreadIds(pinnedThreadIds, updateStorageService: updateStorageService, tx: tx)
-
-        if updateStorageService {
-            storageServiceManager.recordPendingLocalAccountUpdates()
+        if pinnedThreads.contains(where: { $0.threadId == threadId }) {
+            Logger.info("Skipping already-pinned \(threadId)")
+            return
         }
+
+        if pinnedThreads.count >= PinnedThreads.maxPinnedThreads {
+            // When pinning a thread, we want to enforce the limit against the pinned
+            // threads that are actually visible as pinned threads (e.g., they exist,
+            // they're not archived). Otherwise, there may be a pinned thread that you
+            // can't see yet preventing you from pinning a new conversation.
+            //
+            // However, we also don't want to clear pinned threads unless necessary
+            // (e.g., a pinned group that's restoring should remain pinned).
+            //
+            // So, if there's a visible/invisible pinned thread mismatch, we'll replace
+            // on invisible pinned thread with the one currently being pinned.
+            let firstMissingThreadIndex = pinnedThreads.firstIndex(where: {
+                guard let thread = _pinnedThread(forThreadId: $0.threadId, tx: tx) else {
+                    return true
+                }
+                return !_isVisiblePinnedThread(thread)
+            })
+            guard let firstMissingThreadIndex else {
+                throw TooManyPinnedThreadsError()
+            }
+            Logger.warn("un-pinning missing thread")
+            _unpinThread(pinnedThreads[firstMissingThreadIndex], tx: tx)
+        }
+
+        // Pinning a thread should unarchive it and make it visible if it was not already so.
+        if thread.isArchived {
+            threadStore.updateThread(
+                thread,
+                isArchived: false,
+                updateStorageService: updateStorageService,
+                tx: tx,
+            )
+        }
+        if !thread.shouldThreadBeVisible {
+            threadStore.update(thread, withShouldThreadBeVisible: true, tx: tx)
+        }
+
+        _pinThread(threadId: threadId, updateStorageService: updateStorageService, tx: tx)
+
+        didUpdatePinnedThreads(updateStorageService: updateStorageService, tx: tx)
+    }
+
+    private func _pinThread(threadId: PinnedThreadId, updateStorageService: Bool, tx: DBWriteTransaction) {
+        let pinnedThread = PinnedThreadRecord.insertRecord(threadId: threadId, tx: tx)
+        Logger.info("Pinned \(threadId) with order \(pinnedThread.id)")
+        didPinThread(threadId: threadId, updateStorageService: updateStorageService, tx: tx)
+    }
+
+    private func didPinThread(
+        threadId: PinnedThreadId,
+        updateStorageService: Bool,
+        tx: DBWriteTransaction,
+    ) {
+        guard let thread = _pinnedThread(forThreadId: threadId, tx: tx) else {
+            return
+        }
+
+        self.db.touch(thread: thread, shouldReindex: false, shouldUpdateChatListUi: true, tx: tx)
     }
 
     public func unpinThread(
         _ thread: TSThread,
         updateStorageService: Bool,
-        tx: DBWriteTransaction
-    ) throws {
-        var pinnedThreadIds = pinnedThreadStore.pinnedThreadIds(tx: tx)
+        tx: DBWriteTransaction,
+    ) {
+        guard
+            let threadId = fetchPinnedThreadId(forThread: thread, tx: tx),
+            let pinnedThread = pinnedThreadStore.fetchPinnedThreadRecord(forThreadId: threadId, tx: tx)
+        else {
+            return
+        }
+        _unpinThread(pinnedThread, tx: tx)
+        didUpdatePinnedThreads(updateStorageService: updateStorageService, tx: tx)
+    }
 
-        guard let idx = pinnedThreadIds.firstIndex(of: thread.uniqueId) else {
-            throw OWSGenericError("Attempted to unpin thread that is not pinned.")
+    private func _unpinThread(_ pinnedThread: PinnedThreadRecord, tx: DBWriteTransaction) {
+        failIfThrows {
+            try pinnedThread.delete(tx.database)
+        }
+        Logger.info("Unpinned \(pinnedThread.threadId) with order \(pinnedThread.id)")
+        didUnpinThread(threadId: pinnedThread.threadId, tx: tx)
+    }
+
+    private func didUnpinThread(threadId: PinnedThreadId, tx: DBWriteTransaction) {
+        guard let thread = _pinnedThread(forThreadId: threadId, tx: tx) else {
+            return
         }
 
-        pinnedThreadIds.remove(at: idx)
-        updatePinnedThreadIds(pinnedThreadIds, updateStorageService: updateStorageService, tx: tx)
+        self.db.touch(thread: thread, shouldReindex: false, shouldUpdateChatListUi: true, tx: tx)
+    }
 
+    private func didUpdatePinnedThreads(updateStorageService: Bool, tx: DBWriteTransaction) {
         if updateStorageService {
-            self.storageServiceManager.recordPendingLocalAccountUpdates()
+            tx.addSyncCompletion { [storageServiceManager] in
+                storageServiceManager.recordPendingLocalAccountUpdates()
+            }
         }
     }
 
-    public func handleUpdatedThread(_ thread: TSThread, tx: DBWriteTransaction) {
-        guard pinnedThreadStore.pinnedThreadIds(tx: tx).contains(thread.uniqueId) else { return }
-
-        let associatedData = threadStore.fetchOrDefaultAssociatedData(for: thread, tx: tx)
-
-        // If we now can't pin a thread, we should unpin it.
-        guard !canPin(thread, with: associatedData) else { return }
-
-        do {
-            try unpinThread(thread, updateStorageService: true, tx: tx)
-        } catch {
-            owsFailDebug("Failed to upin updated thread \(error)")
+    func mergeRecipientId(
+        _ recipientId: SignalRecipient.RowId,
+        into targetRecipientId: SignalRecipient.RowId,
+        updateStorageService: Bool,
+        tx: DBWriteTransaction,
+    ) {
+        let pinnedThread = pinnedThreadStore.fetchPinnedThreadRecord(forThreadId: .recipientId(recipientId), tx: tx)
+        guard var pinnedThread else {
+            // The recipient we're deleting isn't pinned; there's nothing to change.
+            return
         }
-    }
-
-    private func canPin(_ thread: TSThread, with associatedData: ThreadAssociatedData) -> Bool {
-        owsAssertDebug(thread.uniqueId == associatedData.threadUniqueId)
-        return thread.shouldThreadBeVisible && !associatedData.isArchived
+        let targetPinnedThread = pinnedThreadStore.fetchPinnedThreadRecord(forThreadId: .recipientId(targetRecipientId), tx: tx)
+        if targetPinnedThread != nil {
+            // The one we're merging into is already pinned; delete the redundant pin.
+            _unpinThread(pinnedThread, tx: tx)
+        } else {
+            // The one we're merging into needs to be pinned; pin it now.
+            let threadId = PinnedThreadId.recipientId(targetRecipientId)
+            Logger.info("Moving pin with order \(pinnedThread.id) to \(threadId)")
+            pinnedThread.threadId = threadId
+            failIfThrows { try pinnedThread.update(tx.database) }
+            didPinThread(threadId: threadId, updateStorageService: updateStorageService, tx: tx)
+        }
+        didUpdatePinnedThreads(updateStorageService: updateStorageService, tx: tx)
     }
 }

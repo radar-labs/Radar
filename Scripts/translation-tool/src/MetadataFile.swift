@@ -9,6 +9,7 @@ import Foundation
 private let languageMap: [String: [String]] = [
     // These languages are returned from Smartling and need to be moved to their correct final destination.
     "ar": ["ar-SA"],
+    "bn-BD": ["bn-BD"],
     "ca": ["ca"],
     "cs": ["cs"],
     "da": ["da"],
@@ -17,6 +18,7 @@ private let languageMap: [String: [String]] = [
     "es": ["es-ES", "es-MX"],
     "fi": ["fi"],
     "fr": ["fr-CA", "fr-FR"],
+    "gu-IN": ["gu-IN"],
     "he": ["he"],
     "hi-IN": ["hi"],
     "hr-HR": ["hr"],
@@ -25,6 +27,7 @@ private let languageMap: [String: [String]] = [
     "it": ["it"],
     "ja": ["ja"],
     "ko": ["ko"],
+    "mr-IN": ["mr-IN"],
     "ms": ["ms"],
     "nb": ["no"],
     "nl": ["nl-NL"],
@@ -38,20 +41,19 @@ private let languageMap: [String: [String]] = [
     "th": ["th"],
     "tr": ["tr"],
     "uk-UA": ["uk"],
+    "ur": ["ur-PK"],
     "vi": ["vi"],
     "zh-CN": ["zh-Hans"],
-    "zh-HK": ["zh-Hant"]
+    "zh-HK": ["zh-Hant"],
 
     // These don't exist in App Store Connect, so there's no need to fetch them from Smartling.
     // "be-BY": [],
-    // "bn-BD": [],
+    // "bg-BG": [],
     // "fa-IR": [],
     // "ga-IE": [],
-    // "gu-IN": [],
-    // "mr-IN": [],
+    // "lt-LT": [],
     // "sr-YR": [],
     // "ug": [],
-    // "ur": [],
     // "yue": [],
     // "zh-TW": [],
 ]
@@ -91,7 +93,7 @@ struct MetadataFile: TranslatableFile {
             let localRelativePath = relativePath(for: localIdentifier)
             try FileManager.default.copyItem(
                 at: fileURL,
-                replacingItemAt: repositoryURL.appendingPathComponent(localRelativePath)
+                replacingItemAt: repositoryURL.appendingPathComponent(localRelativePath),
             )
             print("Saved \(localRelativePath)")
         }
@@ -101,7 +103,7 @@ struct MetadataFile: TranslatableFile {
         try checkForUnusedLocalizations(
             in: repositoryURL.appendingPathComponent(Self.relativeDirectoryPath),
             suffix: "",
-            expectedLocalizations: languageMap.flatMap { $1 } + extraEnglishLanguages + ["en-US"]
+            expectedLocalizations: languageMap.flatMap { $1 } + extraEnglishLanguages + ["en-US"],
         )
     }
 }

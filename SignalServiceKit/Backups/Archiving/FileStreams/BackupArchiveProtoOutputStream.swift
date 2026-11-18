@@ -3,78 +3,54 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-extension BackupArchive {
-    public enum ProtoOutputStreamWriteResult {
-        case success
-        /// Unable to serialize the provided proto object.
-        /// Should never happen, and catastrophic if it does.
-        case protoSerializationError(Swift.Error)
-        /// Failure writing at file I/O level.
-        case fileIOError(Swift.Error)
-    }
-}
-
-// MARK: -
-
-/**
- * Output stream for reading and writing a backup file on disk.
- *
- * The backup file is just a sequence of serialized proto bytes, back to back, delimited by varint
- * byte sizes so we know how much to read into memory to deserialize the next proto.
- * The output stream abstracts over this, and allows callers to just think in terms of "frames",
- * the individual proto objects that we write one at a time.
- */
-class BackupArchiveProtoOutputStream {
-    private let outputStream: OutputStreamable
+/// Output stream for writing a "varint-proto" Backup file, where headers and
+/// frames are represented as concatenated, varint-prefixed serialized protos.
+class BackupArchiveProtoOutputStream: BackupArchiveOutputStream {
+    private let outputStream: TransformingOutputStream
     private let exportProgress: BackupArchiveExportProgress?
 
+    /// - Important
+    /// In practice, the "varint-prefixing" of serialized protos is implemented
+    /// via a `ChunkedOutputStreamTransform`. Consequently, callers must include
+    /// a `ChunkedOutputStreamTransform` in the passed list of transforms.
     init(
-        outputStream: OutputStreamable,
-        exportProgress: BackupArchiveExportProgress?
+        transforms: [any StreamTransform],
+        outputStream: any OutputStreamable,
+        exportProgress: BackupArchiveExportProgress?,
     ) {
-        self.outputStream = outputStream
+        owsPrecondition(transforms.contains(where: { $0 is ChunkedOutputStreamTransform }))
+
+        self.outputStream = TransformingOutputStream(
+            transforms: transforms,
+            outputStream: outputStream,
+        )
         self.exportProgress = exportProgress
     }
 
-    /// Write a header (``BackupProto_BackupInfo``) to the backup file.
-    ///
-    /// - Important
-    /// It is the caller's responsibility to ensure this is always written, and
-    /// is the first thing written, in order to produce a valid backup file.
-    func writeHeader(_ header: BackupProto_BackupInfo) -> BackupArchive.ProtoOutputStreamWriteResult {
-        let bytes: Data
-        do {
-            bytes = try header.serializedData()
-        } catch {
-            return .protoSerializationError(error)
+    func writeHeader(_ header: BackupProto_BackupInfo) throws {
+        let bytes = failIfThrows {
+            try header.serializedData()
         }
-        do {
-            try outputStream.write(data: bytes)
-        } catch {
-            return .fileIOError(error)
-        }
+
+        let options = [GzipStreamTransform.optionsKey: GzipStreamTransform.Options.forceFlush]
+        try outputStream.write(data: bytes, options: options)
         exportProgress?.didExportFrame()
-        return .success
     }
 
-    /// Write a frame to the backup file.
-    func writeFrame(_ frame: BackupProto_Frame) -> BackupArchive.ProtoOutputStreamWriteResult {
-        let bytes: Data
-        do {
-            bytes = try frame.serializedData()
-        } catch {
-            return .protoSerializationError(error)
+    func writeFrame(_ frame: BackupProto_Frame, flush: BackupArchiveFlushBehavior?) throws {
+        let bytes = failIfThrows {
+            try frame.serializedData()
         }
-        do {
-            try outputStream.write(data: bytes)
-        } catch {
-            return .fileIOError(error)
+
+        let options: StreamTransform.Options = switch flush {
+        case nil: [:]
+        case .afterWrite: [GzipStreamTransform.optionsKey: GzipStreamTransform.Options.forceFlush]
+        case .afterInterval: [GzipStreamTransform.optionsKey: GzipStreamTransform.Options.intervalFlush]
         }
+        try outputStream.write(data: bytes, options: options)
         exportProgress?.didExportFrame()
-        return .success
     }
 
-    /// Closes the output stream.
     func closeFileStream() throws {
         exportProgress?.didCloseStream()
         try outputStream.close()

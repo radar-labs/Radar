@@ -7,39 +7,49 @@ import CryptoKit
 import Foundation
 
 public class MetadataStreamTransform: StreamTransform, FinalizableStreamTransform {
-    public var hasFinalized: Bool = false
+    public var hasFinalized: Bool { result != nil }
 
-    private var sha256Result: SHA256.Digest?
-    private var sha256State: SHA256?
+    private var result: SHA256.Digest?
+    private var hasher: SHA256
 
     public func digest() throws -> Data {
-        guard hasFinalized else {
+        guard let result else {
             throw OWSAssertionError("Reading digest before finalized")
         }
-        guard let sha256Result else {
-            throw OWSAssertionError("Not configured to calculate digest")
-        }
-        return Data(sha256Result)
+        return Data(result)
     }
 
-    init(calculateDigest: Bool) {
-        if calculateDigest {
-            self.sha256State = SHA256()
-        }
+    init() {
+        self.hasher = SHA256()
     }
 
     public private(set) var count: Int = 0
 
-    public func transform(data: Data) -> Data {
-        sha256State?.update(data: data)
+    public func transform(data: Data, options: Options) -> Data {
+        hasher.update(data: data)
+        count += data.count
+        return data
+    }
+
+    public func finalize() -> Data {
+        owsPrecondition(result == nil)
+        result = hasher.finalize()
+        return Data()
+    }
+}
+
+public class ByteCountStreamTransform: StreamTransform, FinalizableStreamTransform {
+    public var hasFinalized = false
+
+    public private(set) var count: Int = 0
+
+    public func transform(data: Data, options: Options) -> Data {
         count += data.count
         return data
     }
 
     public func finalize() -> Data {
         hasFinalized = true
-        sha256Result = sha256State?.finalize()
-        sha256State = nil
         return Data()
     }
 }

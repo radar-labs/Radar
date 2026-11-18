@@ -4,7 +4,7 @@
 //
 
 import Foundation
-import LibSignalClient
+public import LibSignalClient
 
 public class CallMessagePushPayload: CustomStringConvertible {
     private static let identifierKey = "CallMessageRelayPayload"
@@ -29,7 +29,7 @@ public class CallMessagePushPayload: CustomStringConvertible {
 }
 
 public class CallMessageRelay {
-    private static let pendingCallMessageStore = KeyValueStore(collection: "PendingCallMessageStore")
+    private static let pendingCallMessageStore = NewKeyValueStore(collection: "PendingCallMessageStore")
 
     public static func handleVoipPayload(_ payload: CallMessagePushPayload) {
         Logger.info("Handling incoming VoIP payload: \(payload)")
@@ -37,11 +37,13 @@ public class CallMessageRelay {
         // Process all the pending call messages from the NSE in 1 batch.
         // This should almost always be a batch of one.
         SSKEnvironment.shared.databaseStorageRef.write { transaction in
-            defer { pendingCallMessageStore.removeAll(transaction: transaction) }
+            defer { pendingCallMessageStore.removeAll(tx: transaction) }
             let pendingPayloads: [Payload]
 
             do {
-                pendingPayloads = try pendingCallMessageStore.allCodableValues(transaction: transaction).sorted {
+                pendingPayloads = try pendingCallMessageStore.fetchKeys(tx: transaction).compactMap {
+                    return try pendingCallMessageStore.fetchJSONAsValue(Payload.self, forKey: $0, tx: transaction)
+                }.sorted {
                     $0.envelope.timestamp < $1.envelope.timestamp
                 }
             } catch {
@@ -49,7 +51,7 @@ public class CallMessageRelay {
                 return
             }
 
-            guard let localIdentifiers = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: transaction) else {
+            guard let registeredState = try? DependenciesBridge.shared.tsAccountManager.registeredState(tx: transaction) else {
                 owsFailDebug("Can't process VoIP payload when not registered.")
                 return
             }
@@ -61,18 +63,18 @@ public class CallMessageRelay {
                 // This ensures that if we process a very old ring message, it will correctly be considered "expired".
                 // "This should never happen" in normal operation, but in practice we have seen it happen,
                 // e.g. when there's a crash processing the queued ring message.
-                let delaySecondsSinceDelivery = -(payload.enqueueTimestamp?.timeIntervalSinceNow ?? 0)
-                let adjustedDeliveryTimestamp =
-                    payload.serverDeliveryTimestamp + UInt64(1000 * max(0, delaySecondsSinceDelivery))
+                let delaySinceDelivery = max(0, -(payload.enqueueTimestamp?.timeIntervalSinceNow ?? 0))
+                let adjustedDeliveryDate = Date(millisecondsSince1970: payload.serverDeliveryTimestamp)
+                    .addingTimeInterval(delaySinceDelivery)
 
                 SSKEnvironment.shared.messageReceiverRef.processEnvelope(
                     payload.envelope,
                     plaintextData: payload.plaintextData,
                     wasReceivedByUD: payload.wasReceivedByUD,
-                    serverDeliveryTimestamp: adjustedDeliveryTimestamp,
+                    serverDeliveryTimestamp: adjustedDeliveryDate.ows_millisecondsSince1970,
                     shouldDiscardVisibleMessages: false,
-                    localIdentifiers: localIdentifiers,
-                    tx: transaction
+                    registeredState: registeredState,
+                    tx: transaction,
                 )
             }
         }
@@ -80,20 +82,20 @@ public class CallMessageRelay {
 
     public static func enqueueCallMessageForMainApp(
         envelope: SSKProtoEnvelope,
+        callerAci: Aci,
         plaintextData: Data,
         wasReceivedByUD: Bool,
         serverDeliveryTimestamp: UInt64,
-        transaction: DBWriteTransaction
-    ) throws -> CallMessagePushPayload {
+        transaction: DBWriteTransaction,
+    ) -> CallMessagePushPayload {
         let payload = Payload(
             envelope: envelope,
             plaintextData: plaintextData,
             wasReceivedByUD: wasReceivedByUD,
             serverDeliveryTimestamp: serverDeliveryTimestamp,
-            enqueueTimestamp: Date()
+            enqueueTimestamp: Date(),
         )
-
-        try pendingCallMessageStore.setCodable(payload, key: "\(envelope.timestamp)", transaction: transaction)
+        pendingCallMessageStore.writeValueAsJSON(payload, forKey: "\(callerAci.serviceIdString);\(envelope.timestamp)", tx: transaction)
         return CallMessagePushPayload()
     }
 

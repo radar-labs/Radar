@@ -16,29 +16,31 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
-env:
-  # Path format pulled from https://github.com/actions/runner-images/blob/main/images/macos/macos-15-Readme.md#xcode
-  DEVELOPER_DIR: /Applications/Xcode_26.0.app
-
 jobs:
   build_and_test:
+    # Radar: upstream Signal workflow, gated to signalapp repositories.
+    if: ${{ github.repository_owner == 'signalapp' }}
     name: Build and Test
     timeout-minutes: 20
-    runs-on: macos-15-xlarge
+    runs-on: ${{matrix.os}}
     env:
       FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 7
 
     strategy:
       matrix:
         # Add additional Xcode versions here if necessary.
-        xcode: ["Xcode_26.0"]
+        xcode: ["Xcode_27.1"]
+        include:
+          - xcode: Xcode_27.1
+            os: xcode-27-xlarge
 
+    # Path format pulled from https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md#xcode
     steps:
       - name: Set Xcode version
         run: |
           echo DEVELOPER_DIR=/Applications/${{matrix.xcode}}.app >> "$GITHUB_ENV"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check Xcode version
         run: |
@@ -62,67 +64,44 @@ jobs:
           bundler-cache: true
 
       - name: Build and Test
-        run: |
-          function formatFailures() {
-            grep '<failure message' fastlane/test_output/report.junit | sed -E "s/^.*<failure message='(.*)'>(.*):([0-9]+)<\/failure>/::error file=\2,line=\3::\1/" | sed -E 's/&quot;/"/g'
-            exit 1
-          }
-
-          bundle exec fastlane scan \
-            --scheme Signal \
-            --output_types junit \
-            --skip_package_dependencies_resolution \
-            --disable_package_automatic_updates \
-            --xcargs '-test-timeouts-enabled YES -maximum-test-execution-time-allowance 300 -default-test-execution-time-allowance 60' \
-            || formatFailures
+        run: Scripts/build-and-test.sh
 
       - name: Upload build logs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: Logs
-          path: ~/Library/Logs/scan
+          path: ~/Library/Logs/Signal-CI
+
+      - name: Normalize database schema
+        run: |
+          touch -d 2026-01-01T00:00:00 ~/Library/Signal-iOS-Schema/schema.json
+
+      - name: Upload database schema
+        uses: actions/upload-artifact@v6
+        with:
+          name: Database Schema
+          path: ~/Library/Signal-iOS-Schema
 
   check_autogenstrings:
     name: Check if strings file is outdated
 
     timeout-minutes: 10
 
-    runs-on: macos-15
+    runs-on: macos-26
 
-    if: github.event_name == 'pull_request'
+    # Radar: upstream Signal workflow, gated to signalapp repositories.
+    if: github.repository_owner == 'signalapp' && github.event_name == 'pull_request'
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Set Xcode version
+        run: |
+          echo DEVELOPER_DIR=/Applications/Xcode_26.6.app >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@v6
 
       - name: Run genstrings
         run: Scripts/translation/auto-genstrings
 
       - name: Check for any changes
         run: git diff --exit-code
-
-  lint:
-    name: Lint
-
-    timeout-minutes: 5
-
-    runs-on: macos-15
-
-    if: github.event_name == 'pull_request'
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Fetch base commit
-        run: git fetch origin --depth 1 ${{ github.base_ref }}
-
-      - name: Install Dependencies
-        run: brew install clang-format swiftlint
-
-      - name: Lint files changed in the PR
-        run: |
-          Scripts/precommit.py --ref origin/${{ github.base_ref }}
-
-          # https://help.github.com/en/actions/reference/development-tools-for-github-actions#logging-commands
-          git diff --name-only | sed -E 's|(.*)|::error file=\1::Incorrectly formatted (Scripts/precommit.py)|'
-          git diff --exit-code || exit 1

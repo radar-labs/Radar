@@ -27,20 +27,9 @@ public struct OWSSequentialProgress<StepEnum>: Equatable, SomeOWSProgress where 
     public var totalUnitCount: UInt64 { progress.totalUnitCount }
 
     /// Get the latest progress for any source/sink at any layer of the progress tree.
-    /// Maps from source/child sink label to the progress of that node.
-    /// Note: if there are multiple children with the same label, will pick an
-    /// arbitrary child. In most cases, there will be just one child and this
-    /// is fine and this API is provided for simplicity.
-    /// If not, use `progressesForAllChildren` to get the full acounting
-    /// of duplicate labels.
-    public func progressForChild(label: String) -> OWSProgress.ChildProgress? {
-        return progress.progressForChild(label: label)
-    }
-
-    /// Get the latest progress for any source/sink at any layer of the progress tree.
     /// Maps from source/child sink label to the progress of all nodes with that label.
-    public func progressesForAllChildren(withLabel label: String) -> [OWSProgress.ChildProgress] {
-        return progress.progressesForAllChildren(withLabel: label)
+    public func descendantProgresses(withLabel label: String) -> some Collection<OWSProgress.ChildProgress> {
+        return progress.descendantProgresses(withLabel: label)
     }
 
     public var percentComplete: Float { return progress.percentComplete }
@@ -52,8 +41,7 @@ public struct OWSSequentialProgress<StepEnum>: Equatable, SomeOWSProgress where 
     }
 
     public func progress(for step: StepEnum) -> OWSProgress.ChildProgress? {
-        return self.progressesForAllChildren(withLabel: step.rawValue)
-            .first(where: { $0.parentLabel == nil })
+        return self.descendantProgresses(withLabel: step.rawValue).first(where: { $0.parentLabel == nil })
     }
 
     public var currentStep: StepEnum {
@@ -81,16 +69,16 @@ public struct OWSSequentialProgress<StepEnum>: Equatable, SomeOWSProgress where 
     /// Create a root sink, taking the single observer block of progress updates.
     /// See class docs of ``OWSProgress`` for usage.
     public static func createSink(
-        _ observer: @escaping (OWSSequentialProgress<StepEnum>) async -> Void
-    ) async -> OWSSequentialProgressRootSink<StepEnum> {
+        _ observer: @escaping (OWSSequentialProgress<StepEnum>) async -> Void,
+    ) -> OWSSequentialProgressRootSink<StepEnum> {
         let sink = OWSProgress.createSink { progress in
             await observer(progress.sequential(StepEnum.self))
         }
-        return await OWSSequentialProgressRootSink(sink: sink)
+        return OWSSequentialProgressRootSink(sink: sink)
     }
 
     /// Like ``createSink(_:)``, but instead of using an observer block to emit progress values, emits using a returned AsyncStream.
-    public static func createSink() async -> (OWSSequentialProgressRootSink<StepEnum>, AsyncStream<OWSSequentialProgress<StepEnum>>) {
+    public static func createSink() -> (OWSSequentialProgressRootSink<StepEnum>, AsyncStream<OWSSequentialProgress<StepEnum>>) {
         var stepStreamContinuation: AsyncStream<OWSSequentialProgress<StepEnum>>.Continuation!
         let stepStream = AsyncStream<OWSSequentialProgress<StepEnum>> { continuation in
             stepStreamContinuation = continuation
@@ -102,7 +90,7 @@ public struct OWSSequentialProgress<StepEnum>: Equatable, SomeOWSProgress where 
             }
             stepStreamContinuation.finish()
         }
-        return await (OWSSequentialProgressRootSink(sink: sink), stepStream)
+        return (OWSSequentialProgressRootSink(sink: sink), stepStream)
     }
 }
 
@@ -114,11 +102,11 @@ public struct OWSSequentialProgressRootSink<StepEnum: OWSSequentialProgressStep>
 
     private let children: [StepEnum: OWSProgressSink]
 
-    fileprivate init(sink: OWSProgressSink) async {
+    fileprivate init(sink: OWSProgressSink) {
         self.sink = sink
         var children = [StepEnum: OWSProgressSink]()
         for step in StepEnum.allCases {
-            children[step] = await sink.addChild(withLabel: step.rawValue, unitCount: step.progressUnitCount)
+            children[step] = sink.addChild(withLabel: step.rawValue, unitCount: step.progressUnitCount)
         }
         self.children = children
     }
@@ -131,7 +119,7 @@ public struct OWSSequentialProgressRootSink<StepEnum: OWSSequentialProgressStep>
 extension OWSProgress {
 
     public func sequential<StepEnum>(
-        _ stepEnum: StepEnum.Type
+        _ stepEnum: StepEnum.Type,
     ) -> OWSSequentialProgress<StepEnum> where StepEnum: CaseIterable, StepEnum: RawRepresentable<String> {
         return .init(progress: self)
     }

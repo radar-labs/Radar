@@ -9,7 +9,7 @@ public import LibSignalClient
 @objc
 public class ViewOnceMessages: NSObject {
 
-    private override init() {
+    override private init() {
         super.init()
     }
 
@@ -21,64 +21,59 @@ public class ViewOnceMessages: NSObject {
 
     // "Check for auto-completion", e.g. complete messages whether or
     // not they have been read after N days.  Also complete outgoing
-    // sent messages. We need to repeat this check periodically while
-    // the app is running.
-    public static func startExpiringWhenNecessary() {
+    // sent messages.
+    public static func expireIfNecessary() async throws(CancellationError) {
         // Find all view-once messages which are not yet complete.
         // Complete messages if necessary.
-        Task {
-            while true {
-                let databaseStorage = SSKEnvironment.shared.databaseStorageRef
-                var afterRowId: Int64?
-                while true {
-                    await databaseStorage.awaitableWrite { tx in
-                        let messages: [TSMessage]
-                        (messages, afterRowId) = ViewOnceMessageFinder().fetchSomeIncompleteViewOnceMessages(after: afterRowId, limit: 100, tx: tx)
-                        if !messages.isEmpty {
-                            Logger.info("Checking \(messages.count) view once message(s) for auto-expiration.")
-                        }
-                        for message in messages {
-                            completeIfNecessary(message: message, transaction: tx)
-                        }
-                    }
-                    if afterRowId == nil {
-                        break
-                    }
-                }
-
-                // We need to "check for auto-completion" once per day.
-                do {
-                    try await Task.sleep(nanoseconds: TimeInterval.day.clampedNanoseconds)
-                } catch {
-                    return
-                }
-                Logger.info("Checking for auto-expired view once messages again because it's been a day.")
+        let databaseStorage = SSKEnvironment.shared.databaseStorageRef
+        var afterRowId: Int64?
+        repeat {
+            if Task.isCancelled {
+                throw CancellationError()
             }
-        }
+            await databaseStorage.awaitableWrite { tx in
+                let messages: [TSMessage]
+                (messages, afterRowId) = ViewOnceMessageFinder().fetchSomeIncompleteViewOnceMessages(after: afterRowId, limit: 100, tx: tx)
+                if !messages.isEmpty {
+                    Logger.info("Checking \(messages.count) view once message(s) for auto-expiration.")
+                }
+                for message in messages {
+                    completeIfNecessary(message: message, transaction: tx)
+                }
+            }
+        } while afterRowId != nil
     }
 
     @objc
-    public class func completeIfNecessary(message: TSMessage,
-                                          transaction: DBWriteTransaction) {
+    public class func completeIfNecessary(
+        message: TSMessage,
+        transaction: DBWriteTransaction,
+    ) {
 
-        guard message.isViewOnceMessage,
-            !message.isViewOnceComplete else {
+        guard
+            message.isViewOnceMessage,
+            !message.isViewOnceComplete
+        else {
             return
         }
 
         // If message should auto-complete, complete.
         guard !shouldMessageAutoComplete(message) else {
-            markAsComplete(message: message,
-                           sendSyncMessages: true,
-                           transaction: transaction)
+            markAsComplete(
+                message: message,
+                sendSyncMessages: true,
+                transaction: transaction,
+            )
             return
         }
 
         // If outgoing message and is "sent", complete.
         guard !isOutgoingSent(message: message) else {
-            markAsComplete(message: message,
-                           sendSyncMessages: true,
-                           transaction: transaction)
+            markAsComplete(
+                message: message,
+                sendSyncMessages: true,
+                transaction: transaction,
+            )
             return
         }
 
@@ -107,9 +102,11 @@ public class ViewOnceMessages: NSObject {
     }
 
     @objc
-    public class func markAsComplete(message: TSMessage,
-                                     sendSyncMessages: Bool,
-                                     transaction: DBWriteTransaction) {
+    public class func markAsComplete(
+        message: TSMessage,
+        sendSyncMessages: Bool,
+        transaction: DBWriteTransaction,
+    ) {
         guard message.isViewOnceMessage else {
             owsFailDebug("Not a view-once message.")
             return
@@ -137,29 +134,29 @@ public class ViewOnceMessages: NSObject {
         }
         let readTimestamp: UInt64 = nowMs()
 
-        let syncMessage = OWSViewOnceMessageReadSyncMessage(
+        let syncMessage = OutgoingViewOnceOpenSyncMessage(
             localThread: thread,
-            senderAci: AciObjC(senderAci),
+            senderAci: senderAci,
             message: message,
             readTimestamp: readTimestamp,
-            transaction: transaction
+            tx: transaction,
         )
         // this is the sync that we viewed; it doesn't have the attachment on it.
         let preparedMessage = PreparedOutgoingMessage.preprepared(
-            transientMessageWithoutAttachments: syncMessage
+            transientMessageWithoutAttachments: syncMessage,
         )
         SSKEnvironment.shared.messageSenderJobQueueRef.add(message: preparedMessage, transaction: transaction)
 
         if let incomingMessage = message as? TSIncomingMessage {
             let circumstance: OWSReceiptCircumstance =
                 thread.hasPendingMessageRequest(transaction: transaction)
-                ? .onThisDeviceWhilePendingMessageRequest
-                : .onThisDevice
+                    ? .onThisDeviceWhilePendingMessageRequest
+                    : .onThisDevice
             incomingMessage.markAsViewed(
                 atTimestamp: readTimestamp,
                 thread: thread,
                 circumstance: circumstance,
-                transaction: transaction
+                transaction: transaction,
             )
         }
     }
@@ -173,12 +170,14 @@ public class ViewOnceMessages: NSObject {
     public class func processIncomingSyncMessage(
         _ message: SSKProtoSyncMessageViewOnceOpen,
         envelope: SSKProtoEnvelope,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) -> ViewOnceSyncMessageProcessingResult {
-        guard let messageSender = Aci.parseFrom(
-            serviceIdBinary: message.senderAciBinary,
-            serviceIdString: message.senderAci,
-        ) else {
+        guard
+            let messageSender = Aci.parseFrom(
+                serviceIdBinary: message.senderAciBinary,
+                serviceIdString: message.senderAci,
+            )
+        else {
             owsFailDebug("Invalid messageSender.")
             return .invalidSyncMessage
         }
@@ -207,7 +206,7 @@ public class ViewOnceMessages: NSObject {
         do {
             messages = try InteractionFinder.fetchInteractions(
                 timestamp: messageIdTimestamp,
-                transaction: transaction
+                transaction: transaction,
             ).compactMap(filter)
         } catch {
             owsFailDebug("Couldn't find interactions: \(error)")
@@ -221,9 +220,11 @@ public class ViewOnceMessages: NSObject {
         }
         for message in messages {
             // Mark as complete.
-            markAsComplete(message: message,
-                           sendSyncMessages: false,
-                           transaction: transaction)
+            markAsComplete(
+                message: message,
+                sendSyncMessages: false,
+                transaction: transaction,
+            )
         }
         return .success
     }
@@ -266,7 +267,7 @@ private class ViewOnceMessageFinder {
                 ORDER BY \(interactionColumn: .id)
                 """,
                 arguments: [rowId],
-                transaction: tx
+                transaction: tx,
             )
         } else {
             cursor = TSInteraction.grdbFetchCursor(
@@ -278,7 +279,7 @@ private class ViewOnceMessageFinder {
                 AND \(interactionColumn: .isViewOnceComplete) = 0
                 ORDER BY \(interactionColumn: .id)
                 """,
-                transaction: tx
+                transaction: tx,
             )
         }
 

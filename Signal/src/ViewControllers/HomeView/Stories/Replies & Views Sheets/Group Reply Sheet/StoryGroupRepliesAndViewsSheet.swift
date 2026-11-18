@@ -3,95 +3,142 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
 import SignalServiceKit
 import SignalUI
-import UIKit
 
-class StoryGroupRepliesAndViewsSheet: InteractiveSheetViewController, StoryGroupReplier {
-    override var interactiveScrollViews: [UIScrollView] { [groupReplyViewController.tableView, viewsViewController.tableView] }
-
-    override var sheetBackgroundColor: UIColor { .ows_gray90 }
-
+class StoryGroupRepliesAndViewsSheet: OWSViewController, StoryGroupReplier, StoryGroupReplyDelegate,
+    UIAdaptivePresentationControllerDelegate, UIScrollViewDelegate
+{
     private let groupReplyViewController: StoryGroupReplyViewController
     private let viewsViewController: StoryViewsViewController
-    private let pagingScrollView = UIScrollView()
+    private lazy var pagingScrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.isPagingEnabled = true
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.isDirectionalLockEnabled = true
+        scrollView.delegate = self
+        return scrollView
+    }()
 
     var storyMessage: StoryMessage { groupReplyViewController.storyMessage }
     var threadUniqueId: String? { groupReplyViewController.thread?.uniqueId }
 
-    private lazy var viewsButton = createToggleButton(
-        title: OWSLocalizedString("STORIES_VIEWS_TAB", comment: "Title text for the 'views' tab on the stories views & replies sheet")
-    ) { [weak self] in
-        self?.switchToViewsTab(animated: true)
-    }
-
-    private lazy var repliesButton = createToggleButton(
-        title: OWSLocalizedString("STORIES_REPLIES_TAB", comment: "Title text for the 'replies' tab on the stories views & replies sheet")
-    ) { [weak self] in
-        self?.switchToRepliesTab(animated: true)
-    }
+    private lazy var viewsAndRepliesControl: UISegmentedControl = {
+        let control = UISegmentedControl(items: [
+            OWSLocalizedString(
+                "STORIES_VIEWS_TAB",
+                comment: "Title text for the 'views' tab on the stories views & replies sheet",
+            ),
+            OWSLocalizedString(
+                "STORIES_REPLIES_TAB",
+                comment: "Title text for the 'replies' tab on the stories views & replies sheet",
+            ),
+        ])
+        control.addAction(
+            UIAction { [weak self] _ in
+                self?.switchBetweenRepliesAndViews()
+            },
+            for: .primaryActionTriggered,
+        )
+        return control
+    }()
 
     var dismissHandler: (() -> Void)?
 
-    enum Tab: Int {
-        case views = 0
-        case replies = 1
-    }
-    var focusedTab: Tab = .views
-
     init(storyMessage: StoryMessage, context: StoryContext, spoilerState: SpoilerRenderState) {
-        self.groupReplyViewController = StoryGroupReplyViewController(storyMessage: storyMessage, spoilerState: spoilerState)
-        self.viewsViewController = StoryViewsViewController(storyMessage: storyMessage, context: context)
+        self.groupReplyViewController = StoryGroupReplyViewController(
+            storyMessage: storyMessage,
+            spoilerState: spoilerState,
+            isStandaloneVC: false,
+        )
+        self.viewsViewController = StoryViewsViewController(
+            storyMessage: storyMessage,
+            context: context,
+            isStandaloneVC: false,
+        )
 
         super.init()
 
-        self.allowsExpansion = true
-        minimizedHeight = CurrentAppContext().frame.height * 0.6
+        groupReplyViewController.delegate = self
+
+        overrideUserInterfaceStyle = .dark
+        modalPresentationStyle = .pageSheet
+        presentationController?.delegate = self
+
+        if let sheetPresentationController {
+            if #available(iOS 17.0, *) {
+                sheetPresentationController.traitOverrides.userInterfaceStyle = .dark
+            } else {
+                sheetPresentationController.overrideTraitCollection = UITraitCollection(userInterfaceStyle: .dark)
+            }
+            sheetPresentationController.detents = [.medium(), .large()]
+            sheetPresentationController.prefersGrabberVisible = true
+        }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let vStack = UIStackView()
+        view.preservesSuperviewLayoutMargins = true
+
+        let segmentedControlContainer = UIView()
+        segmentedControlContainer.addSubview(viewsAndRepliesControl)
+        viewsAndRepliesControl.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            viewsAndRepliesControl.topAnchor.constraint(equalTo: segmentedControlContainer.topAnchor, constant: 8),
+            viewsAndRepliesControl.leadingAnchor.constraint(greaterThanOrEqualTo: segmentedControlContainer.leadingAnchor),
+            viewsAndRepliesControl.centerXAnchor.constraint(equalTo: segmentedControlContainer.centerXAnchor),
+            viewsAndRepliesControl.bottomAnchor.constraint(equalTo: segmentedControlContainer.bottomAnchor),
+        ])
+
+        let vStack = UIStackView(arrangedSubviews: [segmentedControlContainer, pagingScrollView])
         vStack.axis = .vertical
-        vStack.alignment = .center
+        vStack.alignment = .fill
         vStack.spacing = 20
-        contentView.addSubview(vStack)
-        vStack.autoPinEdgesToSuperviewEdges()
+        view.addSubview(vStack)
+        vStack.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            vStack.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+            vStack.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            vStack.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            vStack.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
 
-        let hStack = UIStackView(arrangedSubviews: [viewsButton, repliesButton])
-        hStack.axis = .horizontal
-        hStack.spacing = 12
-        vStack.addArrangedSubview(hStack)
+        // Page container: same height as scroll view, twice the width (two full pages of content).
+        let pageContainer = UIView()
+        pagingScrollView.addSubview(pageContainer)
+        pageContainer.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            pageContainer.topAnchor.constraint(equalTo: pagingScrollView.contentLayoutGuide.topAnchor),
+            pageContainer.leadingAnchor.constraint(equalTo: pagingScrollView.contentLayoutGuide.leadingAnchor),
+            pageContainer.trailingAnchor.constraint(equalTo: pagingScrollView.contentLayoutGuide.trailingAnchor),
+            pageContainer.bottomAnchor.constraint(equalTo: pagingScrollView.contentLayoutGuide.bottomAnchor),
 
-        pagingScrollView.isPagingEnabled = true
-        pagingScrollView.showsHorizontalScrollIndicator = false
-        pagingScrollView.isDirectionalLockEnabled = true
-        pagingScrollView.delegate = self
-        vStack.addArrangedSubview(pagingScrollView)
-        pagingScrollView.autoPinEdge(toSuperviewSafeArea: .left)
-        pagingScrollView.autoPinEdge(toSuperviewSafeArea: .right)
+            pageContainer.heightAnchor.constraint(equalTo: pagingScrollView.frameLayoutGuide.heightAnchor),
+            pageContainer.widthAnchor.constraint(equalTo: pagingScrollView.frameLayoutGuide.widthAnchor, multiplier: 2),
+        ])
 
-        let pagesContainer = UIView()
-        pagingScrollView.addSubview(pagesContainer)
-        pagesContainer.autoPinEdgesToSuperviewEdges()
-        pagesContainer.autoMatch(.height, to: .height, of: pagingScrollView)
-        pagesContainer.autoMatch(.width, to: .width, of: pagingScrollView, withMultiplier: 2)
-
+        // Page 1: "Views"
         addChild(viewsViewController)
-        pagesContainer.addSubview(viewsViewController.view)
-        viewsViewController.view.autoMatch(.width, to: .width, of: pagesContainer, withMultiplier: 0.5)
-        viewsViewController.view.autoPinHeightToSuperview()
-        viewsViewController.view.autoPinEdge(toSuperviewEdge: .leading)
+        pageContainer.addSubview(viewsViewController.view)
+        viewsViewController.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            viewsViewController.view.topAnchor.constraint(equalTo: pageContainer.topAnchor),
+            viewsViewController.view.leadingAnchor.constraint(equalTo: pageContainer.leadingAnchor),
+            viewsViewController.view.widthAnchor.constraint(equalTo: pageContainer.widthAnchor, multiplier: 0.5),
+            viewsViewController.view.bottomAnchor.constraint(equalTo: pageContainer.bottomAnchor),
+        ])
 
-        groupReplyViewController.delegate = self
+        // Page 2: "Replies"
         addChild(groupReplyViewController)
-        pagesContainer.addSubview(groupReplyViewController.view)
-        groupReplyViewController.view.autoMatch(.width, to: .width, of: pagesContainer, withMultiplier: 0.5)
-        groupReplyViewController.view.autoPinHeightToSuperview()
-        groupReplyViewController.view.autoPinEdge(.leading, to: .trailing, of: viewsViewController.view)
-        groupReplyViewController.view.autoPinEdge(toSuperviewEdge: .trailing)
+        pageContainer.addSubview(groupReplyViewController.view)
+        groupReplyViewController.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            groupReplyViewController.view.topAnchor.constraint(equalTo: pageContainer.topAnchor),
+            groupReplyViewController.view.trailingAnchor.constraint(equalTo: pageContainer.trailingAnchor),
+            groupReplyViewController.view.widthAnchor.constraint(equalTo: pageContainer.widthAnchor, multiplier: 0.5),
+            groupReplyViewController.view.bottomAnchor.constraint(equalTo: pageContainer.bottomAnchor),
+        ])
 
         pagingScrollViewObservation = pagingScrollView.observe(\.contentSize, changeHandler: { [weak self] _, _ in
             self?.didUpdatePagingScrollViewContentSize()
@@ -101,13 +148,9 @@ class StoryGroupRepliesAndViewsSheet: InteractiveSheetViewController, StoryGroup
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        switch focusedTab {
-        case .views:
-            break
-        case .replies:
-            maximizeHeight {
-                // Once we maximize, don't let you minimize again or things look weird.
-                self.minimizedHeight = super.maxHeight
+        if case .replies = focusedTab {
+            sheetPresentationController?.animateChanges {
+                sheetPresentationController?.selectedDetentIdentifier = .large
             }
         }
     }
@@ -115,15 +158,18 @@ class StoryGroupRepliesAndViewsSheet: InteractiveSheetViewController, StoryGroup
     private var pagingScrollViewObservation: NSKeyValueObservation?
 
     private func didUpdatePagingScrollViewContentSize() {
-        guard view.frame != .zero, self.pagingScrollView.contentSize.width > 0 else { return }
+        guard view.frame != .zero, pagingScrollView.contentSize.width > 0 else { return }
+
         // Only need to trigger once.
         pagingScrollViewObservation = nil
 
         // Once we have a frame, we need to re-switch to the tab
         switch focusedTab {
-        case .views: switchToViewsTab(animated: false)
+        case .views:
+            switchToTab(.views, animated: false)
+
         case .replies:
-            switchToRepliesTab(animated: false)
+            switchToTab(.replies, animated: false)
             groupReplyViewController.inputToolbar.becomeFirstResponder()
         }
     }
@@ -135,73 +181,65 @@ class StoryGroupRepliesAndViewsSheet: InteractiveSheetViewController, StoryGroup
         }
     }
 
-    private var isManuallySwitchingTabs = false
-    func switchToRepliesTab(animated: Bool) {
+    // MARK: - Tabs
+
+    private var ignoreScrollViewDidScroll = false
+
+    enum Tab: Int {
+        case views = 0
+        case replies = 1
+    }
+
+    var focusedTab: Tab = .views
+
+    private func switchBetweenRepliesAndViews() {
+        guard let newTab = Tab(rawValue: viewsAndRepliesControl.selectedSegmentIndex) else { return }
+        switchToTab(newTab, animated: true)
+    }
+
+    private func switchToTab(_ tab: Tab, animated: Bool) {
         if animated {
-            isManuallySwitchingTabs = true
+            ignoreScrollViewDidScroll = true
         }
-        focusedTab = .replies
-        repliesButton.isSelected = true
-        viewsButton.isSelected = false
-        view.layoutIfNeeded()
-        pagingScrollView.setContentOffset(CGPoint(x: pagingScrollView.width, y: 0), animated: animated)
+        focusedTab = tab
+        viewsAndRepliesControl.selectedSegmentIndex = tab.rawValue
+
+        let xOffset: CGFloat = switch tab {
+        case .views: 0
+        case .replies: pagingScrollView.width
+        }
+        pagingScrollView.setContentOffset(CGPoint(x: xOffset, y: 0), animated: animated)
     }
 
-    func switchToViewsTab(animated: Bool) {
-        if animated {
-            isManuallySwitchingTabs = true
-        }
-        focusedTab = .views
-        repliesButton.isSelected = false
-        viewsButton.isSelected = true
-        pagingScrollView.setContentOffset(.zero, animated: animated)
-    }
+    // MARK: - UIScrollViewDelegate
 
-    func createToggleButton(title: String, block: @escaping () -> Void) -> UIButton {
-        let button = OWSButton()
-        button.block = { [unowned button] in
-            guard !button.isSelected else { return }
-            block()
-        }
-        button.autoSetDimension(.height, toSize: 28)
-        button.layer.cornerRadius = 14
-        button.clipsToBounds = true
-        button.titleLabel?.font = UIFont.semiboldFont(ofSize: 15)
-        button.ows_contentEdgeInsets = UIEdgeInsets(hMargin: 12, vMargin: 4)
-        button.setTitle(title, for: .normal)
-        button.setTitleColor(Theme.darkThemePrimaryColor, for: .normal)
-        button.setBackgroundImage(UIImage.image(color: .ows_gray65), for: .selected)
-        return button
-    }
-}
-
-extension StoryGroupRepliesAndViewsSheet: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         groupReplyViewController.inputToolbar.resignFirstResponder()
 
-        guard !isManuallySwitchingTabs else { return }
+        guard ignoreScrollViewDidScroll == false else { return }
 
-        if scrollView.contentOffset.x < scrollView.width / 2 {
-            repliesButton.isSelected = false
-            viewsButton.isSelected = true
-            focusedTab = .views
-        } else {
-            repliesButton.isSelected = true
-            viewsButton.isSelected = false
-            focusedTab = .replies
-        }
+        let newTab: Tab = if scrollView.contentOffset.x < scrollView.width / 2 { .views } else { .replies }
+        guard focusedTab != newTab else { return }
+
+        focusedTab = newTab
+        viewsAndRepliesControl.selectedSegmentIndex = focusedTab.rawValue
     }
 
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        isManuallySwitchingTabs = false
+        ignoreScrollViewDidScroll = false
     }
-}
 
-extension StoryGroupRepliesAndViewsSheet: StoryGroupReplyDelegate {
+    // MARK: - StoryGroupReplyDelegate
+
     func storyGroupReplyViewControllerDidBeginEditing(_ storyGroupReplyViewController: StoryGroupReplyViewController) {
-        maximizeHeight {
-            // Once we maximize, don't let you minimize again or things look weird.
-            self.minimizedHeight = super.maxHeight
+        sheetPresentationController?.animateChanges {
+            sheetPresentationController?.selectedDetentIdentifier = .large
         }
+    }
+
+    // MARK: - UIAdaptivePresentationControllerDelegate
+
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        dismissHandler?()
     }
 }

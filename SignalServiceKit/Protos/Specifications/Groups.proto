@@ -44,6 +44,10 @@ message Member {
   // A `LibSignalClient.ProfileKeyCredentialPresentation` created by the
   // client and used by the server to populate the other fields.
   bytes presentation = 4;
+
+  // These two fields each decrypt to a UTF8 string
+  bytes label_emoji = 6;
+  bytes label_string = 7;
 }
 
 // An invited member of the group.
@@ -94,6 +98,7 @@ message AccessControl {
   AccessRequired attributes = 1; // Who can modify the group title, avatar, disappearing messages timer
   AccessRequired members = 2; // Who can add people to the group
   AccessRequired addFromInviteLink = 3;
+  AccessRequired member_label = 4;
 }
 
 message Group {
@@ -122,6 +127,7 @@ message Group {
   bytes inviteLinkPassword = 10;
   bool announcementsOnly = 12;
   repeated BannedMember bannedMembers = 13;
+  bool terminated = 14;
 }
 
 message GroupAttributeBlob {
@@ -171,6 +177,13 @@ message GroupChange {
     message ModifyMemberRoleAction {
       bytes userId = 1;
       Member.Role role = 2;
+    }
+
+    message ModifyMemberLabelAction {
+      bytes user_id = 1;
+      // These two fields each decrypt to a UTF8 string
+      bytes label_emoji = 2;
+      bytes label_string = 3;
     }
 
     message ModifyMemberProfileKeyAction {
@@ -259,6 +272,10 @@ message GroupChange {
       AccessControl.AccessRequired addFromInviteLinkAccess = 1;
     }
 
+    message ModifyMemberLabelAccessControlAction {
+      AccessControl.AccessRequired member_label_access = 1;
+    }
+
     message ModifyInviteLinkPasswordAction {
       bytes inviteLinkPassword = 1;
     }
@@ -270,6 +287,9 @@ message GroupChange {
 
     message ModifyAnnouncementsOnlyAction {
       bool announcementsOnly = 1;
+    }
+
+    message TerminateGroupAction {
     }
 
     bytes sourceUserId = 1; // Encrypted ServiceId for who made the change
@@ -290,6 +310,7 @@ message GroupChange {
     ModifyAttributesAccessControlAction modifyAttributesAccess = 13; // Changed attributes access control
     ModifyMembersAccessControlAction modifyMemberAccess = 14; // Changed membership access control
     ModifyAddFromInviteLinkAccessControlAction modifyAddFromInviteLinkAccess = 15;  // change epoch = 1
+    ModifyMemberLabelAccessControlAction modify_member_label_access = 27; // change epoch = 6
     repeated AddRequestingMemberAction addRequestingMembers = 16;  // change epoch = 1
     repeated DeleteRequestingMemberAction deleteRequestingMembers = 17;  // change epoch = 1
     repeated PromoteRequestingMemberAction promoteRequestingMembers = 18;  // change epoch = 1
@@ -299,6 +320,8 @@ message GroupChange {
     repeated AddBannedMemberAction addBannedMembers = 22;  // change epoch = 4
     repeated DeleteBannedMemberAction deleteBannedMembers = 23;  // change epoch = 4
     repeated PromoteMemberPendingPniAciProfileKeyAction promotePniPendingMembers = 24;  // change epoch = 5
+    repeated ModifyMemberLabelAction modifyMemberLabel = 26; // change epoch = 6;
+    TerminateGroupAction terminate_group = 28; // change epoch = 7
   }
 
   bytes actions = 1; // The serialized actions

@@ -8,22 +8,19 @@ import Foundation
 /// Simple wrapper around an `InputStream` that allows passing data through an
 /// array of `StreamTransform` objects to alter the data before being passed
 /// back to the caller.
-public final class TransformingInputStream: InputStreamable {
+public final class TransformingInputStream {
 
     private let transforms: [any StreamTransform]
-    private let inputStream: InputStreamable
-    private let runLoop: RunLoop?
+    private let inputStream: InputStream
 
     private var hasInitialized: Bool = false
 
     public init(
         transforms: [any StreamTransform],
-        inputStream: InputStreamable,
-        runLoop: RunLoop? = nil
+        inputStream: InputStream,
     ) {
         self.transforms = transforms
         self.inputStream = inputStream
-        self.runLoop = runLoop
     }
 
     /// `hasBytesAvailable` should return true if any of the following is true:
@@ -37,8 +34,8 @@ public final class TransformingInputStream: InputStreamable {
     public var hasBytesAvailable: Bool {
         return
             inputStream.hasBytesAvailable
-            || transforms.contains { $0.hasPendingBytes }
-            || transforms.compactMap { $0 as? FinalizableStreamTransform }.contains { !$0.hasFinalized }
+                || transforms.contains { $0.hasPendingBytes }
+                || transforms.compactMap { $0 as? FinalizableStreamTransform }.contains { !$0.hasFinalized }
     }
 
     /// Read up to `maxLength` bytes of transformed input stream data.
@@ -54,7 +51,7 @@ public final class TransformingInputStream: InputStreamable {
         // otherwise, read data until the buffer is filled.
         // read some bytes, transform them, read some more, until the buffer is full
         var returnData: Data = Data()
-        while returnData.count == 0 && inputStream.hasBytesAvailable {
+        while returnData.count == 0, inputStream.hasBytesAvailable {
             func getData() throws -> Data {
                 // Only read if there isn't pending data in the transforms
                 if transforms.contains(where: { $0.hasPendingBytes }) == false {
@@ -75,7 +72,7 @@ public final class TransformingInputStream: InputStreamable {
             }
 
             // Transform the data.
-            returnData = try transforms.reduce(getData()) { try $1.transform(data: $0) }
+            returnData = try transforms.reduce(getData()) { try $1.transform(data: $0, options: [:]) }
         }
 
         if returnData.count > 0 {
@@ -86,7 +83,7 @@ public final class TransformingInputStream: InputStreamable {
         // remaining data in the transfom buffers, finalize the transforms
         // and read any data resulting from that.
         var remainingData = try transforms.readNextRemainingBytes()
-        while remainingData.count == 0 && hasBytesAvailable {
+        while remainingData.count == 0, hasBytesAvailable {
             remainingData = try transforms.readNextRemainingBytes()
         }
         return remainingData
@@ -100,7 +97,7 @@ public final class TransformingInputStream: InputStreamable {
         inputStream.schedule(in: runloop, forMode: mode)
     }
 
-    public func close() throws {
-        try inputStream.close()
+    public func close() {
+        inputStream.close()
     }
 }

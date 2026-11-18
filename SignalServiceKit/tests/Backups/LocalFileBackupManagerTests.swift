@@ -1,0 +1,805 @@
+//
+// Copyright 2026 Signal Messenger, LLC
+// SPDX-License-Identifier: AGPL-3.0-only
+//
+
+import CryptoKit
+import Foundation
+import GRDB
+import Testing
+@testable import LibSignalClient
+@testable import SignalServiceKit
+
+typealias Attachment = SignalServiceKit.Attachment
+
+struct LocalFileBackupManagerTests {
+    private let localFileBackupManager: LocalFileBackupManager
+    private let db = InMemoryDB()
+    private let attachmentStore = AttachmentStore()
+    private let localFileBackupAttachmentMetadataManager: LocalFileBackupAttachmentMetadataManager
+    private let localFileBackupAttachmentMetadataStore = LocalFileBackupAttachmentMetadataStore()
+    private let backupArchiveManager = BackupArchiveManagerMock()
+
+    init() {
+        let orphanedAttachmentCleaner = OrphanedAttachmentCleanerImpl(dateProvider: { Date() }, db: db)
+        let validator = AttachmentContentValidatorImpl(
+            attachmentStore: attachmentStore,
+            audioWaveformManager: AudioWaveformManagerMock(),
+            dateProvider: { Date() },
+            db: db,
+            orphanedAttachmentCleaner: orphanedAttachmentCleaner,
+        )
+        self.localFileBackupAttachmentMetadataManager = LocalFileBackupAttachmentMetadataManager(
+            attachmentStore: attachmentStore,
+            db: db,
+            metadataStore: localFileBackupAttachmentMetadataStore,
+        )
+        self.localFileBackupManager = LocalFileBackupManager(
+            appReadiness: AppReadinessMock(),
+            db: db,
+            dateProvider: { Date() },
+            attachmentStore: attachmentStore,
+            attachmentValidator: validator,
+            orphanedAttachmentCleaner: orphanedAttachmentCleaner,
+            localFileBackupAttachmentMetadataStore: localFileBackupAttachmentMetadataStore,
+            localFileBackupStore: LocalFileBackupStore(),
+            securityScopedBookmarkAccess: SecurityScopedBookmarkAccessMock(hasAccess: true, url: nil),
+            restoreProgress: LocalFileBackupAttachmentRestoreProgress(),
+        )
+    }
+
+    @Test
+    func testQueueAttachments() async throws {
+        let encryptedSize: UInt32 = 20
+        let unencryptedSize: UInt32 = 32
+
+        let mockAttachment1 = AttachmentStream.mock(
+            streamInfo: .mock(
+                encryptedByteCount: encryptedSize,
+                unencryptedByteCount: unencryptedSize,
+            ),
+        ).attachment
+
+        let mockAttachment2 = AttachmentStream.mock(
+            streamInfo: .mock(
+                encryptedByteCount: encryptedSize,
+                unencryptedByteCount: unencryptedSize,
+            ),
+        ).attachment
+
+        let (id1, id2) = db.write { tx in
+            let id1 = LocalFileBackupTestSupport.insertMockAttachment(mockAttachment1, tx: tx)
+            let id2 = LocalFileBackupTestSupport.insertMockAttachment(mockAttachment2, tx: tx)
+            return (id1, id2)
+        }
+
+        try await localFileBackupAttachmentMetadataManager.ensureAttachmentMetadataExists(progressSink: nil)
+
+        let localFileBackupAttachmentCollector = LocalFileBackupAttachmentCollector()
+        localFileBackupAttachmentCollector.append(id: id1)
+        localFileBackupAttachmentCollector.append(id: id2)
+
+        try await localFileBackupManager.queueLocalBackupAttachmentsForExport(localFileBackupAttachmentCollector: localFileBackupAttachmentCollector)
+
+        let attachments = try db.read { tx in
+            try BackupLocalFileAttachmentExportRecord
+                .fetchAll(tx.database)
+        }
+
+        #expect(attachments.count == 2)
+        let attachmentIds = Set(attachments.map(\.attachmentRowId))
+        #expect(attachmentIds.contains(id1))
+        #expect(attachmentIds.contains(id2))
+    }
+
+    @Test
+    func testQueueAttachmentsOnlyQueuesDownloadedWithLocalKey() async throws {
+        let downloadedId = db.write { tx in
+            LocalFileBackupTestSupport.insertMockAttachment(AttachmentStream.mock().attachment, tx: tx)
+        }
+
+        try await localFileBackupAttachmentMetadataManager.ensureAttachmentMetadataExists(progressSink: nil)
+
+        let (downloadedWithoutLocalKeyId, offloadedWithLocalKeyId) = db.write { tx in
+            // Downloaded after metadata was ensured, so has no local key.
+            let downloadedWithoutLocalKeyId = LocalFileBackupTestSupport.insertMockAttachment(
+                AttachmentStream.mock().attachment,
+                tx: tx,
+            )
+
+            // Has a local key, e.g. from a past restore, but has since been
+            // offloaded.
+            let plaintextHash = Randomness.generateRandomBytes(32)
+            let offloadedWithLocalKeyId = LocalFileBackupTestSupport.insertMockAttachment(
+                Attachment.mock(
+                    plaintextHash: plaintextHash,
+                    mediaTierInfo: .mock(plaintextHash: plaintextHash),
+                ),
+                tx: tx,
+            )
+            localFileBackupAttachmentMetadataStore.insertNewMetadataIfNeeded(
+                attachmentId: offloadedWithLocalKeyId,
+                unencryptedByteCount: 16,
+                localKey: nil,
+                tx: tx,
+            )
+
+            return (downloadedWithoutLocalKeyId, offloadedWithLocalKeyId)
+        }
+
+        let localFileBackupAttachmentCollector = LocalFileBackupAttachmentCollector()
+        localFileBackupAttachmentCollector.append(id: downloadedId)
+        localFileBackupAttachmentCollector.append(id: downloadedWithoutLocalKeyId)
+        localFileBackupAttachmentCollector.append(id: offloadedWithLocalKeyId)
+
+        try await localFileBackupManager.queueLocalBackupAttachmentsForExport(localFileBackupAttachmentCollector: localFileBackupAttachmentCollector)
+
+        let attachmentIds = try db.read { tx in
+            try BackupLocalFileAttachmentExportRecord
+                .fetchAll(tx.database)
+                .map(\.attachmentRowId)
+        }
+
+        #expect(attachmentIds == [downloadedId])
+    }
+
+    @Test
+    func testCopyBackupToDisk() async throws {
+        let localIdentifiers = LocalIdentifiers.forUnitTests
+        let aep = AccountEntropyPool()
+
+        let backupKey = MessageRootBackupKey(accountEntropyPool: aep, aci: localIdentifiers.aci)
+
+        let backupFile = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString)
+        try Data("test".utf8).write(to: backupFile)
+
+        let localBackupURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: localBackupURL, withIntermediateDirectories: true)
+        defer {
+            try? FileManager.default.removeItem(at: localBackupURL)
+            try? FileManager.default.removeItem(at: backupFile)
+        }
+
+        let currentBackupDirectoryName = try await localFileBackupManager.copyBackupToDisk(
+            backupTempFileURL: backupFile,
+            messageRootBackupKey: backupKey,
+            localBackupURL: localBackupURL,
+        )
+
+        let backupsRootDirectory = LocalFileBackupManager.FileStructure.rootDirectoryInFileLocation(localBackupURL)
+        let currentBackupPath = backupsRootDirectory.appendingPathComponent(currentBackupDirectoryName)
+        let mainFilePath = currentBackupPath.appendingPathComponent("main")
+        let metadataFilePath = currentBackupPath.appendingPathComponent("metadata")
+
+        #expect(FileManager.default.fileExists(atPath: backupsRootDirectory.path))
+        #expect(FileManager.default.fileExists(atPath: currentBackupPath.path))
+        #expect(FileManager.default.fileExists(atPath: mainFilePath.path))
+        #expect(FileManager.default.fileExists(atPath: metadataFilePath.path))
+
+        let metadataFileContents = try Data(contentsOf: metadataFilePath)
+        let metadataProto = try LocalBackupProto_Metadata(serializedBytes: metadataFileContents)
+
+        #expect(metadataProto.version == 1)
+        let localBackupMetadataKey = backupKey.backupKey.deriveLocalBackupMetadataKey()
+        let iv = metadataProto.backupID.iv
+        let nonce = iv + Data(count: 4) // Last 4 bytes are 0 for the counter.
+        var decryptedBackupId = metadataProto.backupID.encryptedID
+        try Aes256Ctr32.process(&decryptedBackupId, key: localBackupMetadataKey, nonce: nonce)
+
+        #expect(decryptedBackupId == backupKey.backupId)
+    }
+
+    @Test
+    func testCopyAttachmentsToDisk() async throws {
+        let mockAttachment1 = try LocalFileBackupTestSupport.makeMockAttachmentWithRealFile()
+        let mockAttachment2 = try LocalFileBackupTestSupport.makeMockAttachmentWithRealFile()
+
+        let (id1, id2) = db.write { tx in
+            let id1 = LocalFileBackupTestSupport.insertMockAttachment(mockAttachment1, tx: tx)
+            let id2 = LocalFileBackupTestSupport.insertMockAttachment(mockAttachment2, tx: tx)
+            return (id1, id2)
+        }
+
+        try await localFileBackupAttachmentMetadataManager.ensureAttachmentMetadataExists(progressSink: nil)
+
+        let localFileBackupAttachmentCollector = LocalFileBackupAttachmentCollector()
+        localFileBackupAttachmentCollector.append(id: id1)
+        localFileBackupAttachmentCollector.append(id: id2)
+
+        try await localFileBackupManager.queueLocalBackupAttachmentsForExport(localFileBackupAttachmentCollector: localFileBackupAttachmentCollector)
+
+        let localBackupURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: localBackupURL, withIntermediateDirectories: true)
+        defer {
+            try? FileManager.default.removeItem(at: localBackupURL)
+        }
+
+        let currentBackupDirectoryName = LocalFileBackupManager.FileStructure.backupDirectory(date: Date())
+        let currentBackupDir = localBackupURL.appendingPathComponent(currentBackupDirectoryName)
+        try FileManager.default.createDirectory(at: currentBackupDir, withIntermediateDirectories: true)
+
+        let filesDir = localBackupURL.appendingPathComponent("files")
+        try FileManager.default.createDirectory(at: filesDir, withIntermediateDirectories: true)
+
+        let filesMetadata = localBackupURL
+            .appendingPathComponent(currentBackupDirectoryName)
+            .appendingPathComponent("files")
+
+        try await localFileBackupManager.writeQueuedAttachmentsToDisk(
+            backupsRootDirectory: localBackupURL,
+            currentBackupDirectoryName: currentBackupDirectoryName,
+            progress: nil,
+        )
+
+        #expect(FileManager.default.fileExists(atPath: filesDir.path))
+        #expect(FileManager.default.fileExists(atPath: filesMetadata.path))
+
+        let localKey1 = try db.read { tx in
+            try BackupLocalFileAttachmentMetadataRecord
+                .filter(key: id1)
+                .fetchOne(tx.database)!.localKey
+        }
+
+        let localKey2 = try db.read { tx in
+            try BackupLocalFileAttachmentMetadataRecord
+                .filter(key: id2)
+                .fetchOne(tx.database)!.localKey
+        }
+
+        let mediaName1 = LocalFileBackupAttachmentNaming.mediaName(
+            localKey: localKey1,
+            plaintextHash: mockAttachment1.plaintextHash!,
+        )
+        let mediaName2 = LocalFileBackupAttachmentNaming.mediaName(
+            localKey: localKey2,
+            plaintextHash: mockAttachment2.plaintextHash!,
+        )
+
+        let mediaNameDir1 = filesDir.appendingPathComponent(
+
+            LocalFileBackupAttachmentNaming.subdirectoryName(mediaName: mediaName1),
+
+        )
+        let mediaNameDir2 = filesDir.appendingPathComponent(
+            LocalFileBackupAttachmentNaming.subdirectoryName(mediaName: mediaName2),
+        )
+
+        #expect(FileManager.default.fileExists(atPath: mediaNameDir1.path))
+        #expect(FileManager.default.fileExists(atPath: mediaNameDir2.path))
+
+        let mediaPath1 = mediaNameDir1.appendingPathComponent(mediaName1)
+        let mediaPath2 = mediaNameDir2.appendingPathComponent(mediaName2)
+
+        #expect(FileManager.default.fileExists(atPath: mediaPath1.path))
+        #expect(FileManager.default.fileExists(atPath: mediaPath2.path))
+    }
+
+    @Test
+    func testCopyAttachmentsToDiskSkipsMissingFile() async throws {
+        let missingAttachment = try LocalFileBackupTestSupport.makeMockAttachmentWithRealFile()
+        let presentAttachment = try LocalFileBackupTestSupport.makeMockAttachmentWithRealFile()
+
+        let (missingId, presentId) = db.write { tx in
+            let missingId = LocalFileBackupTestSupport.insertMockAttachment(missingAttachment, tx: tx)
+            let presentId = LocalFileBackupTestSupport.insertMockAttachment(presentAttachment, tx: tx)
+            return (missingId, presentId)
+        }
+
+        try await localFileBackupAttachmentMetadataManager.ensureAttachmentMetadataExists(progressSink: nil)
+
+        let collector = LocalFileBackupAttachmentCollector()
+        collector.append(id: missingId)
+        collector.append(id: presentId)
+        try await localFileBackupManager.queueLocalBackupAttachmentsForExport(localFileBackupAttachmentCollector: collector)
+
+        try FileManager.default.removeItem(at: missingAttachment.asStream()!.fileURL)
+
+        let localBackupURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer {
+            try? FileManager.default.removeItem(at: localBackupURL)
+        }
+
+        let currentBackupDirectoryName = LocalFileBackupManager.FileStructure.backupDirectory(date: Date())
+        try FileManager.default.createDirectory(
+            at: localBackupURL.appendingPathComponent(currentBackupDirectoryName),
+            withIntermediateDirectories: true,
+        )
+
+        try await localFileBackupManager.writeQueuedAttachmentsToDisk(
+            backupsRootDirectory: localBackupURL,
+            currentBackupDirectoryName: currentBackupDirectoryName,
+            progress: nil,
+        )
+
+        let presentLocalKey = try db.read { tx in
+            try BackupLocalFileAttachmentMetadataRecord
+                .filter(key: presentId)
+                .fetchOne(tx.database)!.localKey
+        }
+        let presentMediaName = LocalFileBackupAttachmentNaming.mediaName(
+            localKey: presentLocalKey,
+            plaintextHash: presentAttachment.plaintextHash!,
+        )
+        let presentMediaPath = localBackupURL
+            .appendingPathComponent("files")
+            .appendingPathComponent(LocalFileBackupAttachmentNaming.subdirectoryName(mediaName: presentMediaName))
+            .appendingPathComponent(presentMediaName)
+
+        #expect(FileManager.default.fileExists(atPath: presentMediaPath.path))
+        #expect(db.read { tx in LocalFileBackupStore().exportRecords(batchSize: 10, tx: tx) }.isEmpty)
+    }
+
+    @Test
+    func testWriteQueuedAttachmentsAcrossMultipleBatches() async throws {
+        // Larger than batch count so it spans multiple manifestStream writes.
+        let attachmentCount = await LocalFileBackupManager.attachmentBatchSize + 1
+
+        var mockAttachments: [Attachment] = []
+        for _ in 0..<attachmentCount {
+            mockAttachments.append(try LocalFileBackupTestSupport.makeMockAttachmentWithRealFile())
+        }
+
+        let ids: [Attachment.IDType] = db.write { tx in
+            mockAttachments.map { LocalFileBackupTestSupport.insertMockAttachment($0, tx: tx) }
+        }
+
+        try await localFileBackupAttachmentMetadataManager.ensureAttachmentMetadataExists(progressSink: nil)
+
+        let collector = LocalFileBackupAttachmentCollector()
+        for id in ids {
+            collector.append(id: id)
+        }
+        try await localFileBackupManager.queueLocalBackupAttachmentsForExport(
+            localFileBackupAttachmentCollector: collector,
+        )
+
+        let localBackupURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: localBackupURL, withIntermediateDirectories: true)
+        defer {
+            try? FileManager.default.removeItem(at: localBackupURL)
+        }
+
+        let currentBackupDirectoryName = LocalFileBackupManager.FileStructure.backupDirectory(date: Date())
+        let currentBackupDir = localBackupURL.appendingPathComponent(currentBackupDirectoryName)
+        try FileManager.default.createDirectory(at: currentBackupDir, withIntermediateDirectories: true)
+
+        let filesDir = localBackupURL.appendingPathComponent("files")
+        try FileManager.default.createDirectory(at: filesDir, withIntermediateDirectories: true)
+
+        try await localFileBackupManager.writeQueuedAttachmentsToDisk(
+            backupsRootDirectory: localBackupURL,
+            currentBackupDirectoryName: currentBackupDirectoryName,
+            progress: nil,
+        )
+
+        // Read the manifest back and count frames.
+        let manifestURL = currentBackupDir.appendingPathComponent("files")
+
+        guard let rawInputStream = InputStream(url: manifestURL) else {
+            Issue.record("Unable to open manifest input stream")
+            return
+        }
+        rawInputStream.open()
+        defer { rawInputStream.close() }
+
+        let inputStream = TransformingInputStream(
+            transforms: [ChunkedInputStreamTransform()],
+            inputStream: rawInputStream,
+        )
+
+        var mediaNamesInManifest: Set<String> = []
+        while inputStream.hasBytesAvailable {
+            let data = try inputStream.read(maxLength: 65_536)
+            if data.isEmpty { break }
+            let frame = try LocalBackupProto_FilesFrame(serializedBytes: data)
+            switch frame.item {
+            case .mediaName(let mediaName):
+                mediaNamesInManifest.insert(mediaName)
+            case nil:
+                throw OWSAssertionError("FAIL unexpected nil frame itme")
+            }
+        }
+
+        #expect(mediaNamesInManifest.count == attachmentCount)
+    }
+
+    func writeAttachmentToFilesDir(
+        filesDir: URL,
+        plaintextData: Data,
+        localKey: AttachmentKey,
+        plaintextHash: Data,
+    ) throws {
+        let plaintextURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString)
+        try plaintextData.write(to: plaintextURL)
+        defer { try? FileManager.default.removeItem(at: plaintextURL) }
+
+        let mediaName = LocalFileBackupAttachmentNaming.mediaName(
+            localKey: localKey.combinedKey,
+            plaintextHash: plaintextHash,
+        )
+        let subdir = filesDir.appendingPathComponent(
+            LocalFileBackupAttachmentNaming.subdirectoryName(mediaName: mediaName),
+        )
+        try FileManager.default.createDirectory(at: subdir, withIntermediateDirectories: true)
+
+        let _ = try Cryptography.encryptAttachment(
+            at: plaintextURL,
+            output: subdir.appendingPathComponent(mediaName),
+            attachmentKey: localKey,
+        )
+    }
+
+    @Test
+    func testRestoreAttachments() async throws {
+        /* put encrypted attachments at a mock local backup location */
+
+        let localBackupURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: localBackupURL, withIntermediateDirectories: true)
+        defer {
+            try? FileManager.default.removeItem(at: localBackupURL)
+        }
+
+        let filesDir = localBackupURL.appendingPathComponent("files")
+
+        let localKey = Randomness.generateRandomBytes(64)
+        let plaintextData = Data("test".utf8)
+        var sha = SHA256()
+        sha.update(data: plaintextData)
+        let plaintextHash = Data(sha.finalize())
+
+        try writeAttachmentToFilesDir(
+            filesDir: filesDir,
+            plaintextData: plaintextData,
+            localKey: AttachmentKey(combinedKey: localKey),
+            plaintextHash: plaintextHash,
+        )
+
+        /* pre-populate as if we've done a backup restore */
+
+        let mockAttachment = Attachment.mock(plaintextHash: plaintextHash)
+        let attachmentId = db.write { tx in
+            var record = Attachment.Record(attachment: mockAttachment)
+            try! record.insert(tx.database)
+            let id = record.sqliteId!
+            try! BackupLocalFileAttachmentMetadataRecord(
+                attachmentRowId: id,
+                localKey: localKey,
+                unencryptedByteCount: UInt32(plaintextData.count),
+            ).insert(tx.database)
+            try! BackupLocalFileAttachmentImportRecord(attachmentRowId: id).insert(tx.database)
+            return id
+        }
+
+        let totalByteCount = db.read { tx in
+            LocalFileBackupStore().totalUnencryptedByteCountOfQueuedImports(tx: tx)
+        }
+
+        /* restore */
+
+        try await localFileBackupManager._restoreLocalFileBackupAttachments(resolvedURL: localBackupURL, totalByteCount: totalByteCount)
+
+        let importRecords = try db.read { tx in
+            try BackupLocalFileAttachmentImportRecord.fetchAll(tx.database)
+        }
+        #expect(importRecords.isEmpty)
+
+        let attachment = db.read { tx in
+            attachmentStore.fetch(id: attachmentId, tx: tx)
+        }
+
+        #expect(attachment != nil)
+        #expect(attachment!.streamInfo != nil)
+        #expect(attachment!.plaintextHash == plaintextHash)
+    }
+
+    @Test
+    func testCleanUpOldBackups() async throws {
+        let localBackupURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: localBackupURL, withIntermediateDirectories: true)
+        defer {
+            try? FileManager.default.removeItem(at: localBackupURL)
+        }
+
+        let oldBackup1 = LocalFileBackupManager.FileStructure.backupDirectory(date: Date.distantPast)
+        let oldBackup2 = LocalFileBackupManager.FileStructure.backupDirectory(date: Date.now.advanced(by: -10000))
+        let currentBackup1 = LocalFileBackupManager.FileStructure.backupDirectory(date: Date())
+        let currentBackup2 = LocalFileBackupManager.FileStructure.backupDirectory(date: Date.now.advanced(by: -10))
+
+        try FileManager.default.createDirectory(at: localBackupURL.appendingPathComponent(oldBackup1), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: localBackupURL.appendingPathComponent(oldBackup2), withIntermediateDirectories: true)
+
+        try FileManager.default.createDirectory(at: localBackupURL.appendingPathComponent(currentBackup1), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: localBackupURL.appendingPathComponent(currentBackup2), withIntermediateDirectories: true)
+
+        #expect(try FileManager.default.contentsOfDirectory(atPath: localBackupURL.path).count == 4)
+
+        try await localFileBackupManager.cleanUpOldBackupsAndOrphanedAttachments(backupsRootDirectory: localBackupURL)
+
+        let backups = try FileManager.default.contentsOfDirectory(atPath: localBackupURL.path)
+        #expect(backups.count == 2)
+        #expect(backups.contains(currentBackup1))
+        #expect(backups.contains(currentBackup2))
+    }
+
+    @Test
+    func testCleanUpOrphanAttachments() async throws {
+        let localBackupURL = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: localBackupURL, withIntermediateDirectories: true)
+        defer {
+            try? FileManager.default.removeItem(at: localBackupURL)
+        }
+
+        let currentBackup1 = LocalFileBackupManager.FileStructure.backupDirectory(date: Date())
+        let currentBackup2 = LocalFileBackupManager.FileStructure.backupDirectory(date: Date.now.advanced(by: -10))
+
+        try FileManager.default.createDirectory(at: localBackupURL.appendingPathComponent(currentBackup1), withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: localBackupURL.appendingPathComponent(currentBackup2), withIntermediateDirectories: true)
+
+        let filesDir = localBackupURL.appendingPathComponent("files")
+        try FileManager.default.createDirectory(at: filesDir, withIntermediateDirectories: true)
+
+        let plaintextData = Data("test".utf8)
+        var sha = SHA256()
+        sha.update(data: plaintextData)
+        let plaintextHash = Data(sha.finalize())
+
+        // Put a bunch of attachments in the files dir
+        for _ in 0..<10 {
+            let localKey = Randomness.generateRandomBytes(64)
+            try writeAttachmentToFilesDir(
+                filesDir: filesDir,
+                plaintextData: plaintextData,
+                localKey: AttachmentKey(combinedKey: localKey),
+                plaintextHash: plaintextHash,
+            )
+        }
+
+        // Now write some attachments to disk that are in a backup metadata file.
+        // These should not be deleted.
+
+        let mockAttachment1 = try LocalFileBackupTestSupport.makeMockAttachmentWithRealFile()
+        let mockAttachment2 = try LocalFileBackupTestSupport.makeMockAttachmentWithRealFile()
+
+        let (id1, id2) = db.write { tx in
+            let id1 = LocalFileBackupTestSupport.insertMockAttachment(mockAttachment1, tx: tx)
+            let id2 = LocalFileBackupTestSupport.insertMockAttachment(mockAttachment2, tx: tx)
+            return (id1, id2)
+        }
+
+        try await localFileBackupAttachmentMetadataManager.ensureAttachmentMetadataExists(progressSink: nil)
+
+        let localFileBackupAttachmentCollector = LocalFileBackupAttachmentCollector()
+        localFileBackupAttachmentCollector.append(id: id1)
+        localFileBackupAttachmentCollector.append(id: id2)
+
+        try await localFileBackupManager.queueLocalBackupAttachmentsForExport(localFileBackupAttachmentCollector: localFileBackupAttachmentCollector)
+
+        try await localFileBackupManager.writeQueuedAttachmentsToDisk(
+            backupsRootDirectory: localBackupURL,
+            currentBackupDirectoryName: currentBackup1,
+            progress: nil,
+        )
+
+        let localKey1 = try db.read { tx in
+            try BackupLocalFileAttachmentMetadataRecord
+                .filter(Column(BackupLocalFileAttachmentMetadataRecord.CodingKeys.attachmentRowId) == id1)
+                .fetchOne(tx.database)
+                .map { $0.localKey }
+        }
+
+        let localKey2 = try db.read { tx in
+            try BackupLocalFileAttachmentMetadataRecord
+                .filter(Column(BackupLocalFileAttachmentMetadataRecord.CodingKeys.attachmentRowId) == id2)
+                .fetchOne(tx.database)
+                .map { $0.localKey }
+        }
+
+        let mediaName1 = LocalFileBackupAttachmentNaming.mediaName(
+            localKey: localKey1!,
+            plaintextHash: mockAttachment1.plaintextHash!,
+        )
+        let mediaName2 = LocalFileBackupAttachmentNaming.mediaName(
+            localKey: localKey2!,
+            plaintextHash: mockAttachment2.plaintextHash!,
+        )
+
+        let enumeratorBefore = FileManager.default.enumerator(
+            at: filesDir,
+            includingPropertiesForKeys: [.isDirectoryKey],
+        )!
+        let fileCountBefore = try enumeratorBefore.reduce(0) { count, item in
+            guard let fileURL = item as? URL else { return count }
+            let isDir = try fileURL.resourceValues(forKeys: [.isDirectoryKey]).isDirectory ?? false
+            return isDir ? count : count + 1
+        }
+
+        #expect(fileCountBefore == 12)
+
+        try await localFileBackupManager.cleanUpOldBackupsAndOrphanedAttachments(backupsRootDirectory: localBackupURL)
+
+        let enumeratorAfter = FileManager.default.enumerator(
+            at: filesDir,
+            includingPropertiesForKeys: [.isDirectoryKey],
+        )!
+
+        let filesAfter = try enumeratorAfter.compactMap { item -> URL? in
+            guard let fileURL = item as? URL else { return nil }
+            let isDir = try fileURL.resourceValues(forKeys: [.isDirectoryKey]).isDirectory ?? false
+            return isDir ? nil : fileURL
+        }
+
+        let fileNamesAfter = Set(filesAfter.map(\.lastPathComponent))
+
+        #expect(filesAfter.count == 2)
+        #expect(fileNamesAfter.contains(mediaName1))
+        #expect(fileNamesAfter.contains(mediaName2))
+    }
+
+    @Test
+    func testInsertExportRecordSkipsDeletedAttachment() throws {
+        let store = LocalFileBackupStore()
+
+        let mockAttachment = AttachmentStream.mock(
+            streamInfo: .mock(
+                encryptedByteCount: 20,
+                unencryptedByteCount: 32,
+            ),
+        ).attachment
+
+        // Insert, then delete the attachment, simulating an attachment being deleted
+        // between the archive walk and the queue-export step.
+        let orphanedId: Attachment.IDType = db.write { tx in
+            let id = LocalFileBackupTestSupport.insertMockAttachment(mockAttachment, tx: tx)
+            try! Attachment.Record
+                .filter(key: id)
+                .deleteAll(tx.database)
+            return id
+        }
+
+        db.write { tx in
+            store.insertExportRecord(attachmentId: orphanedId, tx: tx)
+        }
+
+        let exportRecords = try db.read { tx in
+            try BackupLocalFileAttachmentExportRecord.fetchAll(tx.database)
+        }
+        #expect(exportRecords.isEmpty)
+    }
+
+    @Test
+    func testUpdateAsTransferredNoopsWhenAttachmentAlreadyDeleted() throws {
+        let mockAttachment = try LocalFileBackupTestSupport.makeMockAttachmentWithRealFile()
+
+        let id = db.write { tx in
+            LocalFileBackupTestSupport.insertMockAttachment(mockAttachment, tx: tx)
+        }
+
+        let staleReference = db.read { tx in
+            attachmentStore.fetch(id: id, tx: tx)
+        }!
+
+        try db.write { tx in
+            _ = try Attachment.Record.filter(key: id).deleteAll(tx.database)
+        }
+
+        db.write { tx in
+            attachmentStore.updateLocalFileBackupAttachmentAsTransferred(
+                attachment: staleReference,
+                streamInfo: .mock(),
+                tx: tx,
+            )
+        }
+
+        let result = db.read { tx in
+            attachmentStore.fetch(id: id, tx: tx)
+        }
+        #expect(result == nil)
+    }
+
+    // MARK: - NSFileCoordinator related tests
+
+    /// Models a file-provider extension holding a pending deletion in memory:
+    /// the deletion is only applied to disk when the coordinator asks the
+    /// presenter to save its pending changes via `savePresentedItemChanges`.
+    private final class PendingDeletionPresenter: NSObject, NSFilePresenter {
+        let directoryURL: URL
+        let pendingDeletionURL: URL
+        var didReceiveSaveRequest = false
+
+        init(directoryURL: URL, pendingDeletionURL: URL) {
+            self.directoryURL = directoryURL
+            self.pendingDeletionURL = pendingDeletionURL
+        }
+
+        var presentedItemURL: URL? { directoryURL }
+        let presentedItemOperationQueue = OperationQueue()
+
+        func savePresentedItemChanges(completionHandler: @escaping (Error?) -> Void) {
+            didReceiveSaveRequest = true
+            do {
+                if FileManager.default.fileExists(atPath: pendingDeletionURL.path) {
+                    try FileManager.default.removeItem(at: pendingDeletionURL)
+                }
+                completionHandler(nil)
+            } catch {
+                completionHandler(error)
+            }
+        }
+    }
+
+    /// Simulates a call to `existingFilesInBackupDirectory` when there's pending deletion.
+    /// Makes sure results are flushed to disk before we read the resulting directory.
+    @Test
+    func testExistingFilesInBackupDirectory_waitForSavePendingDeletion() throws {
+        let backupsRoot = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: backupsRoot, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: backupsRoot) }
+
+        let filesDir = backupsRoot.appendingPathComponent("files")
+        let subDir = filesDir.appendingPathComponent("ab")
+        try FileManager.default.createDirectory(at: subDir, withIntermediateDirectories: true)
+
+        let attachmentName = "abfakeattachment"
+        let attachmentFile = subDir.appendingPathComponent(attachmentName)
+        try Data([0x01, 0x02, 0x03]).write(to: attachmentFile)
+
+        let presenter = PendingDeletionPresenter(
+            directoryURL: backupsRoot,
+            pendingDeletionURL: attachmentFile,
+        )
+        NSFileCoordinator.addFilePresenter(presenter)
+        defer { NSFileCoordinator.removeFilePresenter(presenter) }
+
+        let result = try localFileBackupManager
+            .existingFilesInBackupDirectory(backupsRootDirectory: backupsRoot)
+
+        #expect(presenter.didReceiveSaveRequest == true)
+        #expect(result[attachmentName] == nil)
+    }
+}
+
+public enum LocalFileBackupTestSupport {
+    static func makeMockAttachmentWithRealFile() throws -> Attachment {
+        let key = AttachmentKey.generate()
+        let plaintextData = Data("test".utf8)
+        let localRelativeFilePath = AttachmentStream.newRelativeFilePath()
+
+        let plaintextURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString)
+        try plaintextData.write(to: plaintextURL)
+        defer { try? FileManager.default.removeItem(at: plaintextURL) }
+
+        let attachmentFileURL = AttachmentStream.absoluteAttachmentFileURL(relativeFilePath: localRelativeFilePath)
+        try FileManager.default.createDirectory(
+            at: attachmentFileURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true,
+        )
+        let encryptionMetadata = try Cryptography.encryptAttachment(
+            at: plaintextURL,
+            output: attachmentFileURL,
+            attachmentKey: key,
+        )
+
+        return AttachmentStream.mock(
+            streamInfo: .mock(
+                encryptionKey: key,
+                encryptedByteCount: UInt32(clamping: encryptionMetadata.encryptedLength),
+                unencryptedByteCount: UInt32(plaintextData.count),
+                localRelativeFilePath: localRelativeFilePath,
+            ),
+        ).attachment
+    }
+
+    static func insertMockAttachment(_ attachment: Attachment, tx: DBWriteTransaction) -> Attachment.IDType {
+        var record = Attachment.Record(attachment: attachment)
+        try! record.insert(tx.database)
+        return record.sqliteId!
+    }
+}

@@ -4,12 +4,15 @@
 //
 
 import Foundation
+public import SignalServiceKit
 
-public enum RegistrationStep: Equatable {
+public enum RegistrationStep: CustomStringConvertible {
 
     // MARK: - Opening Steps
+
     case registrationSplash
     case changeNumberSplash
+    case signalLoginSplash(RegistrationSignalLoginSplashState)
     case permissions
 
     // MARK: - Quick Restore
@@ -31,11 +34,8 @@ public enum RegistrationStep: Equatable {
     /// If registering via session, the step to enter the verification code.
     case verificationCodeEntry(RegistrationVerificationState)
 
-    /// When registering, the server can inform the client that a device-to-device
-    /// transfer is possible. If so, the user must either do the transfer, or explicitly
-    /// elect not to. This step presents those options to the user.
-    /// Only happens if registering on a new device without local data.
-    case transferSelection
+    /// Prompt the user to enter ACI/AEP for registration
+    case promptForLogin(RegistrationSignalLoginState)
 
     /// For the first time we enter the pin. This can be
     /// for first account setup, creating a pin, or if
@@ -65,7 +65,7 @@ public enum RegistrationStep: Equatable {
     // MARK: - Post-Registration
 
     /// The path taken to get to the restore options screen
-    public enum RestorePath: Equatable {
+    public enum RestorePath {
         public enum BackupTier {
             case free
             case paid
@@ -82,6 +82,16 @@ public enum RegistrationStep: Equatable {
         case manualRestore
         /// Transfer from device, restore backup, prominent skip button
         case unspecified
+
+        public var logSafeString: String {
+            switch self {
+            case .quickRestore(let tier, let platform):
+                let tierString = tier.map { "\($0)" } ?? "unknownTier"
+                return "quickRestore(\(tierString), \(platform))"
+            case .manualRestore: return "manualRestore"
+            case .unspecified: return "unspecified"
+            }
+        }
     }
 
     /// Prompt the user to choose from the available restore methods
@@ -90,7 +100,7 @@ public enum RegistrationStep: Equatable {
     /// Prompt the user to confirm restoring from backup
     case confirmRestoreFromBackup(RegistrationRestoreFromBackupConfirmationState)
 
-    case deviceTransfer(RegistrationTransferStatusState)
+    case deviceTransfer(DeviceTransferCoordinator)
 
     /// If the account has not set whether its phone number should be
     /// discoverable, this step happens after registration is complete.
@@ -103,7 +113,11 @@ public enum RegistrationStep: Equatable {
 
     // MARK: - Non-ViewController steps
 
-    public enum ErrorSheet: Equatable {
+    public enum ErrorSheet {
+        /// We received a session that indicates we won't be able to use it to
+        /// request a code.
+        case sessionCanNeverRequestVerificationCode
+
         /// We should tell the user their attempt has expired
         /// and they need to start over.
         case sessionInvalidated
@@ -122,7 +136,7 @@ public enum RegistrationStep: Equatable {
         /// post-registration steps they were deregistered, likely by
         /// another device registering on the same number.
         /// The only path forward is to reset _everything_ and re-register.
-        case becameDeregistered(reregParams: RegistrationMode.ReregistrationParams)
+        case becameDeregistered(localIdentifiers: ReregisteringLocalIdentifiers)
 
         /// A network error occurred. The user can probably fix this by
         /// checking their internet connection.
@@ -130,6 +144,18 @@ public enum RegistrationStep: Equatable {
 
         /// A generic error occurred. Prefer to use other error types.
         case genericError
+
+        public var logSafeString: String {
+            switch self {
+            case .sessionCanNeverRequestVerificationCode: return "sessionCanNeverRequestVerificationCode"
+            case .sessionInvalidated: return "sessionInvalidated"
+            case .verificationCodeSubmissionUnavailable: return "verificationCodeSubmissionUnavailable"
+            case .submittingVerificationCodeBeforeAnyCodeSent: return "submittingVerificationCodeBeforeAnyCodeSent"
+            case .becameDeregistered: return "becameDeregistered"
+            case .networkError: return "networkError"
+            case .genericError: return "genericError"
+            }
+        }
     }
 
     /// Special cases; should display an error on the current screen, whatever it is.
@@ -149,26 +175,27 @@ public enum RegistrationStep: Equatable {
 
     // MARK: - Logging
 
-    public var logSafeString: String {
+    public var description: String {
         switch self {
         case .registrationSplash: return "registrationSplash"
         case .changeNumberSplash: return "changeNumberSplash"
+        case .signalLoginSplash: return "signalLoginSplash"
         case .permissions: return "permissions"
         case .scanQuickRegistrationQrCode: return "scanQuickRegistrationQrCode"
         case .phoneNumberEntry: return "phoneNumberEntry"
         case .verificationCodeEntry: return "verificationCodeEntry"
-        case .transferSelection: return "transferSelection"
         case .deviceTransfer: return "deviceTransfer"
-        case .pinEntry: return "pinEntry"
+        case .promptForLogin: return "promptForLogin"
+        case .pinEntry(let pinState): return "pinEntry(\(pinState.operation.logSafeString))"
         case .pinAttemptsExhaustedWithoutReglock: return "pinAttemptsExhaustedWithoutReglock"
         case .captchaChallenge: return "captchaChallenge"
         case .reglockTimeout: return "reglockTimeout"
         case .enterRecoveryKey: return "enterRecoveryKey"
-        case .chooseRestoreMethod: return "chooseRestoreMethod"
+        case .chooseRestoreMethod(let restorePath): return "chooseRestoreMethod(\(restorePath.logSafeString))"
         case .confirmRestoreFromBackup: return "confirmRestoreFromBackup"
         case .phoneNumberDiscoverability: return "phoneNumberDiscoverability"
         case .setupProfile: return "setupProfile"
-        case .showErrorSheet: return "showErrorSheet"
+        case .showErrorSheet(let errorSheet): return "showErrorSheet(\(errorSheet.logSafeString))"
         case .appUpdateBanner: return "appUpdateBanner"
         case .done: return "done"
         }

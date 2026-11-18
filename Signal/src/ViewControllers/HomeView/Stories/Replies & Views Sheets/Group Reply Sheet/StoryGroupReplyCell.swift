@@ -7,6 +7,10 @@ import BonMot
 import SignalServiceKit
 import SignalUI
 
+protocol StoryGroupReplyMessageResendDelegate: AnyObject {
+    func askToResendMessage(for: StoryGroupReplyViewItem)
+}
+
 class StoryGroupReplyCell: UITableViewCell {
     lazy var avatarView = ConversationAvatarView(sizeClass: .twentyEight, localUserDisplayMode: .asUser, useAutolayout: true)
     lazy var messageLabel: UILabel = {
@@ -14,23 +18,27 @@ class StoryGroupReplyCell: UITableViewCell {
         label.numberOfLines = 0
         return label
     }()
+
     lazy var authorNameLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.dynamicTypeFootnoteClamped.semibold()
         return label
     }()
+
     lazy var reactionLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 28)
         label.textAlignment = .trailing
         return label
     }()
+
     lazy var bubbleView: UIView = {
         let view = UIView()
         view.backgroundColor = .ows_gray80
         view.layoutMargins = UIEdgeInsets(hMargin: 12, vMargin: 7)
         return view
     }()
+
     lazy var bubbleCornerMaskLayer = CAShapeLayer()
 
     private lazy var sendingSpinner = SendingSpinner()
@@ -39,8 +47,7 @@ class StoryGroupReplyCell: UITableViewCell {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.image = UIImage(imageLiteralResourceName: "error-circle-20")
-        imageView.tintColor = .ows_accentRed
-        imageView.autoSetDimensions(to: .square(20))
+        imageView.tintColor = .Signal.red
 
         let container = UIView()
         container.layoutMargins = UIEdgeInsets(hMargin: 12, vMargin: 0)
@@ -57,12 +64,14 @@ class StoryGroupReplyCell: UITableViewCell {
             case middle
             case bottom
         }
+
         var position: Position
 
         enum Kind: String, CaseIterable {
             case text
             case reaction
         }
+
         let kind: Kind
 
         init(kind: Kind, position: Position = .standalone) {
@@ -172,10 +181,11 @@ class StoryGroupReplyCell: UITableViewCell {
         var cornerRadius: CGFloat { 18 }
         var sharpCornerRadius: CGFloat { 4 }
     }
+
     let cellType: CellType
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        if let reuseIdentifier = reuseIdentifier, let cellType = CellType(rawValue: reuseIdentifier) {
+        if let reuseIdentifier, let cellType = CellType(rawValue: reuseIdentifier) {
             self.cellType = cellType
         } else {
             owsFailDebug("Missing cellType for reuseIdentifier \(String(describing: reuseIdentifier))")
@@ -243,7 +253,7 @@ class StoryGroupReplyCell: UITableViewCell {
 
         sendingSpinner.isHiddenInStackView = true
         sendingSpinner.autoSetDimension(.width, toSize: 12)
-        sendingSpinner.tintColor = Theme.darkThemePrimaryColor
+        sendingSpinner.tintColor = .Signal.label
 
         vStack.addArrangedSubview(internalHStack)
 
@@ -263,10 +273,12 @@ class StoryGroupReplyCell: UITableViewCell {
 
     private var item: StoryGroupReplyViewItem?
     private var spoilerState: SpoilerRenderState?
+    private weak var resendMessageDelegate: StoryGroupReplyMessageResendDelegate?
 
-    func configure(with item: StoryGroupReplyViewItem, spoilerState: SpoilerRenderState) {
+    func configure(with item: StoryGroupReplyViewItem, spoilerState: SpoilerRenderState, resendMessageDelegate: StoryGroupReplyMessageResendDelegate?) {
         self.item = item
         self.spoilerState = spoilerState
+        self.resendMessageDelegate = resendMessageDelegate
         if cellType.hasAuthor {
             authorNameLabel.textColor = item.authorColor
             authorNameLabel.text = item.authorDisplayName
@@ -292,19 +304,19 @@ class StoryGroupReplyCell: UITableViewCell {
             if item.wasRemotelyDeleted {
                 return .attributedText(OWSLocalizedString("THIS_MESSAGE_WAS_DELETED", comment: "text indicating the message was remotely deleted").styled(
                     with: .font(UIFont.dynamicTypeBodyClamped.italic()),
-                    .color(.ows_gray05)
+                    .color(.Signal.label),
                 ))
             } else if cellType.isReaction {
                 let reactionString: String
                 if item.authorAddress.isLocalAddress {
-                    reactionString = OWSLocalizedString("STORY_REPLY_REACTION_SECOND_PERSON", comment: "Text indicating you reacted to a story (the header on the bubble says \"You\")")
+                    reactionString = OWSLocalizedString("GROUP_STORY_REPLY_REACTION_SECOND_PERSON", comment: "Text indicating you reacted to a group story (the header on the bubble says \"You\")")
                 } else {
-                    reactionString = OWSLocalizedString("STORY_REPLY_REACTION_THIRD_PERSON", comment: "Text indicating someone else reacted to a story (the header on the bubble says their name, e.g. \"Bob\")")
+                    reactionString = OWSLocalizedString("GROUP_STORY_REPLY_REACTION_THIRD_PERSON", comment: "Text indicating someone else reacted to a group story (the header on the bubble says their name, e.g. \"Bob\")")
                 }
                 return .attributedText(reactionString.styled(
                     with: .font(.dynamicTypeBodyClamped),
-                    .color(.ows_gray05),
-                    .alignment(.natural)
+                    .color(.Signal.label),
+                    .alignment(.natural),
                 ))
             } else if let displayableText = item.displayableText {
                 return displayableText.displayTextValue
@@ -314,7 +326,7 @@ class StoryGroupReplyCell: UITableViewCell {
         }()
 
         let displayConfig = HydratedMessageBody.DisplayConfiguration.groupStoryReply(
-            revealedSpoilerIds: spoilerState.revealState.revealedSpoilerIds(interactionIdentifier: item.interactionIdentifier)
+            revealedSpoilerIds: spoilerState.revealState.revealedSpoilerIds(interactionIdentifier: item.interactionIdentifier),
         )
         messageSpoilerConfigBuilder.displayConfig = displayConfig
         messageSpoilerConfigBuilder.text = messageText
@@ -364,13 +376,13 @@ class StoryGroupReplyCell: UITableViewCell {
         // Style footer
         footerText.addAttributesToEntireString([
             .font: UIFont.dynamicTypeCaption1Clamped,
-            .foregroundColor: UIColor.ows_gray25
+            .foregroundColor: UIColor.Signal.secondaryLabel,
         ])
 
         // Render footer inline if possible
         let messageMeasurement = measure(
             messageAttributedText(messageText, displayConfig: displayConfig),
-            maxWidth: maxMessageWidth
+            maxWidth: maxMessageWidth,
         )
         let footerMeasurement = measure(footerText, maxWidth: maxMessageWidth)
 
@@ -395,7 +407,7 @@ class StoryGroupReplyCell: UITableViewCell {
         if shouldRenderFooterOnLastMessageLine {
             var possibleMessageBubbleWidths = [
                 messageMeasurement.rect.width,
-                messageMeasurement.lastLineRect.width + footerSpacer + footerMeasurement.rect.width
+                messageMeasurement.lastLineRect.width + footerSpacer + footerMeasurement.rect.width,
             ]
             if cellType.hasAuthor, let authorDisplayName = item.authorDisplayName {
                 let authorMeasurement = measure(authorDisplayName.styled(with: .font(authorNameLabel.font)), maxWidth: maxMessageWidth)
@@ -411,14 +423,14 @@ class StoryGroupReplyCell: UITableViewCell {
                     "\n",
                     footerText.styled(
                         with: .paragraphSpacingBefore(-footerMeasurement.rect.height),
-                        .firstLineHeadIndent(finalMessageLabelWidth - footerMeasurement.rect.width)
-                    )
-                ]
+                        .firstLineHeadIndent(finalMessageLabelWidth - footerMeasurement.rect.width),
+                    ),
+                ],
             )
         } else {
             var possibleMessageBubbleWidths = [
                 messageMeasurement.rect.width,
-                footerMeasurement.rect.width
+                footerMeasurement.rect.width,
             ]
             if cellType.hasAuthor, let authorDisplayName = item.authorDisplayName {
                 let authorMeasurement = measure(authorDisplayName.styled(with: .font(authorNameLabel.font)), maxWidth: maxMessageWidth)
@@ -434,10 +446,10 @@ class StoryGroupReplyCell: UITableViewCell {
                     "\n",
                     footerText.styled(
                         with: textDirectionMatchesAppDirection
-                        ? .firstLineHeadIndent(finalMessageLabelWidth - footerMeasurement.rect.width)
-                        : .alignment(.trailing)
-                    )
-                ]
+                            ? .firstLineHeadIndent(finalMessageLabelWidth - footerMeasurement.rect.width)
+                            : .alignment(.trailing),
+                    ),
+                ],
             )
         }
     }
@@ -449,16 +461,16 @@ class StoryGroupReplyCell: UITableViewCell {
     private func messageAttributedText(
         _ textValue: CVTextValue,
         displayConfig: HydratedMessageBody.DisplayConfiguration,
-        suffixes: [BonMot.Composable] = []
+        suffixes: [BonMot.Composable] = [],
     ) -> NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = textValue.naturalTextAligment
         let baseFont = UIFont.dynamicTypeBodyClamped
-        let baseTextColor = UIColor.ows_gray05
+        let baseTextColor = UIColor.Signal.label
         let baseAttrs: [NSAttributedString.Key: Any] = [
             .font: baseFont,
             .foregroundColor: baseTextColor,
-            .paragraphStyle: paragraphStyle
+            .paragraphStyle: paragraphStyle,
         ]
 
         let attributedText: NSAttributedString = {
@@ -474,7 +486,7 @@ class StoryGroupReplyCell: UITableViewCell {
                     config: displayConfig,
                     baseFont: baseFont,
                     baseTextColor: baseTextColor,
-                    isDarkThemeEnabled: Theme.isDarkThemeEnabled
+                    isDarkThemeEnabled: Theme.isDarkThemeEnabled,
                 )
             }
         }()
@@ -500,14 +512,14 @@ class StoryGroupReplyCell: UITableViewCell {
         let lastGlyphIndex = layoutManager.glyphIndexForCharacter(at: attributedString.length - 1)
         let unroundedLastLineFragmentRect = layoutManager.lineFragmentUsedRect(
             forGlyphAt: lastGlyphIndex,
-            effectiveRange: nil
+            effectiveRange: nil,
         )
         let lastLineFragmentRect = CGRect(
             origin: unroundedLastLineFragmentRect.origin,
             size: CGSize(
                 width: floor(unroundedLastLineFragmentRect.width),
-                height: floor(unroundedLastLineFragmentRect.height)
-            )
+                height: floor(unroundedLastLineFragmentRect.height),
+            ),
         )
 
         let unroundedFullTextRect = layoutManager.usedRect(for: textContainer)
@@ -515,8 +527,8 @@ class StoryGroupReplyCell: UITableViewCell {
             origin: unroundedFullTextRect.origin,
             size: CGSize(
                 width: floor(unroundedFullTextRect.width),
-                height: floor(unroundedFullTextRect.height)
-            )
+                height: floor(unroundedFullTextRect.height),
+            ),
         )
 
         return (fullTextRect, lastLineFragmentRect)
@@ -532,7 +544,7 @@ class StoryGroupReplyCell: UITableViewCell {
             bubbleView.bounds,
             sharpCorners: cellType.sharpCorners,
             sharpCornerRadius: cellType.sharpCornerRadius,
-            wideCornerRadius: cellType.cornerRadius
+            wideCornerRadius: cellType.cornerRadius,
         ).cgPath
     }
 
@@ -555,6 +567,11 @@ class StoryGroupReplyCell: UITableViewCell {
         else {
             return
         }
+
+        if case .failed = item.recipientStatus {
+            resendMessageDelegate?.askToResendMessage(for: item)
+        }
+
         guard let messageText: CVTextValue = item.displayableText?.displayTextValue else {
             return
         }
@@ -564,7 +581,7 @@ class StoryGroupReplyCell: UITableViewCell {
             return
         case .messageBody(let body):
             let revealedSpoilerIds = spoilerState.revealState.revealedSpoilerIds(
-                interactionIdentifier: item.interactionIdentifier
+                interactionIdentifier: item.interactionIdentifier,
             )
             for tappableItem in body.tappableItems(revealedSpoilerIds: revealedSpoilerIds, dataDetector: nil) {
                 switch tappableItem {
@@ -574,11 +591,11 @@ class StoryGroupReplyCell: UITableViewCell {
                     if unrevealedSpoiler.range.contains(tapIndex) {
                         spoilerState.revealState.setSpoilerRevealed(
                             withID: unrevealedSpoiler.id,
-                            interactionIdentifier: item.interactionIdentifier
+                            interactionIdentifier: item.interactionIdentifier,
                         )
                         // Re-configure. This is ok because revealing the spoiler
                         // doesn't change the sizing.
-                        configure(with: item, spoilerState: spoilerState)
+                        configure(with: item, spoilerState: spoilerState, resendMessageDelegate: resendMessageDelegate)
                         return
                     }
                 }
@@ -603,7 +620,10 @@ class StoryGroupReplyCell: UITableViewCell {
 
 private class SendingSpinner: UIImageView {
     init() {
-        super.init(image: #imageLiteral(resourceName: "message_status_sending").withRenderingMode(.alwaysTemplate).withAlignmentRectInsets(.init(hMargin: 0, vMargin: -2)))
+        super.init(
+            image: UIImage(imageLiteralResourceName: "message_status_sending")
+                .withAlignmentRectInsets(.init(hMargin: 0, vMargin: -2)),
+        )
 
         startAnimating()
     }
@@ -617,7 +637,7 @@ private class SendingSpinner: UIImageView {
 
         guard layer.animation(forKey: "spin") == nil else { return }
 
-        let animation = CABasicAnimation.init(keyPath: "transform.rotation.z")
+        let animation = CABasicAnimation(keyPath: "transform.rotation.z")
         animation.toValue = CGFloat.pi * 2
         animation.duration = TimeInterval.second
         animation.isCumulative = true

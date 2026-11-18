@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import XCTest
 import Foundation
+import XCTest
 @testable import SignalServiceKit
 
 class StickerManagerTest: XCTestCase {
@@ -68,10 +68,38 @@ class StickerManagerTest: XCTestCase {
     func testDecryption() {
         // From the Zozo the French Bulldog sticker pack
         let packKey = Data([
-            0x17, 0xe9, 0x71, 0xc1, 0x34, 0x03, 0x56, 0x22,
-            0x78, 0x1d, 0x2e, 0xe2, 0x49, 0xe6, 0x47, 0x3b,
-            0x77, 0x45, 0x83, 0x75, 0x0b, 0x68, 0xc1, 0x1b,
-            0xb8, 0x2b, 0x75, 0x09, 0xc6, 0x8b, 0x6d, 0xfd
+            0x17,
+            0xe9,
+            0x71,
+            0xc1,
+            0x34,
+            0x03,
+            0x56,
+            0x22,
+            0x78,
+            0x1d,
+            0x2e,
+            0xe2,
+            0x49,
+            0xe6,
+            0x47,
+            0x3b,
+            0x77,
+            0x45,
+            0x83,
+            0x75,
+            0x0b,
+            0x68,
+            0xc1,
+            0x1b,
+            0xb8,
+            0x2b,
+            0x75,
+            0x09,
+            0xc6,
+            0x8b,
+            0x6d,
+            0xfd,
         ])
 
         let bundle = Bundle(for: StickerManagerTest.self)
@@ -80,50 +108,66 @@ class StickerManagerTest: XCTestCase {
         let decryptedStickerURL = bundle.url(forResource: "sample-sticker", withExtension: "webp")!
         let decryptedStickerData = try! Data(contentsOf: decryptedStickerURL)
 
-        let outputUrl = try! StickerManager.decrypt(at: encryptedStickerURL, packKey: packKey)
-        let outputData = try! Data(contentsOf: outputUrl)
+        let outputData = try! StickerManager.decrypt(at: encryptedStickerURL, packKey: packKey)
         XCTAssertEqual(outputData, decryptedStickerData)
     }
 }
 
 class StickerManagerTest2: SSKBaseTest {
 
-    func testSuggestedStickers() {
+    private var stickerManager: StickerManager!
+
+    @MainActor
+    override func setUp() {
+        super.setUp()
+        let dateProvider = { Date() }
+        let appReadiness = AppReadinessMock()
+        self.stickerManager = StickerManager(
+            appReadiness: appReadiness,
+            dateProvider: dateProvider,
+            attachmentStore: AttachmentStore(),
+            attachmentDownloadStore: AttachmentDownloadStore(dateProvider: dateProvider),
+            tsAccountManager: MockTSAccountManager(),
+            messageSenderJobQueue: MessageSenderJobQueue(appReadiness: appReadiness),
+            interactionStore: InteractionStoreImpl(),
+            db: SSKEnvironment.shared.databaseStorageRef,
+        )
+    }
+
+    func testSuggestedStickers() async {
         // The "StickerManager.suggestedStickers" instance method does caching;
         // the class method does not.
 
         SSKEnvironment.shared.databaseStorageRef.read { tx in
-            XCTAssertEqual(0, StickerManager.suggestedStickers(for: "🇨🇦", tx: tx).count)
+            XCTAssertEqual(0, stickerManager.suggestedStickers(for: "🇨🇦", tx: tx).count)
         }
 
         let stickerInfo = StickerInfo.defaultValue
         let stickerData = Randomness.generateRandomBytes(1)
-        let temporaryFile = OWSFileSystem.temporaryFileUrl()
-        try! stickerData.write(to: temporaryFile)
 
-        let success = StickerManager.installSticker(
+        let success = await stickerManager.installSticker(
             stickerInfo: stickerInfo,
-            stickerUrl: temporaryFile,
+            stickerData: stickerData,
             contentType: MimeType.imageWebp.rawValue,
-            emojiString: "🌼🇨🇦"
+            emojiString: "🌼🇨🇦",
         )
         XCTAssertTrue(success)
 
         // The sticker should only be suggested if user enters a single emoji
         // (and nothing else) that is associated with the sticker.
         SSKEnvironment.shared.databaseStorageRef.read { tx in
-            XCTAssertEqual(1, StickerManager.suggestedStickers(for: "🇨🇦", tx: tx).count)
-            XCTAssertEqual(1, StickerManager.suggestedStickers(for: "🌼", tx: tx).count)
-            XCTAssertEqual(0, StickerManager.suggestedStickers(for: "🇹🇹", tx: tx).count)
+            XCTAssertEqual(1, stickerManager.suggestedStickers(for: "🇨🇦", tx: tx).count)
+            XCTAssertEqual(1, stickerManager.suggestedStickers(for: "🌼", tx: tx).count)
+            XCTAssertEqual(0, stickerManager.suggestedStickers(for: "🇹🇹", tx: tx).count)
         }
 
-        SSKEnvironment.shared.databaseStorageRef.write { (transaction) in
+        await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
             // Don't bother calling completion.
-            StickerManager.uninstallSticker(stickerInfo: stickerInfo, transaction: transaction)
+            stickerManager.uninstallSticker(stickerInfo: stickerInfo, transaction: transaction)
         }
 
         SSKEnvironment.shared.databaseStorageRef.read { tx in
-            XCTAssertEqual(0, StickerManager.suggestedStickers(for: "🇨🇦", tx: tx).count)
+            XCTAssertEqual(0, stickerManager.suggestedStickers(for: "🇨🇦", tx: tx).count)
         }
     }
 }

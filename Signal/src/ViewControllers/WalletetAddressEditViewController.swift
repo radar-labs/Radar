@@ -27,7 +27,7 @@ class WalletAddressEditViewController: OWSTableViewController2 {
         },
         returnPressed: { [unowned self] in
             if hasUnsavedChanges { self.didTapDone() }
-        }
+        },
     )
 
     private let oldAddress: String
@@ -46,7 +46,8 @@ class WalletAddressEditViewController: OWSTableViewController2 {
         self.isPresentedInSheet = true
         let navigationController = OWSNavigationController(rootViewController: self)
         if forceDarkMode {
-            self.forceDarkMode = true
+            // OWSTableViewController2 uses dynamic colors now (upstream 2e2ff241fc),
+            // so the interface style override alone makes it dark.
             navigationController.overrideUserInterfaceStyle = .dark
         }
         viewController.presentFormSheet(navigationController, animated: true)
@@ -54,13 +55,13 @@ class WalletAddressEditViewController: OWSTableViewController2 {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         title = "Edit address"
 
         if isPresentedInSheet {
             self.navigationItem.leftBarButtonItem = .cancelButton(
                 dismissingFrom: self,
-                hasUnsavedChanges: { [unowned self] in self.hasUnsavedChanges }
+                hasUnsavedChanges: { [unowned self] in self.hasUnsavedChanges },
             )
         }
         self.navigationItem.rightBarButtonItem = .doneButton { [unowned self] in self.didTapDone() }
@@ -71,7 +72,7 @@ class WalletAddressEditViewController: OWSTableViewController2 {
         self.contents = OWSTableContents(sections: [
             OWSTableSection(items: [.textFieldItem(
                 self.addressField,
-                textColor: UIColor.Signal.label
+                textColor: UIColor.Signal.label,
             )]),
         ])
     }
@@ -134,7 +135,7 @@ class WalletAddressEditViewController: OWSTableViewController2 {
                         self?.handleError(error)
                     }
                 }
-            }
+            },
         )
     }
 
@@ -148,7 +149,7 @@ extension WalletAddressEditViewController: UITextFieldDelegate {
             textField,
             shouldChangeCharactersInRange: range,
             replacementString: string,
-            maxGlyphCount: Self.addressGlyphLimit
+            maxGlyphCount: Self.addressGlyphLimit,
         )
     }
 }

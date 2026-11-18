@@ -1,0 +1,835 @@
+//
+// Copyright 2026 Signal Messenger, LLC
+// SPDX-License-Identifier: AGPL-3.0-only
+//
+
+public import LibSignalClient
+
+public enum LocalFileBackupError: Error {
+    public enum AccessFailureReason: CustomStringConvertible {
+        case stale
+        case missing
+        case noAccess
+        case failedToResolveBookmark(Error)
+        case trashed
+
+        public var description: String {
+            switch self {
+            case .stale: return "stale"
+            case .missing: return "missing"
+            case .noAccess: return "noAccess"
+            case .failedToResolveBookmark: return "failedToResolveBookmark"
+            case .trashed: return "trashed"
+            }
+        }
+    }
+
+    case unableToAccessLocalFile(AccessFailureReason)
+    case invalidVersion
+    case mismatchedACIAndRecoveryKey
+}
+
+/// Manager to handle local file backup logic, including file I/O, UIDocumentPicker logic, and security-scoped bookmark handling.
+/// Actual archiving of the backup is handled by BackupArchiveManager.
+public class LocalFileBackupManager: NSObject, UIDocumentPickerDelegate {
+    public enum FileStructure: String {
+        case rootDirectory = "SignalBackups"
+        case attachmentDirectory = "files"
+        case backupFile = "main"
+        case metadataFile = "metadata"
+
+        public static let backupDirectoryPrefix = "signal-backup-"
+
+        static let dateFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd-HH-mm-ss"
+            formatter.timeZone = TimeZone(identifier: "UTC")
+            return formatter
+        }()
+
+        static func backupDirectory(date: Date) -> String {
+            return "\(backupDirectoryPrefix)\(dateFormatter.string(from: date))"
+        }
+
+        static func rootDirectoryInFileLocation(_ fileURL: URL) -> URL {
+            return fileURL.appendingPathComponent(rootDirectory.rawValue)
+        }
+
+        public static func date(fromBackupDirectoryName name: String) -> Date? {
+            guard name.hasPrefix(backupDirectoryPrefix) else { return nil }
+            let dateString = String(name.dropFirst(backupDirectoryPrefix.count))
+            return dateFormatter.date(from: dateString)
+        }
+    }
+
+    struct AttachmentWithMetadata {
+        let attachment: Attachment
+        let metadata: BackupLocalFileAttachmentMetadataRecord
+    }
+
+    private let logger: PrefixedLogger
+    private let db: DB
+    private let dateProvider: DateProvider
+    private let attachmentStore: AttachmentStore
+    private let attachmentValidator: AttachmentContentValidator
+    private let orphanedAttachmentCleaner: OrphanedAttachmentCleaner
+    private let localFileBackupAttachmentMetadataStore: LocalFileBackupAttachmentMetadataStore
+    private nonisolated let localFileBackupStore: LocalFileBackupStore
+    private nonisolated let securityScopedBookmarkAccess: SecurityScopedBookmarkAccess
+    private let restoreProgress: LocalFileBackupAttachmentRestoreProgress
+
+    private static let maxAllowedNumberOfBackups: Int = 2
+
+    private var folderPickerCompletion: ((FolderPickerResult) -> Void)?
+
+    public static let attachmentBatchSize = 50
+
+    public static let localBackupVersion: UInt32 = 1
+
+    public enum ProgressLabel {
+        public static let writeQueuedAttachment = "writeQueuedAttachment"
+    }
+
+    init(
+        appReadiness: AppReadiness,
+        db: DB,
+        dateProvider: @escaping DateProvider,
+        attachmentStore: AttachmentStore,
+        attachmentValidator: AttachmentContentValidator,
+        orphanedAttachmentCleaner: OrphanedAttachmentCleaner,
+        localFileBackupAttachmentMetadataStore: LocalFileBackupAttachmentMetadataStore,
+        localFileBackupStore: LocalFileBackupStore,
+        securityScopedBookmarkAccess: SecurityScopedBookmarkAccess,
+        restoreProgress: LocalFileBackupAttachmentRestoreProgress,
+    ) {
+        self.db = db
+        self.dateProvider = dateProvider
+        self.attachmentStore = attachmentStore
+        self.attachmentValidator = attachmentValidator
+        self.orphanedAttachmentCleaner = orphanedAttachmentCleaner
+        self.logger = PrefixedLogger(prefix: "[LocalFileBackups]")
+        self.localFileBackupAttachmentMetadataStore = localFileBackupAttachmentMetadataStore
+        self.localFileBackupStore = localFileBackupStore
+        self.securityScopedBookmarkAccess = securityScopedBookmarkAccess
+        self.restoreProgress = restoreProgress
+
+        super.init()
+
+        appReadiness.runNowOrWhenMainAppDidBecomeReadyAsync { [weak self] in
+            guard BuildFlags.LocalFileBackups.restore else { return }
+            Task { [weak self] in
+                do {
+                    try await self?.restoreLocalFileBackupAttachments()
+                } catch {
+                    Logger.error("Failed to resume local file backup restore: \(error)")
+                }
+            }
+        }
+    }
+
+    /*
+     ---- DIRECTORY STRUCTURE ----
+
+     SignalBackups/
+     ├─ signal-backup-{year}-{month}-{day}-{hr}-{min}-{sec}/
+          ├─ metadata
+          ├─ main
+          └─ files
+     └─ files/
+       └─ <fileName prefix>
+          └─ <fileName 1>
+       └─ <fileName prefix>
+          ├─ <fileName 2>
+          └─ <fileName 3>
+       ...
+       └─ <fileName prefix>
+          └─ <fileName N>
+     */
+
+    // MARK: - Restoring
+
+    func restoreLocalFileBackupAttachments() async throws {
+        let totalByteCount = db.read { tx in
+            localFileBackupStore.totalUnencryptedByteCountOfQueuedImports(tx: tx)
+        }
+
+        guard totalByteCount > 0 else {
+            // Nothing to restore.
+            return
+        }
+
+        Logger.info("")
+        let resolvedURL: URL?
+        do {
+            resolvedURL = try getSavedSecurityScopedBookmark(type: .restore)
+        } catch {
+            throw LocalFileBackupError.unableToAccessLocalFile(.noAccess)
+        }
+
+        guard let resolvedURL else {
+            // No local file backup location stored.
+            return
+        }
+
+        let hasAccess = securityScopedBookmarkAccess.startAccessToSecurityScopedBookmark(url: resolvedURL)
+        guard hasAccess else {
+            throw LocalFileBackupError.unableToAccessLocalFile(.noAccess)
+        }
+
+        defer {
+            securityScopedBookmarkAccess.stopAccessToSecurityScopedBookmark(url: resolvedURL)
+        }
+
+        try await _restoreLocalFileBackupAttachments(resolvedURL: resolvedURL, totalByteCount: totalByteCount)
+    }
+
+    private func fetchImportRecordsAndAssociatedAttachmentRecords() -> [(AttachmentWithMetadata, BackupLocalFileAttachmentImportRecord)] {
+        return db.read { tx in
+            let imports = localFileBackupStore.importRecords(batchSize: Self.attachmentBatchSize, tx: tx)
+            let attachments = attachmentStore.fetch(ids: imports.map({ $0.attachmentRowId }), tx: tx)
+            let attachmentsByID = Dictionary(uniqueKeysWithValues: attachments.map { ($0.id, $0) })
+
+            return imports.compactMap { importRecord in
+                let attachment = attachmentsByID[importRecord.attachmentRowId].owsFailUnwrap("FOREIGN KEYs mean this must exist.")
+                guard
+                    let metadata = localFileBackupAttachmentMetadataStore.metadataRecord(
+                        attachmentId: importRecord.attachmentRowId,
+                        tx: tx,
+                    )
+                else {
+                    // TODO: Store error to present to beta user
+                    owsFailBeta("Missing local file attachment metadata!")
+                    return nil
+                }
+                return (AttachmentWithMetadata(attachment: attachment, metadata: metadata), importRecord)
+            }
+        }
+    }
+
+    func _restoreLocalFileBackupAttachments(resolvedURL: URL, totalByteCount: UInt64) async throws {
+        Logger.info("")
+        restoreProgress.beginObserving(totalByteCount: totalByteCount)
+
+        while true {
+            let attachmentsWithMetadata: [(AttachmentWithMetadata, BackupLocalFileAttachmentImportRecord)] = fetchImportRecordsAndAssociatedAttachmentRecords()
+            if attachmentsWithMetadata.isEmpty {
+                break
+            }
+
+            let attachmentsDir = resolvedURL.appendingPathComponent(FileStructure.attachmentDirectory.rawValue)
+            for (attachmentWithMetadata, localFileImport) in attachmentsWithMetadata {
+                guard let plaintextHash = attachmentWithMetadata.attachment.plaintextHash else {
+                    // TODO: Store error to present to beta user
+                    owsFailBeta("Missing plaintext hash for a local file attachment")
+                    continue
+                }
+                let mediaName = LocalFileBackupAttachmentNaming.mediaName(
+                    localKey: attachmentWithMetadata.metadata.localKey,
+                    plaintextHash: plaintextHash,
+                )
+                let attachmentSubDirectory = attachmentsDir.appendingPathComponent(
+                    LocalFileBackupAttachmentNaming.subdirectoryName(mediaName: mediaName),
+                )
+
+                let destination = attachmentSubDirectory.appendingPathComponent(mediaName)
+
+                let attachmentKey = try AttachmentKey(combinedKey: attachmentWithMetadata.metadata.localKey)
+
+                var pendingAttachment: PendingAttachment
+                do {
+                    pendingAttachment = try await attachmentValidator.validateDownloadedContents(
+                        ofEncryptedFileAt: destination,
+                        attachmentKey: attachmentKey,
+                        plaintextLength: attachmentWithMetadata.metadata.unencryptedByteCount,
+                        integrityCheck: .plaintextHash(plaintextHash),
+                        mimeType: attachmentWithMetadata.attachment.mimeType,
+                        renderingFlag: .default,
+                        sourceFilename: nil,
+                    )
+                } catch let error as CancellationError {
+                    throw error
+                } catch {
+                    Logger.error("Error validating attachment id \(attachmentWithMetadata.attachment.id), error: \(error)")
+                    restoreProgress.didProcessAttachment(
+                        unencryptedByteCount: attachmentWithMetadata.metadata.unencryptedByteCount,
+                    )
+                    _ = try db.write { tx in
+                        try localFileImport.delete(tx.database)
+                    }
+                    continue
+                }
+
+                db.write { tx in
+                    attachmentStore.updateLocalFileBackupAttachmentAsTransferred(
+                        attachment: attachmentWithMetadata.attachment,
+                        streamInfo: Attachment.StreamInfo(pendingAttachment: pendingAttachment),
+                        tx: tx,
+                    )
+                    orphanedAttachmentCleaner.releasePendingAttachment(
+                        withId: pendingAttachment.orphanRecordId,
+                        tx: tx,
+                    )
+
+                    failIfThrows {
+                        try localFileImport.delete(tx.database)
+                    }
+                }
+
+                restoreProgress.didProcessAttachment(
+                    unencryptedByteCount: attachmentWithMetadata.metadata.unencryptedByteCount,
+                )
+            }
+        }
+
+        restoreProgress.didFinish()
+    }
+
+    // MARK: - Archiving
+
+    /// - Parameter backupsRootDirectory
+    /// The SignalBackups directory.
+    func existingFilesInBackupDirectory(backupsRootDirectory: URL) throws -> [String: Int] {
+        let fileCoordinator = NSFileCoordinator()
+
+        var existingFiles: [String: Int] = [:]
+        try fileCoordinator.coordinateThrows(
+            readingItemAt: backupsRootDirectory,
+            by: { temporaryFileUrl in
+                let filesDirectoryUrl = temporaryFileUrl.appendingPathComponent(FileStructure.attachmentDirectory.rawValue)
+                guard
+                    let enumerator = FileManager.default.enumerator(
+                        at: filesDirectoryUrl,
+                        includingPropertiesForKeys: [.fileSizeKey, .nameKey],
+                        options: [],
+                    )
+                else {
+                    return
+                }
+                while let fileURL = enumerator.nextObject() as? URL {
+                    let fileValues = try fileURL.resourceValues(forKeys: [.fileSizeKey, .nameKey, .isDirectoryKey])
+                    if let isDir = fileValues.isDirectory, isDir {
+                        continue
+                    }
+                    if
+                        let size = fileValues.fileSize,
+                        let name = fileValues.name
+                    {
+                        existingFiles[name] = size
+                    } else {
+                        owsFailDebug("Unexpectedly missing size/name from resource keys!")
+                    }
+                }
+            },
+        )
+        return existingFiles
+    }
+
+    /// - Parameter backupsRootDirectory
+    /// The SignalBackups directory.
+    func writeQueuedAttachmentsToDisk(
+        backupsRootDirectory: URL,
+        currentBackupDirectoryName: String,
+        progress progressSink: OWSProgressSink?,
+    ) async throws {
+        let fileCoordinator = NSFileCoordinator()
+
+        let existingFiles = try existingFilesInBackupDirectory(backupsRootDirectory: backupsRootDirectory)
+
+        let totalByteCount = db.read { tx in
+            localFileBackupStore.totalUnencryptedByteCountOfQueuedExports(tx: tx)
+        }
+        let source = progressSink?.addSource(withLabel: ProgressLabel.writeQueuedAttachment, unitCount: totalByteCount)
+
+        while true {
+            try Task.checkCancellation()
+            let (attachmentsWithMetadata, localFileExports) = db.read { tx in
+                let localFileExports = localFileBackupStore.exportRecords(batchSize: Self.attachmentBatchSize, tx: tx)
+                let ids = localFileExports.map({ $0.attachmentRowId })
+                let attachments = attachmentStore.fetch(ids: ids, tx: tx)
+                let attachmentsWithMetadata: [AttachmentWithMetadata] = attachments.compactMap {
+                    guard
+                        let metadata = localFileBackupAttachmentMetadataStore.metadataRecord(
+                            attachmentId: $0.id,
+                            tx: tx,
+                        )
+                    else {
+                        // TODO: Store error to present to beta user
+                        owsFailBeta("Missing local file attachment metadata!")
+                        return nil
+                    }
+                    return AttachmentWithMetadata(attachment: $0, metadata: metadata)
+                }
+
+                return (attachmentsWithMetadata, localFileExports)
+            }
+            if localFileExports.isEmpty { break }
+
+            let attachmentMetadataFile = backupsRootDirectory
+                .appendingPathComponent(currentBackupDirectoryName)
+                .appendingPathComponent(FileStructure.attachmentDirectory.rawValue)
+
+            guard let outputStream = OutputStream(url: attachmentMetadataFile, append: true) else {
+                throw OWSAssertionError("Unable to initalize output stream")
+            }
+            outputStream.open()
+
+            let manifestStream = TransformingOutputStream(
+                transforms: [ChunkedOutputStreamTransform()],
+                outputStream: outputStream,
+            )
+
+            for attachmentWithMetadata in attachmentsWithMetadata {
+                let attachmentByteCount = UInt64(safeCast: attachmentWithMetadata.metadata.unencryptedByteCount)
+                guard let attachmentStream = attachmentWithMetadata.attachment.asStream() else {
+                    source?.incrementCompletedUnitCount(by: attachmentByteCount)
+                    continue
+                }
+
+                let localKey = attachmentWithMetadata.metadata.localKey
+                let localFileBackupMediaName = LocalFileBackupAttachmentNaming.mediaName(
+                    localKey: localKey,
+                    plaintextHash: attachmentStream.plaintextHash,
+                )
+
+                if let _ = existingFiles[localFileBackupMediaName] {
+                    // Already exists on disk, can skip copying.
+                    // TODO: [KC] also check encrypted byte count is what we expect
+
+                    var fileProto = LocalBackupProto_FilesFrame()
+                    fileProto.item = .mediaName(localFileBackupMediaName)
+                    try manifestStream.write(data: fileProto.serializedData(), options: [:])
+                    source?.incrementCompletedUnitCount(by: attachmentByteCount)
+                    continue
+                }
+
+                let encryptedFileHandle: EncryptedFileHandle
+                let attachmentKey: AttachmentKey
+                do {
+                    encryptedFileHandle = try Cryptography.encryptedAttachmentFileHandle(
+                        at: attachmentStream.fileURL,
+                        plaintextLength: UInt64(safeCast: attachmentStream.unencryptedByteCount),
+                        attachmentKey: AttachmentKey(combinedKey: attachmentStream.attachment.encryptionKey),
+                    )
+                    attachmentKey = try AttachmentKey(combinedKey: localKey)
+                } catch {
+                    logger.error("Error writing attachment ID \(attachmentWithMetadata.attachment.id) to disk, error: \(error)")
+                    source?.incrementCompletedUnitCount(by: attachmentByteCount)
+                    continue
+                }
+
+                let attachmentSubDirectory = backupsRootDirectory
+                    .appendingPathComponent(FileStructure.attachmentDirectory.rawValue)
+                    .appendingPathComponent(LocalFileBackupAttachmentNaming.subdirectoryName(
+                        mediaName: localFileBackupMediaName,
+                    ))
+
+                try fileCoordinator.coordinateThrows(
+                    writingItemAt: attachmentSubDirectory,
+                    options: [],
+                    writingItemAt: attachmentMetadataFile,
+                    options: [],
+                ) { attachmentDirUrl, metadataURL in
+                    try FileManager.default.createDirectory(at: attachmentDirUrl, withIntermediateDirectories: true)
+                    let destination = attachmentDirUrl.appendingPathComponent(localFileBackupMediaName)
+
+                    let _ = try Cryptography.reencryptFileHandle(
+                        at: encryptedFileHandle,
+                        attachmentKey: attachmentKey,
+                        encryptedOutputUrl: destination,
+                        applyExtraPadding: true,
+                    )
+
+                    var fileProto = LocalBackupProto_FilesFrame()
+                    fileProto.item = .mediaName(localFileBackupMediaName)
+                    try manifestStream.write(data: fileProto.serializedData(), options: [:])
+
+                    source?.incrementCompletedUnitCount(by: attachmentByteCount)
+                }
+                await Task.yield()
+            }
+
+            try manifestStream.close()
+
+            await db.awaitableWrite { tx in
+                failIfThrows {
+                    for localFileExport in localFileExports {
+                        try localFileExport.delete(tx.database)
+                    }
+                }
+            }
+        }
+        source?.complete()
+    }
+
+    func queueLocalBackupAttachmentsForExport(localFileBackupAttachmentCollector: LocalFileBackupAttachmentCollector) async throws(CancellationError) {
+        try await TimeGatedBatch.enumerateObjects(
+            localFileBackupAttachmentCollector.attachments,
+            db: db,
+            block: { attachmentId, tx throws(CancellationError) in
+                if Task.isCancelled {
+                    throw CancellationError()
+                }
+
+                // Only downloaded attachments with a local key are exported.
+                if
+                    attachmentStore.fetch(id: attachmentId, tx: tx)?.asStream() != nil,
+                    localFileBackupAttachmentMetadataStore.metadataRecord(
+                        attachmentId: attachmentId,
+                        tx: tx,
+                    ) != nil
+                {
+                    localFileBackupStore.insertExportRecord(attachmentId: attachmentId, tx: tx)
+                }
+            },
+        )
+    }
+
+    private func buildMetadataProto(messageRootBackupKey: MessageRootBackupKey) throws -> LocalBackupProto_Metadata {
+        let localBackupMetadataKey = messageRootBackupKey.backupKey.deriveLocalBackupMetadataKey()
+        let backupIdBytes = messageRootBackupKey.backupId
+        let iv = Randomness.generateRandomBytes(12)
+        let nonce = iv + Data(count: 4) // Last 4 bytes are 0 for the counter.
+        var encryptedBackupId = backupIdBytes
+        try Aes256Ctr32.process(&encryptedBackupId, key: localBackupMetadataKey, nonce: nonce)
+
+        var metadataProto = LocalBackupProto_Metadata()
+        metadataProto.version = Self.localBackupVersion
+
+        var encryptedBackupIdProto = LocalBackupProto_Metadata.EncryptedBackupId()
+        encryptedBackupIdProto.iv = iv
+        encryptedBackupIdProto.encryptedID = encryptedBackupId
+
+        metadataProto.backupID = encryptedBackupIdProto
+
+        return metadataProto
+    }
+
+    private func readMetadataProto(fromBackupDirectory backupDirectory: URL) throws -> LocalBackupProto_Metadata {
+        let metadataFileURL = backupDirectory.appendingPathComponent(FileStructure.metadataFile.rawValue)
+        let fileCoordinator = NSFileCoordinator()
+        var data: Data?
+        try fileCoordinator.coordinateThrows(
+            readingItemAt: metadataFileURL,
+            options: .withoutChanges,
+            by: { readURL in
+                data = try Data(contentsOf: readURL)
+            },
+        )
+        guard let data else {
+            throw OWSAssertionError("File coordinator returned without providing metadata contents")
+        }
+        return try LocalBackupProto_Metadata(serializedBytes: data)
+    }
+
+    public func verifyVersionAndReadBackupId(
+        fromBackupDirectory backupDirectory: URL,
+        backupKey: BackupKey,
+    ) throws -> Data {
+        let metadataProto = try readMetadataProto(fromBackupDirectory: backupDirectory)
+
+        guard metadataProto.version <= Self.localBackupVersion else {
+            throw LocalFileBackupError.invalidVersion
+        }
+
+        guard metadataProto.hasBackupID else {
+            throw OWSAssertionError("Local backup metadata is missing backupID")
+        }
+        let encryptedBackupId = metadataProto.backupID
+        guard encryptedBackupId.iv.count == 12 else {
+            throw OWSAssertionError("Local backup metadata has invalid IV length")
+        }
+        let localBackupMetadataKey = backupKey.deriveLocalBackupMetadataKey()
+        let nonce = encryptedBackupId.iv + Data(count: 4) // Last 4 bytes are 0 for the counter.
+        var backupIdBytes = encryptedBackupId.encryptedID
+        try Aes256Ctr32.process(&backupIdBytes, key: localBackupMetadataKey, nonce: nonce)
+        return backupIdBytes
+    }
+
+    /// - Parameter localBackupURL
+    /// The location chosen by the user to store the top level SignalBackups file.
+    func copyBackupToDisk(
+        backupTempFileURL: URL,
+        messageRootBackupKey: MessageRootBackupKey,
+        localBackupURL: URL,
+    ) async throws -> String {
+        let metadataProtoData = try buildMetadataProto(messageRootBackupKey: messageRootBackupKey).serializedData()
+
+        try makeInitialDirectoryStructureIfNeeded(at: localBackupURL)
+
+        let backupsRootDirectory = FileStructure.rootDirectoryInFileLocation(localBackupURL)
+
+        let fileCoordinator = NSFileCoordinator()
+        let currentBackupDirectoryName = FileStructure.backupDirectory(date: dateProvider())
+        try fileCoordinator.coordinateThrows(writingItemAt: backupsRootDirectory, options: [], by: { writeURL in
+            let currentBackupDirectory = writeURL
+                .appendingPathComponent(currentBackupDirectoryName)
+            let backupFileURL = currentBackupDirectory.appendingPathComponent(LocalFileBackupManager.FileStructure.backupFile.rawValue)
+            let metadataFileURL = currentBackupDirectory.appendingPathComponent(LocalFileBackupManager.FileStructure.metadataFile.rawValue)
+
+            try FileManager.default.createDirectory(
+                at: currentBackupDirectory,
+                withIntermediateDirectories: true,
+                attributes: nil,
+            )
+
+            try FileManager.default.copyItem(at: backupTempFileURL, to: backupFileURL)
+
+            try metadataProtoData.write(to: metadataFileURL)
+        })
+
+        return currentBackupDirectoryName
+    }
+
+    private func makeInitialDirectoryStructureIfNeeded(at url: URL) throws {
+        let fileCoordinator = NSFileCoordinator()
+
+        let outerDirectoryName = FileStructure.rootDirectory.rawValue
+        let outerDirectoryURL = url.appendingPathComponent(outerDirectoryName, isDirectory: true)
+
+        try fileCoordinator.coordinateThrows(writingItemAt: outerDirectoryURL, options: [], by: { writeURL in
+            try FileManager.default.createDirectory(
+                at: writeURL,
+                withIntermediateDirectories: true,
+                attributes: nil,
+            )
+
+            let filesDirectoryURL = writeURL.appendingPathComponent(FileStructure.attachmentDirectory.rawValue, isDirectory: true)
+            try FileManager.default.createDirectory(
+                at: filesDirectoryURL,
+                withIntermediateDirectories: true,
+                attributes: nil,
+            )
+        })
+    }
+
+    /// - Parameter backupsRootDirectory
+    /// The SignalBackups directory.
+    func cleanUpOldBackupsAndOrphanedAttachments(backupsRootDirectory: URL) async throws {
+        let fileCoordinator = NSFileCoordinator()
+
+        try fileCoordinator.coordinateThrows(writingItemAt: backupsRootDirectory, options: [.forDeleting], by: { writeURL in
+            let attachmentDirectory = writeURL.appendingPathComponent(FileStructure.attachmentDirectory.rawValue)
+
+            let contents = try FileManager.default.contentsOfDirectory(
+                at: writeURL,
+                includingPropertiesForKeys: [.isDirectoryKey],
+            )
+
+            var sortedBackupDirectories = contents
+                .filter { $0.lastPathComponent.hasPrefix(FileStructure.backupDirectoryPrefix) }
+                .sorted { $0.lastPathComponent > $1.lastPathComponent }
+
+            var directoriesToPrune: [URL] = []
+            while sortedBackupDirectories.count > Self.maxAllowedNumberOfBackups {
+                directoriesToPrune += [sortedBackupDirectories.removeLast()]
+            }
+            for url in directoriesToPrune {
+                try FileManager.default.removeItem(at: url)
+            }
+
+            var attachmentMediaNames: Set<String> = []
+            for backupDirectory in sortedBackupDirectories {
+
+                let filesMetadataURL = backupDirectory.appendingPathComponent(FileStructure.attachmentDirectory.rawValue)
+
+                guard let rawInputStream = InputStream(url: filesMetadataURL) else {
+                    throw OWSAssertionError("Unable to open filestream")
+                }
+                rawInputStream.open()
+                defer { rawInputStream.close() }
+
+                let inputStream = TransformingInputStream(
+                    transforms: [ChunkedInputStreamTransform()],
+                    inputStream: rawInputStream,
+                )
+
+                while inputStream.hasBytesAvailable {
+                    let data = try inputStream.read(maxLength: 65_536)
+                    if data.isEmpty { break }
+                    let frame = try LocalBackupProto_FilesFrame(serializedBytes: data)
+                    switch frame.item {
+                    case .mediaName(let mediaName):
+                        attachmentMediaNames.insert(mediaName)
+                    case nil:
+                        owsFailDebug("Unexpectedly missing mediaName from local file backup attachment frame")
+                    }
+                }
+            }
+            guard
+                let enumerator = FileManager.default.enumerator(
+                    at: attachmentDirectory,
+                    includingPropertiesForKeys: [.nameKey],
+                    options: [],
+                )
+            else {
+                return
+            }
+            while let fileURL = enumerator.nextObject() as? URL {
+                let fileValues = try fileURL.resourceValues(forKeys: [.nameKey, .isDirectoryKey])
+                if let isDir = fileValues.isDirectory, isDir {
+                    continue
+                }
+                if let name = fileValues.name {
+                    if !attachmentMediaNames.contains(name) {
+                        try FileManager.default.removeItem(at: fileURL)
+                        let parentDirectory = fileURL.deletingLastPathComponent()
+                        if try FileManager.default.contentsOfDirectory(atPath: parentDirectory.path).isEmpty {
+                            try FileManager.default.removeItem(at: parentDirectory)
+                        }
+                    }
+                } else {
+                    owsFailDebug("Unexpectedly missing name from resource keys!")
+                }
+            }
+        })
+    }
+
+    @concurrent
+    public func deleteLocalFileBackup() async throws {
+        guard let bookmarkUrl = try await getSavedSecurityScopedBookmark(type: .archive) else {
+            throw OWSAssertionError("Failed to find backup root directory")
+        }
+
+        let hasAccess = securityScopedBookmarkAccess.startAccessToSecurityScopedBookmark(url: bookmarkUrl)
+        guard hasAccess else {
+            throw OWSAssertionError("Failed to access backup root directory")
+        }
+
+        defer { securityScopedBookmarkAccess.stopAccessToSecurityScopedBookmark(url: bookmarkUrl) }
+
+        let backupsRootDirectory = LocalFileBackupManager.FileStructure.rootDirectoryInFileLocation(bookmarkUrl)
+
+        let fileCoordinator = NSFileCoordinator()
+        try fileCoordinator.coordinateThrows(writingItemAt: backupsRootDirectory, options: [.forDeleting], by: { writeURL in
+            try FileManager.default.removeItem(at: writeURL)
+        })
+    }
+
+    // MARK: - Choosing backup location
+
+    public enum FolderPickerResult {
+        case picked
+        case cancelled
+        case failed(Error)
+    }
+
+    /// This should only be used when choosing a file location for archiving a local file backup.
+    /// When the file is chosen, it will be stored with an archive-specific DB key.
+    public func promptUserToChooseFileLocationForArchiving(fromViewController: UIViewController, completion: ((FolderPickerResult) -> Void)?) {
+        let pickerController = UIDocumentPickerViewController(
+            forOpeningContentTypes: [.folder],
+            asCopy: false,
+        )
+        pickerController.delegate = self
+        folderPickerCompletion = completion
+
+        fromViewController.present(pickerController, animated: true)
+    }
+
+    public func getSavedSecurityScopedBookmark(type: SecurityScopedBookmarkType) throws -> URL? {
+        let bookmarkData = db.read { tx in
+            switch type {
+            case .archive:
+                return localFileBackupStore.fetchArchiveBookmarkData(tx: tx)
+            case .restore:
+                return localFileBackupStore.fetchRestoreBookmarkData(tx: tx)
+            }
+        }
+
+        guard let bookmarkData else {
+            return nil
+        }
+
+        var resolvedURL: URL
+        var isStale = false
+        do {
+            resolvedURL = try securityScopedBookmarkAccess.urlForBookmarkData(bookmarkData, isStale: &isStale)
+        } catch NSFileProviderError.noSuchItem {
+            throw LocalFileBackupError.unableToAccessLocalFile(.missing)
+        } catch {
+            logger.error("failedToResolveBookmark: \(error)")
+            throw LocalFileBackupError.unableToAccessLocalFile(.failedToResolveBookmark(error))
+        }
+
+        if isStale {
+            throw LocalFileBackupError.unableToAccessLocalFile(.stale)
+        }
+
+        if resolvedURL.pathComponents.contains(".Trash") {
+            throw LocalFileBackupError.unableToAccessLocalFile(.trashed)
+        }
+
+        return resolvedURL
+    }
+
+    public func saveSecurityScopedBookmark(url: URL, type: SecurityScopedBookmarkType) throws {
+        let bookmarkData = try securityScopedBookmarkAccess.bookmarkDataForURL(url)
+        db.write { tx in
+            switch type {
+            case .archive:
+                localFileBackupStore.storeArchiveBookmarkData(bookmarkData: bookmarkData, tx: tx)
+            case .restore:
+                localFileBackupStore.storeRestoreBookmarkData(bookmarkData: bookmarkData, tx: tx)
+            }
+        }
+    }
+
+    // MARK: - UIDocumentPickerDelegate
+
+    public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentAt url: URL) {
+        // The bookmark data has to be written when we have access to the security scoped resource.
+        guard securityScopedBookmarkAccess.startAccessToSecurityScopedBookmark(url: url) else {
+            Logger.error("Failed to start security scoped access")
+            return
+        }
+
+        defer { securityScopedBookmarkAccess.stopAccessToSecurityScopedBookmark(url: url) }
+
+        let result: FolderPickerResult
+        do {
+            try saveSecurityScopedBookmark(url: url, type: .archive)
+            result = .picked
+        } catch {
+            logger.error("Failed to save bookmark: \(error.shortDescription)")
+            result = .failed(error)
+        }
+
+        let completion = folderPickerCompletion
+        folderPickerCompletion = nil
+        completion?(result)
+    }
+
+    public func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+        let completion = folderPickerCompletion
+        folderPickerCompletion = nil
+        completion?(.cancelled)
+    }
+
+    // MARK: - Prompt user to enable local backups, e.g. after restoring
+
+    public nonisolated func shouldPromptUserToEnableLocalBackups(tx: DBReadTransaction) -> Bool {
+        localFileBackupStore.shouldPromptUserToEnableLocalBackups(tx: tx)
+    }
+
+    public nonisolated func clearShouldPromptUserToEnableLocalBackups(tx: DBWriteTransaction) {
+        localFileBackupStore.clearShouldPromptUserToEnableLocalBackups(tx: tx)
+    }
+
+    public nonisolated func setShouldPromptUserToEnableLocalBackups(tx: DBWriteTransaction) {
+        localFileBackupStore.setShouldPromptUserToEnableLocalBackups(tx: tx)
+    }
+
+    // MARK: - Prompt user to choose new local backup location, e.g. if there was an error archiving
+
+    public nonisolated func shouldPromptUserToChooseNewLocalBackupLocation(tx: DBReadTransaction) -> Bool {
+        localFileBackupStore.shouldPromptUserToChooseNewLocalBackupLocation(tx: tx)
+    }
+
+    public nonisolated func clearChooseNewLocalBackupLocation(tx: DBWriteTransaction) {
+        localFileBackupStore.clearChooseNewLocalBackupLocation(tx: tx)
+    }
+
+    public nonisolated func setChooseNewLocalBackupLocation(tx: DBWriteTransaction) {
+        localFileBackupStore.setChooseNewLocalBackupLocation(tx: tx)
+    }
+}

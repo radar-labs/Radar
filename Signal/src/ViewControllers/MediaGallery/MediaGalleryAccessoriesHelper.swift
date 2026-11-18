@@ -11,7 +11,7 @@ protocol MediaGalleryPrimaryViewController: UIViewController {
     var mediaGalleryFilterMenuItems: [MediaGalleryAccessoriesHelper.MenuItem] { get }
     var isEmpty: Bool { get }
     var hasSelection: Bool { get }
-    func selectionInfo() -> (count: Int, totalSize: Int64)?
+    func selectionInfo() -> (count: Int, totalSize: UInt64)?
     func disableFiltering()
     func batchSelectionModeDidChange(isInBatchSelectMode: Bool)
     func selectAll()
@@ -22,7 +22,8 @@ protocol MediaGalleryPrimaryViewController: UIViewController {
     func set(mediaCategory: AllMediaCategory, isGridLayout: Bool)
 }
 
-public class MediaGalleryAccessoriesHelper {
+@MainActor
+class MediaGalleryAccessoriesHelper {
     private var footerBarBottomConstraint: NSLayoutConstraint?
     weak var viewController: MediaGalleryPrimaryViewController?
 
@@ -35,13 +36,14 @@ public class MediaGalleryAccessoriesHelper {
             case .list:
                 return OWSLocalizedString(
                     "ALL_MEDIA_LIST_MODE",
-                    comment: "Menu option to show All Media items in a single-column list")
+                    comment: "Menu option to show All Media items in a single-column list",
+                )
 
             case .grid:
                 return OWSLocalizedString(
                     "ALL_MEDIA_GRID_MODE",
-                    comment: "Menu option to show All Media items in a grid of square thumbnails")
-
+                    comment: "Menu option to show All Media items in a grid of square thumbnails",
+                )
             }
         }
     }
@@ -74,26 +76,19 @@ public class MediaGalleryAccessoriesHelper {
             AllMediaCategory.otherFiles,
         ].map { $0.titleString }
         let segmentedControl = UISegmentedControl(items: items)
-        segmentedControl.selectedSegmentTintColor = .init(dynamicProvider: { _ in
-            Theme.isDarkThemeEnabled ? UIColor.init(rgbHex: 0x636366) : .white
-        })
         segmentedControl.backgroundColor = .clear
         segmentedControl.selectedSegmentIndex = 0
-        segmentedControl.addTarget(self, action: #selector(segmentedControlValueChanged), for: .valueChanged)
+        segmentedControl.addAction(
+            UIAction { [weak self] action in
+                self?.segmentedControlValueChanged(action.sender as! UISegmentedControl)
+            },
+            for: .valueChanged,
+        )
         return segmentedControl
     }()
 
-    init() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(contentSizeCategoryDidChange),
-            name: UIContentSizeCategory.didChangeNotification,
-            object: nil
-        )
-    }
-
     func installViews() {
-        guard let viewController else { return }
+        guard let viewController, let view = viewController.view else { return }
 
         headerView.sizeToFit()
         var frame = headerView.frame
@@ -101,24 +96,35 @@ public class MediaGalleryAccessoriesHelper {
         headerView.frame = frame
         viewController.navigationItem.titleView = headerView
 
-        viewController.view.addSubview(footerBar)
-        footerBar.autoPinEdge(toSuperviewSafeArea: .leading)
-        footerBar.autoPinEdge(toSuperviewSafeArea: .trailing)
+        view.addSubview(footerBar)
+        footerBar.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            footerBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            footerBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+        ])
+        if #available(iOS 26, *) {
+            let interaction = UIScrollEdgeElementContainerInteraction()
+            interaction.scrollView = viewController.scrollView
+            interaction.edge = .bottom
+            footerBar.addInteraction(interaction)
+        }
+        if #available(iOS 17, *) {
+            footerBar.registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { [weak self] (_: UIView, _) in
+                self?.updateFilterButton()
+            }
+        }
 
         updateDeleteButton()
         updateSelectionModeControls()
     }
 
+    @available(iOS, obsoleted: 26)
     func applyTheme() {
+        guard #unavailable(iOS 26) else { return }
         footerBar.barTintColor = Theme.navbarBackgroundColor
         footerBar.tintColor = Theme.primaryIconColor
         deleteButton.tintColor = Theme.primaryIconColor
         shareButton.tintColor = Theme.primaryIconColor
-    }
-
-    @objc
-    private func contentSizeCategoryDidChange(_ notification: Notification) {
-        updateFilterButton()
     }
 
     // MARK: - Menu
@@ -133,6 +139,7 @@ public class MediaGalleryAccessoriesHelper {
             return isChecked ? .on : .off
         }
 
+        @MainActor
         var uiAction: UIAction {
             return UIAction(title: title, image: icon, state: state) { _ in handler() }
         }
@@ -140,12 +147,9 @@ public class MediaGalleryAccessoriesHelper {
 
     // MARK: - Batch Selection
 
-    private lazy var selectButton = UIBarButtonItem(
-        title: CommonStrings.selectButton,
-        style: .plain,
-        target: self,
-        action: #selector(didTapSelect)
-    )
+    private lazy var selectButton = UIBarButtonItem.button(title: CommonStrings.selectButton) { [weak self] in
+        self?.didTapSelect()
+    }
 
     var isInBatchSelectMode = false {
         didSet {
@@ -184,12 +188,11 @@ public class MediaGalleryAccessoriesHelper {
             viewController.navigationItem.leftBarButtonItem = .button(
                 title: OWSLocalizedString(
                     "SELECT_ALL",
-                    comment: "Button text to select all in any list selection mode"
+                    comment: "Button text to select all in any list selection mode",
                 ),
-                style: .plain,
-                action: { [weak self] in
-                    self?.didSelectAll()
-                })
+            ) { [weak self] in
+                self?.didSelectAll()
+            }
         } else {
             viewController.navigationItem.rightBarButtonItem = nil // TODO: Search
             viewController.navigationItem.leftBarButtonItem = previousLeftBarButtonItem
@@ -203,8 +206,7 @@ public class MediaGalleryAccessoriesHelper {
         viewController.navigationItem.hidesBackButton = isInBatchSelectMode
     }
 
-    @objc
-    private func didTapSelect(_ sender: Any) {
+    private func didTapSelect() {
         isInBatchSelectMode = true
     }
 
@@ -225,15 +227,12 @@ public class MediaGalleryAccessoriesHelper {
 
     // MARK: - Filter
 
-    private func filterMenuItemsAndCurrentValue() -> (title: NSAttributedString, items: [MenuItem]) {
+    private func filterMenuItemsAndCurrentValue() -> (title: String, items: [MenuItem]) {
         guard let items = viewController?.mediaGalleryFilterMenuItems, !items.isEmpty else {
-            return ( NSAttributedString(string: ""), [] )
+            return ("", [])
         }
         let currentTitle = items.first(where: { $0.isChecked })?.title ?? ""
-        return (
-            NSAttributedString(string: currentTitle, attributes: [ .font: UIFont.dynamicTypeHeadlineClamped ] ),
-            items
-        )
+        return (currentTitle, items)
     }
 
     private lazy var filterButton: UIBarButtonItem = {
@@ -241,29 +240,46 @@ public class MediaGalleryAccessoriesHelper {
         configuration.imagePlacement = .trailing
         configuration.image = UIImage(imageLiteralResourceName: "chevron-down-compact-bold")
         configuration.imagePadding = 4
+        // For iOS 15-16.
+        configuration.titleTextAttributesTransformer = .defaultFont(.systemFont(ofSize: 17, weight: .semibold))
 
         let button = UIButton(configuration: configuration, primaryAction: nil)
         button.showsMenuAsPrimaryAction = true
+        if #available(iOS 26, *) {
+            // Otherwise title will be blue when the button is pressed.
+            // On earlier iOS version color is applied in `applyTheme`.
+            button.tintColor = .Signal.label
+        }
         return UIBarButtonItem(customView: button)
     }()
 
     func updateFilterButton() {
         let (buttonTitle, menuItems) = filterMenuItemsAndCurrentValue()
         if let button = filterButton.customView as? UIButton {
-            button.setAttributedTitle(buttonTitle, for: .normal)
+            button.configuration?.title = buttonTitle
             button.menu = menuItems.menu()
             button.sizeToFit()
             button.isHidden = menuItems.isEmpty
+
+            if #available(iOS 17, *) {
+                // UIKit uses three different font sizes for text buttons in the toolbar.
+                // Reverse engineered logic is below.
+                let preferredContentSizeCategory = UIApplication.shared.preferredContentSizeCategory
+                let fontSize: CGFloat = switch preferredContentSizeCategory {
+                case .extraSmall, .small, .medium, .large: 17
+                case .extraLarge: 19
+                default: 21
+                }
+                button.configuration?.titleTextAttributesTransformer = .defaultFont(.systemFont(ofSize: fontSize, weight: .semibold))
+            }
         }
-#if compiler(>=6.2)
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26, *) {
             // I tried just setting .isHidden on the bar button item here, but
             // for some reason it would never reappear when I do that. But if
             // the content is blank and the shared background is hidden, then it
             // appears completely invisible.
             filterButton.hidesSharedBackground = menuItems.isEmpty
         }
-#endif
     }
 
     // MARK: - List/Grid
@@ -275,7 +291,7 @@ public class MediaGalleryAccessoriesHelper {
             isChecked: isChecked,
             handler: { [weak self] in
                 self?.layout = .list
-            }
+            },
         )
     }
 
@@ -286,30 +302,26 @@ public class MediaGalleryAccessoriesHelper {
             isChecked: isChecked,
             handler: { [weak self] in
                 self?.layout = .grid
-            }
+            },
         )
     }
 
     private func createLayoutPickerMenu(checkedLayout: Layout) -> UIMenu {
         let menuItems = [
             gridMenuItem(isChecked: checkedLayout == .grid),
-            listMenuItem(isChecked: checkedLayout == .list)
+            listMenuItem(isChecked: checkedLayout == .list),
         ]
         return menuItems.menu(with: .singleSelection)
     }
 
-    private lazy var listViewButton: UIBarButtonItem = UIBarButtonItem(
-        title: nil,
-        image: UIImage(imageLiteralResourceName: "list-bullet"),
-        primaryAction: nil,
-        menu: createLayoutPickerMenu(checkedLayout: .list)
+    private lazy var listViewButton = UIBarButtonItem(
+        image: .listBullet,
+        menu: createLayoutPickerMenu(checkedLayout: .list),
     )
 
-    private lazy var gridViewButton: UIBarButtonItem = UIBarButtonItem(
-        title: nil,
-        image: UIImage(imageLiteralResourceName: "grid-square"),
-        primaryAction: nil,
-        menu: createLayoutPickerMenu(checkedLayout: .grid)
+    private lazy var gridViewButton = UIBarButtonItem(
+        image: .gridSquare,
+        menu: createLayoutPickerMenu(checkedLayout: .grid),
     )
 
     // MARK: - Footer
@@ -332,9 +344,9 @@ public class MediaGalleryAccessoriesHelper {
         willSet {
             let wasHidden = footerBarState == .hidden
             let willBeHidden = newValue == .hidden
-            if wasHidden && !willBeHidden {
+            if wasHidden, !willBeHidden {
                 showToolbar(animated: footerBar.window != nil)
-            } else if !wasHidden && willBeHidden {
+            } else if !wasHidden, willBeHidden {
                 hideToolbar(animated: footerBar.window != nil)
             }
         }
@@ -346,13 +358,13 @@ public class MediaGalleryAccessoriesHelper {
     private func updateBottomToolbarControls() {
         guard footerBarState != .hidden else { return }
 
-        let fixedSpace = { return UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil) }
+        let fixedSpace = { UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil) }
         let footerBarItems: [UIBarButtonItem]? = {
             switch footerBarState {
             case .hidden:
                 return nil
             case .selection:
-                return [ shareButton, .flexibleSpace(), selectionInfoButton, .flexibleSpace(), deleteButton ]
+                return [shareButton, .flexibleSpace(), selectionInfoButton, .flexibleSpace(), deleteButton]
             case .regular:
                 let firstItem: UIBarButtonItem
                 if mediaCategory.supportsGridView {
@@ -368,7 +380,7 @@ public class MediaGalleryAccessoriesHelper {
                     .flexibleSpace(),
                     filterButton,
                     .flexibleSpace(),
-                    selectButton
+                    selectButton,
                 ]
             }
         }()
@@ -409,13 +421,18 @@ public class MediaGalleryAccessoriesHelper {
             NSLayoutConstraint.deactivate([footerBarBottomConstraint])
         }
 
-        footerBarBottomConstraint = footerBar.autoPin(toBottomLayoutGuideOf: viewController, withInset: 0)
+        footerBar.translatesAutoresizingMaskIntoConstraints = false
+        let constraint = footerBar.bottomAnchor.constraint(
+            equalTo: viewController.view.layoutMarginsGuide.bottomAnchor,
+        )
+        NSLayoutConstraint.activate([constraint])
+        footerBarBottomConstraint = constraint
 
         viewController.view.layoutIfNeeded()
-
         let bottomInset = viewController.view.bounds.maxY - footerBar.frame.minY
-        viewController.scrollView.contentInset.bottom = bottomInset
+        viewController.scrollView.contentInset.bottom = bottomInset + 12
         viewController.scrollView.verticalScrollIndicatorInsets.bottom = bottomInset
+
     }
 
     private func hideToolbar(animated: Bool) {
@@ -445,13 +462,9 @@ public class MediaGalleryAccessoriesHelper {
 
     // MARK: - Delete
 
-    private lazy var deleteButton = UIBarButtonItem.button(
-        icon: .buttonDelete,
-        style: .plain,
-        action: { [weak self] in
-            self?.didPressDelete()
-        }
-    )
+    private lazy var deleteButton = UIBarButtonItem.button(icon: .buttonDelete) { [weak self] in
+        self?.didPressDelete()
+    }
 
     private func updateDeleteButton() {
         guard let viewController else { return }
@@ -467,9 +480,9 @@ public class MediaGalleryAccessoriesHelper {
 
     private lazy var shareButton = UIBarButtonItem(
         image: Theme.iconImage(.buttonShare),
-        style: .plain,
-        target: self,
-        action: #selector(didPressShare)
+        primaryAction: UIAction { [weak self] action in
+            self?.didPressShare(action.sender!)
+        },
     )
 
     private func updateShareButton() {
@@ -478,7 +491,6 @@ public class MediaGalleryAccessoriesHelper {
         shareButton.isEnabled = viewController.hasSelection
     }
 
-    @objc
     private func didPressShare(_ sender: Any) {
         Logger.debug("")
         viewController?.shareSelectedItems(sender)
@@ -489,7 +501,7 @@ public class MediaGalleryAccessoriesHelper {
     private lazy var selectionCountLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
-        label.textColor = UIColor(dynamicProvider: { _ in Theme.primaryTextColor })
+        label.textColor = .Signal.label
         label.font = .dynamicTypeSubheadlineClamped.semibold()
         label.adjustsFontForContentSizeCategory = true
         return label
@@ -498,14 +510,14 @@ public class MediaGalleryAccessoriesHelper {
     private lazy var selectionSizeLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
-        label.textColor = UIColor(dynamicProvider: { _ in Theme.primaryTextColor })
+        label.textColor = .Signal.label
         label.font = .dynamicTypeSubheadlineClamped
         label.adjustsFontForContentSizeCategory = true
         return label
     }()
 
     private lazy var selectionInfoButton = UIBarButtonItem(customView: {
-        let stackView = UIStackView(arrangedSubviews: [ selectionCountLabel, selectionSizeLabel ])
+        let stackView = UIStackView(arrangedSubviews: [selectionCountLabel, selectionSizeLabel])
         stackView.axis = .vertical
         stackView.spacing = 0
         let container = UIView()
@@ -520,21 +532,17 @@ public class MediaGalleryAccessoriesHelper {
             selectionCountLabel.text = ""
             selectionSizeLabel.text = ""
             selectionInfoButton.customView?.sizeToFit()
-#if compiler(>=6.2)
             if #available(iOS 26, *) {
                 selectionInfoButton.hidesSharedBackground = true
             }
-#endif
             return
         }
-#if compiler(>=6.2)
         if #available(iOS 26, *) {
             selectionInfoButton.hidesSharedBackground = false
         }
-#endif
         selectionCountLabel.text = String.localizedStringWithFormat(
             OWSLocalizedString("MESSAGE_ACTIONS_TOOLBAR_CAPTION_%d", tableName: "PluralAware", comment: ""),
-            selectionCount
+            selectionCount,
         )
         selectionSizeLabel.text = OWSFormat.localizedFileSizeString(from: totalSize)
 
@@ -545,22 +553,24 @@ public class MediaGalleryAccessoriesHelper {
         return AllMediaCategory(rawValue: headerView.selectedSegmentIndex) ?? .defaultValue
     }
 
-    @objc
     private func segmentedControlValueChanged(_ sender: UISegmentedControl) {
-        if let mediaCategory = AllMediaCategory(rawValue: sender.selectedSegmentIndex) {
-            if let previousMediaCategory = viewController?.mediaCategory {
-                lastUsedLayoutMap[previousMediaCategory] = layout
-            }
-            if mediaCategory.supportsGridView {
-                // Return to the previous mode
-                _layout = lastUsedLayoutMap[mediaCategory, default: .grid]
-            } else if layout == .grid {
-                // This file type requires a switch to list mode
-                _layout = .list
-            }
-            updateBottomToolbarControls()
-            viewController?.set(mediaCategory: mediaCategory, isGridLayout: layout == .grid)
+        guard let mediaCategory = AllMediaCategory(rawValue: sender.selectedSegmentIndex) else {
+            owsFailDebug("Invalid segment index")
+            return
         }
+
+        if let previousMediaCategory = viewController?.mediaCategory {
+            lastUsedLayoutMap[previousMediaCategory] = layout
+        }
+        if mediaCategory.supportsGridView {
+            // Return to the previous mode
+            _layout = lastUsedLayoutMap[mediaCategory, default: .grid]
+        } else if layout == .grid {
+            // This file type requires a switch to list mode
+            _layout = .list
+        }
+        updateBottomToolbarControls()
+        viewController?.set(mediaCategory: mediaCategory, isGridLayout: layout == .grid)
     }
 }
 
@@ -581,20 +591,25 @@ extension AllMediaCategory {
     var titleString: String {
         switch self {
         case .photoVideo:
-            return OWSLocalizedString("ALL_MEDIA_FILE_TYPE_MEDIA",
-                                      comment: "Media (i.e., graphical) file type in All Meda file type picker.")
+            return OWSLocalizedString(
+                "ALL_MEDIA_FILE_TYPE_MEDIA",
+                comment: "Media (i.e., graphical) file type in All Meda file type picker.",
+            )
         case .audio:
-            return OWSLocalizedString("ALL_MEDIA_FILE_TYPE_AUDIO",
-                                      comment: "Audio file type in All Meda file type picker.")
+            return OWSLocalizedString(
+                "ALL_MEDIA_FILE_TYPE_AUDIO",
+                comment: "Audio file type in All Meda file type picker.",
+            )
         case .otherFiles:
             return OWSLocalizedString(
                 "ALL_MEDIA_FILE_TYPE_FILES",
-                comment: "Generic All Media file type for non-audiovisual files used in file type picker"
+                comment: "Generic All Media file type for non-audiovisual files used in file type picker",
             )
         }
     }
 }
 
+@MainActor
 private extension Array where Element == MediaGalleryAccessoriesHelper.MenuItem {
     func menu(with options: UIMenu.Options = []) -> UIMenu {
         return UIMenu(title: "", options: options, children: reversed().map({ $0.uiAction }))

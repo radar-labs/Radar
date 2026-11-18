@@ -4,9 +4,9 @@
 //
 
 import CoreMedia
+import SDWebImage
 import SignalServiceKit
 import SignalUI
-import SDWebImage
 
 protocol MediaItemViewControllerDelegate: AnyObject {
     func mediaItemViewControllerDidTapMedia(_ viewController: MediaItemViewController)
@@ -26,14 +26,12 @@ class MediaItemViewController: OWSViewController, VideoPlaybackStatusProvider {
 
     weak var delegate: MediaItemViewControllerDelegate?
 
-    let galleryItem: MediaGalleryItem
+    private(set) var galleryItem: MediaGalleryItem
 
     init(galleryItem: MediaGalleryItem) {
         self.galleryItem = galleryItem
 
         super.init()
-
-        image = attachmentStream.thumbnailImageSync(quality: .large)
     }
 
     deinit {
@@ -44,6 +42,7 @@ class MediaItemViewController: OWSViewController, VideoPlaybackStatusProvider {
 
     private var scrollView: ZoomableMediaView!
 
+    private var progressView: CVAttachmentProgressView?
     private(set) var mediaView: UIView!
     private var mediaViewBottomConstraint: NSLayoutConstraint?
     private var mediaViewLeadingConstraint: NSLayoutConstraint?
@@ -54,38 +53,94 @@ class MediaItemViewController: OWSViewController, VideoPlaybackStatusProvider {
     var videoPlayer: VideoPlayer? { videoPlayerView?.videoPlayer }
     private var buttonPlayVideo: UIButton?
 
+    private var downloadTask: Task<Void, Never>?
+
     func zoomOut(animated: Bool) {
         scrollView.zoomOut(animated: animated)
     }
 
     private func configureVideoPlaybackControls() {
-        guard videoPlayerView != nil else {
-            owsFailBeta("No videoPlayer")
+        guard isVideo else {
             return
         }
 
-        let buttonPlayVideo = OWSButton { [weak self] in
-            self?.playVideo()
+        if galleryItem.isVideoReadyToPlay {
+            let buttonConfiguration = UIButton.Configuration.roundMedia(
+                image: UIImage(imageLiteralResourceName: "play-fill-48"),
+                size: 92,
+            )
+            let button = UIButton(
+                configuration: buttonConfiguration,
+                primaryAction: UIAction { [weak self] _ in
+                    self?.playVideo()
+                },
+            )
+            button.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(button)
+            NSLayoutConstraint.activate([
+                button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                button.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            ])
+            self.buttonPlayVideo = button
         }
-        view.addSubview(buttonPlayVideo)
-        buttonPlayVideo.autoSetDimensions(to: .square(.scaleFromIPhone5(70)))
-        buttonPlayVideo.autoCenterInSuperview()
-        self.buttonPlayVideo = buttonPlayVideo
-
-        let playVideoCircleView = OWSLayerView.circleView()
-        playVideoCircleView.isUserInteractionEnabled = false
-        playVideoCircleView.backgroundColor = UIColor(white: 1, alpha: 0.75)
-        buttonPlayVideo.addSubview(playVideoCircleView)
-        playVideoCircleView.autoPinEdgesToSuperviewEdges()
-
-        let playVideoIconView = UIImageView.withTemplateImageName("play-fill-32", tintColor: .black)
-        playVideoIconView.isUserInteractionEnabled = false
-        buttonPlayVideo.addSubview(playVideoIconView)
-        playVideoIconView.autoSetDimensions(to: .square(.scaleFromIPhone5(30)))
-        playVideoIconView.autoCenterInSuperview()
     }
 
     // MARK: - Media Views
+
+    func replaceGalleryItem(item: MediaGalleryItem) {
+        zoomOut(animated: false)
+        stopVideoIfPlaying()
+
+        mediaView.removeFromSuperview()
+        mediaView = nil
+        scrollView.removeFromSuperview()
+        scrollView.delegate = nil
+        scrollView = nil
+
+        galleryItem = item
+        configureMediaView()
+
+        view.addSubview(scrollView)
+        scrollView.autoPinEdgesToSuperviewEdges()
+        scrollView.layoutIfNeeded()
+
+        // Video Playback controls
+        if isVideo {
+            configureVideoPlaybackControls()
+            if shouldAutoPlayVideo, !hasAutoPlayedVideo {
+                playVideo()
+                hasAutoPlayedVideo = true
+            }
+            layoutMediaView()
+        }
+    }
+
+    private func addProgressViewIfNeeded() {
+        guard progressView == nil else {
+            return
+        }
+        guard let attachmentPointer = galleryItem.referencedAttachment.attachment.asAnyPointer() else {
+            return
+        }
+        self.progressView = MediaGallery.addDownloadProgressView(
+            attachmentPointer: attachmentPointer,
+            toView: view,
+        )
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapProgressView))
+        progressView?.addGestureRecognizer(tapGesture)
+    }
+
+    @objc
+    private func didTapProgressView() {
+        if
+            let downloadTask,
+            !downloadTask.isCancelled
+        {
+            downloadTask.cancel()
+        } else if galleryItem.referencedAttachment.asReferencedStream == nil {
+            downloadFullsizeIfNeeded(userInitiated: true)
+        }
+    }
 
     private func configureMediaView() {
         buildMediaView()
@@ -108,35 +163,46 @@ class MediaItemViewController: OWSViewController, VideoPlaybackStatusProvider {
     private func buildMediaView() {
         guard mediaView == nil else { return }
 
+        image = galleryItem.referencedAttachment.getThumbnailImageSync(quality: .large)
+
         let view: UIView
-        if attachmentStream.contentType.isVideo, galleryItem.renderingFlag == .shouldLoop {
-            if attachmentStream.contentType.isVideo, let loopingVideoPlayerView = buildLoopingVideoPlayerView() {
+        let referencedAttachmentStream = galleryItem.referencedAttachment.asReferencedStream
+        if
+            let referencedAttachmentStream,
+            referencedAttachmentStream.attachmentStream.contentType.isVideo,
+            galleryItem.renderingFlag == .shouldLoop
+        {
+            if let loopingVideoPlayerView = buildLoopingVideoPlayerView(attachmentStream: referencedAttachmentStream.attachmentStream) {
                 loopingVideoPlayerView.delegate = self
                 view = loopingVideoPlayerView
             } else {
                 view = buildPlaceholderView()
             }
-        } else if attachmentStream.contentType.isAnimatedImage {
-            if let animatedGif = try? attachmentStream.decryptedSDAnimatedImage() {
+        } else if
+            let referencedAttachmentStream,
+            let imageMetadata = referencedAttachmentStream.attachmentStream.imageMetadata(),
+            imageMetadata.isAnimated
+        {
+            if let animatedGif = try? referencedAttachmentStream.attachmentStream.decryptedSDAnimatedImage() {
                 view = SDAnimatedImageView(image: animatedGif)
             } else {
                 view = buildPlaceholderView()
             }
-        } else if image == nil {
-            // Still loading thumbnail.
-            view = buildPlaceholderView()
-        } else if isVideo {
-            if attachmentStream.contentType.isVideo, let videoPlayerView = buildVideoPlayerView() {
-                videoPlayerView.delegate = self
-                videoPlayerView.videoPlayer?.delegate = self
+        } else if
+            let referencedAttachmentStream,
+            isVideo, // TODO: Separate isVideo from isVideoPlayable
+            let videoPlayerView = buildVideoPlayerView(referencedAttachmentStream: referencedAttachmentStream)
+        {
+            videoPlayerView.delegate = self
+            videoPlayerView.videoPlayer?.delegate = self
 
-                view = videoPlayerView
-            } else {
-                view = buildPlaceholderView()
-            }
-        } else {
+            view = videoPlayerView
+        } else if let image {
             // Present the static image using standard UIImageView
             view = UIImageView(image: image)
+        } else {
+            // Still loading thumbnail.
+            view = buildPlaceholderView()
         }
 
         mediaView = view
@@ -148,7 +214,7 @@ class MediaItemViewController: OWSViewController, VideoPlaybackStatusProvider {
         return view
     }
 
-    private func buildLoopingVideoPlayerView() -> LoopingVideoView? {
+    private func buildLoopingVideoPlayerView(attachmentStream: AttachmentStream) -> LoopingVideoView? {
         guard let loopingVideo = LoopingVideo(attachmentStream) else {
             owsFailBeta("Invalid looping video")
             return nil
@@ -158,8 +224,8 @@ class MediaItemViewController: OWSViewController, VideoPlaybackStatusProvider {
         return videoView
     }
 
-    private func buildVideoPlayerView() -> VideoPlayerView? {
-        guard let videoPlayer = try? VideoPlayer(attachment: galleryItem.attachmentStream) else {
+    private func buildVideoPlayerView(referencedAttachmentStream: ReferencedAttachmentStream) -> VideoPlayerView? {
+        guard let videoPlayer = try? VideoPlayer(attachment: referencedAttachmentStream) else {
             owsFailBeta("Invalid attachment")
             return nil
         }
@@ -170,6 +236,36 @@ class MediaItemViewController: OWSViewController, VideoPlaybackStatusProvider {
         videoPlayerView.videoPlayer = videoPlayer
 
         return videoPlayerView
+    }
+
+    private func layoutMediaView() {
+        // HACK: Setting the frame to itself *seems* like it should be a no-op, but
+        // it ensures the content is drawn at the right frame. In particular I was
+        // reproducibly seeing some images squished (they were EXIF rotated, maybe
+        // related). similar to this report:
+        // https://stackoverflow.com/questions/27961884/swift-uiimageview-stretched-aspect
+        view.layoutIfNeeded()
+        mediaView.frame = mediaView.frame
+
+        scrollView.updateZoomScaleForLayout()
+        scrollView.zoomScale = scrollView.minimumZoomScale
+    }
+
+    private func downloadFullsizeIfNeeded(userInitiated: Bool) {
+        guard galleryItem.referencedAttachment.asReferencedStream == nil else { return }
+
+        addProgressViewIfNeeded()
+
+        downloadTask?.cancel()
+
+        downloadTask = MediaGallery.createGalleryItemDownloadTask(
+            item: galleryItem,
+            priority: userInitiated ? .userInitiated : .default,
+        )
+        Task {
+            await downloadTask?.value
+            downloadTask = nil
+        }
     }
 
     // MARK: - UIViewController
@@ -192,58 +288,49 @@ class MediaItemViewController: OWSViewController, VideoPlaybackStatusProvider {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
-        // HACK: Setting the frame to itself *seems* like it should be a no-op, but
-        // it ensures the content is drawn at the right frame. In particular I was
-        // reproducibly seeing some images squished (they were EXIF rotated, maybe
-        // related). similar to this report:
-        // https://stackoverflow.com/questions/27961884/swift-uiimageview-stretched-aspect
-        view.layoutIfNeeded()
-        mediaView.frame = mediaView.frame
-
-        scrollView.updateZoomScaleForLayout()
-        scrollView.zoomScale = scrollView.minimumZoomScale
+        layoutMediaView()
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        if isVideo && shouldAutoPlayVideo && !hasAutoPlayedVideo {
+        if isVideo, shouldAutoPlayVideo, !hasAutoPlayedVideo {
             playVideo()
             hasAutoPlayedVideo = true
         }
 
         let timestamp = Date().ows_millisecondsSince1970
-        let attachmentId = galleryItem.attachmentStream.attachment.id
+        let attachmentId = galleryItem.referencedAttachment.attachment.id
+
         Task {
-            do {
-                try await DependenciesBridge.shared.db.awaitableWrite { tx in
-                    guard let attachment = DependenciesBridge.shared.attachmentStore.fetch(id: attachmentId, tx: tx) else {
-                        return
-                    }
-                    try DependenciesBridge.shared.attachmentStore.markViewedFullscreen(
-                        attachment: attachment,
-                        timestamp: timestamp,
-                        tx: tx
-                    )
-                }
-            } catch {
-                Logger.warn("Failed to mark attachment as viewed: \(error)")
+            await DependenciesBridge.shared.db.awaitableWrite { tx in
+                DependenciesBridge.shared.attachmentStore.markViewedFullscreen(
+                    attachmentId: attachmentId,
+                    timestamp: timestamp,
+                    tx: tx,
+                )
             }
         }
+
+        downloadFullsizeIfNeeded(userInitiated: false)
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        if isVideo {
+            downloadTask?.cancel()
+        }
+        super.viewDidDisappear(animated)
     }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
         scrollView.updateZoomScaleForLayout()
-   }
+    }
 
     // MARK: - Helpers
 
     private var image: UIImage?
-
-    private var attachmentStream: AttachmentStream { galleryItem.attachmentStream.attachmentStream }
 
     // MARK: - Video Playback
 

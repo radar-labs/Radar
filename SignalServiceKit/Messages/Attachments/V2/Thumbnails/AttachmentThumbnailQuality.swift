@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import UIKit
 
 public enum AttachmentThumbnailQuality: CaseIterable {
     case small
@@ -33,10 +34,10 @@ extension AttachmentThumbnailQuality: CustomStringConvertible {
 extension AttachmentThumbnailQuality {
 
     public static func pointSize(pixelSize: CGSize) -> CGSize {
-        let factor = 1 / UIScreen.main.scale
+        let displayScale = UITraitCollection.current.displayScale
         return CGSize(
-            width: pixelSize.width * factor,
-            height: pixelSize.height * factor
+            width: pixelSize.width / displayScale,
+            height: pixelSize.height / displayScale,
         )
     }
 
@@ -49,18 +50,18 @@ extension AttachmentThumbnailQuality {
     // This size is large enough to render full screen.
     private static func thumbnailDimensionPointsLarge() -> CGFloat {
         let screenSizePoints = UIScreen.main.bounds.size
-        return max(screenSizePoints.width, screenSizePoints.height)
+        return screenSizePoints.largerAxis
     }
 
     public static let backupThumbnailDimensionPixels: CGFloat = 256
-    public static let backupThumbnailMinPixelSize: CGFloat = 32
+    public static let backupThumbnailMinPixelSize: CGFloat = 64
 
     public static let backupThumbnailMaxSizeBytes: UInt32 = 8192
-    public static let backupThumbnailMinSizeBytes: UInt32 = 64
+    public static let backupThumbnailMinSizeBytes: UInt32 = 2048
 
     private static func thumbnailDimensionPointsBackupThumbnail() -> CGFloat {
-        let screenScale = UIScreen.main.scale
-        return Self.backupThumbnailDimensionPixels / screenScale
+        let displayScale = UITraitCollection.current.displayScale
+        return Self.backupThumbnailDimensionPixels / displayScale
     }
 
     public func thumbnailDimensionPoints() -> CGFloat {
@@ -80,17 +81,17 @@ extension AttachmentThumbnailQuality {
 
     public static func thumbnailCacheFileUrl(
         for attachmentStream: AttachmentStream,
-        at quality: AttachmentThumbnailQuality
+        at quality: AttachmentThumbnailQuality,
     ) -> URL {
         return thumbnailCacheFileUrl(
             attachmentLocalRelativeFilePath: attachmentStream.localRelativeFilePath,
-            at: quality
+            at: quality,
         )
     }
 
     public static func thumbnailCacheFileUrl(
         attachmentLocalRelativeFilePath: String,
-        at quality: AttachmentThumbnailQuality
+        at quality: AttachmentThumbnailQuality,
     ) -> URL {
         let originalFilename = (attachmentLocalRelativeFilePath as NSString).lastPathComponent
         // Its not SUPER important that this breaks if someone changes the description.

@@ -4,15 +4,24 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
-public class CVComponentSenderName: CVComponentBase, CVComponent {
+class CVComponentSenderName: CVComponentBase, CVComponent {
 
-    public var componentKey: CVComponentKey { .senderName }
+    var componentKey: CVComponentKey { .senderName }
 
     private let state: CVComponentState.SenderName
-    private var senderName: NSAttributedString { state.senderName }
+    private var senderName: NSAttributedString {
+        let padding = " "
+        if let labelString = state.memberLabel {
+            return state.senderName + padding + labelString
+        } else {
+            return state.senderName
+        }
+    }
+
     private var senderNameColor: UIColor { state.senderNameColor }
+    private var memberLabel: String? { state.memberLabel }
 
     init(itemModel: CVItemModel, senderNameState: CVComponentState.SenderName) {
         self.state = senderNameState
@@ -20,8 +29,16 @@ public class CVComponentSenderName: CVComponentBase, CVComponent {
         super.init(itemModel: itemModel)
     }
 
-    public func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
+    func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
         CVComponentViewSenderName()
+    }
+
+    override func wallpaperBlurView(componentView: CVComponentView) -> CVWallpaperBlurView? {
+        guard let componentView = componentView as? CVComponentViewSenderName else {
+            owsFailDebug("Unexpected componentView.")
+            return nil
+        }
+        return componentView.wallpaperBlurView
     }
 
     private var bodyTextColor: UIColor {
@@ -31,9 +48,11 @@ public class CVComponentSenderName: CVComponentBase, CVComponent {
         return conversationStyle.bubbleTextColor(message: message)
     }
 
-    public func configureForRendering(componentView componentViewParam: CVComponentView,
-                                      cellMeasurement: CVCellMeasurement,
-                                      componentDelegate: CVComponentDelegate) {
+    func configureForRendering(
+        componentView componentViewParam: CVComponentView,
+        cellMeasurement: CVCellMeasurement,
+        componentDelegate: CVComponentDelegate,
+    ) {
         guard let componentView = componentViewParam as? CVComponentViewSenderName else {
             owsFailDebug("Unexpected componentView.")
             componentViewParam.reset()
@@ -42,28 +61,72 @@ public class CVComponentSenderName: CVComponentBase, CVComponent {
 
         let outerStack = componentView.outerStack
         let innerStack = componentView.innerStack
-        let label = componentView.label
 
         outerStack.reset()
         innerStack.reset()
 
         if isBorderlessWithWallpaper {
             owsAssertDebug(isIncoming)
-            let backgroundView = OWSLayerView.pillView()
-            backgroundView.backgroundColor = itemModel.conversationStyle.bubbleColorIncoming
-            innerStack.addSubviewToFillSuperviewEdges(backgroundView)
+
+            let bubbleView: UIView
+            if conversationStyle.hasWallpaper {
+                let wallpaperBlurView = componentView.ensureWallpaperBlurView()
+                configureWallpaperBlurView(
+                    wallpaperBlurView: wallpaperBlurView,
+                    componentDelegate: componentDelegate,
+                    bubbleConfig: BubbleConfiguration(
+                        corners: .capsule(),
+                        stroke: ConversationStyle.bubbleStroke(isDarkThemeEnabled: isDarkThemeEnabled),
+                    ),
+                )
+                bubbleView = wallpaperBlurView
+            } else {
+                let chatColorView = componentView.chatColorView
+                chatColorView.configure(
+                    value: conversationStyle.bubbleChatColorIncoming,
+                    referenceView: componentDelegate.view,
+                    bubbleConfig: BubbleConfiguration(corners: .capsule()),
+                )
+                bubbleView = chatColorView
+            }
+            innerStack.addSubviewToFillSuperviewEdges(bubbleView)
         }
 
-        labelConfig.applyForRendering(label: label)
+        if let memberLabel = state.memberLabel {
+            // Finds the first or last occurance of the member label.
+            // Since member label is appended to the end of the string, this
+            // will work even if member label is a substring of sender name or equal to sender name.
+            let range = (senderName.string as NSString).range(of: memberLabel, options: .backwards)
+            componentView.label = CVCapsuleLabel(
+                attributedText: senderName,
+                textColor: senderNameColor,
+                font: UIFont.dynamicTypeFootnote.semibold(),
+                highlightRange: range,
+                highlightFont: .dynamicTypeFootnote,
+                axLabelPrefix: nil, // handled separately in CVItemViewState
+                presentationContext: .messageBubbleRegular,
+                signalSymbolRange: nil,
+                onTap: nil,
+            )
+        } else {
+            labelConfig.applyForRendering(label: componentView.label)
+        }
 
-        innerStack.configure(config: innerStackConfig,
-                            cellMeasurement: cellMeasurement,
-                            measurementKey: Self.measurementKey_innerStack,
-                            subviews: [ label ])
-        outerStack.configure(config: outerStackConfig,
-                            cellMeasurement: cellMeasurement,
-                            measurementKey: Self.measurementKey_outerStack,
-                            subviews: [ innerStack ])
+        var subviews: [UIView] = []
+        subviews.append(componentView.label)
+
+        innerStack.configure(
+            config: innerStackConfig,
+            cellMeasurement: cellMeasurement,
+            measurementKey: Self.measurementKey_innerStack,
+            subviews: subviews,
+        )
+        outerStack.configure(
+            config: outerStackConfig,
+            cellMeasurement: cellMeasurement,
+            measurementKey: Self.measurementKey_outerStack,
+            subviews: [innerStack],
+        )
     }
 
     private var isBorderlessWithWallpaper: Bool {
@@ -78,47 +141,77 @@ public class CVComponentSenderName: CVComponentBase, CVComponent {
             font: font,
             textColor: senderNameColor,
             numberOfLines: 0,
-            lineBreakMode: .byWordWrapping
+            lineBreakMode: .byWordWrapping,
         )
     }
 
     private var outerStackConfig: CVStackViewConfig {
-        CVStackViewConfig(axis: .vertical,
-                          alignment: .leading,
-                          spacing: 0,
-                          layoutMargins: .zero)
+        CVStackViewConfig(
+            axis: .vertical,
+            alignment: .leading,
+            spacing: 0,
+            layoutMargins: .zero,
+        )
     }
 
     private var innerStackConfig: CVStackViewConfig {
-        let layoutMargins: UIEdgeInsets = (isBorderlessWithWallpaper
-                                            ? UIEdgeInsets(hMargin: 12, vMargin: 3)
-                                            : .zero)
-        return CVStackViewConfig(axis: .vertical,
-                                 alignment: .center,
-                                 spacing: 0,
-                                 layoutMargins: layoutMargins)
+        let layoutMargins: UIEdgeInsets = (
+            isBorderlessWithWallpaper
+                ? UIEdgeInsets(hMargin: 12, vMargin: 3)
+                : .zero,
+        )
+        return CVStackViewConfig(
+            axis: .horizontal,
+            alignment: .center,
+            spacing: 4,
+            layoutMargins: layoutMargins,
+        )
     }
 
     private static let measurementKey_outerStack = "CVComponentSenderName.measurementKey_outerStack"
     private static let measurementKey_innerStack = "CVComponentSenderName.measurementKey_innerStack"
 
-    public func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
+    func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
         owsAssertDebug(maxWidth > 0)
 
-        let maxWidth = maxWidth - (outerStackConfig.layoutMargins.totalWidth +
-                                    innerStackConfig.layoutMargins.totalWidth)
-        let labelSize = CVText.measureLabel(config: labelConfig, maxWidth: maxWidth)
+        let maxWidth = maxWidth - (
+            outerStackConfig.layoutMargins.totalWidth +
+                innerStackConfig.layoutMargins.totalWidth
+        )
+
+        var subviewInfos: [ManualStackSubviewInfo] = []
+        let labelSize: CGSize
+        if let memberLabel = state.memberLabel {
+            let range = (senderName.string as NSString).range(of: memberLabel, options: .backwards)
+            labelSize = CVCapsuleLabel.measureLabel(
+                attributedText: senderName,
+                font: UIFont.dynamicTypeFootnote.semibold(),
+                highlightRange: range,
+                highlightFont: .dynamicTypeFootnote,
+                presentationContext: .messageBubbleRegular,
+                maxWidth: maxWidth,
+                signalSymbolRange: nil,
+            )
+        } else {
+            labelSize = CVText.measureLabel(config: labelConfig, maxWidth: maxWidth)
+        }
         let labelInfo = labelSize.asManualSubviewInfo
-        let innerStackMeasurement = ManualStackView.measure(config: innerStackConfig,
-                                                       measurementBuilder: measurementBuilder,
-                                                       measurementKey: Self.measurementKey_innerStack,
-                                                       subviewInfos: [ labelInfo ])
+        subviewInfos.insert(labelInfo, at: 0)
+
+        let innerStackMeasurement = ManualStackView.measure(
+            config: innerStackConfig,
+            measurementBuilder: measurementBuilder,
+            measurementKey: Self.measurementKey_innerStack,
+            subviewInfos: subviewInfos,
+        )
         let innerStackInfo = innerStackMeasurement.measuredSize.asManualSubviewInfo
-        let outerStackMeasurement = ManualStackView.measure(config: outerStackConfig,
-                                                       measurementBuilder: measurementBuilder,
-                                                       measurementKey: Self.measurementKey_outerStack,
-                                                       subviewInfos: [ innerStackInfo ],
-                                                       maxWidth: maxWidth)
+        let outerStackMeasurement = ManualStackView.measure(
+            config: outerStackConfig,
+            measurementBuilder: measurementBuilder,
+            measurementKey: Self.measurementKey_outerStack,
+            subviewInfos: [innerStackInfo],
+            maxWidth: maxWidth,
+        )
         return outerStackMeasurement.measuredSize
     }
 
@@ -126,24 +219,42 @@ public class CVComponentSenderName: CVComponentBase, CVComponent {
 
     // Used for rendering some portion of an Conversation View item.
     // It could be the entire item or some part thereof.
-    public class CVComponentViewSenderName: NSObject, CVComponentView {
+    class CVComponentViewSenderName: CVComponentView {
 
-        fileprivate let label = CVLabel()
+        fileprivate var label = UILabel()
 
         fileprivate let outerStack = ManualStackView(name: "CVComponentViewSenderName.outerStack")
         fileprivate let innerStack = ManualStackView(name: "CVComponentViewSenderName.innerStack")
 
-        public var isDedicatedCellView = false
+        // Bubble view when there is no chat wallpaper.
+        fileprivate let chatColorView = CVColorOrGradientView()
+        // Bubble view when there is a chat wallpaper.
+        fileprivate var wallpaperBlurView: CVWallpaperBlurView?
+        fileprivate func ensureWallpaperBlurView() -> CVWallpaperBlurView {
+            if let wallpaperBlurView {
+                return wallpaperBlurView
+            }
+            let wallpaperBlurView = CVWallpaperBlurView()
+            self.wallpaperBlurView = wallpaperBlurView
+            return wallpaperBlurView
+        }
 
-        public var rootView: UIView {
+        var isDedicatedCellView = false
+
+        var rootView: UIView {
             outerStack
         }
 
-        public func setIsCellVisible(_ isCellVisible: Bool) {}
+        func setIsCellVisible(_ isCellVisible: Bool) {}
 
-        public func reset() {
+        func reset() {
             outerStack.reset()
             innerStack.reset()
+
+            chatColorView.reset()
+            chatColorView.removeFromSuperview()
+
+            wallpaperBlurView?.removeFromSuperview()
 
             label.text = nil
         }

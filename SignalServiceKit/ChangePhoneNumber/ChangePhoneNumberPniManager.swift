@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import Foundation
 public import LibSignalClient
 
 // MARK: - ChangePhoneNumberPniManager protocol
@@ -37,7 +38,7 @@ public protocol ChangePhoneNumberPniManager {
         forNewE164 newE164: E164,
         localAci: Aci,
         localDeviceId: DeviceId,
-    ) async -> ChangePhoneNumberPni.GeneratePniIdentityResult
+    ) async throws -> (PniDistribution.Parameters, ChangePhoneNumberPni.PendingState)
 
     /// Commits an identity generated for a change number request.
     ///
@@ -49,8 +50,8 @@ public protocol ChangePhoneNumberPniManager {
         signedPreKey: Result<LibSignalClient.SignedPreKeyRecord, DecodingError>,
         lastResortPreKey: Result<LibSignalClient.KyberPreKeyRecord, DecodingError>,
         registrationId: UInt32,
-        tx: DBWriteTransaction
-    ) throws
+        tx: DBWriteTransaction,
+    )
 }
 
 // MARK: - Change-Number PNI types
@@ -71,7 +72,7 @@ public enum ChangePhoneNumberPni {
             pniIdentityKeyPair: ECKeyPair,
             localDevicePniSignedPreKeyRecord: LibSignalClient.SignedPreKeyRecord,
             localDevicePniPqLastResortPreKeyRecord: LibSignalClient.KyberPreKeyRecord,
-            localDevicePniRegistrationId: UInt32
+            localDevicePniRegistrationId: UInt32,
         ) {
             self.newE164 = newE164
             self.pniIdentityKeyPair = pniIdentityKeyPair
@@ -79,14 +80,6 @@ public enum ChangePhoneNumberPni {
             self.localDevicePniPqLastResortPreKeyRecord = localDevicePniPqLastResortPreKeyRecord
             self.localDevicePniRegistrationId = localDevicePniRegistrationId
         }
-    }
-
-    public enum GeneratePniIdentityResult {
-        /// Successful generation of PNI change-number parameters and state.
-        case success(parameters: PniDistribution.Parameters, pendingState: PendingState)
-
-        /// An error occurred.
-        case failure
     }
 }
 
@@ -115,7 +108,7 @@ class ChangePhoneNumberPniManagerImpl: ChangePhoneNumberPniManager {
         pniKyberPreKeyStore: KyberPreKeyStoreImpl,
         preKeyManager: PreKeyManager,
         registrationIdGenerator: RegistrationIdGenerator,
-        tsAccountManager: TSAccountManager
+        tsAccountManager: TSAccountManager,
     ) {
         self.db = db
         self.identityManager = identityManager
@@ -133,7 +126,7 @@ class ChangePhoneNumberPniManagerImpl: ChangePhoneNumberPniManager {
         forNewE164 newE164: E164,
         localAci: Aci,
         localDeviceId: DeviceId,
-    ) async -> ChangePhoneNumberPni.GeneratePniIdentityResult {
+    ) async throws -> (PniDistribution.Parameters, ChangePhoneNumberPni.PendingState) {
         logger.info("Generating PNI identity!")
 
         let pniIdentityKeyPair = identityManager.generateNewIdentityKeyPair()
@@ -146,23 +139,19 @@ class ChangePhoneNumberPniManagerImpl: ChangePhoneNumberPniManager {
             pniIdentityKeyPair: pniIdentityKeyPair,
             localDevicePniSignedPreKeyRecord: localDevicePniSignedPreKeyRecord,
             localDevicePniPqLastResortPreKeyRecord: localDevicePniPqLastResortPreKeyRecord,
-            localDevicePniRegistrationId: registrationIdGenerator.generate()
+            localDevicePniRegistrationId: registrationIdGenerator.generate(),
         )
 
-        do {
-            let parameters = try await self.pniDistributionParameterBuilder.buildPniDistributionParameters(
-                localAci: localAci,
-                localDeviceId: .valid(localDeviceId),
-                localPniIdentityKeyPair: pniIdentityKeyPair,
-                localE164: newE164,
-                localDevicePniSignedPreKey: localDevicePniSignedPreKeyRecord,
-                localDevicePniPqLastResortPreKey: localDevicePniPqLastResortPreKeyRecord,
-                localDevicePniRegistrationId: pendingState.localDevicePniRegistrationId
-            )
-            return .success(parameters: parameters, pendingState: pendingState)
-        } catch {
-            return .failure
-        }
+        let parameters = try await self.pniDistributionParameterBuilder.buildPniDistributionParameters(
+            localAci: localAci,
+            localDeviceId: localDeviceId,
+            localNewPhoneNumber: newE164,
+            localPniIdentityKeyPair: pniIdentityKeyPair,
+            localDevicePniSignedPreKey: localDevicePniSignedPreKeyRecord,
+            localDevicePniPqLastResortPreKey: localDevicePniPqLastResortPreKeyRecord,
+            localDevicePniRegistrationId: pendingState.localDevicePniRegistrationId,
+        )
+        return (parameters, pendingState)
     }
 
     // MARK: - Saving the New Identity
@@ -172,8 +161,8 @@ class ChangePhoneNumberPniManagerImpl: ChangePhoneNumberPniManager {
         signedPreKey: Result<LibSignalClient.SignedPreKeyRecord, DecodingError>,
         lastResortPreKey: Result<LibSignalClient.KyberPreKeyRecord, DecodingError>,
         registrationId: UInt32,
-        tx: DBWriteTransaction
-    ) throws {
+        tx: DBWriteTransaction,
+    ) {
         logger.info("Finalizing PNI identity.")
 
         // Store pending state in the right places
@@ -205,13 +194,12 @@ class ChangePhoneNumberPniManagerImpl: ChangePhoneNumberPniManager {
         // Followup tasks
 
         tx.addSyncCompletion { [preKeyManager] in
-            // Since we rotated the identity key, we need new one-time pre-keys.
-            // However, no need to update the signed pre-key, which we also just
-            // rotated.
-            preKeyManager.refreshOneTimePreKeys(
-                forIdentity: .pni,
-                alsoRefreshSignedPreKey: refreshSignedPreKey,
-            )
+            Task {
+                try? await preKeyManager.refreshOneTimePreKeys(
+                    forIdentity: .pni,
+                    alsoRefreshSignedPreKey: refreshSignedPreKey,
+                )
+            }
         }
     }
 }

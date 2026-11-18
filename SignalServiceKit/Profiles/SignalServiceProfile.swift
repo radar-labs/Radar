@@ -17,12 +17,15 @@ public class SignalServiceProfile {
 
     public struct Capabilities {
         fileprivate static let dummyCapabilityKey = "dummy"
+        fileprivate static let usernameChangeSyncMessageKey = "usernameChangeSyncMessage"
 
         /// A dummy capability that keeps this struct non-empty. If it were
         /// empty, the compiler would complain about much of the code in here
         /// being unused...which is true! But, we want to keep it around for the
         /// future, when we may add new capabilities.
         public let dummyCapability: Bool
+
+        public let usernameChangeSyncMessage: Bool
     }
 
     public let serviceId: ServiceId
@@ -35,7 +38,12 @@ public class SignalServiceProfile {
     public let unidentifiedAccessVerifier: Data?
     public let hasUnrestrictedUnidentifiedAccess: Bool
     public let credential: Data?
-    public let badges: [(OWSUserProfileBadgeInfo, ProfileBadge)]
+    /// Metadata about the badges present on the profile, as pertains to the
+    /// specific profile.
+    public let profileBadgeUserInfos: [OWSUserProfileBadgeInfo]
+    /// Info about the badges present on the profile, describing the badge
+    /// object itself.
+    public let profileBadges: [ProfileBadge]
     public let phoneNumberSharingEncrypted: Data?
 
     public let capabilities: Capabilities
@@ -51,9 +59,9 @@ public class SignalServiceProfile {
         unidentifiedAccessVerifier: Data?,
         hasUnrestrictedUnidentifiedAccess: Bool,
         credential: Data?,
-        badges: [(OWSUserProfileBadgeInfo, ProfileBadge)],
+        badges: [(userInfo: OWSUserProfileBadgeInfo, badge: ProfileBadge)],
         phoneNumberSharingEncrypted: Data?,
-        capabilities: Capabilities
+        capabilities: Capabilities,
     ) {
         self.serviceId = serviceId
         self.identityKey = identityKey
@@ -65,7 +73,8 @@ public class SignalServiceProfile {
         self.unidentifiedAccessVerifier = unidentifiedAccessVerifier
         self.hasUnrestrictedUnidentifiedAccess = hasUnrestrictedUnidentifiedAccess
         self.credential = credential
-        self.badges = badges
+        self.profileBadgeUserInfos = badges.map(\.userInfo)
+        self.profileBadges = badges.map(\.badge)
         self.phoneNumberSharingEncrypted = phoneNumberSharingEncrypted
         self.capabilities = capabilities
     }
@@ -98,7 +107,7 @@ public class SignalServiceProfile {
                 credential: credential,
                 badges: badges,
                 phoneNumberSharingEncrypted: phoneNumberSharingEncrypted,
-                capabilities: capabilities
+                capabilities: capabilities,
             )
         } catch let error {
             throw ValidationError(description: "Failed to parse profile JSON: \(error)")
@@ -115,7 +124,7 @@ public class SignalServiceProfile {
 
                 let badge = try ProfileBadge(jsonDictionary: badgeDict)
                 let badgeMetadata: OWSUserProfileBadgeInfo
-                if let expirationMills = expirationMills, let isVisible = isVisible {
+                if let expirationMills, let isVisible {
                     badgeMetadata = OWSUserProfileBadgeInfo(badgeId: badge.id, expiration: expirationMills, isVisible: isVisible)
                 } else {
                     badgeMetadata = OWSUserProfileBadgeInfo(badgeId: badge.id)
@@ -132,10 +141,16 @@ public class SignalServiceProfile {
             throw ValidationError(description: "Missing or invalid capabilities JSON!")
         }
 
+        let capabilitiesParser = ParamParser(capabilitiesDict)
+
         return Capabilities(
             dummyCapability: parseCapabilityFlag(
-                capabilitiesParser: ParamParser(capabilitiesDict),
-                capabilityKey: Capabilities.dummyCapabilityKey
+                capabilitiesParser: capabilitiesParser,
+                capabilityKey: Capabilities.dummyCapabilityKey,
+            ),
+            usernameChangeSyncMessage: parseCapabilityFlag(
+                capabilitiesParser: capabilitiesParser,
+                capabilityKey: Capabilities.usernameChangeSyncMessageKey,
             ),
         )
     }
@@ -146,7 +161,7 @@ public class SignalServiceProfile {
     /// was removed from the service and is therefore default-true.
     private static func parseCapabilityFlag(
         capabilitiesParser: ParamParser,
-        capabilityKey: String
+        capabilityKey: String,
     ) -> Bool {
         if capabilityKey == Capabilities.dummyCapabilityKey {
             return false

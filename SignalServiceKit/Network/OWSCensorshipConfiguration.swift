@@ -18,7 +18,7 @@ enum OWSFrontingHost {
 
     /// When using censorship circumvention, we pin to the fronted domain host.
     /// Adding a new domain front entails adding a corresponding HttpSecurityPolicy
-    /// and pinning to its CA.
+    /// and specifying which CAs it can use.
     ///
     /// If the security policy requires new certificates, include them in the SSK bundle
     fileprivate var securityPolicy: HttpSecurityPolicy {
@@ -39,7 +39,7 @@ enum OWSFrontingHost {
         }
     }
 
-    fileprivate var requiresPathPrefix: Bool {
+    private var requiresPathPrefix: Bool {
         switch self {
         case .googleEgypt, .googleUae, .googleOman, .googlePakistan, .googleQatar, .googleUzbekistan, .googleVenezuela, .`default`:
             return true

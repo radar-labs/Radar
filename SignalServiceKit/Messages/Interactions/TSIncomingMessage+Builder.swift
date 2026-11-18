@@ -54,7 +54,6 @@ public class TSIncomingMessageBuilder: TSMessageBuilder {
         giftBadge: OWSGiftBadge?,
         paymentNotification: TSPaymentNotification?,
         isPoll: Bool,
-        isStarred: Bool,
     ) {
         self.authorAci = authorAci
         self.authorE164 = authorE164
@@ -87,7 +86,6 @@ public class TSIncomingMessageBuilder: TSMessageBuilder {
             messageSticker: messageSticker,
             giftBadge: giftBadge,
             isPoll: isPoll,
-            isStarred: isStarred
         )
     }
 
@@ -122,7 +120,6 @@ public class TSIncomingMessageBuilder: TSMessageBuilder {
         giftBadge: OWSGiftBadge? = nil,
         paymentNotification: TSPaymentNotification? = nil,
         isPoll: Bool = false,
-        isStarred: Bool = false,
     ) -> TSIncomingMessageBuilder {
         return TSIncomingMessageBuilder(
             thread: thread,
@@ -154,7 +151,6 @@ public class TSIncomingMessageBuilder: TSMessageBuilder {
             giftBadge: giftBadge,
             paymentNotification: paymentNotification,
             isPoll: isPoll,
-            isStarred: isStarred,
         )
     }
 
@@ -171,7 +167,7 @@ public class TSIncomingMessageBuilder: TSMessageBuilder {
         if let paymentNotification {
             return OWSIncomingPaymentMessage(
                 initIncomingMessageWithBuilder: self,
-                paymentNotification: paymentNotification
+                paymentNotification: paymentNotification,
             )
         }
 

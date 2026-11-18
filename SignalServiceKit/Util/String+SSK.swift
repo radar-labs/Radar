@@ -5,12 +5,22 @@
 
 import Foundation
 import NaturalLanguage
+public import UIKit
 
 extension NSString {
     @objc
     @available(swift, obsoleted: 1)
-    internal var filterStringForDisplay: NSString {
+    var filterStringForDisplay: NSString {
         (self as String).filterStringForDisplay() as NSString
+    }
+}
+
+// MARK: -
+
+public struct FilteredString {
+    public let rawValue: String
+    public init(rawValue: String) {
+        self.rawValue = rawValue.filterStringForDisplay()
     }
 }
 
@@ -35,7 +45,7 @@ public extension String {
 
     func replaceCharacters(
         characterSet: CharacterSet,
-        replacement: String
+        replacement: String,
     ) -> String {
         let endIndex = self.endIndex
         var startIndex = self.startIndex
@@ -52,7 +62,7 @@ public extension String {
 
         // Create the result string and set up a capacity close to the final string
         var result = ""
-        result.reserveCapacity(self.count)
+        result.reserveCapacity(self.utf8.count)
 
         // Iterate through the ranges, appending the string between the last
         // match and the next, and then appending the replacement string
@@ -83,11 +93,13 @@ extension Optional where Wrapped == String {
     }
 }
 
+// MARK: -
+
 public extension Character {
-    /// Is this an ASCII digit between 0 and 9?
+    /// - SeeAlso ``String/asciiDigitsOnly``
     var isAsciiDigit: Bool { isASCII && isNumber }
 
-    /// Is this an ASCII alphanumeric (letter or digit)?
+    /// - SeeAlso ``String/asciiAlphanumericsOnly``
     var isAsciiAlphanumeric: Bool { isASCII && (isLetter || isNumber) }
 }
 
@@ -103,7 +115,7 @@ public extension String {
     /// // => "23"
     /// ```
     var asciiDigitsOnly: String {
-        filter { $0.isASCII && $0.isNumber }
+        filter { $0.isAsciiDigit }
     }
 
     /// Is every character an ASCII digit between 0 and 9?
@@ -117,7 +129,7 @@ public extension String {
     /// "1.23".isAsciiDigitsOnly // => false
     /// ```
     var isAsciiDigitsOnly: Bool {
-        allSatisfy { $0.isASCII && $0.isNumber }
+        allSatisfy { $0.isAsciiDigit }
     }
 
     /// A version of the string that only contains ASCII alphanumerics.
@@ -129,7 +141,7 @@ public extension String {
     /// // => "bc123"
     /// ```
     var asciiAlphanumericsOnly: String {
-        filter { $0.isASCII && ($0.isLetter || $0.isNumber) }
+        filter { $0.isAsciiAlphanumeric }
     }
 
     /// Is every character an ASCII alphanumeric?
@@ -141,8 +153,10 @@ public extension String {
     /// "abc12#".isAsciiAlphanumericsOnly // => false
     /// ```
     var isAsciiAlphanumericsOnly: Bool {
-        allSatisfy { $0.isASCII && ($0.isLetter || $0.isNumber) }
+        allSatisfy { $0.isAsciiAlphanumeric }
     }
+
+    // MARK: -
 
     func substring(withRange range: NSRange) -> String {
         (self as NSString).substring(with: range)
@@ -154,10 +168,6 @@ public extension String {
 
     func substring(afterRange range: NSRange) -> String {
         (self as NSString).substring(from: range.location + range.length)
-    }
-
-    enum StringError: Error {
-        case invalidCharacterShift
     }
 
     /// Converts all non arabic numerals within a string to arabic numerals
@@ -226,11 +236,11 @@ public extension NSAttributedString {
         return copy.copy() as! NSAttributedString
     }
 
-    static func + (lhs: NSAttributedString, rhs: NSAttributedString) -> NSAttributedString {
+    static func +(lhs: NSAttributedString, rhs: NSAttributedString) -> NSAttributedString {
         return lhs.stringByAppendingString(rhs)
     }
 
-    static func + (lhs: NSAttributedString, rhs: String) -> NSAttributedString {
+    static func +(lhs: NSAttributedString, rhs: String) -> NSAttributedString {
         return lhs.stringByAppendingString(rhs)
     }
 
@@ -378,7 +388,7 @@ public extension NSMutableAttributedString {
         if newEndOfString < mutableString.length {
             mutableString.replaceCharacters(
                 in: NSRange(location: newEndOfString, length: mutableString.length - newEndOfString),
-                with: ""
+                with: "",
             )
         }
 
@@ -386,7 +396,7 @@ public extension NSMutableAttributedString {
         if newStartOfString > 0 {
             mutableString.replaceCharacters(
                 in: NSRange(location: 0, length: newStartOfString),
-                with: ""
+                with: "",
             )
         }
     }
@@ -410,7 +420,7 @@ public extension NSAttributedString {
         font: UIFont,
         attributes: [NSAttributedString.Key: Any]? = nil,
         centerVerticallyRelativeTo centeringFont: UIFont? = nil,
-        heightReference: ImageAttachmentHeightReference = .lineHeight
+        heightReference: ImageAttachmentHeightReference = .lineHeight,
     ) -> NSAttributedString {
         let attachment = NSTextAttachment()
         attachment.image = image
@@ -425,12 +435,12 @@ public extension NSAttributedString {
             x: 0,
             y: (centeringFont.capHeight - imageHeight) / 2,
             width: imageWidth,
-            height: imageHeight
+            height: imageHeight,
         )
 
         let attachmentString = NSAttributedString(attachment: attachment)
 
-        if let attributes = attributes {
+        if let attributes {
             let mutableString = NSMutableAttributedString(attributedString: attachmentString)
             mutableString.addAttributes(attributes, range: mutableString.entireRange)
             return mutableString
@@ -451,7 +461,7 @@ public extension String {
     /// than the natural alignment of the current system locale depending on
     /// the language of the string, especially for user entered text.
     var naturalTextAlignment: NSTextAlignment {
-        guard let dominantLanguage = dominantLanguage else {
+        guard let dominantLanguage else {
             // If we can't identify the strings language, use the system language's natural alignment
             return .natural
         }
@@ -478,8 +488,7 @@ public extension String {
     func caesar(shift: UInt32) throws -> String {
         let shiftedScalars: [UnicodeScalar] = try unicodeScalars.map { c in
             guard let shiftedScalar = UnicodeScalar((c.value + shift) % 127) else {
-                owsFailDebug("invalidCharacterShift")
-                throw StringError.invalidCharacterShift
+                throw OWSAssertionError("Invalid character shift")
             }
             return shiftedScalar
         }
@@ -600,7 +609,7 @@ extension UnicodeScalar {
         EmojiRange(rangeStart: 0x1F85A, rangeEnd: 0x1F85F),
         EmojiRange(rangeStart: 0x1F888, rangeEnd: 0x1F88F),
         EmojiRange(rangeStart: 0x1F8AE, rangeEnd: 0x1FFFD),
-        EmojiRange(rangeStart: 0xE0020, rangeEnd: 0xE007F)
+        EmojiRange(rangeStart: 0xE0020, rangeEnd: 0xE007F),
     ]
 
     var isEmoji: Bool {
@@ -794,15 +803,6 @@ public extension String {
     }
 }
 
-// MARK: -
-
-@objc
-public extension NSString {
-    static func formatDurationLossless(durationSeconds: UInt32) -> String {
-        String.formatDurationLossless(durationSeconds: durationSeconds)
-    }
-}
-
 // MARK: - Filename
 
 public extension String {
@@ -829,27 +829,24 @@ public extension String {
     /// could ever be a dialable phone number.
     private static let validE164StructureRegex = try! NSRegularExpression(
         pattern: #"^\+[1-9][0-9]{0,18}$"#,
-        options: []
+        options: [],
     )
 
     /// Checks if the value starts with a "+" and has [1, 19] digits.
     var isStructurallyValidE164: Bool { Self.validE164StructureRegex.hasMatch(input: self) }
 
     var filteredAsE164: String {
-        let maxLength = 256
-        let length = min(maxLength, count)
-
-        var result: [unichar] = []
-        result.reserveCapacity(length)
-        for uch in utf16 {
-            if (0x30...0x39).contains(uch) || (result.isEmpty && uch == 0x2B) {
-                result.append(uch)
-                if result.count >= length {
+        var result = Data(capacity: self.utf8.count)
+        for ch in self.utf8 {
+            // '0'...'9' anywhere OR '+' at the beginning
+            if (0x30...0x39).contains(ch) || (result.isEmpty && ch == 0x2B) {
+                result.append(ch)
+                if result.count >= 256 {
                     break
                 }
             }
         }
-        return String(utf16CodeUnits: result, count: result.count)
+        return String(data: result, encoding: .utf8).owsFailUnwrap("filtered characters are always valid")
     }
 }
 

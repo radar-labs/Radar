@@ -7,10 +7,10 @@ public import SignalServiceKit
 
 public protocol ContactShareViewControllerDelegate: AnyObject {
 
-    func contactShareViewController(_ viewController: ContactShareViewController,
-                                    didApproveContactShare contactShare: ContactShareDraft)
-
-    func contactShareViewControllerDidCancel(_ viewController: ContactShareViewController)
+    func contactShareViewController(
+        _ viewController: ContactShareViewController,
+        didApproveContactShare contactShare: ContactShareDraft,
+    )
 
     func titleForContactShareViewController(_ viewController: ContactShareViewController) -> String?
 
@@ -19,37 +19,38 @@ public protocol ContactShareViewControllerDelegate: AnyObject {
     func approvalModeForContactShareViewController(_ viewController: ContactShareViewController) -> ApprovalMode
 }
 
-public class ContactShareViewController: OWSTableViewController2 {
+public class ContactShareViewController: OWSTableViewController2, ApprovalFooterDelegate,
+    EditContactShareNameViewControllerDelegate
+{
 
     public weak var shareDelegate: ContactShareViewControllerDelegate?
 
     private var approvalMode: ApprovalMode {
-        return shareDelegate?.approvalModeForContactShareViewController(self) ?? .send
+        shareDelegate?.approvalModeForContactShareViewController(self) ?? .send
     }
 
     // MARK: Contact data
 
     private var contactShareDraft: ContactShareDraft
 
-    private lazy var avatarField: ContactShareField? = {
-        guard let avatarData = contactShareDraft.avatarImageData else { return nil }
-        guard let avatarImage = contactShareDraft.avatarImage else {
-            owsFailDebug("could not load avatar image.")
-            return nil
-        }
-        return ContactShareAvatarField(OWSContactAvatar(
-            avatarImage: avatarImage,
-            avatarData: avatarData,
-            existingAttachment: contactShareDraft.existingAvatarAttachment
-        ))
+    private lazy var avatarField = ContactShareAvatarField(contactShareDraft: contactShareDraft)
+
+    private lazy var nicknameField: ContactShareField? = {
+        guard let nickname = contactShareDraft.signalNickname else { return nil }
+        return ContactShareNicknameField(OWSContactNickname(nickname: nickname), includedByDefault: false)
+    }()
+
+    private lazy var noteField: ContactShareField? = {
+        guard let note = contactShareDraft.signalNote?.strippedOrNil else { return nil }
+        return ContactShareNoteField(OWSContactNote(note: note), includedByDefault: false)
     }()
 
     private lazy var contactShareFields: [ContactShareField] = {
         var fields = [ContactShareField]()
 
         fields += contactShareDraft.phoneNumbers.map { ContactSharePhoneNumber($0) }
-        fields += contactShareDraft.emails.map { ContactShareEmail($0) }
-        fields += contactShareDraft.addresses.map { ContactShareAddress($0) }
+        fields += contactShareDraft.emails.map { ContactShareEmail($0, includedByDefault: false) }
+        fields += contactShareDraft.addresses.map { ContactShareAddress($0, includedByDefault: false) }
 
         return fields
     }()
@@ -57,7 +58,8 @@ public class ContactShareViewController: OWSTableViewController2 {
     private func filteredContactShare() -> ContactShareDraft {
         let result = contactShareDraft.newContact(withName: contactShareDraft.name)
 
-        if let avatarField, avatarField.isIncluded {
+        // The avatar row is always "included". User can select initials to send no data.
+        if let avatarField {
             avatarField.applyToContact(contact: result)
         }
 
@@ -65,6 +67,14 @@ public class ContactShareViewController: OWSTableViewController2 {
             if field.isIncluded {
                 field.applyToContact(contact: result)
             }
+        }
+
+        if let nicknameField, nicknameField.isIncluded {
+            nicknameField.applyToContact(contact: result)
+        }
+
+        if let noteField, noteField.isIncluded {
+            noteField.applyToContact(contact: result)
         }
 
         return result
@@ -81,29 +91,45 @@ public class ContactShareViewController: OWSTableViewController2 {
     override public func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationItem.leftBarButtonItem = .cancelButton { [weak self] in
-            self?.didPressCancel()
-        }
         if let title = shareDelegate?.titleForContactShareViewController(self) {
             navigationItem.title = title
         } else {
-            navigationItem.title = OWSLocalizedString("CONTACT_SHARE_APPROVAL_VIEW_TITLE",
-                                                      comment: "Title for the 'Approve contact share' view.")
+            navigationItem.title = OWSLocalizedString(
+                "CONTACT_SHARE_APPROVAL_VIEW_TITLE",
+                comment: "Title for the 'Approve contact share' view.",
+            )
         }
         if let recipientsDescription = shareDelegate?.recipientsDescriptionForContactShareViewController(self) {
             footerView.setNamesText(recipientsDescription, animated: false)
         }
+        footerView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(footerView)
+        NSLayoutConstraint.activate([
+            footerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            footerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            footerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
+        if #available(iOS 26, *) {
+            let interaction = UIScrollEdgeElementContainerInteraction()
+            interaction.edge = .bottom
+            interaction.scrollView = tableView
+            footerView.addInteraction(interaction)
+        }
 
         updateContent()
-        updateProceedButtonState()
     }
 
-    public override var canBecomeFirstResponder: Bool {
-        return true
+    override public func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        let footerHeight = footerView.frame.height - footerView.safeAreaInsets.bottom
+        tableView.contentInset.bottom = footerHeight
+        tableView.verticalScrollIndicatorInsets.bottom = footerHeight
     }
 
-    public override var inputAccessoryView: UIView? {
-        return footerView
+    override public func contentSizeCategoryDidChange() {
+        super.contentSizeCategoryDidChange()
+        updateContent()
     }
 
     // MARK: UI
@@ -114,17 +140,24 @@ public class ContactShareViewController: OWSTableViewController2 {
         return footerView
     }()
 
-    private func isAtLeastOneFieldSelected() -> Bool {
-        for field in contactShareFields {
-            if field.isIncluded {
-                return true
-            }
-        }
-        return false
-    }
-
     private func updateContent() {
         var tableItems = [OWSTableItem]()
+
+        // Avatar
+        if let avatarField {
+            tableItems.append(OWSTableItem(
+                customCellBlock: { [weak self] in
+                    let avatarImage = avatarField.selectedOption?.image ?? self?.initialsAvatarImage(diameter: 56)
+                    return ContactShareFieldCell.avatarCell(
+                        avatarImage: avatarImage,
+                        selectedSource: avatarField.selectedSource,
+                    )
+                },
+                actionBlock: { [weak self] in
+                    self?.showAvatarPicker(avatarField: avatarField)
+                },
+            ))
+        }
 
         // Name
         tableItems.append(OWSTableItem(
@@ -132,66 +165,94 @@ public class ContactShareViewController: OWSTableViewController2 {
                 guard let contactName = self?.contactShareDraft.displayName else {
                     return OWSTableItem.newCell()
                 }
-                return ContactShareFieldCell.contactNameCell(for: contactName)
+
+                let organizationName = self?.contactShareDraft.name.organizationName?.strippedOrNil
+                return ContactShareFieldCell.contactNameCell(
+                    contactName: contactName,
+                    organizationName: organizationName == contactName ? nil : organizationName,
+                )
             },
             actionBlock: { [weak self] in
                 self?.openContactNameEditingView()
-            }
+            },
         ))
-
-        // Avatar
-        if let avatarField {
-            tableItems.append(OWSTableItem(
-                customCellBlock: {
-                    return ContactShareFieldCell(field: avatarField)
-                },
-                actionBlock: { [weak self] in
-                    self?.toggleSelection(for: avatarField)
-                }
-            ))
-        }
 
         // Other fields
         tableItems += contactShareFields.map { field in
-            return OWSTableItem(
+            OWSTableItem(
                 customCellBlock: {
                     return ContactShareFieldCell(field: field)
                 },
                 actionBlock: { [weak self] in
                     self?.toggleSelection(for: field)
-                })
+                },
+            )
         }
-        contents = OWSTableContents(sections: [OWSTableSection(items: tableItems)])
-    }
 
-    private func updateProceedButtonState() {
-        footerView.proceedButton.isEnabled = isAtLeastOneFieldSelected()
+        // Nickname
+        if let nicknameField {
+            tableItems.append(OWSTableItem(
+                customCellBlock: {
+                    return ContactShareFieldCell(field: nicknameField)
+                },
+                actionBlock: { [weak self] in
+                    self?.toggleSelection(for: nicknameField)
+                },
+            ))
+        }
+
+        // Note
+        if let noteField {
+            tableItems.append(OWSTableItem(
+                customCellBlock: {
+                    return ContactShareFieldCell(field: noteField)
+                },
+                actionBlock: { [weak self] in
+                    self?.toggleSelection(for: noteField)
+                },
+            ))
+        }
+
+        let section = OWSTableSection(items: tableItems)
+        if contactShareDraft.aci != nil {
+            let format = OWSLocalizedString(
+                "CONTACT_SHARE_SIGNAL_ACCOUNT_NOTICE_FORMAT",
+                comment: "Notice at the top of the 'Share Contact' view when the shared contact includes their Signal account. Embeds {{ contact name }}.",
+            )
+            var configuration = UIListContentConfiguration.groupedHeader()
+            configuration.text = String(format: format, contactShareDraft.displayName)
+            configuration.textProperties.font = Self.defaultFooterFont
+            configuration.textProperties.color = Self.defaultFooterTextColor
+            configuration.textProperties.transform = .none
+            configuration.directionalLayoutMargins.top = 16
+            let headerView = UITableViewHeaderFooterView()
+            headerView.contentConfiguration = configuration
+            section.customHeaderView = headerView
+        }
+
+        contents = OWSTableContents(sections: [section])
     }
 
     private func toggleSelection(for contactShareField: ContactShareField) {
         contactShareField.isIncluded = !contactShareField.isIncluded
 
-        guard let cell = tableView.visibleCells.first(where: { visibleCell in
-            guard let contactFieldCell = visibleCell as? ContactShareFieldCell else { return false }
-            return contactFieldCell.field === contactShareField
-        }) as? ContactShareFieldCell else { return }
+        guard
+            let cell = tableView.visibleCells.first(where: { visibleCell in
+                guard let contactFieldCell = visibleCell as? ContactShareFieldCell else { return false }
+                return contactFieldCell.field === contactShareField
+            }) as? ContactShareFieldCell else { return }
 
         cell.updateCheckmarkState()
-
-        updateProceedButtonState()
     }
 
     // MARK: -
 
-    @objc
     private func didPressSendButton() {
-        AssertIsOnMainThread()
-
-        guard isAtLeastOneFieldSelected() else { return }
-
         guard contactShareDraft.ows_isValid else {
-            OWSActionSheets.showErrorAlert(message: OWSLocalizedString("CONTACT_SHARE_INVALID_CONTACT",
-                                                                       comment: "Error indicating that an invalid contact cannot be shared."))
+            OWSActionSheets.showErrorAlert(message: OWSLocalizedString(
+                "CONTACT_SHARE_INVALID_CONTACT",
+                comment: "Error indicating that an invalid contact cannot be shared.",
+            ))
             return
         }
 
@@ -205,41 +266,44 @@ public class ContactShareViewController: OWSTableViewController2 {
         shareDelegate.contactShareViewController(self, didApproveContactShare: filteredContactShare)
     }
 
-    private func didPressCancel() {
-        guard let shareDelegate else {
-            owsFailDebug("missing delegate.")
-            return
+    private func initialsAvatarImage(diameter: UInt) -> UIImage? {
+        SSKEnvironment.shared.databaseStorageRef.read { tx in
+            SSKEnvironment.shared.avatarBuilderRef.defaultAvatarImage(
+                personNameComponents: contactShareDraft.name.components,
+                diameterPoints: diameter,
+                transaction: tx,
+            )
         }
+    }
 
-        shareDelegate.contactShareViewControllerDidCancel(self)
+    private func showAvatarPicker(avatarField: ContactShareAvatarField) {
+        let sheet = ContactShareAvatarPickerSheet(
+            options: avatarField.options,
+            initialsImage: initialsAvatarImage(diameter: 96),
+            selectedSource: avatarField.selectedSource,
+        ) { [weak self] selectedSource in
+            avatarField.selectedSource = selectedSource
+            self?.tableView.reloadData()
+        }
+        present(sheet, animated: true)
     }
 
     private func openContactNameEditingView() {
         let view = EditContactShareNameViewController(contactShareDraft: contactShareDraft, delegate: self)
-        navigationController?.pushViewController(view, animated: true)
+        present(OWSNavigationController(rootViewController: view), animated: true)
     }
 
     private class ContactShareFieldCell: UITableViewCell {
 
         let field: ContactShareField
 
-        private lazy var checkmark: UIImageView = {
-            let checkmark = UIImageView(
-                image: Theme.iconImage(.circle).withTintColor(.ows_gray25, renderingMode: .automatic),
-                highlightedImage: Theme.iconImage(.checkCircleFill).withTintColor(Theme.accentBlueColor, renderingMode: .automatic)
-            )
-            checkmark.autoSetDimensions(to: .square(24))
-            return checkmark
-        }()
+        private lazy var checkmark = SelectionIndicatorView()
 
         init(field: ContactShareField) {
             self.field = field
 
             let fieldContentView: UIView? = {
                 switch field {
-                case let avatarField as ContactShareAvatarField:
-                    return ContactFieldViewHelper.contactFieldView(forAvatarImage: avatarField.value.avatarImage)
-
                 case let phoneNumberField as ContactSharePhoneNumber:
                     return ContactFieldViewHelper.contactFieldView(forPhoneNumber: phoneNumberField.value)
 
@@ -248,6 +312,12 @@ public class ContactShareViewController: OWSTableViewController2 {
 
                 case let addressField as ContactShareAddress:
                     return ContactFieldViewHelper.contactFieldView(forAddress: addressField.value)
+
+                case let nicknameField as ContactShareNicknameField:
+                    return ContactFieldViewHelper.contactFieldView(forNickname: nicknameField.value.nickname)
+
+                case let noteField as ContactShareNoteField:
+                    return ContactFieldViewHelper.contactFieldView(forNote: noteField.value.note)
 
                 default:
                     owsFailDebug("Invalid field")
@@ -259,7 +329,7 @@ public class ContactShareViewController: OWSTableViewController2 {
 
             selectionStyle = .none
 
-            let stackView = UIStackView(arrangedSubviews: [ checkmark ])
+            let stackView = UIStackView(arrangedSubviews: [checkmark])
             if let fieldContentView {
                 stackView.addArrangedSubview(fieldContentView)
             }
@@ -273,11 +343,47 @@ public class ContactShareViewController: OWSTableViewController2 {
             updateCheckmarkState()
         }
 
-        class func contactNameCell(for contactName: String) -> UITableViewCell {
-            let checkmark = UIImageView(image: Theme.iconImage(.checkCircleFill).withTintColor(.ows_gray25, renderingMode: .automatic))
-            let nameField = ContactFieldViewHelper.contactFieldView(forContactName: contactName)
+        class func contactNameCell(contactName: String, organizationName: String?) -> UITableViewCell {
+            let checkmark = SelectionIndicatorView()
+            checkmark.isSelected = true
 
-            let stackView = UIStackView(arrangedSubviews: [ checkmark, nameField ])
+            let nameField = ContactFieldViewHelper.contactFieldView(
+                forContactName: contactName,
+                organizationName: organizationName,
+            )
+
+            return disclosureCell(checkmark: checkmark, fieldView: nameField, verticalMargin: 14)
+        }
+
+        class func avatarCell(
+            avatarImage: UIImage?,
+            selectedSource: ContactShareAvatarOption.Source?,
+        ) -> UITableViewCell {
+            let checkmark = SelectionIndicatorView()
+            checkmark.isSelected = true
+
+            let avatarView = avatarImage.map { ContactFieldViewHelper.contactFieldView(forAvatarImage: $0) }
+
+            let cell = disclosureCell(checkmark: checkmark, fieldView: avatarView, verticalMargin: 10)
+            cell.isAccessibilityElement = true
+            cell.accessibilityLabel = OWSLocalizedString(
+                "CONTACT_SHARE_AVATAR_ROW_LABEL",
+                comment: "Accessibility label for the row that chooses which photo to include when sharing a contact.",
+            )
+            cell.accessibilityValue = ContactShareAvatarOption.localizedVoiceOverName(source: selectedSource)
+            cell.accessibilityTraits = .button
+            return cell
+        }
+
+        private class func disclosureCell(
+            checkmark: SelectionIndicatorView,
+            fieldView: UIView?,
+            verticalMargin: CGFloat,
+        ) -> UITableViewCell {
+            let stackView = UIStackView(arrangedSubviews: [checkmark])
+            if let fieldView {
+                stackView.addArrangedSubview(fieldView)
+            }
             stackView.axis = .horizontal
             stackView.spacing = 12
             stackView.alignment = .center
@@ -285,42 +391,38 @@ public class ContactShareViewController: OWSTableViewController2 {
             let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
             cell.accessoryType = .disclosureIndicator
             cell.contentView.addSubview(stackView)
-            stackView.autoPinHeightToSuperview(withMargin: 14)
+            stackView.autoPinHeightToSuperview(withMargin: verticalMargin)
             stackView.autoPinWidthToSuperviewMargins()
 
             return cell
-       }
+        }
 
         required init(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
 
         func updateCheckmarkState() {
-            checkmark.isHighlighted = field.isIncluded
+            checkmark.isSelected = field.isIncluded
         }
     }
-}
 
-extension ContactShareViewController: EditContactShareNameViewControllerDelegate {
+    // MARK: - EditContactShareNameViewControllerDelegate
 
-    public func editContactShareNameView(_ editContactShareNameView: EditContactShareNameViewController,
-                                         didFinishWith contactName: OWSContactName) {
+    public func editContactShareNameView(
+        _ editContactShareNameView: EditContactShareNameViewController,
+        didFinishWith contactName: OWSContactName,
+    ) {
         contactShareDraft.name = contactName
-        tableView.reloadData()
+        updateContent()
     }
-}
 
-// MARK: -
-
-extension ContactShareViewController: ApprovalFooterDelegate {
+    // MARK: - ApprovalFooterDelegate
 
     public func approvalFooterDelegateDidRequestProceed(_ approvalFooterView: ApprovalFooterView) {
         didPressSendButton()
     }
 
-    public func approvalMode(_ approvalFooterView: ApprovalFooterView) -> ApprovalMode {
-        return approvalMode
-    }
+    public func approvalMode(_ approvalFooterView: ApprovalFooterView) -> ApprovalMode { approvalMode }
 
     public func approvalFooterDidBeginEditingText() {}
 }

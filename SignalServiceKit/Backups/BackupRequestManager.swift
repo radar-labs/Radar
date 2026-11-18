@@ -24,12 +24,12 @@ public extension BackupArchive {
                 [
                     "sourceAttachment": [
                         "cdn": self.sourceAttachment.cdn,
-                        "key": self.sourceAttachment.key
+                        "key": self.sourceAttachment.key,
                     ],
                     "objectLength": self.objectLength,
                     "mediaId": self.mediaId.asBase64Url,
                     "hmacKey": self.hmacKey.base64EncodedString(),
-                    "encryptionKey": self.aesKey.base64EncodedString()
+                    "encryptionKey": self.aesKey.base64EncodedString(),
                 ]
             }
         }
@@ -41,7 +41,7 @@ public extension BackupArchive {
             var asParameters: [String: Any] {
                 [
                     "cdn": self.cdn,
-                    "mediaId": self.mediaId.asBase64Url
+                    "mediaId": self.mediaId.asBase64Url,
                 ]
             }
         }
@@ -77,13 +77,8 @@ public extension BackupArchive {
             case rateLimited = 429
         }
 
-        public enum BackupUploadFormError: Int, Error {
-            case badArgument = 400
-            case invalidAuth = 401
-            case forbidden = 403
-            /// The backup file is too large (as reported by us in `backupByteLength`.
-            case tooLarge = 413
-            case rateLimited = 429
+        public enum BackupUploadFormError: Error {
+            case tooLarge
         }
     }
 }
@@ -95,6 +90,7 @@ public protocol BackupRequestManager {
         key: BackupKeyMaterial,
         localAci: Aci,
         chatServiceAuth: ChatServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> BackupServiceAuth
 
     /// Passthrough API for ``BackupAuthCredentialManager/fetchBackupServiceAuth``.
@@ -102,64 +98,79 @@ public protocol BackupRequestManager {
         for key: BackupKeyMaterial,
         localAci: Aci,
         auth: ChatServiceAuth,
-        forceRefreshUnlessCachedPaidCredential: Bool
+        forceRefreshUnlessCachedPaidCredential: Bool,
+        logger: PrefixedLogger,
     ) async throws -> BackupServiceAuth
 
     /// - parameter backupByteLength: length in bytes of the encrypted backup file we will upload
     func fetchBackupUploadForm(
         backupByteLength: UInt32,
-        auth: BackupServiceAuth
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> Upload.Form
 
     func fetchBackupMediaAttachmentUploadForm(
+        encryptedByteLength: UInt32,
         auth: BackupServiceAuth,
-        logger: PrefixedLogger?
+        logger: PrefixedLogger,
     ) async throws -> Upload.Form
 
-    func fetchMediaTierCdnRequestMetadata(cdn: Int32, auth: BackupServiceAuth) async throws -> MediaTierReadCredential
+    func fetchMediaTierCdnRequestMetadata(
+        cdn: Int32,
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
+    ) async throws -> MediaTierReadCredential
 
-    func fetchBackupRequestMetadata(auth: BackupServiceAuth) async throws -> BackupReadCredential
+    func fetchBackupRequestMetadata(
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
+    ) async throws -> BackupReadCredential
 
     func copyToMediaTier(
         item: BackupArchive.Request.MediaItem,
         auth: BackupServiceAuth,
-        logger: PrefixedLogger?
+        logger: PrefixedLogger,
     ) async throws -> UInt32
 
     func copyToMediaTier(
         items: [BackupArchive.Request.MediaItem],
-        auth: BackupServiceAuth
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> [BackupArchive.Response.BatchedBackupMediaResult]
 
     func listMediaObjects(
         cursor: String?,
         limit: UInt32?,
-        auth: BackupServiceAuth
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> BackupArchive.Response.ListMediaResult
 
     func deleteMediaObjects(
         objects: [BackupArchive.Request.DeleteMediaTarget],
-        auth: BackupServiceAuth
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws
 
-    func fetchSvr🐝AuthCredential(
+    func fetchSVRBAuthCredential(
         key: MessageRootBackupKey,
         chatServiceAuth auth: ChatServiceAuth,
-        forceRefresh: Bool,
+        logger: PrefixedLogger,
     ) async throws -> LibSignalClient.Auth
 }
 
 extension BackupRequestManager {
-    func fetchBackupServiceAuth(
+    public func fetchBackupServiceAuth(
         for key: BackupKeyMaterial,
         localAci: Aci,
         auth: ChatServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> BackupServiceAuth {
         return try await self.fetchBackupServiceAuth(
             for: key,
             localAci: localAci,
             auth: auth,
-            forceRefreshUnlessCachedPaidCredential: false
+            forceRefreshUnlessCachedPaidCredential: false,
+            logger: logger,
         )
     }
 }
@@ -169,25 +180,26 @@ public struct BackupRequestManagerImpl: BackupRequestManager {
     private let backupAuthCredentialManager: BackupAuthCredentialManager
     private let backupCDNCredentialStore: BackupCDNCredentialStore
     private let backupSettingsStore: BackupSettingsStore
+    private let chatConnectionManager: ChatConnectionManager
     private let dateProvider: DateProvider
     private let db: any DB
-    private let kvStore: KeyValueStore
     private let networkManager: NetworkManager
 
     init(
         backupAuthCredentialManager: BackupAuthCredentialManager,
         backupCDNCredentialStore: BackupCDNCredentialStore,
         backupSettingsStore: BackupSettingsStore,
+        chatConnectionManager: ChatConnectionManager,
         dateProvider: @escaping DateProvider,
         db: any DB,
-        networkManager: NetworkManager
+        networkManager: NetworkManager,
     ) {
         self.backupAuthCredentialManager = backupAuthCredentialManager
         self.backupCDNCredentialStore = backupCDNCredentialStore
         self.backupSettingsStore = backupSettingsStore
+        self.chatConnectionManager = chatConnectionManager
         self.dateProvider = dateProvider
         self.db = db
-        self.kvStore = KeyValueStore(collection: "BackupRequestManager")
         self.networkManager = networkManager
     }
 
@@ -196,12 +208,14 @@ public struct BackupRequestManagerImpl: BackupRequestManager {
     public func fetchBackupServiceAuthForRegistration(
         key: BackupKeyMaterial,
         localAci: Aci,
-        chatServiceAuth: ChatServiceAuth
+        chatServiceAuth: ChatServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> BackupServiceAuth {
         return try await backupAuthCredentialManager.fetchBackupServiceAuthForRegistration(
             key: key,
             localAci: localAci,
             chatServiceAuth: chatServiceAuth,
+            logger: logger,
         )
     }
 
@@ -209,13 +223,15 @@ public struct BackupRequestManagerImpl: BackupRequestManager {
         for key: BackupKeyMaterial,
         localAci: Aci,
         auth: ChatServiceAuth,
-        forceRefreshUnlessCachedPaidCredential: Bool
+        forceRefreshUnlessCachedPaidCredential: Bool,
+        logger: PrefixedLogger,
     ) async throws -> BackupServiceAuth {
         return try await backupAuthCredentialManager.fetchBackupServiceAuth(
             key: key,
             localAci: localAci,
             chatServiceAuth: auth,
             forceRefreshUnlessCachedPaidCredential: forceRefreshUnlessCachedPaidCredential,
+            logger: logger,
         )
     }
 
@@ -224,64 +240,61 @@ public struct BackupRequestManagerImpl: BackupRequestManager {
     /// CDN upload form for uploading a backup
     public func fetchBackupUploadForm(
         backupByteLength: UInt32,
-        auth: BackupServiceAuth
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> Upload.Form {
         owsAssertDebug(auth.type == .messages)
         do {
-            return try await executeBackupService(
-                auth: auth,
-                requestFactory: { auth in
-                    OWSRequestFactory.backupUploadFormRequest(
-                        backupByteLength: backupByteLength,
-                        auth: auth
-                    )
-                }
-            )
-        } catch let error {
-            if
-                let httpStatusCode = error.httpStatusCode,
-                let error = BackupArchive.Response.BackupUploadFormError(rawValue: httpStatusCode)
-            {
-                throw error
-            } else {
-                throw error
-            }
+            return try await chatConnectionManager.withUnauthService(.backups) {
+                try await $0.getUploadForm(
+                    auth: auth.backupAuth,
+                    uploadSize: UInt64(safeCast: backupByteLength),
+                )
+            }.asUploadForm()
+        } catch SignalError.uploadTooLarge(let message) {
+            logger.warn("Backup too large! \(backupByteLength); SignalError.uploadTooLarge(\(message)")
+            throw BackupArchive.Response.BackupUploadFormError.tooLarge
         }
     }
 
     /// CDN upload form for uploading backup media
     public func fetchBackupMediaAttachmentUploadForm(
+        encryptedByteLength: UInt32,
         auth: BackupServiceAuth,
-        logger: PrefixedLogger? = nil
+        logger: PrefixedLogger,
     ) async throws -> Upload.Form {
         owsAssertDebug(auth.type == .media)
-        return try await executeBackupService(
-            auth: auth,
-            requestFactory: { auth in
-                OWSRequestFactory.backupMediaUploadFormRequest(
-                    auth: auth,
-                    logger: logger
-                )
-            }
-        )
+        return try await chatConnectionManager.withUnauthService(.backups) {
+            try await $0.getMediaUploadForm(
+                auth: auth.backupAuth,
+                uploadSize: UInt64(safeCast: encryptedByteLength),
+            )
+        }.asUploadForm()
     }
 
     // MARK: - Backup Info
 
-    private func fetchBackupCDNMetadata(auth: BackupServiceAuth) async throws -> BackupCDNMetadata {
-        if let cachedCDNMetadata = db.read(block: { tx in
-            backupCDNCredentialStore.backupCDNMetadata(
-                authType: auth.type,
-                now: dateProvider(),
-                tx: tx
-            )
-        }) {
+    private func fetchBackupCDNMetadata(
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
+    ) async throws -> BackupCDNMetadata {
+        if
+            let cachedCDNMetadata = db.read(block: { tx in
+                backupCDNCredentialStore.backupCDNMetadata(
+                    authType: auth.type,
+                    now: dateProvider(),
+                    tx: tx,
+                )
+            })
+        {
             return cachedCDNMetadata
         }
 
         let cdnMetadata: BackupCDNMetadata = try await executeBackupService(
             auth: auth,
-            requestFactory: OWSRequestFactory.backupInfoRequest(auth:)
+            requestFactory: {
+                OWSRequestFactory.backupInfoRequest(auth: $0, logger: logger)
+            },
         )
 
         await db.awaitableWrite { tx in
@@ -290,7 +303,7 @@ public struct BackupRequestManagerImpl: BackupRequestManager {
                 authType: auth.type,
                 now: dateProvider(),
                 currentBackupPlan: backupSettingsStore.backupPlan(tx: tx),
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -299,10 +312,15 @@ public struct BackupRequestManagerImpl: BackupRequestManager {
 
     // TODO: [Backups] Call this regularly, or move it somewhere it is called regularly
     /// Backup keep-alive request.  If not called, the backup may be deleted after 30 days.
-    private func refreshBackupInfo(auth: BackupServiceAuth) async throws {
+    private func refreshBackupInfo(
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
+    ) async throws {
         _ = try await executeBackupServiceRequest(
             auth: auth,
-            requestFactory: OWSRequestFactory.backupRefreshInfoRequest(auth:)
+            requestFactory: {
+                OWSRequestFactory.backupRefreshInfoRequest(auth: $0, logger: logger)
+            },
         )
     }
 
@@ -311,22 +329,25 @@ public struct BackupRequestManagerImpl: BackupRequestManager {
     /// Retrieve credentials used for reading from the CDN
     private func fetchCDNReadCredentials(
         cdn: Int32,
-        auth: BackupServiceAuth
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> BackupCDNReadCredential {
-        if let cachedCDNReadCredential = db.read(block: { tx in
-            backupCDNCredentialStore.backupCDNReadCredential(
-                cdnNumber: cdn,
-                authType: auth.type,
-                now: dateProvider(),
-                tx: tx
-            )
-        }) {
+        if
+            let cachedCDNReadCredential = db.read(block: { tx in
+                backupCDNCredentialStore.backupCDNReadCredential(
+                    cdnNumber: cdn,
+                    authType: auth.type,
+                    now: dateProvider(),
+                    tx: tx,
+                )
+            })
+        {
             return cachedCDNReadCredential
         }
 
         let cdnReadCredential: BackupCDNReadCredential = try await executeBackupService(
             auth: auth,
-            requestFactory: { OWSRequestFactory.fetchBackupCDNCredentials(auth: $0, cdn: cdn) }
+            requestFactory: { OWSRequestFactory.fetchBackupCDNCredentials(auth: $0, cdn: cdn, logger: logger) },
         )
 
         await db.awaitableWrite { tx in
@@ -335,33 +356,37 @@ public struct BackupRequestManagerImpl: BackupRequestManager {
                 cdnNumber: cdn,
                 authType: auth.type,
                 currentBackupPlan: backupSettingsStore.backupPlan(tx: tx),
-                tx: tx
+                tx: tx,
             )
         }
 
         return cdnReadCredential
     }
 
-    public func fetchBackupRequestMetadata(auth: BackupServiceAuth) async throws -> BackupReadCredential {
-        let metadata = try await fetchBackupCDNMetadata(auth: auth)
-        let authCredential = try await fetchCDNReadCredentials(cdn: metadata.cdn, auth: auth)
+    public func fetchBackupRequestMetadata(
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
+    ) async throws -> BackupReadCredential {
+        let metadata = try await fetchBackupCDNMetadata(auth: auth, logger: logger)
+        let authCredential = try await fetchCDNReadCredentials(cdn: metadata.cdn, auth: auth, logger: logger)
         return BackupReadCredential(credential: authCredential, metadata: metadata)
     }
 
     public func fetchMediaTierCdnRequestMetadata(
         cdn: Int32,
-        auth: BackupServiceAuth
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> MediaTierReadCredential {
         owsAssertDebug(auth.type == .media)
-        let metadata = try await fetchBackupCDNMetadata(auth: auth)
-        let authCredential = try await fetchCDNReadCredentials(cdn: cdn, auth: auth)
+        let metadata = try await fetchBackupCDNMetadata(auth: auth, logger: logger)
+        let authCredential = try await fetchCDNReadCredentials(cdn: cdn, auth: auth, logger: logger)
         return MediaTierReadCredential(cdn: cdn, credential: authCredential, metadata: metadata)
     }
 
     public func copyToMediaTier(
         item: BackupArchive.Request.MediaItem,
         auth: BackupServiceAuth,
-        logger: PrefixedLogger? = nil
+        logger: PrefixedLogger,
     ) async throws -> UInt32 {
         owsAssertDebug(auth.type == .media)
         do {
@@ -371,11 +396,11 @@ public struct BackupRequestManagerImpl: BackupRequestManager {
                     OWSRequestFactory.copyToMediaTier(
                         auth: $0,
                         item: item,
-                        logger: logger
+                        logger: logger,
                     )
-                }
+                },
             )
-            if let error = BackupArchive.Response.CopyToMediaTierError.init(rawValue: response.responseStatusCode) {
+            if let error = BackupArchive.Response.CopyToMediaTierError(rawValue: response.responseStatusCode) {
                 throw error
             }
             guard let bodyData = response.responseBodyData else {
@@ -389,7 +414,7 @@ public struct BackupRequestManagerImpl: BackupRequestManager {
         } catch let error {
             if
                 let responseStatusCode = error.httpStatusCode,
-                let typedError = BackupArchive.Response.CopyToMediaTierError.init(rawValue: responseStatusCode)
+                let typedError = BackupArchive.Response.CopyToMediaTierError(rawValue: responseStatusCode)
             {
                 throw typedError
             } else {
@@ -400,7 +425,8 @@ public struct BackupRequestManagerImpl: BackupRequestManager {
 
     public func copyToMediaTier(
         items: [BackupArchive.Request.MediaItem],
-        auth: BackupServiceAuth
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> [BackupArchive.Response.BatchedBackupMediaResult] {
         owsAssertDebug(auth.type == .media)
         return try await executeBackupService(
@@ -408,16 +434,18 @@ public struct BackupRequestManagerImpl: BackupRequestManager {
             requestFactory: {
                 OWSRequestFactory.archiveMedia(
                     auth: $0,
-                    items: items
+                    items: items,
+                    logger: logger,
                 )
-            }
+            },
         )
     }
 
     public func listMediaObjects(
         cursor: String?,
         limit: UInt32?,
-        auth: BackupServiceAuth
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> BackupArchive.Response.ListMediaResult {
         owsAssertDebug(auth.type == .media)
         return try await executeBackupService(
@@ -426,34 +454,40 @@ public struct BackupRequestManagerImpl: BackupRequestManager {
                 OWSRequestFactory.listMedia(
                     auth: $0,
                     cursor: cursor,
-                    limit: limit
+                    limit: limit,
+                    logger: logger,
                 )
-            }
+            },
         )
     }
 
-    public func deleteMediaObjects(objects: [BackupArchive.Request.DeleteMediaTarget], auth: BackupServiceAuth) async throws {
+    public func deleteMediaObjects(
+        objects: [BackupArchive.Request.DeleteMediaTarget],
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
+    ) async throws {
         owsAssertDebug(auth.type == .media)
         _ = try await executeBackupServiceRequest(
             auth: auth,
             requestFactory: {
                 OWSRequestFactory.deleteMedia(
                     auth: $0,
-                    objects: objects
+                    objects: objects,
+                    logger: logger,
                 )
-            }
+            },
         )
     }
 
-    public func fetchSvr🐝AuthCredential(
+    public func fetchSVRBAuthCredential(
         key: MessageRootBackupKey,
         chatServiceAuth auth: ChatServiceAuth,
-        forceRefresh: Bool,
+        logger: PrefixedLogger,
     ) async throws -> LibSignalClient.Auth {
-        return try await backupAuthCredentialManager.fetchSvr🐝AuthCredential(
+        return try await backupAuthCredentialManager.fetchSVRBAuthCredential(
             key: key,
             chatServiceAuth: auth,
-            forceRefresh: forceRefresh,
+            logger: logger,
         )
     }
 
@@ -461,18 +495,18 @@ public struct BackupRequestManagerImpl: BackupRequestManager {
 
     private func executeBackupServiceRequest(
         auth: BackupServiceAuth,
-        requestFactory: (BackupServiceAuth) -> TSRequest
+        requestFactory: (BackupServiceAuth) -> TSRequest,
     ) async throws -> HTTPResponse {
         return try await networkManager.asyncRequest(requestFactory(auth))
     }
 
     private func executeBackupService<T: Decodable>(
         auth: BackupServiceAuth,
-        requestFactory: (BackupServiceAuth) -> TSRequest
+        requestFactory: (BackupServiceAuth) -> TSRequest,
     ) async throws -> T {
         let response = try await executeBackupServiceRequest(
             auth: auth,
-            requestFactory: requestFactory
+            requestFactory: requestFactory,
         )
         guard let bodyData = response.responseBodyData else {
             throw OWSAssertionError("Missing body data")
@@ -517,7 +551,7 @@ public struct BackupReadCredential {
 
     fileprivate init(
         credential: BackupCDNReadCredential,
-        metadata: BackupCDNMetadata
+        metadata: BackupCDNMetadata,
     ) {
         self.credential = credential
         self.metadata = metadata
@@ -552,6 +586,7 @@ public class BackupRequestManagerMock: BackupRequestManager {
         key: BackupKeyMaterial,
         localAci: Aci,
         chatServiceAuth: ChatServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> BackupServiceAuth {
         return BackupServiceAuth.mock(type: .media, backupLevel: .paid)
     }
@@ -560,34 +595,39 @@ public class BackupRequestManagerMock: BackupRequestManager {
         for key: SignalServiceKit.BackupKeyMaterial,
         localAci: LibSignalClient.Aci,
         auth: SignalServiceKit.ChatServiceAuth,
-        forceRefreshUnlessCachedPaidCredential: Bool
+        forceRefreshUnlessCachedPaidCredential: Bool,
+        logger: PrefixedLogger,
     ) async throws -> SignalServiceKit.BackupServiceAuth {
         return BackupServiceAuth.mock(type: .media, backupLevel: .paid)
     }
 
     public func fetchBackupUploadForm(
         backupByteLength: UInt32,
-        auth: SignalServiceKit.BackupServiceAuth
+        auth: SignalServiceKit.BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> SignalServiceKit.Upload.Form {
         fatalError("Unimplemented")
     }
 
     public func fetchBackupMediaAttachmentUploadForm(
+        encryptedByteLength: UInt32,
         auth: SignalServiceKit.BackupServiceAuth,
-        logger: PrefixedLogger? = nil
+        logger: PrefixedLogger,
     ) async throws -> SignalServiceKit.Upload.Form {
         fatalError("Unimplemented")
     }
 
     public func fetchMediaTierCdnRequestMetadata(
         cdn: Int32,
-        auth: SignalServiceKit.BackupServiceAuth
+        auth: SignalServiceKit.BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> SignalServiceKit.MediaTierReadCredential {
         fatalError("Unimplemented")
     }
 
     public func fetchBackupRequestMetadata(
-        auth: SignalServiceKit.BackupServiceAuth
+        auth: SignalServiceKit.BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> SignalServiceKit.BackupReadCredential {
         fatalError("Unimplemented")
     }
@@ -595,14 +635,15 @@ public class BackupRequestManagerMock: BackupRequestManager {
     public func copyToMediaTier(
         item: SignalServiceKit.BackupArchive.Request.MediaItem,
         auth: SignalServiceKit.BackupServiceAuth,
-        logger: PrefixedLogger? = nil
+        logger: PrefixedLogger,
     ) async throws -> UInt32 {
         fatalError("Unimplemented")
     }
 
     public func copyToMediaTier(
         items: [SignalServiceKit.BackupArchive.Request.MediaItem],
-        auth: SignalServiceKit.BackupServiceAuth
+        auth: SignalServiceKit.BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> [SignalServiceKit.BackupArchive.Response.BatchedBackupMediaResult] {
         fatalError("Unimplemented")
     }
@@ -612,14 +653,16 @@ public class BackupRequestManagerMock: BackupRequestManager {
     public func listMediaObjects(
         cursor: String?,
         limit: UInt32?,
-        auth: SignalServiceKit.BackupServiceAuth
+        auth: SignalServiceKit.BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> SignalServiceKit.BackupArchive.Response.ListMediaResult {
         return listMediaResults.popFirst()!
     }
 
     public func deleteMediaObjects(
         objects: [SignalServiceKit.BackupArchive.Request.DeleteMediaTarget],
-        auth: SignalServiceKit.BackupServiceAuth
+        auth: SignalServiceKit.BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws {
         fatalError("Unimplemented")
     }
@@ -628,10 +671,10 @@ public class BackupRequestManagerMock: BackupRequestManager {
         fatalError("Unimplemented")
     }
 
-    public func fetchSvr🐝AuthCredential(
+    public func fetchSVRBAuthCredential(
         key: SignalServiceKit.MessageRootBackupKey,
         chatServiceAuth auth: SignalServiceKit.ChatServiceAuth,
-        forceRefresh: Bool
+        logger: PrefixedLogger,
     ) async throws -> LibSignalClient.Auth {
         return LibSignalClient.Auth(username: "", password: "")
     }

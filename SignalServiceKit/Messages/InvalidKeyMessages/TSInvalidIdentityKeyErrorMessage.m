@@ -9,11 +9,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation TSInvalidIdentityKeyErrorMessage
 
-- (nullable instancetype)initWithCoder:(NSCoder *)coder
-{
-    return [super initWithCoder:coder];
-}
-
 - (SignalServiceAddress *)theirSignalAddress
 {
     OWSAbstractMethod();
@@ -39,7 +34,6 @@ NS_ASSUME_NONNULL_BEGIN
                  isGroupStoryReply:(BOOL)isGroupStoryReply
                             isPoll:(BOOL)isPoll
     isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
-                         isStarred:(BOOL)isStarred
                 isViewOnceComplete:(BOOL)isViewOnceComplete
                  isViewOnceMessage:(BOOL)isViewOnceMessage
                        linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -75,7 +69,6 @@ NS_ASSUME_NONNULL_BEGIN
                      isGroupStoryReply:isGroupStoryReply
                                 isPoll:isPoll
         isSmsMessageRestoredFromBackup:isSmsMessageRestoredFromBackup
-                             isStarred:isStarred
                     isViewOnceComplete:isViewOnceComplete
                      isViewOnceMessage:isViewOnceMessage
                            linkPreview:linkPreview

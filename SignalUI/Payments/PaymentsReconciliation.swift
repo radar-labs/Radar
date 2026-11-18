@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+public import BreezSdkSpark
 import Foundation
 public import MobileCoin
 public import SignalServiceKit
-public import BreezSdkSpark
 
 public class PaymentsReconciliation {
 
@@ -25,10 +25,12 @@ public class PaymentsReconciliation {
                 self?.reconcileIfNecessary()
             }
         }
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(reconcileIfNecessary),
-                                               name: PaymentsConstants.arePaymentsEnabledDidChange,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(reconcileIfNecessary),
+            name: PaymentsConstants.arePaymentsEnabledDidChange,
+            object: nil,
+        )
     }
 
     private let operationQueue = SerialTaskQueue()
@@ -101,56 +103,81 @@ public class PaymentsReconciliation {
 
     private static func shouldReconcileWithSneakyTransaction(transactionHistory: LightningTransactionHistory) -> Bool {
         SSKEnvironment.shared.databaseStorageRef.read { transaction in
-            Self.shouldReconcile(transaction: transaction,
-                                 transactionHistory: transactionHistory)
+            Self.shouldReconcile(
+                transaction: transaction,
+                transactionHistory: transactionHistory,
+            )
         }
     }
 
-    private static func shouldReconcile(transaction: DBReadTransaction,
-                                        transactionHistory: LightningTransactionHistory) -> Bool {
-
+    private static func shouldReconcile(
+        transaction: DBReadTransaction,
+        transactionHistory: LightningTransactionHistory,
+    ) -> Bool {
 
         let lastKnownPaymentsCount = transactionHistory.count
         let lastKnownPaymentId = transactionHistory.lastKnownPaymentId
         let lastKnownPaymentTimestamp = transactionHistory.lastKnownTimestamp
 
-        guard lastKnownPaymentsCount == Self.schedulingStore.getUInt64(Self.lastKnownPaymentsCountKey,
-                                                                       defaultValue: 0,
-                                                                       transaction: transaction) else {
+        guard
+            lastKnownPaymentsCount == Self.schedulingStore.getUInt64(
+                Self.lastKnownPaymentsCountKey,
+                defaultValue: 0,
+                transaction: transaction,
+            )
+        else {
             return true
         }
-        guard lastKnownPaymentId == Self.schedulingStore.getString(Self.lastKnownPaymentIdKey,
-                                                                   transaction: transaction) else {
+        guard
+            lastKnownPaymentId == Self.schedulingStore.getString(
+                Self.lastKnownPaymentIdKey,
+                transaction: transaction,
+            )
+        else {
             return true
         }
-        guard lastKnownPaymentTimestamp == Self.schedulingStore.getUInt(Self.lastKnownPaymentTimestampKey,
-                                                                        defaultValue: 0,
-                                                                        transaction: transaction) else {
+        guard
+            lastKnownPaymentTimestamp == Self.schedulingStore.getUInt(
+                Self.lastKnownPaymentTimestampKey,
+                defaultValue: 0,
+                transaction: transaction,
+            )
+        else {
             return true
         }
         return false
     }
 
-    private static func reconciliationDidSucceed(transaction: DBWriteTransaction,
-                                                 transactionHistory: LightningTransactionHistory) {
+    private static func reconciliationDidSucceed(
+        transaction: DBWriteTransaction,
+        transactionHistory: LightningTransactionHistory,
+    ) {
         Self.schedulingStore.setDate(Date(), key: Self.successDateKey, transaction: transaction)
 
         let lastKnownPaymentsCount = transactionHistory.count
         let lastKnownPaymentId = transactionHistory.lastKnownPaymentId
         let lastKnownPaymentTimestamp = transactionHistory.lastKnownTimestamp
 
-        Self.schedulingStore.setUInt64(lastKnownPaymentsCount,
-                                       key: Self.lastKnownPaymentsCountKey,
-                                       transaction: transaction)
-        Self.schedulingStore.setString(lastKnownPaymentId,
-                                    key: Self.lastKnownPaymentIdKey,
-                                    transaction: transaction)
-        Self.schedulingStore.setUInt64(lastKnownPaymentTimestamp,
-                                    key: Self.lastKnownPaymentTimestampKey,
-                                    transaction: transaction)
-        Self.schedulingStore.setBool(true,
-                                     key: Self.hasReconciledPreviously,
-                                     transaction: transaction)
+        Self.schedulingStore.setUInt64(
+            lastKnownPaymentsCount,
+            key: Self.lastKnownPaymentsCountKey,
+            transaction: transaction,
+        )
+        Self.schedulingStore.setString(
+            lastKnownPaymentId,
+            key: Self.lastKnownPaymentIdKey,
+            transaction: transaction,
+        )
+        Self.schedulingStore.setUInt64(
+            lastKnownPaymentTimestamp,
+            key: Self.lastKnownPaymentTimestampKey,
+            transaction: transaction,
+        )
+        Self.schedulingStore.setBool(
+            true,
+            key: Self.hasReconciledPreviously,
+            transaction: transaction,
+        )
     }
 
     public func scheduleReconciliationNow(transaction: DBWriteTransaction) {
@@ -193,15 +220,19 @@ public class PaymentsReconciliation {
             try SSKEnvironment.shared.databaseStorageRef.read { transaction in
                 let databaseState = Self.buildPaymentsDatabaseState(transaction: transaction)
 
-                try reconcile(transactionHistory: transactionHistory,
-                              databaseState: databaseState,
-                              transaction: transaction)
+                try reconcile(
+                    transactionHistory: transactionHistory,
+                    databaseState: databaseState,
+                    transaction: transaction,
+                )
 
                 try cleanUpDatabase(transaction: transaction)
             }
             await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
-                reconciliationDidSucceed(transaction: transaction,
-                                         transactionHistory: transactionHistory)
+                reconciliationDidSucceed(
+                    transaction: transaction,
+                    transactionHistory: transactionHistory,
+                )
             }
         } catch {
             if case ReconciliationError.unsavedChanges = error {
@@ -211,14 +242,18 @@ public class PaymentsReconciliation {
                     try await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
                         let databaseState = Self.buildPaymentsDatabaseState(transaction: transaction)
 
-                        try reconcile(transactionHistory: transactionHistory,
-                                      databaseState: databaseState,
-                                      transaction: transaction)
+                        try reconcile(
+                            transactionHistory: transactionHistory,
+                            databaseState: databaseState,
+                            transaction: transaction,
+                        )
 
                         try cleanUpDatabase(transaction: transaction)
 
-                        reconciliationDidSucceed(transaction: transaction,
-                                                 transactionHistory: transactionHistory)
+                        reconciliationDidSucceed(
+                            transaction: transaction,
+                            transactionHistory: transactionHistory,
+                        )
                     }
                 } catch {
                     owsFailDebug("Error: \(error)")
@@ -229,16 +264,18 @@ public class PaymentsReconciliation {
         }
     }
 
-    internal static func reconcile(transactionHistory: LightningTransactionHistory,
-                                   databaseState: PaymentsDatabaseState,
-                                   transaction: DBReadTransaction) throws {
+    static func reconcile(
+        transactionHistory: LightningTransactionHistory,
+        databaseState: PaymentsDatabaseState,
+        transaction: DBReadTransaction,
+    ) throws {
 
         Logger.info("")
 
         let hasReconciledOnce = Self.schedulingStore.getBool(
             Self.hasReconciledPreviously,
             defaultValue: false,
-            transaction: transaction
+            transaction: transaction,
         )
         let isPrimaryDevice = DependenciesBridge.shared.tsAccountManager.registrationState(tx: transaction).isPrimaryDevice ?? true
 
@@ -358,7 +395,7 @@ public class PaymentsReconciliation {
 
             let createdTimestamp: UInt64 = Self.guesstimateBlockTimestamp(
                 forBlockActivity: blockActivity,
-                allBlockActivities: blockActivities
+                allBlockActivities: blockActivities,
             )
 
             func insert(model: TSPaymentModel) throws {
@@ -369,20 +406,22 @@ public class PaymentsReconciliation {
                 }
             }
 
-            if restoredPayments.isEmpty.negated {
+            if !restoredPayments.isEmpty {
                 // An archived payment at this point means there is something from a backup that is now
                 // being populated from the ledger. For each ArchivedPayment matched above, attempt
                 // to rebuild a TSPaymentModel from the matched public keys and spent key image information.
                 for restoredPayment in restoredPayments {
                     let restoredSpentPayments = restoredSpentPayments[restoredPayment]
                     let restoredReceivedPayments = restoredReceivedPayments[restoredPayment]
-                    if let paymentModel = buildArchivedPaymentModel(
-                        timestamp: createdTimestamp,
-                        blockActivity: blockActivity,
-                        restoredSpentItems: restoredSpentPayments,
-                        restoredReceivedItems: restoredReceivedPayments,
-                        archivedPayment: restoredPayment
-                    ) {
+                    if
+                        let paymentModel = buildArchivedPaymentModel(
+                            timestamp: createdTimestamp,
+                            blockActivity: blockActivity,
+                            restoredSpentItems: restoredSpentPayments,
+                            restoredReceivedItems: restoredReceivedPayments,
+                            archivedPayment: restoredPayment,
+                        )
+                    {
                         try insert(model: paymentModel)
                         databaseState.add(paymentModel: paymentModel)
                     } else {
@@ -398,7 +437,7 @@ public class PaymentsReconciliation {
                     blockActivity: blockActivity,
                     unaccountedForSpentItems: unaccountedForSpentItems,
                     unaccountedForReceivedItems: unaccountedForReceivedItems,
-                    markUnaccountedForItemsAsUnread: markUnaccountedForItemsAsUnread
+                    markUnaccountedForItemsAsUnread: markUnaccountedForItemsAsUnread,
                 )
                 try insert(model: paymentModel)
                 databaseState.add(paymentModel: paymentModel)
@@ -421,8 +460,10 @@ public class PaymentsReconciliation {
                 let hasLedgerBlockIndex = (paymentModel.mobileCoin?.ledgerBlockIndex ?? 0) > 0
                 if !hasLedgerBlockIndex {
                     if let transaction = transaction as? DBWriteTransaction {
-                        paymentModel.update(mcLedgerBlockTimestamp: ledgerBlockTimestamp,
-                                            transaction: transaction)
+                        paymentModel.update(
+                            mcLedgerBlockTimestamp: ledgerBlockTimestamp,
+                            transaction: transaction,
+                        )
                     } else {
                         throw ReconciliationError.unsavedChanges
                     }
@@ -436,7 +477,7 @@ public class PaymentsReconciliation {
         blockActivity: BlockActivity,
         unaccountedForSpentItems: [LightningTransactionHistoryItem],
         unaccountedForReceivedItems: [LightningTransactionHistoryItem],
-        markUnaccountedForItemsAsUnread: Bool
+        markUnaccountedForItemsAsUnread: Bool,
     ) -> TSPaymentModel {
         let spentPicoMob = unaccountedForSpentItems.map { $0.paymentAmount.picoMob }.reduce(0, +)
         let receivedPicoMob = unaccountedForReceivedItems.map { $0.paymentAmount.picoMob }.reduce(0, +)
@@ -453,8 +494,10 @@ public class PaymentsReconciliation {
         } else {
             netPicoMob = receivedPicoMob - spentPicoMob
         }
-        let paymentAmount = TSPaymentAmount(currency: .bitcoin,
-                                            picoMob: netPicoMob)
+        let paymentAmount = TSPaymentAmount(
+            currency: .bitcoin,
+            picoMob: netPicoMob,
+        )
         let paymentType: TSPaymentType = (isOutgoing ? .outgoingUnidentified : .incomingUnidentified)
         let paymentState: TSPaymentState = (isOutgoing ? .outgoingComplete : .incomingComplete)
 
@@ -467,24 +510,28 @@ public class PaymentsReconciliation {
         let spentKeyImages: [Data]? = Array(Set(unaccountedForSpentKeyImages)).nilIfEmpty
         let incomingTransactionPublicKeys: [Data]? = unaccountedForReceivedItems.map { $0.hashAsData }.nilIfEmpty
 
-        let mobileCoin = MobileCoinPayment(recipientPublicAddressData: nil,
-                                           transactionData: nil,
-                                           receiptData: nil,
-                                           incomingTransactionPublicKeys: incomingTransactionPublicKeys,
-                                           spentKeyImages: spentKeyImages,
-                                           outputPublicKeys: nil,
-                                           ledgerBlockTimestamp: ledgerBlockTimestamp,
-                                           ledgerBlockIndex: ledgerBlockIndex,
-                                           feeAmount: nil)
-        return TSPaymentModel(paymentType: paymentType,
-                              paymentState: paymentState,
-                              paymentAmount: paymentAmount,
-                              createdDate: createdDate,
-                              senderOrRecipientAci: nil,
-                              memoMessage: nil,
-                              isUnread: markUnaccountedForItemsAsUnread,
-                              interactionUniqueId: nil,
-                              mobileCoin: mobileCoin)
+        let mobileCoin = MobileCoinPayment(
+            recipientPublicAddressData: nil,
+            transactionData: nil,
+            receiptData: nil,
+            incomingTransactionPublicKeys: incomingTransactionPublicKeys,
+            spentKeyImages: spentKeyImages,
+            outputPublicKeys: nil,
+            ledgerBlockTimestamp: ledgerBlockTimestamp,
+            ledgerBlockIndex: ledgerBlockIndex,
+            feeAmount: nil,
+        )
+        return TSPaymentModel(
+            paymentType: paymentType,
+            paymentState: paymentState,
+            paymentAmount: paymentAmount,
+            createdDate: createdDate,
+            senderOrRecipientAci: nil,
+            memoMessage: nil,
+            isUnread: markUnaccountedForItemsAsUnread,
+            interactionUniqueId: nil,
+            mobileCoin: mobileCoin,
+        )
     }
 
     /// Take an ArchivedPayment and any matched spent keys and public keys and rebuild a payment model
@@ -499,7 +546,7 @@ public class PaymentsReconciliation {
         blockActivity: BlockActivity,
         restoredSpentItems: [LightningTransactionHistoryItem],
         restoredReceivedItems: [LightningTransactionHistoryItem],
-        archivedPayment: ArchivedPayment
+        archivedPayment: ArchivedPayment,
     ) -> TSPaymentModel? {
         let isOutgoing = archivedPayment.direction == .outgoing
 
@@ -516,7 +563,7 @@ public class PaymentsReconciliation {
         // spentKeyImages and transaction data can be nil for incoming payments, so only validate for outgoing
         let spentKeyImages = archivedPayment.mobileCoinIdentification?.keyImages?.nilIfEmpty
         if isOutgoing {
-            if  archivedPayment.transaction == nil || spentKeyImages == nil {
+            if archivedPayment.transaction == nil || spentKeyImages == nil {
                 return nil
             }
         }
@@ -547,18 +594,18 @@ public class PaymentsReconciliation {
             outputPublicKeys: isOutgoing ? publicKey : nil,
             ledgerBlockTimestamp: ledgerBlockTimestamp,
             ledgerBlockIndex: ledgerBlockIndex,
-            feeAmount: nil
+            feeAmount: nil,
         )
         return TSPaymentModel(
             paymentType: paymentType,
             paymentState: paymentState,
             paymentAmount: paymentAmount,
             createdDate: createdDate,
-            senderOrRecipientAci: archivedPayment.senderOrRecipientAci.map { AciObjC($0) },
+            senderOrRecipientAci: archivedPayment.senderOrRecipientAci,
             memoMessage: archivedPayment.note,
             isUnread: false,
             interactionUniqueId: archivedPayment.interactionUniqueId,
-            mobileCoin: mobileCoin
+            mobileCoin: mobileCoin,
         )
     }
 
@@ -568,8 +615,10 @@ public class PaymentsReconciliation {
     //
     // * Ensure correct ordering of the transactions.
     // * Display the "best guess" of when transaction occurred in the UI.
-    private static func guesstimateBlockTimestamp(forBlockActivity blockActivity: BlockActivity,
-                                                  allBlockActivities: [BlockActivity]) -> UInt64 {
+    private static func guesstimateBlockTimestamp(
+        forBlockActivity blockActivity: BlockActivity,
+        allBlockActivities: [BlockActivity],
+    ) -> UInt64 {
         // A given block has a single timestamp, so we can
         // consult all TXOs sent or received in the same block
         // to find a timestamp.
@@ -589,8 +638,10 @@ public class PaymentsReconciliation {
         var timestampUpperBound = Date().ows_millisecondsSince1970
 
         for otherBlockActivity in allBlockActivities {
-            if otherBlockActivity.blockIndex > blockIndex,
-               let timestamp = otherBlockActivity.blockTimestamp {
+            if
+                otherBlockActivity.blockIndex > blockIndex,
+                let timestamp = otherBlockActivity.blockTimestamp
+            {
                 timestampUpperBound = min(timestampUpperBound, timestamp)
             }
         }
@@ -620,8 +671,10 @@ public class PaymentsReconciliation {
             return cullCount
         }
 
-        func cullUnidentifiedDuplicates(_ map: MultiMap<Data, TSPaymentModel>,
-                                        label: String) {
+        func cullUnidentifiedDuplicates(
+            _ map: MultiMap<Data, TSPaymentModel>,
+            label: String,
+        ) {
             for (_, paymentModels) in map {
                 guard paymentModels.count > 1 else {
                     continue
@@ -641,8 +694,10 @@ public class PaymentsReconciliation {
         let allPaymentModels = TSPaymentModel.anyFetchAll(transaction: transaction)
         for paymentModel in allPaymentModels {
             owsAssertDebug(paymentModel.isFailed == (paymentModel.mobileCoin == nil))
-            guard !paymentModel.isFailed,
-                  let mobileCoin = paymentModel.mobileCoin else {
+            guard
+                !paymentModel.isFailed,
+                let mobileCoin = paymentModel.mobileCoin
+            else {
                 // Ignore failed models.
                 continue
             }
@@ -703,8 +758,10 @@ public class PaymentsReconciliation {
         }
     }
 
-    public func replaceAsUnidentified(paymentModel oldPaymentModel: TSPaymentModel,
-                                      transaction: DBWriteTransaction) {
+    public func replaceAsUnidentified(
+        paymentModel oldPaymentModel: TSPaymentModel,
+        transaction: DBWriteTransaction,
+    ) {
         guard !oldPaymentModel.isUnidentified else {
             owsFailDebug("Unexpected payment: \(oldPaymentModel.descriptionForLogs)")
             return
@@ -739,24 +796,28 @@ public class PaymentsReconciliation {
         let spentKeyImages: [Data]? = Array(Set(oldPaymentModel.mobileCoin?.spentKeyImages ?? [])).nilIfEmpty
         let outputPublicKeys: [Data]? = Array(Set(oldPaymentModel.mobileCoin?.outputPublicKeys ?? [])).nilIfEmpty
 
-        let mobileCoin = MobileCoinPayment(recipientPublicAddressData: nil,
-                                           transactionData: nil,
-                                           receiptData: nil,
-                                           incomingTransactionPublicKeys: oldPaymentModel.mobileCoin?.incomingTransactionPublicKeys,
-                                           spentKeyImages: spentKeyImages,
-                                           outputPublicKeys: outputPublicKeys,
-                                           ledgerBlockTimestamp: oldPaymentModel.mobileCoin?.ledgerBlockTimestamp ?? 0,
-                                           ledgerBlockIndex: oldPaymentModel.mobileCoin?.ledgerBlockIndex ?? 0,
-                                           feeAmount: nil)
-        let newPaymentModel = TSPaymentModel(paymentType: paymentType,
-                                             paymentState: paymentState,
-                                             paymentAmount: oldPaymentModel.paymentAmount,
-                                             createdDate: oldPaymentModel.createdDate,
-                                             senderOrRecipientAci: nil,
-                                             memoMessage: nil,
-                                             isUnread: false,
-                                             interactionUniqueId: nil,
-                                             mobileCoin: mobileCoin)
+        let mobileCoin = MobileCoinPayment(
+            recipientPublicAddressData: nil,
+            transactionData: nil,
+            receiptData: nil,
+            incomingTransactionPublicKeys: oldPaymentModel.mobileCoin?.incomingTransactionPublicKeys,
+            spentKeyImages: spentKeyImages,
+            outputPublicKeys: outputPublicKeys,
+            ledgerBlockTimestamp: oldPaymentModel.mobileCoin?.ledgerBlockTimestamp ?? 0,
+            ledgerBlockIndex: oldPaymentModel.mobileCoin?.ledgerBlockIndex ?? 0,
+            feeAmount: nil,
+        )
+        let newPaymentModel = TSPaymentModel(
+            paymentType: paymentType,
+            paymentState: paymentState,
+            paymentAmount: oldPaymentModel.paymentAmount,
+            createdDate: oldPaymentModel.createdDate,
+            senderOrRecipientAci: nil,
+            memoMessage: nil,
+            isUnread: false,
+            interactionUniqueId: nil,
+            mobileCoin: mobileCoin,
+        )
         do {
             try SSKEnvironment.shared.paymentsHelperRef.tryToInsertPaymentModel(newPaymentModel, transaction: transaction)
         } catch {
@@ -768,15 +829,17 @@ public class PaymentsReconciliation {
 
     // MARK: -
 
-    internal static func buildPaymentsDatabaseState(transaction: DBReadTransaction) -> PaymentsDatabaseState {
+    static func buildPaymentsDatabaseState(transaction: DBReadTransaction) -> PaymentsDatabaseState {
         let databaseState = PaymentsDatabaseState()
 
-        TSPaymentModel.anyEnumerate(transaction: transaction,
-                                    batchSize: 100) { (paymentModel, _) in
+        TSPaymentModel.anyEnumerate(
+            transaction: transaction,
+            batchingPreference: .batched(100),
+        ) { paymentModel, _ in
             databaseState.add(paymentModel: paymentModel)
         }
 
-        DependenciesBridge.shared.archivedPaymentStore.enumerateAll(tx: transaction) { (archivedPayment, _) in
+        DependenciesBridge.shared.archivedPaymentStore.enumerateAll(tx: transaction) { archivedPayment, _ in
             databaseState.add(archivedPayment: archivedPayment)
         }
         return databaseState
@@ -787,8 +850,10 @@ public class PaymentsReconciliation {
     public func willInsertPayment(_ paymentModel: TSPaymentModel, transaction: DBWriteTransaction) {
         // Cull unidentified payment models which might be replaced by this identified model,
         // then schedule reconciliation pass to create new unidentified payment models if necessary.
-        if !paymentModel.isUnidentified,
-           paymentModel.mcLedgerBlockIndex > 0 {
+        if
+            !paymentModel.isUnidentified,
+            paymentModel.mcLedgerBlockIndex > 0
+        {
             cullUnidentifiedPaymentsInSameBlock(paymentModel, transaction: transaction)
         }
     }
@@ -796,21 +861,27 @@ public class PaymentsReconciliation {
     public func willUpdatePayment(_ paymentModel: TSPaymentModel, transaction: DBWriteTransaction) {
         // Cull unidentified payment models which might be replaced by this identified model,
         // then schedule reconciliation pass to create new unidentified payment models if necessary.
-        if !paymentModel.isUnidentified,
-           paymentModel.mcLedgerBlockIndex > 0 {
+        if
+            !paymentModel.isUnidentified,
+            paymentModel.mcLedgerBlockIndex > 0
+        {
             cullUnidentifiedPaymentsInSameBlock(paymentModel, transaction: transaction)
         }
     }
 
     private func cullUnidentifiedPaymentsInSameBlock(_ paymentModel: TSPaymentModel, transaction: DBWriteTransaction) {
-        guard !paymentModel.isUnidentified,
-              paymentModel.mcLedgerBlockIndex > 0 else {
+        guard
+            !paymentModel.isUnidentified,
+            paymentModel.mcLedgerBlockIndex > 0
+        else {
             owsFailDebug("Invalid paymentModel.")
             return
         }
 
-        let otherPaymentModels = PaymentFinder.paymentModels(forMcLedgerBlockIndex: paymentModel.mcLedgerBlockIndex,
-                                                             transaction: transaction)
+        let otherPaymentModels = PaymentFinder.paymentModels(
+            forMcLedgerBlockIndex: paymentModel.mcLedgerBlockIndex,
+            transaction: transaction,
+        )
         for otherPaymentModel in otherPaymentModels {
             guard otherPaymentModel.isUnidentified else {
                 continue
@@ -837,7 +908,7 @@ extension MCTransactionHistoryItem {
 
 extension Array where Element == MCTransactionHistoryItem {
     private func sortByBlockIndexBlock(descending: Bool) -> (MCTransactionHistoryItem, MCTransactionHistoryItem) -> Bool {
-        return { (left, right) -> Bool in
+        return { left, right -> Bool in
             if descending {
                 return left.receivedBlockIndex > right.receivedBlockIndex
             } else {
@@ -889,7 +960,7 @@ private class BlockActivity {
 
 extension Array where Element == BlockActivity {
     private func sortByBlockIndexBlock(descending: Bool) -> (BlockActivity, BlockActivity) -> Bool {
-        return { (left, right) -> Bool in
+        return { left, right -> Bool in
             if descending {
                 return left.blockIndex > right.blockIndex
             } else {
@@ -909,7 +980,7 @@ extension Array where Element == BlockActivity {
 
 // MARK: -
 
-internal class PaymentsDatabaseState {
+class PaymentsDatabaseState {
     enum PaymentState {
         case model(TSPaymentModel)
         case archivedPayment(ArchivedPayment)
@@ -965,7 +1036,7 @@ internal class PaymentsDatabaseState {
                 spentImageKeyMap[spentImageKey] = .model(paymentModel)
             }
         } else if paymentModel.shouldHaveMCSpentKeyImages {
-           owsFailDebug("Empty or missing mcSpentKeyImages: \(formattedState).")
+            owsFailDebug("Empty or missing mcSpentKeyImages: \(formattedState).")
         }
 
         if let mcOutputPublicKeys = paymentModel.mcOutputPublicKeys {
@@ -974,7 +1045,7 @@ internal class PaymentsDatabaseState {
                 outputPublicKeyMap[outputPublicKeys] = .model(paymentModel)
             }
         } else if paymentModel.shouldHaveMCOutputPublicKeys {
-           owsFailDebug("Empty or missing mcOutputPublicKeys: \(formattedState).")
+            owsFailDebug("Empty or missing mcOutputPublicKeys: \(formattedState).")
         }
 
         let ledgerBlockIndex = paymentModel.mobileCoin?.ledgerBlockIndex ?? 0
@@ -993,13 +1064,13 @@ internal class PaymentsDatabaseState {
             return
         case .incoming:
             archivedPayment.mobileCoinIdentification?.publicKey?
-                 .filter { item in
+                .filter { item in
                     incomingAnyMap[item].isEmpty
-                 }
-                 .forEach {
-                     incomingAnyMap.add(key: $0, value: .archivedPayment(archivedPayment))
-                     wasPaymentAdded = true
-                 }
+                }
+                .forEach {
+                    incomingAnyMap.add(key: $0, value: .archivedPayment(archivedPayment))
+                    wasPaymentAdded = true
+                }
         case .outgoing:
             if archivedPayment.mobileCoinIdentification?.keyImages == nil || archivedPayment.mobileCoinIdentification?.publicKey == nil {
                 owsFailDebug("missing data ")
@@ -1221,7 +1292,7 @@ extension MobileCoin.OwnedTxOut: MCTransactionHistoryItem {
 
 // MARK: -
 
-fileprivate extension MCTransactionHistory {
+private extension MCTransactionHistory {
     // Well-behaved clients should never make TXOs of zero value,
     // but we can't count on that.  Therefore we filter records in
     // the SDK transaction history, discarding any zero value TXOs.
@@ -1230,9 +1301,11 @@ fileprivate extension MCTransactionHistory {
     var safeItems: [MCTransactionHistoryItem] {
         items.filter { $0.amountPicoMob > 0 }
     }
+
     var receivedItems: [MCTransactionHistoryItem] {
         safeItems
     }
+
     var spentItems: [MCTransactionHistoryItem] {
         safeItems.filter { $0.spentBlock != nil }
     }
@@ -1240,7 +1313,7 @@ fileprivate extension MCTransactionHistory {
 
 //
 
-fileprivate extension Array {
+private extension Array {
     var nilIfEmpty: [Element]? {
         isEmpty ? nil : self
     }

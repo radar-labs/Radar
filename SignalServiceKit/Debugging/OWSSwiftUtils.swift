@@ -18,7 +18,7 @@ public func AssertIsOnMainThread(
     logger: PrefixedLogger = .empty(),
     file: String = #fileID,
     function: String = #function,
-    line: Int = #line
+    line: Int = #line,
 ) {
     if !Thread.isMainThread {
         owsFailDebug("Must be on main thread.", logger: logger, file: file, function: function, line: line)
@@ -30,7 +30,7 @@ public func AssertNotOnMainThread(
     logger: PrefixedLogger = .empty(),
     file: String = #fileID,
     function: String = #function,
-    line: Int = #line
+    line: Int = #line,
 ) {
     if Thread.isMainThread {
         owsFailDebug("Must be off main thread.", logger: logger, file: file, function: function, line: line)
@@ -43,7 +43,7 @@ public func owsFailDebug(
     logger: PrefixedLogger = .empty(),
     file: String = #fileID,
     function: String = #function,
-    line: Int = #line
+    line: Int = #line,
 ) {
     logger.error(logMessage, file: file, function: function, line: line)
     logger.flush()
@@ -63,7 +63,7 @@ public func owsFail(
     logger: PrefixedLogger = .empty(),
     file: String = #fileID,
     function: String = #function,
-    line: Int = #line
+    line: Int = #line,
 ) -> Never {
     logger.error(Thread.callStackSymbols.joined(separator: "\n"))
     owsFailDebug(logMessage, logger: logger, file: file, function: function, line: line)
@@ -79,17 +79,38 @@ public func failIfThrowsDatabaseError<T>(
     failIfThrows(block: block, file: file, function: function, line: line)
 }
 
+@discardableResult
 public func failIfThrows<T>(
     block: () throws -> T,
     file: String = #fileID,
     function: String = #function,
-    line: Int = #line
+    line: Int = #line,
 ) -> T {
     do {
         return try block()
     } catch {
-        DatabaseCorruptionState.flagDatabaseCorruptionIfNecessary(userDefaults: CurrentAppContext().appUserDefaults(), error: error)
-        owsFail("Couldn't write: \(error)", file: file, function: function, line: line)
+        if let error = error as? DatabaseError, error.resultCode == .SQLITE_CORRUPT {
+            DatabaseCorruptionState.flagDatabaseAsCorrupted(userDefaults: CurrentAppContext().appUserDefaults())
+            owsFail("Failing due to database corruption. Extended result code: \(error.extendedResultCode)", file: file, function: function, line: line)
+        } else {
+            owsFail("Failing for unexpected throw: \(error.grdbErrorForLogging)", file: file, function: function, line: line)
+        }
+    }
+}
+
+@discardableResult
+public func failIfThrowsUnlessConstraintError<T>(
+    block: () throws -> T,
+    file: String = #fileID,
+    function: String = #function,
+    line: Int = #line,
+) throws(ConstraintError) -> T {
+    do {
+        return try block()
+    } catch DatabaseError.SQLITE_CONSTRAINT {
+        throw ConstraintError()
+    } catch {
+        return failIfThrows(block: { throw error }, file: file, function: function, line: line)
     }
 }
 
@@ -100,7 +121,7 @@ public func owsAssertDebug(
     logger: PrefixedLogger = .empty(),
     file: String = #fileID,
     function: String = #function,
-    line: Int = #line
+    line: Int = #line,
 ) {
     if !condition {
         let message: String = message()
@@ -118,7 +139,7 @@ public func owsPrecondition(
     logger: PrefixedLogger = .empty(),
     file: String = #fileID,
     function: String = #function,
-    line: Int = #line
+    line: Int = #line,
 ) {
     if !condition() {
         let message: String = message()
@@ -136,7 +157,7 @@ public class OWSSwiftUtils: NSObject {
         _ logMessage: String,
         file: String = #fileID,
         function: String = #function,
-        line: Int = #line
+        line: Int = #line,
     ) -> Never {
         owsFail(logMessage, file: file, function: function, line: line)
     }

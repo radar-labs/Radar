@@ -108,6 +108,12 @@ message AccountData {
   }
 
   message AccountSettings {
+    enum UnreadBadgeType {
+      UNKNOWN_BADGE_TYPE = 0; // Interpret as "Unread messages"
+      UNREAD_MESSAGES = 1;
+      UNREAD_CHATS = 2;
+    }
+
     bool readReceipts = 1;
     bool sealedSenderIndicators = 2;
     bool typingIndicators = 3;
@@ -140,7 +146,15 @@ message AccountData {
     CallsUseLessDataSetting callsUseLessDataSetting = 29;  // If unset, treat the same as "Unknown" case
     bool allowSealedSenderFromAnyone = 30;
     bool allowAutomaticKeyVerification = 31;
-    bool seenAdminDeleteEducationDialog = 32;
+    bool hasSeenAdminDeleteEducationDialog = 32;
+    UnreadBadgeType unreadBadgeType = 33;
+    optional bool includeMutedChatsInBadge = 34; // If unset, consider this disabled
+    optional bool reactionNotifications = 35; // If unset, consider this enabled
+    optional bool notifyForCallsIfMuted = 36; // If unset, consider this disabled
+    optional bool notifyForMentionsIfMuted = 37; // If unset, consider this enabled
+    optional bool notifyForRepliesIfMuted = 38; // If unset, consider this enabled
+    optional bool showUnreadReminders = 39; // If unset, consider this enabled
+    optional bool notifyWhenContactJoins = 40; // If unset, consider this disabled
   }
 
   message SubscriberData {
@@ -283,6 +297,8 @@ message Contact {
   optional AvatarColor avatarColor = 21;
   // Opaque blob containing key transparency data for the contact
   optional bytes keyTransparencyData = 22;
+  uint64 blockedAtTimestamp = 23; // if `blocked` is true, 0 means unknown block time
+  Name sharedName = 24; // absent iff both `given` and `family` are empty, name provided by third party
 }
 
 message Group {
@@ -299,6 +315,7 @@ message Group {
   GroupSnapshot snapshot = 5;
   bool blocked = 6;
   optional AvatarColor avatarColor = 7;
+  uint64 blockedAtTimestamp = 8; // if `blocked` is true, 0 means unknown block time
 
   // These are simply plaintext copies of the groups proto from Groups.proto.
   // They should be kept completely in-sync with Groups.proto.
@@ -396,9 +413,13 @@ message Chat {
   optional uint64 expirationTimerMs = 5;
   optional uint64 muteUntilMs = 6; // INT64_MAX (2^63 - 1) = "always muted".
   bool markedUnread = 7;
-  bool dontNotifyForMentionsIfMuted = 8;
+  bool dontNotifyForMentionsIfMuted = 8; // will be deprecated in favor of [notifyForMentionsIfMuted]
   ChatStyle style = 9;
   uint32 expireTimerVersion = 10;
+  optional bool notifyForCallsIfMuted = 11; // If unset, use default global settings
+  optional bool notifyForMentionsIfMuted = 12; // If unset, use default global settings. Only for groups. If [dontNotifyForMentionsIfMuted] is true, this should be initialized to false.
+  optional bool notifyForRepliesIfMuted = 13; // If unset, use default global settings. Only for groups.
+  optional bool showUnreadReminders = 14; // If unset, use default global settings
 }
 
 /**
@@ -678,6 +699,12 @@ message ContactAttachment {
     string nickname = 6;
   }
 
+  // The sharer's Signal nickname for this contact
+  message SignalNickname {
+    string given = 1;
+    string family = 2;
+  }
+
   message Phone {
     enum Type {
       UNKNOWN = 0; // Interpret as "Home"
@@ -726,11 +753,15 @@ message ContactAttachment {
   }
 
   optional Name name = 1;
+  reserved 2;
   repeated Phone number = 3;
   repeated Email email = 4;
   repeated PostalAddress address = 5;
   optional FilePointer avatar = 6;
   string organization = 7;
+  bytes aci = 8; // should be 16 bytes
+  optional SignalNickname nickname = 9; // absent iff both `given` and `family` are empty
+  string note = 10;
 }
 
 message StickerMessage {
@@ -840,6 +871,11 @@ message FilePointer {
   optional string caption = 10;
   optional string blurHash = 11;
   LocatorInfo locatorInfo = 13;
+  // Waveform for audio attachments. Each byte represents a "bar" in the
+  // waveform, with 0 as silence 255 as loudest. At most 100 bytes/bars.
+  optional bytes audioWaveform = 14;
+  // Duration of an audio attachment, in seconds.
+  optional float audioDurationSeconds = 15;
 }
 
 message Quote {
@@ -1040,6 +1076,7 @@ message LearnedProfileChatUpdate {
   oneof previousName {
     uint64 e164 = 1;
     string username = 2;
+    string sharedName = 3;
   }
 }
 

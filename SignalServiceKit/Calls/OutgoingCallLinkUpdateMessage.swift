@@ -7,35 +7,59 @@ import Foundation
 public import SignalRingRTC
 
 @objc(OutgoingCallLinkUpdateMessage)
-public class OutgoingCallLinkUpdateMessage: OWSOutgoingSyncMessage {
-    @objc
-    private var rootKey: Data!
+public class OutgoingCallLinkUpdateMessage: OutgoingSyncMessage {
+    override public class var supportsSecureCoding: Bool { true }
 
-    @objc
-    private var adminPasskey: Data?
+    public required init?(coder: NSCoder) {
+        self.adminPasskey = coder.decodeObject(of: NSData.self, forKey: "adminPasskey") as Data?
+        guard let rootKey = coder.decodeObject(of: NSData.self, forKey: "rootKey") as Data? else {
+            return nil
+        }
+        self.rootKey = rootKey
+        super.init(coder: coder)
+    }
+
+    override public func encode(with coder: NSCoder) {
+        super.encode(with: coder)
+        if let adminPasskey {
+            coder.encode(adminPasskey, forKey: "adminPasskey")
+        }
+        coder.encode(rootKey, forKey: "rootKey")
+    }
+
+    override public var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(super.hash)
+        hasher.combine(adminPasskey)
+        hasher.combine(rootKey)
+        return hasher.finalize()
+    }
+
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard super.isEqual(object) else { return false }
+        guard self.adminPasskey == object.adminPasskey else { return false }
+        guard self.rootKey == object.rootKey else { return false }
+        return true
+    }
+
+    private let rootKey: Data
+    private let adminPasskey: Data?
 
     public init(
         localThread: TSContactThread,
         rootKey: CallLinkRootKey,
         adminPasskey: Data?,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) {
         self.rootKey = rootKey.bytes
         self.adminPasskey = adminPasskey
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
-    public required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
+    override public var isUrgent: Bool { false }
 
-    public required init(dictionary dictionaryValue: [String: Any]!) throws {
-        try super.init(dictionary: dictionaryValue)
-    }
-
-    public override var isUrgent: Bool { false }
-
-    public override func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override public func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let callLinkUpdateBuilder = SSKProtoSyncMessageCallLinkUpdate.builder()
         callLinkUpdateBuilder.setType(.update)
         callLinkUpdateBuilder.setRootKey(self.rootKey)

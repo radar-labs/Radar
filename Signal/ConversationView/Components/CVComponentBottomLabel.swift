@@ -4,10 +4,11 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
-public class CVComponentBottomLabel: CVComponentBase, CVComponent {
-    public var componentKey: CVComponentKey { .bottomLabel }
+class CVComponentBottomLabel: CVComponentBase, CVComponent {
+
+    var componentKey: CVComponentKey { .bottomLabel }
     private let bottomLabelState: String
 
     init(itemModel: CVItemModel, bottomLabelState: String) {
@@ -23,7 +24,7 @@ public class CVComponentBottomLabel: CVComponentBase, CVComponent {
             axis: .horizontal,
             alignment: .center,
             spacing: 0,
-            layoutMargins: .init(top: 0, leading: 0, bottom: 24, trailing: 0)
+            layoutMargins: .init(top: 0, leading: 0, bottom: 24, trailing: 0),
         )
     }
 
@@ -34,17 +35,19 @@ public class CVComponentBottomLabel: CVComponentBase, CVComponent {
             textColor: conversationStyle.bubbleTextColor(isIncoming: isIncoming),
             numberOfLines: 0,
             lineBreakMode: .byWordWrapping,
-            textAlignment: .center
+            textAlignment: .center,
         )
     }
 
-    public func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
+    func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
         CVComponentViewBottomLabel()
     }
 
-    public func configureForRendering(componentView componentViewParam: CVComponentView,
-                                      cellMeasurement: CVCellMeasurement,
-                                      componentDelegate: CVComponentDelegate) {
+    func configureForRendering(
+        componentView componentViewParam: CVComponentView,
+        cellMeasurement: CVCellMeasurement,
+        componentDelegate: CVComponentDelegate,
+    ) {
         guard let componentView = componentViewParam as? CVComponentViewBottomLabel else {
             owsFailDebug("Unexpected componentView.")
             componentViewParam.reset()
@@ -58,31 +61,33 @@ public class CVComponentBottomLabel: CVComponentBase, CVComponent {
 
         let stackView = componentView.stackView
         stackView.reset()
-        stackView.configure(config: stackConfig,
-                            cellMeasurement: cellMeasurement,
-                            measurementKey: Self.measurementKey_stackView,
-                            subviews: [label])
+        stackView.configure(
+            config: stackConfig,
+            cellMeasurement: cellMeasurement,
+            measurementKey: Self.measurementKey_stackView,
+            subviews: [label],
+        )
     }
 
-    public func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
+    func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
         owsAssertDebug(maxWidth > 0)
 
         let bottomLabelSize = CVText.measureLabel(
             config: bottomLabelConfig,
-            maxWidth: maxWidth
+            maxWidth: maxWidth,
         )
         let stackMeasurement = ManualStackView.measure(
             config: stackConfig,
             measurementBuilder: measurementBuilder,
             measurementKey: Self.measurementKey_stackView,
             subviewInfos: [bottomLabelSize.asManualSubviewInfo],
-            maxWidth: maxWidth
+            maxWidth: maxWidth,
         )
 
         return stackMeasurement.measuredSize
     }
 
-    private class CVComponentViewBottomLabel: NSObject, CVComponentView {
+    private class CVComponentViewBottomLabel: CVComponentView {
 
         let stackView = ManualStackView(name: "bottomLabel")
 

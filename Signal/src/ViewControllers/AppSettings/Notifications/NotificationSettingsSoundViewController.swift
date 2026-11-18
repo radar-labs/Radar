@@ -22,7 +22,9 @@ class NotificationSettingsSoundViewController: OWSTableViewController2 {
         if let thread {
             self.originalNotificationSound = Sounds.notificationSoundWithSneakyTransaction(forThreadUniqueId: thread.uniqueId)
         } else {
-            self.originalNotificationSound = Sounds.globalNotificationSound
+            self.originalNotificationSound = DependenciesBridge.shared.db.read { tx in
+                DependenciesBridge.shared.notificationPreferencesManager.globalNotificationSound(tx: tx)
+            }
         }
 
         super.init()
@@ -33,7 +35,7 @@ class NotificationSettingsSoundViewController: OWSTableViewController2 {
 
         title = OWSLocalizedString(
             "SETTINGS_ITEM_NOTIFICATION_SOUND",
-            comment: "Label for settings view that allows user to change the notification sound."
+            comment: "Label for settings view that allows user to change the notification sound.",
         )
 
         navigationItem.leftBarButtonItem = .cancelButton { [weak self] in
@@ -51,6 +53,7 @@ class NotificationSettingsSoundViewController: OWSTableViewController2 {
     private var hasUnsavedChanges: Bool {
         notificationSound != originalNotificationSound
     }
+
     // Don't allow interactive dismiss when there are unsaved changes.
     override var isModalInPresentation: Bool {
         get { hasUnsavedChanges }
@@ -68,13 +71,13 @@ class NotificationSettingsSoundViewController: OWSTableViewController2 {
 
         for sound in Sounds.allNotificationSounds {
             let soundName: String
-            if sound == .standard(.note) {
-                soundName = String(
-                    format: OWSLocalizedString(
+            if sound == NotificationPreferencesManager.Defaults.globalNotificationSound {
+                soundName = String.nonPluralLocalizedStringWithFormat(
+                    OWSLocalizedString(
                         "SETTINGS_AUDIO_DEFAULT_TONE_LABEL_FORMAT",
-                        comment: "Format string for the default 'Note' sound. Embeds the system {{sound name}}."
+                        comment: "Format string for the default 'Note' sound. Embeds the system {{sound name}}.",
                     ),
-                    sound.displayName
+                    sound.displayName,
                 )
             } else {
                 soundName = sound.displayName
@@ -85,17 +88,17 @@ class NotificationSettingsSoundViewController: OWSTableViewController2 {
                 actionBlock: { [weak self] in
                     self?.soundWasSelected(sound)
                 },
-                accessoryType: sound == notificationSound ? .checkmark : .none
+                accessoryType: sound == notificationSound ? .checkmark : .none,
             ))
         }
 
         section.add(.disclosureItem(
             withText: OWSLocalizedString(
                 "NOTIFICATIONS_SECTION_SOUNDS_ADD_CUSTOM_SOUND",
-                comment: "Label for settings UI that allows user to add a new notification sound."
+                comment: "Label for settings UI that allows user to add a new notification sound.",
             ),
             actionBlock: { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 var contentTypes: [UTType] = [.wav, .aiff, .mp3]
                 for additionalUti in [
                     "public.aifc-audio",
@@ -109,7 +112,7 @@ class NotificationSettingsSoundViewController: OWSTableViewController2 {
                 let picker = UIDocumentPickerViewController(forOpeningContentTypes: contentTypes, asCopy: true)
                 picker.delegate = self
                 self.present(picker, animated: true)
-            }
+            },
         ))
 
         contents.add(section)
@@ -152,7 +155,10 @@ class NotificationSettingsSoundViewController: OWSTableViewController2 {
         if let thread {
             Sounds.setNotificationSound(notificationSound, forThread: thread)
         } else {
-            Sounds.setGlobalNotificationSound(notificationSound)
+            DependenciesBridge.shared.db.write { tx in
+                DependenciesBridge.shared.notificationPreferencesManager
+                    .setGlobalNotificationSound(notificationSound, tx: tx)
+            }
         }
 
         stopPlayingAndDismiss()

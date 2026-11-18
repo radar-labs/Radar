@@ -3,14 +3,14 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public extension BackupArchive {
+extension BackupArchive {
 
     /// The ringRTC-provided call id for a call, shared across participating clients
     /// and persisted to the backup.
     /// Uniquely identifies an Ad-hoc Call in both the app and the backup.
     /// Representations of past non-ad-hoc calls also have call ids, but have
     /// alternative identifiers because they are represented as ChatItems.
-    struct CallId: BackupArchive.LoggableId {
+    struct CallId {
         let value: UInt64
 
         init(callRecord: CallRecord) {
@@ -20,9 +20,6 @@ public extension BackupArchive {
         init(adHocCall: BackupProto_AdHocCall) {
             self.value = adHocCall.callID
         }
-
-        public var typeLogString: String { "CallRecord" }
-        public var idLogString: String { String(value) }
     }
 
     // We use the same identifier (the CallId from RingRTC) to identify
@@ -33,13 +30,13 @@ public extension BackupArchive {
 
 // MARK: -
 
-public class BackupArchiveAdHocCallArchiver: BackupArchiveProtoStreamWriter {
+class BackupArchiveAdHocCallArchiver {
     typealias AdHocCallAppId = BackupArchive.AdHocCallAppId
     typealias AdHocCallId = BackupArchive.AdHocCallId
-    typealias ArchiveMultiFrameResult = BackupArchive.ArchiveMultiFrameResult<AdHocCallAppId>
-    typealias ArchiveFrameError = BackupArchive.ArchiveFrameError<AdHocCallAppId>
-    typealias RestoreFrameResult = BackupArchive.RestoreFrameResult<AdHocCallId>
-    typealias RestoreFrameError = BackupArchive.RestoreFrameError<AdHocCallId>
+    typealias ArchiveMultiFrameResult = BackupArchive.ArchiveMultiFrameResult
+    typealias ArchiveFrameError = BackupArchive.ArchiveFrameError
+    typealias RestoreFrameResult = BackupArchive.RestoreFrameResult
+    typealias RestoreFrameError = BackupArchive.RestoreFrameError
 
     private let callRecordStore: CallRecordStore
     private let callLinkRecordStore: CallLinkRecordStore
@@ -48,7 +45,7 @@ public class BackupArchiveAdHocCallArchiver: BackupArchiveProtoStreamWriter {
     init(
         callRecordStore: CallRecordStore,
         callLinkRecordStore: CallLinkRecordStore,
-        adHocCallRecordManager: AdHocCallRecordManager
+        adHocCallRecordManager: AdHocCallRecordManager,
     ) {
         self.callRecordStore = callRecordStore
         self.callLinkRecordStore = callLinkRecordStore
@@ -66,75 +63,62 @@ public class BackupArchiveAdHocCallArchiver: BackupArchiveProtoStreamWriter {
     /// ``ArchiveMultiFrameResult.completeFailure``, on the other hand, will stop the entire backup,
     /// and should be used if some critical or category-wide failure occurs.
     func archiveAdHocCalls(
-        stream: BackupArchiveProtoOutputStream,
-        context: BackupArchive.ChatArchivingContext
+        stream: BackupArchiveOutputStream,
+        context: BackupArchive.ChatArchivingContext,
     ) throws(CancellationError) -> ArchiveMultiFrameResult {
         var partialErrors = [ArchiveFrameError]()
-        do {
-            try context.bencher.wrapEnumeration(
-                callRecordStore.enumerateAdHocCallRecords(tx:block:),
-                tx: context.tx
-            ) { record, frameBencher in
-                try Task.checkCancellation()
-                autoreleasepool {
-                    let recordId = AdHocCallAppId(callRecord: record)
 
-                    let callTimestamp = record.callBeganTimestamp
-                    guard BackupArchive.Timestamps.isValid(callTimestamp) else {
-                        partialErrors.append(.archiveFrameError(
-                            .invalidAdHocCallTimestamp,
-                            recordId
-                        ))
-                        return
-                    }
-
-                    var adHocCallProto = BackupProto_AdHocCall()
-                    adHocCallProto.callID = record.callId
-                    adHocCallProto.callTimestamp = record.callBeganTimestamp
-
-                    // It's a cross-client decision that `state` can only
-                    // ever be `.generic` (even if the client state is
-                    // actually `.joined`).
-                    adHocCallProto.state = .generic
-
-                    guard
-                        let callLinkRecordId = BackupArchive.CallLinkRecordId(callRecordConversationId: record.conversationId)
-                    else {
-                        partialErrors.append(.archiveFrameError(
-                            .adHocCallDoesNotHaveCallLinkAsConversationId,
-                            recordId
-                        ))
-                        return
-                    }
-                    guard let recipientId = context.recipientContext[.callLink(callLinkRecordId)] else {
-                        partialErrors.append(.archiveFrameError(
-                            .referencedRecipientIdMissing(.callLink(callLinkRecordId)),
-                            recordId
-                        ))
-                        return
-                    }
-                    adHocCallProto.recipientID = recipientId.value
-
-                    let error = Self.writeFrameToStream(
-                        stream,
-                        objectId: recordId,
-                        frameBencher: frameBencher
-                    ) {
-                        var frame = BackupProto_Frame()
-                        frame.adHocCall = adHocCallProto
-                        return frame
-                    }
-
-                    if let error {
-                        partialErrors.append(error)
-                    }
+        try context.wrapEnumeration(
+            enumerationBlock: { tx, block throws(CancellationError) in
+                try callRecordStore.enumerateAdHocCallRecords(tx: tx, block: block)
+            },
+            perEnumerantBlock: { record, frameBencher -> Bool in
+                let callTimestamp = record.callBeganTimestamp
+                guard BackupArchive.Timestamps.isValid(callTimestamp) else {
+                    partialErrors.append(.archiveFrameError(.invalidAdHocCallTimestamp))
+                    return true
                 }
-            }
-        } catch let error as CancellationError {
-            throw error
-        } catch {
-            return .completeFailure(.fatalArchiveError(.adHocCallIteratorError(error)))
-        }
+
+                var adHocCallProto = BackupProto_AdHocCall()
+                adHocCallProto.callID = record.callId
+                adHocCallProto.callTimestamp = record.callBeganTimestamp
+
+                // It's a cross-client decision that `state` can only
+                // ever be `.generic` (even if the client state is
+                // actually `.joined`).
+                adHocCallProto.state = .generic
+
+                guard
+                    let callLinkRecordId = BackupArchive.CallLinkRecordId(callRecordConversationId: record.conversationId)
+                else {
+                    partialErrors.append(.archiveFrameError(.adHocCallDoesNotHaveCallLinkAsConversationId))
+                    return true
+                }
+                guard let recipientId = context.recipientContext[.callLink(callLinkRecordId)] else {
+                    partialErrors.append(.archiveFrameError(
+                        .referencedRecipientIdMissing(.callLink(callLinkRecordId)),
+                    ))
+                    return true
+                }
+                adHocCallProto.recipientID = recipientId.value
+
+                let error: ArchiveFrameError? = context.writeFrame(
+                    toStream: stream,
+                    flush: nil,
+                    frameBencher: frameBencher,
+                ) {
+                    var frame = BackupProto_Frame()
+                    frame.adHocCall = adHocCallProto
+                    return frame
+                }
+
+                if let error {
+                    partialErrors.append(error)
+                }
+
+                return true
+            },
+        )
 
         if partialErrors.isEmpty {
             return .success
@@ -152,10 +136,8 @@ public class BackupArchiveAdHocCallArchiver: BackupArchiveProtoStreamWriter {
     /// but typically an error will be shown to the user, but the restore will be allowed to proceed.
     func restore(
         _ adHocCall: BackupProto_AdHocCall,
-        context: BackupArchive.ChatItemRestoringContext
+        context: BackupArchive.ChatItemRestoringContext,
     ) -> RestoreFrameResult {
-        var partialErrors = [BackupArchive.RestoreFrameError<AdHocCallId>]()
-
         let callId = AdHocCallId(adHocCall: adHocCall)
 
         let state: CallRecord.CallStatus.CallLinkCallStatus
@@ -172,46 +154,39 @@ public class BackupArchiveAdHocCallArchiver: BackupArchiveProtoStreamWriter {
         case .callLink(let _callLinkRecordId):
             callLinkRecordId = _callLinkRecordId
         default:
-            return .failure([.restoreFrameError(
-                .invalidProtoData(.recipientOfAdHocCallWasNotCallLink),
-                callId
-            )])
+            return .failure([.restoreFrameError(.invalidProtoData(.recipientOfAdHocCallWasNotCallLink))])
         }
+
+        switch callRecordStore.fetch(
+            callId: callId.value,
+            conversationId: .callLink(callLinkRowId: callLinkRecordId.rowId),
+            tx: context.tx,
+        ) {
+        case .matchFound:
+            // Desktop backups can contain duplicate CallRecords. Ignore them.
+            return .success
+        case .matchDeleted, .matchNotFound:
+            break
+        }
+
         let adHocCallRecord = CallRecord(
             callId: callId.value,
             callLinkRowId: callLinkRecordId.rowId,
             callStatus: state,
-            callBeganTimestamp: adHocCall.callTimestamp
+            callBeganTimestamp: adHocCall.callTimestamp,
         )
 
         if let callLinkRecord = context.recipientContext[callLinkRecordId] {
-            do {
-                var callLinkRecord = callLinkRecord
-                callLinkRecord.didInsertCallRecord()
-                try callLinkRecordStore.update(callLinkRecord, tx: context.tx)
-            } catch {
-                partialErrors.append(
-                    .restoreFrameError(
-                        .databaseInsertionFailed(error),
-                        callId
-                    )
-                )
-            }
+            var callLinkRecord = callLinkRecord
+            callLinkRecord.didInsertCallRecord()
+            callLinkRecordStore.update(callLinkRecord, tx: context.tx)
         }
 
-        do {
-            try callRecordStore.insert(
-                callRecord: adHocCallRecord,
-                tx: context.tx
-            )
-        } catch {
-            return .failure(partialErrors + [.restoreFrameError(.databaseInsertionFailed(error), callId)])
-        }
+        callRecordStore.insert(
+            callRecord: adHocCallRecord,
+            tx: context.tx,
+        )
 
-        if partialErrors.isEmpty {
-            return .success
-        } else {
-            return .partialRestore(partialErrors)
-        }
+        return .success
     }
 }

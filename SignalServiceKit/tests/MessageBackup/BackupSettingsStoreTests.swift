@@ -18,63 +18,46 @@ class BackupSettingsStoreTests: XCTestCase {
     }
 
     func testLastAndFirstBackupDate() throws {
-        var lastBackup = db.read { tx in
-            backupSettingsStore.lastBackupDate(tx: tx)
+        var lastBackupDetails = db.read { tx in
+            backupSettingsStore.lastBackupDetails(tx: tx)
         }
-        XCTAssertNil(lastBackup, "Last backup should not be set")
+        XCTAssertNil(lastBackupDetails, "Last backup should not be set")
 
-        db.write { tx in
-            backupSettingsStore.setLastBackupDate(Date(), tx: tx)
+        lastBackupDetails = db.write { tx in
+            backupSettingsStore.setLastBackupDetails(Date(), tx: tx)
+            return backupSettingsStore.lastBackupDetails(tx: tx)
         }
+        XCTAssertNotNil(lastBackupDetails, "Last backup should be set")
+        XCTAssertEqual(lastBackupDetails!.date, lastBackupDetails!.firstBackupDate, "First and last backups should be the same")
 
-        lastBackup = db.read { tx in
-            backupSettingsStore.lastBackupDate(tx: tx)
+        lastBackupDetails = db.write { tx in
+            backupSettingsStore.setLastBackupDetails(Date(), tx: tx)
+            return backupSettingsStore.lastBackupDetails(tx: tx)
         }
-        XCTAssertNotNil(lastBackup, "Last backup should be set")
-
-        var firstBackupDate = db.read { tx in
-            backupSettingsStore.firstBackupDate(tx: tx)
-        }
-        XCTAssertNotNil(firstBackupDate, "First backup should be set with last backup")
-        XCTAssertEqual(firstBackupDate, lastBackup, "First and last backups should be the same")
-
-        let betweenBackupsDate = Date()
-
-        db.write { tx in
-            backupSettingsStore.setLastBackupDate(Date(), tx: tx)
-        }
-
-        firstBackupDate = db.read { tx in
-            backupSettingsStore.firstBackupDate(tx: tx)
-        }
-        XCTAssertTrue(firstBackupDate! < betweenBackupsDate, "First backup should not update after it is first set")
+        XCTAssertTrue(lastBackupDetails!.firstBackupDate < lastBackupDetails!.date, "First backup should not update after it is first set")
     }
 
     func testBackupUpdatesRefreshDate() throws {
         var lastBackupRefresh = db.read { tx in
-            backupSettingsStore.lastBackupRefreshDate(tx: tx)
+            CronStore(uniqueKey: .refreshBackup).mostRecentDate(tx: tx)
         }
-        XCTAssertNil(lastBackupRefresh, "Last backup should not be set")
+        XCTAssertEqual(lastBackupRefresh, .distantPast, "Last backup should not be set")
 
         db.write { tx in
-            backupSettingsStore.setLastBackupDate(Date(), tx: tx)
+            backupSettingsStore.setLastBackupDetails(Date(), tx: tx)
         }
 
         lastBackupRefresh = db.read { tx in
-            backupSettingsStore.lastBackupRefreshDate(tx: tx)
+            CronStore(uniqueKey: .refreshBackup).mostRecentDate(tx: tx)
         }
-        XCTAssertNotNil(lastBackupRefresh, "Last backup should be set")
+        XCTAssertNotEqual(lastBackupRefresh, .distantPast, "Last backup should be set")
     }
 }
 
 // MARK: -
 
 private extension BackupSettingsStore {
-    func lastBackupDate(tx: DBReadTransaction) -> Date? {
-        return lastBackupDetails(tx: tx)?.date
-    }
-
-    func setLastBackupDate(_ date: Date, tx: DBWriteTransaction) {
+    func setLastBackupDetails(_ date: Date, tx: DBWriteTransaction) {
         setLastBackupDetails(date: date, backupFileSizeBytes: 1, backupMediaSizeBytes: 1, tx: tx)
     }
 }

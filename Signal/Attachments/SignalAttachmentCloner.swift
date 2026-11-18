@@ -5,38 +5,37 @@
 
 import Foundation
 import SignalServiceKit
+import SignalUI
 
 enum SignalAttachmentCloner {
-    static func cloneAsSignalAttachment(attachment: ReferencedAttachmentStream) throws -> SignalAttachment {
+    static func cloneAsSignalAttachment(
+        attachment: ReferencedAttachmentStream,
+        attachmentLimits: OutgoingAttachmentLimits,
+    ) throws -> PreviewableAttachment {
         guard let dataUTI = MimeTypeUtil.utiTypeForMimeType(attachment.attachmentStream.mimeType) else {
             throw OWSAssertionError("Missing dataUTI.")
         }
 
-        // Just use a random file name on the decrypted copy; its internal use only.
         let decryptedCopyUrl = try attachment.attachmentStream.makeDecryptedCopy(
-            filename: attachment.reference.sourceFilename
+            filename: attachment.reference.sourceFilename,
         )
 
-        let decryptedDataSource = try DataSourcePath(
-            fileUrl: decryptedCopyUrl,
-            shouldDeleteOnDeallocation: true
-        )
+        let decryptedDataSource = DataSourcePath(fileUrl: decryptedCopyUrl, ownership: .owned)
         decryptedDataSource.sourceFilename = attachment.reference.sourceFilename
 
-        let signalAttachment: SignalAttachment
+        let result: PreviewableAttachment
         switch attachment.reference.renderingFlag {
         case .default:
-            signalAttachment = try SignalAttachment.attachment(dataSource: decryptedDataSource, dataUTI: dataUTI)
+            result = try PreviewableAttachment.buildAttachment(dataSource: decryptedDataSource, dataUTI: dataUTI, attachmentLimits: attachmentLimits)
         case .voiceMessage:
-            signalAttachment = try SignalAttachment.voiceMessageAttachment(dataSource: decryptedDataSource, dataUTI: dataUTI)
+            result = try PreviewableAttachment.voiceMessageAttachment(dataSource: decryptedDataSource, dataUTI: dataUTI, attachmentLimits: attachmentLimits)
         case .borderless:
-            signalAttachment = try SignalAttachment.imageAttachment(dataSource: decryptedDataSource, dataUTI: dataUTI)
-            signalAttachment.isBorderless = true
+            result = try PreviewableAttachment.imageAttachment(dataSource: decryptedDataSource, dataUTI: dataUTI)
+            result.rawValue.isBorderless = true
         case .shouldLoop:
-            signalAttachment = try SignalAttachment.attachment(dataSource: decryptedDataSource, dataUTI: dataUTI)
-            signalAttachment.isLoopingVideo = true
+            result = try PreviewableAttachment.buildAttachment(dataSource: decryptedDataSource, dataUTI: dataUTI, attachmentLimits: attachmentLimits)
+            result.rawValue.isLoopingVideo = true
         }
-        signalAttachment.captionText = attachment.reference.storyMediaCaption?.text
-        return signalAttachment
+        return result
     }
 }

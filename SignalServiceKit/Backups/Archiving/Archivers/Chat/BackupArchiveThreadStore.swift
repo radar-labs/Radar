@@ -5,7 +5,7 @@
 
 import LibSignalClient
 
-public final class BackupArchiveThreadStore {
+final class BackupArchiveThreadStore {
 
     private let threadStore: ThreadStore
 
@@ -17,64 +17,53 @@ public final class BackupArchiveThreadStore {
 
     func enumerateNonStoryThreads(
         tx: DBReadTransaction,
-        block: (TSThread) throws -> Bool
-    ) throws {
+        block: (TSThread) throws(CancellationError) -> Bool,
+    ) throws(CancellationError) {
         try threadStore.enumerateNonStoryThreads(tx: tx, block: block)
-    }
-
-    func enumerateGroupThreads(
-        tx: DBReadTransaction,
-        block: (TSGroupThread) throws -> Bool
-    ) throws {
-        try threadStore.enumerateGroupThreads(tx: tx, block: block)
     }
 
     func enumerateStoryThreads(
         tx: DBReadTransaction,
-        block: (TSPrivateStoryThread) throws -> Bool
-    ) throws {
+        block: (TSPrivateStoryThread) throws(CancellationError) -> Bool,
+    ) throws(CancellationError) {
         try threadStore.enumerateStoryThreads(tx: tx, block: block)
-    }
-
-    func fetchOrDefaultAssociatedData(
-        for thread: TSThread,
-        tx: DBReadTransaction
-    ) -> ThreadAssociatedData {
-        return threadStore.fetchOrDefaultAssociatedData(for: thread, tx: tx)
     }
 
     func fetchContactThread(
         recipient: SignalRecipient,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> TSContactThread? {
         return threadStore.fetchContactThread(recipient: recipient, tx: tx)
+    }
+
+    func fetchThread(forGroupId groupId: GroupIdentifier, tx: DBReadTransaction) -> TSGroupThread? {
+        return threadStore.fetchThread(forGroupId: groupId, tx: tx)
     }
 
     // MARK: - Restoring
 
     func createNoteToSelfThread(
-        context: BackupArchive.ChatRestoringContext
+        context: BackupArchive.ChatRestoringContext,
     ) throws -> TSContactThread {
         let thread = TSContactThread(contactAddress: context.recipientContext.localIdentifiers.aciAddress)
-        let record = thread.asRecord()
-        try record.insert(context.tx.database)
+        try thread.insert(context.tx.database)
         return thread
     }
 
     func createContactThread(
         with address: BackupArchive.ContactAddress,
-        context: BackupArchive.ChatRestoringContext
+        context: BackupArchive.ChatRestoringContext,
     ) throws -> TSContactThread {
-        let thread = TSContactThread(contactAddress: address.asInteropAddress())
-        let record = thread.asRecord()
-        try record.insert(context.tx.database)
+        let thread = TSContactThread(contactAddress: address.asSignalServiceAddress())
+        try thread.insert(context.tx.database)
         return thread
     }
 
-    func createGroupThread(
+    func insertGroupThread(
+        groupRecord: inout GroupRecord,
         groupModel: TSGroupModelV2,
         isStorySendEnabled: Bool?,
-        context: BackupArchive.RestoringContext
+        context: BackupArchive.RestoringContext,
     ) throws -> TSGroupThread {
         let groupThread = TSGroupThread(groupModel: groupModel)
         switch isStorySendEnabled {
@@ -85,22 +74,22 @@ public final class BackupArchiveThreadStore {
         default:
             groupThread.storyViewMode = .default
         }
-        let record = groupThread.asRecord()
-        try record.insert(context.tx.database)
+        try groupThread.insert(context.tx.database)
+        groupRecord.setThreadId(groupThread.sqliteRowId.owsFailUnwrap("must exist"), tx: context.tx)
         return groupThread
     }
 
     func insertFullGroupMemberRecords(
         acis: Set<Aci>,
         groupThread: TSGroupThread,
-        context: BackupArchive.RestoringContext
+        context: BackupArchive.RestoringContext,
     ) throws {
         for aci in acis {
             let groupMember = TSGroupMember(
                 address: NormalizedDatabaseRecordAddress(aci: aci),
-                groupThreadId: groupThread.uniqueId,
+                threadUniqueId: groupThread.uniqueId,
                 // This gets updated in post frame restore actions.
-                lastInteractionTimestamp: 0
+                lastInteractionTimestamp: 0,
             )
             try groupMember.insert(context.tx.database)
         }
@@ -109,64 +98,102 @@ public final class BackupArchiveThreadStore {
     /// We _have_ to do this in a separate step from group thread creation; we create the group
     /// thread when we process the group's Recipient frame, but only have mention state later
     /// when processing the group's Chat frame.
+    ///
+    /// For the optional values, `nil` inherits the global setting.
     func update(
         thread: BackupArchive.ChatThread,
         dontNotifyForMentionsIfMuted: Bool,
-        context: BackupArchive.ChatRestoringContext
+        shouldNotifyForCallsWhenMuted: Bool?,
+        shouldNotifyForMentionsWhenMuted: Bool?,
+        shouldNotifyForRepliesWhenMuted: Bool?,
+        shouldNotifyForUnreadRemindersWhenMuted: Bool?,
+        context: BackupArchive.ChatRestoringContext,
     ) throws {
-        guard dontNotifyForMentionsIfMuted else {
-            // We only need to set if its not the default (false)
+        guard
+            dontNotifyForMentionsIfMuted
+            || shouldNotifyForCallsWhenMuted != nil
+            || shouldNotifyForMentionsWhenMuted != nil
+            || shouldNotifyForRepliesWhenMuted != nil
+            || shouldNotifyForUnreadRemindersWhenMuted != nil
+        else {
+            // We only need to set if they're not the defaults
             return
         }
 
         // Technically, this isn't relevant for contact threads (they can't have mentions
         // in them anyway), but the boolean does exist for them and the backup integration
         // tests have contact threads with muted mentions. So we set for all thread types.
+        let mentionNotificationMode: TSThread.MentionNotificationMode = if dontNotifyForMentionsIfMuted {
+            .doNotNotifyWhenMuted
+        } else {
+            .notifyWhenMuted
+        }
 
         try context.tx.database.execute(
             sql: """
-            UPDATE \(TSThread.table.tableName)
+            UPDATE \(TSThread.databaseTableName)
             SET
-                \(TSThreadSerializer.mentionNotificationModeColumn.columnName) = ?
+                \(threadColumn: .mentionNotificationMode) = ?,
+                \(threadColumn: .shouldNotifyForCallsWhenMuted) = ?,
+                \(threadColumn: .shouldNotifyForMentionsWhenMuted) = ?,
+                \(threadColumn: .shouldNotifyForRepliesWhenMuted) = ?,
+                \(threadColumn: .shouldNotifyForUnreadRemindersWhenMuted) = ?
             WHERE
-                \(TSThreadSerializer.idColumn.columnName) = ?;
+                \(threadColumn: .id) = ?;
             """,
-            arguments: [TSThreadMentionNotificationMode.never.rawValue, thread.threadRowId]
+            arguments: [
+                mentionNotificationMode.rawValue,
+                shouldNotifyForCallsWhenMuted,
+                dontNotifyForMentionsIfMuted ? false : shouldNotifyForMentionsWhenMuted,
+                shouldNotifyForRepliesWhenMuted,
+                shouldNotifyForUnreadRemindersWhenMuted,
+                thread.threadRowId,
+            ],
         )
     }
 
     func markVisible(
         thread: BackupArchive.ChatThread,
         lastInteractionRowId: Int64?,
-        context: BackupArchive.ChatRestoringContext
+        context: BackupArchive.ChatRestoringContext,
     ) throws {
         try context.tx.database.execute(
             sql: """
-            UPDATE \(TSThread.table.tableName)
+            UPDATE \(TSThread.databaseTableName)
             SET
-                \(TSThreadSerializer.shouldThreadBeVisibleColumn.columnName) = 1,
-                \(TSThreadSerializer.lastInteractionRowIdColumn.columnName) = ?
+                \(threadColumn: .shouldThreadBeVisible) = 1,
+                \(threadColumn: .lastInteractionRowId) = ?
             WHERE
-                \(TSThreadSerializer.idColumn.columnName) = ?;
+                \(threadColumn: .id) = ?;
             """,
-            arguments: [lastInteractionRowId ?? 0, thread.threadRowId]
+            arguments: [lastInteractionRowId ?? 0, thread.threadRowId],
         )
     }
 
-    func createAssociatedData(
-        for thread: TSThread,
+    func updateThread(
+        _ thread: TSThread,
         isArchived: Bool,
         isMarkedUnread: Bool,
         mutedUntilTimestamp: UInt64?,
-        context: BackupArchive.ChatRestoringContext
+        context: BackupArchive.ChatRestoringContext,
     ) throws {
-        let threadAssociatedData = ThreadAssociatedData(
-            threadUniqueId: thread.uniqueId,
-            isArchived: isArchived,
-            isMarkedUnread: isMarkedUnread,
-            mutedUntilTimestamp: mutedUntilTimestamp ?? 0,
-            audioPlaybackRate: 1
+        let threadId = thread.sqliteRowId.owsFailUnwrap("must exist")
+        try context.tx.database.execute(
+            sql: """
+            UPDATE \(TSThread.databaseTableName)
+            SET
+                \(threadColumn: .isArchived) = ?,
+                \(threadColumn: .isMarkedUnread) = ?,
+                \(threadColumn: .mutedUntilTimestamp) = ?
+            WHERE
+                \(threadColumn: .id) = ?
+            """,
+            arguments: [
+                isArchived,
+                isMarkedUnread,
+                mutedUntilTimestamp ?? 0,
+                threadId,
+            ],
         )
-        try threadAssociatedData.insert(context.tx.database)
     }
 }

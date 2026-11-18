@@ -4,11 +4,11 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
-public class CVComponentBottomButtons: CVComponentBase, CVComponent {
+class CVComponentBottomButtons: CVComponentBase, CVComponent {
 
-    public var componentKey: CVComponentKey { .bottomButtons }
+    var componentKey: CVComponentKey { .bottomButtons }
 
     private let bottomButtonsState: CVComponentState.BottomButtons
 
@@ -21,13 +21,15 @@ public class CVComponentBottomButtons: CVComponentBase, CVComponent {
         super.init(itemModel: itemModel)
     }
 
-    public func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
+    func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
         CVComponentViewBottomButtons()
     }
 
-    public func configureForRendering(componentView componentViewParam: CVComponentView,
-                                      cellMeasurement: CVCellMeasurement,
-                                      componentDelegate: CVComponentDelegate) {
+    func configureForRendering(
+        componentView componentViewParam: CVComponentView,
+        cellMeasurement: CVCellMeasurement,
+        componentDelegate: CVComponentDelegate,
+    ) {
         guard let componentView = componentViewParam as? CVComponentViewBottomButtons else {
             owsFailDebug("Unexpected componentView.")
             componentViewParam.reset()
@@ -39,60 +41,81 @@ public class CVComponentBottomButtons: CVComponentBase, CVComponent {
         var subviews = [UIView]()
         for action in actions {
             let buttonView = CVMessageActionButton(action: action)
-            if !isIncoming || isDarkThemeEnabled {
-                buttonView.backgroundColor = UIColor(white: 1, alpha: 0.16)
+            if isIncoming {
+                if conversationStyle.hasWallpaper {
+                    buttonView.backgroundColor = .Signal.MaterialBase.button
+                } else {
+                    buttonView.backgroundColor = .Signal.LightBase.button
+                }
+                buttonView.textColor = .Signal.label
             } else {
-                buttonView.backgroundColor = UIColor(white: 1, alpha: 0.8)
+                buttonView.backgroundColor = .Signal.ColorBase.button
+                buttonView.textColor = .Signal.ColorBase.labelPrimary
             }
-            buttonView.textColor = conversationStyle.bubbleTextColor(isIncoming: isIncoming)
             subviews.append(buttonView)
             componentView.buttonViews.append(buttonView)
         }
 
+        let isHorizontal = cellMeasurement.value(key: Self.measurementKey_isHorizontal) == 1
         let stackView = componentView.stackView
         stackView.reset()
-        stackView.configure(config: stackConfig,
-                            cellMeasurement: cellMeasurement,
-                            measurementKey: Self.measurementKey_stackView,
-                            subviews: subviews)
+        stackView.configure(
+            config: Self.stackConfig(isHorizontal: isHorizontal),
+            cellMeasurement: cellMeasurement,
+            measurementKey: Self.measurementKey_stackView,
+            subviews: subviews,
+        )
     }
 
-    private var stackConfig: CVStackViewConfig {
+    private static func stackConfig(isHorizontal: Bool) -> CVStackViewConfig {
         CVStackViewConfig(
-            axis: .vertical,
+            axis: isHorizontal ? .horizontal : .vertical,
             alignment: .fill,
             spacing: Self.buttonSpacing,
-            layoutMargins: .init(top: 6, leading: 12, bottom: 12, trailing: 12)
+            layoutMargins: .init(top: 6, leading: 12, bottom: 12, trailing: 12),
         )
     }
 
     fileprivate static var buttonHeight: CGFloat { CVMessageActionButton.buttonHeight }
-    fileprivate static let buttonSpacing: CGFloat = 4
+    private static let buttonSpacing: CGFloat = 8
 
     private static let measurementKey_stackView = "CVComponentBottomButtons.measurementKey_stackView"
+    private static let measurementKey_isHorizontal = "CVComponentBottomButtons.measurementKey_isHorizontal"
 
-    public func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
+    func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
         owsAssertDebug(maxWidth > 0)
 
-        let subviewSize = CGSize(width: maxWidth - stackConfig.layoutMargins.totalWidth, height: Self.buttonHeight)
+        let contentWidth = max(0, maxWidth - Self.stackConfig(isHorizontal: true).layoutMargins.totalWidth)
+        let totalSpacing = Self.buttonSpacing * CGFloat(max(0, actions.count - 1))
+        let horizontalButtonWidth = max(0, contentWidth - totalSpacing) / CGFloat(max(1, actions.count))
+        let isHorizontal = actions.allSatisfy { action in
+            CVMessageActionButton.minimumWidth(title: action.title) <= horizontalButtonWidth
+        }
+        measurementBuilder.setValue(key: Self.measurementKey_isHorizontal, value: isHorizontal ? 1 : 0)
+
+        let subviewSize = CGSize(width: isHorizontal ? horizontalButtonWidth : contentWidth, height: Self.buttonHeight)
         var subviewInfos = [ManualStackSubviewInfo]()
-        for _ in 0 ..< actions.count {
+        for _ in 0..<actions.count {
             subviewInfos.append(subviewSize.asManualSubviewInfo)
         }
-        let stackMeasurement = ManualStackView.measure(config: stackConfig,
-                                                       measurementBuilder: measurementBuilder,
-                                                       measurementKey: Self.measurementKey_stackView,
-                                                       subviewInfos: subviewInfos,
-                                                       maxWidth: maxWidth)
+        let stackMeasurement = ManualStackView.measure(
+            config: Self.stackConfig(isHorizontal: isHorizontal),
+            measurementBuilder: measurementBuilder,
+            measurementKey: Self.measurementKey_stackView,
+            subviewInfos: subviewInfos,
+            maxWidth: maxWidth,
+        )
         return stackMeasurement.measuredSize
     }
 
     // MARK: - Events
 
-    public override func handleTap(sender: UIGestureRecognizer,
-                                   componentDelegate: CVComponentDelegate,
-                                   componentView: CVComponentView,
-                                   renderItem: CVRenderItem) -> Bool {
+    override func handleTap(
+        sender: UIGestureRecognizer,
+        componentDelegate: CVComponentDelegate,
+        componentView: CVComponentView,
+        renderItem: CVRenderItem,
+    ) -> Bool {
 
         guard let componentView = componentView as? CVComponentViewBottomButtons else {
             owsFailDebug("Unexpected componentView.")
@@ -131,22 +154,29 @@ public class CVComponentBottomButtons: CVComponentBase, CVComponent {
         private func configure() {
             layoutMargins = .zero
             layer.masksToBounds = true
-            layer.cornerRadius = 16
+            layer.cornerRadius = Self.buttonHeight / 2
             text = action.title
             font = Self.buttonFont
             textAlignment = .center
         }
 
-        private static var buttonFont: UIFont { UIFont.dynamicTypeSubheadlineClamped.medium() }
+        private static var buttonFont: UIFont { UIFont.dynamicTypeFootnoteClamped.medium() }
 
-        private static let buttonVMargin: CGFloat = 6
+        private static let buttonVMargin: CGFloat = 5
+        private static let minimumTitleHMargin: CGFloat = 12
 
         static var buttonHeight: CGFloat {
-            ceil(buttonFont.lineHeight + buttonVMargin * 2).clamp(32, 44)
+            ceil(buttonFont.lineHeight + buttonVMargin * 2).clamp(28, 44)
+        }
+
+        static func minimumWidth(title: String) -> CGFloat {
+            let labelConfig = CVLabelConfig.unstyledText(title, font: buttonFont, textColor: .Signal.label)
+            let titleSize = CVText.measureLabel(config: labelConfig, maxWidth: .greatestFiniteMagnitude)
+            return ceil(titleSize.width) + minimumTitleHMargin * 2
         }
     }
 
-    private class CVComponentViewBottomButtons: NSObject, CVComponentView {
+    private class CVComponentViewBottomButtons: CVComponentView {
 
         let stackView = ManualStackView(name: "bottomButtons")
         var buttonViews = [CVMessageActionButton]()

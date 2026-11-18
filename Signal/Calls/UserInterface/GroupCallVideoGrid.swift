@@ -5,13 +5,17 @@
 
 import SignalRingRTC
 import SignalServiceKit
+import UIKit
 
-class GroupCallVideoGrid: UICollectionView {
+class GroupCallVideoGrid: UICollectionView, UICollectionViewDelegate, UICollectionViewDataSource, GroupCallVideoGridLayoutDelegate, GroupCallObserver {
     weak var memberViewErrorPresenter: CallMemberErrorPresenter?
     let layout: GroupCallVideoGridLayout
     let call: SignalCall
     let groupCall: GroupCall
     let ringRtcCall: SignalRingRTC.GroupCall
+
+    private var contactManager: ContactManager { SSKEnvironment.shared.contactManagerRef }
+    private var db: DB { DependenciesBridge.shared.db }
 
     init(call: SignalCall, groupCall: GroupCall) {
         self.call = call
@@ -33,9 +37,9 @@ class GroupCallVideoGrid: UICollectionView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-}
 
-extension GroupCallVideoGrid: UICollectionViewDelegate {
+    // MARK: - UICollectionViewDelegate
+
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? GroupCallVideoGridCell else { return }
         cell.cleanupVideoViews()
@@ -48,9 +52,35 @@ extension GroupCallVideoGrid: UICollectionViewDelegate {
         }
         cell.configureRemoteVideo(device: remoteDevice)
     }
-}
 
-extension GroupCallVideoGrid: UICollectionViewDataSource {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
+        point: CGPoint,
+    ) -> UIContextMenuConfiguration? {
+        guard
+            indexPaths.count == 1,
+            let indexPath = indexPaths.first,
+            let remoteDevice = gridRemoteDeviceStates[safe: indexPath.row]
+        else {
+            return nil
+        }
+
+        return GroupCallVideoContextMenuConfiguration.build(
+            call: call,
+            groupCall: groupCall,
+            ringRtcCall: ringRtcCall,
+            remoteDevice: remoteDevice,
+            interactionProvider: { [weak self] in
+                return self?.interactions
+                    .compactMap({ $0 as? UIContextMenuInteraction })
+                    .first
+            },
+        )
+    }
+
+    // MARK: - UICollectionViewDataSource
+
     var gridRemoteDeviceStates: [RemoteDeviceState] {
         let remoteDeviceStates = ringRtcCall.remoteDeviceStates.sortedBySpeakerTime
         return Array(remoteDeviceStates.prefix(maxItems)).sortedByAddedTime
@@ -63,7 +93,7 @@ extension GroupCallVideoGrid: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: GroupCallVideoGridCell.reuseIdentifier,
-            for: indexPath
+            for: indexPath,
         ) as! GroupCallVideoGridCell
 
         guard let remoteDevice = gridRemoteDeviceStates[safe: indexPath.row] else {
@@ -75,9 +105,9 @@ extension GroupCallVideoGrid: UICollectionViewDataSource {
         cell.configure(call: call, device: remoteDevice)
         return cell
     }
-}
 
-extension GroupCallVideoGrid: GroupCallObserver {
+    // MARK: - GroupCallObserver
+
     func groupCallRemoteDeviceStatesChanged(_ call: GroupCall) {
         AssertIsOnMainThread()
         reloadData()
@@ -88,7 +118,7 @@ extension GroupCallVideoGrid: GroupCallObserver {
         reloadData()
     }
 
-    func groupCallEnded(_ call: GroupCall, reason: GroupCallEndReason) {
+    func groupCallEnded(_ call: GroupCall, reason: CallEndReason) {
         AssertIsOnMainThread()
         reloadData()
     }
@@ -97,9 +127,9 @@ extension GroupCallVideoGrid: GroupCallObserver {
         AssertIsOnMainThread()
         reloadData()
     }
-}
 
-extension GroupCallVideoGrid: GroupCallVideoGridLayoutDelegate {
+    // MARK: - GroupCallVideoGridLayoutDelegate
+
     var maxColumns: Int {
         if CurrentAppContext().frame.width > 1080 {
             return 4
@@ -120,6 +150,8 @@ extension GroupCallVideoGrid: GroupCallVideoGridLayoutDelegate {
 
     var maxItems: Int { maxColumns * maxRows }
 }
+
+// MARK: -
 
 private class GroupCallVideoGridCell: UICollectionViewCell {
     static let reuseIdentifier = "GroupCallVideoGridCell"
@@ -161,6 +193,8 @@ private class GroupCallVideoGridCell: UICollectionViewCell {
     }
 }
 
+// MARK: -
+
 extension Sequence where Element: RemoteDeviceState {
     /// The first person to join the call is the first item in the list.
     /// Members that are presenting are always put at the top of the list.
@@ -194,6 +228,8 @@ extension Sequence where Element: RemoteDeviceState {
         }
     }
 }
+
+// MARK: -
 
 extension Dictionary where Value: RemoteDeviceState {
     /// The first person to join the call is the first item in the list.

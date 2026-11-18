@@ -11,76 +11,49 @@ public class SecureValueRecoveryMock: SecureValueRecovery {
 
     public init() {}
 
-    public var hasMasterKey = false
-
-    public var hasBackedUpMasterKey: Bool = false
-
-    public func hasBackedUpMasterKey(transaction: DBReadTransaction) -> Bool {
-        return hasBackedUpMasterKey
+    public func refreshBackupIfNecessary() async throws {
     }
 
-    public func hasMasterKey(transaction: DBReadTransaction) -> Bool {
-        return hasMasterKey
-    }
-
-    public var currentPinType: SVR.PinType?
-
-    public func currentPinType(transaction: DBReadTransaction) -> SVR.PinType? {
-        return currentPinType
+    public func refreshCredentialsIfNecessary() async throws {
     }
 
     public var reglockToken: String?
 
-    public var backupMasterKeyMock: ((_ pin: String, _ masterKey: MasterKey, _ authMethod: SVR.AuthMethod) -> Promise<MasterKey>)?
+    public var backUpMasterKeyMock: ((_ pin: String, _ masterKey: MasterKey, _ authMethod: SVR.AuthMethod) async throws -> Void)!
 
-    public func backupMasterKey(pin: String, masterKey: MasterKey, authMethod: SVR.AuthMethod) -> Promise<MasterKey> {
-        return backupMasterKeyMock!(pin, masterKey, authMethod)
+    public func backUpMasterKey(pin: String, masterKey: MasterKey, authMethod: SVR.AuthMethod) async throws {
+        try await backUpMasterKeyMock(pin, masterKey, authMethod)
     }
 
     public var restoreKeysMock: ((_ pin: String, _ authMethod: SVR.AuthMethod) -> Guarantee<SVR.RestoreKeysResult>)?
 
-    public func restoreKeys(pin: String, authMethod: SVR.AuthMethod) -> Guarantee<SVR.RestoreKeysResult> {
-        return restoreKeysMock!(pin, authMethod)
+    public func restoreKeys(pin: String, authMethod: SVR.AuthMethod) async -> SVR.RestoreKeysResult {
+        return await restoreKeysMock!(pin, authMethod).awaitable()
     }
 
-    public var restoreKeysAndBackupMock: ((_ pin: String, _ authMethod: SVR.AuthMethod) -> Guarantee<SVR.RestoreKeysResult>)?
-
-    public func restoreKeysAndBackup(pin: String, authMethod: SVR.AuthMethod) -> Guarantee<SVR.RestoreKeysResult> {
-        return restoreKeysAndBackupMock!(pin, authMethod)
-    }
-
-    public func deleteKeys() -> Promise<Void> {
-        return .value(())
-    }
-
-    public func warmCaches() {
-        // Do nothing
-    }
-
-    public func clearKeys(transaction: DBWriteTransaction) {
-        hasMasterKey = false
+    public func invalidateBackupAttemptForEveryEnclave(tx: DBWriteTransaction) {
     }
 
     public var syncedMasterKey: MasterKey?
 
     public func storeKeys(
         fromKeysSyncMessage syncMessage: SSKProtoSyncMessageKeys,
-        authedDevice: AuthedDevice,
-        tx: DBWriteTransaction
+        authedAccount: AuthedAccount,
+        tx: DBWriteTransaction,
     ) throws(SVR.KeysError) {
-        syncedMasterKey = syncMessage.master.map { try! MasterKey(data: $0) }
+        let aep = syncMessage.accountEntropyPool.flatMap({ try? AccountEntropyPool(key: $0) })
+        guard let aep else {
+            throw .missingAep
+        }
+        syncedMasterKey = aep.getMasterKey()
     }
 
     public func storeKeys(
         fromProvisioningMessage provisioningMessage: LinkingProvisioningMessage,
-        authedDevice: AuthedDevice,
-        tx: DBWriteTransaction
-    ) throws(SVR.KeysError) {
-        let masterKey = switch provisioningMessage.rootKey {
-        case .accountEntropyPool(let aep): aep.getMasterKey()
-        case .masterKey(let masterKey): masterKey
-        }
-        syncedMasterKey = masterKey
+        authedAccount: AuthedAccount,
+        tx: DBWriteTransaction,
+    ) {
+        syncedMasterKey = provisioningMessage.aep.getMasterKey()
     }
 
     public var doesHavePendingRestoration = false
@@ -95,10 +68,6 @@ public class SecureValueRecoveryMock: SecureValueRecovery {
 
     public func clearPendingRestoration(transaction: DBWriteTransaction) {
         doesHavePendingRestoration = false
-    }
-
-    public func handleMasterKeyUpdated(newMasterKey: MasterKey, disablePIN: Bool, tx: DBWriteTransaction) {
-        // Do nothing
     }
 }
 

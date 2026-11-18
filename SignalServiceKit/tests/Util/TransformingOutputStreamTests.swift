@@ -14,14 +14,14 @@ final class TransformingOutputStreamTests: XCTestCase {
             transforms: [
                 TestStreamTransform3(),
                 TestStreamTransform2(),
-                TestStreamTransform1()
+                TestStreamTransform1(),
             ],
-            outputStream: outputStream
+            outputStream: outputStream,
         )
-        try transformingStream.write(data: "w".data(using: .utf8)!)
-        try transformingStream.write(data: "xx".data(using: .utf8)!)
-        try transformingStream.write(data: "yyy".data(using: .utf8)!)
-        try transformingStream.write(data: "zzzz".data(using: .utf8)!)
+        try transformingStream.write(data: "w".data(using: .utf8)!, options: [:])
+        try transformingStream.write(data: "xx".data(using: .utf8)!, options: [:])
+        try transformingStream.write(data: "yyy".data(using: .utf8)!, options: [:])
+        try transformingStream.write(data: "zzzz".data(using: .utf8)!, options: [:])
         try transformingStream.close()
 
         let expected = "H0[H1{H2|w|}][{|xx|}][{|yyy|}][{|zzzz|}][{F2}][F1]F0"
@@ -39,7 +39,7 @@ final class TransformingOutputStreamTests: XCTestCase {
             return returnData
         }
 
-        func transform(data: Data) throws -> Data {
+        func transform(data: Data, options: Options) throws -> Data {
             var returnData = Data()
             if !initialized {
                 initialized = true
@@ -68,7 +68,7 @@ final class TransformingOutputStreamTests: XCTestCase {
             return returnData
         }
 
-        func transform(data: Data) throws -> Data {
+        func transform(data: Data, options: Options) throws -> Data {
             var returnData = Data()
             if !initialized {
                 initialized = true
@@ -97,7 +97,7 @@ final class TransformingOutputStreamTests: XCTestCase {
             return returnData
         }
 
-        func transform(data: Data) throws -> Data {
+        func transform(data: Data, options: Options) throws -> Data {
             var returnData = Data()
             if !initialized {
                 initialized = true
@@ -116,33 +116,11 @@ final class TransformingOutputStreamTests: XCTestCase {
     }
 }
 
-class TextBackedInputStream: InputStreamable {
-    var hasBytesAvailable: Bool { data.count > 0 }
-
-    private var data: Data
-    init(data: Data) {
-        self.data = data
-    }
-
-    func read(maxLength len: Int) throws -> Data {
-        let readCount = min(len, data.count)
-        let returnData = data.subdata(in: 0..<readCount)
-        data = data.subdata(in: readCount..<data.count)
-        return returnData
-    }
-
-    func close() throws { }
-
-    func remove(from: RunLoop, forMode: RunLoop.Mode) { }
-
-    func schedule(in: RunLoop, forMode: RunLoop.Mode) { }
-}
-
 class TextBackedOutputStream: OutputStreamable {
 
     var accumulation = Data()
 
-    func write(data: Data) throws {
+    func write(data: Data, options: StreamTransform.Options) throws {
         accumulation.append(data)
     }
 

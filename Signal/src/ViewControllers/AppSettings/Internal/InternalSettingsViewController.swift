@@ -4,10 +4,14 @@
 //
 
 import AVFoundation
-import GRDB
-import LibSignalClient
 import SignalServiceKit
 import SignalUI
+
+public enum InMemorySettings {
+    static var spinningCheckmarks = false
+    static var spinningConversationTitle = false
+    static var forceCallQualitySurvey = false
+}
 
 class InternalSettingsViewController: OWSTableViewController2 {
 
@@ -34,192 +38,130 @@ class InternalSettingsViewController: OWSTableViewController2 {
     }
 
     func updateTableContents() {
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+
         let contents = OWSTableContents()
 
         let debugSection = OWSTableSection()
 
-        #if USE_DEBUG_UI
+#if USE_DEBUG_UI
         debugSection.add(.disclosureItem(
             withText: "Debug UI",
             actionBlock: { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 DebugUITableViewController.presentDebugUI(
                     fromViewController: self,
-                    thread: nil
+                    thread: nil,
                 )
-            }
+            },
         ))
-        #endif
-
-        if DebugFlags.audibleErrorLogging {
-            debugSection.add(.disclosureItem(
-                withText: OWSLocalizedString("SETTINGS_ADVANCED_VIEW_ERROR_LOG", comment: ""),
-                actionBlock: { [weak self] in
-                    Logger.flush()
-                    let vc = LogPickerViewController(logDirUrl: DebugLogger.errorLogsDir)
-                    self?.navigationController?.pushViewController(vc, animated: true)
-                }
-            ))
-        }
+#endif
 
         debugSection.add(.disclosureItem(
             withText: "Remote Configs",
             actionBlock: { [weak self] in
                 let vc = FlagsViewController()
                 self?.navigationController?.pushViewController(vc, animated: true)
-            }
+            },
         ))
         debugSection.add(.disclosureItem(
             withText: "Testing",
             actionBlock: { [weak self] in
                 let vc = TestingViewController()
                 self?.navigationController?.pushViewController(vc, animated: true)
-            }
+            },
         ))
         debugSection.add(.actionItem(
             withText: "Export Database",
             actionBlock: { [weak self] in
-                guard let self = self else {
+                guard let self else {
                     return
                 }
-                SignalApp.showExportDatabaseUI(from: self)
-            }
+                SignalApp.shared.showExportDatabaseUI(from: self)
+            },
         ))
         debugSection.add(.actionItem(
             withText: "Query Database",
             actionBlock: { [weak self] in
                 let vc = InternalSQLClientViewController()
                 self?.navigationController?.pushViewController(vc, animated: true)
-            }
+            },
         ))
-        debugSection.add(.actionItem(
-            withText: "Run Database Integrity Checks",
+        debugSection.add(.disclosureItem(
+            withText: "Backups",
             actionBlock: { [weak self] in
-                guard let self = self else {
-                    return
-                }
-                SignalApp.showDatabaseIntegrityCheckUI(from: self, databaseStorage: SSKEnvironment.shared.databaseStorageRef)
-            }
+                let vc = InternalBackupSettingsViewController()
+                self?.navigationController?.pushViewController(vc, animated: true)
+            },
         ))
-        debugSection.add(.actionItem(
-            withText: "Clean Orphaned Data",
+        debugSection.add(.disclosureItem(
+            withText: "Misc.",
             actionBlock: { [weak self] in
-                guard let self else { return }
-                ModalActivityIndicatorViewController.present(
-                    fromViewController: self,
-                    canCancel: false
-                ) { modalActivityIndicator in
-                    DispatchQueue.main.async {
-                        OWSOrphanDataCleaner.auditAndCleanup(true) {
-                            DispatchQueue.main.async { modalActivityIndicator.dismiss() }
-                        }
-                    }
-                }
-            }
+                let vc = InternalMiscViewController()
+                self?.navigationController?.pushViewController(vc, animated: true)
+            },
         ))
 
         if mode == .registration {
-            debugSection.add(.actionItem(withText: "Submit debug logs") {
-                DebugLogs.submitLogs(supportTag: "Registration", dumper: .fromGlobals())
+            debugSection.add(.actionItem(withText: "Submit debug logs") { [weak self] in
+                guard let self else { return }
+                let logs = DebugLogs(dumper: .fromGlobals())
+                logs.promptToSubmitLogs(from: self, supportTag: "Registration")
             })
         }
 
         contents.add(debugSection)
 
-        let backupsSection = OWSTableSection(title: "Backups")
-
-        let backupSettingsStore = BackupSettingsStore()
-        let db = DependenciesBridge.shared.db
-        let lastBackupDetails = db.read { tx in
-            return backupSettingsStore.lastBackupDetails(tx: tx)
-        }
-
-        if mode != .registration {
-            backupsSection.add(.actionItem(withText: "Export + Validate Message Backup proto") { [self] in
-                Task {
-                    await exportMessageBackupProto()
-                }
-            })
-        }
-        if BuildFlags.Backups.showOptimizeMedia {
-            backupsSection.add(.switch(
-                withText: "Offload all attachments",
-                subtitle: "If on and \"Optimize Storage\" enabled, offload all attachments instead of only those >30d old",
-                isOn: { Attachment.offloadingThresholdOverride },
-                actionBlock: { _ in
-                    Attachment.offloadingThresholdOverride = !Attachment.offloadingThresholdOverride
-                }
-            ))
-        }
-        backupsSection.add(.switch(
-            withText: "Disable transit tier downloads",
-            subtitle: "Only download backed-up media, never last 45 days free tier media",
-            isOn: { BackupAttachmentDownloadEligibility.disableTransitTierDownloadsOverride },
-            actionBlock: { _ in
-                BackupAttachmentDownloadEligibility.disableTransitTierDownloadsOverride =
-                    !BackupAttachmentDownloadEligibility.disableTransitTierDownloadsOverride
-            }
-        ))
-        backupsSection.add(.switch(
-            withText: "Don't reuse transit tier uploads",
-            subtitle: "Reupload all attachments for backups, even stuff <45d old",
-            isOn: { Upload.disableTransitTierUploadReuse },
-            actionBlock: { _ in
-                Upload.disableTransitTierUploadReuse =
-                    !Upload.disableTransitTierUploadReuse
-            }
-        ))
-        backupsSection.add(.actionItem(withText: "Enable Backups onboarding flow") { [weak self] in
-            let backupSettingsStore = BackupSettingsStore()
+        if ScreenshotBlockingManager.isAvailable {
             let db = DependenciesBridge.shared.db
+            let screenshotBlockingManager = AppEnvironment.shared.screenshotBlockingManager!
 
-            db.write { tx in
-                backupSettingsStore.wipeHaveBackupsEverBeenEnabled(tx: tx)
-            }
+            let currentPreference = db.read { screenshotBlockingManager.getPreference(tx: $0) }
 
-            self?.presentToast(text: "Backups onboarding enabled!")
-        })
-        backupsSection.add(.actionItem(withText: "Backup media integrity check") { [weak self] in
-            let vc = InternalListMediaViewController()
-            self?.navigationController?.pushViewController(vc, animated: true)
-        })
-        backupsSection.add(.copyableItem(
-            label: "Last Backup chats/messages file size",
-            value: lastBackupDetails.flatMap { ByteCountFormatter().string(for: $0.backupFileSizeBytes) }
-        ))
-
-        if backupsSection.items.isEmpty.negated {
-            contents.add(backupsSection)
-        }
-
-        do {
-            func makeFileBrowsingActionItem(_ title: String, _ fileUrl: URL) -> OWSTableItem {
-                return .actionItem(
-                    withText: title,
-                    actionBlock: { [weak self] in
-                        guard let self else { return }
-                        navigationController?.pushViewController(
-                            InternalFileBrowserViewController(fileURL: fileUrl),
-                            animated: true
-                        )
+            let screenshotsSection = OWSTableSection(title: "Screenshots")
+            screenshotsSection.footerTitle = "Prevent screenshots and screen recordings from capturing Signal."
+            screenshotsSection.add(.menuPicker(
+                withText: "Block Screenshots",
+                menuTitle: "Block Screenshots",
+                menuOptions: ScreenshotBlockingPreference.allCases.map { preference in
+                    let menuOptionTitle = switch preference {
+                    case .blockScreenshots: "On"
+                    case .doNotBlockScreenshots: "Off"
+                    case .doNotBlockScreenshotsForTenMinutes: "Off for 10 Minutes"
                     }
-                )
-            }
 
-            let fileBrowsingSection = OWSTableSection(title: "Browse App Files")
-            fileBrowsingSection.add(makeFileBrowsingActionItem(
-                "App Container: Library",
-                URL(string: OWSFileSystem.appLibraryDirectoryPath())!.deletingLastPathComponent()
+                    // Don't allow temporarily disabling if we're already
+                    // permanently disabled.
+                    let isOptionEnabled: Bool = switch preference {
+                    case .blockScreenshots, .doNotBlockScreenshots:
+                        true
+                    case .doNotBlockScreenshotsForTenMinutes:
+                        switch currentPreference {
+                        case .blockScreenshots, .doNotBlockScreenshotsForTenMinutes: true
+                        case .doNotBlockScreenshots: false
+                        }
+                    }
+
+                    return OWSTableItem.MenuPickerOption<ScreenshotBlockingPreference>(
+                        title: menuOptionTitle,
+                        isEnabled: isOptionEnabled,
+                        value: preference,
+                        onSelect: { [weak self] in
+                            guard let self else { return }
+
+                            Task {
+                                await screenshotBlockingManager.setPreferenceWithConfirmation(
+                                    preference,
+                                    fromViewController: self,
+                                )
+                                self.updateTableContents()
+                            }
+                        },
+                    )
+                },
+                selectedMenuOption: currentPreference,
             ))
-            fileBrowsingSection.add(makeFileBrowsingActionItem(
-                "App Container: Documents",
-                URL(string: OWSFileSystem.appDocumentDirectoryPath())!.deletingLastPathComponent()
-            ))
-            fileBrowsingSection.add(makeFileBrowsingActionItem(
-                "Shared App Container",
-                URL(string: OWSFileSystem.appSharedDataDirectoryPath())!.deletingLastPathComponent()
-            ))
-            contents.add(fileBrowsingSection)
+            contents.add(screenshotsSection)
         }
 
         let (
@@ -230,28 +172,34 @@ class InternalSettingsViewController: OWSTableViewController2 {
             donationSubscriberID,
             storageServiceManifestVersion,
             aciRegistrationId,
-            pniRegistrationId
+            pniRegistrationId,
         ) = SSKEnvironment.shared.databaseStorageRef.read { tx in
             return (
                 TSThread.anyFetchAll(transaction: tx).filter { !$0.isGroupThread }.count,
                 TSThread.anyFetchAll(transaction: tx).filter { $0.isGroupThread }.count,
                 TSInteraction.anyCount(transaction: tx),
                 try? Attachment.Record.fetchCount(tx.database),
-                DonationSubscriptionManager.getSubscriberID(transaction: tx),
+                DependenciesBridge.shared.donationSubscriptionManager.getSubscriberID(tx: tx),
                 SSKEnvironment.shared.storageServiceManagerRef.currentManifestVersion(tx: tx),
-                DependenciesBridge.shared.tsAccountManager.getRegistrationId(for: .aci, tx: tx),
-                DependenciesBridge.shared.tsAccountManager.getRegistrationId(for: .pni, tx: tx)
+                tsAccountManager.getRegistrationId(for: .aci, tx: tx),
+                tsAccountManager.getRegistrationId(for: .pni, tx: tx),
             )
         }
 
         let regSection = OWSTableSection(title: "Account")
-        let localIdentifiers = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction
-        regSection.add(.copyableItem(label: "Phone Number", value: localIdentifiers?.phoneNumber))
-        regSection.add(.copyableItem(label: "ACI", value: localIdentifiers?.aci.serviceIdString))
-        regSection.add(.copyableItem(label: "PNI", value: localIdentifiers?.pni?.serviceIdString))
-        regSection.add(.copyableItem(label: "Device ID", value: "\(DependenciesBridge.shared.tsAccountManager.storedDeviceIdWithMaybeTransaction)"))
-        regSection.add(.copyableItem(label: "ACI Registration ID", value: aciRegistrationId.map({"\($0)"}) ?? "<missing>"))
-        regSection.add(.copyableItem(label: "PNI Registration ID", value: pniRegistrationId.map({"\($0)"}) ?? "<missing>"))
+        let localIdentifiers = tsAccountManager.localIdentifiersWithMaybeSneakyTransaction
+            .owsFailUnwrap("must have been registered at some point")
+        regSection.add(.copyableItem(label: "Phone Number", value: localIdentifiers.phoneNumber))
+        regSection.add(.copyableItem(label: "ACI", value: localIdentifiers.aci.serviceIdString))
+        regSection.add(.copyableItem(label: "PNI", value: localIdentifiers.pni?.serviceIdString))
+        if let loggingKey = DebugLogger.shared.loggingKey {
+            regSection.add(.copyableItem(label: "Phone Number Log Hash", value: localIdentifiers.phoneNumber.map { loggingKey.hashForLogging(string: $0) }))
+            regSection.add(.copyableItem(label: "ACI Log Hash", value: loggingKey.hashForLogging(aci: localIdentifiers.aci)))
+            regSection.add(.copyableItem(label: "PNI Log Hash", value: localIdentifiers.pni.map { loggingKey.hashForLogging(pni: $0) }))
+        }
+        regSection.add(.copyableItem(label: "Device ID", value: "\(tsAccountManager.storedDeviceIdWithMaybeTransaction)"))
+        regSection.add(.copyableItem(label: "ACI Registration ID", value: aciRegistrationId.map({ "\($0)" }) ?? "<missing>"))
+        regSection.add(.copyableItem(label: "PNI Registration ID", value: pniRegistrationId.map({ "\($0)" }) ?? "<missing>"))
         regSection.add(.copyableItem(label: "Push Token", value: SSKEnvironment.shared.preferencesRef.pushToken))
         regSection.add(.copyableItem(label: "Profile Key", value: SSKEnvironment.shared.databaseStorageRef.read(block: SSKEnvironment.shared.profileManagerRef.localUserProfile(tx:))?.profileKey?.keyData.hexadecimalString ?? "none"))
         if let donationSubscriberID {
@@ -290,8 +238,9 @@ class InternalSettingsViewController: OWSTableViewController2 {
                         let vc = await InternalDiskUsageViewController.build()
                         self?.navigationController?.pushViewController(vc, animated: true)
                         modal.dismiss(animated: true)
-                    })
-            }
+                    },
+                )
+            },
         ))
         contents.add(dbSection)
 
@@ -313,9 +262,34 @@ class InternalSettingsViewController: OWSTableViewController2 {
         otherSection.add(.copyableItem(label: "Audio Category", value: AVAudioSession.sharedInstance().category.rawValue.replacingOccurrences(of: "AVAudioSessionCategory", with: "")))
         otherSection.add(.switch(
             withText: "Spinning checkmarks",
-            isOn: { SpinningCheckmarks.shouldSpin },
-            target: self,
-            selector: #selector(spinCheckmarks(_:))))
+            isOn: { InMemorySettings.spinningCheckmarks },
+            actionBlock: { [weak self] uiSwitch in
+                self?.spinCheckmarks(uiSwitch)
+            },
+        ))
+        otherSection.add(.switch(
+            withText: "Spinning conversation title",
+            isOn: { InMemorySettings.spinningConversationTitle },
+            actionBlock: { _ in
+                InMemorySettings.spinningConversationTitle.toggle()
+            },
+        ))
+        otherSection.add(.switch(
+            withText: "Force call quality survey",
+            isOn: { InMemorySettings.forceCallQualitySurvey },
+            actionBlock: { _ in
+                InMemorySettings.forceCallQualitySurvey.toggle()
+            },
+        ))
+        if #available(iOS 26, *) {
+            otherSection.add(.switch(
+                withText: "Disable Content Tracking in Chat Header",
+                isOn: { self.isChatHeaderContentTrackingDisabled },
+                actionBlock: { [weak self] uiSwitch in
+                    self?.toggleChatHeaderContentTrackingDisabled(uiSwitch)
+                },
+            ))
+        }
         contents.add(otherSection)
 
         if mode != .registration {
@@ -336,97 +310,27 @@ class InternalSettingsViewController: OWSTableViewController2 {
 
         self.contents = contents
     }
-}
 
-// MARK: -
-
-public enum SpinningCheckmarks {
-    static var shouldSpin = false
-}
-
-private extension InternalSettingsViewController {
-
-    @objc
-    func spinCheckmarks(_ sender: Any) {
-        let wasSpinning = SpinningCheckmarks.shouldSpin
-        if let view = sender as? UIView {
-            if wasSpinning {
-                view.layer.removeAnimation(forKey: "spin")
-            } else {
-                let animation = CABasicAnimation(keyPath: "transform.rotation.z")
-                animation.toValue = NSNumber(value: Double.pi * 2)
-                animation.duration = TimeInterval.second
-                animation.isCumulative = true
-                animation.repeatCount = .greatestFiniteMagnitude
-                view.layer.add(animation, forKey: "spin")
-            }
-        }
-        SpinningCheckmarks.shouldSpin = !wasSpinning
+    var isChatHeaderContentTrackingDisabled: Bool {
+        CurrentAppContext().appUserDefaults().bool(forKey: "DisableChatHeaderContentTracking")
     }
 
-    func exportMessageBackupProto() async {
-        let accountKeyStore = DependenciesBridge.shared.accountKeyStore
-        let backupArchiveManager = DependenciesBridge.shared.backupArchiveManager
-        let db = DependenciesBridge.shared.db
-        let errorPresenter = DependenciesBridge.shared.backupArchiveErrorPresenter
-        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+    func toggleChatHeaderContentTrackingDisabled(_ sender: UISwitch) {
+        CurrentAppContext().appUserDefaults().set(sender.isOn, forKey: "DisableChatHeaderContentTracking")
+    }
 
-        func presentBackupErrorsAndToast(_ message: String) {
-            errorPresenter.presentOverTopmostViewController { [self] in
-                presentToast(text: message)
-            }
+    func spinCheckmarks(_ view: UISwitch) {
+        let wasSpinning = InMemorySettings.spinningCheckmarks
+        if wasSpinning {
+            view.layer.removeAnimation(forKey: "spin")
+        } else {
+            let animation = CABasicAnimation(keyPath: "transform.rotation.z")
+            animation.toValue = NSNumber(value: Double.pi * 2)
+            animation.duration = TimeInterval.second
+            animation.isCumulative = true
+            animation.repeatCount = .greatestFiniteMagnitude
+            view.layer.add(animation, forKey: "spin")
         }
-
-        let backupKey: MessageBackupKey
-        let exportMetadata: Upload.EncryptedBackupUploadMetadata
-        do {
-            (backupKey, exportMetadata) = try await ModalActivityIndicatorViewController.presentAndPropagateResult(
-                from: self
-            ) {
-                let (messageBackupKey, localIdentifiers) = try db.read { tx in
-                    let localIdentifiers = tsAccountManager.localIdentifiers(tx: tx)!
-                    return (
-                        try accountKeyStore.getMessageRootBackupKey(aci: localIdentifiers.aci, tx: tx)!,
-                        localIdentifiers,
-                    )
-                }
-
-                let backupKey = try MessageBackupKey(
-                    backupKey: messageBackupKey.backupKey,
-                    backupId: messageBackupKey.backupId
-                )
-
-                let exportMetadata = try await backupArchiveManager.exportEncryptedBackup(
-                    localIdentifiers: localIdentifiers,
-                    backupPurpose: .remoteExport(key: messageBackupKey, chatAuth: .implicit()),
-                    progress: nil
-                )
-
-                return (backupKey, exportMetadata)
-            }
-        } catch {
-            owsFailDebug("Failed to export Backup proto! \(error)")
-            presentBackupErrorsAndToast("Failed to export Backup proto!")
-            return
-        }
-
-        let keyString = "AES key: \(backupKey.aesKey.base64EncodedString())"
-        + "\nHMAC key: \(backupKey.hmacKey.base64EncodedString())"
-
-        let activityVC = UIActivityViewController(
-            activityItems: [exportMetadata.fileUrl],
-            applicationActivities: nil
-        )
-        activityVC.popoverPresentationController?.sourceView = view
-        activityVC.completionWithItemsHandler = { _, _, _, _ in
-            UIPasteboard.general.setItems(
-                [[UIPasteboard.typeAutomatic: keyString]],
-                options: [.expirationDate: Date().addingTimeInterval(120)]
-            )
-
-            presentBackupErrorsAndToast("Success! Encryption key copied.")
-        }
-
-        present(activityVC, animated: true)
+        InMemorySettings.spinningCheckmarks = !wasSpinning
     }
 }

@@ -29,6 +29,7 @@ public struct TSGroupModelBuilder {
     public var addedByAddress: SignalServiceAddress?
     public var wasJustMigrated: Bool = false
     public var didJustAddSelfViaGroupLink: Bool = false
+    public var isTerminated: Bool = false
 
     private init(groupVersion: GroupVersion) {
         self.groupVersion = groupVersion
@@ -48,6 +49,7 @@ public struct TSGroupModelBuilder {
             self.inviteLinkPassword = v2.inviteLinkPassword
             self.isAnnouncementsOnly = v2.isAnnouncementsOnly
             self.descriptionText = v2.descriptionText
+            self.isTerminated = v2.isTerminated
 
             // Do not copy transient properties:
             //
@@ -82,9 +84,13 @@ public struct TSGroupModelBuilder {
         self.isJoinRequestPlaceholder = false
         self.wasJustMigrated = false
         self.didJustAddSelfViaGroupLink = false
+        self.isTerminated = groupV2Snapshot.isTerminated
     }
 
-    static func builderForSnapshot(groupV2Snapshot: GroupV2Snapshot, transaction: DBWriteTransaction) throws -> TSGroupModelBuilder {
+    static func builderForSnapshot(
+        groupV2Snapshot: GroupV2Snapshot,
+        transaction: DBWriteTransaction,
+    ) throws -> TSGroupModelBuilder {
         return try TSGroupModelBuilder(groupV2Snapshot: groupV2Snapshot)
     }
 
@@ -109,15 +115,13 @@ public struct TSGroupModelBuilder {
 
         switch groupVersion {
         case .V1(let groupId):
-            guard GroupManager.isValidGroupId(groupId, groupsVersion: .V1) else {
-                throw OWSAssertionError("Invalid groupId.")
-            }
+            let groupId = try GroupIdentifierV1(rawValue: groupId)
             return TSGroupModel(
-                groupId: groupId,
+                groupId: groupId.rawValue,
                 name: name,
                 avatarData: avatarDataState.dataIfPresent,
                 members: Array(groupMembership.fullMembers),
-                addedBy: addedByAddress
+                addedBy: addedByAddress,
             )
         case .V2(let secretParamsData):
             let groupSecretParams = try GroupSecretParams(contents: secretParamsData)
@@ -137,7 +141,8 @@ public struct TSGroupModelBuilder {
                 isJoinRequestPlaceholder: isJoinRequestPlaceholder,
                 wasJustMigrated: wasJustMigrated,
                 didJustAddSelfViaGroupLink: didJustAddSelfViaGroupLink,
-                addedByAddress: addedByAddress
+                addedByAddress: addedByAddress,
+                isTerminated: isTerminated,
             )
         }
     }
@@ -165,6 +170,7 @@ public struct TSGroupModelOptions: OptionSet {
 
     public static let didJustAddSelfViaGroupLink = TSGroupModelOptions(rawValue: 1 << 0)
     public static let throttle = TSGroupModelOptions(rawValue: 1 << 1)
+    public static let leavingGroup = TSGroupModelOptions(rawValue: 1 << 2)
 
     public init(rawValue: Int) {
         self.rawValue = rawValue

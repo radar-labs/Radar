@@ -21,7 +21,7 @@ public class GroupTableViewCell: UITableViewCell {
 
         // Font config
         nameLabel.font = .dynamicTypeBody
-        subtitleLabel.font = .regularFont(ofSize: 11)
+        subtitleLabel.font = .dynamicTypeCaption2
 
         // Layout
 
@@ -61,13 +61,13 @@ public class GroupTableViewCell: UITableViewCell {
         }
 
         let groupMembersCount = thread.groupModel.groupMembership.fullMembers.count
-        self.subtitleLabel.text = customSubtitle ?? GroupViewUtils.formatGroupMembersLabel(memberCount: groupMembersCount)
+        self.subtitleLabel.text = customSubtitle ?? GroupViewUtils.formatGroupMembersLabel(memberCount: groupMembersCount, isTerminated: false)
 
         self.avatarView.updateWithSneakyTransactionIfNecessary { config in
             config.dataSource = .thread(thread)
         }
 
-        if let accessoryMessage = accessoryMessage, !accessoryMessage.isEmpty {
+        if let accessoryMessage, !accessoryMessage.isEmpty {
             accessoryLabel.text = accessoryMessage
             accessoryLabel.isHidden = false
         } else {
@@ -83,7 +83,7 @@ public class GroupTableViewCell: UITableViewCell {
             customAccessoryContainer.isHiddenInStackView = true
         }
 
-        nameLabel.textColor = customTextColor ?? Theme.primaryTextColor
-        subtitleLabel.textColor = customTextColor ?? Theme.secondaryTextAndIconColor
+        nameLabel.textColor = customTextColor ?? UIColor.Signal.label
+        subtitleLabel.textColor = customTextColor ?? UIColor.Signal.secondaryLabel
     }
 }

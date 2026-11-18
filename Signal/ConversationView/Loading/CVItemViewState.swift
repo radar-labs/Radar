@@ -15,7 +15,7 @@ import SignalUI
 //
 // CVItemViewState might be affected by adjacent items, profile changes,
 // the passage of time, etc.
-public struct CVItemViewState: Equatable {
+struct CVItemViewState: Equatable {
     let shouldShowSenderAvatar: Bool
     let accessibilityAuthorName: String?
     let shouldHideFooter: Bool
@@ -35,10 +35,10 @@ public struct CVItemViewState: Equatable {
     let uiMode: ConversationUIMode
     let previousUIMode: ConversationUIMode
 
-    public var isShowingSelectionUI: Bool { uiMode.hasSelectionUI }
-    public var wasShowingSelectionUI: Bool { previousUIMode.hasSelectionUI }
+    var isShowingSelectionUI: Bool { uiMode.hasSelectionUI }
+    var wasShowingSelectionUI: Bool { previousUIMode.hasSelectionUI }
 
-    public class Builder {
+    class Builder {
         var shouldShowSenderAvatar = false
         var accessibilityAuthorName: String?
         var shouldHideFooter = false
@@ -56,21 +56,23 @@ public struct CVItemViewState: Equatable {
         var previousUIMode: ConversationUIMode = .normal
 
         func build() -> CVItemViewState {
-            CVItemViewState(shouldShowSenderAvatar: shouldShowSenderAvatar,
-                            accessibilityAuthorName: accessibilityAuthorName,
-                            shouldHideFooter: shouldHideFooter,
-                            isFirstInCluster: isFirstInCluster,
-                            isLastInCluster: isLastInCluster,
-                            shouldCollapseSystemMessageAction: shouldCollapseSystemMessageAction,
-                            senderNameState: senderNameState,
-                            footerState: footerState,
-                            dateHeaderState: dateHeaderState,
-                            bodyTextState: bodyTextState,
-                            giftBadgeState: giftBadgeState,
-                            nextAudioAttachment: nextAudioAttachment,
-                            audioPlaybackRate: audioPlaybackRate,
-                            uiMode: uiMode,
-                            previousUIMode: previousUIMode)
+            CVItemViewState(
+                shouldShowSenderAvatar: shouldShowSenderAvatar,
+                accessibilityAuthorName: accessibilityAuthorName,
+                shouldHideFooter: shouldHideFooter,
+                isFirstInCluster: isFirstInCluster,
+                isLastInCluster: isLastInCluster,
+                shouldCollapseSystemMessageAction: shouldCollapseSystemMessageAction,
+                senderNameState: senderNameState,
+                footerState: footerState,
+                dateHeaderState: dateHeaderState,
+                bodyTextState: bodyTextState,
+                giftBadgeState: giftBadgeState,
+                nextAudioAttachment: nextAudioAttachment,
+                audioPlaybackRate: audioPlaybackRate,
+                uiMode: uiMode,
+                previousUIMode: previousUIMode,
+            )
         }
     }
 }
@@ -84,10 +86,6 @@ struct CVItemModelBuilder: CVItemBuilding {
 
     // MARK: -
 
-    private var shouldShowDateOnNextViewItem = true
-    private let todayDate = Date()
-    private var previousDaysBeforeToday: Int?
-
     private var items = [ItemBuilder]()
     private var previousItem: ItemBuilder? {
         items.last
@@ -100,24 +98,26 @@ struct CVItemModelBuilder: CVItemBuilding {
 
     // TODO: How should we handle failed stickers?
     // TODO: Do we need a new equivalent of clearNeedsUpdate?
-    mutating func buildItems(localAci: Aci) -> [CVItemModel] {
+    mutating func buildItems(localAci: Aci, interactions: [TSInteraction]) -> [CVItemModel] {
         // Contact Offers / Thread Details are the first item in the thread
         if messageLoader.shouldShowThreadDetails {
             // The thread details should have a stable timestamp.
             let threadDetailsTimestamp: UInt64
-            if let firstInteraction = messageLoader.loadedInteractions.first {
+            if let firstInteraction = interactions.first {
                 threadDetailsTimestamp = max(1, firstInteraction.timestamp) - 2
             } else {
                 threadDetailsTimestamp = 1
             }
-            let threadDetails = ThreadDetailsInteraction(thread: thread,
-                                                         timestamp: threadDetailsTimestamp)
+            let threadDetails = ThreadDetailsInteraction(
+                threadUniqueId: thread.uniqueId,
+                timestamp: threadDetailsTimestamp,
+            )
             let item = addItem(interaction: threadDetails)
             owsAssertDebug(item != nil)
         }
 
         var interactionIds = Set<String>()
-        for interaction in messageLoader.loadedInteractions {
+        for interaction in interactions {
             guard !interactionIds.contains(interaction.uniqueId) else {
                 owsFailDebug("Duplicate interaction(1): \(interaction.uniqueId)")
                 continue
@@ -128,27 +128,31 @@ struct CVItemModelBuilder: CVItemBuilding {
             owsAssertDebug(item != nil)
         }
 
-        if messageLoader.shouldShowDefaultDisappearingMessageTimer(
-            thread: thread,
-            transaction: transaction
-        ) {
-            let interaction = DefaultDisappearingMessageTimerInteraction(
+        if
+            messageLoader.shouldShowDefaultDisappearingMessageTimer(
                 thread: thread,
-                timestamp: NSDate.ows_millisecondTimeStamp() - 1
+                transaction: transaction,
+            )
+        {
+            let interaction = DefaultDisappearingMessageTimerInteraction(
+                threadUniqueId: thread.uniqueId,
+                timestamp: NSDate.ows_millisecondTimeStamp() - 1,
             )
             let item = addItem(interaction: interaction)
             owsAssertDebug(item != nil)
         }
 
         if let typingIndicatorsSender = viewStateSnapshot.typingIndicatorsSender {
-            let interaction = TypingIndicatorInteraction(thread: thread,
-                                                         timestamp: NSDate.ows_millisecondTimeStamp(),
-                                                         address: typingIndicatorsSender)
+            let interaction = TypingIndicatorInteraction(
+                threadUniqueId: thread.uniqueId,
+                timestamp: NSDate.ows_millisecondTimeStamp(),
+                address: typingIndicatorsSender,
+            )
             let item = addItem(interaction: interaction)
             owsAssertDebug(item != nil)
         }
 
-        let groupNameColors = GroupNameColors.forThread(thread, localAci: localAci)
+        let groupNameColors = GroupNameColors.forThread(thread)
         let displayNameCache = DisplayNameCache()
 
         // Update the properties of the view items.
@@ -158,15 +162,18 @@ struct CVItemModelBuilder: CVItemBuilding {
             let previousItem: ItemBuilder? = items[safe: index - 1]
             let nextItem: ItemBuilder? = items[safe: index + 1]
 
-            Self.configureItemViewState(item: item,
-                                        previousItem: previousItem,
-                                        nextItem: nextItem,
-                                        thread: thread,
-                                        threadViewModel: threadViewModel,
-                                        viewStateSnapshot: viewStateSnapshot,
-                                        groupNameColors: groupNameColors,
-                                        displayNameCache: displayNameCache,
-                                        transaction: transaction)
+            Self.configureItemViewState(
+                item: item,
+                previousItem: previousItem,
+                nextItem: nextItem,
+                thread: thread,
+                threadViewModel: threadViewModel,
+                viewStateSnapshot: viewStateSnapshot,
+                groupNameColors: groupNameColors,
+                displayNameCache: displayNameCache,
+                timestampMode: .original,
+                transaction: transaction,
+            )
         }
 
         return items.map { (itemBuilder: ItemBuilder) in
@@ -174,53 +181,61 @@ struct CVItemModelBuilder: CVItemBuilding {
         }
     }
 
-    public static func buildStandaloneItem(
+    static func buildStandaloneItem(
         interaction: TSInteraction,
         thread: TSThread,
-        threadAssociatedData: ThreadAssociatedData,
         threadViewModel: ThreadViewModel,
         itemBuildingContext: CVItemBuildingContext,
-        localAci: Aci,
+        groupNameColors: GroupNameColors,
+        timestampMode: CVComponentFooter.TimestampMode,
         transaction: DBReadTransaction,
     ) -> CVItemModel? {
         AssertIsOnMainThread()
 
         let viewStateSnapshot = itemBuildingContext.viewStateSnapshot
 
-        guard let itemBuilder = Self.itemBuilder(forInteraction: interaction,
-                                                 thread: thread,
-                                                 threadAssociatedData: threadAssociatedData,
-                                                 itemBuildingContext: itemBuildingContext,
-                                                 componentStateCache: ComponentStateCache()) else {
+        guard
+            let itemBuilder = Self.itemBuilder(
+                forInteraction: interaction,
+                thread: thread,
+                itemBuildingContext: itemBuildingContext,
+                componentStateCache: ComponentStateCache(),
+            )
+        else {
             owsFailDebug("Could not create itemBuilder.")
             return nil
         }
 
-        let groupNameColors = GroupNameColors.forThread(thread, localAci: localAci)
         let displayNameCache = DisplayNameCache()
 
-        configureItemViewState(item: itemBuilder,
-                               previousItem: nil,
-                               nextItem: nil,
-                               thread: thread,
-                               threadViewModel: threadViewModel,
-                               viewStateSnapshot: viewStateSnapshot,
-                               groupNameColors: groupNameColors,
-                               displayNameCache: displayNameCache,
-                               transaction: transaction)
+        configureItemViewState(
+            item: itemBuilder,
+            previousItem: nil,
+            nextItem: nil,
+            thread: thread,
+            threadViewModel: threadViewModel,
+            viewStateSnapshot: viewStateSnapshot,
+            groupNameColors: groupNameColors,
+            displayNameCache: displayNameCache,
+            timestampMode: timestampMode,
+            transaction: transaction,
+        )
 
         return itemBuilder.build(coreState: viewStateSnapshot.coreState)
     }
 
-    private static func configureItemViewState(item: ItemBuilder,
-                                               previousItem: ItemBuilder?,
-                                               nextItem: ItemBuilder?,
-                                               thread: TSThread,
-                                               threadViewModel: ThreadViewModel,
-                                               viewStateSnapshot: CVViewStateSnapshot,
-                                               groupNameColors: GroupNameColors,
-                                               displayNameCache: DisplayNameCache,
-                                               transaction: DBReadTransaction) {
+    private static func configureItemViewState(
+        item: ItemBuilder,
+        previousItem: ItemBuilder?,
+        nextItem: ItemBuilder?,
+        thread: TSThread,
+        threadViewModel: ThreadViewModel,
+        viewStateSnapshot: CVViewStateSnapshot,
+        groupNameColors: GroupNameColors,
+        displayNameCache: DisplayNameCache,
+        timestampMode: CVComponentFooter.TimestampMode,
+        transaction: DBReadTransaction,
+    ) {
         let itemViewState = item.itemViewState
         itemViewState.shouldShowSenderAvatar = false
         itemViewState.shouldHideFooter = false
@@ -236,13 +251,21 @@ struct CVItemModelBuilder: CVItemBuilding {
             tapForMoreState = hasTapForMore ? .tapForMore : .none
         case .oversizeTextUndownloadable:
             tapForMoreState = .undownloadableLongText
+        case .oversizeTextSkipped:
+            tapForMoreState = .skippedLongText
+        case .oversizeTextDownloading:
+            tapForMoreState = .downloadingLongText
         default:
             tapForMoreState = .none
         }
 
         var isPinnedMessage: Bool = false
         if let interactionId = interaction.grdbId?.int64Value {
-            isPinnedMessage = threadViewModel.pinnedMessageIds.contains(interactionId)
+            isPinnedMessage = threadViewModel.pinnedMessages.contains(where: { $0.grdbId?.int64Value == interactionId })
+        }
+        var adminDeleteRecipientAddressStates: AdminDeleteManager.RecipientAddressStates?
+        if let message = interaction as? TSMessage, message.wasRemotelyDeleted {
+            adminDeleteRecipientAddressStates = AdminDeleteManager.recipientAddressStates(message: message, tx: transaction)
         }
 
         if let paymentMessage = interaction as? OWSPaymentMessage {
@@ -250,14 +273,16 @@ struct CVItemModelBuilder: CVItemBuilding {
                 interaction: interaction,
                 paymentNotification: paymentMessage.paymentNotification,
                 tapForMoreState: tapForMoreState,
-                transaction: transaction
+                transaction: transaction,
             )
         } else {
             itemViewState.footerState = CVComponentFooter.buildState(
                 interaction: interaction,
                 tapForMoreState: tapForMoreState,
                 isPinnedMessage: isPinnedMessage,
-                transaction: transaction
+                adminDeleteRecipientStates: adminDeleteRecipientAddressStates,
+                timestampMode: timestampMode,
+                transaction: transaction,
             )
         }
 
@@ -265,7 +290,7 @@ struct CVItemModelBuilder: CVItemBuilding {
             itemViewState.giftBadgeState = CVComponentGiftBadge.buildViewState(giftBadge)
         }
 
-        itemViewState.audioPlaybackRate =  threadViewModel.associatedData.audioPlaybackRate
+        itemViewState.audioPlaybackRate = threadViewModel.threadRecord.audioPlaybackRate
 
         if interaction.interactionType == .dateHeader {
             itemViewState.dateHeaderState = CVComponentDateHeader.buildState(interaction: interaction)
@@ -275,7 +300,7 @@ struct CVItemModelBuilder: CVItemBuilding {
                 interaction: interaction,
                 bodyText: bodyText,
                 viewStateSnapshot: viewStateSnapshot,
-                hasPendingMessageRequest: threadViewModel.hasPendingMessageRequest
+                hasPendingMessageRequest: threadViewModel.hasPendingMessageRequest,
             )
         }
         itemViewState.uiMode = viewStateSnapshot.uiMode
@@ -303,17 +328,21 @@ struct CVItemModelBuilder: CVItemBuilding {
             itemViewState.accessibilityAuthorName = CommonStrings.you
 
             // clustering
-            if let previousItem = previousItem,
-               previousItem.interactionType == .outgoingMessage,
-               canClusterMessages(previousItem, item) {
+            if
+                let previousItem,
+                previousItem.interactionType == .outgoingMessage,
+                canClusterMessages(previousItem, item)
+            {
                 itemViewState.isFirstInCluster = false
             } else {
                 itemViewState.isFirstInCluster = true
             }
 
-            if let nextItem = nextItem,
-               let nextOutgoingMessage = nextItem.interaction as? TSOutgoingMessage,
-               canClusterMessages(item, nextItem) {
+            if
+                let nextItem,
+                let nextOutgoingMessage = nextItem.interaction as? TSOutgoingMessage,
+                canClusterMessages(item, nextItem)
+            {
                 itemViewState.isLastInCluster = false
 
                 // We can skip the "outgoing message status" footer if the next message
@@ -325,13 +354,13 @@ struct CVItemModelBuilder: CVItemBuilding {
                 let nextTimestampText = DateUtil.formatTimestampShort(nextOutgoingMessage.timestamp)
                 itemViewState.shouldHideFooter = (
                     timestampText == nextTimestampText &&
-                    receiptStatus == nextReceiptStatus &&
-                    outgoingMessage.messageState != .failed &&
-                    outgoingMessage.messageState != .sending &&
-                    outgoingMessage.messageState != .pending &&
-                    outgoingMessage.editState == .none &&
-                    !isDisappearingMessage &&
-                    !tapForMoreState.shouldShowFooter
+                        receiptStatus == nextReceiptStatus &&
+                        outgoingMessage.messageState != .failed &&
+                        outgoingMessage.messageState != .sending &&
+                        outgoingMessage.messageState != .pending &&
+                        outgoingMessage.editState == .none &&
+                        !isDisappearingMessage &&
+                        !tapForMoreState.shouldShowFooter,
                 )
             } else {
                 itemViewState.isLastInCluster = true
@@ -343,19 +372,23 @@ struct CVItemModelBuilder: CVItemBuilding {
 
             // clustering
 
-            if let previousItem = previousItem,
-               let previousIncomingMessage = previousItem.interaction as? TSIncomingMessage,
-               incomingSenderAddress == previousIncomingMessage.authorAddress,
-               canClusterMessages(previousItem, item) {
+            if
+                let previousItem,
+                let previousIncomingMessage = previousItem.interaction as? TSIncomingMessage,
+                incomingSenderAddress == previousIncomingMessage.authorAddress,
+                canClusterMessages(previousItem, item)
+            {
                 itemViewState.isFirstInCluster = false
             } else {
                 itemViewState.isFirstInCluster = true
             }
 
-            if let nextItem = nextItem,
-               let nextIncomingMessage = nextItem.interaction as? TSIncomingMessage,
+            if
+                let nextItem,
+                let nextIncomingMessage = nextItem.interaction as? TSIncomingMessage,
                 incomingSenderAddress == nextIncomingMessage.authorAddress,
-                canClusterMessages(item, nextItem) {
+                canClusterMessages(item, nextItem)
+            {
                 itemViewState.isLastInCluster = false
 
                 // We can skip the "incoming message status" footer in a cluster if the next message
@@ -363,10 +396,12 @@ struct CVItemModelBuilder: CVItemBuilding {
                 // ...but always show the "disappearing messages" animation...
                 // ...and always show the "tap to read more" footer.
                 let nextTimestampText = DateUtil.formatTimestampShort(nextIncomingMessage.timestamp)
-                itemViewState.shouldHideFooter = (timestampText == nextTimestampText &&
-                                                    !isDisappearingMessage &&
-                                                    incomingMessage.editState == .none &&
-                                                    !tapForMoreState.shouldShowFooter)
+                itemViewState.shouldHideFooter = (
+                    timestampText == nextTimestampText &&
+                        !isDisappearingMessage &&
+                        incomingMessage.editState == .none &&
+                        !tapForMoreState.shouldShowFooter,
+                )
             } else {
                 itemViewState.isLastInCluster = true
             }
@@ -379,26 +414,50 @@ struct CVItemModelBuilder: CVItemBuilding {
                 let authorName = displayNameCache.displayName(address: incomingSenderAddress, transaction: transaction)
                 itemViewState.accessibilityAuthorName = authorName
 
-                if let previousItem = previousItem,
-                   let previousIncomingMessage = previousItem.interaction as? TSIncomingMessage {
+                if
+                    let previousItem,
+                    let previousIncomingMessage = previousItem.interaction as? TSIncomingMessage
+                {
                     let previousIncomingSenderAddress = previousIncomingMessage.authorAddress
                     owsAssertDebug(previousIncomingSenderAddress.isValid)
 
                     shouldShowSenderName = incomingSenderAddress != previousIncomingSenderAddress
                 }
+
+                var memberLabel: String?
+                if
+                    let groupThread = thread as? TSGroupThread,
+                    !threadViewModel.hasPendingMessageRequest,
+                    let senderAci = incomingSenderAddress.aci
+                {
+                    memberLabel = groupThread.groupModel.groupMembership.memberLabel(for: senderAci)?.labelForRendering()
+                    memberLabel = memberLabel?
+                        .components(separatedBy: .whitespaces)
+                        .joined(separator: SignalSymbol.LeadingCharacter.nonBreakingSpace.rawValue)
+
+                    if let memberLabel {
+                        itemViewState.accessibilityAuthorName = authorName + "," + memberLabel
+                    }
+                }
+
                 if shouldShowSenderName {
                     let senderName = NSAttributedString(string: authorName)
                     let senderNameColor = groupNameColors.color(for: incomingSenderAddress.aci)
-                    itemViewState.senderNameState = CVComponentState.SenderName(senderName: senderName,
-                                                                                senderNameColor: senderNameColor)
+                    itemViewState.senderNameState = CVComponentState.SenderName(
+                        senderName: senderName,
+                        senderNameColor: senderNameColor,
+                        memberLabel: memberLabel,
+                    )
                 }
 
                 // Show the sender avatar for incoming group messages unless
                 // the next message has the same sender avatar and
                 // no "date break" separates us.
                 itemViewState.shouldShowSenderAvatar = true
-                if let nextItem = nextItem,
-                   let nextIncomingMessage = nextItem.interaction as? TSIncomingMessage {
+                if
+                    let nextItem,
+                    let nextIncomingMessage = nextItem.interaction as? TSIncomingMessage
+                {
                     let nextIncomingSenderAddress: SignalServiceAddress = nextIncomingMessage.authorAddress
                     itemViewState.shouldShowSenderAvatar = incomingSenderAddress != nextIncomingSenderAddress
                 }
@@ -407,31 +466,37 @@ struct CVItemModelBuilder: CVItemBuilding {
                 // full name. Group thread's will continue to read off the full name.
                 itemViewState.accessibilityAuthorName = displayNameCache.shortDisplayName(
                     address: incomingSenderAddress,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             }
 
         } else if [.call, .info, .error].contains(interaction.interactionType) {
             // clustering
 
-            if let previousItem = previousItem,
-               interaction.interactionType == previousItem.interaction.interactionType {
+            if
+                let previousItem,
+                interaction.interactionType == previousItem.interaction.interactionType
+            {
 
                 switch previousItem.interaction.interactionType {
                 case .error:
-                    if let errorMessage = interaction as? TSErrorMessage,
-                       let previousErrorMessage = previousItem.interaction as? TSErrorMessage,
-                       (errorMessage.errorType == .nonBlockingIdentityChange
-                            || previousErrorMessage.errorType != errorMessage.errorType) {
+                    if
+                        let errorMessage = interaction as? TSErrorMessage,
+                        let previousErrorMessage = previousItem.interaction as? TSErrorMessage,
+                        errorMessage.errorType == .nonBlockingIdentityChange
+                        || previousErrorMessage.errorType != errorMessage.errorType
+                    {
                         itemViewState.isFirstInCluster = true
                     } else {
                         itemViewState.isFirstInCluster = false
                     }
                 case .info:
-                    if let infoMessage = interaction as? TSInfoMessage,
-                       let previousInfoMessage = previousItem.interaction as? TSInfoMessage,
-                       (infoMessage.messageType == .verificationStateChange
-                            || previousInfoMessage.messageType != infoMessage.messageType) {
+                    if
+                        let infoMessage = interaction as? TSInfoMessage,
+                        let previousInfoMessage = previousItem.interaction as? TSInfoMessage,
+                        infoMessage.messageType == .verificationStateChange
+                        || previousInfoMessage.messageType != infoMessage.messageType
+                    {
                         itemViewState.isFirstInCluster = true
                     } else {
                         itemViewState.isFirstInCluster = false
@@ -445,23 +510,29 @@ struct CVItemModelBuilder: CVItemBuilding {
                 itemViewState.isFirstInCluster = true
             }
 
-            if let nextItem = nextItem,
-               interaction.interactionType == nextItem.interaction.interactionType {
+            if
+                let nextItem,
+                interaction.interactionType == nextItem.interaction.interactionType
+            {
                 switch nextItem.interaction.interactionType {
                 case .error:
-                    if let errorMessage = interaction as? TSErrorMessage,
-                       let nextErrorMessage = nextItem.interaction as? TSErrorMessage,
-                       (errorMessage.errorType == .nonBlockingIdentityChange
-                            || nextErrorMessage.errorType != errorMessage.errorType) {
+                    if
+                        let errorMessage = interaction as? TSErrorMessage,
+                        let nextErrorMessage = nextItem.interaction as? TSErrorMessage,
+                        errorMessage.errorType == .nonBlockingIdentityChange
+                        || nextErrorMessage.errorType != errorMessage.errorType
+                    {
                         itemViewState.isLastInCluster = true
                     } else {
                         itemViewState.isLastInCluster = false
                     }
                 case .info:
-                    if let infoMessage = interaction as? TSInfoMessage,
-                       let nextInfoMessage = nextItem.interaction as? TSInfoMessage,
-                       (infoMessage.messageType == .verificationStateChange
-                            || nextInfoMessage.messageType != infoMessage.messageType) {
+                    if
+                        let infoMessage = interaction as? TSInfoMessage,
+                        let nextInfoMessage = nextItem.interaction as? TSInfoMessage,
+                        infoMessage.messageType == .verificationStateChange
+                        || nextInfoMessage.messageType != infoMessage.messageType
+                    {
                         itemViewState.isLastInCluster = true
                     } else {
                         itemViewState.isLastInCluster = false
@@ -485,17 +556,16 @@ struct CVItemModelBuilder: CVItemBuilding {
             let nextMessage = nextItem?.interaction as? TSMessage,
             let rowId = nextMessage.sqliteRowId,
             let attachment = DependenciesBridge.shared.attachmentStore
-                .fetchFirstReferencedAttachment(for: .messageBodyAttachment(messageRowId: rowId), tx: transaction),
+                .fetchAnyReferencedAttachment(for: .messageBodyAttachment(messageRowId: rowId), tx: transaction),
             attachment.attachment.asStream()?.contentType.isAudio
-                ?? MimeTypeUtil.isSupportedAudioMimeType(attachment.attachment.mimeType)
+            ?? MimeTypeUtil.isSupportedAudioMimeType(attachment.attachment.mimeType)
         {
-
             if let stream = attachment.asReferencedStream {
                 itemViewState.nextAudioAttachment = AudioAttachment(
                     attachmentStream: stream,
                     owningMessage: nextMessage,
                     metadata: nil,
-                    receivedAtDate: nextMessage.receivedAtDate
+                    receivedAtDate: nextMessage.receivedAtDate,
                 )
             } else if let pointer = attachment.asReferencedAnyPointer {
                 itemViewState.nextAudioAttachment = AudioAttachment(
@@ -503,69 +573,9 @@ struct CVItemModelBuilder: CVItemBuilding {
                     owningMessage: nextMessage,
                     metadata: nil,
                     receivedAtDate: nextMessage.receivedAtDate,
-                    downloadState: pointer.attachmentPointer.downloadState(tx: transaction)
+                    downloadState: pointer.attachmentPointer.downloadState(tx: transaction),
                 )
             }
-        }
-    }
-
-    private mutating func addDateHeaderViewItemIfNecessary(item: ItemBuilder) {
-        let itemTimestamp = item.interaction.timestamp
-        owsAssertDebug(itemTimestamp > 0)
-
-        let itemDate = Date(millisecondsSince1970: itemTimestamp)
-        let daysBeforeToday = DateUtil.daysFrom(firstDate: itemDate, toSecondDate: todayDate)
-
-        var shouldShowDate = false
-        if let previousDaysBeforeToday = self.previousDaysBeforeToday {
-            if daysBeforeToday != previousDaysBeforeToday {
-                shouldShowDateOnNextViewItem = true
-            }
-        } else {
-            // Only show for the first item if the date is not today
-            shouldShowDateOnNextViewItem = daysBeforeToday != 0
-        }
-
-        if shouldShowDateOnNextViewItem && item.canShowDate {
-            shouldShowDate = true
-            shouldShowDateOnNextViewItem = false
-        }
-
-        if shouldShowDate {
-            let interaction = DateHeaderInteraction(thread: thread, timestamp: itemTimestamp)
-            let componentState = CVComponentState.buildDateHeader(interaction: interaction,
-                                                                  itemBuildingContext: itemBuildingContext)
-            let item = ItemBuilder(interaction: interaction,
-                                   thread: thread,
-                                   threadAssociatedData: threadAssociatedData,
-                                   componentState: componentState)
-            items.append(item)
-        }
-
-        self.previousDaysBeforeToday = daysBeforeToday
-    }
-
-    var hasPlacedUnreadIndicator = false
-
-    private mutating func addUnreadHeaderViewItemIfNecessary(item: ItemBuilder) {
-        let itemTimestamp = item.interaction.timestamp
-        owsAssertDebug(itemTimestamp > 0)
-
-        if hasPlacedUnreadIndicator {
-            return
-        }
-        if let oldestSortId = viewStateSnapshot.oldestUnreadMessageSortId, oldestSortId <= item.interaction.sortId {
-            hasPlacedUnreadIndicator = true
-            let interaction = UnreadIndicatorInteraction(thread: thread,
-                                                         timestamp: itemTimestamp,
-                                                         receivedAtTimestamp: item.interaction.receivedAtTimestamp)
-            let componentState = CVComponentState.buildUnreadIndicator(interaction: interaction,
-                                                                       itemBuildingContext: itemBuildingContext)
-            let item = ItemBuilder(interaction: interaction,
-                                   thread: thread,
-                                   threadAssociatedData: threadAssociatedData,
-                                   componentState: componentState)
-            items.append(item)
         }
     }
 
@@ -580,48 +590,57 @@ struct CVItemModelBuilder: CVItemBuilding {
             cache[interactionId]
         }
     }
+
     private var componentStateCache = ComponentStateCache()
 
-    mutating func reuseComponentStates(prevRenderState: CVRenderState,
-                                       updatedInteractionIds: Set<String>) {
-
+    mutating func reuseComponentStates(
+        prevRenderState: CVRenderState,
+        updatedInteractionIds: Set<String>,
+    ) {
         for renderItem in prevRenderState.items {
             guard !updatedInteractionIds.contains(renderItem.interactionUniqueId) else {
                 continue
             }
-            componentStateCache.add(interactionId: renderItem.interactionUniqueId,
-                                    componentState: renderItem.rootComponent.componentState)
+            componentStateCache.add(
+                interactionId: renderItem.interactionUniqueId,
+                componentState: renderItem.rootComponent.componentState,
+            )
         }
     }
 
-    private static func buildComponentState(interaction: TSInteraction,
-                                            itemBuildingContext: CVItemBuildingContext,
-                                            componentStateCache: ComponentStateCache) throws -> CVComponentState {
+    private static func buildComponentState(
+        interaction: TSInteraction,
+        itemBuildingContext: CVItemBuildingContext,
+        componentStateCache: ComponentStateCache,
+    ) throws -> CVComponentState {
         if let componentState = componentStateCache.get(interactionId: interaction.uniqueId) {
             // CVComponentState is immutable and safe to re-use without copying. It's currently a struct.
             return componentState
         }
-        return try CVComponentState.build(interaction: interaction,
-                                          itemBuildingContext: itemBuildingContext)
+        return try CVComponentState.build(
+            interaction: interaction,
+            itemBuildingContext: itemBuildingContext,
+        )
     }
 
     private mutating func addItem(interaction: TSInteraction) -> ItemBuilder? {
-        guard let item = Self.itemBuilder(forInteraction: interaction,
-                                          thread: thread,
-                                          threadAssociatedData: threadAssociatedData,
-                                          itemBuildingContext: itemBuildingContext,
-                                          componentStateCache: componentStateCache) else {
+        guard
+            let item = Self.itemBuilder(
+                forInteraction: interaction,
+                thread: thread,
+                itemBuildingContext: itemBuildingContext,
+                componentStateCache: componentStateCache,
+            )
+        else {
             return nil
         }
 
-        // Insert dynamic header item(s) before this item if necessary.
-        addDateHeaderViewItemIfNecessary(item: item)
-        addUnreadHeaderViewItemIfNecessary(item: item)
-
-        if let previousItem = previousItem {
-            configureAdjacent(item: item,
-                              previousItem: previousItem,
-                              viewStateSnapshot: viewStateSnapshot)
+        if let previousItem {
+            configureAdjacent(
+                item: item,
+                previousItem: previousItem,
+                viewStateSnapshot: viewStateSnapshot,
+            )
         }
 
         // Hide "call" buttons if there is an active call in another thread.
@@ -648,30 +667,36 @@ struct CVItemModelBuilder: CVItemBuilding {
         return item
     }
 
-    private static func itemBuilder(forInteraction interaction: TSInteraction,
-                                    thread: TSThread,
-                                    threadAssociatedData: ThreadAssociatedData,
-                                    itemBuildingContext: CVItemBuildingContext,
-                                    componentStateCache: ComponentStateCache) -> ItemBuilder? {
+    private static func itemBuilder(
+        forInteraction interaction: TSInteraction,
+        thread: TSThread,
+        itemBuildingContext: CVItemBuildingContext,
+        componentStateCache: ComponentStateCache,
+    ) -> ItemBuilder? {
         let componentState: CVComponentState
         do {
-            componentState = try buildComponentState(interaction: interaction,
-                                                     itemBuildingContext: itemBuildingContext,
-                                                     componentStateCache: componentStateCache)
+            componentState = try buildComponentState(
+                interaction: interaction,
+                itemBuildingContext: itemBuildingContext,
+                componentStateCache: componentStateCache,
+            )
         } catch {
             owsFailDebug("Error: \(error)")
             return nil
         }
 
-        return ItemBuilder(interaction: interaction,
-                           thread: thread,
-                           threadAssociatedData: threadAssociatedData,
-                           componentState: componentState)
+        return ItemBuilder(
+            interaction: interaction,
+            thread: thread,
+            componentState: componentState,
+        )
     }
 
-    private func configureAdjacent(item: ItemBuilder,
-                                   previousItem: ItemBuilder,
-                                   viewStateSnapshot: CVViewStateSnapshot) {
+    private func configureAdjacent(
+        item: ItemBuilder,
+        previousItem: ItemBuilder,
+        viewStateSnapshot: CVViewStateSnapshot,
+    ) {
         let interaction = item.interaction
         guard previousItem.interactionType == item.interactionType else {
             return
@@ -679,8 +704,10 @@ struct CVItemModelBuilder: CVItemBuilding {
 
         switch item.interactionType {
         case .error:
-            guard let errorMessage = interaction as? TSErrorMessage,
-                  let previousErrorMessage = previousItem.interaction as? TSErrorMessage else {
+            guard
+                let errorMessage = interaction as? TSErrorMessage,
+                let previousErrorMessage = previousItem.interaction as? TSErrorMessage
+            else {
                 owsFailDebug("Invalid interactions.")
                 return
             }
@@ -690,13 +717,15 @@ struct CVItemModelBuilder: CVItemBuilding {
             previousItem.itemViewState.shouldCollapseSystemMessageAction
                 = previousErrorMessage.errorType == errorMessage.errorType
         case .info:
-            guard let infoMessage = interaction as? TSInfoMessage,
-                  let previousInfoMessage = previousItem.interaction as? TSInfoMessage else {
+            guard
+                let infoMessage = interaction as? TSInfoMessage,
+                let previousInfoMessage = previousItem.interaction as? TSInfoMessage
+            else {
                 owsFailDebug("Invalid interactions.")
                 return
             }
             switch infoMessage.messageType {
-            case .verificationStateChange, .typeGroupUpdate, .threadMerge, .sessionSwitchover:
+            case .verificationStateChange, .typeGroupUpdate, .threadMerge, .sessionSwitchover, .typePinnedMessage:
                 return // never collapse
             case .phoneNumberChange:
                 // Only collapse if the previous message was a change number for the same user
@@ -736,7 +765,7 @@ private extension MessageLoader {
 
         return ThreadFinder().shouldSetDefaultDisappearingMessageTimer(
             contactThread: contactThread,
-            transaction: transaction
+            transaction: transaction,
         )
     }
 }
@@ -746,47 +775,31 @@ private extension MessageLoader {
 private class ItemBuilder {
     let interaction: TSInteraction
     let thread: TSThread
-    let threadAssociatedData: ThreadAssociatedData
     let componentState: CVComponentState
     var itemViewState = CVItemViewState.Builder()
 
-    init(interaction: TSInteraction,
-         thread: TSThread,
-         threadAssociatedData: ThreadAssociatedData,
-         componentState: CVComponentState) {
+    init(
+        interaction: TSInteraction,
+        thread: TSThread,
+        componentState: CVComponentState,
+    ) {
         self.interaction = interaction
         self.thread = thread
-        self.threadAssociatedData = threadAssociatedData
         self.componentState = componentState
     }
 
     func build(coreState: CVCoreState) -> CVItemModel {
-        CVItemModel(interaction: interaction,
-                    thread: thread,
-                    threadAssociatedData: threadAssociatedData,
-                    componentState: componentState,
-                    itemViewState: itemViewState.build(),
-                    coreState: coreState)
+        CVItemModel(
+            interaction: interaction,
+            thread: thread,
+            componentState: componentState,
+            itemViewState: itemViewState.build(),
+            coreState: coreState,
+        )
     }
 
     var interactionType: OWSInteractionType {
         interaction.interactionType
-    }
-
-    var canShowDate: Bool {
-        switch interaction.interactionType {
-        case .unknown, .typingIndicator, .threadDetails, .dateHeader, .unknownThreadWarning, .defaultDisappearingMessageTimer:
-            return false
-        case .info:
-            guard let infoMessage = interaction as? TSInfoMessage else {
-                owsFailDebug("Invalid interaction.")
-                return false
-            }
-            // Only show the date for non-synced thread messages;
-            return infoMessage.messageType != .syncedThread
-        case .unreadIndicator, .incomingMessage, .outgoingMessage, .error, .call:
-            return true
-        }
     }
 }
 

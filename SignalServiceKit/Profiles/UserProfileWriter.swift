@@ -21,4 +21,5 @@ public enum UserProfileWriter: UInt {
     case systemContactsFetch = 13
     case changePhoneNumber = 14
     case backupRestore = 15
+    case paymentActivation = 16
 }

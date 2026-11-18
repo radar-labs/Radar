@@ -4,8 +4,8 @@
 //
 
 public enum BackupExportJobRunnerUpdate {
-    case progress(OWSSequentialProgress<BackupExportJobStep>)
-    case completion(Result<Void, BackupExportJobError>)
+    case progress(OWSSequentialProgress<BackupExportJobStage>)
+    case completion(Result<Void, Error>)
 }
 
 /// A wrapper around ``BackupExportJob`` that prevents overlapping job runs and
@@ -20,21 +20,28 @@ public protocol BackupExportJobRunner {
     /// job is running.
     func updates() -> AsyncStream<BackupExportJobRunnerUpdate?>
 
-    /// Cooperatively cancel the running export job, if one exists.
-    func cancelIfRunning()
+    /// Resume an interrupted ``BackupExportJob`` from a previous launch, if
+    /// one exists. Resumed jobs are run using ``BackupExportJobMode/manual``.
+    ///
+    /// - SeeAlso ``BackupExportJobStore``
+    func resumeIfNecessary()
+
+    /// Cancel the in-progress `BackupExportJob`, if one exists.
+    ///
+    /// - Returns
+    /// A `Task` tracking the teardown of the canceled `BackupExportJob`, if one
+    /// was running.
+    func cancelIfRunning() -> Task<Void, Error>?
 
     /// Run a ``BackupExportJob``, if one is not already running.
     ///
-    /// Only one export job is allowed to run at once, so calls to this method
-    /// will only start new async work if there is no job running. Callers who
-    /// wish to cancel a running job must use ``cancelIfRunning()``.
-    ///
     /// - Note
-    /// Callers should use ``updates()`` for status notifications about the
-    /// running job.
+    /// To receive granular updates on a running job, use ``updates()``.
     ///
-    /// - SeeAlso ``BackupExportJob/exportAndUploadBackup(onProgressUpdate:)``
-    func startIfNecessary()
+    /// - Returns
+    /// A `Task` tracking a `BackupExportJob` run, which may be freshly started
+    /// or preexisting.
+    func startIfNecessary(mode: BackupExportJobMode) -> Task<Void, Error>
 }
 
 // MARK: -
@@ -47,10 +54,9 @@ class BackupExportJobRunnerImpl: BackupExportJobRunner {
         }
 
         var updateObservers: [UpdateObserver] = []
-        var currentExportJobTask: Task<Void, Never>?
+        var currentExportJobTask: Task<Void, Error>?
 
-        var progressUpdateDebounceUntil: [BackupExportJobStep: MonotonicDate] = [:]
-
+        var nextProgressUpdate: OWSSequentialProgress<BackupExportJobStage>?
         var latestUpdate: BackupExportJobRunnerUpdate? {
             didSet {
                 for observer in updateObservers {
@@ -61,12 +67,50 @@ class BackupExportJobRunnerImpl: BackupExportJobRunner {
     }
 
     private let backupExportJob: BackupExportJob
-    private let state: SeriallyAccessedState<State>
+    private let backupExportJobStore: BackupExportJobStore
+    private let db: DB
 
-    init(backupExportJob: BackupExportJob) {
+    private let backupExportLock: BackupExportLock
+    private let state: AtomicValue<State>
+
+    init(
+        backupExportJob: BackupExportJob,
+        backupExportJobStore: BackupExportJobStore,
+        db: DB,
+        backupExportLock: BackupExportLock,
+    ) {
         self.backupExportJob = backupExportJob
-        self.state = SeriallyAccessedState(State())
+        self.backupExportJobStore = backupExportJobStore
+        self.db = db
+        self.backupExportLock = backupExportLock
+
+        self.state = AtomicValue(State(), lock: .init())
     }
+
+    // MARK: -
+
+    private lazy var progressUpdateDebouncer = DebouncedEvents.build(
+        mode: .firstLast,
+        maxFrequencySeconds: 0.2,
+        onQueue: .main,
+        notifyBlock: { [weak self] in
+            guard let self else { return }
+
+            state.update { _state in
+                guard let nextProgressUpdate = _state.nextProgressUpdate.take() else {
+                    return
+                }
+
+                guard _state.currentExportJobTask != nil else {
+                    // Our running job completed before this progress update was
+                    // emitted, so ignore this late update.
+                    return
+                }
+
+                _state.latestUpdate = .progress(nextProgressUpdate)
+            }
+        },
+    )
 
     // MARK: -
 
@@ -84,11 +128,11 @@ class BackupExportJobRunnerImpl: BackupExportJobRunner {
     }
 
     private func addUpdateObserver(
-        block: @escaping (BackupExportJobRunnerUpdate?) -> Void
+        block: @escaping (BackupExportJobRunnerUpdate?) -> Void,
     ) -> State.UpdateObserver {
         let observer = State.UpdateObserver(block: block)
 
-        state.enqueueUpdate { _state in
+        state.update { _state in
             observer.block(_state.latestUpdate)
             _state.updateObservers.append(observer)
         }
@@ -97,92 +141,96 @@ class BackupExportJobRunnerImpl: BackupExportJobRunner {
     }
 
     private func removeUpdateObserver(_ observer: State.UpdateObserver) {
-        state.enqueueUpdate { _state in
+        state.update { _state in
             _state.updateObservers.removeAll { $0.id == observer.id }
         }
     }
 
     // MARK: -
 
-    func cancelIfRunning() {
-        state.enqueueUpdate { _state in
-            if let currentExportJobTask = _state.currentExportJobTask {
-                currentExportJobTask.cancel()
-            }
+    func resumeIfNecessary() {
+        let resumptionPoint: BackupExportJobStore.ResumptionPoint? = db.read { tx in
+            backupExportJobStore.lastReachedResumptionPoint(tx: tx)
+        }
+
+        if let resumptionPoint {
+            _ = _startIfNecessary(
+                mode: .manual,
+                resumptionPoint: resumptionPoint,
+            )
         }
     }
 
     // MARK: -
 
-    func startIfNecessary() {
-        state.enqueueUpdate { [self] _state in
-            if _state.currentExportJobTask != nil {
-                return
-            }
+    func cancelIfRunning() -> Task<Void, Error>? {
+        return state.update { _state in
+            _state.currentExportJobTask?.cancel()
+            return _state.currentExportJobTask
+        }
+    }
 
-            _state.currentExportJobTask = Task { () async -> Void in
-                let result: Result<Void, BackupExportJobError>
+    // MARK: -
 
-                do throws(BackupExportJobError) {
-                    try await backupExportJob.exportAndUploadBackup(
-                        mode: .manual(OWSSequentialProgress<BackupExportJobStep>
+    func startIfNecessary(mode: BackupExportJobMode) -> Task<Void, Error> {
+        return _startIfNecessary(mode: mode, resumptionPoint: nil)
+    }
+
+    private func _startIfNecessary(
+        mode: BackupExportJobMode,
+        resumptionPoint: BackupExportJobStore.ResumptionPoint?,
+    ) -> Task<Void, Error> {
+        let claim = backupExportLock.tryClaim(asHolder: .remote, start: {
+
+            return state.update { [self] _state in
+                if let currentExportJobTask = _state.currentExportJobTask {
+                    return currentExportJobTask
+                }
+
+                let newExportJobTask = Task { [self] () async throws -> Void in
+                    let result = await Result(catching: { [self] in
+                        let progressSink = OWSSequentialProgress<BackupExportJobStage>
                             .createSink { [weak self] exportJobProgress in
                                 self?.exportJobDidUpdateProgress(exportJobProgress)
                             }
+
+                        try await backupExportJob.run(
+                            mode: mode,
+                            resumptionPoint: resumptionPoint,
+                            progress: progressSink,
                         )
-                    )
-                    result = .success(())
-                } catch {
-                    result = .failure(error)
+                    })
+
+                    backupExportLock.release(holder: .remote)
+                    exportJobDidComplete(result: result)
+                    try result.get()
                 }
 
-                exportJobDidComplete(result: result)
+                _state.currentExportJobTask = newExportJobTask
+                return newExportJobTask
             }
+        })
+        switch claim {
+        case .claimed(let task), .alreadyHeld(let task):
+            return task
+        case .blockedBy:
+            return Task { throw BackupExportLockError.localBackupInProgress }
         }
     }
 
-    private func exportJobDidUpdateProgress(_ exportJobProgress: OWSSequentialProgress<BackupExportJobStep>) {
-        self.state.enqueueUpdate { _state in
-            guard _state.currentExportJobTask != nil else {
-                // Our running job completed before this progress update was
-                // emitted, so ignore this late update.
-                return
-            }
+    private func exportJobDidUpdateProgress(_ exportJobProgress: OWSSequentialProgress<BackupExportJobStage>) {
+        state.update { [weak self] _state in
+            guard let self else { return }
 
-            let currentStep = exportJobProgress.currentStep
-            let now = MonotonicDate()
-            let shortDebounceUntil = now.adding(0.1)
-            let longDebounceUntil = now.adding(0.5)
-
-            // If this is our first update, publish immediately.
-            if _state.progressUpdateDebounceUntil.isEmpty {
-                _state.progressUpdateDebounceUntil[currentStep] = shortDebounceUntil
-                _state.latestUpdate = .progress(exportJobProgress)
-                return
-            }
-
-            if let debounceUntil = _state.progressUpdateDebounceUntil[currentStep] {
-                if now > debounceUntil {
-                    _state.progressUpdateDebounceUntil[currentStep] = shortDebounceUntil
-                    _state.latestUpdate = .progress(exportJobProgress)
-                } else {
-                    // We're debounced: ignore this update.
-                }
-            } else {
-                // Skip updates for a longer debounce the first time we start a
-                // new step. This helps prevent short-lived steps from flashing
-                // on and then off screen.
-                _state.progressUpdateDebounceUntil[currentStep] = longDebounceUntil
-            }
+            // Stash this update for our next debounce
+            _state.nextProgressUpdate = exportJobProgress
+            progressUpdateDebouncer.requestNotify()
         }
     }
 
-    private func exportJobDidComplete(result: Result<Void, BackupExportJobError>) {
-        self.state.enqueueUpdate { _state in
+    private func exportJobDidComplete(result: Result<Void, Error>) {
+        state.update { _state in
             _state.currentExportJobTask = nil
-
-            // Reset all debounces.
-            _state.progressUpdateDebounceUntil = [:]
 
             // Push through the completion update...
             _state.latestUpdate = .completion(result)

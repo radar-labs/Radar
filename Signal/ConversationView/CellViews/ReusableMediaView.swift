@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import SignalServiceKit
-import SignalUI
 import SDWebImage
+import SignalServiceKit
+import SignalUI
 
 // MARK: -
 
@@ -27,7 +27,7 @@ private enum LoadState {
 
 // MARK: -
 
-public protocol MediaViewAdapter {
+protocol MediaViewAdapter {
     var mediaView: UIView { get }
     var isLoaded: Bool { get }
     var cacheKey: CVMediaCache.CacheKey { get }
@@ -40,24 +40,29 @@ public protocol MediaViewAdapter {
 
 // MARK: -
 
-public enum ReusableMediaError: Error {
-    case invalidMedia
+enum ReusableMediaError: Error {
     case redundantLoad
 }
 
 // MARK: -
 
-public class ReusableMediaView {
+class ReusableMediaView {
 
     private let mediaViewAdapter: MediaViewAdapter
     private let mediaCache: CVMediaCache
 
-    public var mediaView: UIView {
+    var mediaView: UIView {
         mediaViewAdapter.mediaView
     }
 
     var isVideo: Bool {
-        mediaViewAdapter is MediaViewAdapterVideo
+        if mediaViewAdapter is MediaViewAdapterVideo {
+            return true
+        }
+        if let thumbnail = mediaViewAdapter as? MediaViewAdapterBackupThumbnail {
+            return thumbnail.isVideo
+        }
+        return false
     }
 
     // MARK: - LoadState
@@ -80,25 +85,25 @@ public class ReusableMediaView {
 
     // MARK: - Ownership
 
-    public weak var owner: NSObject?
+    weak var owner: AnyObject?
 
     // MARK: - Initializers
 
-    public init(mediaViewAdapter: MediaViewAdapter,
-                mediaCache: CVMediaCache) {
+    init(
+        mediaViewAdapter: MediaViewAdapter,
+        mediaCache: CVMediaCache,
+    ) {
         self.mediaViewAdapter = mediaViewAdapter
         self.mediaCache = mediaCache
     }
 
     deinit {
-        AssertIsOnMainThread()
-
         loadState = .unloaded
     }
 
     // MARK: - Initializers
 
-    public func load() {
+    func load() {
         AssertIsOnMainThread()
 
         switch loadState {
@@ -111,7 +116,7 @@ public class ReusableMediaView {
         }
     }
 
-    public func unload() {
+    func unload() {
         AssertIsOnMainThread()
 
         loadState = .unloaded
@@ -135,13 +140,13 @@ public class ReusableMediaView {
 
         // It's critical that we update loadState once
         // our load attempt is complete.
-        let loadCompletion: (AnyObject?) -> Void = { [weak self] (possibleMedia) in
+        let loadCompletion: (AnyObject?) -> Void = { [weak self] possibleMedia in
             AssertIsOnMainThread()
 
-            guard let self = self else {
+            guard let self else {
                 return
             }
-            guard loadOwner == self.owner else {
+            guard loadOwner === self.owner else {
                 // Owner has changed; ignore.
                 return
             }
@@ -182,15 +187,14 @@ public class ReusableMediaView {
                 mediaCache.setMedia(
                     media,
                     forKey: cacheKey,
-                    isAnimated: mediaViewAdapter.shouldBeRenderedByYY
+                    isAnimated: mediaViewAdapter.shouldBeRenderedByYY,
                 )
                 await MainActor.run {
                     loadCompletion(media)
                 }
             } catch {
                 switch error {
-                case ReusableMediaError.redundantLoad,
-                     ReusableMediaError.invalidMedia:
+                case ReusableMediaError.redundantLoad:
                     Logger.warn("Error: \(error)")
                 default:
                     owsFailDebug("Error: \(error)")
@@ -207,7 +211,7 @@ public class ReusableMediaView {
 
 class MediaViewAdapterBlurHash: MediaViewAdapter {
 
-    public let shouldBeRenderedByYY = false
+    let shouldBeRenderedByYY = false
     let blurHash: String
     let imageView = CVImageView()
 
@@ -270,7 +274,7 @@ class MediaViewAdapterLoopingVideo: MediaViewAdapter {
 
     func loadMedia() async throws -> AnyObject {
         guard let video = LoopingVideo(attachmentStream) else {
-            throw ReusableMediaError.invalidMedia
+            throw OWSAssertionError("Invalid looping video")
         }
         return video
     }
@@ -296,7 +300,7 @@ class MediaViewAdapterLoopingVideo: MediaViewAdapter {
 
 class MediaViewAdapterAnimated: MediaViewAdapter {
 
-    public let shouldBeRenderedByYY = true
+    let shouldBeRenderedByYY = true
     let attachmentStream: AttachmentStream
     let imageView = CVAnimatedImageView()
 
@@ -317,9 +321,6 @@ class MediaViewAdapterAnimated: MediaViewAdapter {
     }
 
     func loadMedia() async throws -> AnyObject {
-        guard attachmentStream.contentType.isAnimatedImage else {
-            throw ReusableMediaError.invalidMedia
-        }
         guard let animatedImage = try? attachmentStream.decryptedSDAnimatedImage() else {
             throw OWSAssertionError("Invalid animated image.")
         }
@@ -347,14 +348,14 @@ class MediaViewAdapterAnimated: MediaViewAdapter {
 
 class MediaViewAdapterStill: MediaViewAdapter {
 
-    public let shouldBeRenderedByYY = false
+    let shouldBeRenderedByYY = false
     let attachmentStream: AttachmentStream
     let imageView = CVImageView()
     let thumbnailQuality: AttachmentThumbnailQuality
 
     init(
         attachmentStream: AttachmentStream,
-        thumbnailQuality: AttachmentThumbnailQuality
+        thumbnailQuality: AttachmentThumbnailQuality,
     ) {
         self.attachmentStream = attachmentStream
         self.thumbnailQuality = thumbnailQuality
@@ -373,9 +374,6 @@ class MediaViewAdapterStill: MediaViewAdapter {
     }
 
     func loadMedia() async throws -> AnyObject {
-        guard attachmentStream.contentType.isImage else {
-            throw ReusableMediaError.invalidMedia
-        }
         let image = await self.attachmentStream.thumbnailImage(quality: self.thumbnailQuality)
         guard let image else {
             throw OWSAssertionError("Could not load thumbnail")
@@ -402,7 +400,7 @@ class MediaViewAdapterStill: MediaViewAdapter {
 
 class MediaViewAdapterBackupThumbnail: MediaViewAdapter {
 
-    public let shouldBeRenderedByYY = false
+    let shouldBeRenderedByYY = false
     let attachmentBackupThumbnail: AttachmentBackupThumbnail
     let imageView = CVImageView()
 
@@ -412,6 +410,10 @@ class MediaViewAdapterBackupThumbnail: MediaViewAdapter {
 
     var mediaView: UIView {
         imageView
+    }
+
+    var isVideo: Bool {
+        attachmentBackupThumbnail.attachment.contentType.isVideo
     }
 
     var isLoaded: Bool {
@@ -450,14 +452,14 @@ class MediaViewAdapterBackupThumbnail: MediaViewAdapter {
 
 class MediaViewAdapterVideo: MediaViewAdapter {
 
-    public let shouldBeRenderedByYY = false
+    let shouldBeRenderedByYY = false
     let attachmentStream: AttachmentStream
     let imageView = CVImageView()
     let thumbnailQuality: AttachmentThumbnailQuality
 
     init(
         attachmentStream: AttachmentStream,
-        thumbnailQuality: AttachmentThumbnailQuality
+        thumbnailQuality: AttachmentThumbnailQuality,
     ) {
         self.attachmentStream = attachmentStream
         self.thumbnailQuality = thumbnailQuality
@@ -476,9 +478,6 @@ class MediaViewAdapterVideo: MediaViewAdapter {
     }
 
     func loadMedia() async throws -> AnyObject {
-        guard attachmentStream.contentType.isVideo else {
-            throw ReusableMediaError.invalidMedia
-        }
         let image = await self.attachmentStream.thumbnailImage(quality: self.thumbnailQuality)
         guard let image else {
             throw OWSAssertionError("Could not load thumbnail")
@@ -505,17 +504,17 @@ class MediaViewAdapterVideo: MediaViewAdapter {
 
 // MARK: -
 
-public class MediaViewAdapterSticker: MediaViewAdapter {
+class MediaViewAdapterSticker: MediaViewAdapter {
 
-    public let shouldBeRenderedByYY: Bool
-    let attachmentStream: AttachmentStream
-    let imageView: UIImageView
+    private let attachmentStream: AttachmentStream
+    private let isAnimated: Bool
+    private let imageView: UIImageView
 
-    public init(attachmentStream: AttachmentStream) {
-        self.shouldBeRenderedByYY = attachmentStream.contentType.isAnimatedImage
+    init(attachmentStream: AttachmentStream, isAnimated: Bool) {
         self.attachmentStream = attachmentStream
+        self.isAnimated = isAnimated
 
-        if shouldBeRenderedByYY {
+        if isAnimated {
             imageView = CVAnimatedImageView()
         } else {
             imageView = CVImageView()
@@ -524,26 +523,24 @@ public class MediaViewAdapterSticker: MediaViewAdapter {
         imageView.contentMode = .scaleAspectFit
     }
 
-    public var mediaView: UIView {
+    var shouldBeRenderedByYY: Bool {
+        isAnimated
+    }
+
+    var mediaView: UIView {
         imageView
     }
 
-    public var isLoaded: Bool {
+    var isLoaded: Bool {
         imageView.image != nil
     }
 
-    public var cacheKey: CVMediaCache.CacheKey {
+    var cacheKey: CVMediaCache.CacheKey {
         .attachment(attachmentStream.id)
     }
 
-    public func loadMedia() async throws -> AnyObject {
-        switch attachmentStream.contentType {
-        case .image, .animatedImage:
-            break
-        case .video, .audio, .file, .invalid:
-            throw ReusableMediaError.invalidMedia
-        }
-        if shouldBeRenderedByYY {
+    func loadMedia() async throws -> AnyObject {
+        if isAnimated {
             guard let animatedImage = try? attachmentStream.decryptedSDAnimatedImage() else {
                 throw OWSAssertionError("Invalid animated image.")
             }
@@ -556,10 +553,10 @@ public class MediaViewAdapterSticker: MediaViewAdapter {
         }
     }
 
-    public func applyMedia(_ media: AnyObject) {
+    func applyMedia(_ media: AnyObject) {
         AssertIsOnMainThread()
 
-        if shouldBeRenderedByYY {
+        if isAnimated {
             guard let image = media as? SDAnimatedImage else {
                 owsFailDebug("Media has unexpected type: \(type(of: media))")
                 return
@@ -574,7 +571,7 @@ public class MediaViewAdapterSticker: MediaViewAdapter {
         }
     }
 
-    public func unloadMedia() {
+    func unloadMedia() {
         AssertIsOnMainThread()
 
         imageView.image = nil

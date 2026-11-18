@@ -1,8 +1,3 @@
-//
-// Copyright 2018 Signal Messenger, LLC
-// SPDX-License-Identifier: AGPL-3.0-only
-//
-
 // DO NOT EDIT.
 // swift-format-ignore-file
 // swiftlint:disable all
@@ -20,7 +15,11 @@
 /// iOS - since we use a modern proto-compiler, we must specify
 /// the legacy proto format.
 
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
 import Foundation
+#endif
 import SwiftProtobuf
 
 // If the compiler emits an error on this type, it is because this file
@@ -28,174 +27,174 @@ import SwiftProtobuf
 // incompatible with the version of SwiftProtobuf to which you are linking.
 // Please ensure that you are building against the same version of the API
 // that was used to generate this file.
-fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAPIVersionCheck {
+fileprivate nonisolated struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAPIVersionCheck {
   struct _2: SwiftProtobuf.ProtobufAPIVersion_2 {}
   typealias Version = _2
 }
 
-struct SignalServiceProtos_Envelope: Sendable {
+nonisolated struct SignalServiceProtos_Envelope: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var type: SignalServiceProtos_Envelope.TypeEnum {
-    get {return _type ?? .unknown}
+    get {_type ?? .unknown}
     set {_type = newValue}
   }
   /// Returns true if `type` has been explicitly set.
-  var hasType: Bool {return self._type != nil}
+  var hasType: Bool {self._type != nil}
   /// Clears the value of `type`. Subsequent reads from it will return its default value.
   mutating func clearType() {self._type = nil}
 
   var sourceDevice: UInt32 {
-    get {return _sourceDevice ?? 0}
+    get {_sourceDevice ?? 0}
     set {_sourceDevice = newValue}
   }
   /// Returns true if `sourceDevice` has been explicitly set.
-  var hasSourceDevice: Bool {return self._sourceDevice != nil}
+  var hasSourceDevice: Bool {self._sourceDevice != nil}
   /// Clears the value of `sourceDevice`. Subsequent reads from it will return its default value.
   mutating func clearSourceDevice() {self._sourceDevice = nil}
 
   var destinationServiceID: String {
-    get {return _destinationServiceID ?? String()}
+    get {_destinationServiceID ?? String()}
     set {_destinationServiceID = newValue}
   }
   /// Returns true if `destinationServiceID` has been explicitly set.
-  var hasDestinationServiceID: Bool {return self._destinationServiceID != nil}
+  var hasDestinationServiceID: Bool {self._destinationServiceID != nil}
   /// Clears the value of `destinationServiceID`. Subsequent reads from it will return its default value.
   mutating func clearDestinationServiceID() {self._destinationServiceID = nil}
 
   /// @required
   var timestamp: UInt64 {
-    get {return _timestamp ?? 0}
+    get {_timestamp ?? 0}
     set {_timestamp = newValue}
   }
   /// Returns true if `timestamp` has been explicitly set.
-  var hasTimestamp: Bool {return self._timestamp != nil}
+  var hasTimestamp: Bool {self._timestamp != nil}
   /// Clears the value of `timestamp`. Subsequent reads from it will return its default value.
   mutating func clearTimestamp() {self._timestamp = nil}
 
   /// Contains an encrypted Content
   var content: Data {
-    get {return _content ?? Data()}
+    get {_content ?? Data()}
     set {_content = newValue}
   }
   /// Returns true if `content` has been explicitly set.
-  var hasContent: Bool {return self._content != nil}
+  var hasContent: Bool {self._content != nil}
   /// Clears the value of `content`. Subsequent reads from it will return its default value.
   mutating func clearContent() {self._content = nil}
 
   /// We may eventually want to make this required.
   var serverGuid: String {
-    get {return _serverGuid ?? String()}
+    get {_serverGuid ?? String()}
     set {_serverGuid = newValue}
   }
   /// Returns true if `serverGuid` has been explicitly set.
-  var hasServerGuid: Bool {return self._serverGuid != nil}
+  var hasServerGuid: Bool {self._serverGuid != nil}
   /// Clears the value of `serverGuid`. Subsequent reads from it will return its default value.
   mutating func clearServerGuid() {self._serverGuid = nil}
 
   /// We may eventually want to make this required.
   var serverTimestamp: UInt64 {
-    get {return _serverTimestamp ?? 0}
+    get {_serverTimestamp ?? 0}
     set {_serverTimestamp = newValue}
   }
   /// Returns true if `serverTimestamp` has been explicitly set.
-  var hasServerTimestamp: Bool {return self._serverTimestamp != nil}
+  var hasServerTimestamp: Bool {self._serverTimestamp != nil}
   /// Clears the value of `serverTimestamp`. Subsequent reads from it will return its default value.
   mutating func clearServerTimestamp() {self._serverTimestamp = nil}
 
   var sourceServiceID: String {
-    get {return _sourceServiceID ?? String()}
+    get {_sourceServiceID ?? String()}
     set {_sourceServiceID = newValue}
   }
   /// Returns true if `sourceServiceID` has been explicitly set.
-  var hasSourceServiceID: Bool {return self._sourceServiceID != nil}
+  var hasSourceServiceID: Bool {self._sourceServiceID != nil}
   /// Clears the value of `sourceServiceID`. Subsequent reads from it will return its default value.
   mutating func clearSourceServiceID() {self._sourceServiceID = nil}
 
   /// indicates that the content is considered timely by the sender; defaults to true so senders have to opt-out to say something isn't time critical
   var urgent: Bool {
-    get {return _urgent ?? true}
+    get {_urgent ?? true}
     set {_urgent = newValue}
   }
   /// Returns true if `urgent` has been explicitly set.
-  var hasUrgent: Bool {return self._urgent != nil}
+  var hasUrgent: Bool {self._urgent != nil}
   /// Clears the value of `urgent`. Subsequent reads from it will return its default value.
   mutating func clearUrgent() {self._urgent = nil}
 
   /// On change-number sync messages delivered to linked devices, this will
   /// contain the account's new PNI.
   var updatedPni: String {
-    get {return _updatedPni ?? String()}
+    get {_updatedPni ?? String()}
     set {_updatedPni = newValue}
   }
   /// Returns true if `updatedPni` has been explicitly set.
-  var hasUpdatedPni: Bool {return self._updatedPni != nil}
+  var hasUpdatedPni: Bool {self._updatedPni != nil}
   /// Clears the value of `updatedPni`. Subsequent reads from it will return its default value.
   mutating func clearUpdatedPni() {self._updatedPni = nil}
 
   var story: Bool {
-    get {return _story ?? false}
+    get {_story ?? false}
     set {_story = newValue}
   }
   /// Returns true if `story` has been explicitly set.
-  var hasStory: Bool {return self._story != nil}
+  var hasStory: Bool {self._story != nil}
   /// Clears the value of `story`. Subsequent reads from it will return its default value.
   mutating func clearStory() {self._story = nil}
 
   var spamReportingToken: Data {
-    get {return _spamReportingToken ?? Data()}
+    get {_spamReportingToken ?? Data()}
     set {_spamReportingToken = newValue}
   }
   /// Returns true if `spamReportingToken` has been explicitly set.
-  var hasSpamReportingToken: Bool {return self._spamReportingToken != nil}
+  var hasSpamReportingToken: Bool {self._spamReportingToken != nil}
   /// Clears the value of `spamReportingToken`. Subsequent reads from it will return its default value.
   mutating func clearSpamReportingToken() {self._spamReportingToken = nil}
 
   /// service ID binary (i.e. 16 byte UUID for ACI, 1 byte prefix + 16 byte UUID for PNI)
   var sourceServiceIDBinary: Data {
-    get {return _sourceServiceIDBinary ?? Data()}
+    get {_sourceServiceIDBinary ?? Data()}
     set {_sourceServiceIDBinary = newValue}
   }
   /// Returns true if `sourceServiceIDBinary` has been explicitly set.
-  var hasSourceServiceIDBinary: Bool {return self._sourceServiceIDBinary != nil}
+  var hasSourceServiceIDBinary: Bool {self._sourceServiceIDBinary != nil}
   /// Clears the value of `sourceServiceIDBinary`. Subsequent reads from it will return its default value.
   mutating func clearSourceServiceIDBinary() {self._sourceServiceIDBinary = nil}
 
   /// service ID binary (i.e. 16 byte UUID for ACI, 1 byte prefix + 16 byte UUID for PNI)
   var destinationServiceIDBinary: Data {
-    get {return _destinationServiceIDBinary ?? Data()}
+    get {_destinationServiceIDBinary ?? Data()}
     set {_destinationServiceIDBinary = newValue}
   }
   /// Returns true if `destinationServiceIDBinary` has been explicitly set.
-  var hasDestinationServiceIDBinary: Bool {return self._destinationServiceIDBinary != nil}
+  var hasDestinationServiceIDBinary: Bool {self._destinationServiceIDBinary != nil}
   /// Clears the value of `destinationServiceIDBinary`. Subsequent reads from it will return its default value.
   mutating func clearDestinationServiceIDBinary() {self._destinationServiceIDBinary = nil}
 
   /// 16-byte UUID
   var serverGuidBinary: Data {
-    get {return _serverGuidBinary ?? Data()}
+    get {_serverGuidBinary ?? Data()}
     set {_serverGuidBinary = newValue}
   }
   /// Returns true if `serverGuidBinary` has been explicitly set.
-  var hasServerGuidBinary: Bool {return self._serverGuidBinary != nil}
+  var hasServerGuidBinary: Bool {self._serverGuidBinary != nil}
   /// Clears the value of `serverGuidBinary`. Subsequent reads from it will return its default value.
   mutating func clearServerGuidBinary() {self._serverGuidBinary = nil}
 
   /// 16-byte UUID
   var updatedPniBinary: Data {
-    get {return _updatedPniBinary ?? Data()}
+    get {_updatedPniBinary ?? Data()}
     set {_updatedPniBinary = newValue}
   }
   /// Returns true if `updatedPniBinary` has been explicitly set.
-  var hasUpdatedPniBinary: Bool {return self._updatedPniBinary != nil}
+  var hasUpdatedPniBinary: Bool {self._updatedPniBinary != nil}
   /// Clears the value of `updatedPniBinary`. Subsequent reads from it will return its default value.
   mutating func clearUpdatedPniBinary() {self._updatedPniBinary = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+  nonisolated enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
     case unknown = 0
     case ciphertext = 1
     case prekeyBundle = 3
@@ -229,42 +228,42 @@ struct SignalServiceProtos_Envelope: Sendable {
   fileprivate var _updatedPniBinary: Data? = nil
 }
 
-struct SignalServiceProtos_TypingMessage: Sendable {
+nonisolated struct SignalServiceProtos_TypingMessage: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// @required
   var timestamp: UInt64 {
-    get {return _timestamp ?? 0}
+    get {_timestamp ?? 0}
     set {_timestamp = newValue}
   }
   /// Returns true if `timestamp` has been explicitly set.
-  var hasTimestamp: Bool {return self._timestamp != nil}
+  var hasTimestamp: Bool {self._timestamp != nil}
   /// Clears the value of `timestamp`. Subsequent reads from it will return its default value.
   mutating func clearTimestamp() {self._timestamp = nil}
 
   var action: SignalServiceProtos_TypingMessage.Action {
-    get {return _action ?? .started}
+    get {_action ?? .started}
     set {_action = newValue}
   }
   /// Returns true if `action` has been explicitly set.
-  var hasAction: Bool {return self._action != nil}
+  var hasAction: Bool {self._action != nil}
   /// Clears the value of `action`. Subsequent reads from it will return its default value.
   mutating func clearAction() {self._action = nil}
 
   var groupID: Data {
-    get {return _groupID ?? Data()}
+    get {_groupID ?? Data()}
     set {_groupID = newValue}
   }
   /// Returns true if `groupID` has been explicitly set.
-  var hasGroupID: Bool {return self._groupID != nil}
+  var hasGroupID: Bool {self._groupID != nil}
   /// Clears the value of `groupID`. Subsequent reads from it will return its default value.
   mutating func clearGroupID() {self._groupID = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum Action: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+  nonisolated enum Action: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
     case started = 0
     case stopped = 1
 
@@ -281,60 +280,60 @@ struct SignalServiceProtos_TypingMessage: Sendable {
   fileprivate var _groupID: Data? = nil
 }
 
-struct SignalServiceProtos_StoryMessage: @unchecked Sendable {
+nonisolated struct SignalServiceProtos_StoryMessage: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var profileKey: Data {
-    get {return _storage._profileKey ?? Data()}
+    get {_storage._profileKey ?? Data()}
     set {_uniqueStorage()._profileKey = newValue}
   }
   /// Returns true if `profileKey` has been explicitly set.
-  var hasProfileKey: Bool {return _storage._profileKey != nil}
+  var hasProfileKey: Bool {_storage._profileKey != nil}
   /// Clears the value of `profileKey`. Subsequent reads from it will return its default value.
   mutating func clearProfileKey() {_uniqueStorage()._profileKey = nil}
 
   var group: SignalServiceProtos_GroupContextV2 {
-    get {return _storage._group ?? SignalServiceProtos_GroupContextV2()}
+    get {_storage._group ?? SignalServiceProtos_GroupContextV2()}
     set {_uniqueStorage()._group = newValue}
   }
   /// Returns true if `group` has been explicitly set.
-  var hasGroup: Bool {return _storage._group != nil}
+  var hasGroup: Bool {_storage._group != nil}
   /// Clears the value of `group`. Subsequent reads from it will return its default value.
   mutating func clearGroup() {_uniqueStorage()._group = nil}
 
   /// oneof attachment {
   var fileAttachment: SignalServiceProtos_AttachmentPointer {
-    get {return _storage._fileAttachment ?? SignalServiceProtos_AttachmentPointer()}
+    get {_storage._fileAttachment ?? SignalServiceProtos_AttachmentPointer()}
     set {_uniqueStorage()._fileAttachment = newValue}
   }
   /// Returns true if `fileAttachment` has been explicitly set.
-  var hasFileAttachment: Bool {return _storage._fileAttachment != nil}
+  var hasFileAttachment: Bool {_storage._fileAttachment != nil}
   /// Clears the value of `fileAttachment`. Subsequent reads from it will return its default value.
   mutating func clearFileAttachment() {_uniqueStorage()._fileAttachment = nil}
 
   var textAttachment: SignalServiceProtos_TextAttachment {
-    get {return _storage._textAttachment ?? SignalServiceProtos_TextAttachment()}
+    get {_storage._textAttachment ?? SignalServiceProtos_TextAttachment()}
     set {_uniqueStorage()._textAttachment = newValue}
   }
   /// Returns true if `textAttachment` has been explicitly set.
-  var hasTextAttachment: Bool {return _storage._textAttachment != nil}
+  var hasTextAttachment: Bool {_storage._textAttachment != nil}
   /// Clears the value of `textAttachment`. Subsequent reads from it will return its default value.
   mutating func clearTextAttachment() {_uniqueStorage()._textAttachment = nil}
 
   /// }
   var allowsReplies: Bool {
-    get {return _storage._allowsReplies ?? false}
+    get {_storage._allowsReplies ?? false}
     set {_uniqueStorage()._allowsReplies = newValue}
   }
   /// Returns true if `allowsReplies` has been explicitly set.
-  var hasAllowsReplies: Bool {return _storage._allowsReplies != nil}
+  var hasAllowsReplies: Bool {_storage._allowsReplies != nil}
   /// Clears the value of `allowsReplies`. Subsequent reads from it will return its default value.
   mutating func clearAllowsReplies() {_uniqueStorage()._allowsReplies = nil}
 
   var bodyRanges: [SignalServiceProtos_BodyRange] {
-    get {return _storage._bodyRanges}
+    get {_storage._bodyRanges}
     set {_uniqueStorage()._bodyRanges = newValue}
   }
 
@@ -345,138 +344,142 @@ struct SignalServiceProtos_StoryMessage: @unchecked Sendable {
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
-struct SignalServiceProtos_Preview: @unchecked Sendable {
+nonisolated struct SignalServiceProtos_Preview: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// @required
   var url: String {
-    get {return _storage._url ?? String()}
-    set {_uniqueStorage()._url = newValue}
+    get {_url ?? String()}
+    set {_url = newValue}
   }
   /// Returns true if `url` has been explicitly set.
-  var hasURL: Bool {return _storage._url != nil}
+  var hasURL: Bool {self._url != nil}
   /// Clears the value of `url`. Subsequent reads from it will return its default value.
-  mutating func clearURL() {_uniqueStorage()._url = nil}
+  mutating func clearURL() {self._url = nil}
 
   var title: String {
-    get {return _storage._title ?? String()}
-    set {_uniqueStorage()._title = newValue}
+    get {_title ?? String()}
+    set {_title = newValue}
   }
   /// Returns true if `title` has been explicitly set.
-  var hasTitle: Bool {return _storage._title != nil}
+  var hasTitle: Bool {self._title != nil}
   /// Clears the value of `title`. Subsequent reads from it will return its default value.
-  mutating func clearTitle() {_uniqueStorage()._title = nil}
+  mutating func clearTitle() {self._title = nil}
 
   var image: SignalServiceProtos_AttachmentPointer {
-    get {return _storage._image ?? SignalServiceProtos_AttachmentPointer()}
-    set {_uniqueStorage()._image = newValue}
+    get {_image ?? SignalServiceProtos_AttachmentPointer()}
+    set {_image = newValue}
   }
   /// Returns true if `image` has been explicitly set.
-  var hasImage: Bool {return _storage._image != nil}
+  var hasImage: Bool {self._image != nil}
   /// Clears the value of `image`. Subsequent reads from it will return its default value.
-  mutating func clearImage() {_uniqueStorage()._image = nil}
+  mutating func clearImage() {self._image = nil}
 
   var previewDescription: String {
-    get {return _storage._previewDescription ?? String()}
-    set {_uniqueStorage()._previewDescription = newValue}
+    get {_previewDescription ?? String()}
+    set {_previewDescription = newValue}
   }
   /// Returns true if `previewDescription` has been explicitly set.
-  var hasPreviewDescription: Bool {return _storage._previewDescription != nil}
+  var hasPreviewDescription: Bool {self._previewDescription != nil}
   /// Clears the value of `previewDescription`. Subsequent reads from it will return its default value.
-  mutating func clearPreviewDescription() {_uniqueStorage()._previewDescription = nil}
+  mutating func clearPreviewDescription() {self._previewDescription = nil}
 
   var date: UInt64 {
-    get {return _storage._date ?? 0}
-    set {_uniqueStorage()._date = newValue}
+    get {_date ?? 0}
+    set {_date = newValue}
   }
   /// Returns true if `date` has been explicitly set.
-  var hasDate: Bool {return _storage._date != nil}
+  var hasDate: Bool {self._date != nil}
   /// Clears the value of `date`. Subsequent reads from it will return its default value.
-  mutating func clearDate() {_uniqueStorage()._date = nil}
+  mutating func clearDate() {self._date = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
 
-  fileprivate var _storage = _StorageClass.defaultInstance
+  fileprivate var _url: String? = nil
+  fileprivate var _title: String? = nil
+  fileprivate var _image: SignalServiceProtos_AttachmentPointer? = nil
+  fileprivate var _previewDescription: String? = nil
+  fileprivate var _date: UInt64? = nil
 }
 
-struct SignalServiceProtos_TextAttachment: Sendable {
+nonisolated struct SignalServiceProtos_TextAttachment: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var text: String {
-    get {return _text ?? String()}
+    get {_text ?? String()}
     set {_text = newValue}
   }
   /// Returns true if `text` has been explicitly set.
-  var hasText: Bool {return self._text != nil}
+  var hasText: Bool {self._text != nil}
   /// Clears the value of `text`. Subsequent reads from it will return its default value.
   mutating func clearText() {self._text = nil}
 
   var textStyle: SignalServiceProtos_TextAttachment.Style {
-    get {return _textStyle ?? .default}
+    get {_textStyle ?? .default}
     set {_textStyle = newValue}
   }
   /// Returns true if `textStyle` has been explicitly set.
-  var hasTextStyle: Bool {return self._textStyle != nil}
+  var hasTextStyle: Bool {self._textStyle != nil}
   /// Clears the value of `textStyle`. Subsequent reads from it will return its default value.
   mutating func clearTextStyle() {self._textStyle = nil}
 
   /// integer representation of hex color
   var textForegroundColor: UInt32 {
-    get {return _textForegroundColor ?? 0}
+    get {_textForegroundColor ?? 0}
     set {_textForegroundColor = newValue}
   }
   /// Returns true if `textForegroundColor` has been explicitly set.
-  var hasTextForegroundColor: Bool {return self._textForegroundColor != nil}
+  var hasTextForegroundColor: Bool {self._textForegroundColor != nil}
   /// Clears the value of `textForegroundColor`. Subsequent reads from it will return its default value.
   mutating func clearTextForegroundColor() {self._textForegroundColor = nil}
 
   var textBackgroundColor: UInt32 {
-    get {return _textBackgroundColor ?? 0}
+    get {_textBackgroundColor ?? 0}
     set {_textBackgroundColor = newValue}
   }
   /// Returns true if `textBackgroundColor` has been explicitly set.
-  var hasTextBackgroundColor: Bool {return self._textBackgroundColor != nil}
+  var hasTextBackgroundColor: Bool {self._textBackgroundColor != nil}
   /// Clears the value of `textBackgroundColor`. Subsequent reads from it will return its default value.
   mutating func clearTextBackgroundColor() {self._textBackgroundColor = nil}
 
   var preview: SignalServiceProtos_Preview {
-    get {return _preview ?? SignalServiceProtos_Preview()}
+    get {_preview ?? SignalServiceProtos_Preview()}
     set {_preview = newValue}
   }
   /// Returns true if `preview` has been explicitly set.
-  var hasPreview: Bool {return self._preview != nil}
+  var hasPreview: Bool {self._preview != nil}
   /// Clears the value of `preview`. Subsequent reads from it will return its default value.
   mutating func clearPreview() {self._preview = nil}
 
   /// oneof background {
   var gradient: SignalServiceProtos_TextAttachment.Gradient {
-    get {return _gradient ?? SignalServiceProtos_TextAttachment.Gradient()}
+    get {_gradient ?? SignalServiceProtos_TextAttachment.Gradient()}
     set {_gradient = newValue}
   }
   /// Returns true if `gradient` has been explicitly set.
-  var hasGradient: Bool {return self._gradient != nil}
+  var hasGradient: Bool {self._gradient != nil}
   /// Clears the value of `gradient`. Subsequent reads from it will return its default value.
   mutating func clearGradient() {self._gradient = nil}
 
   /// }
   var color: UInt32 {
-    get {return _color ?? 0}
+    get {_color ?? 0}
     set {_color = newValue}
   }
   /// Returns true if `color` has been explicitly set.
-  var hasColor: Bool {return self._color != nil}
+  var hasColor: Bool {self._color != nil}
   /// Clears the value of `color`. Subsequent reads from it will return its default value.
   mutating func clearColor() {self._color = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum Style: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+  nonisolated enum Style: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
     case `default` = 0
     case regular = 1
     case bold = 2
@@ -490,38 +493,38 @@ struct SignalServiceProtos_TextAttachment: Sendable {
 
   }
 
-  struct Gradient: Sendable {
+  nonisolated struct Gradient: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// deprecated: this field will be removed in a future release.
     var startColor: UInt32 {
-      get {return _startColor ?? 0}
+      get {_startColor ?? 0}
       set {_startColor = newValue}
     }
     /// Returns true if `startColor` has been explicitly set.
-    var hasStartColor: Bool {return self._startColor != nil}
+    var hasStartColor: Bool {self._startColor != nil}
     /// Clears the value of `startColor`. Subsequent reads from it will return its default value.
     mutating func clearStartColor() {self._startColor = nil}
 
     /// deprecated: this field will be removed in a future release.
     var endColor: UInt32 {
-      get {return _endColor ?? 0}
+      get {_endColor ?? 0}
       set {_endColor = newValue}
     }
     /// Returns true if `endColor` has been explicitly set.
-    var hasEndColor: Bool {return self._endColor != nil}
+    var hasEndColor: Bool {self._endColor != nil}
     /// Clears the value of `endColor`. Subsequent reads from it will return its default value.
     mutating func clearEndColor() {self._endColor = nil}
 
     /// degrees
     var angle: UInt32 {
-      get {return _angle ?? 0}
+      get {_angle ?? 0}
       set {_angle = newValue}
     }
     /// Returns true if `angle` has been explicitly set.
-    var hasAngle: Bool {return self._angle != nil}
+    var hasAngle: Bool {self._angle != nil}
     /// Clears the value of `angle`. Subsequent reads from it will return its default value.
     mutating func clearAngle() {self._angle = nil}
 
@@ -550,109 +553,109 @@ struct SignalServiceProtos_TextAttachment: Sendable {
   fileprivate var _color: UInt32? = nil
 }
 
-struct SignalServiceProtos_Content: @unchecked Sendable {
+nonisolated struct SignalServiceProtos_Content: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var dataMessage: SignalServiceProtos_DataMessage {
-    get {return _storage._dataMessage ?? SignalServiceProtos_DataMessage()}
+    get {_storage._dataMessage ?? SignalServiceProtos_DataMessage()}
     set {_uniqueStorage()._dataMessage = newValue}
   }
   /// Returns true if `dataMessage` has been explicitly set.
-  var hasDataMessage: Bool {return _storage._dataMessage != nil}
+  var hasDataMessage: Bool {_storage._dataMessage != nil}
   /// Clears the value of `dataMessage`. Subsequent reads from it will return its default value.
   mutating func clearDataMessage() {_uniqueStorage()._dataMessage = nil}
 
   var syncMessage: SignalServiceProtos_SyncMessage {
-    get {return _storage._syncMessage ?? SignalServiceProtos_SyncMessage()}
+    get {_storage._syncMessage ?? SignalServiceProtos_SyncMessage()}
     set {_uniqueStorage()._syncMessage = newValue}
   }
   /// Returns true if `syncMessage` has been explicitly set.
-  var hasSyncMessage: Bool {return _storage._syncMessage != nil}
+  var hasSyncMessage: Bool {_storage._syncMessage != nil}
   /// Clears the value of `syncMessage`. Subsequent reads from it will return its default value.
   mutating func clearSyncMessage() {_uniqueStorage()._syncMessage = nil}
 
   var callMessage: SignalServiceProtos_CallMessage {
-    get {return _storage._callMessage ?? SignalServiceProtos_CallMessage()}
+    get {_storage._callMessage ?? SignalServiceProtos_CallMessage()}
     set {_uniqueStorage()._callMessage = newValue}
   }
   /// Returns true if `callMessage` has been explicitly set.
-  var hasCallMessage: Bool {return _storage._callMessage != nil}
+  var hasCallMessage: Bool {_storage._callMessage != nil}
   /// Clears the value of `callMessage`. Subsequent reads from it will return its default value.
   mutating func clearCallMessage() {_uniqueStorage()._callMessage = nil}
 
   var nullMessage: SignalServiceProtos_NullMessage {
-    get {return _storage._nullMessage ?? SignalServiceProtos_NullMessage()}
+    get {_storage._nullMessage ?? SignalServiceProtos_NullMessage()}
     set {_uniqueStorage()._nullMessage = newValue}
   }
   /// Returns true if `nullMessage` has been explicitly set.
-  var hasNullMessage: Bool {return _storage._nullMessage != nil}
+  var hasNullMessage: Bool {_storage._nullMessage != nil}
   /// Clears the value of `nullMessage`. Subsequent reads from it will return its default value.
   mutating func clearNullMessage() {_uniqueStorage()._nullMessage = nil}
 
   var receiptMessage: SignalServiceProtos_ReceiptMessage {
-    get {return _storage._receiptMessage ?? SignalServiceProtos_ReceiptMessage()}
+    get {_storage._receiptMessage ?? SignalServiceProtos_ReceiptMessage()}
     set {_uniqueStorage()._receiptMessage = newValue}
   }
   /// Returns true if `receiptMessage` has been explicitly set.
-  var hasReceiptMessage: Bool {return _storage._receiptMessage != nil}
+  var hasReceiptMessage: Bool {_storage._receiptMessage != nil}
   /// Clears the value of `receiptMessage`. Subsequent reads from it will return its default value.
   mutating func clearReceiptMessage() {_uniqueStorage()._receiptMessage = nil}
 
   var typingMessage: SignalServiceProtos_TypingMessage {
-    get {return _storage._typingMessage ?? SignalServiceProtos_TypingMessage()}
+    get {_storage._typingMessage ?? SignalServiceProtos_TypingMessage()}
     set {_uniqueStorage()._typingMessage = newValue}
   }
   /// Returns true if `typingMessage` has been explicitly set.
-  var hasTypingMessage: Bool {return _storage._typingMessage != nil}
+  var hasTypingMessage: Bool {_storage._typingMessage != nil}
   /// Clears the value of `typingMessage`. Subsequent reads from it will return its default value.
   mutating func clearTypingMessage() {_uniqueStorage()._typingMessage = nil}
 
   /// Serialized SKDM
   var senderKeyDistributionMessage: Data {
-    get {return _storage._senderKeyDistributionMessage ?? Data()}
+    get {_storage._senderKeyDistributionMessage ?? Data()}
     set {_uniqueStorage()._senderKeyDistributionMessage = newValue}
   }
   /// Returns true if `senderKeyDistributionMessage` has been explicitly set.
-  var hasSenderKeyDistributionMessage: Bool {return _storage._senderKeyDistributionMessage != nil}
+  var hasSenderKeyDistributionMessage: Bool {_storage._senderKeyDistributionMessage != nil}
   /// Clears the value of `senderKeyDistributionMessage`. Subsequent reads from it will return its default value.
   mutating func clearSenderKeyDistributionMessage() {_uniqueStorage()._senderKeyDistributionMessage = nil}
 
   /// Serialized decryption error
   var decryptionErrorMessage: Data {
-    get {return _storage._decryptionErrorMessage ?? Data()}
+    get {_storage._decryptionErrorMessage ?? Data()}
     set {_uniqueStorage()._decryptionErrorMessage = newValue}
   }
   /// Returns true if `decryptionErrorMessage` has been explicitly set.
-  var hasDecryptionErrorMessage: Bool {return _storage._decryptionErrorMessage != nil}
+  var hasDecryptionErrorMessage: Bool {_storage._decryptionErrorMessage != nil}
   /// Clears the value of `decryptionErrorMessage`. Subsequent reads from it will return its default value.
   mutating func clearDecryptionErrorMessage() {_uniqueStorage()._decryptionErrorMessage = nil}
 
   var storyMessage: SignalServiceProtos_StoryMessage {
-    get {return _storage._storyMessage ?? SignalServiceProtos_StoryMessage()}
+    get {_storage._storyMessage ?? SignalServiceProtos_StoryMessage()}
     set {_uniqueStorage()._storyMessage = newValue}
   }
   /// Returns true if `storyMessage` has been explicitly set.
-  var hasStoryMessage: Bool {return _storage._storyMessage != nil}
+  var hasStoryMessage: Bool {_storage._storyMessage != nil}
   /// Clears the value of `storyMessage`. Subsequent reads from it will return its default value.
   mutating func clearStoryMessage() {_uniqueStorage()._storyMessage = nil}
 
   var pniSignatureMessage: SignalServiceProtos_PniSignatureMessage {
-    get {return _storage._pniSignatureMessage ?? SignalServiceProtos_PniSignatureMessage()}
+    get {_storage._pniSignatureMessage ?? SignalServiceProtos_PniSignatureMessage()}
     set {_uniqueStorage()._pniSignatureMessage = newValue}
   }
   /// Returns true if `pniSignatureMessage` has been explicitly set.
-  var hasPniSignatureMessage: Bool {return _storage._pniSignatureMessage != nil}
+  var hasPniSignatureMessage: Bool {_storage._pniSignatureMessage != nil}
   /// Clears the value of `pniSignatureMessage`. Subsequent reads from it will return its default value.
   mutating func clearPniSignatureMessage() {_uniqueStorage()._pniSignatureMessage = nil}
 
   var editMessage: SignalServiceProtos_EditMessage {
-    get {return _storage._editMessage ?? SignalServiceProtos_EditMessage()}
+    get {_storage._editMessage ?? SignalServiceProtos_EditMessage()}
     set {_uniqueStorage()._editMessage = newValue}
   }
   /// Returns true if `editMessage` has been explicitly set.
-  var hasEditMessage: Bool {return _storage._editMessage != nil}
+  var hasEditMessage: Bool {_storage._editMessage != nil}
   /// Clears the value of `editMessage`. Subsequent reads from it will return its default value.
   mutating func clearEditMessage() {_uniqueStorage()._editMessage = nil}
 
@@ -663,114 +666,114 @@ struct SignalServiceProtos_Content: @unchecked Sendable {
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
-struct SignalServiceProtos_CallMessage: Sendable {
+nonisolated struct SignalServiceProtos_CallMessage: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var offer: SignalServiceProtos_CallMessage.Offer {
-    get {return _offer ?? SignalServiceProtos_CallMessage.Offer()}
+    get {_offer ?? SignalServiceProtos_CallMessage.Offer()}
     set {_offer = newValue}
   }
   /// Returns true if `offer` has been explicitly set.
-  var hasOffer: Bool {return self._offer != nil}
+  var hasOffer: Bool {self._offer != nil}
   /// Clears the value of `offer`. Subsequent reads from it will return its default value.
   mutating func clearOffer() {self._offer = nil}
 
   var answer: SignalServiceProtos_CallMessage.Answer {
-    get {return _answer ?? SignalServiceProtos_CallMessage.Answer()}
+    get {_answer ?? SignalServiceProtos_CallMessage.Answer()}
     set {_answer = newValue}
   }
   /// Returns true if `answer` has been explicitly set.
-  var hasAnswer: Bool {return self._answer != nil}
+  var hasAnswer: Bool {self._answer != nil}
   /// Clears the value of `answer`. Subsequent reads from it will return its default value.
   mutating func clearAnswer() {self._answer = nil}
 
   var iceUpdate: [SignalServiceProtos_CallMessage.IceUpdate] = []
 
   var busy: SignalServiceProtos_CallMessage.Busy {
-    get {return _busy ?? SignalServiceProtos_CallMessage.Busy()}
+    get {_busy ?? SignalServiceProtos_CallMessage.Busy()}
     set {_busy = newValue}
   }
   /// Returns true if `busy` has been explicitly set.
-  var hasBusy: Bool {return self._busy != nil}
+  var hasBusy: Bool {self._busy != nil}
   /// Clears the value of `busy`. Subsequent reads from it will return its default value.
   mutating func clearBusy() {self._busy = nil}
 
   var profileKey: Data {
-    get {return _profileKey ?? Data()}
+    get {_profileKey ?? Data()}
     set {_profileKey = newValue}
   }
   /// Returns true if `profileKey` has been explicitly set.
-  var hasProfileKey: Bool {return self._profileKey != nil}
+  var hasProfileKey: Bool {self._profileKey != nil}
   /// Clears the value of `profileKey`. Subsequent reads from it will return its default value.
   mutating func clearProfileKey() {self._profileKey = nil}
 
   var hangup: SignalServiceProtos_CallMessage.Hangup {
-    get {return _hangup ?? SignalServiceProtos_CallMessage.Hangup()}
+    get {_hangup ?? SignalServiceProtos_CallMessage.Hangup()}
     set {_hangup = newValue}
   }
   /// Returns true if `hangup` has been explicitly set.
-  var hasHangup: Bool {return self._hangup != nil}
+  var hasHangup: Bool {self._hangup != nil}
   /// Clears the value of `hangup`. Subsequent reads from it will return its default value.
   mutating func clearHangup() {self._hangup = nil}
 
   var destinationDeviceID: UInt32 {
-    get {return _destinationDeviceID ?? 0}
+    get {_destinationDeviceID ?? 0}
     set {_destinationDeviceID = newValue}
   }
   /// Returns true if `destinationDeviceID` has been explicitly set.
-  var hasDestinationDeviceID: Bool {return self._destinationDeviceID != nil}
+  var hasDestinationDeviceID: Bool {self._destinationDeviceID != nil}
   /// Clears the value of `destinationDeviceID`. Subsequent reads from it will return its default value.
   mutating func clearDestinationDeviceID() {self._destinationDeviceID = nil}
 
   var opaque: SignalServiceProtos_CallMessage.Opaque {
-    get {return _opaque ?? SignalServiceProtos_CallMessage.Opaque()}
+    get {_opaque ?? SignalServiceProtos_CallMessage.Opaque()}
     set {_opaque = newValue}
   }
   /// Returns true if `opaque` has been explicitly set.
-  var hasOpaque: Bool {return self._opaque != nil}
+  var hasOpaque: Bool {self._opaque != nil}
   /// Clears the value of `opaque`. Subsequent reads from it will return its default value.
   mutating func clearOpaque() {self._opaque = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  struct Offer: Sendable {
+  nonisolated struct Offer: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// @required
     var id: UInt64 {
-      get {return _id ?? 0}
+      get {_id ?? 0}
       set {_id = newValue}
     }
     /// Returns true if `id` has been explicitly set.
-    var hasID: Bool {return self._id != nil}
+    var hasID: Bool {self._id != nil}
     /// Clears the value of `id`. Subsequent reads from it will return its default value.
     mutating func clearID() {self._id = nil}
 
     var type: SignalServiceProtos_CallMessage.Offer.TypeEnum {
-      get {return _type ?? .offerAudioCall}
+      get {_type ?? .offerAudioCall}
       set {_type = newValue}
     }
     /// Returns true if `type` has been explicitly set.
-    var hasType: Bool {return self._type != nil}
+    var hasType: Bool {self._type != nil}
     /// Clears the value of `type`. Subsequent reads from it will return its default value.
     mutating func clearType() {self._type = nil}
 
     var opaque: Data {
-      get {return _opaque ?? Data()}
+      get {_opaque ?? Data()}
       set {_opaque = newValue}
     }
     /// Returns true if `opaque` has been explicitly set.
-    var hasOpaque: Bool {return self._opaque != nil}
+    var hasOpaque: Bool {self._opaque != nil}
     /// Clears the value of `opaque`. Subsequent reads from it will return its default value.
     mutating func clearOpaque() {self._opaque = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+    nonisolated enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
       case offerAudioCall = 0
 
       /// next index 3, skip 2 – it was the unused "NEED_PERMISSION" type
@@ -789,27 +792,27 @@ struct SignalServiceProtos_CallMessage: Sendable {
     fileprivate var _opaque: Data? = nil
   }
 
-  struct Answer: Sendable {
+  nonisolated struct Answer: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// @required
     var id: UInt64 {
-      get {return _id ?? 0}
+      get {_id ?? 0}
       set {_id = newValue}
     }
     /// Returns true if `id` has been explicitly set.
-    var hasID: Bool {return self._id != nil}
+    var hasID: Bool {self._id != nil}
     /// Clears the value of `id`. Subsequent reads from it will return its default value.
     mutating func clearID() {self._id = nil}
 
     var opaque: Data {
-      get {return _opaque ?? Data()}
+      get {_opaque ?? Data()}
       set {_opaque = newValue}
     }
     /// Returns true if `opaque` has been explicitly set.
-    var hasOpaque: Bool {return self._opaque != nil}
+    var hasOpaque: Bool {self._opaque != nil}
     /// Clears the value of `opaque`. Subsequent reads from it will return its default value.
     mutating func clearOpaque() {self._opaque = nil}
 
@@ -821,27 +824,27 @@ struct SignalServiceProtos_CallMessage: Sendable {
     fileprivate var _opaque: Data? = nil
   }
 
-  struct IceUpdate: Sendable {
+  nonisolated struct IceUpdate: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// @required
     var id: UInt64 {
-      get {return _id ?? 0}
+      get {_id ?? 0}
       set {_id = newValue}
     }
     /// Returns true if `id` has been explicitly set.
-    var hasID: Bool {return self._id != nil}
+    var hasID: Bool {self._id != nil}
     /// Clears the value of `id`. Subsequent reads from it will return its default value.
     mutating func clearID() {self._id = nil}
 
     var opaque: Data {
-      get {return _opaque ?? Data()}
+      get {_opaque ?? Data()}
       set {_opaque = newValue}
     }
     /// Returns true if `opaque` has been explicitly set.
-    var hasOpaque: Bool {return self._opaque != nil}
+    var hasOpaque: Bool {self._opaque != nil}
     /// Clears the value of `opaque`. Subsequent reads from it will return its default value.
     mutating func clearOpaque() {self._opaque = nil}
 
@@ -853,18 +856,18 @@ struct SignalServiceProtos_CallMessage: Sendable {
     fileprivate var _opaque: Data? = nil
   }
 
-  struct Busy: Sendable {
+  nonisolated struct Busy: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// @required
     var id: UInt64 {
-      get {return _id ?? 0}
+      get {_id ?? 0}
       set {_id = newValue}
     }
     /// Returns true if `id` has been explicitly set.
-    var hasID: Bool {return self._id != nil}
+    var hasID: Bool {self._id != nil}
     /// Clears the value of `id`. Subsequent reads from it will return its default value.
     mutating func clearID() {self._id = nil}
 
@@ -875,42 +878,42 @@ struct SignalServiceProtos_CallMessage: Sendable {
     fileprivate var _id: UInt64? = nil
   }
 
-  struct Hangup: Sendable {
+  nonisolated struct Hangup: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// @required
     var id: UInt64 {
-      get {return _id ?? 0}
+      get {_id ?? 0}
       set {_id = newValue}
     }
     /// Returns true if `id` has been explicitly set.
-    var hasID: Bool {return self._id != nil}
+    var hasID: Bool {self._id != nil}
     /// Clears the value of `id`. Subsequent reads from it will return its default value.
     mutating func clearID() {self._id = nil}
 
     var type: SignalServiceProtos_CallMessage.Hangup.TypeEnum {
-      get {return _type ?? .hangupNormal}
+      get {_type ?? .hangupNormal}
       set {_type = newValue}
     }
     /// Returns true if `type` has been explicitly set.
-    var hasType: Bool {return self._type != nil}
+    var hasType: Bool {self._type != nil}
     /// Clears the value of `type`. Subsequent reads from it will return its default value.
     mutating func clearType() {self._type = nil}
 
     var deviceID: UInt32 {
-      get {return _deviceID ?? 0}
+      get {_deviceID ?? 0}
       set {_deviceID = newValue}
     }
     /// Returns true if `deviceID` has been explicitly set.
-    var hasDeviceID: Bool {return self._deviceID != nil}
+    var hasDeviceID: Bool {self._deviceID != nil}
     /// Clears the value of `deviceID`. Subsequent reads from it will return its default value.
     mutating func clearDeviceID() {self._deviceID = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+    nonisolated enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
       case hangupNormal = 0
       case hangupAccepted = 1
       case hangupDeclined = 2
@@ -930,32 +933,32 @@ struct SignalServiceProtos_CallMessage: Sendable {
     fileprivate var _deviceID: UInt32? = nil
   }
 
-  struct Opaque: Sendable {
+  nonisolated struct Opaque: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var data: Data {
-      get {return _data ?? Data()}
+      get {_data ?? Data()}
       set {_data = newValue}
     }
     /// Returns true if `data` has been explicitly set.
-    var hasData: Bool {return self._data != nil}
+    var hasData: Bool {self._data != nil}
     /// Clears the value of `data`. Subsequent reads from it will return its default value.
     mutating func clearData() {self._data = nil}
 
     var urgency: SignalServiceProtos_CallMessage.Opaque.Urgency {
-      get {return _urgency ?? .droppable}
+      get {_urgency ?? .droppable}
       set {_urgency = newValue}
     }
     /// Returns true if `urgency` has been explicitly set.
-    var hasUrgency: Bool {return self._urgency != nil}
+    var hasUrgency: Bool {self._urgency != nil}
     /// Clears the value of `urgency`. Subsequent reads from it will return its default value.
     mutating func clearUrgency() {self._urgency = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    enum Urgency: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+    nonisolated enum Urgency: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
       case droppable = 0
       case handleImmediately = 1
 
@@ -982,226 +985,252 @@ struct SignalServiceProtos_CallMessage: Sendable {
   fileprivate var _opaque: SignalServiceProtos_CallMessage.Opaque? = nil
 }
 
-struct SignalServiceProtos_DataMessage: @unchecked Sendable {
+nonisolated struct SignalServiceProtos_DataMessage: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var body: String {
-    get {return _storage._body ?? String()}
+    get {_storage._body ?? String()}
     set {_uniqueStorage()._body = newValue}
   }
   /// Returns true if `body` has been explicitly set.
-  var hasBody: Bool {return _storage._body != nil}
+  var hasBody: Bool {_storage._body != nil}
   /// Clears the value of `body`. Subsequent reads from it will return its default value.
   mutating func clearBody() {_uniqueStorage()._body = nil}
 
   var attachments: [SignalServiceProtos_AttachmentPointer] {
-    get {return _storage._attachments}
+    get {_storage._attachments}
     set {_uniqueStorage()._attachments = newValue}
   }
 
   var groupV2: SignalServiceProtos_GroupContextV2 {
-    get {return _storage._groupV2 ?? SignalServiceProtos_GroupContextV2()}
+    get {_storage._groupV2 ?? SignalServiceProtos_GroupContextV2()}
     set {_uniqueStorage()._groupV2 = newValue}
   }
   /// Returns true if `groupV2` has been explicitly set.
-  var hasGroupV2: Bool {return _storage._groupV2 != nil}
+  var hasGroupV2: Bool {_storage._groupV2 != nil}
   /// Clears the value of `groupV2`. Subsequent reads from it will return its default value.
   mutating func clearGroupV2() {_uniqueStorage()._groupV2 = nil}
 
   var flags: UInt32 {
-    get {return _storage._flags ?? 0}
+    get {_storage._flags ?? 0}
     set {_uniqueStorage()._flags = newValue}
   }
   /// Returns true if `flags` has been explicitly set.
-  var hasFlags: Bool {return _storage._flags != nil}
+  var hasFlags: Bool {_storage._flags != nil}
   /// Clears the value of `flags`. Subsequent reads from it will return its default value.
   mutating func clearFlags() {_uniqueStorage()._flags = nil}
 
   var expireTimer: UInt32 {
-    get {return _storage._expireTimer ?? 0}
+    get {_storage._expireTimer ?? 0}
     set {_uniqueStorage()._expireTimer = newValue}
   }
   /// Returns true if `expireTimer` has been explicitly set.
-  var hasExpireTimer: Bool {return _storage._expireTimer != nil}
+  var hasExpireTimer: Bool {_storage._expireTimer != nil}
   /// Clears the value of `expireTimer`. Subsequent reads from it will return its default value.
   mutating func clearExpireTimer() {_uniqueStorage()._expireTimer = nil}
 
   var expireTimerVersion: UInt32 {
-    get {return _storage._expireTimerVersion ?? 0}
+    get {_storage._expireTimerVersion ?? 0}
     set {_uniqueStorage()._expireTimerVersion = newValue}
   }
   /// Returns true if `expireTimerVersion` has been explicitly set.
-  var hasExpireTimerVersion: Bool {return _storage._expireTimerVersion != nil}
+  var hasExpireTimerVersion: Bool {_storage._expireTimerVersion != nil}
   /// Clears the value of `expireTimerVersion`. Subsequent reads from it will return its default value.
   mutating func clearExpireTimerVersion() {_uniqueStorage()._expireTimerVersion = nil}
 
   var profileKey: Data {
-    get {return _storage._profileKey ?? Data()}
+    get {_storage._profileKey ?? Data()}
     set {_uniqueStorage()._profileKey = newValue}
   }
   /// Returns true if `profileKey` has been explicitly set.
-  var hasProfileKey: Bool {return _storage._profileKey != nil}
+  var hasProfileKey: Bool {_storage._profileKey != nil}
   /// Clears the value of `profileKey`. Subsequent reads from it will return its default value.
   mutating func clearProfileKey() {_uniqueStorage()._profileKey = nil}
 
   var timestamp: UInt64 {
-    get {return _storage._timestamp ?? 0}
+    get {_storage._timestamp ?? 0}
     set {_uniqueStorage()._timestamp = newValue}
   }
   /// Returns true if `timestamp` has been explicitly set.
-  var hasTimestamp: Bool {return _storage._timestamp != nil}
+  var hasTimestamp: Bool {_storage._timestamp != nil}
   /// Clears the value of `timestamp`. Subsequent reads from it will return its default value.
   mutating func clearTimestamp() {_uniqueStorage()._timestamp = nil}
 
   var quote: SignalServiceProtos_DataMessage.Quote {
-    get {return _storage._quote ?? SignalServiceProtos_DataMessage.Quote()}
+    get {_storage._quote ?? SignalServiceProtos_DataMessage.Quote()}
     set {_uniqueStorage()._quote = newValue}
   }
   /// Returns true if `quote` has been explicitly set.
-  var hasQuote: Bool {return _storage._quote != nil}
+  var hasQuote: Bool {_storage._quote != nil}
   /// Clears the value of `quote`. Subsequent reads from it will return its default value.
   mutating func clearQuote() {_uniqueStorage()._quote = nil}
 
   var contact: [SignalServiceProtos_DataMessage.Contact] {
-    get {return _storage._contact}
+    get {_storage._contact}
     set {_uniqueStorage()._contact = newValue}
   }
 
   var preview: [SignalServiceProtos_Preview] {
-    get {return _storage._preview}
+    get {_storage._preview}
     set {_uniqueStorage()._preview = newValue}
   }
 
   var sticker: SignalServiceProtos_DataMessage.Sticker {
-    get {return _storage._sticker ?? SignalServiceProtos_DataMessage.Sticker()}
+    get {_storage._sticker ?? SignalServiceProtos_DataMessage.Sticker()}
     set {_uniqueStorage()._sticker = newValue}
   }
   /// Returns true if `sticker` has been explicitly set.
-  var hasSticker: Bool {return _storage._sticker != nil}
+  var hasSticker: Bool {_storage._sticker != nil}
   /// Clears the value of `sticker`. Subsequent reads from it will return its default value.
   mutating func clearSticker() {_uniqueStorage()._sticker = nil}
 
   var requiredProtocolVersion: UInt32 {
-    get {return _storage._requiredProtocolVersion ?? 0}
+    get {_storage._requiredProtocolVersion ?? 0}
     set {_uniqueStorage()._requiredProtocolVersion = newValue}
   }
   /// Returns true if `requiredProtocolVersion` has been explicitly set.
-  var hasRequiredProtocolVersion: Bool {return _storage._requiredProtocolVersion != nil}
+  var hasRequiredProtocolVersion: Bool {_storage._requiredProtocolVersion != nil}
   /// Clears the value of `requiredProtocolVersion`. Subsequent reads from it will return its default value.
   mutating func clearRequiredProtocolVersion() {_uniqueStorage()._requiredProtocolVersion = nil}
 
   var isViewOnce: Bool {
-    get {return _storage._isViewOnce ?? false}
+    get {_storage._isViewOnce ?? false}
     set {_uniqueStorage()._isViewOnce = newValue}
   }
   /// Returns true if `isViewOnce` has been explicitly set.
-  var hasIsViewOnce: Bool {return _storage._isViewOnce != nil}
+  var hasIsViewOnce: Bool {_storage._isViewOnce != nil}
   /// Clears the value of `isViewOnce`. Subsequent reads from it will return its default value.
   mutating func clearIsViewOnce() {_uniqueStorage()._isViewOnce = nil}
 
   var reaction: SignalServiceProtos_DataMessage.Reaction {
-    get {return _storage._reaction ?? SignalServiceProtos_DataMessage.Reaction()}
+    get {_storage._reaction ?? SignalServiceProtos_DataMessage.Reaction()}
     set {_uniqueStorage()._reaction = newValue}
   }
   /// Returns true if `reaction` has been explicitly set.
-  var hasReaction: Bool {return _storage._reaction != nil}
+  var hasReaction: Bool {_storage._reaction != nil}
   /// Clears the value of `reaction`. Subsequent reads from it will return its default value.
   mutating func clearReaction() {_uniqueStorage()._reaction = nil}
 
   var delete: SignalServiceProtos_DataMessage.Delete {
-    get {return _storage._delete ?? SignalServiceProtos_DataMessage.Delete()}
+    get {_storage._delete ?? SignalServiceProtos_DataMessage.Delete()}
     set {_uniqueStorage()._delete = newValue}
   }
   /// Returns true if `delete` has been explicitly set.
-  var hasDelete: Bool {return _storage._delete != nil}
+  var hasDelete: Bool {_storage._delete != nil}
   /// Clears the value of `delete`. Subsequent reads from it will return its default value.
   mutating func clearDelete() {_uniqueStorage()._delete = nil}
 
   var bodyRanges: [SignalServiceProtos_BodyRange] {
-    get {return _storage._bodyRanges}
+    get {_storage._bodyRanges}
     set {_uniqueStorage()._bodyRanges = newValue}
   }
 
   var groupCallUpdate: SignalServiceProtos_DataMessage.GroupCallUpdate {
-    get {return _storage._groupCallUpdate ?? SignalServiceProtos_DataMessage.GroupCallUpdate()}
+    get {_storage._groupCallUpdate ?? SignalServiceProtos_DataMessage.GroupCallUpdate()}
     set {_uniqueStorage()._groupCallUpdate = newValue}
   }
   /// Returns true if `groupCallUpdate` has been explicitly set.
-  var hasGroupCallUpdate: Bool {return _storage._groupCallUpdate != nil}
+  var hasGroupCallUpdate: Bool {_storage._groupCallUpdate != nil}
   /// Clears the value of `groupCallUpdate`. Subsequent reads from it will return its default value.
   mutating func clearGroupCallUpdate() {_uniqueStorage()._groupCallUpdate = nil}
 
   var payment: SignalServiceProtos_DataMessage.Payment {
-    get {return _storage._payment ?? SignalServiceProtos_DataMessage.Payment()}
+    get {_storage._payment ?? SignalServiceProtos_DataMessage.Payment()}
     set {_uniqueStorage()._payment = newValue}
   }
   /// Returns true if `payment` has been explicitly set.
-  var hasPayment: Bool {return _storage._payment != nil}
+  var hasPayment: Bool {_storage._payment != nil}
   /// Clears the value of `payment`. Subsequent reads from it will return its default value.
   mutating func clearPayment() {_uniqueStorage()._payment = nil}
 
   var storyContext: SignalServiceProtos_DataMessage.StoryContext {
-    get {return _storage._storyContext ?? SignalServiceProtos_DataMessage.StoryContext()}
+    get {_storage._storyContext ?? SignalServiceProtos_DataMessage.StoryContext()}
     set {_uniqueStorage()._storyContext = newValue}
   }
   /// Returns true if `storyContext` has been explicitly set.
-  var hasStoryContext: Bool {return _storage._storyContext != nil}
+  var hasStoryContext: Bool {_storage._storyContext != nil}
   /// Clears the value of `storyContext`. Subsequent reads from it will return its default value.
   mutating func clearStoryContext() {_uniqueStorage()._storyContext = nil}
 
   var giftBadge: SignalServiceProtos_DataMessage.GiftBadge {
-    get {return _storage._giftBadge ?? SignalServiceProtos_DataMessage.GiftBadge()}
+    get {_storage._giftBadge ?? SignalServiceProtos_DataMessage.GiftBadge()}
     set {_uniqueStorage()._giftBadge = newValue}
   }
   /// Returns true if `giftBadge` has been explicitly set.
-  var hasGiftBadge: Bool {return _storage._giftBadge != nil}
+  var hasGiftBadge: Bool {_storage._giftBadge != nil}
   /// Clears the value of `giftBadge`. Subsequent reads from it will return its default value.
   mutating func clearGiftBadge() {_uniqueStorage()._giftBadge = nil}
 
   var pollCreate: SignalServiceProtos_DataMessage.PollCreate {
-    get {return _storage._pollCreate ?? SignalServiceProtos_DataMessage.PollCreate()}
+    get {_storage._pollCreate ?? SignalServiceProtos_DataMessage.PollCreate()}
     set {_uniqueStorage()._pollCreate = newValue}
   }
   /// Returns true if `pollCreate` has been explicitly set.
-  var hasPollCreate: Bool {return _storage._pollCreate != nil}
+  var hasPollCreate: Bool {_storage._pollCreate != nil}
   /// Clears the value of `pollCreate`. Subsequent reads from it will return its default value.
   mutating func clearPollCreate() {_uniqueStorage()._pollCreate = nil}
 
   var pollTerminate: SignalServiceProtos_DataMessage.PollTerminate {
-    get {return _storage._pollTerminate ?? SignalServiceProtos_DataMessage.PollTerminate()}
+    get {_storage._pollTerminate ?? SignalServiceProtos_DataMessage.PollTerminate()}
     set {_uniqueStorage()._pollTerminate = newValue}
   }
   /// Returns true if `pollTerminate` has been explicitly set.
-  var hasPollTerminate: Bool {return _storage._pollTerminate != nil}
+  var hasPollTerminate: Bool {_storage._pollTerminate != nil}
   /// Clears the value of `pollTerminate`. Subsequent reads from it will return its default value.
   mutating func clearPollTerminate() {_uniqueStorage()._pollTerminate = nil}
 
-  /// NEXT ID: 27
   var pollVote: SignalServiceProtos_DataMessage.PollVote {
-    get {return _storage._pollVote ?? SignalServiceProtos_DataMessage.PollVote()}
+    get {_storage._pollVote ?? SignalServiceProtos_DataMessage.PollVote()}
     set {_uniqueStorage()._pollVote = newValue}
   }
   /// Returns true if `pollVote` has been explicitly set.
-  var hasPollVote: Bool {return _storage._pollVote != nil}
+  var hasPollVote: Bool {_storage._pollVote != nil}
   /// Clears the value of `pollVote`. Subsequent reads from it will return its default value.
   mutating func clearPollVote() {_uniqueStorage()._pollVote = nil}
 
+  var pinMessage: SignalServiceProtos_DataMessage.PinMessage {
+    get {_storage._pinMessage ?? SignalServiceProtos_DataMessage.PinMessage()}
+    set {_uniqueStorage()._pinMessage = newValue}
+  }
+  /// Returns true if `pinMessage` has been explicitly set.
+  var hasPinMessage: Bool {_storage._pinMessage != nil}
+  /// Clears the value of `pinMessage`. Subsequent reads from it will return its default value.
+  mutating func clearPinMessage() {_uniqueStorage()._pinMessage = nil}
+
+  var unpinMessage: SignalServiceProtos_DataMessage.UnpinMessage {
+    get {_storage._unpinMessage ?? SignalServiceProtos_DataMessage.UnpinMessage()}
+    set {_uniqueStorage()._unpinMessage = newValue}
+  }
+  /// Returns true if `unpinMessage` has been explicitly set.
+  var hasUnpinMessage: Bool {_storage._unpinMessage != nil}
+  /// Clears the value of `unpinMessage`. Subsequent reads from it will return its default value.
+  mutating func clearUnpinMessage() {_uniqueStorage()._unpinMessage = nil}
+
+  /// NEXT ID: 30
+  var adminDelete: SignalServiceProtos_DataMessage.AdminDelete {
+    get {_storage._adminDelete ?? SignalServiceProtos_DataMessage.AdminDelete()}
+    set {_uniqueStorage()._adminDelete = newValue}
+  }
+  /// Returns true if `adminDelete` has been explicitly set.
+  var hasAdminDelete: Bool {_storage._adminDelete != nil}
+  /// Clears the value of `adminDelete`. Subsequent reads from it will return its default value.
+  mutating func clearAdminDelete() {_uniqueStorage()._adminDelete = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum Flags: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
-    case endSession = 1
+  nonisolated enum Flags: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
     case expirationTimerUpdate = 2
     case profileKeyUpdate = 4
 
     init() {
-      self = .endSession
+      self = .expirationTimerUpdate
     }
 
   }
 
-  enum ProtocolVersion: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+  nonisolated enum ProtocolVersion: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
     case initial = 0
     case messageTimers = 1
     case viewOnce = 2
@@ -1219,36 +1248,36 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
 
   }
 
-  struct Quote: Sendable {
+  nonisolated struct Quote: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// @required
     var id: UInt64 {
-      get {return _id ?? 0}
+      get {_id ?? 0}
       set {_id = newValue}
     }
     /// Returns true if `id` has been explicitly set.
-    var hasID: Bool {return self._id != nil}
+    var hasID: Bool {self._id != nil}
     /// Clears the value of `id`. Subsequent reads from it will return its default value.
     mutating func clearID() {self._id = nil}
 
     var authorAci: String {
-      get {return _authorAci ?? String()}
+      get {_authorAci ?? String()}
       set {_authorAci = newValue}
     }
     /// Returns true if `authorAci` has been explicitly set.
-    var hasAuthorAci: Bool {return self._authorAci != nil}
+    var hasAuthorAci: Bool {self._authorAci != nil}
     /// Clears the value of `authorAci`. Subsequent reads from it will return its default value.
     mutating func clearAuthorAci() {self._authorAci = nil}
 
     var text: String {
-      get {return _text ?? String()}
+      get {_text ?? String()}
       set {_text = newValue}
     }
     /// Returns true if `text` has been explicitly set.
-    var hasText: Bool {return self._text != nil}
+    var hasText: Bool {self._text != nil}
     /// Clears the value of `text`. Subsequent reads from it will return its default value.
     mutating func clearText() {self._text = nil}
 
@@ -1257,27 +1286,27 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
     var bodyRanges: [SignalServiceProtos_BodyRange] = []
 
     var type: SignalServiceProtos_DataMessage.Quote.TypeEnum {
-      get {return _type ?? .normal}
+      get {_type ?? .normal}
       set {_type = newValue}
     }
     /// Returns true if `type` has been explicitly set.
-    var hasType: Bool {return self._type != nil}
+    var hasType: Bool {self._type != nil}
     /// Clears the value of `type`. Subsequent reads from it will return its default value.
     mutating func clearType() {self._type = nil}
 
     /// 16-byte UUID
     var authorAciBinary: Data {
-      get {return _authorAciBinary ?? Data()}
+      get {_authorAciBinary ?? Data()}
       set {_authorAciBinary = newValue}
     }
     /// Returns true if `authorAciBinary` has been explicitly set.
-    var hasAuthorAciBinary: Bool {return self._authorAciBinary != nil}
+    var hasAuthorAciBinary: Bool {self._authorAciBinary != nil}
     /// Clears the value of `authorAciBinary`. Subsequent reads from it will return its default value.
     mutating func clearAuthorAciBinary() {self._authorAciBinary = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+    nonisolated enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
       case normal = 0
       case giftBadge = 1
 
@@ -1287,43 +1316,45 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
 
     }
 
-    struct QuotedAttachment: @unchecked Sendable {
+    nonisolated struct QuotedAttachment: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var contentType: String {
-        get {return _storage._contentType ?? String()}
-        set {_uniqueStorage()._contentType = newValue}
+        get {_contentType ?? String()}
+        set {_contentType = newValue}
       }
       /// Returns true if `contentType` has been explicitly set.
-      var hasContentType: Bool {return _storage._contentType != nil}
+      var hasContentType: Bool {self._contentType != nil}
       /// Clears the value of `contentType`. Subsequent reads from it will return its default value.
-      mutating func clearContentType() {_uniqueStorage()._contentType = nil}
+      mutating func clearContentType() {self._contentType = nil}
 
       var fileName: String {
-        get {return _storage._fileName ?? String()}
-        set {_uniqueStorage()._fileName = newValue}
+        get {_fileName ?? String()}
+        set {_fileName = newValue}
       }
       /// Returns true if `fileName` has been explicitly set.
-      var hasFileName: Bool {return _storage._fileName != nil}
+      var hasFileName: Bool {self._fileName != nil}
       /// Clears the value of `fileName`. Subsequent reads from it will return its default value.
-      mutating func clearFileName() {_uniqueStorage()._fileName = nil}
+      mutating func clearFileName() {self._fileName = nil}
 
       var thumbnail: SignalServiceProtos_AttachmentPointer {
-        get {return _storage._thumbnail ?? SignalServiceProtos_AttachmentPointer()}
-        set {_uniqueStorage()._thumbnail = newValue}
+        get {_thumbnail ?? SignalServiceProtos_AttachmentPointer()}
+        set {_thumbnail = newValue}
       }
       /// Returns true if `thumbnail` has been explicitly set.
-      var hasThumbnail: Bool {return _storage._thumbnail != nil}
+      var hasThumbnail: Bool {self._thumbnail != nil}
       /// Clears the value of `thumbnail`. Subsequent reads from it will return its default value.
-      mutating func clearThumbnail() {_uniqueStorage()._thumbnail = nil}
+      mutating func clearThumbnail() {self._thumbnail = nil}
 
       var unknownFields = SwiftProtobuf.UnknownStorage()
 
       init() {}
 
-      fileprivate var _storage = _StorageClass.defaultInstance
+      fileprivate var _contentType: String? = nil
+      fileprivate var _fileName: String? = nil
+      fileprivate var _thumbnail: SignalServiceProtos_AttachmentPointer? = nil
     }
 
     init() {}
@@ -1335,17 +1366,17 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
     fileprivate var _authorAciBinary: Data? = nil
   }
 
-  struct Contact: Sendable {
+  nonisolated struct Contact: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var name: SignalServiceProtos_DataMessage.Contact.Name {
-      get {return _name ?? SignalServiceProtos_DataMessage.Contact.Name()}
+      get {_name ?? SignalServiceProtos_DataMessage.Contact.Name()}
       set {_name = newValue}
     }
     /// Returns true if `name` has been explicitly set.
-    var hasName: Bool {return self._name != nil}
+    var hasName: Bool {self._name != nil}
     /// Clears the value of `name`. Subsequent reads from it will return its default value.
     mutating func clearName() {self._name = nil}
 
@@ -1356,74 +1387,111 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
     var address: [SignalServiceProtos_DataMessage.Contact.PostalAddress] = []
 
     var avatar: SignalServiceProtos_DataMessage.Contact.Avatar {
-      get {return _avatar ?? SignalServiceProtos_DataMessage.Contact.Avatar()}
+      get {_avatar ?? SignalServiceProtos_DataMessage.Contact.Avatar()}
       set {_avatar = newValue}
     }
     /// Returns true if `avatar` has been explicitly set.
-    var hasAvatar: Bool {return self._avatar != nil}
+    var hasAvatar: Bool {self._avatar != nil}
     /// Clears the value of `avatar`. Subsequent reads from it will return its default value.
     mutating func clearAvatar() {self._avatar = nil}
 
     var organization: String {
-      get {return _organization ?? String()}
+      get {_organization ?? String()}
       set {_organization = newValue}
     }
     /// Returns true if `organization` has been explicitly set.
-    var hasOrganization: Bool {return self._organization != nil}
+    var hasOrganization: Bool {self._organization != nil}
     /// Clears the value of `organization`. Subsequent reads from it will return its default value.
     mutating func clearOrganization() {self._organization = nil}
 
+    /// 16-byte UUID
+    var aciBinary: Data {
+      get {_aciBinary ?? Data()}
+      set {_aciBinary = newValue}
+    }
+    /// Returns true if `aciBinary` has been explicitly set.
+    var hasAciBinary: Bool {self._aciBinary != nil}
+    /// Clears the value of `aciBinary`. Subsequent reads from it will return its default value.
+    mutating func clearAciBinary() {self._aciBinary = nil}
+
+    var nickname: SignalServiceProtos_DataMessage.Contact.SignalNickname {
+      get {_nickname ?? SignalServiceProtos_DataMessage.Contact.SignalNickname()}
+      set {_nickname = newValue}
+    }
+    /// Returns true if `nickname` has been explicitly set.
+    var hasNickname: Bool {self._nickname != nil}
+    /// Clears the value of `nickname`. Subsequent reads from it will return its default value.
+    mutating func clearNickname() {self._nickname = nil}
+
+    var note: String {
+      get {_note ?? String()}
+      set {_note = newValue}
+    }
+    /// Returns true if `note` has been explicitly set.
+    var hasNote: Bool {self._note != nil}
+    /// Clears the value of `note`. Subsequent reads from it will return its default value.
+    mutating func clearNote() {self._note = nil}
+
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    struct Name: Sendable {
+    nonisolated struct Name: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var givenName: String {
-        get {return _givenName ?? String()}
+        get {_givenName ?? String()}
         set {_givenName = newValue}
       }
       /// Returns true if `givenName` has been explicitly set.
-      var hasGivenName: Bool {return self._givenName != nil}
+      var hasGivenName: Bool {self._givenName != nil}
       /// Clears the value of `givenName`. Subsequent reads from it will return its default value.
       mutating func clearGivenName() {self._givenName = nil}
 
       var familyName: String {
-        get {return _familyName ?? String()}
+        get {_familyName ?? String()}
         set {_familyName = newValue}
       }
       /// Returns true if `familyName` has been explicitly set.
-      var hasFamilyName: Bool {return self._familyName != nil}
+      var hasFamilyName: Bool {self._familyName != nil}
       /// Clears the value of `familyName`. Subsequent reads from it will return its default value.
       mutating func clearFamilyName() {self._familyName = nil}
 
       var prefix: String {
-        get {return _prefix ?? String()}
+        get {_prefix ?? String()}
         set {_prefix = newValue}
       }
       /// Returns true if `prefix` has been explicitly set.
-      var hasPrefix: Bool {return self._prefix != nil}
+      var hasPrefix: Bool {self._prefix != nil}
       /// Clears the value of `prefix`. Subsequent reads from it will return its default value.
       mutating func clearPrefix() {self._prefix = nil}
 
       var suffix: String {
-        get {return _suffix ?? String()}
+        get {_suffix ?? String()}
         set {_suffix = newValue}
       }
       /// Returns true if `suffix` has been explicitly set.
-      var hasSuffix: Bool {return self._suffix != nil}
+      var hasSuffix: Bool {self._suffix != nil}
       /// Clears the value of `suffix`. Subsequent reads from it will return its default value.
       mutating func clearSuffix() {self._suffix = nil}
 
       var middleName: String {
-        get {return _middleName ?? String()}
+        get {_middleName ?? String()}
         set {_middleName = newValue}
       }
       /// Returns true if `middleName` has been explicitly set.
-      var hasMiddleName: Bool {return self._middleName != nil}
+      var hasMiddleName: Bool {self._middleName != nil}
       /// Clears the value of `middleName`. Subsequent reads from it will return its default value.
       mutating func clearMiddleName() {self._middleName = nil}
+
+      var nickname: String {
+        get {_nickname ?? String()}
+        set {_nickname = newValue}
+      }
+      /// Returns true if `nickname` has been explicitly set.
+      var hasNickname: Bool {self._nickname != nil}
+      /// Clears the value of `nickname`. Subsequent reads from it will return its default value.
+      mutating func clearNickname() {self._nickname = nil}
 
       var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -1434,43 +1502,76 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
       fileprivate var _prefix: String? = nil
       fileprivate var _suffix: String? = nil
       fileprivate var _middleName: String? = nil
+      fileprivate var _nickname: String? = nil
     }
 
-    struct Phone: Sendable {
+    /// The sharer's Signal nickname for this contact
+    nonisolated struct SignalNickname: Sendable {
+      // SwiftProtobuf.Message conformance is added in an extension below. See the
+      // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+      // methods supported on all messages.
+
+      var given: String {
+        get {_given ?? String()}
+        set {_given = newValue}
+      }
+      /// Returns true if `given` has been explicitly set.
+      var hasGiven: Bool {self._given != nil}
+      /// Clears the value of `given`. Subsequent reads from it will return its default value.
+      mutating func clearGiven() {self._given = nil}
+
+      var family: String {
+        get {_family ?? String()}
+        set {_family = newValue}
+      }
+      /// Returns true if `family` has been explicitly set.
+      var hasFamily: Bool {self._family != nil}
+      /// Clears the value of `family`. Subsequent reads from it will return its default value.
+      mutating func clearFamily() {self._family = nil}
+
+      var unknownFields = SwiftProtobuf.UnknownStorage()
+
+      init() {}
+
+      fileprivate var _given: String? = nil
+      fileprivate var _family: String? = nil
+    }
+
+    nonisolated struct Phone: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var value: String {
-        get {return _value ?? String()}
+        get {_value ?? String()}
         set {_value = newValue}
       }
       /// Returns true if `value` has been explicitly set.
-      var hasValue: Bool {return self._value != nil}
+      var hasValue: Bool {self._value != nil}
       /// Clears the value of `value`. Subsequent reads from it will return its default value.
       mutating func clearValue() {self._value = nil}
 
       var type: SignalServiceProtos_DataMessage.Contact.Phone.TypeEnum {
-        get {return _type ?? .home}
+        get {_type ?? .home}
         set {_type = newValue}
       }
       /// Returns true if `type` has been explicitly set.
-      var hasType: Bool {return self._type != nil}
+      var hasType: Bool {self._type != nil}
       /// Clears the value of `type`. Subsequent reads from it will return its default value.
       mutating func clearType() {self._type = nil}
 
       var label: String {
-        get {return _label ?? String()}
+        get {_label ?? String()}
         set {_label = newValue}
       }
       /// Returns true if `label` has been explicitly set.
-      var hasLabel: Bool {return self._label != nil}
+      var hasLabel: Bool {self._label != nil}
       /// Clears the value of `label`. Subsequent reads from it will return its default value.
       mutating func clearLabel() {self._label = nil}
 
       var unknownFields = SwiftProtobuf.UnknownStorage()
 
-      enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+      nonisolated enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
         case home = 1
         case mobile = 2
         case work = 3
@@ -1489,41 +1590,41 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
       fileprivate var _label: String? = nil
     }
 
-    struct Email: Sendable {
+    nonisolated struct Email: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var value: String {
-        get {return _value ?? String()}
+        get {_value ?? String()}
         set {_value = newValue}
       }
       /// Returns true if `value` has been explicitly set.
-      var hasValue: Bool {return self._value != nil}
+      var hasValue: Bool {self._value != nil}
       /// Clears the value of `value`. Subsequent reads from it will return its default value.
       mutating func clearValue() {self._value = nil}
 
       var type: SignalServiceProtos_DataMessage.Contact.Email.TypeEnum {
-        get {return _type ?? .home}
+        get {_type ?? .home}
         set {_type = newValue}
       }
       /// Returns true if `type` has been explicitly set.
-      var hasType: Bool {return self._type != nil}
+      var hasType: Bool {self._type != nil}
       /// Clears the value of `type`. Subsequent reads from it will return its default value.
       mutating func clearType() {self._type = nil}
 
       var label: String {
-        get {return _label ?? String()}
+        get {_label ?? String()}
         set {_label = newValue}
       }
       /// Returns true if `label` has been explicitly set.
-      var hasLabel: Bool {return self._label != nil}
+      var hasLabel: Bool {self._label != nil}
       /// Clears the value of `label`. Subsequent reads from it will return its default value.
       mutating func clearLabel() {self._label = nil}
 
       var unknownFields = SwiftProtobuf.UnknownStorage()
 
-      enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+      nonisolated enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
         case home = 1
         case mobile = 2
         case work = 3
@@ -1542,95 +1643,95 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
       fileprivate var _label: String? = nil
     }
 
-    struct PostalAddress: Sendable {
+    nonisolated struct PostalAddress: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var type: SignalServiceProtos_DataMessage.Contact.PostalAddress.TypeEnum {
-        get {return _type ?? .home}
+        get {_type ?? .home}
         set {_type = newValue}
       }
       /// Returns true if `type` has been explicitly set.
-      var hasType: Bool {return self._type != nil}
+      var hasType: Bool {self._type != nil}
       /// Clears the value of `type`. Subsequent reads from it will return its default value.
       mutating func clearType() {self._type = nil}
 
       var label: String {
-        get {return _label ?? String()}
+        get {_label ?? String()}
         set {_label = newValue}
       }
       /// Returns true if `label` has been explicitly set.
-      var hasLabel: Bool {return self._label != nil}
+      var hasLabel: Bool {self._label != nil}
       /// Clears the value of `label`. Subsequent reads from it will return its default value.
       mutating func clearLabel() {self._label = nil}
 
       var street: String {
-        get {return _street ?? String()}
+        get {_street ?? String()}
         set {_street = newValue}
       }
       /// Returns true if `street` has been explicitly set.
-      var hasStreet: Bool {return self._street != nil}
+      var hasStreet: Bool {self._street != nil}
       /// Clears the value of `street`. Subsequent reads from it will return its default value.
       mutating func clearStreet() {self._street = nil}
 
       var pobox: String {
-        get {return _pobox ?? String()}
+        get {_pobox ?? String()}
         set {_pobox = newValue}
       }
       /// Returns true if `pobox` has been explicitly set.
-      var hasPobox: Bool {return self._pobox != nil}
+      var hasPobox: Bool {self._pobox != nil}
       /// Clears the value of `pobox`. Subsequent reads from it will return its default value.
       mutating func clearPobox() {self._pobox = nil}
 
       var neighborhood: String {
-        get {return _neighborhood ?? String()}
+        get {_neighborhood ?? String()}
         set {_neighborhood = newValue}
       }
       /// Returns true if `neighborhood` has been explicitly set.
-      var hasNeighborhood: Bool {return self._neighborhood != nil}
+      var hasNeighborhood: Bool {self._neighborhood != nil}
       /// Clears the value of `neighborhood`. Subsequent reads from it will return its default value.
       mutating func clearNeighborhood() {self._neighborhood = nil}
 
       var city: String {
-        get {return _city ?? String()}
+        get {_city ?? String()}
         set {_city = newValue}
       }
       /// Returns true if `city` has been explicitly set.
-      var hasCity: Bool {return self._city != nil}
+      var hasCity: Bool {self._city != nil}
       /// Clears the value of `city`. Subsequent reads from it will return its default value.
       mutating func clearCity() {self._city = nil}
 
       var region: String {
-        get {return _region ?? String()}
+        get {_region ?? String()}
         set {_region = newValue}
       }
       /// Returns true if `region` has been explicitly set.
-      var hasRegion: Bool {return self._region != nil}
+      var hasRegion: Bool {self._region != nil}
       /// Clears the value of `region`. Subsequent reads from it will return its default value.
       mutating func clearRegion() {self._region = nil}
 
       var postcode: String {
-        get {return _postcode ?? String()}
+        get {_postcode ?? String()}
         set {_postcode = newValue}
       }
       /// Returns true if `postcode` has been explicitly set.
-      var hasPostcode: Bool {return self._postcode != nil}
+      var hasPostcode: Bool {self._postcode != nil}
       /// Clears the value of `postcode`. Subsequent reads from it will return its default value.
       mutating func clearPostcode() {self._postcode = nil}
 
       var country: String {
-        get {return _country ?? String()}
+        get {_country ?? String()}
         set {_country = newValue}
       }
       /// Returns true if `country` has been explicitly set.
-      var hasCountry: Bool {return self._country != nil}
+      var hasCountry: Bool {self._country != nil}
       /// Clears the value of `country`. Subsequent reads from it will return its default value.
       mutating func clearCountry() {self._country = nil}
 
       var unknownFields = SwiftProtobuf.UnknownStorage()
 
-      enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+      nonisolated enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
         case home = 1
         case work = 2
         case custom = 3
@@ -1654,34 +1755,35 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
       fileprivate var _country: String? = nil
     }
 
-    struct Avatar: @unchecked Sendable {
+    nonisolated struct Avatar: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var avatar: SignalServiceProtos_AttachmentPointer {
-        get {return _storage._avatar ?? SignalServiceProtos_AttachmentPointer()}
-        set {_uniqueStorage()._avatar = newValue}
+        get {_avatar ?? SignalServiceProtos_AttachmentPointer()}
+        set {_avatar = newValue}
       }
       /// Returns true if `avatar` has been explicitly set.
-      var hasAvatar: Bool {return _storage._avatar != nil}
+      var hasAvatar: Bool {self._avatar != nil}
       /// Clears the value of `avatar`. Subsequent reads from it will return its default value.
-      mutating func clearAvatar() {_uniqueStorage()._avatar = nil}
+      mutating func clearAvatar() {self._avatar = nil}
 
       var isProfile: Bool {
-        get {return _storage._isProfile ?? false}
-        set {_uniqueStorage()._isProfile = newValue}
+        get {_isProfile ?? false}
+        set {_isProfile = newValue}
       }
       /// Returns true if `isProfile` has been explicitly set.
-      var hasIsProfile: Bool {return _storage._isProfile != nil}
+      var hasIsProfile: Bool {self._isProfile != nil}
       /// Clears the value of `isProfile`. Subsequent reads from it will return its default value.
-      mutating func clearIsProfile() {_uniqueStorage()._isProfile = nil}
+      mutating func clearIsProfile() {self._isProfile = nil}
 
       var unknownFields = SwiftProtobuf.UnknownStorage()
 
       init() {}
 
-      fileprivate var _storage = _StorageClass.defaultInstance
+      fileprivate var _avatar: SignalServiceProtos_AttachmentPointer? = nil
+      fileprivate var _isProfile: Bool? = nil
     }
 
     init() {}
@@ -1689,119 +1791,126 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
     fileprivate var _name: SignalServiceProtos_DataMessage.Contact.Name? = nil
     fileprivate var _avatar: SignalServiceProtos_DataMessage.Contact.Avatar? = nil
     fileprivate var _organization: String? = nil
+    fileprivate var _aciBinary: Data? = nil
+    fileprivate var _nickname: SignalServiceProtos_DataMessage.Contact.SignalNickname? = nil
+    fileprivate var _note: String? = nil
   }
 
-  struct Sticker: @unchecked Sendable {
+  nonisolated struct Sticker: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// @required
     var packID: Data {
-      get {return _storage._packID ?? Data()}
-      set {_uniqueStorage()._packID = newValue}
+      get {_packID ?? Data()}
+      set {_packID = newValue}
     }
     /// Returns true if `packID` has been explicitly set.
-    var hasPackID: Bool {return _storage._packID != nil}
+    var hasPackID: Bool {self._packID != nil}
     /// Clears the value of `packID`. Subsequent reads from it will return its default value.
-    mutating func clearPackID() {_uniqueStorage()._packID = nil}
+    mutating func clearPackID() {self._packID = nil}
 
     /// @required
     var packKey: Data {
-      get {return _storage._packKey ?? Data()}
-      set {_uniqueStorage()._packKey = newValue}
+      get {_packKey ?? Data()}
+      set {_packKey = newValue}
     }
     /// Returns true if `packKey` has been explicitly set.
-    var hasPackKey: Bool {return _storage._packKey != nil}
+    var hasPackKey: Bool {self._packKey != nil}
     /// Clears the value of `packKey`. Subsequent reads from it will return its default value.
-    mutating func clearPackKey() {_uniqueStorage()._packKey = nil}
+    mutating func clearPackKey() {self._packKey = nil}
 
     /// @required
     var stickerID: UInt32 {
-      get {return _storage._stickerID ?? 0}
-      set {_uniqueStorage()._stickerID = newValue}
+      get {_stickerID ?? 0}
+      set {_stickerID = newValue}
     }
     /// Returns true if `stickerID` has been explicitly set.
-    var hasStickerID: Bool {return _storage._stickerID != nil}
+    var hasStickerID: Bool {self._stickerID != nil}
     /// Clears the value of `stickerID`. Subsequent reads from it will return its default value.
-    mutating func clearStickerID() {_uniqueStorage()._stickerID = nil}
+    mutating func clearStickerID() {self._stickerID = nil}
 
     /// @required
     var data: SignalServiceProtos_AttachmentPointer {
-      get {return _storage._data ?? SignalServiceProtos_AttachmentPointer()}
-      set {_uniqueStorage()._data = newValue}
+      get {_data ?? SignalServiceProtos_AttachmentPointer()}
+      set {_data = newValue}
     }
     /// Returns true if `data` has been explicitly set.
-    var hasData: Bool {return _storage._data != nil}
+    var hasData: Bool {self._data != nil}
     /// Clears the value of `data`. Subsequent reads from it will return its default value.
-    mutating func clearData() {_uniqueStorage()._data = nil}
+    mutating func clearData() {self._data = nil}
 
     var emoji: String {
-      get {return _storage._emoji ?? String()}
-      set {_uniqueStorage()._emoji = newValue}
+      get {_emoji ?? String()}
+      set {_emoji = newValue}
     }
     /// Returns true if `emoji` has been explicitly set.
-    var hasEmoji: Bool {return _storage._emoji != nil}
+    var hasEmoji: Bool {self._emoji != nil}
     /// Clears the value of `emoji`. Subsequent reads from it will return its default value.
-    mutating func clearEmoji() {_uniqueStorage()._emoji = nil}
+    mutating func clearEmoji() {self._emoji = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
     init() {}
 
-    fileprivate var _storage = _StorageClass.defaultInstance
+    fileprivate var _packID: Data? = nil
+    fileprivate var _packKey: Data? = nil
+    fileprivate var _stickerID: UInt32? = nil
+    fileprivate var _data: SignalServiceProtos_AttachmentPointer? = nil
+    fileprivate var _emoji: String? = nil
   }
 
-  struct Reaction: Sendable {
+  nonisolated struct Reaction: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// @required
     var emoji: String {
-      get {return _emoji ?? String()}
+      get {_emoji ?? String()}
       set {_emoji = newValue}
     }
     /// Returns true if `emoji` has been explicitly set.
-    var hasEmoji: Bool {return self._emoji != nil}
+    var hasEmoji: Bool {self._emoji != nil}
     /// Clears the value of `emoji`. Subsequent reads from it will return its default value.
     mutating func clearEmoji() {self._emoji = nil}
 
     var remove: Bool {
-      get {return _remove ?? false}
+      get {_remove ?? false}
       set {_remove = newValue}
     }
     /// Returns true if `remove` has been explicitly set.
-    var hasRemove: Bool {return self._remove != nil}
+    var hasRemove: Bool {self._remove != nil}
     /// Clears the value of `remove`. Subsequent reads from it will return its default value.
     mutating func clearRemove() {self._remove = nil}
 
     var targetAuthorAci: String {
-      get {return _targetAuthorAci ?? String()}
+      get {_targetAuthorAci ?? String()}
       set {_targetAuthorAci = newValue}
     }
     /// Returns true if `targetAuthorAci` has been explicitly set.
-    var hasTargetAuthorAci: Bool {return self._targetAuthorAci != nil}
+    var hasTargetAuthorAci: Bool {self._targetAuthorAci != nil}
     /// Clears the value of `targetAuthorAci`. Subsequent reads from it will return its default value.
     mutating func clearTargetAuthorAci() {self._targetAuthorAci = nil}
 
     /// @required
     var timestamp: UInt64 {
-      get {return _timestamp ?? 0}
+      get {_timestamp ?? 0}
       set {_timestamp = newValue}
     }
     /// Returns true if `timestamp` has been explicitly set.
-    var hasTimestamp: Bool {return self._timestamp != nil}
+    var hasTimestamp: Bool {self._timestamp != nil}
     /// Clears the value of `timestamp`. Subsequent reads from it will return its default value.
     mutating func clearTimestamp() {self._timestamp = nil}
 
     /// 16-byte UUID
     var targetAuthorAciBinary: Data {
-      get {return _targetAuthorAciBinary ?? Data()}
+      get {_targetAuthorAciBinary ?? Data()}
       set {_targetAuthorAciBinary = newValue}
     }
     /// Returns true if `targetAuthorAciBinary` has been explicitly set.
-    var hasTargetAuthorAciBinary: Bool {return self._targetAuthorAciBinary != nil}
+    var hasTargetAuthorAciBinary: Bool {self._targetAuthorAciBinary != nil}
     /// Clears the value of `targetAuthorAciBinary`. Subsequent reads from it will return its default value.
     mutating func clearTargetAuthorAciBinary() {self._targetAuthorAciBinary = nil}
 
@@ -1816,18 +1925,18 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
     fileprivate var _targetAuthorAciBinary: Data? = nil
   }
 
-  struct Delete: Sendable {
+  nonisolated struct Delete: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// @required
     var targetSentTimestamp: UInt64 {
-      get {return _targetSentTimestamp ?? 0}
+      get {_targetSentTimestamp ?? 0}
       set {_targetSentTimestamp = newValue}
     }
     /// Returns true if `targetSentTimestamp` has been explicitly set.
-    var hasTargetSentTimestamp: Bool {return self._targetSentTimestamp != nil}
+    var hasTargetSentTimestamp: Bool {self._targetSentTimestamp != nil}
     /// Clears the value of `targetSentTimestamp`. Subsequent reads from it will return its default value.
     mutating func clearTargetSentTimestamp() {self._targetSentTimestamp = nil}
 
@@ -1838,17 +1947,17 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
     fileprivate var _targetSentTimestamp: UInt64? = nil
   }
 
-  struct GroupCallUpdate: Sendable {
+  nonisolated struct GroupCallUpdate: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var eraID: String {
-      get {return _eraID ?? String()}
+      get {_eraID ?? String()}
       set {_eraID = newValue}
     }
     /// Returns true if `eraID` has been explicitly set.
-    var hasEraID: Bool {return self._eraID != nil}
+    var hasEraID: Bool {self._eraID != nil}
     /// Clears the value of `eraID`. Subsequent reads from it will return its default value.
     mutating func clearEraID() {self._eraID = nil}
 
@@ -1859,7 +1968,7 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
     fileprivate var _eraID: String? = nil
   }
 
-  struct Payment: Sendable {
+  nonisolated struct Payment: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -1867,26 +1976,26 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
     /// oneof commented out
     /// oneof Item {
     var notification: SignalServiceProtos_DataMessage.Payment.Notification {
-      get {return _notification ?? SignalServiceProtos_DataMessage.Payment.Notification()}
+      get {_notification ?? SignalServiceProtos_DataMessage.Payment.Notification()}
       set {_notification = newValue}
     }
     /// Returns true if `notification` has been explicitly set.
-    var hasNotification: Bool {return self._notification != nil}
+    var hasNotification: Bool {self._notification != nil}
     /// Clears the value of `notification`. Subsequent reads from it will return its default value.
     mutating func clearNotification() {self._notification = nil}
 
     var activation: SignalServiceProtos_DataMessage.Payment.Activation {
-      get {return _activation ?? SignalServiceProtos_DataMessage.Payment.Activation()}
+      get {_activation ?? SignalServiceProtos_DataMessage.Payment.Activation()}
       set {_activation = newValue}
     }
     /// Returns true if `activation` has been explicitly set.
-    var hasActivation: Bool {return self._activation != nil}
+    var hasActivation: Bool {self._activation != nil}
     /// Clears the value of `activation`. Subsequent reads from it will return its default value.
     mutating func clearActivation() {self._activation = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    struct Amount: Sendable {
+    nonisolated struct Amount: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -1894,28 +2003,28 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
       /// oneof commented out
       /// oneof Amount {
       var mobileCoin: SignalServiceProtos_DataMessage.Payment.Amount.MobileCoin {
-        get {return _mobileCoin ?? SignalServiceProtos_DataMessage.Payment.Amount.MobileCoin()}
+        get {_mobileCoin ?? SignalServiceProtos_DataMessage.Payment.Amount.MobileCoin()}
         set {_mobileCoin = newValue}
       }
       /// Returns true if `mobileCoin` has been explicitly set.
-      var hasMobileCoin: Bool {return self._mobileCoin != nil}
+      var hasMobileCoin: Bool {self._mobileCoin != nil}
       /// Clears the value of `mobileCoin`. Subsequent reads from it will return its default value.
       mutating func clearMobileCoin() {self._mobileCoin = nil}
 
       var unknownFields = SwiftProtobuf.UnknownStorage()
 
-      struct MobileCoin: Sendable {
+      nonisolated struct MobileCoin: Sendable {
         // SwiftProtobuf.Message conformance is added in an extension below. See the
         // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
         // methods supported on all messages.
 
         /// @required
         var picoMob: UInt64 {
-          get {return _picoMob ?? 0}
+          get {_picoMob ?? 0}
           set {_picoMob = newValue}
         }
         /// Returns true if `picoMob` has been explicitly set.
-        var hasPicoMob: Bool {return self._picoMob != nil}
+        var hasPicoMob: Bool {self._picoMob != nil}
         /// Clears the value of `picoMob`. Subsequent reads from it will return its default value.
         mutating func clearPicoMob() {self._picoMob = nil}
 
@@ -1931,7 +2040,7 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
       fileprivate var _mobileCoin: SignalServiceProtos_DataMessage.Payment.Amount.MobileCoin? = nil
     }
 
-    struct Notification: Sendable {
+    nonisolated struct Notification: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -1939,37 +2048,37 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
       /// oneof commented out
       /// oneof Transaction {
       var mobileCoin: SignalServiceProtos_DataMessage.Payment.Notification.MobileCoin {
-        get {return _mobileCoin ?? SignalServiceProtos_DataMessage.Payment.Notification.MobileCoin()}
+        get {_mobileCoin ?? SignalServiceProtos_DataMessage.Payment.Notification.MobileCoin()}
         set {_mobileCoin = newValue}
       }
       /// Returns true if `mobileCoin` has been explicitly set.
-      var hasMobileCoin: Bool {return self._mobileCoin != nil}
+      var hasMobileCoin: Bool {self._mobileCoin != nil}
       /// Clears the value of `mobileCoin`. Subsequent reads from it will return its default value.
       mutating func clearMobileCoin() {self._mobileCoin = nil}
 
       var note: String {
-        get {return _note ?? String()}
+        get {_note ?? String()}
         set {_note = newValue}
       }
       /// Returns true if `note` has been explicitly set.
-      var hasNote: Bool {return self._note != nil}
+      var hasNote: Bool {self._note != nil}
       /// Clears the value of `note`. Subsequent reads from it will return its default value.
       mutating func clearNote() {self._note = nil}
 
       var unknownFields = SwiftProtobuf.UnknownStorage()
 
-      struct MobileCoin: Sendable {
+      nonisolated struct MobileCoin: Sendable {
         // SwiftProtobuf.Message conformance is added in an extension below. See the
         // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
         // methods supported on all messages.
 
         /// @required
         var receipt: Data {
-          get {return _receipt ?? Data()}
+          get {_receipt ?? Data()}
           set {_receipt = newValue}
         }
         /// Returns true if `receipt` has been explicitly set.
-        var hasReceipt: Bool {return self._receipt != nil}
+        var hasReceipt: Bool {self._receipt != nil}
         /// Clears the value of `receipt`. Subsequent reads from it will return its default value.
         mutating func clearReceipt() {self._receipt = nil}
 
@@ -1986,23 +2095,23 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
       fileprivate var _note: String? = nil
     }
 
-    struct Activation: Sendable {
+    nonisolated struct Activation: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var type: SignalServiceProtos_DataMessage.Payment.Activation.TypeEnum {
-        get {return _type ?? .request}
+        get {_type ?? .request}
         set {_type = newValue}
       }
       /// Returns true if `type` has been explicitly set.
-      var hasType: Bool {return self._type != nil}
+      var hasType: Bool {self._type != nil}
       /// Clears the value of `type`. Subsequent reads from it will return its default value.
       mutating func clearType() {self._type = nil}
 
       var unknownFields = SwiftProtobuf.UnknownStorage()
 
-      enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+      nonisolated enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
         case request = 0
         case activated = 1
 
@@ -2023,36 +2132,36 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
     fileprivate var _activation: SignalServiceProtos_DataMessage.Payment.Activation? = nil
   }
 
-  struct StoryContext: Sendable {
+  nonisolated struct StoryContext: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var authorAci: String {
-      get {return _authorAci ?? String()}
+      get {_authorAci ?? String()}
       set {_authorAci = newValue}
     }
     /// Returns true if `authorAci` has been explicitly set.
-    var hasAuthorAci: Bool {return self._authorAci != nil}
+    var hasAuthorAci: Bool {self._authorAci != nil}
     /// Clears the value of `authorAci`. Subsequent reads from it will return its default value.
     mutating func clearAuthorAci() {self._authorAci = nil}
 
     var sentTimestamp: UInt64 {
-      get {return _sentTimestamp ?? 0}
+      get {_sentTimestamp ?? 0}
       set {_sentTimestamp = newValue}
     }
     /// Returns true if `sentTimestamp` has been explicitly set.
-    var hasSentTimestamp: Bool {return self._sentTimestamp != nil}
+    var hasSentTimestamp: Bool {self._sentTimestamp != nil}
     /// Clears the value of `sentTimestamp`. Subsequent reads from it will return its default value.
     mutating func clearSentTimestamp() {self._sentTimestamp = nil}
 
     /// 16-byte UUID
     var authorAciBinary: Data {
-      get {return _authorAciBinary ?? Data()}
+      get {_authorAciBinary ?? Data()}
       set {_authorAciBinary = newValue}
     }
     /// Returns true if `authorAciBinary` has been explicitly set.
-    var hasAuthorAciBinary: Bool {return self._authorAciBinary != nil}
+    var hasAuthorAciBinary: Bool {self._authorAciBinary != nil}
     /// Clears the value of `authorAciBinary`. Subsequent reads from it will return its default value.
     mutating func clearAuthorAciBinary() {self._authorAciBinary = nil}
 
@@ -2065,17 +2174,17 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
     fileprivate var _authorAciBinary: Data? = nil
   }
 
-  struct GiftBadge: Sendable {
+  nonisolated struct GiftBadge: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var receiptCredentialPresentation: Data {
-      get {return _receiptCredentialPresentation ?? Data()}
+      get {_receiptCredentialPresentation ?? Data()}
       set {_receiptCredentialPresentation = newValue}
     }
     /// Returns true if `receiptCredentialPresentation` has been explicitly set.
-    var hasReceiptCredentialPresentation: Bool {return self._receiptCredentialPresentation != nil}
+    var hasReceiptCredentialPresentation: Bool {self._receiptCredentialPresentation != nil}
     /// Clears the value of `receiptCredentialPresentation`. Subsequent reads from it will return its default value.
     mutating func clearReceiptCredentialPresentation() {self._receiptCredentialPresentation = nil}
 
@@ -2086,26 +2195,26 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
     fileprivate var _receiptCredentialPresentation: Data? = nil
   }
 
-  struct PollCreate: Sendable {
+  nonisolated struct PollCreate: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var question: String {
-      get {return _question ?? String()}
+      get {_question ?? String()}
       set {_question = newValue}
     }
     /// Returns true if `question` has been explicitly set.
-    var hasQuestion: Bool {return self._question != nil}
+    var hasQuestion: Bool {self._question != nil}
     /// Clears the value of `question`. Subsequent reads from it will return its default value.
     mutating func clearQuestion() {self._question = nil}
 
     var allowMultiple: Bool {
-      get {return _allowMultiple ?? false}
+      get {_allowMultiple ?? false}
       set {_allowMultiple = newValue}
     }
     /// Returns true if `allowMultiple` has been explicitly set.
-    var hasAllowMultiple: Bool {return self._allowMultiple != nil}
+    var hasAllowMultiple: Bool {self._allowMultiple != nil}
     /// Clears the value of `allowMultiple`. Subsequent reads from it will return its default value.
     mutating func clearAllowMultiple() {self._allowMultiple = nil}
 
@@ -2119,17 +2228,17 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
     fileprivate var _allowMultiple: Bool? = nil
   }
 
-  struct PollTerminate: Sendable {
+  nonisolated struct PollTerminate: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var targetSentTimestamp: UInt64 {
-      get {return _targetSentTimestamp ?? 0}
+      get {_targetSentTimestamp ?? 0}
       set {_targetSentTimestamp = newValue}
     }
     /// Returns true if `targetSentTimestamp` has been explicitly set.
-    var hasTargetSentTimestamp: Bool {return self._targetSentTimestamp != nil}
+    var hasTargetSentTimestamp: Bool {self._targetSentTimestamp != nil}
     /// Clears the value of `targetSentTimestamp`. Subsequent reads from it will return its default value.
     mutating func clearTargetSentTimestamp() {self._targetSentTimestamp = nil}
 
@@ -2140,37 +2249,37 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
     fileprivate var _targetSentTimestamp: UInt64? = nil
   }
 
-  struct PollVote: Sendable {
+  nonisolated struct PollVote: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var targetAuthorAciBinary: Data {
-      get {return _targetAuthorAciBinary ?? Data()}
+      get {_targetAuthorAciBinary ?? Data()}
       set {_targetAuthorAciBinary = newValue}
     }
     /// Returns true if `targetAuthorAciBinary` has been explicitly set.
-    var hasTargetAuthorAciBinary: Bool {return self._targetAuthorAciBinary != nil}
+    var hasTargetAuthorAciBinary: Bool {self._targetAuthorAciBinary != nil}
     /// Clears the value of `targetAuthorAciBinary`. Subsequent reads from it will return its default value.
     mutating func clearTargetAuthorAciBinary() {self._targetAuthorAciBinary = nil}
 
     var targetSentTimestamp: UInt64 {
-      get {return _targetSentTimestamp ?? 0}
+      get {_targetSentTimestamp ?? 0}
       set {_targetSentTimestamp = newValue}
     }
     /// Returns true if `targetSentTimestamp` has been explicitly set.
-    var hasTargetSentTimestamp: Bool {return self._targetSentTimestamp != nil}
+    var hasTargetSentTimestamp: Bool {self._targetSentTimestamp != nil}
     /// Clears the value of `targetSentTimestamp`. Subsequent reads from it will return its default value.
     mutating func clearTargetSentTimestamp() {self._targetSentTimestamp = nil}
 
     var optionIndexes: [UInt32] = []
 
     var voteCount: UInt32 {
-      get {return _voteCount ?? 0}
+      get {_voteCount ?? 0}
       set {_voteCount = newValue}
     }
     /// Returns true if `voteCount` has been explicitly set.
-    var hasVoteCount: Bool {return self._voteCount != nil}
+    var hasVoteCount: Bool {self._voteCount != nil}
     /// Clears the value of `voteCount`. Subsequent reads from it will return its default value.
     mutating func clearVoteCount() {self._voteCount = nil}
 
@@ -2183,22 +2292,140 @@ struct SignalServiceProtos_DataMessage: @unchecked Sendable {
     fileprivate var _voteCount: UInt32? = nil
   }
 
+  nonisolated struct PinMessage: Sendable {
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
+
+    /// 16-byte UUID
+    var targetAuthorAciBinary: Data {
+      get {_targetAuthorAciBinary ?? Data()}
+      set {_targetAuthorAciBinary = newValue}
+    }
+    /// Returns true if `targetAuthorAciBinary` has been explicitly set.
+    var hasTargetAuthorAciBinary: Bool {self._targetAuthorAciBinary != nil}
+    /// Clears the value of `targetAuthorAciBinary`. Subsequent reads from it will return its default value.
+    mutating func clearTargetAuthorAciBinary() {self._targetAuthorAciBinary = nil}
+
+    var targetSentTimestamp: UInt64 {
+      get {_targetSentTimestamp ?? 0}
+      set {_targetSentTimestamp = newValue}
+    }
+    /// Returns true if `targetSentTimestamp` has been explicitly set.
+    var hasTargetSentTimestamp: Bool {self._targetSentTimestamp != nil}
+    /// Clears the value of `targetSentTimestamp`. Subsequent reads from it will return its default value.
+    mutating func clearTargetSentTimestamp() {self._targetSentTimestamp = nil}
+
+    /// oneof pinDuration {
+    var pinDurationSeconds: UInt32 {
+      get {_pinDurationSeconds ?? 0}
+      set {_pinDurationSeconds = newValue}
+    }
+    /// Returns true if `pinDurationSeconds` has been explicitly set.
+    var hasPinDurationSeconds: Bool {self._pinDurationSeconds != nil}
+    /// Clears the value of `pinDurationSeconds`. Subsequent reads from it will return its default value.
+    mutating func clearPinDurationSeconds() {self._pinDurationSeconds = nil}
+
+    /// }
+    var pinDurationForever: Bool {
+      get {_pinDurationForever ?? false}
+      set {_pinDurationForever = newValue}
+    }
+    /// Returns true if `pinDurationForever` has been explicitly set.
+    var hasPinDurationForever: Bool {self._pinDurationForever != nil}
+    /// Clears the value of `pinDurationForever`. Subsequent reads from it will return its default value.
+    mutating func clearPinDurationForever() {self._pinDurationForever = nil}
+
+    var unknownFields = SwiftProtobuf.UnknownStorage()
+
+    init() {}
+
+    fileprivate var _targetAuthorAciBinary: Data? = nil
+    fileprivate var _targetSentTimestamp: UInt64? = nil
+    fileprivate var _pinDurationSeconds: UInt32? = nil
+    fileprivate var _pinDurationForever: Bool? = nil
+  }
+
+  nonisolated struct UnpinMessage: Sendable {
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
+
+    /// 16-byte UUID
+    var targetAuthorAciBinary: Data {
+      get {_targetAuthorAciBinary ?? Data()}
+      set {_targetAuthorAciBinary = newValue}
+    }
+    /// Returns true if `targetAuthorAciBinary` has been explicitly set.
+    var hasTargetAuthorAciBinary: Bool {self._targetAuthorAciBinary != nil}
+    /// Clears the value of `targetAuthorAciBinary`. Subsequent reads from it will return its default value.
+    mutating func clearTargetAuthorAciBinary() {self._targetAuthorAciBinary = nil}
+
+    var targetSentTimestamp: UInt64 {
+      get {_targetSentTimestamp ?? 0}
+      set {_targetSentTimestamp = newValue}
+    }
+    /// Returns true if `targetSentTimestamp` has been explicitly set.
+    var hasTargetSentTimestamp: Bool {self._targetSentTimestamp != nil}
+    /// Clears the value of `targetSentTimestamp`. Subsequent reads from it will return its default value.
+    mutating func clearTargetSentTimestamp() {self._targetSentTimestamp = nil}
+
+    var unknownFields = SwiftProtobuf.UnknownStorage()
+
+    init() {}
+
+    fileprivate var _targetAuthorAciBinary: Data? = nil
+    fileprivate var _targetSentTimestamp: UInt64? = nil
+  }
+
+  nonisolated struct AdminDelete: Sendable {
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
+
+    /// 16-byte UUID
+    var targetAuthorAciBinary: Data {
+      get {_targetAuthorAciBinary ?? Data()}
+      set {_targetAuthorAciBinary = newValue}
+    }
+    /// Returns true if `targetAuthorAciBinary` has been explicitly set.
+    var hasTargetAuthorAciBinary: Bool {self._targetAuthorAciBinary != nil}
+    /// Clears the value of `targetAuthorAciBinary`. Subsequent reads from it will return its default value.
+    mutating func clearTargetAuthorAciBinary() {self._targetAuthorAciBinary = nil}
+
+    var targetSentTimestamp: UInt64 {
+      get {_targetSentTimestamp ?? 0}
+      set {_targetSentTimestamp = newValue}
+    }
+    /// Returns true if `targetSentTimestamp` has been explicitly set.
+    var hasTargetSentTimestamp: Bool {self._targetSentTimestamp != nil}
+    /// Clears the value of `targetSentTimestamp`. Subsequent reads from it will return its default value.
+    mutating func clearTargetSentTimestamp() {self._targetSentTimestamp = nil}
+
+    var unknownFields = SwiftProtobuf.UnknownStorage()
+
+    init() {}
+
+    fileprivate var _targetAuthorAciBinary: Data? = nil
+    fileprivate var _targetSentTimestamp: UInt64? = nil
+  }
+
   init() {}
 
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
-struct SignalServiceProtos_NullMessage: Sendable {
+nonisolated struct SignalServiceProtos_NullMessage: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var padding: Data {
-    get {return _padding ?? Data()}
+    get {_padding ?? Data()}
     set {_padding = newValue}
   }
   /// Returns true if `padding` has been explicitly set.
-  var hasPadding: Bool {return self._padding != nil}
+  var hasPadding: Bool {self._padding != nil}
   /// Clears the value of `padding`. Subsequent reads from it will return its default value.
   mutating func clearPadding() {self._padding = nil}
 
@@ -2209,17 +2436,17 @@ struct SignalServiceProtos_NullMessage: Sendable {
   fileprivate var _padding: Data? = nil
 }
 
-struct SignalServiceProtos_ReceiptMessage: Sendable {
+nonisolated struct SignalServiceProtos_ReceiptMessage: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var type: SignalServiceProtos_ReceiptMessage.TypeEnum {
-    get {return _type ?? .delivery}
+    get {_type ?? .delivery}
     set {_type = newValue}
   }
   /// Returns true if `type` has been explicitly set.
-  var hasType: Bool {return self._type != nil}
+  var hasType: Bool {self._type != nil}
   /// Clears the value of `type`. Subsequent reads from it will return its default value.
   mutating func clearType() {self._type = nil}
 
@@ -2227,7 +2454,7 @@ struct SignalServiceProtos_ReceiptMessage: Sendable {
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+  nonisolated enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
     case delivery = 0
     case read = 1
     case viewed = 2
@@ -2243,60 +2470,60 @@ struct SignalServiceProtos_ReceiptMessage: Sendable {
   fileprivate var _type: SignalServiceProtos_ReceiptMessage.TypeEnum? = nil
 }
 
-struct SignalServiceProtos_Verified: Sendable {
+nonisolated struct SignalServiceProtos_Verified: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var destinationAci: String {
-    get {return _destinationAci ?? String()}
+    get {_destinationAci ?? String()}
     set {_destinationAci = newValue}
   }
   /// Returns true if `destinationAci` has been explicitly set.
-  var hasDestinationAci: Bool {return self._destinationAci != nil}
+  var hasDestinationAci: Bool {self._destinationAci != nil}
   /// Clears the value of `destinationAci`. Subsequent reads from it will return its default value.
   mutating func clearDestinationAci() {self._destinationAci = nil}
 
   var identityKey: Data {
-    get {return _identityKey ?? Data()}
+    get {_identityKey ?? Data()}
     set {_identityKey = newValue}
   }
   /// Returns true if `identityKey` has been explicitly set.
-  var hasIdentityKey: Bool {return self._identityKey != nil}
+  var hasIdentityKey: Bool {self._identityKey != nil}
   /// Clears the value of `identityKey`. Subsequent reads from it will return its default value.
   mutating func clearIdentityKey() {self._identityKey = nil}
 
   var state: SignalServiceProtos_Verified.State {
-    get {return _state ?? .default}
+    get {_state ?? .default}
     set {_state = newValue}
   }
   /// Returns true if `state` has been explicitly set.
-  var hasState: Bool {return self._state != nil}
+  var hasState: Bool {self._state != nil}
   /// Clears the value of `state`. Subsequent reads from it will return its default value.
   mutating func clearState() {self._state = nil}
 
   var nullMessage: Data {
-    get {return _nullMessage ?? Data()}
+    get {_nullMessage ?? Data()}
     set {_nullMessage = newValue}
   }
   /// Returns true if `nullMessage` has been explicitly set.
-  var hasNullMessage: Bool {return self._nullMessage != nil}
+  var hasNullMessage: Bool {self._nullMessage != nil}
   /// Clears the value of `nullMessage`. Subsequent reads from it will return its default value.
   mutating func clearNullMessage() {self._nullMessage = nil}
 
   /// 16-byte UUID
   var destinationAciBinary: Data {
-    get {return _destinationAciBinary ?? Data()}
+    get {_destinationAciBinary ?? Data()}
     set {_destinationAciBinary = newValue}
   }
   /// Returns true if `destinationAciBinary` has been explicitly set.
-  var hasDestinationAciBinary: Bool {return self._destinationAciBinary != nil}
+  var hasDestinationAciBinary: Bool {self._destinationAciBinary != nil}
   /// Clears the value of `destinationAciBinary`. Subsequent reads from it will return its default value.
   mutating func clearDestinationAciBinary() {self._destinationAciBinary = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum State: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+  nonisolated enum State: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
     case `default` = 0
     case verified = 1
     case unverified = 2
@@ -2316,313 +2543,340 @@ struct SignalServiceProtos_Verified: Sendable {
   fileprivate var _destinationAciBinary: Data? = nil
 }
 
-struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
+nonisolated struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var sent: SignalServiceProtos_SyncMessage.Sent {
-    get {return _storage._sent ?? SignalServiceProtos_SyncMessage.Sent()}
+    get {_storage._sent ?? SignalServiceProtos_SyncMessage.Sent()}
     set {_uniqueStorage()._sent = newValue}
   }
   /// Returns true if `sent` has been explicitly set.
-  var hasSent: Bool {return _storage._sent != nil}
+  var hasSent: Bool {_storage._sent != nil}
   /// Clears the value of `sent`. Subsequent reads from it will return its default value.
   mutating func clearSent() {_uniqueStorage()._sent = nil}
 
   var contacts: SignalServiceProtos_SyncMessage.Contacts {
-    get {return _storage._contacts ?? SignalServiceProtos_SyncMessage.Contacts()}
+    get {_storage._contacts ?? SignalServiceProtos_SyncMessage.Contacts()}
     set {_uniqueStorage()._contacts = newValue}
   }
   /// Returns true if `contacts` has been explicitly set.
-  var hasContacts: Bool {return _storage._contacts != nil}
+  var hasContacts: Bool {_storage._contacts != nil}
   /// Clears the value of `contacts`. Subsequent reads from it will return its default value.
   mutating func clearContacts() {_uniqueStorage()._contacts = nil}
 
   var request: SignalServiceProtos_SyncMessage.Request {
-    get {return _storage._request ?? SignalServiceProtos_SyncMessage.Request()}
+    get {_storage._request ?? SignalServiceProtos_SyncMessage.Request()}
     set {_uniqueStorage()._request = newValue}
   }
   /// Returns true if `request` has been explicitly set.
-  var hasRequest: Bool {return _storage._request != nil}
+  var hasRequest: Bool {_storage._request != nil}
   /// Clears the value of `request`. Subsequent reads from it will return its default value.
   mutating func clearRequest() {_uniqueStorage()._request = nil}
 
   var read: [SignalServiceProtos_SyncMessage.Read] {
-    get {return _storage._read}
+    get {_storage._read}
     set {_uniqueStorage()._read = newValue}
   }
 
   var blocked: SignalServiceProtos_SyncMessage.Blocked {
-    get {return _storage._blocked ?? SignalServiceProtos_SyncMessage.Blocked()}
+    get {_storage._blocked ?? SignalServiceProtos_SyncMessage.Blocked()}
     set {_uniqueStorage()._blocked = newValue}
   }
   /// Returns true if `blocked` has been explicitly set.
-  var hasBlocked: Bool {return _storage._blocked != nil}
+  var hasBlocked: Bool {_storage._blocked != nil}
   /// Clears the value of `blocked`. Subsequent reads from it will return its default value.
   mutating func clearBlocked() {_uniqueStorage()._blocked = nil}
 
   var verified: SignalServiceProtos_Verified {
-    get {return _storage._verified ?? SignalServiceProtos_Verified()}
+    get {_storage._verified ?? SignalServiceProtos_Verified()}
     set {_uniqueStorage()._verified = newValue}
   }
   /// Returns true if `verified` has been explicitly set.
-  var hasVerified: Bool {return _storage._verified != nil}
+  var hasVerified: Bool {_storage._verified != nil}
   /// Clears the value of `verified`. Subsequent reads from it will return its default value.
   mutating func clearVerified() {_uniqueStorage()._verified = nil}
 
   var configuration: SignalServiceProtos_SyncMessage.Configuration {
-    get {return _storage._configuration ?? SignalServiceProtos_SyncMessage.Configuration()}
+    get {_storage._configuration ?? SignalServiceProtos_SyncMessage.Configuration()}
     set {_uniqueStorage()._configuration = newValue}
   }
   /// Returns true if `configuration` has been explicitly set.
-  var hasConfiguration: Bool {return _storage._configuration != nil}
+  var hasConfiguration: Bool {_storage._configuration != nil}
   /// Clears the value of `configuration`. Subsequent reads from it will return its default value.
   mutating func clearConfiguration() {_uniqueStorage()._configuration = nil}
 
   var padding: Data {
-    get {return _storage._padding ?? Data()}
+    get {_storage._padding ?? Data()}
     set {_uniqueStorage()._padding = newValue}
   }
   /// Returns true if `padding` has been explicitly set.
-  var hasPadding: Bool {return _storage._padding != nil}
+  var hasPadding: Bool {_storage._padding != nil}
   /// Clears the value of `padding`. Subsequent reads from it will return its default value.
   mutating func clearPadding() {_uniqueStorage()._padding = nil}
 
   var stickerPackOperation: [SignalServiceProtos_SyncMessage.StickerPackOperation] {
-    get {return _storage._stickerPackOperation}
+    get {_storage._stickerPackOperation}
     set {_uniqueStorage()._stickerPackOperation = newValue}
   }
 
   var viewOnceOpen: SignalServiceProtos_SyncMessage.ViewOnceOpen {
-    get {return _storage._viewOnceOpen ?? SignalServiceProtos_SyncMessage.ViewOnceOpen()}
+    get {_storage._viewOnceOpen ?? SignalServiceProtos_SyncMessage.ViewOnceOpen()}
     set {_uniqueStorage()._viewOnceOpen = newValue}
   }
   /// Returns true if `viewOnceOpen` has been explicitly set.
-  var hasViewOnceOpen: Bool {return _storage._viewOnceOpen != nil}
+  var hasViewOnceOpen: Bool {_storage._viewOnceOpen != nil}
   /// Clears the value of `viewOnceOpen`. Subsequent reads from it will return its default value.
   mutating func clearViewOnceOpen() {_uniqueStorage()._viewOnceOpen = nil}
 
   var fetchLatest: SignalServiceProtos_SyncMessage.FetchLatest {
-    get {return _storage._fetchLatest ?? SignalServiceProtos_SyncMessage.FetchLatest()}
+    get {_storage._fetchLatest ?? SignalServiceProtos_SyncMessage.FetchLatest()}
     set {_uniqueStorage()._fetchLatest = newValue}
   }
   /// Returns true if `fetchLatest` has been explicitly set.
-  var hasFetchLatest: Bool {return _storage._fetchLatest != nil}
+  var hasFetchLatest: Bool {_storage._fetchLatest != nil}
   /// Clears the value of `fetchLatest`. Subsequent reads from it will return its default value.
   mutating func clearFetchLatest() {_uniqueStorage()._fetchLatest = nil}
 
   var keys: SignalServiceProtos_SyncMessage.Keys {
-    get {return _storage._keys ?? SignalServiceProtos_SyncMessage.Keys()}
+    get {_storage._keys ?? SignalServiceProtos_SyncMessage.Keys()}
     set {_uniqueStorage()._keys = newValue}
   }
   /// Returns true if `keys` has been explicitly set.
-  var hasKeys: Bool {return _storage._keys != nil}
+  var hasKeys: Bool {_storage._keys != nil}
   /// Clears the value of `keys`. Subsequent reads from it will return its default value.
   mutating func clearKeys() {_uniqueStorage()._keys = nil}
 
   var messageRequestResponse: SignalServiceProtos_SyncMessage.MessageRequestResponse {
-    get {return _storage._messageRequestResponse ?? SignalServiceProtos_SyncMessage.MessageRequestResponse()}
+    get {_storage._messageRequestResponse ?? SignalServiceProtos_SyncMessage.MessageRequestResponse()}
     set {_uniqueStorage()._messageRequestResponse = newValue}
   }
   /// Returns true if `messageRequestResponse` has been explicitly set.
-  var hasMessageRequestResponse: Bool {return _storage._messageRequestResponse != nil}
+  var hasMessageRequestResponse: Bool {_storage._messageRequestResponse != nil}
   /// Clears the value of `messageRequestResponse`. Subsequent reads from it will return its default value.
   mutating func clearMessageRequestResponse() {_uniqueStorage()._messageRequestResponse = nil}
 
   var outgoingPayment: SignalServiceProtos_SyncMessage.OutgoingPayment {
-    get {return _storage._outgoingPayment ?? SignalServiceProtos_SyncMessage.OutgoingPayment()}
+    get {_storage._outgoingPayment ?? SignalServiceProtos_SyncMessage.OutgoingPayment()}
     set {_uniqueStorage()._outgoingPayment = newValue}
   }
   /// Returns true if `outgoingPayment` has been explicitly set.
-  var hasOutgoingPayment: Bool {return _storage._outgoingPayment != nil}
+  var hasOutgoingPayment: Bool {_storage._outgoingPayment != nil}
   /// Clears the value of `outgoingPayment`. Subsequent reads from it will return its default value.
   mutating func clearOutgoingPayment() {_uniqueStorage()._outgoingPayment = nil}
 
   var viewed: [SignalServiceProtos_SyncMessage.Viewed] {
-    get {return _storage._viewed}
+    get {_storage._viewed}
     set {_uniqueStorage()._viewed = newValue}
   }
 
   var pniChangeNumber: SignalServiceProtos_SyncMessage.PniChangeNumber {
-    get {return _storage._pniChangeNumber ?? SignalServiceProtos_SyncMessage.PniChangeNumber()}
+    get {_storage._pniChangeNumber ?? SignalServiceProtos_SyncMessage.PniChangeNumber()}
     set {_uniqueStorage()._pniChangeNumber = newValue}
   }
   /// Returns true if `pniChangeNumber` has been explicitly set.
-  var hasPniChangeNumber: Bool {return _storage._pniChangeNumber != nil}
+  var hasPniChangeNumber: Bool {_storage._pniChangeNumber != nil}
   /// Clears the value of `pniChangeNumber`. Subsequent reads from it will return its default value.
   mutating func clearPniChangeNumber() {_uniqueStorage()._pniChangeNumber = nil}
 
   var callEvent: SignalServiceProtos_SyncMessage.CallEvent {
-    get {return _storage._callEvent ?? SignalServiceProtos_SyncMessage.CallEvent()}
+    get {_storage._callEvent ?? SignalServiceProtos_SyncMessage.CallEvent()}
     set {_uniqueStorage()._callEvent = newValue}
   }
   /// Returns true if `callEvent` has been explicitly set.
-  var hasCallEvent: Bool {return _storage._callEvent != nil}
+  var hasCallEvent: Bool {_storage._callEvent != nil}
   /// Clears the value of `callEvent`. Subsequent reads from it will return its default value.
   mutating func clearCallEvent() {_uniqueStorage()._callEvent = nil}
 
   var callLinkUpdate: SignalServiceProtos_SyncMessage.CallLinkUpdate {
-    get {return _storage._callLinkUpdate ?? SignalServiceProtos_SyncMessage.CallLinkUpdate()}
+    get {_storage._callLinkUpdate ?? SignalServiceProtos_SyncMessage.CallLinkUpdate()}
     set {_uniqueStorage()._callLinkUpdate = newValue}
   }
   /// Returns true if `callLinkUpdate` has been explicitly set.
-  var hasCallLinkUpdate: Bool {return _storage._callLinkUpdate != nil}
+  var hasCallLinkUpdate: Bool {_storage._callLinkUpdate != nil}
   /// Clears the value of `callLinkUpdate`. Subsequent reads from it will return its default value.
   mutating func clearCallLinkUpdate() {_uniqueStorage()._callLinkUpdate = nil}
 
   var callLogEvent: SignalServiceProtos_SyncMessage.CallLogEvent {
-    get {return _storage._callLogEvent ?? SignalServiceProtos_SyncMessage.CallLogEvent()}
+    get {_storage._callLogEvent ?? SignalServiceProtos_SyncMessage.CallLogEvent()}
     set {_uniqueStorage()._callLogEvent = newValue}
   }
   /// Returns true if `callLogEvent` has been explicitly set.
-  var hasCallLogEvent: Bool {return _storage._callLogEvent != nil}
+  var hasCallLogEvent: Bool {_storage._callLogEvent != nil}
   /// Clears the value of `callLogEvent`. Subsequent reads from it will return its default value.
   mutating func clearCallLogEvent() {_uniqueStorage()._callLogEvent = nil}
 
   var deleteForMe: SignalServiceProtos_SyncMessage.DeleteForMe {
-    get {return _storage._deleteForMe ?? SignalServiceProtos_SyncMessage.DeleteForMe()}
+    get {_storage._deleteForMe ?? SignalServiceProtos_SyncMessage.DeleteForMe()}
     set {_uniqueStorage()._deleteForMe = newValue}
   }
   /// Returns true if `deleteForMe` has been explicitly set.
-  var hasDeleteForMe: Bool {return _storage._deleteForMe != nil}
+  var hasDeleteForMe: Bool {_storage._deleteForMe != nil}
   /// Clears the value of `deleteForMe`. Subsequent reads from it will return its default value.
   mutating func clearDeleteForMe() {_uniqueStorage()._deleteForMe = nil}
 
   var deviceNameChange: SignalServiceProtos_SyncMessage.DeviceNameChange {
-    get {return _storage._deviceNameChange ?? SignalServiceProtos_SyncMessage.DeviceNameChange()}
+    get {_storage._deviceNameChange ?? SignalServiceProtos_SyncMessage.DeviceNameChange()}
     set {_uniqueStorage()._deviceNameChange = newValue}
   }
   /// Returns true if `deviceNameChange` has been explicitly set.
-  var hasDeviceNameChange: Bool {return _storage._deviceNameChange != nil}
+  var hasDeviceNameChange: Bool {_storage._deviceNameChange != nil}
   /// Clears the value of `deviceNameChange`. Subsequent reads from it will return its default value.
   mutating func clearDeviceNameChange() {_uniqueStorage()._deviceNameChange = nil}
 
+  var attachmentBackfillRequest: SignalServiceProtos_SyncMessage.AttachmentBackfillRequest {
+    get {_storage._attachmentBackfillRequest ?? SignalServiceProtos_SyncMessage.AttachmentBackfillRequest()}
+    set {_uniqueStorage()._attachmentBackfillRequest = newValue}
+  }
+  /// Returns true if `attachmentBackfillRequest` has been explicitly set.
+  var hasAttachmentBackfillRequest: Bool {_storage._attachmentBackfillRequest != nil}
+  /// Clears the value of `attachmentBackfillRequest`. Subsequent reads from it will return its default value.
+  mutating func clearAttachmentBackfillRequest() {_uniqueStorage()._attachmentBackfillRequest = nil}
+
+  var attachmentBackfillResponse: SignalServiceProtos_SyncMessage.AttachmentBackfillResponse {
+    get {_storage._attachmentBackfillResponse ?? SignalServiceProtos_SyncMessage.AttachmentBackfillResponse()}
+    set {_uniqueStorage()._attachmentBackfillResponse = newValue}
+  }
+  /// Returns true if `attachmentBackfillResponse` has been explicitly set.
+  var hasAttachmentBackfillResponse: Bool {_storage._attachmentBackfillResponse != nil}
+  /// Clears the value of `attachmentBackfillResponse`. Subsequent reads from it will return its default value.
+  mutating func clearAttachmentBackfillResponse() {_uniqueStorage()._attachmentBackfillResponse = nil}
+
+  var usernameChange: SignalServiceProtos_SyncMessage.UsernameChange {
+    get {_storage._usernameChange ?? SignalServiceProtos_SyncMessage.UsernameChange()}
+    set {_uniqueStorage()._usernameChange = newValue}
+  }
+  /// Returns true if `usernameChange` has been explicitly set.
+  var hasUsernameChange: Bool {_storage._usernameChange != nil}
+  /// Clears the value of `usernameChange`. Subsequent reads from it will return its default value.
+  mutating func clearUsernameChange() {_uniqueStorage()._usernameChange = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  struct Sent: Sendable {
+  nonisolated struct Sent: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var destinationE164: String {
-      get {return _destinationE164 ?? String()}
+      get {_destinationE164 ?? String()}
       set {_destinationE164 = newValue}
     }
     /// Returns true if `destinationE164` has been explicitly set.
-    var hasDestinationE164: Bool {return self._destinationE164 != nil}
+    var hasDestinationE164: Bool {self._destinationE164 != nil}
     /// Clears the value of `destinationE164`. Subsequent reads from it will return its default value.
     mutating func clearDestinationE164() {self._destinationE164 = nil}
 
     var destinationServiceID: String {
-      get {return _destinationServiceID ?? String()}
+      get {_destinationServiceID ?? String()}
       set {_destinationServiceID = newValue}
     }
     /// Returns true if `destinationServiceID` has been explicitly set.
-    var hasDestinationServiceID: Bool {return self._destinationServiceID != nil}
+    var hasDestinationServiceID: Bool {self._destinationServiceID != nil}
     /// Clears the value of `destinationServiceID`. Subsequent reads from it will return its default value.
     mutating func clearDestinationServiceID() {self._destinationServiceID = nil}
 
     var timestamp: UInt64 {
-      get {return _timestamp ?? 0}
+      get {_timestamp ?? 0}
       set {_timestamp = newValue}
     }
     /// Returns true if `timestamp` has been explicitly set.
-    var hasTimestamp: Bool {return self._timestamp != nil}
+    var hasTimestamp: Bool {self._timestamp != nil}
     /// Clears the value of `timestamp`. Subsequent reads from it will return its default value.
     mutating func clearTimestamp() {self._timestamp = nil}
 
     var message: SignalServiceProtos_DataMessage {
-      get {return _message ?? SignalServiceProtos_DataMessage()}
+      get {_message ?? SignalServiceProtos_DataMessage()}
       set {_message = newValue}
     }
     /// Returns true if `message` has been explicitly set.
-    var hasMessage: Bool {return self._message != nil}
+    var hasMessage: Bool {self._message != nil}
     /// Clears the value of `message`. Subsequent reads from it will return its default value.
     mutating func clearMessage() {self._message = nil}
 
     var expirationStartTimestamp: UInt64 {
-      get {return _expirationStartTimestamp ?? 0}
+      get {_expirationStartTimestamp ?? 0}
       set {_expirationStartTimestamp = newValue}
     }
     /// Returns true if `expirationStartTimestamp` has been explicitly set.
-    var hasExpirationStartTimestamp: Bool {return self._expirationStartTimestamp != nil}
+    var hasExpirationStartTimestamp: Bool {self._expirationStartTimestamp != nil}
     /// Clears the value of `expirationStartTimestamp`. Subsequent reads from it will return its default value.
     mutating func clearExpirationStartTimestamp() {self._expirationStartTimestamp = nil}
 
     var unidentifiedStatus: [SignalServiceProtos_SyncMessage.Sent.UnidentifiedDeliveryStatus] = []
 
     var isRecipientUpdate: Bool {
-      get {return _isRecipientUpdate ?? false}
+      get {_isRecipientUpdate ?? false}
       set {_isRecipientUpdate = newValue}
     }
     /// Returns true if `isRecipientUpdate` has been explicitly set.
-    var hasIsRecipientUpdate: Bool {return self._isRecipientUpdate != nil}
+    var hasIsRecipientUpdate: Bool {self._isRecipientUpdate != nil}
     /// Clears the value of `isRecipientUpdate`. Subsequent reads from it will return its default value.
     mutating func clearIsRecipientUpdate() {self._isRecipientUpdate = nil}
 
     var storyMessage: SignalServiceProtos_StoryMessage {
-      get {return _storyMessage ?? SignalServiceProtos_StoryMessage()}
+      get {_storyMessage ?? SignalServiceProtos_StoryMessage()}
       set {_storyMessage = newValue}
     }
     /// Returns true if `storyMessage` has been explicitly set.
-    var hasStoryMessage: Bool {return self._storyMessage != nil}
+    var hasStoryMessage: Bool {self._storyMessage != nil}
     /// Clears the value of `storyMessage`. Subsequent reads from it will return its default value.
     mutating func clearStoryMessage() {self._storyMessage = nil}
 
     var storyMessageRecipients: [SignalServiceProtos_SyncMessage.Sent.StoryMessageRecipient] = []
 
     var editMessage: SignalServiceProtos_EditMessage {
-      get {return _editMessage ?? SignalServiceProtos_EditMessage()}
+      get {_editMessage ?? SignalServiceProtos_EditMessage()}
       set {_editMessage = newValue}
     }
     /// Returns true if `editMessage` has been explicitly set.
-    var hasEditMessage: Bool {return self._editMessage != nil}
+    var hasEditMessage: Bool {self._editMessage != nil}
     /// Clears the value of `editMessage`. Subsequent reads from it will return its default value.
     mutating func clearEditMessage() {self._editMessage = nil}
 
     /// service ID binary (i.e. 16 byte UUID for ACI, 1 byte prefix + 16 byte UUID for PNI)
     var destinationServiceIDBinary: Data {
-      get {return _destinationServiceIDBinary ?? Data()}
+      get {_destinationServiceIDBinary ?? Data()}
       set {_destinationServiceIDBinary = newValue}
     }
     /// Returns true if `destinationServiceIDBinary` has been explicitly set.
-    var hasDestinationServiceIDBinary: Bool {return self._destinationServiceIDBinary != nil}
+    var hasDestinationServiceIDBinary: Bool {self._destinationServiceIDBinary != nil}
     /// Clears the value of `destinationServiceIDBinary`. Subsequent reads from it will return its default value.
     mutating func clearDestinationServiceIDBinary() {self._destinationServiceIDBinary = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    struct UnidentifiedDeliveryStatus: Sendable {
+    nonisolated struct UnidentifiedDeliveryStatus: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var destinationServiceID: String {
-        get {return _destinationServiceID ?? String()}
+        get {_destinationServiceID ?? String()}
         set {_destinationServiceID = newValue}
       }
       /// Returns true if `destinationServiceID` has been explicitly set.
-      var hasDestinationServiceID: Bool {return self._destinationServiceID != nil}
+      var hasDestinationServiceID: Bool {self._destinationServiceID != nil}
       /// Clears the value of `destinationServiceID`. Subsequent reads from it will return its default value.
       mutating func clearDestinationServiceID() {self._destinationServiceID = nil}
 
       var unidentified: Bool {
-        get {return _unidentified ?? false}
+        get {_unidentified ?? false}
         set {_unidentified = newValue}
       }
       /// Returns true if `unidentified` has been explicitly set.
-      var hasUnidentified: Bool {return self._unidentified != nil}
+      var hasUnidentified: Bool {self._unidentified != nil}
       /// Clears the value of `unidentified`. Subsequent reads from it will return its default value.
       mutating func clearUnidentified() {self._unidentified = nil}
 
       /// service ID binary (i.e. 16 byte UUID for ACI, 1 byte prefix + 16 byte UUID for PNI)
       var destinationServiceIDBinary: Data {
-        get {return _destinationServiceIDBinary ?? Data()}
+        get {_destinationServiceIDBinary ?? Data()}
         set {_destinationServiceIDBinary = newValue}
       }
       /// Returns true if `destinationServiceIDBinary` has been explicitly set.
-      var hasDestinationServiceIDBinary: Bool {return self._destinationServiceIDBinary != nil}
+      var hasDestinationServiceIDBinary: Bool {self._destinationServiceIDBinary != nil}
       /// Clears the value of `destinationServiceIDBinary`. Subsequent reads from it will return its default value.
       mutating func clearDestinationServiceIDBinary() {self._destinationServiceIDBinary = nil}
 
@@ -2635,38 +2889,38 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
       fileprivate var _destinationServiceIDBinary: Data? = nil
     }
 
-    struct StoryMessageRecipient: Sendable {
+    nonisolated struct StoryMessageRecipient: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var destinationServiceID: String {
-        get {return _destinationServiceID ?? String()}
+        get {_destinationServiceID ?? String()}
         set {_destinationServiceID = newValue}
       }
       /// Returns true if `destinationServiceID` has been explicitly set.
-      var hasDestinationServiceID: Bool {return self._destinationServiceID != nil}
+      var hasDestinationServiceID: Bool {self._destinationServiceID != nil}
       /// Clears the value of `destinationServiceID`. Subsequent reads from it will return its default value.
       mutating func clearDestinationServiceID() {self._destinationServiceID = nil}
 
       var distributionListIds: [String] = []
 
       var isAllowedToReply: Bool {
-        get {return _isAllowedToReply ?? false}
+        get {_isAllowedToReply ?? false}
         set {_isAllowedToReply = newValue}
       }
       /// Returns true if `isAllowedToReply` has been explicitly set.
-      var hasIsAllowedToReply: Bool {return self._isAllowedToReply != nil}
+      var hasIsAllowedToReply: Bool {self._isAllowedToReply != nil}
       /// Clears the value of `isAllowedToReply`. Subsequent reads from it will return its default value.
       mutating func clearIsAllowedToReply() {self._isAllowedToReply = nil}
 
       /// service ID binary (i.e. 16 byte UUID for ACI, 1 byte prefix + 16 byte UUID for PNI)
       var destinationServiceIDBinary: Data {
-        get {return _destinationServiceIDBinary ?? Data()}
+        get {_destinationServiceIDBinary ?? Data()}
         set {_destinationServiceIDBinary = newValue}
       }
       /// Returns true if `destinationServiceIDBinary` has been explicitly set.
-      var hasDestinationServiceIDBinary: Bool {return self._destinationServiceIDBinary != nil}
+      var hasDestinationServiceIDBinary: Bool {self._destinationServiceIDBinary != nil}
       /// Clears the value of `destinationServiceIDBinary`. Subsequent reads from it will return its default value.
       mutating func clearDestinationServiceIDBinary() {self._destinationServiceIDBinary = nil}
 
@@ -2692,74 +2946,177 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     fileprivate var _destinationServiceIDBinary: Data? = nil
   }
 
-  struct Contacts: @unchecked Sendable {
+  nonisolated struct Contacts: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// @required
     var blob: SignalServiceProtos_AttachmentPointer {
-      get {return _storage._blob ?? SignalServiceProtos_AttachmentPointer()}
-      set {_uniqueStorage()._blob = newValue}
+      get {_blob ?? SignalServiceProtos_AttachmentPointer()}
+      set {_blob = newValue}
     }
     /// Returns true if `blob` has been explicitly set.
-    var hasBlob: Bool {return _storage._blob != nil}
+    var hasBlob: Bool {self._blob != nil}
     /// Clears the value of `blob`. Subsequent reads from it will return its default value.
-    mutating func clearBlob() {_uniqueStorage()._blob = nil}
+    mutating func clearBlob() {self._blob = nil}
 
     /// Signal-iOS renamed this property.
     var isComplete: Bool {
-      get {return _storage._isComplete ?? false}
-      set {_uniqueStorage()._isComplete = newValue}
+      get {_isComplete ?? false}
+      set {_isComplete = newValue}
     }
     /// Returns true if `isComplete` has been explicitly set.
-    var hasIsComplete: Bool {return _storage._isComplete != nil}
+    var hasIsComplete: Bool {self._isComplete != nil}
     /// Clears the value of `isComplete`. Subsequent reads from it will return its default value.
-    mutating func clearIsComplete() {_uniqueStorage()._isComplete = nil}
+    mutating func clearIsComplete() {self._isComplete = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
     init() {}
 
-    fileprivate var _storage = _StorageClass.defaultInstance
+    fileprivate var _blob: SignalServiceProtos_AttachmentPointer? = nil
+    fileprivate var _isComplete: Bool? = nil
   }
 
-  struct Blocked: Sendable {
+  nonisolated struct Blocked: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
+    /// deprecated: this field will be removed in a future release.
     var numbers: [String] = []
 
     var acis: [String] = []
 
+    /// deprecated: this field will be removed in a future release.
     var groupIds: [Data] = []
 
-    /// 16-byte UUID
+    /// deprecated: this field will be removed in a future release.
     var acisBinary: [Data] = []
 
+    var blockedE164S: [SignalServiceProtos_SyncMessage.Blocked.BlockedE164] = []
+
+    var blockedAcis: [SignalServiceProtos_SyncMessage.Blocked.BlockedAci] = []
+
+    var blockedGroups: [SignalServiceProtos_SyncMessage.Blocked.BlockedGroup] = []
+
     var unknownFields = SwiftProtobuf.UnknownStorage()
+
+    nonisolated struct BlockedE164: Sendable {
+      // SwiftProtobuf.Message conformance is added in an extension below. See the
+      // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+      // methods supported on all messages.
+
+      var e164: String {
+        get {_e164 ?? String()}
+        set {_e164 = newValue}
+      }
+      /// Returns true if `e164` has been explicitly set.
+      var hasE164: Bool {self._e164 != nil}
+      /// Clears the value of `e164`. Subsequent reads from it will return its default value.
+      mutating func clearE164() {self._e164 = nil}
+
+      var timestamp: UInt64 {
+        get {_timestamp ?? 0}
+        set {_timestamp = newValue}
+      }
+      /// Returns true if `timestamp` has been explicitly set.
+      var hasTimestamp: Bool {self._timestamp != nil}
+      /// Clears the value of `timestamp`. Subsequent reads from it will return its default value.
+      mutating func clearTimestamp() {self._timestamp = nil}
+
+      var unknownFields = SwiftProtobuf.UnknownStorage()
+
+      init() {}
+
+      fileprivate var _e164: String? = nil
+      fileprivate var _timestamp: UInt64? = nil
+    }
+
+    nonisolated struct BlockedAci: Sendable {
+      // SwiftProtobuf.Message conformance is added in an extension below. See the
+      // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+      // methods supported on all messages.
+
+      /// 16-byte UUID
+      var aciBinary: Data {
+        get {_aciBinary ?? Data()}
+        set {_aciBinary = newValue}
+      }
+      /// Returns true if `aciBinary` has been explicitly set.
+      var hasAciBinary: Bool {self._aciBinary != nil}
+      /// Clears the value of `aciBinary`. Subsequent reads from it will return its default value.
+      mutating func clearAciBinary() {self._aciBinary = nil}
+
+      var timestamp: UInt64 {
+        get {_timestamp ?? 0}
+        set {_timestamp = newValue}
+      }
+      /// Returns true if `timestamp` has been explicitly set.
+      var hasTimestamp: Bool {self._timestamp != nil}
+      /// Clears the value of `timestamp`. Subsequent reads from it will return its default value.
+      mutating func clearTimestamp() {self._timestamp = nil}
+
+      var unknownFields = SwiftProtobuf.UnknownStorage()
+
+      init() {}
+
+      fileprivate var _aciBinary: Data? = nil
+      fileprivate var _timestamp: UInt64? = nil
+    }
+
+    nonisolated struct BlockedGroup: Sendable {
+      // SwiftProtobuf.Message conformance is added in an extension below. See the
+      // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+      // methods supported on all messages.
+
+      var groupID: Data {
+        get {_groupID ?? Data()}
+        set {_groupID = newValue}
+      }
+      /// Returns true if `groupID` has been explicitly set.
+      var hasGroupID: Bool {self._groupID != nil}
+      /// Clears the value of `groupID`. Subsequent reads from it will return its default value.
+      mutating func clearGroupID() {self._groupID = nil}
+
+      var timestamp: UInt64 {
+        get {_timestamp ?? 0}
+        set {_timestamp = newValue}
+      }
+      /// Returns true if `timestamp` has been explicitly set.
+      var hasTimestamp: Bool {self._timestamp != nil}
+      /// Clears the value of `timestamp`. Subsequent reads from it will return its default value.
+      mutating func clearTimestamp() {self._timestamp = nil}
+
+      var unknownFields = SwiftProtobuf.UnknownStorage()
+
+      init() {}
+
+      fileprivate var _groupID: Data? = nil
+      fileprivate var _timestamp: UInt64? = nil
+    }
 
     init() {}
   }
 
-  struct Request: Sendable {
+  nonisolated struct Request: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var type: SignalServiceProtos_SyncMessage.Request.TypeEnum {
-      get {return _type ?? .unknown}
+      get {_type ?? .unknown}
       set {_type = newValue}
     }
     /// Returns true if `type` has been explicitly set.
-    var hasType: Bool {return self._type != nil}
+    var hasType: Bool {self._type != nil}
     /// Clears the value of `type`. Subsequent reads from it will return its default value.
     mutating func clearType() {self._type = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+    nonisolated enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
       case unknown = 0
       case contacts = 1
       case blocked = 3
@@ -2777,37 +3134,37 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     fileprivate var _type: SignalServiceProtos_SyncMessage.Request.TypeEnum? = nil
   }
 
-  struct Read: Sendable {
+  nonisolated struct Read: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var senderAci: String {
-      get {return _senderAci ?? String()}
+      get {_senderAci ?? String()}
       set {_senderAci = newValue}
     }
     /// Returns true if `senderAci` has been explicitly set.
-    var hasSenderAci: Bool {return self._senderAci != nil}
+    var hasSenderAci: Bool {self._senderAci != nil}
     /// Clears the value of `senderAci`. Subsequent reads from it will return its default value.
     mutating func clearSenderAci() {self._senderAci = nil}
 
     /// @required
     var timestamp: UInt64 {
-      get {return _timestamp ?? 0}
+      get {_timestamp ?? 0}
       set {_timestamp = newValue}
     }
     /// Returns true if `timestamp` has been explicitly set.
-    var hasTimestamp: Bool {return self._timestamp != nil}
+    var hasTimestamp: Bool {self._timestamp != nil}
     /// Clears the value of `timestamp`. Subsequent reads from it will return its default value.
     mutating func clearTimestamp() {self._timestamp = nil}
 
     /// 16-byte UUID
     var senderAciBinary: Data {
-      get {return _senderAciBinary ?? Data()}
+      get {_senderAciBinary ?? Data()}
       set {_senderAciBinary = newValue}
     }
     /// Returns true if `senderAciBinary` has been explicitly set.
-    var hasSenderAciBinary: Bool {return self._senderAciBinary != nil}
+    var hasSenderAciBinary: Bool {self._senderAciBinary != nil}
     /// Clears the value of `senderAciBinary`. Subsequent reads from it will return its default value.
     mutating func clearSenderAciBinary() {self._senderAciBinary = nil}
 
@@ -2820,37 +3177,37 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     fileprivate var _senderAciBinary: Data? = nil
   }
 
-  struct Viewed: Sendable {
+  nonisolated struct Viewed: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var senderAci: String {
-      get {return _senderAci ?? String()}
+      get {_senderAci ?? String()}
       set {_senderAci = newValue}
     }
     /// Returns true if `senderAci` has been explicitly set.
-    var hasSenderAci: Bool {return self._senderAci != nil}
+    var hasSenderAci: Bool {self._senderAci != nil}
     /// Clears the value of `senderAci`. Subsequent reads from it will return its default value.
     mutating func clearSenderAci() {self._senderAci = nil}
 
     /// @required
     var timestamp: UInt64 {
-      get {return _timestamp ?? 0}
+      get {_timestamp ?? 0}
       set {_timestamp = newValue}
     }
     /// Returns true if `timestamp` has been explicitly set.
-    var hasTimestamp: Bool {return self._timestamp != nil}
+    var hasTimestamp: Bool {self._timestamp != nil}
     /// Clears the value of `timestamp`. Subsequent reads from it will return its default value.
     mutating func clearTimestamp() {self._timestamp = nil}
 
     /// 16-byte UUID
     var senderAciBinary: Data {
-      get {return _senderAciBinary ?? Data()}
+      get {_senderAciBinary ?? Data()}
       set {_senderAciBinary = newValue}
     }
     /// Returns true if `senderAciBinary` has been explicitly set.
-    var hasSenderAciBinary: Bool {return self._senderAciBinary != nil}
+    var hasSenderAciBinary: Bool {self._senderAciBinary != nil}
     /// Clears the value of `senderAciBinary`. Subsequent reads from it will return its default value.
     mutating func clearSenderAciBinary() {self._senderAciBinary = nil}
 
@@ -2863,53 +3220,53 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     fileprivate var _senderAciBinary: Data? = nil
   }
 
-  struct Configuration: Sendable {
+  nonisolated struct Configuration: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var readReceipts: Bool {
-      get {return _readReceipts ?? false}
+      get {_readReceipts ?? false}
       set {_readReceipts = newValue}
     }
     /// Returns true if `readReceipts` has been explicitly set.
-    var hasReadReceipts: Bool {return self._readReceipts != nil}
+    var hasReadReceipts: Bool {self._readReceipts != nil}
     /// Clears the value of `readReceipts`. Subsequent reads from it will return its default value.
     mutating func clearReadReceipts() {self._readReceipts = nil}
 
     var unidentifiedDeliveryIndicators: Bool {
-      get {return _unidentifiedDeliveryIndicators ?? false}
+      get {_unidentifiedDeliveryIndicators ?? false}
       set {_unidentifiedDeliveryIndicators = newValue}
     }
     /// Returns true if `unidentifiedDeliveryIndicators` has been explicitly set.
-    var hasUnidentifiedDeliveryIndicators: Bool {return self._unidentifiedDeliveryIndicators != nil}
+    var hasUnidentifiedDeliveryIndicators: Bool {self._unidentifiedDeliveryIndicators != nil}
     /// Clears the value of `unidentifiedDeliveryIndicators`. Subsequent reads from it will return its default value.
     mutating func clearUnidentifiedDeliveryIndicators() {self._unidentifiedDeliveryIndicators = nil}
 
     var typingIndicators: Bool {
-      get {return _typingIndicators ?? false}
+      get {_typingIndicators ?? false}
       set {_typingIndicators = newValue}
     }
     /// Returns true if `typingIndicators` has been explicitly set.
-    var hasTypingIndicators: Bool {return self._typingIndicators != nil}
+    var hasTypingIndicators: Bool {self._typingIndicators != nil}
     /// Clears the value of `typingIndicators`. Subsequent reads from it will return its default value.
     mutating func clearTypingIndicators() {self._typingIndicators = nil}
 
     var provisioningVersion: UInt32 {
-      get {return _provisioningVersion ?? 0}
+      get {_provisioningVersion ?? 0}
       set {_provisioningVersion = newValue}
     }
     /// Returns true if `provisioningVersion` has been explicitly set.
-    var hasProvisioningVersion: Bool {return self._provisioningVersion != nil}
+    var hasProvisioningVersion: Bool {self._provisioningVersion != nil}
     /// Clears the value of `provisioningVersion`. Subsequent reads from it will return its default value.
     mutating func clearProvisioningVersion() {self._provisioningVersion = nil}
 
     var linkPreviews: Bool {
-      get {return _linkPreviews ?? false}
+      get {_linkPreviews ?? false}
       set {_linkPreviews = newValue}
     }
     /// Returns true if `linkPreviews` has been explicitly set.
-    var hasLinkPreviews: Bool {return self._linkPreviews != nil}
+    var hasLinkPreviews: Bool {self._linkPreviews != nil}
     /// Clears the value of `linkPreviews`. Subsequent reads from it will return its default value.
     mutating func clearLinkPreviews() {self._linkPreviews = nil}
 
@@ -2924,43 +3281,43 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     fileprivate var _linkPreviews: Bool? = nil
   }
 
-  struct StickerPackOperation: Sendable {
+  nonisolated struct StickerPackOperation: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// @required
     var packID: Data {
-      get {return _packID ?? Data()}
+      get {_packID ?? Data()}
       set {_packID = newValue}
     }
     /// Returns true if `packID` has been explicitly set.
-    var hasPackID: Bool {return self._packID != nil}
+    var hasPackID: Bool {self._packID != nil}
     /// Clears the value of `packID`. Subsequent reads from it will return its default value.
     mutating func clearPackID() {self._packID = nil}
 
     /// @required
     var packKey: Data {
-      get {return _packKey ?? Data()}
+      get {_packKey ?? Data()}
       set {_packKey = newValue}
     }
     /// Returns true if `packKey` has been explicitly set.
-    var hasPackKey: Bool {return self._packKey != nil}
+    var hasPackKey: Bool {self._packKey != nil}
     /// Clears the value of `packKey`. Subsequent reads from it will return its default value.
     mutating func clearPackKey() {self._packKey = nil}
 
     var type: SignalServiceProtos_SyncMessage.StickerPackOperation.TypeEnum {
-      get {return _type ?? .install}
+      get {_type ?? .install}
       set {_type = newValue}
     }
     /// Returns true if `type` has been explicitly set.
-    var hasType: Bool {return self._type != nil}
+    var hasType: Bool {self._type != nil}
     /// Clears the value of `type`. Subsequent reads from it will return its default value.
     mutating func clearType() {self._type = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+    nonisolated enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
       case install = 0
       case remove = 1
 
@@ -2977,37 +3334,37 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     fileprivate var _type: SignalServiceProtos_SyncMessage.StickerPackOperation.TypeEnum? = nil
   }
 
-  struct ViewOnceOpen: Sendable {
+  nonisolated struct ViewOnceOpen: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var senderAci: String {
-      get {return _senderAci ?? String()}
+      get {_senderAci ?? String()}
       set {_senderAci = newValue}
     }
     /// Returns true if `senderAci` has been explicitly set.
-    var hasSenderAci: Bool {return self._senderAci != nil}
+    var hasSenderAci: Bool {self._senderAci != nil}
     /// Clears the value of `senderAci`. Subsequent reads from it will return its default value.
     mutating func clearSenderAci() {self._senderAci = nil}
 
     /// @required
     var timestamp: UInt64 {
-      get {return _timestamp ?? 0}
+      get {_timestamp ?? 0}
       set {_timestamp = newValue}
     }
     /// Returns true if `timestamp` has been explicitly set.
-    var hasTimestamp: Bool {return self._timestamp != nil}
+    var hasTimestamp: Bool {self._timestamp != nil}
     /// Clears the value of `timestamp`. Subsequent reads from it will return its default value.
     mutating func clearTimestamp() {self._timestamp = nil}
 
     /// 16-byte UUID
     var senderAciBinary: Data {
-      get {return _senderAciBinary ?? Data()}
+      get {_senderAciBinary ?? Data()}
       set {_senderAciBinary = newValue}
     }
     /// Returns true if `senderAciBinary` has been explicitly set.
-    var hasSenderAciBinary: Bool {return self._senderAciBinary != nil}
+    var hasSenderAciBinary: Bool {self._senderAciBinary != nil}
     /// Clears the value of `senderAciBinary`. Subsequent reads from it will return its default value.
     mutating func clearSenderAciBinary() {self._senderAciBinary = nil}
 
@@ -3020,23 +3377,23 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     fileprivate var _senderAciBinary: Data? = nil
   }
 
-  struct FetchLatest: Sendable {
+  nonisolated struct FetchLatest: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var type: SignalServiceProtos_SyncMessage.FetchLatest.TypeEnum {
-      get {return _type ?? .unknown}
+      get {_type ?? .unknown}
       set {_type = newValue}
     }
     /// Returns true if `type` has been explicitly set.
-    var hasType: Bool {return self._type != nil}
+    var hasType: Bool {self._type != nil}
     /// Clears the value of `type`. Subsequent reads from it will return its default value.
     mutating func clearType() {self._type = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+    nonisolated enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
       case unknown = 0
       case localProfile = 1
       case storageManifest = 2
@@ -3053,35 +3410,26 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     fileprivate var _type: SignalServiceProtos_SyncMessage.FetchLatest.TypeEnum? = nil
   }
 
-  struct Keys: Sendable {
+  nonisolated struct Keys: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
-    var master: Data {
-      get {return _master ?? Data()}
-      set {_master = newValue}
-    }
-    /// Returns true if `master` has been explicitly set.
-    var hasMaster: Bool {return self._master != nil}
-    /// Clears the value of `master`. Subsequent reads from it will return its default value.
-    mutating func clearMaster() {self._master = nil}
-
     var accountEntropyPool: String {
-      get {return _accountEntropyPool ?? String()}
+      get {_accountEntropyPool ?? String()}
       set {_accountEntropyPool = newValue}
     }
     /// Returns true if `accountEntropyPool` has been explicitly set.
-    var hasAccountEntropyPool: Bool {return self._accountEntropyPool != nil}
+    var hasAccountEntropyPool: Bool {self._accountEntropyPool != nil}
     /// Clears the value of `accountEntropyPool`. Subsequent reads from it will return its default value.
     mutating func clearAccountEntropyPool() {self._accountEntropyPool = nil}
 
     var mediaRootBackupKey: Data {
-      get {return _mediaRootBackupKey ?? Data()}
+      get {_mediaRootBackupKey ?? Data()}
       set {_mediaRootBackupKey = newValue}
     }
     /// Returns true if `mediaRootBackupKey` has been explicitly set.
-    var hasMediaRootBackupKey: Bool {return self._mediaRootBackupKey != nil}
+    var hasMediaRootBackupKey: Bool {self._mediaRootBackupKey != nil}
     /// Clears the value of `mediaRootBackupKey`. Subsequent reads from it will return its default value.
     mutating func clearMediaRootBackupKey() {self._mediaRootBackupKey = nil}
 
@@ -3089,56 +3437,55 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
 
     init() {}
 
-    fileprivate var _master: Data? = nil
     fileprivate var _accountEntropyPool: String? = nil
     fileprivate var _mediaRootBackupKey: Data? = nil
   }
 
-  struct MessageRequestResponse: Sendable {
+  nonisolated struct MessageRequestResponse: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var threadAci: String {
-      get {return _threadAci ?? String()}
+      get {_threadAci ?? String()}
       set {_threadAci = newValue}
     }
     /// Returns true if `threadAci` has been explicitly set.
-    var hasThreadAci: Bool {return self._threadAci != nil}
+    var hasThreadAci: Bool {self._threadAci != nil}
     /// Clears the value of `threadAci`. Subsequent reads from it will return its default value.
     mutating func clearThreadAci() {self._threadAci = nil}
 
     var groupID: Data {
-      get {return _groupID ?? Data()}
+      get {_groupID ?? Data()}
       set {_groupID = newValue}
     }
     /// Returns true if `groupID` has been explicitly set.
-    var hasGroupID: Bool {return self._groupID != nil}
+    var hasGroupID: Bool {self._groupID != nil}
     /// Clears the value of `groupID`. Subsequent reads from it will return its default value.
     mutating func clearGroupID() {self._groupID = nil}
 
     var type: SignalServiceProtos_SyncMessage.MessageRequestResponse.TypeEnum {
-      get {return _type ?? .unknown}
+      get {_type ?? .unknown}
       set {_type = newValue}
     }
     /// Returns true if `type` has been explicitly set.
-    var hasType: Bool {return self._type != nil}
+    var hasType: Bool {self._type != nil}
     /// Clears the value of `type`. Subsequent reads from it will return its default value.
     mutating func clearType() {self._type = nil}
 
     /// 16-byte UUID
     var threadAciBinary: Data {
-      get {return _threadAciBinary ?? Data()}
+      get {_threadAciBinary ?? Data()}
       set {_threadAciBinary = newValue}
     }
     /// Returns true if `threadAciBinary` has been explicitly set.
-    var hasThreadAciBinary: Bool {return self._threadAciBinary != nil}
+    var hasThreadAciBinary: Bool {self._threadAciBinary != nil}
     /// Clears the value of `threadAciBinary`. Subsequent reads from it will return its default value.
     mutating func clearThreadAciBinary() {self._threadAciBinary = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+    nonisolated enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
       case unknown = 0
       case accept = 1
       case delete = 2
@@ -3161,100 +3508,100 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     fileprivate var _threadAciBinary: Data? = nil
   }
 
-  struct OutgoingPayment: Sendable {
+  nonisolated struct OutgoingPayment: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var recipientServiceID: String {
-      get {return _recipientServiceID ?? String()}
+      get {_recipientServiceID ?? String()}
       set {_recipientServiceID = newValue}
     }
     /// Returns true if `recipientServiceID` has been explicitly set.
-    var hasRecipientServiceID: Bool {return self._recipientServiceID != nil}
+    var hasRecipientServiceID: Bool {self._recipientServiceID != nil}
     /// Clears the value of `recipientServiceID`. Subsequent reads from it will return its default value.
     mutating func clearRecipientServiceID() {self._recipientServiceID = nil}
 
     var note: String {
-      get {return _note ?? String()}
+      get {_note ?? String()}
       set {_note = newValue}
     }
     /// Returns true if `note` has been explicitly set.
-    var hasNote: Bool {return self._note != nil}
+    var hasNote: Bool {self._note != nil}
     /// Clears the value of `note`. Subsequent reads from it will return its default value.
     mutating func clearNote() {self._note = nil}
 
     /// oneof attachment_identifier {
     var mobileCoin: SignalServiceProtos_SyncMessage.OutgoingPayment.MobileCoin {
-      get {return _mobileCoin ?? SignalServiceProtos_SyncMessage.OutgoingPayment.MobileCoin()}
+      get {_mobileCoin ?? SignalServiceProtos_SyncMessage.OutgoingPayment.MobileCoin()}
       set {_mobileCoin = newValue}
     }
     /// Returns true if `mobileCoin` has been explicitly set.
-    var hasMobileCoin: Bool {return self._mobileCoin != nil}
+    var hasMobileCoin: Bool {self._mobileCoin != nil}
     /// Clears the value of `mobileCoin`. Subsequent reads from it will return its default value.
     mutating func clearMobileCoin() {self._mobileCoin = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    struct MobileCoin: Sendable {
+    nonisolated struct MobileCoin: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var recipientAddress: Data {
-        get {return _recipientAddress ?? Data()}
+        get {_recipientAddress ?? Data()}
         set {_recipientAddress = newValue}
       }
       /// Returns true if `recipientAddress` has been explicitly set.
-      var hasRecipientAddress: Bool {return self._recipientAddress != nil}
+      var hasRecipientAddress: Bool {self._recipientAddress != nil}
       /// Clears the value of `recipientAddress`. Subsequent reads from it will return its default value.
       mutating func clearRecipientAddress() {self._recipientAddress = nil}
 
       /// @required
       var amountPicoMob: UInt64 {
-        get {return _amountPicoMob ?? 0}
+        get {_amountPicoMob ?? 0}
         set {_amountPicoMob = newValue}
       }
       /// Returns true if `amountPicoMob` has been explicitly set.
-      var hasAmountPicoMob: Bool {return self._amountPicoMob != nil}
+      var hasAmountPicoMob: Bool {self._amountPicoMob != nil}
       /// Clears the value of `amountPicoMob`. Subsequent reads from it will return its default value.
       mutating func clearAmountPicoMob() {self._amountPicoMob = nil}
 
       /// @required
       var feePicoMob: UInt64 {
-        get {return _feePicoMob ?? 0}
+        get {_feePicoMob ?? 0}
         set {_feePicoMob = newValue}
       }
       /// Returns true if `feePicoMob` has been explicitly set.
-      var hasFeePicoMob: Bool {return self._feePicoMob != nil}
+      var hasFeePicoMob: Bool {self._feePicoMob != nil}
       /// Clears the value of `feePicoMob`. Subsequent reads from it will return its default value.
       mutating func clearFeePicoMob() {self._feePicoMob = nil}
 
       var receipt: Data {
-        get {return _receipt ?? Data()}
+        get {_receipt ?? Data()}
         set {_receipt = newValue}
       }
       /// Returns true if `receipt` has been explicitly set.
-      var hasReceipt: Bool {return self._receipt != nil}
+      var hasReceipt: Bool {self._receipt != nil}
       /// Clears the value of `receipt`. Subsequent reads from it will return its default value.
       mutating func clearReceipt() {self._receipt = nil}
 
       var ledgerBlockTimestamp: UInt64 {
-        get {return _ledgerBlockTimestamp ?? 0}
+        get {_ledgerBlockTimestamp ?? 0}
         set {_ledgerBlockTimestamp = newValue}
       }
       /// Returns true if `ledgerBlockTimestamp` has been explicitly set.
-      var hasLedgerBlockTimestamp: Bool {return self._ledgerBlockTimestamp != nil}
+      var hasLedgerBlockTimestamp: Bool {self._ledgerBlockTimestamp != nil}
       /// Clears the value of `ledgerBlockTimestamp`. Subsequent reads from it will return its default value.
       mutating func clearLedgerBlockTimestamp() {self._ledgerBlockTimestamp = nil}
 
       /// @required
       var ledgerBlockIndex: UInt64 {
-        get {return _ledgerBlockIndex ?? 0}
+        get {_ledgerBlockIndex ?? 0}
         set {_ledgerBlockIndex = newValue}
       }
       /// Returns true if `ledgerBlockIndex` has been explicitly set.
-      var hasLedgerBlockIndex: Bool {return self._ledgerBlockIndex != nil}
+      var hasLedgerBlockIndex: Bool {self._ledgerBlockIndex != nil}
       /// Clears the value of `ledgerBlockIndex`. Subsequent reads from it will return its default value.
       mutating func clearLedgerBlockIndex() {self._ledgerBlockIndex = nil}
 
@@ -3281,56 +3628,56 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     fileprivate var _mobileCoin: SignalServiceProtos_SyncMessage.OutgoingPayment.MobileCoin? = nil
   }
 
-  struct PniChangeNumber: Sendable {
+  nonisolated struct PniChangeNumber: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// Serialized libsignal-client IdentityKeyPair
     var identityKeyPair: Data {
-      get {return _identityKeyPair ?? Data()}
+      get {_identityKeyPair ?? Data()}
       set {_identityKeyPair = newValue}
     }
     /// Returns true if `identityKeyPair` has been explicitly set.
-    var hasIdentityKeyPair: Bool {return self._identityKeyPair != nil}
+    var hasIdentityKeyPair: Bool {self._identityKeyPair != nil}
     /// Clears the value of `identityKeyPair`. Subsequent reads from it will return its default value.
     mutating func clearIdentityKeyPair() {self._identityKeyPair = nil}
 
     /// Serialized libsignal-client SignedPreKeyRecord
     var signedPreKey: Data {
-      get {return _signedPreKey ?? Data()}
+      get {_signedPreKey ?? Data()}
       set {_signedPreKey = newValue}
     }
     /// Returns true if `signedPreKey` has been explicitly set.
-    var hasSignedPreKey: Bool {return self._signedPreKey != nil}
+    var hasSignedPreKey: Bool {self._signedPreKey != nil}
     /// Clears the value of `signedPreKey`. Subsequent reads from it will return its default value.
     mutating func clearSignedPreKey() {self._signedPreKey = nil}
 
     /// Serialized libsignal-client KyberPreKeyRecord
     var lastResortKyberPreKey: Data {
-      get {return _lastResortKyberPreKey ?? Data()}
+      get {_lastResortKyberPreKey ?? Data()}
       set {_lastResortKyberPreKey = newValue}
     }
     /// Returns true if `lastResortKyberPreKey` has been explicitly set.
-    var hasLastResortKyberPreKey: Bool {return self._lastResortKyberPreKey != nil}
+    var hasLastResortKyberPreKey: Bool {self._lastResortKyberPreKey != nil}
     /// Clears the value of `lastResortKyberPreKey`. Subsequent reads from it will return its default value.
     mutating func clearLastResortKyberPreKey() {self._lastResortKyberPreKey = nil}
 
     var registrationID: UInt32 {
-      get {return _registrationID ?? 0}
+      get {_registrationID ?? 0}
       set {_registrationID = newValue}
     }
     /// Returns true if `registrationID` has been explicitly set.
-    var hasRegistrationID: Bool {return self._registrationID != nil}
+    var hasRegistrationID: Bool {self._registrationID != nil}
     /// Clears the value of `registrationID`. Subsequent reads from it will return its default value.
     mutating func clearRegistrationID() {self._registrationID = nil}
 
     var newE164: String {
-      get {return _newE164 ?? String()}
+      get {_newE164 ?? String()}
       set {_newE164 = newValue}
     }
     /// Returns true if `newE164` has been explicitly set.
-    var hasNewE164: Bool {return self._newE164 != nil}
+    var hasNewE164: Bool {self._newE164 != nil}
     /// Clears the value of `newE164`. Subsequent reads from it will return its default value.
     mutating func clearNewE164() {self._newE164 = nil}
 
@@ -3345,7 +3692,7 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     fileprivate var _newE164: String? = nil
   }
 
-  struct CallEvent: Sendable {
+  nonisolated struct CallEvent: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -3354,64 +3701,64 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     /// group, or the room ID for an ad-hoc call. See also
     /// `CallLogEvent/conversationId`. 
     var conversationID: Data {
-      get {return _conversationID ?? Data()}
+      get {_conversationID ?? Data()}
       set {_conversationID = newValue}
     }
     /// Returns true if `conversationID` has been explicitly set.
-    var hasConversationID: Bool {return self._conversationID != nil}
+    var hasConversationID: Bool {self._conversationID != nil}
     /// Clears the value of `conversationID`. Subsequent reads from it will return its default value.
     mutating func clearConversationID() {self._conversationID = nil}
 
     /// An identifier for a call. Generated directly for 1:1, or derived from
     /// the era ID for group and ad-hoc calls. See also `CallLogEvent/callId`. 
     var callID: UInt64 {
-      get {return _callID ?? 0}
+      get {_callID ?? 0}
       set {_callID = newValue}
     }
     /// Returns true if `callID` has been explicitly set.
-    var hasCallID: Bool {return self._callID != nil}
+    var hasCallID: Bool {self._callID != nil}
     /// Clears the value of `callID`. Subsequent reads from it will return its default value.
     mutating func clearCallID() {self._callID = nil}
 
     var timestamp: UInt64 {
-      get {return _timestamp ?? 0}
+      get {_timestamp ?? 0}
       set {_timestamp = newValue}
     }
     /// Returns true if `timestamp` has been explicitly set.
-    var hasTimestamp: Bool {return self._timestamp != nil}
+    var hasTimestamp: Bool {self._timestamp != nil}
     /// Clears the value of `timestamp`. Subsequent reads from it will return its default value.
     mutating func clearTimestamp() {self._timestamp = nil}
 
     var type: SignalServiceProtos_SyncMessage.CallEvent.TypeEnum {
-      get {return _type ?? .unknownType}
+      get {_type ?? .unknownType}
       set {_type = newValue}
     }
     /// Returns true if `type` has been explicitly set.
-    var hasType: Bool {return self._type != nil}
+    var hasType: Bool {self._type != nil}
     /// Clears the value of `type`. Subsequent reads from it will return its default value.
     mutating func clearType() {self._type = nil}
 
     var direction: SignalServiceProtos_SyncMessage.CallEvent.Direction {
-      get {return _direction ?? .unknownDirection}
+      get {_direction ?? .unknownDirection}
       set {_direction = newValue}
     }
     /// Returns true if `direction` has been explicitly set.
-    var hasDirection: Bool {return self._direction != nil}
+    var hasDirection: Bool {self._direction != nil}
     /// Clears the value of `direction`. Subsequent reads from it will return its default value.
     mutating func clearDirection() {self._direction = nil}
 
     var event: SignalServiceProtos_SyncMessage.CallEvent.Event {
-      get {return _event ?? .unknownAction}
+      get {_event ?? .unknownAction}
       set {_event = newValue}
     }
     /// Returns true if `event` has been explicitly set.
-    var hasEvent: Bool {return self._event != nil}
+    var hasEvent: Bool {self._event != nil}
     /// Clears the value of `event`. Subsequent reads from it will return its default value.
     mutating func clearEvent() {self._event = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+    nonisolated enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
       case unknownType = 0
       case audioCall = 1
       case videoCall = 2
@@ -3424,7 +3771,7 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
 
     }
 
-    enum Direction: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+    nonisolated enum Direction: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
       case unknownDirection = 0
       case incoming = 1
       case outgoing = 2
@@ -3435,7 +3782,7 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
 
     }
 
-    enum Event: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+    nonisolated enum Event: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
       case unknownAction = 0
       case accepted = 1
       case notAccepted = 2
@@ -3458,42 +3805,42 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     fileprivate var _event: SignalServiceProtos_SyncMessage.CallEvent.Event? = nil
   }
 
-  struct CallLinkUpdate: Sendable {
+  nonisolated struct CallLinkUpdate: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var rootKey: Data {
-      get {return _rootKey ?? Data()}
+      get {_rootKey ?? Data()}
       set {_rootKey = newValue}
     }
     /// Returns true if `rootKey` has been explicitly set.
-    var hasRootKey: Bool {return self._rootKey != nil}
+    var hasRootKey: Bool {self._rootKey != nil}
     /// Clears the value of `rootKey`. Subsequent reads from it will return its default value.
     mutating func clearRootKey() {self._rootKey = nil}
 
     var adminPasskey: Data {
-      get {return _adminPasskey ?? Data()}
+      get {_adminPasskey ?? Data()}
       set {_adminPasskey = newValue}
     }
     /// Returns true if `adminPasskey` has been explicitly set.
-    var hasAdminPasskey: Bool {return self._adminPasskey != nil}
+    var hasAdminPasskey: Bool {self._adminPasskey != nil}
     /// Clears the value of `adminPasskey`. Subsequent reads from it will return its default value.
     mutating func clearAdminPasskey() {self._adminPasskey = nil}
 
     /// defaults to UPDATE
     var type: SignalServiceProtos_SyncMessage.CallLinkUpdate.TypeEnum {
-      get {return _type ?? .update}
+      get {_type ?? .update}
       set {_type = newValue}
     }
     /// Returns true if `type` has been explicitly set.
-    var hasType: Bool {return self._type != nil}
+    var hasType: Bool {self._type != nil}
     /// Clears the value of `type`. Subsequent reads from it will return its default value.
     mutating func clearType() {self._type = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+    nonisolated enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
       case update = 0
 
       init() {
@@ -3509,26 +3856,26 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     fileprivate var _type: SignalServiceProtos_SyncMessage.CallLinkUpdate.TypeEnum? = nil
   }
 
-  struct CallLogEvent: Sendable {
+  nonisolated struct CallLogEvent: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var type: SignalServiceProtos_SyncMessage.CallLogEvent.TypeEnum {
-      get {return _type ?? .cleared}
+      get {_type ?? .cleared}
       set {_type = newValue}
     }
     /// Returns true if `type` has been explicitly set.
-    var hasType: Bool {return self._type != nil}
+    var hasType: Bool {self._type != nil}
     /// Clears the value of `type`. Subsequent reads from it will return its default value.
     mutating func clearType() {self._type = nil}
 
     var timestamp: UInt64 {
-      get {return _timestamp ?? 0}
+      get {_timestamp ?? 0}
       set {_timestamp = newValue}
     }
     /// Returns true if `timestamp` has been explicitly set.
-    var hasTimestamp: Bool {return self._timestamp != nil}
+    var hasTimestamp: Bool {self._timestamp != nil}
     /// Clears the value of `timestamp`. Subsequent reads from it will return its default value.
     mutating func clearTimestamp() {self._timestamp = nil}
 
@@ -3536,28 +3883,28 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     /// group, or the room ID for an ad-hoc call. See also
     /// `CallEvent/conversationId`. 
     var conversationID: Data {
-      get {return _conversationID ?? Data()}
+      get {_conversationID ?? Data()}
       set {_conversationID = newValue}
     }
     /// Returns true if `conversationID` has been explicitly set.
-    var hasConversationID: Bool {return self._conversationID != nil}
+    var hasConversationID: Bool {self._conversationID != nil}
     /// Clears the value of `conversationID`. Subsequent reads from it will return its default value.
     mutating func clearConversationID() {self._conversationID = nil}
 
     /// An identifier for a call. Generated directly for 1:1, or derived from
     /// the era ID for group and ad-hoc calls. See also `CallEvent/callId`. 
     var callID: UInt64 {
-      get {return _callID ?? 0}
+      get {_callID ?? 0}
       set {_callID = newValue}
     }
     /// Returns true if `callID` has been explicitly set.
-    var hasCallID: Bool {return self._callID != nil}
+    var hasCallID: Bool {self._callID != nil}
     /// Clears the value of `callID`. Subsequent reads from it will return its default value.
     mutating func clearCallID() {self._callID = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+    nonisolated enum TypeEnum: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
       case cleared = 0
       case markedAsRead = 1
       case markedAsReadInConversation = 2
@@ -3576,7 +3923,7 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     fileprivate var _callID: UInt64? = nil
   }
 
-  struct DeleteForMe: Sendable {
+  nonisolated struct DeleteForMe: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -3591,186 +3938,79 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    struct ConversationIdentifier: Sendable {
+    nonisolated struct MessageDeletes: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
-      /// oneof identifier {
-      var threadServiceID: String {
-        get {return _threadServiceID ?? String()}
-        set {_threadServiceID = newValue}
-      }
-      /// Returns true if `threadServiceID` has been explicitly set.
-      var hasThreadServiceID: Bool {return self._threadServiceID != nil}
-      /// Clears the value of `threadServiceID`. Subsequent reads from it will return its default value.
-      mutating func clearThreadServiceID() {self._threadServiceID = nil}
-
-      var threadGroupID: Data {
-        get {return _threadGroupID ?? Data()}
-        set {_threadGroupID = newValue}
-      }
-      /// Returns true if `threadGroupID` has been explicitly set.
-      var hasThreadGroupID: Bool {return self._threadGroupID != nil}
-      /// Clears the value of `threadGroupID`. Subsequent reads from it will return its default value.
-      mutating func clearThreadGroupID() {self._threadGroupID = nil}
-
-      var threadE164: String {
-        get {return _threadE164 ?? String()}
-        set {_threadE164 = newValue}
-      }
-      /// Returns true if `threadE164` has been explicitly set.
-      var hasThreadE164: Bool {return self._threadE164 != nil}
-      /// Clears the value of `threadE164`. Subsequent reads from it will return its default value.
-      mutating func clearThreadE164() {self._threadE164 = nil}
-
-      /// service ID binary (i.e. 16 byte UUID for ACI, 1 byte prefix + 16 byte UUID for PNI)
-      var threadServiceIDBinary: Data {
-        get {return _threadServiceIDBinary ?? Data()}
-        set {_threadServiceIDBinary = newValue}
-      }
-      /// Returns true if `threadServiceIDBinary` has been explicitly set.
-      var hasThreadServiceIDBinary: Bool {return self._threadServiceIDBinary != nil}
-      /// Clears the value of `threadServiceIDBinary`. Subsequent reads from it will return its default value.
-      mutating func clearThreadServiceIDBinary() {self._threadServiceIDBinary = nil}
-
-      var unknownFields = SwiftProtobuf.UnknownStorage()
-
-      init() {}
-
-      fileprivate var _threadServiceID: String? = nil
-      fileprivate var _threadGroupID: Data? = nil
-      fileprivate var _threadE164: String? = nil
-      fileprivate var _threadServiceIDBinary: Data? = nil
-    }
-
-    struct AddressableMessage: Sendable {
-      // SwiftProtobuf.Message conformance is added in an extension below. See the
-      // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-      // methods supported on all messages.
-
-      /// oneof author {
-      var authorServiceID: String {
-        get {return _authorServiceID ?? String()}
-        set {_authorServiceID = newValue}
-      }
-      /// Returns true if `authorServiceID` has been explicitly set.
-      var hasAuthorServiceID: Bool {return self._authorServiceID != nil}
-      /// Clears the value of `authorServiceID`. Subsequent reads from it will return its default value.
-      mutating func clearAuthorServiceID() {self._authorServiceID = nil}
-
-      var authorE164: String {
-        get {return _authorE164 ?? String()}
-        set {_authorE164 = newValue}
-      }
-      /// Returns true if `authorE164` has been explicitly set.
-      var hasAuthorE164: Bool {return self._authorE164 != nil}
-      /// Clears the value of `authorE164`. Subsequent reads from it will return its default value.
-      mutating func clearAuthorE164() {self._authorE164 = nil}
-
-      /// service ID binary (i.e. 16 byte UUID for ACI, 1 byte prefix + 16 byte UUID for PNI)
-      var authorServiceIDBinary: Data {
-        get {return _authorServiceIDBinary ?? Data()}
-        set {_authorServiceIDBinary = newValue}
-      }
-      /// Returns true if `authorServiceIDBinary` has been explicitly set.
-      var hasAuthorServiceIDBinary: Bool {return self._authorServiceIDBinary != nil}
-      /// Clears the value of `authorServiceIDBinary`. Subsequent reads from it will return its default value.
-      mutating func clearAuthorServiceIDBinary() {self._authorServiceIDBinary = nil}
-
-      /// }
-      var sentTimestamp: UInt64 {
-        get {return _sentTimestamp ?? 0}
-        set {_sentTimestamp = newValue}
-      }
-      /// Returns true if `sentTimestamp` has been explicitly set.
-      var hasSentTimestamp: Bool {return self._sentTimestamp != nil}
-      /// Clears the value of `sentTimestamp`. Subsequent reads from it will return its default value.
-      mutating func clearSentTimestamp() {self._sentTimestamp = nil}
-
-      var unknownFields = SwiftProtobuf.UnknownStorage()
-
-      init() {}
-
-      fileprivate var _authorServiceID: String? = nil
-      fileprivate var _authorE164: String? = nil
-      fileprivate var _authorServiceIDBinary: Data? = nil
-      fileprivate var _sentTimestamp: UInt64? = nil
-    }
-
-    struct MessageDeletes: Sendable {
-      // SwiftProtobuf.Message conformance is added in an extension below. See the
-      // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
-      // methods supported on all messages.
-
-      var conversation: SignalServiceProtos_SyncMessage.DeleteForMe.ConversationIdentifier {
-        get {return _conversation ?? SignalServiceProtos_SyncMessage.DeleteForMe.ConversationIdentifier()}
+      var conversation: SignalServiceProtos_ConversationIdentifier {
+        get {_conversation ?? SignalServiceProtos_ConversationIdentifier()}
         set {_conversation = newValue}
       }
       /// Returns true if `conversation` has been explicitly set.
-      var hasConversation: Bool {return self._conversation != nil}
+      var hasConversation: Bool {self._conversation != nil}
       /// Clears the value of `conversation`. Subsequent reads from it will return its default value.
       mutating func clearConversation() {self._conversation = nil}
 
-      var messages: [SignalServiceProtos_SyncMessage.DeleteForMe.AddressableMessage] = []
+      var messages: [SignalServiceProtos_AddressableMessage] = []
 
       var unknownFields = SwiftProtobuf.UnknownStorage()
 
       init() {}
 
-      fileprivate var _conversation: SignalServiceProtos_SyncMessage.DeleteForMe.ConversationIdentifier? = nil
+      fileprivate var _conversation: SignalServiceProtos_ConversationIdentifier? = nil
     }
 
-    struct AttachmentDelete: Sendable {
+    nonisolated struct AttachmentDelete: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
-      var conversation: SignalServiceProtos_SyncMessage.DeleteForMe.ConversationIdentifier {
-        get {return _conversation ?? SignalServiceProtos_SyncMessage.DeleteForMe.ConversationIdentifier()}
+      var conversation: SignalServiceProtos_ConversationIdentifier {
+        get {_conversation ?? SignalServiceProtos_ConversationIdentifier()}
         set {_conversation = newValue}
       }
       /// Returns true if `conversation` has been explicitly set.
-      var hasConversation: Bool {return self._conversation != nil}
+      var hasConversation: Bool {self._conversation != nil}
       /// Clears the value of `conversation`. Subsequent reads from it will return its default value.
       mutating func clearConversation() {self._conversation = nil}
 
-      var targetMessage: SignalServiceProtos_SyncMessage.DeleteForMe.AddressableMessage {
-        get {return _targetMessage ?? SignalServiceProtos_SyncMessage.DeleteForMe.AddressableMessage()}
+      var targetMessage: SignalServiceProtos_AddressableMessage {
+        get {_targetMessage ?? SignalServiceProtos_AddressableMessage()}
         set {_targetMessage = newValue}
       }
       /// Returns true if `targetMessage` has been explicitly set.
-      var hasTargetMessage: Bool {return self._targetMessage != nil}
+      var hasTargetMessage: Bool {self._targetMessage != nil}
       /// Clears the value of `targetMessage`. Subsequent reads from it will return its default value.
       mutating func clearTargetMessage() {self._targetMessage = nil}
 
       /// The `clientUuid` from `AttachmentPointer`.
       var clientUuid: Data {
-        get {return _clientUuid ?? Data()}
+        get {_clientUuid ?? Data()}
         set {_clientUuid = newValue}
       }
       /// Returns true if `clientUuid` has been explicitly set.
-      var hasClientUuid: Bool {return self._clientUuid != nil}
+      var hasClientUuid: Bool {self._clientUuid != nil}
       /// Clears the value of `clientUuid`. Subsequent reads from it will return its default value.
       mutating func clearClientUuid() {self._clientUuid = nil}
 
       /// SHA256 hash of the (encrypted, padded, etc.) attachment blob on the CDN.
       var fallbackDigest: Data {
-        get {return _fallbackDigest ?? Data()}
+        get {_fallbackDigest ?? Data()}
         set {_fallbackDigest = newValue}
       }
       /// Returns true if `fallbackDigest` has been explicitly set.
-      var hasFallbackDigest: Bool {return self._fallbackDigest != nil}
+      var hasFallbackDigest: Bool {self._fallbackDigest != nil}
       /// Clears the value of `fallbackDigest`. Subsequent reads from it will return its default value.
       mutating func clearFallbackDigest() {self._fallbackDigest = nil}
 
       /// SHA256 hash of the plaintext content of the attachment.
       var fallbackPlaintextHash: Data {
-        get {return _fallbackPlaintextHash ?? Data()}
+        get {_fallbackPlaintextHash ?? Data()}
         set {_fallbackPlaintextHash = newValue}
       }
       /// Returns true if `fallbackPlaintextHash` has been explicitly set.
-      var hasFallbackPlaintextHash: Bool {return self._fallbackPlaintextHash != nil}
+      var hasFallbackPlaintextHash: Bool {self._fallbackPlaintextHash != nil}
       /// Clears the value of `fallbackPlaintextHash`. Subsequent reads from it will return its default value.
       mutating func clearFallbackPlaintextHash() {self._fallbackPlaintextHash = nil}
 
@@ -3778,37 +4018,37 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
 
       init() {}
 
-      fileprivate var _conversation: SignalServiceProtos_SyncMessage.DeleteForMe.ConversationIdentifier? = nil
-      fileprivate var _targetMessage: SignalServiceProtos_SyncMessage.DeleteForMe.AddressableMessage? = nil
+      fileprivate var _conversation: SignalServiceProtos_ConversationIdentifier? = nil
+      fileprivate var _targetMessage: SignalServiceProtos_AddressableMessage? = nil
       fileprivate var _clientUuid: Data? = nil
       fileprivate var _fallbackDigest: Data? = nil
       fileprivate var _fallbackPlaintextHash: Data? = nil
     }
 
-    struct ConversationDelete: Sendable {
+    nonisolated struct ConversationDelete: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
-      var conversation: SignalServiceProtos_SyncMessage.DeleteForMe.ConversationIdentifier {
-        get {return _conversation ?? SignalServiceProtos_SyncMessage.DeleteForMe.ConversationIdentifier()}
+      var conversation: SignalServiceProtos_ConversationIdentifier {
+        get {_conversation ?? SignalServiceProtos_ConversationIdentifier()}
         set {_conversation = newValue}
       }
       /// Returns true if `conversation` has been explicitly set.
-      var hasConversation: Bool {return self._conversation != nil}
+      var hasConversation: Bool {self._conversation != nil}
       /// Clears the value of `conversation`. Subsequent reads from it will return its default value.
       mutating func clearConversation() {self._conversation = nil}
 
-      var mostRecentMessages: [SignalServiceProtos_SyncMessage.DeleteForMe.AddressableMessage] = []
+      var mostRecentMessages: [SignalServiceProtos_AddressableMessage] = []
 
-      var mostRecentNonExpiringMessages: [SignalServiceProtos_SyncMessage.DeleteForMe.AddressableMessage] = []
+      var mostRecentNonExpiringMessages: [SignalServiceProtos_AddressableMessage] = []
 
       var isFullDelete: Bool {
-        get {return _isFullDelete ?? false}
+        get {_isFullDelete ?? false}
         set {_isFullDelete = newValue}
       }
       /// Returns true if `isFullDelete` has been explicitly set.
-      var hasIsFullDelete: Bool {return self._isFullDelete != nil}
+      var hasIsFullDelete: Bool {self._isFullDelete != nil}
       /// Clears the value of `isFullDelete`. Subsequent reads from it will return its default value.
       mutating func clearIsFullDelete() {self._isFullDelete = nil}
 
@@ -3816,21 +4056,21 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
 
       init() {}
 
-      fileprivate var _conversation: SignalServiceProtos_SyncMessage.DeleteForMe.ConversationIdentifier? = nil
+      fileprivate var _conversation: SignalServiceProtos_ConversationIdentifier? = nil
       fileprivate var _isFullDelete: Bool? = nil
     }
 
-    struct LocalOnlyConversationDelete: Sendable {
+    nonisolated struct LocalOnlyConversationDelete: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
-      var conversation: SignalServiceProtos_SyncMessage.DeleteForMe.ConversationIdentifier {
-        get {return _conversation ?? SignalServiceProtos_SyncMessage.DeleteForMe.ConversationIdentifier()}
+      var conversation: SignalServiceProtos_ConversationIdentifier {
+        get {_conversation ?? SignalServiceProtos_ConversationIdentifier()}
         set {_conversation = newValue}
       }
       /// Returns true if `conversation` has been explicitly set.
-      var hasConversation: Bool {return self._conversation != nil}
+      var hasConversation: Bool {self._conversation != nil}
       /// Clears the value of `conversation`. Subsequent reads from it will return its default value.
       mutating func clearConversation() {self._conversation = nil}
 
@@ -3838,23 +4078,23 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
 
       init() {}
 
-      fileprivate var _conversation: SignalServiceProtos_SyncMessage.DeleteForMe.ConversationIdentifier? = nil
+      fileprivate var _conversation: SignalServiceProtos_ConversationIdentifier? = nil
     }
 
     init() {}
   }
 
-  struct DeviceNameChange: Sendable {
+  nonisolated struct DeviceNameChange: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var deviceID: UInt32 {
-      get {return _deviceID ?? 0}
+      get {_deviceID ?? 0}
       set {_deviceID = newValue}
     }
     /// Returns true if `deviceID` has been explicitly set.
-    var hasDeviceID: Bool {return self._deviceID != nil}
+    var hasDeviceID: Bool {self._deviceID != nil}
     /// Clears the value of `deviceID`. Subsequent reads from it will return its default value.
     mutating func clearDeviceID() {self._deviceID = nil}
 
@@ -3865,12 +4105,178 @@ struct SignalServiceProtos_SyncMessage: @unchecked Sendable {
     fileprivate var _deviceID: UInt32? = nil
   }
 
+  nonisolated struct AttachmentBackfillRequest: Sendable {
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
+
+    var targetMessage: SignalServiceProtos_AddressableMessage {
+      get {_targetMessage ?? SignalServiceProtos_AddressableMessage()}
+      set {_targetMessage = newValue}
+    }
+    /// Returns true if `targetMessage` has been explicitly set.
+    var hasTargetMessage: Bool {self._targetMessage != nil}
+    /// Clears the value of `targetMessage`. Subsequent reads from it will return its default value.
+    mutating func clearTargetMessage() {self._targetMessage = nil}
+
+    var targetConversation: SignalServiceProtos_ConversationIdentifier {
+      get {_targetConversation ?? SignalServiceProtos_ConversationIdentifier()}
+      set {_targetConversation = newValue}
+    }
+    /// Returns true if `targetConversation` has been explicitly set.
+    var hasTargetConversation: Bool {self._targetConversation != nil}
+    /// Clears the value of `targetConversation`. Subsequent reads from it will return its default value.
+    mutating func clearTargetConversation() {self._targetConversation = nil}
+
+    var unknownFields = SwiftProtobuf.UnknownStorage()
+
+    init() {}
+
+    fileprivate var _targetMessage: SignalServiceProtos_AddressableMessage? = nil
+    fileprivate var _targetConversation: SignalServiceProtos_ConversationIdentifier? = nil
+  }
+
+  nonisolated struct AttachmentBackfillResponse: Sendable {
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
+
+    var targetMessage: SignalServiceProtos_AddressableMessage {
+      get {_targetMessage ?? SignalServiceProtos_AddressableMessage()}
+      set {_targetMessage = newValue}
+    }
+    /// Returns true if `targetMessage` has been explicitly set.
+    var hasTargetMessage: Bool {self._targetMessage != nil}
+    /// Clears the value of `targetMessage`. Subsequent reads from it will return its default value.
+    mutating func clearTargetMessage() {self._targetMessage = nil}
+
+    var targetConversation: SignalServiceProtos_ConversationIdentifier {
+      get {_targetConversation ?? SignalServiceProtos_ConversationIdentifier()}
+      set {_targetConversation = newValue}
+    }
+    /// Returns true if `targetConversation` has been explicitly set.
+    var hasTargetConversation: Bool {self._targetConversation != nil}
+    /// Clears the value of `targetConversation`. Subsequent reads from it will return its default value.
+    mutating func clearTargetConversation() {self._targetConversation = nil}
+
+    /// oneof commented out because swift generated
+    /// enum with associated values can't be converted
+    /// to objc representation
+    ///
+    /// oneof data {
+    var attachments: SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.AttachmentDataList {
+      get {_attachments ?? SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.AttachmentDataList()}
+      set {_attachments = newValue}
+    }
+    /// Returns true if `attachments` has been explicitly set.
+    var hasAttachments: Bool {self._attachments != nil}
+    /// Clears the value of `attachments`. Subsequent reads from it will return its default value.
+    mutating func clearAttachments() {self._attachments = nil}
+
+    /// }
+    var error: SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.Error {
+      get {_error ?? .messageNotFound}
+      set {_error = newValue}
+    }
+    /// Returns true if `error` has been explicitly set.
+    var hasError: Bool {self._error != nil}
+    /// Clears the value of `error`. Subsequent reads from it will return its default value.
+    mutating func clearError() {self._error = nil}
+
+    var unknownFields = SwiftProtobuf.UnknownStorage()
+
+    nonisolated enum Error: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+      case messageNotFound = 0
+
+      init() {
+        self = .messageNotFound
+      }
+
+    }
+
+    nonisolated struct AttachmentData: Sendable {
+      // SwiftProtobuf.Message conformance is added in an extension below. See the
+      // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+      // methods supported on all messages.
+
+      /// oneof commented out because swift generated
+      /// enum with associated values can't be converted
+      /// to objc representation
+      ///
+      /// oneof data {
+      var attachment: SignalServiceProtos_AttachmentPointer {
+        get {_attachment ?? SignalServiceProtos_AttachmentPointer()}
+        set {_attachment = newValue}
+      }
+      /// Returns true if `attachment` has been explicitly set.
+      var hasAttachment: Bool {self._attachment != nil}
+      /// Clears the value of `attachment`. Subsequent reads from it will return its default value.
+      mutating func clearAttachment() {self._attachment = nil}
+
+      /// }
+      var status: SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.AttachmentData.Status {
+        get {_status ?? .pending}
+        set {_status = newValue}
+      }
+      /// Returns true if `status` has been explicitly set.
+      var hasStatus: Bool {self._status != nil}
+      /// Clears the value of `status`. Subsequent reads from it will return its default value.
+      mutating func clearStatus() {self._status = nil}
+
+      var unknownFields = SwiftProtobuf.UnknownStorage()
+
+      nonisolated enum Status: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+        case pending = 0
+        case terminalError = 1
+
+        init() {
+          self = .pending
+        }
+
+      }
+
+      init() {}
+
+      fileprivate var _attachment: SignalServiceProtos_AttachmentPointer? = nil
+      fileprivate var _status: SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.AttachmentData.Status? = nil
+    }
+
+    nonisolated struct AttachmentDataList: Sendable {
+      // SwiftProtobuf.Message conformance is added in an extension below. See the
+      // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+      // methods supported on all messages.
+
+      var attachments: [SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.AttachmentData] = []
+
+      var unknownFields = SwiftProtobuf.UnknownStorage()
+
+      init() {}
+    }
+
+    init() {}
+
+    fileprivate var _targetMessage: SignalServiceProtos_AddressableMessage? = nil
+    fileprivate var _targetConversation: SignalServiceProtos_ConversationIdentifier? = nil
+    fileprivate var _attachments: SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.AttachmentDataList? = nil
+    fileprivate var _error: SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.Error? = nil
+  }
+
+  nonisolated struct UsernameChange: Sendable {
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
+
+    var unknownFields = SwiftProtobuf.UnknownStorage()
+
+    init() {}
+  }
+
   init() {}
 
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
-struct SignalServiceProtos_AttachmentPointer: Sendable {
+nonisolated struct SignalServiceProtos_AttachmentPointer: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -3881,156 +4287,176 @@ struct SignalServiceProtos_AttachmentPointer: Sendable {
   ///
   /// oneof attachment_identifier {
   var cdnID: UInt64 {
-    get {return _cdnID ?? 0}
-    set {_cdnID = newValue}
+    get {_storage._cdnID ?? 0}
+    set {_uniqueStorage()._cdnID = newValue}
   }
   /// Returns true if `cdnID` has been explicitly set.
-  var hasCdnID: Bool {return self._cdnID != nil}
+  var hasCdnID: Bool {_storage._cdnID != nil}
   /// Clears the value of `cdnID`. Subsequent reads from it will return its default value.
-  mutating func clearCdnID() {self._cdnID = nil}
+  mutating func clearCdnID() {_uniqueStorage()._cdnID = nil}
 
   /// }
   var cdnKey: String {
-    get {return _cdnKey ?? String()}
-    set {_cdnKey = newValue}
+    get {_storage._cdnKey ?? String()}
+    set {_uniqueStorage()._cdnKey = newValue}
   }
   /// Returns true if `cdnKey` has been explicitly set.
-  var hasCdnKey: Bool {return self._cdnKey != nil}
+  var hasCdnKey: Bool {_storage._cdnKey != nil}
   /// Clears the value of `cdnKey`. Subsequent reads from it will return its default value.
-  mutating func clearCdnKey() {self._cdnKey = nil}
+  mutating func clearCdnKey() {_uniqueStorage()._cdnKey = nil}
 
   /// Cross-client identifier for this attachment among all attachments on the
   /// owning message.
   var clientUuid: Data {
-    get {return _clientUuid ?? Data()}
-    set {_clientUuid = newValue}
+    get {_storage._clientUuid ?? Data()}
+    set {_uniqueStorage()._clientUuid = newValue}
   }
   /// Returns true if `clientUuid` has been explicitly set.
-  var hasClientUuid: Bool {return self._clientUuid != nil}
+  var hasClientUuid: Bool {_storage._clientUuid != nil}
   /// Clears the value of `clientUuid`. Subsequent reads from it will return its default value.
-  mutating func clearClientUuid() {self._clientUuid = nil}
+  mutating func clearClientUuid() {_uniqueStorage()._clientUuid = nil}
 
   var contentType: String {
-    get {return _contentType ?? String()}
-    set {_contentType = newValue}
+    get {_storage._contentType ?? String()}
+    set {_uniqueStorage()._contentType = newValue}
   }
   /// Returns true if `contentType` has been explicitly set.
-  var hasContentType: Bool {return self._contentType != nil}
+  var hasContentType: Bool {_storage._contentType != nil}
   /// Clears the value of `contentType`. Subsequent reads from it will return its default value.
-  mutating func clearContentType() {self._contentType = nil}
+  mutating func clearContentType() {_uniqueStorage()._contentType = nil}
 
   var key: Data {
-    get {return _key ?? Data()}
-    set {_key = newValue}
+    get {_storage._key ?? Data()}
+    set {_uniqueStorage()._key = newValue}
   }
   /// Returns true if `key` has been explicitly set.
-  var hasKey: Bool {return self._key != nil}
+  var hasKey: Bool {_storage._key != nil}
   /// Clears the value of `key`. Subsequent reads from it will return its default value.
-  mutating func clearKey() {self._key = nil}
+  mutating func clearKey() {_uniqueStorage()._key = nil}
 
   var size: UInt32 {
-    get {return _size ?? 0}
-    set {_size = newValue}
+    get {_storage._size ?? 0}
+    set {_uniqueStorage()._size = newValue}
   }
   /// Returns true if `size` has been explicitly set.
-  var hasSize: Bool {return self._size != nil}
+  var hasSize: Bool {_storage._size != nil}
   /// Clears the value of `size`. Subsequent reads from it will return its default value.
-  mutating func clearSize() {self._size = nil}
+  mutating func clearSize() {_uniqueStorage()._size = nil}
 
   var thumbnail: Data {
-    get {return _thumbnail ?? Data()}
-    set {_thumbnail = newValue}
+    get {_storage._thumbnail ?? Data()}
+    set {_uniqueStorage()._thumbnail = newValue}
   }
   /// Returns true if `thumbnail` has been explicitly set.
-  var hasThumbnail: Bool {return self._thumbnail != nil}
+  var hasThumbnail: Bool {_storage._thumbnail != nil}
   /// Clears the value of `thumbnail`. Subsequent reads from it will return its default value.
-  mutating func clearThumbnail() {self._thumbnail = nil}
+  mutating func clearThumbnail() {_uniqueStorage()._thumbnail = nil}
 
   var digest: Data {
-    get {return _digest ?? Data()}
-    set {_digest = newValue}
+    get {_storage._digest ?? Data()}
+    set {_uniqueStorage()._digest = newValue}
   }
   /// Returns true if `digest` has been explicitly set.
-  var hasDigest: Bool {return self._digest != nil}
+  var hasDigest: Bool {_storage._digest != nil}
   /// Clears the value of `digest`. Subsequent reads from it will return its default value.
-  mutating func clearDigest() {self._digest = nil}
+  mutating func clearDigest() {_uniqueStorage()._digest = nil}
 
   var fileName: String {
-    get {return _fileName ?? String()}
-    set {_fileName = newValue}
+    get {_storage._fileName ?? String()}
+    set {_uniqueStorage()._fileName = newValue}
   }
   /// Returns true if `fileName` has been explicitly set.
-  var hasFileName: Bool {return self._fileName != nil}
+  var hasFileName: Bool {_storage._fileName != nil}
   /// Clears the value of `fileName`. Subsequent reads from it will return its default value.
-  mutating func clearFileName() {self._fileName = nil}
+  mutating func clearFileName() {_uniqueStorage()._fileName = nil}
 
   var flags: UInt32 {
-    get {return _flags ?? 0}
-    set {_flags = newValue}
+    get {_storage._flags ?? 0}
+    set {_uniqueStorage()._flags = newValue}
   }
   /// Returns true if `flags` has been explicitly set.
-  var hasFlags: Bool {return self._flags != nil}
+  var hasFlags: Bool {_storage._flags != nil}
   /// Clears the value of `flags`. Subsequent reads from it will return its default value.
-  mutating func clearFlags() {self._flags = nil}
+  mutating func clearFlags() {_uniqueStorage()._flags = nil}
 
   var width: UInt32 {
-    get {return _width ?? 0}
-    set {_width = newValue}
+    get {_storage._width ?? 0}
+    set {_uniqueStorage()._width = newValue}
   }
   /// Returns true if `width` has been explicitly set.
-  var hasWidth: Bool {return self._width != nil}
+  var hasWidth: Bool {_storage._width != nil}
   /// Clears the value of `width`. Subsequent reads from it will return its default value.
-  mutating func clearWidth() {self._width = nil}
+  mutating func clearWidth() {_uniqueStorage()._width = nil}
 
   var height: UInt32 {
-    get {return _height ?? 0}
-    set {_height = newValue}
+    get {_storage._height ?? 0}
+    set {_uniqueStorage()._height = newValue}
   }
   /// Returns true if `height` has been explicitly set.
-  var hasHeight: Bool {return self._height != nil}
+  var hasHeight: Bool {_storage._height != nil}
   /// Clears the value of `height`. Subsequent reads from it will return its default value.
-  mutating func clearHeight() {self._height = nil}
+  mutating func clearHeight() {_uniqueStorage()._height = nil}
 
   var caption: String {
-    get {return _caption ?? String()}
-    set {_caption = newValue}
+    get {_storage._caption ?? String()}
+    set {_uniqueStorage()._caption = newValue}
   }
   /// Returns true if `caption` has been explicitly set.
-  var hasCaption: Bool {return self._caption != nil}
+  var hasCaption: Bool {_storage._caption != nil}
   /// Clears the value of `caption`. Subsequent reads from it will return its default value.
-  mutating func clearCaption() {self._caption = nil}
+  mutating func clearCaption() {_uniqueStorage()._caption = nil}
 
   var blurHash: String {
-    get {return _blurHash ?? String()}
-    set {_blurHash = newValue}
+    get {_storage._blurHash ?? String()}
+    set {_uniqueStorage()._blurHash = newValue}
   }
   /// Returns true if `blurHash` has been explicitly set.
-  var hasBlurHash: Bool {return self._blurHash != nil}
+  var hasBlurHash: Bool {_storage._blurHash != nil}
   /// Clears the value of `blurHash`. Subsequent reads from it will return its default value.
-  mutating func clearBlurHash() {self._blurHash = nil}
+  mutating func clearBlurHash() {_uniqueStorage()._blurHash = nil}
 
   var uploadTimestamp: UInt64 {
-    get {return _uploadTimestamp ?? 0}
-    set {_uploadTimestamp = newValue}
+    get {_storage._uploadTimestamp ?? 0}
+    set {_uniqueStorage()._uploadTimestamp = newValue}
   }
   /// Returns true if `uploadTimestamp` has been explicitly set.
-  var hasUploadTimestamp: Bool {return self._uploadTimestamp != nil}
+  var hasUploadTimestamp: Bool {_storage._uploadTimestamp != nil}
   /// Clears the value of `uploadTimestamp`. Subsequent reads from it will return its default value.
-  mutating func clearUploadTimestamp() {self._uploadTimestamp = nil}
+  mutating func clearUploadTimestamp() {_uniqueStorage()._uploadTimestamp = nil}
 
-  /// Next ID: 21
   var cdnNumber: UInt32 {
-    get {return _cdnNumber ?? 0}
-    set {_cdnNumber = newValue}
+    get {_storage._cdnNumber ?? 0}
+    set {_uniqueStorage()._cdnNumber = newValue}
   }
   /// Returns true if `cdnNumber` has been explicitly set.
-  var hasCdnNumber: Bool {return self._cdnNumber != nil}
+  var hasCdnNumber: Bool {_storage._cdnNumber != nil}
   /// Clears the value of `cdnNumber`. Subsequent reads from it will return its default value.
-  mutating func clearCdnNumber() {self._cdnNumber = nil}
+  mutating func clearCdnNumber() {_uniqueStorage()._cdnNumber = nil}
+
+  /// Waveform for audio attachments. Each byte represents a "bar" in the
+  /// waveform, with 0 as silence 255 as loudest. At most 100 bytes/bars.
+  var audioWaveform: Data {
+    get {_storage._audioWaveform ?? Data()}
+    set {_uniqueStorage()._audioWaveform = newValue}
+  }
+  /// Returns true if `audioWaveform` has been explicitly set.
+  var hasAudioWaveform: Bool {_storage._audioWaveform != nil}
+  /// Clears the value of `audioWaveform`. Subsequent reads from it will return its default value.
+  mutating func clearAudioWaveform() {_uniqueStorage()._audioWaveform = nil}
+
+  /// Duration of an audio attachment, in seconds.
+  var audioDurationSeconds: Float {
+    get {_storage._audioDurationSeconds ?? 0}
+    set {_uniqueStorage()._audioDurationSeconds = newValue}
+  }
+  /// Returns true if `audioDurationSeconds` has been explicitly set.
+  var hasAudioDurationSeconds: Bool {_storage._audioDurationSeconds != nil}
+  /// Clears the value of `audioDurationSeconds`. Subsequent reads from it will return its default value.
+  mutating func clearAudioDurationSeconds() {_uniqueStorage()._audioDurationSeconds = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum Flags: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+  nonisolated enum Flags: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
     case voiceMessage = 1
     case borderless = 2
     case gif = 8
@@ -4043,53 +4469,38 @@ struct SignalServiceProtos_AttachmentPointer: Sendable {
 
   init() {}
 
-  fileprivate var _cdnID: UInt64? = nil
-  fileprivate var _cdnKey: String? = nil
-  fileprivate var _clientUuid: Data? = nil
-  fileprivate var _contentType: String? = nil
-  fileprivate var _key: Data? = nil
-  fileprivate var _size: UInt32? = nil
-  fileprivate var _thumbnail: Data? = nil
-  fileprivate var _digest: Data? = nil
-  fileprivate var _fileName: String? = nil
-  fileprivate var _flags: UInt32? = nil
-  fileprivate var _width: UInt32? = nil
-  fileprivate var _height: UInt32? = nil
-  fileprivate var _caption: String? = nil
-  fileprivate var _blurHash: String? = nil
-  fileprivate var _uploadTimestamp: UInt64? = nil
-  fileprivate var _cdnNumber: UInt32? = nil
+  fileprivate var _storage = _StorageClass.defaultInstance
 }
 
-struct SignalServiceProtos_GroupContextV2: Sendable {
+nonisolated struct SignalServiceProtos_GroupContextV2: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var masterKey: Data {
-    get {return _masterKey ?? Data()}
+    get {_masterKey ?? Data()}
     set {_masterKey = newValue}
   }
   /// Returns true if `masterKey` has been explicitly set.
-  var hasMasterKey: Bool {return self._masterKey != nil}
+  var hasMasterKey: Bool {self._masterKey != nil}
   /// Clears the value of `masterKey`. Subsequent reads from it will return its default value.
   mutating func clearMasterKey() {self._masterKey = nil}
 
   var revision: UInt32 {
-    get {return _revision ?? 0}
+    get {_revision ?? 0}
     set {_revision = newValue}
   }
   /// Returns true if `revision` has been explicitly set.
-  var hasRevision: Bool {return self._revision != nil}
+  var hasRevision: Bool {self._revision != nil}
   /// Clears the value of `revision`. Subsequent reads from it will return its default value.
   mutating func clearRevision() {self._revision = nil}
 
   var groupChange: Data {
-    get {return _groupChange ?? Data()}
+    get {_groupChange ?? Data()}
     set {_groupChange = newValue}
   }
   /// Returns true if `groupChange` has been explicitly set.
-  var hasGroupChange: Bool {return self._groupChange != nil}
+  var hasGroupChange: Bool {self._groupChange != nil}
   /// Clears the value of `groupChange`. Subsequent reads from it will return its default value.
   mutating func clearGroupChange() {self._groupChange = nil}
 
@@ -4102,106 +4513,106 @@ struct SignalServiceProtos_GroupContextV2: Sendable {
   fileprivate var _groupChange: Data? = nil
 }
 
-struct SignalServiceProtos_ContactDetails: Sendable {
+nonisolated struct SignalServiceProtos_ContactDetails: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var contactE164: String {
-    get {return _contactE164 ?? String()}
+    get {_contactE164 ?? String()}
     set {_contactE164 = newValue}
   }
   /// Returns true if `contactE164` has been explicitly set.
-  var hasContactE164: Bool {return self._contactE164 != nil}
+  var hasContactE164: Bool {self._contactE164 != nil}
   /// Clears the value of `contactE164`. Subsequent reads from it will return its default value.
   mutating func clearContactE164() {self._contactE164 = nil}
 
   var aci: String {
-    get {return _aci ?? String()}
+    get {_aci ?? String()}
     set {_aci = newValue}
   }
   /// Returns true if `aci` has been explicitly set.
-  var hasAci: Bool {return self._aci != nil}
+  var hasAci: Bool {self._aci != nil}
   /// Clears the value of `aci`. Subsequent reads from it will return its default value.
   mutating func clearAci() {self._aci = nil}
 
   /// 16-byte UUID
   var aciBinary: Data {
-    get {return _aciBinary ?? Data()}
+    get {_aciBinary ?? Data()}
     set {_aciBinary = newValue}
   }
   /// Returns true if `aciBinary` has been explicitly set.
-  var hasAciBinary: Bool {return self._aciBinary != nil}
+  var hasAciBinary: Bool {self._aciBinary != nil}
   /// Clears the value of `aciBinary`. Subsequent reads from it will return its default value.
   mutating func clearAciBinary() {self._aciBinary = nil}
 
   var name: String {
-    get {return _name ?? String()}
+    get {_name ?? String()}
     set {_name = newValue}
   }
   /// Returns true if `name` has been explicitly set.
-  var hasName: Bool {return self._name != nil}
+  var hasName: Bool {self._name != nil}
   /// Clears the value of `name`. Subsequent reads from it will return its default value.
   mutating func clearName() {self._name = nil}
 
   var avatar: SignalServiceProtos_ContactDetails.Avatar {
-    get {return _avatar ?? SignalServiceProtos_ContactDetails.Avatar()}
+    get {_avatar ?? SignalServiceProtos_ContactDetails.Avatar()}
     set {_avatar = newValue}
   }
   /// Returns true if `avatar` has been explicitly set.
-  var hasAvatar: Bool {return self._avatar != nil}
+  var hasAvatar: Bool {self._avatar != nil}
   /// Clears the value of `avatar`. Subsequent reads from it will return its default value.
   mutating func clearAvatar() {self._avatar = nil}
 
   var expireTimer: UInt32 {
-    get {return _expireTimer ?? 0}
+    get {_expireTimer ?? 0}
     set {_expireTimer = newValue}
   }
   /// Returns true if `expireTimer` has been explicitly set.
-  var hasExpireTimer: Bool {return self._expireTimer != nil}
+  var hasExpireTimer: Bool {self._expireTimer != nil}
   /// Clears the value of `expireTimer`. Subsequent reads from it will return its default value.
   mutating func clearExpireTimer() {self._expireTimer = nil}
 
   var expireTimerVersion: UInt32 {
-    get {return _expireTimerVersion ?? 0}
+    get {_expireTimerVersion ?? 0}
     set {_expireTimerVersion = newValue}
   }
   /// Returns true if `expireTimerVersion` has been explicitly set.
-  var hasExpireTimerVersion: Bool {return self._expireTimerVersion != nil}
+  var hasExpireTimerVersion: Bool {self._expireTimerVersion != nil}
   /// Clears the value of `expireTimerVersion`. Subsequent reads from it will return its default value.
   mutating func clearExpireTimerVersion() {self._expireTimerVersion = nil}
 
   var inboxPosition: UInt32 {
-    get {return _inboxPosition ?? 0}
+    get {_inboxPosition ?? 0}
     set {_inboxPosition = newValue}
   }
   /// Returns true if `inboxPosition` has been explicitly set.
-  var hasInboxPosition: Bool {return self._inboxPosition != nil}
+  var hasInboxPosition: Bool {self._inboxPosition != nil}
   /// Clears the value of `inboxPosition`. Subsequent reads from it will return its default value.
   mutating func clearInboxPosition() {self._inboxPosition = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  struct Avatar: Sendable {
+  nonisolated struct Avatar: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var contentType: String {
-      get {return _contentType ?? String()}
+      get {_contentType ?? String()}
       set {_contentType = newValue}
     }
     /// Returns true if `contentType` has been explicitly set.
-    var hasContentType: Bool {return self._contentType != nil}
+    var hasContentType: Bool {self._contentType != nil}
     /// Clears the value of `contentType`. Subsequent reads from it will return its default value.
     mutating func clearContentType() {self._contentType = nil}
 
     var length: UInt32 {
-      get {return _length ?? 0}
+      get {_length ?? 0}
       set {_length = newValue}
     }
     /// Returns true if `length` has been explicitly set.
-    var hasLength: Bool {return self._length != nil}
+    var hasLength: Bool {self._length != nil}
     /// Clears the value of `length`. Subsequent reads from it will return its default value.
     mutating func clearLength() {self._length = nil}
 
@@ -4225,35 +4636,35 @@ struct SignalServiceProtos_ContactDetails: Sendable {
   fileprivate var _inboxPosition: UInt32? = nil
 }
 
-struct SignalServiceProtos_Pack: Sendable {
+nonisolated struct SignalServiceProtos_Pack: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var title: String {
-    get {return _title ?? String()}
+    get {_title ?? String()}
     set {_title = newValue}
   }
   /// Returns true if `title` has been explicitly set.
-  var hasTitle: Bool {return self._title != nil}
+  var hasTitle: Bool {self._title != nil}
   /// Clears the value of `title`. Subsequent reads from it will return its default value.
   mutating func clearTitle() {self._title = nil}
 
   var author: String {
-    get {return _author ?? String()}
+    get {_author ?? String()}
     set {_author = newValue}
   }
   /// Returns true if `author` has been explicitly set.
-  var hasAuthor: Bool {return self._author != nil}
+  var hasAuthor: Bool {self._author != nil}
   /// Clears the value of `author`. Subsequent reads from it will return its default value.
   mutating func clearAuthor() {self._author = nil}
 
   var cover: SignalServiceProtos_Pack.Sticker {
-    get {return _cover ?? SignalServiceProtos_Pack.Sticker()}
+    get {_cover ?? SignalServiceProtos_Pack.Sticker()}
     set {_cover = newValue}
   }
   /// Returns true if `cover` has been explicitly set.
-  var hasCover: Bool {return self._cover != nil}
+  var hasCover: Bool {self._cover != nil}
   /// Clears the value of `cover`. Subsequent reads from it will return its default value.
   mutating func clearCover() {self._cover = nil}
 
@@ -4261,36 +4672,36 @@ struct SignalServiceProtos_Pack: Sendable {
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  struct Sticker: Sendable {
+  nonisolated struct Sticker: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// @required
     var id: UInt32 {
-      get {return _id ?? 0}
+      get {_id ?? 0}
       set {_id = newValue}
     }
     /// Returns true if `id` has been explicitly set.
-    var hasID: Bool {return self._id != nil}
+    var hasID: Bool {self._id != nil}
     /// Clears the value of `id`. Subsequent reads from it will return its default value.
     mutating func clearID() {self._id = nil}
 
     var emoji: String {
-      get {return _emoji ?? String()}
+      get {_emoji ?? String()}
       set {_emoji = newValue}
     }
     /// Returns true if `emoji` has been explicitly set.
-    var hasEmoji: Bool {return self._emoji != nil}
+    var hasEmoji: Bool {self._emoji != nil}
     /// Clears the value of `emoji`. Subsequent reads from it will return its default value.
     mutating func clearEmoji() {self._emoji = nil}
 
     var contentType: String {
-      get {return _contentType ?? String()}
+      get {_contentType ?? String()}
       set {_contentType = newValue}
     }
     /// Returns true if `contentType` has been explicitly set.
-    var hasContentType: Bool {return self._contentType != nil}
+    var hasContentType: Bool {self._contentType != nil}
     /// Clears the value of `contentType`. Subsequent reads from it will return its default value.
     mutating func clearContentType() {self._contentType = nil}
 
@@ -4310,7 +4721,7 @@ struct SignalServiceProtos_Pack: Sendable {
   fileprivate var _cover: SignalServiceProtos_Pack.Sticker? = nil
 }
 
-struct SignalServiceProtos_PaymentAddress: Sendable {
+nonisolated struct SignalServiceProtos_PaymentAddress: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -4318,38 +4729,38 @@ struct SignalServiceProtos_PaymentAddress: Sendable {
   /// oneof commented out
   /// oneof Address {
   var mobileCoin: SignalServiceProtos_PaymentAddress.MobileCoin {
-    get {return _mobileCoin ?? SignalServiceProtos_PaymentAddress.MobileCoin()}
+    get {_mobileCoin ?? SignalServiceProtos_PaymentAddress.MobileCoin()}
     set {_mobileCoin = newValue}
   }
   /// Returns true if `mobileCoin` has been explicitly set.
-  var hasMobileCoin: Bool {return self._mobileCoin != nil}
+  var hasMobileCoin: Bool {self._mobileCoin != nil}
   /// Clears the value of `mobileCoin`. Subsequent reads from it will return its default value.
   mutating func clearMobileCoin() {self._mobileCoin = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  struct MobileCoin: Sendable {
+  nonisolated struct MobileCoin: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// @required
     var publicAddress: Data {
-      get {return _publicAddress ?? Data()}
+      get {_publicAddress ?? Data()}
       set {_publicAddress = newValue}
     }
     /// Returns true if `publicAddress` has been explicitly set.
-    var hasPublicAddress: Bool {return self._publicAddress != nil}
+    var hasPublicAddress: Bool {self._publicAddress != nil}
     /// Clears the value of `publicAddress`. Subsequent reads from it will return its default value.
     mutating func clearPublicAddress() {self._publicAddress = nil}
 
     /// @required
     var signature: Data {
-      get {return _signature ?? Data()}
+      get {_signature ?? Data()}
       set {_signature = newValue}
     }
     /// Returns true if `signature` has been explicitly set.
-    var hasSignature: Bool {return self._signature != nil}
+    var hasSignature: Bool {self._signature != nil}
     /// Clears the value of `signature`. Subsequent reads from it will return its default value.
     mutating func clearSignature() {self._signature = nil}
 
@@ -4366,35 +4777,35 @@ struct SignalServiceProtos_PaymentAddress: Sendable {
   fileprivate var _mobileCoin: SignalServiceProtos_PaymentAddress.MobileCoin? = nil
 }
 
-struct SignalServiceProtos_DecryptionErrorMessage: Sendable {
+nonisolated struct SignalServiceProtos_DecryptionErrorMessage: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var ratchetKey: Data {
-    get {return _ratchetKey ?? Data()}
+    get {_ratchetKey ?? Data()}
     set {_ratchetKey = newValue}
   }
   /// Returns true if `ratchetKey` has been explicitly set.
-  var hasRatchetKey: Bool {return self._ratchetKey != nil}
+  var hasRatchetKey: Bool {self._ratchetKey != nil}
   /// Clears the value of `ratchetKey`. Subsequent reads from it will return its default value.
   mutating func clearRatchetKey() {self._ratchetKey = nil}
 
   var timestamp: UInt64 {
-    get {return _timestamp ?? 0}
+    get {_timestamp ?? 0}
     set {_timestamp = newValue}
   }
   /// Returns true if `timestamp` has been explicitly set.
-  var hasTimestamp: Bool {return self._timestamp != nil}
+  var hasTimestamp: Bool {self._timestamp != nil}
   /// Clears the value of `timestamp`. Subsequent reads from it will return its default value.
   mutating func clearTimestamp() {self._timestamp = nil}
 
   var deviceID: UInt32 {
-    get {return _deviceID ?? 0}
+    get {_deviceID ?? 0}
     set {_deviceID = newValue}
   }
   /// Returns true if `deviceID` has been explicitly set.
-  var hasDeviceID: Bool {return self._deviceID != nil}
+  var hasDeviceID: Bool {self._deviceID != nil}
   /// Clears the value of `deviceID`. Subsequent reads from it will return its default value.
   mutating func clearDeviceID() {self._deviceID = nil}
 
@@ -4407,27 +4818,27 @@ struct SignalServiceProtos_DecryptionErrorMessage: Sendable {
   fileprivate var _deviceID: UInt32? = nil
 }
 
-struct SignalServiceProtos_PniSignatureMessage: Sendable {
+nonisolated struct SignalServiceProtos_PniSignatureMessage: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var pni: Data {
-    get {return _pni ?? Data()}
+    get {_pni ?? Data()}
     set {_pni = newValue}
   }
   /// Returns true if `pni` has been explicitly set.
-  var hasPni: Bool {return self._pni != nil}
+  var hasPni: Bool {self._pni != nil}
   /// Clears the value of `pni`. Subsequent reads from it will return its default value.
   mutating func clearPni() {self._pni = nil}
 
   /// Signature *by* the PNI identity key *of* the ACI identity key
   var signature: Data {
-    get {return _signature ?? Data()}
+    get {_signature ?? Data()}
     set {_signature = newValue}
   }
   /// Returns true if `signature` has been explicitly set.
-  var hasSignature: Bool {return self._signature != nil}
+  var hasSignature: Bool {self._signature != nil}
   /// Clears the value of `signature`. Subsequent reads from it will return its default value.
   mutating func clearSignature() {self._signature = nil}
 
@@ -4439,26 +4850,26 @@ struct SignalServiceProtos_PniSignatureMessage: Sendable {
   fileprivate var _signature: Data? = nil
 }
 
-struct SignalServiceProtos_BodyRange: Sendable {
+nonisolated struct SignalServiceProtos_BodyRange: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var start: UInt32 {
-    get {return _start ?? 0}
+    get {_start ?? 0}
     set {_start = newValue}
   }
   /// Returns true if `start` has been explicitly set.
-  var hasStart: Bool {return self._start != nil}
+  var hasStart: Bool {self._start != nil}
   /// Clears the value of `start`. Subsequent reads from it will return its default value.
   mutating func clearStart() {self._start = nil}
 
   var length: UInt32 {
-    get {return _length ?? 0}
+    get {_length ?? 0}
     set {_length = newValue}
   }
   /// Returns true if `length` has been explicitly set.
-  var hasLength: Bool {return self._length != nil}
+  var hasLength: Bool {self._length != nil}
   /// Clears the value of `length`. Subsequent reads from it will return its default value.
   mutating func clearLength() {self._length = nil}
 
@@ -4468,36 +4879,36 @@ struct SignalServiceProtos_BodyRange: Sendable {
   ///
   /// oneof associatedValue {
   var mentionAci: String {
-    get {return _mentionAci ?? String()}
+    get {_mentionAci ?? String()}
     set {_mentionAci = newValue}
   }
   /// Returns true if `mentionAci` has been explicitly set.
-  var hasMentionAci: Bool {return self._mentionAci != nil}
+  var hasMentionAci: Bool {self._mentionAci != nil}
   /// Clears the value of `mentionAci`. Subsequent reads from it will return its default value.
   mutating func clearMentionAci() {self._mentionAci = nil}
 
   var style: SignalServiceProtos_BodyRange.Style {
-    get {return _style ?? .none}
+    get {_style ?? .none}
     set {_style = newValue}
   }
   /// Returns true if `style` has been explicitly set.
-  var hasStyle: Bool {return self._style != nil}
+  var hasStyle: Bool {self._style != nil}
   /// Clears the value of `style`. Subsequent reads from it will return its default value.
   mutating func clearStyle() {self._style = nil}
 
   /// 16-byte UUID
   var mentionAciBinary: Data {
-    get {return _mentionAciBinary ?? Data()}
+    get {_mentionAciBinary ?? Data()}
     set {_mentionAciBinary = newValue}
   }
   /// Returns true if `mentionAciBinary` has been explicitly set.
-  var hasMentionAciBinary: Bool {return self._mentionAciBinary != nil}
+  var hasMentionAciBinary: Bool {self._mentionAciBinary != nil}
   /// Clears the value of `mentionAciBinary`. Subsequent reads from it will return its default value.
   mutating func clearMentionAciBinary() {self._mentionAciBinary = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum Style: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
+  nonisolated enum Style: Int, SwiftProtobuf.Enum, Swift.CaseIterable {
     case none = 0
     case bold = 1
     case italic = 2
@@ -4520,26 +4931,26 @@ struct SignalServiceProtos_BodyRange: Sendable {
   fileprivate var _mentionAciBinary: Data? = nil
 }
 
-struct SignalServiceProtos_EditMessage: Sendable {
+nonisolated struct SignalServiceProtos_EditMessage: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var targetSentTimestamp: UInt64 {
-    get {return _targetSentTimestamp ?? 0}
+    get {_targetSentTimestamp ?? 0}
     set {_targetSentTimestamp = newValue}
   }
   /// Returns true if `targetSentTimestamp` has been explicitly set.
-  var hasTargetSentTimestamp: Bool {return self._targetSentTimestamp != nil}
+  var hasTargetSentTimestamp: Bool {self._targetSentTimestamp != nil}
   /// Clears the value of `targetSentTimestamp`. Subsequent reads from it will return its default value.
   mutating func clearTargetSentTimestamp() {self._targetSentTimestamp = nil}
 
   var dataMessage: SignalServiceProtos_DataMessage {
-    get {return _dataMessage ?? SignalServiceProtos_DataMessage()}
+    get {_dataMessage ?? SignalServiceProtos_DataMessage()}
     set {_dataMessage = newValue}
   }
   /// Returns true if `dataMessage` has been explicitly set.
-  var hasDataMessage: Bool {return self._dataMessage != nil}
+  var hasDataMessage: Bool {self._dataMessage != nil}
   /// Clears the value of `dataMessage`. Subsequent reads from it will return its default value.
   mutating func clearDataMessage() {self._dataMessage = nil}
 
@@ -4551,11 +4962,118 @@ struct SignalServiceProtos_EditMessage: Sendable {
   fileprivate var _dataMessage: SignalServiceProtos_DataMessage? = nil
 }
 
+nonisolated struct SignalServiceProtos_AddressableMessage: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// oneof author {
+  var authorServiceID: String {
+    get {_authorServiceID ?? String()}
+    set {_authorServiceID = newValue}
+  }
+  /// Returns true if `authorServiceID` has been explicitly set.
+  var hasAuthorServiceID: Bool {self._authorServiceID != nil}
+  /// Clears the value of `authorServiceID`. Subsequent reads from it will return its default value.
+  mutating func clearAuthorServiceID() {self._authorServiceID = nil}
+
+  var authorE164: String {
+    get {_authorE164 ?? String()}
+    set {_authorE164 = newValue}
+  }
+  /// Returns true if `authorE164` has been explicitly set.
+  var hasAuthorE164: Bool {self._authorE164 != nil}
+  /// Clears the value of `authorE164`. Subsequent reads from it will return its default value.
+  mutating func clearAuthorE164() {self._authorE164 = nil}
+
+  /// service ID binary (i.e. 16 byte UUID for ACI, 1 byte prefix + 16 byte UUID for PNI)
+  var authorServiceIDBinary: Data {
+    get {_authorServiceIDBinary ?? Data()}
+    set {_authorServiceIDBinary = newValue}
+  }
+  /// Returns true if `authorServiceIDBinary` has been explicitly set.
+  var hasAuthorServiceIDBinary: Bool {self._authorServiceIDBinary != nil}
+  /// Clears the value of `authorServiceIDBinary`. Subsequent reads from it will return its default value.
+  mutating func clearAuthorServiceIDBinary() {self._authorServiceIDBinary = nil}
+
+  /// }
+  var sentTimestamp: UInt64 {
+    get {_sentTimestamp ?? 0}
+    set {_sentTimestamp = newValue}
+  }
+  /// Returns true if `sentTimestamp` has been explicitly set.
+  var hasSentTimestamp: Bool {self._sentTimestamp != nil}
+  /// Clears the value of `sentTimestamp`. Subsequent reads from it will return its default value.
+  mutating func clearSentTimestamp() {self._sentTimestamp = nil}
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+
+  fileprivate var _authorServiceID: String? = nil
+  fileprivate var _authorE164: String? = nil
+  fileprivate var _authorServiceIDBinary: Data? = nil
+  fileprivate var _sentTimestamp: UInt64? = nil
+}
+
+nonisolated struct SignalServiceProtos_ConversationIdentifier: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// oneof identifier {
+  var threadServiceID: String {
+    get {_threadServiceID ?? String()}
+    set {_threadServiceID = newValue}
+  }
+  /// Returns true if `threadServiceID` has been explicitly set.
+  var hasThreadServiceID: Bool {self._threadServiceID != nil}
+  /// Clears the value of `threadServiceID`. Subsequent reads from it will return its default value.
+  mutating func clearThreadServiceID() {self._threadServiceID = nil}
+
+  var threadGroupID: Data {
+    get {_threadGroupID ?? Data()}
+    set {_threadGroupID = newValue}
+  }
+  /// Returns true if `threadGroupID` has been explicitly set.
+  var hasThreadGroupID: Bool {self._threadGroupID != nil}
+  /// Clears the value of `threadGroupID`. Subsequent reads from it will return its default value.
+  mutating func clearThreadGroupID() {self._threadGroupID = nil}
+
+  var threadE164: String {
+    get {_threadE164 ?? String()}
+    set {_threadE164 = newValue}
+  }
+  /// Returns true if `threadE164` has been explicitly set.
+  var hasThreadE164: Bool {self._threadE164 != nil}
+  /// Clears the value of `threadE164`. Subsequent reads from it will return its default value.
+  mutating func clearThreadE164() {self._threadE164 = nil}
+
+  /// service ID binary (i.e. 16 byte UUID for ACI, 1 byte prefix + 16 byte UUID for PNI)
+  var threadServiceIDBinary: Data {
+    get {_threadServiceIDBinary ?? Data()}
+    set {_threadServiceIDBinary = newValue}
+  }
+  /// Returns true if `threadServiceIDBinary` has been explicitly set.
+  var hasThreadServiceIDBinary: Bool {self._threadServiceIDBinary != nil}
+  /// Clears the value of `threadServiceIDBinary`. Subsequent reads from it will return its default value.
+  mutating func clearThreadServiceIDBinary() {self._threadServiceIDBinary = nil}
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+
+  fileprivate var _threadServiceID: String? = nil
+  fileprivate var _threadGroupID: Data? = nil
+  fileprivate var _threadE164: String? = nil
+  fileprivate var _threadServiceIDBinary: Data? = nil
+}
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
-fileprivate let _protobuf_package = "SignalServiceProtos"
+fileprivate nonisolated let _protobuf_package = "SignalServiceProtos"
 
-extension SignalServiceProtos_Envelope: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_Envelope: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Envelope"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0\u{2}\u{4}timestamp\0\u{2}\u{2}sourceDevice\0\u{1}content\0\u{1}serverGuid\0\u{1}serverTimestamp\0\u{1}sourceServiceId\0\u{2}\u{2}destinationServiceId\0\u{1}urgent\0\u{1}updatedPni\0\u{1}story\0\u{1}spamReportingToken\0\u{2}\u{2}sourceServiceIdBinary\0\u{1}destinationServiceIdBinary\0\u{1}serverGuidBinary\0\u{1}updatedPniBinary\0\u{c}\u{2}\u{1}\u{c}\u{3}\u{1}\u{c}\u{6}\u{1}\u{c}\u{12}\u{1}")
 
@@ -4664,11 +5182,11 @@ extension SignalServiceProtos_Envelope: SwiftProtobuf.Message, SwiftProtobuf._Me
   }
 }
 
-extension SignalServiceProtos_Envelope.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_Envelope.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0UNKNOWN\0\u{1}CIPHERTEXT\0\u{2}\u{2}PREKEY_BUNDLE\0\u{2}\u{2}RECEIPT\0\u{1}UNIDENTIFIED_SENDER\0\u{2}\u{2}PLAINTEXT_CONTENT\0")
 }
 
-extension SignalServiceProtos_TypingMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_TypingMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".TypingMessage"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}timestamp\0\u{1}action\0\u{1}groupId\0")
 
@@ -4712,11 +5230,11 @@ extension SignalServiceProtos_TypingMessage: SwiftProtobuf.Message, SwiftProtobu
   }
 }
 
-extension SignalServiceProtos_TypingMessage.Action: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_TypingMessage.Action: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0STARTED\0\u{1}STOPPED\0")
 }
 
-extension SignalServiceProtos_StoryMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_StoryMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".StoryMessage"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}profileKey\0\u{1}group\0\u{1}fileAttachment\0\u{1}textAttachment\0\u{1}allowsReplies\0\u{1}bodyRanges\0")
 
@@ -4821,105 +5339,61 @@ extension SignalServiceProtos_StoryMessage: SwiftProtobuf.Message, SwiftProtobuf
   }
 }
 
-extension SignalServiceProtos_Preview: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_Preview: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Preview"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}url\0\u{1}title\0\u{1}image\0\u{1}previewDescription\0\u{1}date\0")
 
-  fileprivate class _StorageClass {
-    var _url: String? = nil
-    var _title: String? = nil
-    var _image: SignalServiceProtos_AttachmentPointer? = nil
-    var _previewDescription: String? = nil
-    var _date: UInt64? = nil
-
-      // This property is used as the initial default value for new instances of the type.
-      // The type itself is protecting the reference to its storage via CoW semantics.
-      // This will force a copy to be made of this reference when the first mutation occurs;
-      // hence, it is safe to mark this as `nonisolated(unsafe)`.
-      static nonisolated(unsafe) let defaultInstance = _StorageClass()
-
-    private init() {}
-
-    init(copying source: _StorageClass) {
-      _url = source._url
-      _title = source._title
-      _image = source._image
-      _previewDescription = source._previewDescription
-      _date = source._date
-    }
-  }
-
-  fileprivate mutating func _uniqueStorage() -> _StorageClass {
-    if !isKnownUniquelyReferenced(&_storage) {
-      _storage = _StorageClass(copying: _storage)
-    }
-    return _storage
-  }
-
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    _ = _uniqueStorage()
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      while let fieldNumber = try decoder.nextFieldNumber() {
-        // The use of inline closures is to circumvent an issue where the compiler
-        // allocates stack space for every case branch when no optimizations are
-        // enabled. https://github.com/apple/swift-protobuf/issues/1034
-        switch fieldNumber {
-        case 1: try { try decoder.decodeSingularStringField(value: &_storage._url) }()
-        case 2: try { try decoder.decodeSingularStringField(value: &_storage._title) }()
-        case 3: try { try decoder.decodeSingularMessageField(value: &_storage._image) }()
-        case 4: try { try decoder.decodeSingularStringField(value: &_storage._previewDescription) }()
-        case 5: try { try decoder.decodeSingularUInt64Field(value: &_storage._date) }()
-        default: break
-        }
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self._url) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self._title) }()
+      case 3: try { try decoder.decodeSingularMessageField(value: &self._image) }()
+      case 4: try { try decoder.decodeSingularStringField(value: &self._previewDescription) }()
+      case 5: try { try decoder.decodeSingularUInt64Field(value: &self._date) }()
+      default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every if/case branch local when no optimizations
-      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-      // https://github.com/apple/swift-protobuf/issues/1182
-      try { if let v = _storage._url {
-        try visitor.visitSingularStringField(value: v, fieldNumber: 1)
-      } }()
-      try { if let v = _storage._title {
-        try visitor.visitSingularStringField(value: v, fieldNumber: 2)
-      } }()
-      try { if let v = _storage._image {
-        try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-      } }()
-      try { if let v = _storage._previewDescription {
-        try visitor.visitSingularStringField(value: v, fieldNumber: 4)
-      } }()
-      try { if let v = _storage._date {
-        try visitor.visitSingularUInt64Field(value: v, fieldNumber: 5)
-      } }()
-    }
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._url {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._title {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 2)
+    } }()
+    try { if let v = self._image {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
+    } }()
+    try { if let v = self._previewDescription {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 4)
+    } }()
+    try { if let v = self._date {
+      try visitor.visitSingularUInt64Field(value: v, fieldNumber: 5)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: SignalServiceProtos_Preview, rhs: SignalServiceProtos_Preview) -> Bool {
-    if lhs._storage !== rhs._storage {
-      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
-        let _storage = _args.0
-        let rhs_storage = _args.1
-        if _storage._url != rhs_storage._url {return false}
-        if _storage._title != rhs_storage._title {return false}
-        if _storage._image != rhs_storage._image {return false}
-        if _storage._previewDescription != rhs_storage._previewDescription {return false}
-        if _storage._date != rhs_storage._date {return false}
-        return true
-      }
-      if !storagesAreEqual {return false}
-    }
+    if lhs._url != rhs._url {return false}
+    if lhs._title != rhs._title {return false}
+    if lhs._image != rhs._image {return false}
+    if lhs._previewDescription != rhs._previewDescription {return false}
+    if lhs._date != rhs._date {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension SignalServiceProtos_TextAttachment: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_TextAttachment: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".TextAttachment"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}text\0\u{1}textStyle\0\u{1}textForegroundColor\0\u{1}textBackgroundColor\0\u{1}preview\0\u{1}gradient\0\u{1}color\0")
 
@@ -4983,11 +5457,11 @@ extension SignalServiceProtos_TextAttachment: SwiftProtobuf.Message, SwiftProtob
   }
 }
 
-extension SignalServiceProtos_TextAttachment.Style: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_TextAttachment.Style: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0DEFAULT\0\u{1}REGULAR\0\u{1}BOLD\0\u{1}SERIF\0\u{1}SCRIPT\0\u{1}CONDENSED\0")
 }
 
-extension SignalServiceProtos_TextAttachment.Gradient: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_TextAttachment.Gradient: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_TextAttachment.protoMessageName + ".Gradient"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}startColor\0\u{1}endColor\0\u{1}angle\0\u{1}colors\0\u{1}positions\0")
 
@@ -5041,7 +5515,7 @@ extension SignalServiceProtos_TextAttachment.Gradient: SwiftProtobuf.Message, Sw
   }
 }
 
-extension SignalServiceProtos_Content: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_Content: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Content"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}dataMessage\0\u{1}syncMessage\0\u{1}callMessage\0\u{1}nullMessage\0\u{1}receiptMessage\0\u{1}typingMessage\0\u{1}senderKeyDistributionMessage\0\u{1}decryptionErrorMessage\0\u{1}storyMessage\0\u{1}pniSignatureMessage\0\u{1}editMessage\0")
 
@@ -5181,7 +5655,7 @@ extension SignalServiceProtos_Content: SwiftProtobuf.Message, SwiftProtobuf._Mes
   }
 }
 
-extension SignalServiceProtos_CallMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_CallMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".CallMessage"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}offer\0\u{1}answer\0\u{1}iceUpdate\0\u{2}\u{2}busy\0\u{1}profileKey\0\u{1}hangup\0\u{2}\u{2}destinationDeviceId\0\u{1}opaque\0\u{c}\u{4}\u{1}\u{c}\u{8}\u{1}")
 
@@ -5250,7 +5724,7 @@ extension SignalServiceProtos_CallMessage: SwiftProtobuf.Message, SwiftProtobuf.
   }
 }
 
-extension SignalServiceProtos_CallMessage.Offer: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_CallMessage.Offer: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_CallMessage.protoMessageName + ".Offer"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{2}\u{2}type\0\u{1}opaque\0\u{c}\u{2}\u{1}")
 
@@ -5294,11 +5768,11 @@ extension SignalServiceProtos_CallMessage.Offer: SwiftProtobuf.Message, SwiftPro
   }
 }
 
-extension SignalServiceProtos_CallMessage.Offer.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_CallMessage.Offer.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0OFFER_AUDIO_CALL\0\u{1}OFFER_VIDEO_CALL\0")
 }
 
-extension SignalServiceProtos_CallMessage.Answer: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_CallMessage.Answer: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_CallMessage.protoMessageName + ".Answer"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{2}\u{2}opaque\0\u{c}\u{2}\u{1}")
 
@@ -5337,7 +5811,7 @@ extension SignalServiceProtos_CallMessage.Answer: SwiftProtobuf.Message, SwiftPr
   }
 }
 
-extension SignalServiceProtos_CallMessage.IceUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_CallMessage.IceUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_CallMessage.protoMessageName + ".IceUpdate"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{2}\u{4}opaque\0\u{c}\u{2}\u{1}\u{c}\u{3}\u{1}\u{c}\u{4}\u{1}")
 
@@ -5376,7 +5850,7 @@ extension SignalServiceProtos_CallMessage.IceUpdate: SwiftProtobuf.Message, Swif
   }
 }
 
-extension SignalServiceProtos_CallMessage.Busy: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_CallMessage.Busy: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_CallMessage.protoMessageName + ".Busy"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0")
 
@@ -5410,7 +5884,7 @@ extension SignalServiceProtos_CallMessage.Busy: SwiftProtobuf.Message, SwiftProt
   }
 }
 
-extension SignalServiceProtos_CallMessage.Hangup: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_CallMessage.Hangup: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_CallMessage.protoMessageName + ".Hangup"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{1}type\0\u{1}deviceId\0")
 
@@ -5454,11 +5928,11 @@ extension SignalServiceProtos_CallMessage.Hangup: SwiftProtobuf.Message, SwiftPr
   }
 }
 
-extension SignalServiceProtos_CallMessage.Hangup.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_CallMessage.Hangup.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0HANGUP_NORMAL\0\u{1}HANGUP_ACCEPTED\0\u{1}HANGUP_DECLINED\0\u{1}HANGUP_BUSY\0\u{1}HANGUP_NEED_PERMISSION\0")
 }
 
-extension SignalServiceProtos_CallMessage.Opaque: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_CallMessage.Opaque: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_CallMessage.protoMessageName + ".Opaque"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}data\0\u{1}urgency\0")
 
@@ -5497,13 +5971,13 @@ extension SignalServiceProtos_CallMessage.Opaque: SwiftProtobuf.Message, SwiftPr
   }
 }
 
-extension SignalServiceProtos_CallMessage.Opaque.Urgency: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_CallMessage.Opaque.Urgency: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0DROPPABLE\0\u{1}HANDLE_IMMEDIATELY\0")
 }
 
-extension SignalServiceProtos_DataMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".DataMessage"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}body\0\u{1}attachments\0\u{2}\u{2}flags\0\u{1}expireTimer\0\u{1}profileKey\0\u{1}timestamp\0\u{1}quote\0\u{1}contact\0\u{1}preview\0\u{1}sticker\0\u{1}requiredProtocolVersion\0\u{2}\u{2}isViewOnce\0\u{1}groupV2\0\u{1}reaction\0\u{1}delete\0\u{1}bodyRanges\0\u{1}groupCallUpdate\0\u{1}payment\0\u{1}storyContext\0\u{1}giftBadge\0\u{1}expireTimerVersion\0\u{1}pollCreate\0\u{1}pollTerminate\0\u{1}pollVote\0\u{c}\u{3}\u{1}")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}body\0\u{1}attachments\0\u{2}\u{2}flags\0\u{1}expireTimer\0\u{1}profileKey\0\u{1}timestamp\0\u{1}quote\0\u{1}contact\0\u{1}preview\0\u{1}sticker\0\u{1}requiredProtocolVersion\0\u{2}\u{2}isViewOnce\0\u{1}groupV2\0\u{1}reaction\0\u{1}delete\0\u{1}bodyRanges\0\u{1}groupCallUpdate\0\u{1}payment\0\u{1}storyContext\0\u{1}giftBadge\0\u{1}expireTimerVersion\0\u{1}pollCreate\0\u{1}pollTerminate\0\u{1}pollVote\0\u{1}pinMessage\0\u{1}unpinMessage\0\u{1}adminDelete\0\u{c}\u{3}\u{1}")
 
   fileprivate class _StorageClass {
     var _body: String? = nil
@@ -5530,6 +6004,9 @@ extension SignalServiceProtos_DataMessage: SwiftProtobuf.Message, SwiftProtobuf.
     var _pollCreate: SignalServiceProtos_DataMessage.PollCreate? = nil
     var _pollTerminate: SignalServiceProtos_DataMessage.PollTerminate? = nil
     var _pollVote: SignalServiceProtos_DataMessage.PollVote? = nil
+    var _pinMessage: SignalServiceProtos_DataMessage.PinMessage? = nil
+    var _unpinMessage: SignalServiceProtos_DataMessage.UnpinMessage? = nil
+    var _adminDelete: SignalServiceProtos_DataMessage.AdminDelete? = nil
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -5564,6 +6041,9 @@ extension SignalServiceProtos_DataMessage: SwiftProtobuf.Message, SwiftProtobuf.
       _pollCreate = source._pollCreate
       _pollTerminate = source._pollTerminate
       _pollVote = source._pollVote
+      _pinMessage = source._pinMessage
+      _unpinMessage = source._unpinMessage
+      _adminDelete = source._adminDelete
     }
   }
 
@@ -5606,6 +6086,9 @@ extension SignalServiceProtos_DataMessage: SwiftProtobuf.Message, SwiftProtobuf.
         case 24: try { try decoder.decodeSingularMessageField(value: &_storage._pollCreate) }()
         case 25: try { try decoder.decodeSingularMessageField(value: &_storage._pollTerminate) }()
         case 26: try { try decoder.decodeSingularMessageField(value: &_storage._pollVote) }()
+        case 27: try { try decoder.decodeSingularMessageField(value: &_storage._pinMessage) }()
+        case 28: try { try decoder.decodeSingularMessageField(value: &_storage._unpinMessage) }()
+        case 29: try { try decoder.decodeSingularMessageField(value: &_storage._adminDelete) }()
         default: break
         }
       }
@@ -5690,6 +6173,15 @@ extension SignalServiceProtos_DataMessage: SwiftProtobuf.Message, SwiftProtobuf.
       try { if let v = _storage._pollVote {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 26)
       } }()
+      try { if let v = _storage._pinMessage {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 27)
+      } }()
+      try { if let v = _storage._unpinMessage {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 28)
+      } }()
+      try { if let v = _storage._adminDelete {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 29)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -5723,6 +6215,9 @@ extension SignalServiceProtos_DataMessage: SwiftProtobuf.Message, SwiftProtobuf.
         if _storage._pollCreate != rhs_storage._pollCreate {return false}
         if _storage._pollTerminate != rhs_storage._pollTerminate {return false}
         if _storage._pollVote != rhs_storage._pollVote {return false}
+        if _storage._pinMessage != rhs_storage._pinMessage {return false}
+        if _storage._unpinMessage != rhs_storage._unpinMessage {return false}
+        if _storage._adminDelete != rhs_storage._adminDelete {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -5732,15 +6227,15 @@ extension SignalServiceProtos_DataMessage: SwiftProtobuf.Message, SwiftProtobuf.
   }
 }
 
-extension SignalServiceProtos_DataMessage.Flags: SwiftProtobuf._ProtoNameProviding {
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}END_SESSION\0\u{1}EXPIRATION_TIMER_UPDATE\0\u{2}\u{2}PROFILE_KEY_UPDATE\0")
+nonisolated extension SignalServiceProtos_DataMessage.Flags: SwiftProtobuf._ProtoNameProviding {
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\u{2}EXPIRATION_TIMER_UPDATE\0\u{2}\u{2}PROFILE_KEY_UPDATE\0")
 }
 
-extension SignalServiceProtos_DataMessage.ProtocolVersion: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.ProtocolVersion: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0INITIAL\0\u{1}MESSAGE_TIMERS\0\u{1}VIEW_ONCE\0\u{1}VIEW_ONCE_VIDEO\0\u{1}REACTIONS\0\u{1}CDN_SELECTOR_ATTACHMENTS\0\u{1}MENTIONS\0\u{1}PAYMENTS\0\u{9}POLLS\0\u{1}CURRENT\0")
 }
 
-extension SignalServiceProtos_DataMessage.Quote: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Quote: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.protoMessageName + ".Quote"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{2}\u{2}text\0\u{1}attachments\0\u{1}authorAci\0\u{1}bodyRanges\0\u{1}type\0\u{1}authorAciBinary\0\u{c}\u{2}\u{1}")
 
@@ -5804,97 +6299,57 @@ extension SignalServiceProtos_DataMessage.Quote: SwiftProtobuf.Message, SwiftPro
   }
 }
 
-extension SignalServiceProtos_DataMessage.Quote.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Quote.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0NORMAL\0\u{1}GIFT_BADGE\0")
 }
 
-extension SignalServiceProtos_DataMessage.Quote.QuotedAttachment: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Quote.QuotedAttachment: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.Quote.protoMessageName + ".QuotedAttachment"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}contentType\0\u{1}fileName\0\u{1}thumbnail\0")
 
-  fileprivate class _StorageClass {
-    var _contentType: String? = nil
-    var _fileName: String? = nil
-    var _thumbnail: SignalServiceProtos_AttachmentPointer? = nil
-
-      // This property is used as the initial default value for new instances of the type.
-      // The type itself is protecting the reference to its storage via CoW semantics.
-      // This will force a copy to be made of this reference when the first mutation occurs;
-      // hence, it is safe to mark this as `nonisolated(unsafe)`.
-      static nonisolated(unsafe) let defaultInstance = _StorageClass()
-
-    private init() {}
-
-    init(copying source: _StorageClass) {
-      _contentType = source._contentType
-      _fileName = source._fileName
-      _thumbnail = source._thumbnail
-    }
-  }
-
-  fileprivate mutating func _uniqueStorage() -> _StorageClass {
-    if !isKnownUniquelyReferenced(&_storage) {
-      _storage = _StorageClass(copying: _storage)
-    }
-    return _storage
-  }
-
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    _ = _uniqueStorage()
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      while let fieldNumber = try decoder.nextFieldNumber() {
-        // The use of inline closures is to circumvent an issue where the compiler
-        // allocates stack space for every case branch when no optimizations are
-        // enabled. https://github.com/apple/swift-protobuf/issues/1034
-        switch fieldNumber {
-        case 1: try { try decoder.decodeSingularStringField(value: &_storage._contentType) }()
-        case 2: try { try decoder.decodeSingularStringField(value: &_storage._fileName) }()
-        case 3: try { try decoder.decodeSingularMessageField(value: &_storage._thumbnail) }()
-        default: break
-        }
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self._contentType) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self._fileName) }()
+      case 3: try { try decoder.decodeSingularMessageField(value: &self._thumbnail) }()
+      default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every if/case branch local when no optimizations
-      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-      // https://github.com/apple/swift-protobuf/issues/1182
-      try { if let v = _storage._contentType {
-        try visitor.visitSingularStringField(value: v, fieldNumber: 1)
-      } }()
-      try { if let v = _storage._fileName {
-        try visitor.visitSingularStringField(value: v, fieldNumber: 2)
-      } }()
-      try { if let v = _storage._thumbnail {
-        try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
-      } }()
-    }
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._contentType {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._fileName {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 2)
+    } }()
+    try { if let v = self._thumbnail {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: SignalServiceProtos_DataMessage.Quote.QuotedAttachment, rhs: SignalServiceProtos_DataMessage.Quote.QuotedAttachment) -> Bool {
-    if lhs._storage !== rhs._storage {
-      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
-        let _storage = _args.0
-        let rhs_storage = _args.1
-        if _storage._contentType != rhs_storage._contentType {return false}
-        if _storage._fileName != rhs_storage._fileName {return false}
-        if _storage._thumbnail != rhs_storage._thumbnail {return false}
-        return true
-      }
-      if !storagesAreEqual {return false}
-    }
+    if lhs._contentType != rhs._contentType {return false}
+    if lhs._fileName != rhs._fileName {return false}
+    if lhs._thumbnail != rhs._thumbnail {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension SignalServiceProtos_DataMessage.Contact: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Contact: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.protoMessageName + ".Contact"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}name\0\u{2}\u{2}number\0\u{1}email\0\u{1}address\0\u{1}avatar\0\u{1}organization\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}name\0\u{2}\u{2}number\0\u{1}email\0\u{1}address\0\u{1}avatar\0\u{1}organization\0\u{1}aciBinary\0\u{1}nickname\0\u{1}note\0\u{c}\u{2}\u{1}")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -5908,6 +6363,9 @@ extension SignalServiceProtos_DataMessage.Contact: SwiftProtobuf.Message, SwiftP
       case 5: try { try decoder.decodeRepeatedMessageField(value: &self.address) }()
       case 6: try { try decoder.decodeSingularMessageField(value: &self._avatar) }()
       case 7: try { try decoder.decodeSingularStringField(value: &self._organization) }()
+      case 8: try { try decoder.decodeSingularBytesField(value: &self._aciBinary) }()
+      case 9: try { try decoder.decodeSingularMessageField(value: &self._nickname) }()
+      case 10: try { try decoder.decodeSingularStringField(value: &self._note) }()
       default: break
       }
     }
@@ -5936,6 +6394,15 @@ extension SignalServiceProtos_DataMessage.Contact: SwiftProtobuf.Message, SwiftP
     try { if let v = self._organization {
       try visitor.visitSingularStringField(value: v, fieldNumber: 7)
     } }()
+    try { if let v = self._aciBinary {
+      try visitor.visitSingularBytesField(value: v, fieldNumber: 8)
+    } }()
+    try { if let v = self._nickname {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 9)
+    } }()
+    try { if let v = self._note {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 10)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5946,14 +6413,17 @@ extension SignalServiceProtos_DataMessage.Contact: SwiftProtobuf.Message, SwiftP
     if lhs.address != rhs.address {return false}
     if lhs._avatar != rhs._avatar {return false}
     if lhs._organization != rhs._organization {return false}
+    if lhs._aciBinary != rhs._aciBinary {return false}
+    if lhs._nickname != rhs._nickname {return false}
+    if lhs._note != rhs._note {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension SignalServiceProtos_DataMessage.Contact.Name: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Contact.Name: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.Contact.protoMessageName + ".Name"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}givenName\0\u{1}familyName\0\u{1}prefix\0\u{1}suffix\0\u{1}middleName\0\u{c}\u{6}\u{1}")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}givenName\0\u{1}familyName\0\u{1}prefix\0\u{1}suffix\0\u{1}middleName\0\u{2}\u{2}nickname\0\u{c}\u{6}\u{1}")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -5966,6 +6436,7 @@ extension SignalServiceProtos_DataMessage.Contact.Name: SwiftProtobuf.Message, S
       case 3: try { try decoder.decodeSingularStringField(value: &self._prefix) }()
       case 4: try { try decoder.decodeSingularStringField(value: &self._suffix) }()
       case 5: try { try decoder.decodeSingularStringField(value: &self._middleName) }()
+      case 7: try { try decoder.decodeSingularStringField(value: &self._nickname) }()
       default: break
       }
     }
@@ -5991,6 +6462,9 @@ extension SignalServiceProtos_DataMessage.Contact.Name: SwiftProtobuf.Message, S
     try { if let v = self._middleName {
       try visitor.visitSingularStringField(value: v, fieldNumber: 5)
     } }()
+    try { if let v = self._nickname {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 7)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -6000,12 +6474,52 @@ extension SignalServiceProtos_DataMessage.Contact.Name: SwiftProtobuf.Message, S
     if lhs._prefix != rhs._prefix {return false}
     if lhs._suffix != rhs._suffix {return false}
     if lhs._middleName != rhs._middleName {return false}
+    if lhs._nickname != rhs._nickname {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension SignalServiceProtos_DataMessage.Contact.Phone: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Contact.SignalNickname: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = SignalServiceProtos_DataMessage.Contact.protoMessageName + ".SignalNickname"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}given\0\u{1}family\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self._given) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self._family) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._given {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._family {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 2)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: SignalServiceProtos_DataMessage.Contact.SignalNickname, rhs: SignalServiceProtos_DataMessage.Contact.SignalNickname) -> Bool {
+    if lhs._given != rhs._given {return false}
+    if lhs._family != rhs._family {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension SignalServiceProtos_DataMessage.Contact.Phone: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.Contact.protoMessageName + ".Phone"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}value\0\u{1}type\0\u{1}label\0")
 
@@ -6049,11 +6563,11 @@ extension SignalServiceProtos_DataMessage.Contact.Phone: SwiftProtobuf.Message, 
   }
 }
 
-extension SignalServiceProtos_DataMessage.Contact.Phone.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Contact.Phone.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}HOME\0\u{1}MOBILE\0\u{1}WORK\0\u{1}CUSTOM\0")
 }
 
-extension SignalServiceProtos_DataMessage.Contact.Email: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Contact.Email: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.Contact.protoMessageName + ".Email"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}value\0\u{1}type\0\u{1}label\0")
 
@@ -6097,11 +6611,11 @@ extension SignalServiceProtos_DataMessage.Contact.Email: SwiftProtobuf.Message, 
   }
 }
 
-extension SignalServiceProtos_DataMessage.Contact.Email.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Contact.Email.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}HOME\0\u{1}MOBILE\0\u{1}WORK\0\u{1}CUSTOM\0")
 }
 
-extension SignalServiceProtos_DataMessage.Contact.PostalAddress: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Contact.PostalAddress: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.Contact.protoMessageName + ".PostalAddress"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0\u{1}label\0\u{1}street\0\u{1}pobox\0\u{1}neighborhood\0\u{1}city\0\u{1}region\0\u{1}postcode\0\u{1}country\0")
 
@@ -6175,186 +6689,104 @@ extension SignalServiceProtos_DataMessage.Contact.PostalAddress: SwiftProtobuf.M
   }
 }
 
-extension SignalServiceProtos_DataMessage.Contact.PostalAddress.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Contact.PostalAddress.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}HOME\0\u{1}WORK\0\u{1}CUSTOM\0")
 }
 
-extension SignalServiceProtos_DataMessage.Contact.Avatar: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Contact.Avatar: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.Contact.protoMessageName + ".Avatar"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}avatar\0\u{1}isProfile\0")
 
-  fileprivate class _StorageClass {
-    var _avatar: SignalServiceProtos_AttachmentPointer? = nil
-    var _isProfile: Bool? = nil
-
-      // This property is used as the initial default value for new instances of the type.
-      // The type itself is protecting the reference to its storage via CoW semantics.
-      // This will force a copy to be made of this reference when the first mutation occurs;
-      // hence, it is safe to mark this as `nonisolated(unsafe)`.
-      static nonisolated(unsafe) let defaultInstance = _StorageClass()
-
-    private init() {}
-
-    init(copying source: _StorageClass) {
-      _avatar = source._avatar
-      _isProfile = source._isProfile
-    }
-  }
-
-  fileprivate mutating func _uniqueStorage() -> _StorageClass {
-    if !isKnownUniquelyReferenced(&_storage) {
-      _storage = _StorageClass(copying: _storage)
-    }
-    return _storage
-  }
-
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    _ = _uniqueStorage()
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      while let fieldNumber = try decoder.nextFieldNumber() {
-        // The use of inline closures is to circumvent an issue where the compiler
-        // allocates stack space for every case branch when no optimizations are
-        // enabled. https://github.com/apple/swift-protobuf/issues/1034
-        switch fieldNumber {
-        case 1: try { try decoder.decodeSingularMessageField(value: &_storage._avatar) }()
-        case 2: try { try decoder.decodeSingularBoolField(value: &_storage._isProfile) }()
-        default: break
-        }
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._avatar) }()
+      case 2: try { try decoder.decodeSingularBoolField(value: &self._isProfile) }()
+      default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every if/case branch local when no optimizations
-      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-      // https://github.com/apple/swift-protobuf/issues/1182
-      try { if let v = _storage._avatar {
-        try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-      } }()
-      try { if let v = _storage._isProfile {
-        try visitor.visitSingularBoolField(value: v, fieldNumber: 2)
-      } }()
-    }
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._avatar {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._isProfile {
+      try visitor.visitSingularBoolField(value: v, fieldNumber: 2)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: SignalServiceProtos_DataMessage.Contact.Avatar, rhs: SignalServiceProtos_DataMessage.Contact.Avatar) -> Bool {
-    if lhs._storage !== rhs._storage {
-      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
-        let _storage = _args.0
-        let rhs_storage = _args.1
-        if _storage._avatar != rhs_storage._avatar {return false}
-        if _storage._isProfile != rhs_storage._isProfile {return false}
-        return true
-      }
-      if !storagesAreEqual {return false}
-    }
+    if lhs._avatar != rhs._avatar {return false}
+    if lhs._isProfile != rhs._isProfile {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension SignalServiceProtos_DataMessage.Sticker: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Sticker: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.protoMessageName + ".Sticker"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}packId\0\u{1}packKey\0\u{1}stickerId\0\u{1}data\0\u{1}emoji\0")
 
-  fileprivate class _StorageClass {
-    var _packID: Data? = nil
-    var _packKey: Data? = nil
-    var _stickerID: UInt32? = nil
-    var _data: SignalServiceProtos_AttachmentPointer? = nil
-    var _emoji: String? = nil
-
-      // This property is used as the initial default value for new instances of the type.
-      // The type itself is protecting the reference to its storage via CoW semantics.
-      // This will force a copy to be made of this reference when the first mutation occurs;
-      // hence, it is safe to mark this as `nonisolated(unsafe)`.
-      static nonisolated(unsafe) let defaultInstance = _StorageClass()
-
-    private init() {}
-
-    init(copying source: _StorageClass) {
-      _packID = source._packID
-      _packKey = source._packKey
-      _stickerID = source._stickerID
-      _data = source._data
-      _emoji = source._emoji
-    }
-  }
-
-  fileprivate mutating func _uniqueStorage() -> _StorageClass {
-    if !isKnownUniquelyReferenced(&_storage) {
-      _storage = _StorageClass(copying: _storage)
-    }
-    return _storage
-  }
-
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    _ = _uniqueStorage()
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      while let fieldNumber = try decoder.nextFieldNumber() {
-        // The use of inline closures is to circumvent an issue where the compiler
-        // allocates stack space for every case branch when no optimizations are
-        // enabled. https://github.com/apple/swift-protobuf/issues/1034
-        switch fieldNumber {
-        case 1: try { try decoder.decodeSingularBytesField(value: &_storage._packID) }()
-        case 2: try { try decoder.decodeSingularBytesField(value: &_storage._packKey) }()
-        case 3: try { try decoder.decodeSingularUInt32Field(value: &_storage._stickerID) }()
-        case 4: try { try decoder.decodeSingularMessageField(value: &_storage._data) }()
-        case 5: try { try decoder.decodeSingularStringField(value: &_storage._emoji) }()
-        default: break
-        }
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularBytesField(value: &self._packID) }()
+      case 2: try { try decoder.decodeSingularBytesField(value: &self._packKey) }()
+      case 3: try { try decoder.decodeSingularUInt32Field(value: &self._stickerID) }()
+      case 4: try { try decoder.decodeSingularMessageField(value: &self._data) }()
+      case 5: try { try decoder.decodeSingularStringField(value: &self._emoji) }()
+      default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every if/case branch local when no optimizations
-      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-      // https://github.com/apple/swift-protobuf/issues/1182
-      try { if let v = _storage._packID {
-        try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
-      } }()
-      try { if let v = _storage._packKey {
-        try visitor.visitSingularBytesField(value: v, fieldNumber: 2)
-      } }()
-      try { if let v = _storage._stickerID {
-        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
-      } }()
-      try { if let v = _storage._data {
-        try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
-      } }()
-      try { if let v = _storage._emoji {
-        try visitor.visitSingularStringField(value: v, fieldNumber: 5)
-      } }()
-    }
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._packID {
+      try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._packKey {
+      try visitor.visitSingularBytesField(value: v, fieldNumber: 2)
+    } }()
+    try { if let v = self._stickerID {
+      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
+    } }()
+    try { if let v = self._data {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
+    } }()
+    try { if let v = self._emoji {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 5)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: SignalServiceProtos_DataMessage.Sticker, rhs: SignalServiceProtos_DataMessage.Sticker) -> Bool {
-    if lhs._storage !== rhs._storage {
-      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
-        let _storage = _args.0
-        let rhs_storage = _args.1
-        if _storage._packID != rhs_storage._packID {return false}
-        if _storage._packKey != rhs_storage._packKey {return false}
-        if _storage._stickerID != rhs_storage._stickerID {return false}
-        if _storage._data != rhs_storage._data {return false}
-        if _storage._emoji != rhs_storage._emoji {return false}
-        return true
-      }
-      if !storagesAreEqual {return false}
-    }
+    if lhs._packID != rhs._packID {return false}
+    if lhs._packKey != rhs._packKey {return false}
+    if lhs._stickerID != rhs._stickerID {return false}
+    if lhs._data != rhs._data {return false}
+    if lhs._emoji != rhs._emoji {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension SignalServiceProtos_DataMessage.Reaction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Reaction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.protoMessageName + ".Reaction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}emoji\0\u{1}remove\0\u{2}\u{2}targetAuthorAci\0\u{1}timestamp\0\u{1}targetAuthorAciBinary\0\u{c}\u{3}\u{1}")
 
@@ -6408,7 +6840,7 @@ extension SignalServiceProtos_DataMessage.Reaction: SwiftProtobuf.Message, Swift
   }
 }
 
-extension SignalServiceProtos_DataMessage.Delete: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Delete: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.protoMessageName + ".Delete"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}targetSentTimestamp\0")
 
@@ -6442,7 +6874,7 @@ extension SignalServiceProtos_DataMessage.Delete: SwiftProtobuf.Message, SwiftPr
   }
 }
 
-extension SignalServiceProtos_DataMessage.GroupCallUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.GroupCallUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.protoMessageName + ".GroupCallUpdate"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}eraId\0")
 
@@ -6476,7 +6908,7 @@ extension SignalServiceProtos_DataMessage.GroupCallUpdate: SwiftProtobuf.Message
   }
 }
 
-extension SignalServiceProtos_DataMessage.Payment: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Payment: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.protoMessageName + ".Payment"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}notification\0\u{1}activation\0\u{c}j\u{f}\u{1}\u{c}k\u{f}\u{1}")
 
@@ -6515,7 +6947,7 @@ extension SignalServiceProtos_DataMessage.Payment: SwiftProtobuf.Message, SwiftP
   }
 }
 
-extension SignalServiceProtos_DataMessage.Payment.Amount: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Payment.Amount: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.Payment.protoMessageName + ".Amount"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}mobileCoin\0")
 
@@ -6549,7 +6981,7 @@ extension SignalServiceProtos_DataMessage.Payment.Amount: SwiftProtobuf.Message,
   }
 }
 
-extension SignalServiceProtos_DataMessage.Payment.Amount.MobileCoin: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Payment.Amount.MobileCoin: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.Payment.Amount.protoMessageName + ".MobileCoin"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}picoMob\0")
 
@@ -6583,7 +7015,7 @@ extension SignalServiceProtos_DataMessage.Payment.Amount.MobileCoin: SwiftProtob
   }
 }
 
-extension SignalServiceProtos_DataMessage.Payment.Notification: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Payment.Notification: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.Payment.protoMessageName + ".Notification"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}mobileCoin\0\u{1}note\0\u{c}k\u{f}\u{1}")
 
@@ -6622,7 +7054,7 @@ extension SignalServiceProtos_DataMessage.Payment.Notification: SwiftProtobuf.Me
   }
 }
 
-extension SignalServiceProtos_DataMessage.Payment.Notification.MobileCoin: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Payment.Notification.MobileCoin: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.Payment.Notification.protoMessageName + ".MobileCoin"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}receipt\0")
 
@@ -6656,7 +7088,7 @@ extension SignalServiceProtos_DataMessage.Payment.Notification.MobileCoin: Swift
   }
 }
 
-extension SignalServiceProtos_DataMessage.Payment.Activation: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Payment.Activation: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.Payment.protoMessageName + ".Activation"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0")
 
@@ -6690,11 +7122,11 @@ extension SignalServiceProtos_DataMessage.Payment.Activation: SwiftProtobuf.Mess
   }
 }
 
-extension SignalServiceProtos_DataMessage.Payment.Activation.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.Payment.Activation.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0REQUEST\0\u{1}ACTIVATED\0")
 }
 
-extension SignalServiceProtos_DataMessage.StoryContext: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.StoryContext: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.protoMessageName + ".StoryContext"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}authorAci\0\u{1}sentTimestamp\0\u{1}authorAciBinary\0")
 
@@ -6738,7 +7170,7 @@ extension SignalServiceProtos_DataMessage.StoryContext: SwiftProtobuf.Message, S
   }
 }
 
-extension SignalServiceProtos_DataMessage.GiftBadge: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.GiftBadge: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.protoMessageName + ".GiftBadge"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}receiptCredentialPresentation\0")
 
@@ -6772,7 +7204,7 @@ extension SignalServiceProtos_DataMessage.GiftBadge: SwiftProtobuf.Message, Swif
   }
 }
 
-extension SignalServiceProtos_DataMessage.PollCreate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.PollCreate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.protoMessageName + ".PollCreate"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}question\0\u{1}allowMultiple\0\u{1}options\0")
 
@@ -6816,7 +7248,7 @@ extension SignalServiceProtos_DataMessage.PollCreate: SwiftProtobuf.Message, Swi
   }
 }
 
-extension SignalServiceProtos_DataMessage.PollTerminate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.PollTerminate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.protoMessageName + ".PollTerminate"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}targetSentTimestamp\0")
 
@@ -6850,7 +7282,7 @@ extension SignalServiceProtos_DataMessage.PollTerminate: SwiftProtobuf.Message, 
   }
 }
 
-extension SignalServiceProtos_DataMessage.PollVote: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.PollVote: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_DataMessage.protoMessageName + ".PollVote"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}targetAuthorAciBinary\0\u{1}targetSentTimestamp\0\u{1}optionIndexes\0\u{1}voteCount\0")
 
@@ -6899,7 +7331,134 @@ extension SignalServiceProtos_DataMessage.PollVote: SwiftProtobuf.Message, Swift
   }
 }
 
-extension SignalServiceProtos_NullMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DataMessage.PinMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = SignalServiceProtos_DataMessage.protoMessageName + ".PinMessage"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}targetAuthorAciBinary\0\u{1}targetSentTimestamp\0\u{1}pinDurationSeconds\0\u{1}pinDurationForever\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularBytesField(value: &self._targetAuthorAciBinary) }()
+      case 2: try { try decoder.decodeSingularUInt64Field(value: &self._targetSentTimestamp) }()
+      case 3: try { try decoder.decodeSingularUInt32Field(value: &self._pinDurationSeconds) }()
+      case 4: try { try decoder.decodeSingularBoolField(value: &self._pinDurationForever) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._targetAuthorAciBinary {
+      try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._targetSentTimestamp {
+      try visitor.visitSingularUInt64Field(value: v, fieldNumber: 2)
+    } }()
+    try { if let v = self._pinDurationSeconds {
+      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 3)
+    } }()
+    try { if let v = self._pinDurationForever {
+      try visitor.visitSingularBoolField(value: v, fieldNumber: 4)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: SignalServiceProtos_DataMessage.PinMessage, rhs: SignalServiceProtos_DataMessage.PinMessage) -> Bool {
+    if lhs._targetAuthorAciBinary != rhs._targetAuthorAciBinary {return false}
+    if lhs._targetSentTimestamp != rhs._targetSentTimestamp {return false}
+    if lhs._pinDurationSeconds != rhs._pinDurationSeconds {return false}
+    if lhs._pinDurationForever != rhs._pinDurationForever {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension SignalServiceProtos_DataMessage.UnpinMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = SignalServiceProtos_DataMessage.protoMessageName + ".UnpinMessage"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}targetAuthorAciBinary\0\u{1}targetSentTimestamp\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularBytesField(value: &self._targetAuthorAciBinary) }()
+      case 2: try { try decoder.decodeSingularUInt64Field(value: &self._targetSentTimestamp) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._targetAuthorAciBinary {
+      try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._targetSentTimestamp {
+      try visitor.visitSingularUInt64Field(value: v, fieldNumber: 2)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: SignalServiceProtos_DataMessage.UnpinMessage, rhs: SignalServiceProtos_DataMessage.UnpinMessage) -> Bool {
+    if lhs._targetAuthorAciBinary != rhs._targetAuthorAciBinary {return false}
+    if lhs._targetSentTimestamp != rhs._targetSentTimestamp {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension SignalServiceProtos_DataMessage.AdminDelete: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = SignalServiceProtos_DataMessage.protoMessageName + ".AdminDelete"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}targetAuthorAciBinary\0\u{1}targetSentTimestamp\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularBytesField(value: &self._targetAuthorAciBinary) }()
+      case 2: try { try decoder.decodeSingularUInt64Field(value: &self._targetSentTimestamp) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._targetAuthorAciBinary {
+      try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._targetSentTimestamp {
+      try visitor.visitSingularUInt64Field(value: v, fieldNumber: 2)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: SignalServiceProtos_DataMessage.AdminDelete, rhs: SignalServiceProtos_DataMessage.AdminDelete) -> Bool {
+    if lhs._targetAuthorAciBinary != rhs._targetAuthorAciBinary {return false}
+    if lhs._targetSentTimestamp != rhs._targetSentTimestamp {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension SignalServiceProtos_NullMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".NullMessage"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}padding\0")
 
@@ -6933,7 +7492,7 @@ extension SignalServiceProtos_NullMessage: SwiftProtobuf.Message, SwiftProtobuf.
   }
 }
 
-extension SignalServiceProtos_ReceiptMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_ReceiptMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".ReceiptMessage"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0\u{1}timestamp\0")
 
@@ -6972,11 +7531,11 @@ extension SignalServiceProtos_ReceiptMessage: SwiftProtobuf.Message, SwiftProtob
   }
 }
 
-extension SignalServiceProtos_ReceiptMessage.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_ReceiptMessage.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0DELIVERY\0\u{1}READ\0\u{1}VIEWED\0")
 }
 
-extension SignalServiceProtos_Verified: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_Verified: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Verified"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\u{2}identityKey\0\u{1}state\0\u{1}nullMessage\0\u{1}destinationAci\0\u{1}destinationAciBinary\0\u{c}\u{1}\u{1}")
 
@@ -7030,13 +7589,13 @@ extension SignalServiceProtos_Verified: SwiftProtobuf.Message, SwiftProtobuf._Me
   }
 }
 
-extension SignalServiceProtos_Verified.State: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_Verified.State: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0DEFAULT\0\u{1}VERIFIED\0\u{1}UNVERIFIED\0")
 }
 
-extension SignalServiceProtos_SyncMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".SyncMessage"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}sent\0\u{1}contacts\0\u{2}\u{2}request\0\u{1}read\0\u{1}blocked\0\u{1}verified\0\u{1}padding\0\u{1}configuration\0\u{1}stickerPackOperation\0\u{1}viewOnceOpen\0\u{1}fetchLatest\0\u{1}keys\0\u{1}messageRequestResponse\0\u{1}outgoingPayment\0\u{1}viewed\0\u{2}\u{2}pniChangeNumber\0\u{1}callEvent\0\u{1}callLinkUpdate\0\u{1}callLogEvent\0\u{1}deleteForMe\0\u{1}deviceNameChange\0\u{c}\u{3}\u{1}\u{c}\u{11}\u{1}")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}sent\0\u{1}contacts\0\u{2}\u{2}request\0\u{1}read\0\u{1}blocked\0\u{1}verified\0\u{1}padding\0\u{1}configuration\0\u{1}stickerPackOperation\0\u{1}viewOnceOpen\0\u{1}fetchLatest\0\u{1}keys\0\u{1}messageRequestResponse\0\u{1}outgoingPayment\0\u{1}viewed\0\u{2}\u{2}pniChangeNumber\0\u{1}callEvent\0\u{1}callLinkUpdate\0\u{1}callLogEvent\0\u{1}deleteForMe\0\u{1}deviceNameChange\0\u{1}attachmentBackfillRequest\0\u{1}attachmentBackfillResponse\0\u{1}usernameChange\0\u{c}\u{3}\u{1}\u{c}\u{11}\u{1}")
 
   fileprivate class _StorageClass {
     var _sent: SignalServiceProtos_SyncMessage.Sent? = nil
@@ -7060,6 +7619,9 @@ extension SignalServiceProtos_SyncMessage: SwiftProtobuf.Message, SwiftProtobuf.
     var _callLogEvent: SignalServiceProtos_SyncMessage.CallLogEvent? = nil
     var _deleteForMe: SignalServiceProtos_SyncMessage.DeleteForMe? = nil
     var _deviceNameChange: SignalServiceProtos_SyncMessage.DeviceNameChange? = nil
+    var _attachmentBackfillRequest: SignalServiceProtos_SyncMessage.AttachmentBackfillRequest? = nil
+    var _attachmentBackfillResponse: SignalServiceProtos_SyncMessage.AttachmentBackfillResponse? = nil
+    var _usernameChange: SignalServiceProtos_SyncMessage.UsernameChange? = nil
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -7091,6 +7653,9 @@ extension SignalServiceProtos_SyncMessage: SwiftProtobuf.Message, SwiftProtobuf.
       _callLogEvent = source._callLogEvent
       _deleteForMe = source._deleteForMe
       _deviceNameChange = source._deviceNameChange
+      _attachmentBackfillRequest = source._attachmentBackfillRequest
+      _attachmentBackfillResponse = source._attachmentBackfillResponse
+      _usernameChange = source._usernameChange
     }
   }
 
@@ -7130,6 +7695,9 @@ extension SignalServiceProtos_SyncMessage: SwiftProtobuf.Message, SwiftProtobuf.
         case 21: try { try decoder.decodeSingularMessageField(value: &_storage._callLogEvent) }()
         case 22: try { try decoder.decodeSingularMessageField(value: &_storage._deleteForMe) }()
         case 23: try { try decoder.decodeSingularMessageField(value: &_storage._deviceNameChange) }()
+        case 24: try { try decoder.decodeSingularMessageField(value: &_storage._attachmentBackfillRequest) }()
+        case 25: try { try decoder.decodeSingularMessageField(value: &_storage._attachmentBackfillResponse) }()
+        case 26: try { try decoder.decodeSingularMessageField(value: &_storage._usernameChange) }()
         default: break
         }
       }
@@ -7205,6 +7773,15 @@ extension SignalServiceProtos_SyncMessage: SwiftProtobuf.Message, SwiftProtobuf.
       try { if let v = _storage._deviceNameChange {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 23)
       } }()
+      try { if let v = _storage._attachmentBackfillRequest {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 24)
+      } }()
+      try { if let v = _storage._attachmentBackfillResponse {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 25)
+      } }()
+      try { if let v = _storage._usernameChange {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 26)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -7235,6 +7812,9 @@ extension SignalServiceProtos_SyncMessage: SwiftProtobuf.Message, SwiftProtobuf.
         if _storage._callLogEvent != rhs_storage._callLogEvent {return false}
         if _storage._deleteForMe != rhs_storage._deleteForMe {return false}
         if _storage._deviceNameChange != rhs_storage._deviceNameChange {return false}
+        if _storage._attachmentBackfillRequest != rhs_storage._attachmentBackfillRequest {return false}
+        if _storage._attachmentBackfillResponse != rhs_storage._attachmentBackfillResponse {return false}
+        if _storage._usernameChange != rhs_storage._usernameChange {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -7244,7 +7824,7 @@ extension SignalServiceProtos_SyncMessage: SwiftProtobuf.Message, SwiftProtobuf.
   }
 }
 
-extension SignalServiceProtos_SyncMessage.Sent: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.Sent: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".Sent"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}destinationE164\0\u{1}timestamp\0\u{1}message\0\u{1}expirationStartTimestamp\0\u{1}unidentifiedStatus\0\u{1}isRecipientUpdate\0\u{1}destinationServiceId\0\u{1}storyMessage\0\u{1}storyMessageRecipients\0\u{1}editMessage\0\u{2}\u{2}destinationServiceIdBinary\0")
 
@@ -7328,7 +7908,7 @@ extension SignalServiceProtos_SyncMessage.Sent: SwiftProtobuf.Message, SwiftProt
   }
 }
 
-extension SignalServiceProtos_SyncMessage.Sent.UnidentifiedDeliveryStatus: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.Sent.UnidentifiedDeliveryStatus: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.Sent.protoMessageName + ".UnidentifiedDeliveryStatus"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\u{2}unidentified\0\u{1}destinationServiceId\0\u{2}\u{3}destinationServiceIdBinary\0\u{c}\u{1}\u{1}")
 
@@ -7372,7 +7952,7 @@ extension SignalServiceProtos_SyncMessage.Sent.UnidentifiedDeliveryStatus: Swift
   }
 }
 
-extension SignalServiceProtos_SyncMessage.Sent.StoryMessageRecipient: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.Sent.StoryMessageRecipient: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.Sent.protoMessageName + ".StoryMessageRecipient"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}destinationServiceId\0\u{1}distributionListIds\0\u{1}isAllowedToReply\0\u{2}\u{2}destinationServiceIdBinary\0")
 
@@ -7421,86 +8001,48 @@ extension SignalServiceProtos_SyncMessage.Sent.StoryMessageRecipient: SwiftProto
   }
 }
 
-extension SignalServiceProtos_SyncMessage.Contacts: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.Contacts: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".Contacts"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}blob\0\u{1}isComplete\0")
 
-  fileprivate class _StorageClass {
-    var _blob: SignalServiceProtos_AttachmentPointer? = nil
-    var _isComplete: Bool? = nil
-
-      // This property is used as the initial default value for new instances of the type.
-      // The type itself is protecting the reference to its storage via CoW semantics.
-      // This will force a copy to be made of this reference when the first mutation occurs;
-      // hence, it is safe to mark this as `nonisolated(unsafe)`.
-      static nonisolated(unsafe) let defaultInstance = _StorageClass()
-
-    private init() {}
-
-    init(copying source: _StorageClass) {
-      _blob = source._blob
-      _isComplete = source._isComplete
-    }
-  }
-
-  fileprivate mutating func _uniqueStorage() -> _StorageClass {
-    if !isKnownUniquelyReferenced(&_storage) {
-      _storage = _StorageClass(copying: _storage)
-    }
-    return _storage
-  }
-
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    _ = _uniqueStorage()
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      while let fieldNumber = try decoder.nextFieldNumber() {
-        // The use of inline closures is to circumvent an issue where the compiler
-        // allocates stack space for every case branch when no optimizations are
-        // enabled. https://github.com/apple/swift-protobuf/issues/1034
-        switch fieldNumber {
-        case 1: try { try decoder.decodeSingularMessageField(value: &_storage._blob) }()
-        case 2: try { try decoder.decodeSingularBoolField(value: &_storage._isComplete) }()
-        default: break
-        }
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._blob) }()
+      case 2: try { try decoder.decodeSingularBoolField(value: &self._isComplete) }()
+      default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every if/case branch local when no optimizations
-      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-      // https://github.com/apple/swift-protobuf/issues/1182
-      try { if let v = _storage._blob {
-        try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-      } }()
-      try { if let v = _storage._isComplete {
-        try visitor.visitSingularBoolField(value: v, fieldNumber: 2)
-      } }()
-    }
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._blob {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._isComplete {
+      try visitor.visitSingularBoolField(value: v, fieldNumber: 2)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: SignalServiceProtos_SyncMessage.Contacts, rhs: SignalServiceProtos_SyncMessage.Contacts) -> Bool {
-    if lhs._storage !== rhs._storage {
-      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
-        let _storage = _args.0
-        let rhs_storage = _args.1
-        if _storage._blob != rhs_storage._blob {return false}
-        if _storage._isComplete != rhs_storage._isComplete {return false}
-        return true
-      }
-      if !storagesAreEqual {return false}
-    }
+    if lhs._blob != rhs._blob {return false}
+    if lhs._isComplete != rhs._isComplete {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension SignalServiceProtos_SyncMessage.Blocked: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.Blocked: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".Blocked"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}numbers\0\u{1}groupIds\0\u{1}acis\0\u{1}acisBinary\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}numbers\0\u{1}groupIds\0\u{1}acis\0\u{1}acisBinary\0\u{1}blockedE164s\0\u{1}blockedAcis\0\u{1}blockedGroups\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -7512,6 +8054,9 @@ extension SignalServiceProtos_SyncMessage.Blocked: SwiftProtobuf.Message, SwiftP
       case 2: try { try decoder.decodeRepeatedBytesField(value: &self.groupIds) }()
       case 3: try { try decoder.decodeRepeatedStringField(value: &self.acis) }()
       case 4: try { try decoder.decodeRepeatedBytesField(value: &self.acisBinary) }()
+      case 5: try { try decoder.decodeRepeatedMessageField(value: &self.blockedE164S) }()
+      case 6: try { try decoder.decodeRepeatedMessageField(value: &self.blockedAcis) }()
+      case 7: try { try decoder.decodeRepeatedMessageField(value: &self.blockedGroups) }()
       default: break
       }
     }
@@ -7530,6 +8075,15 @@ extension SignalServiceProtos_SyncMessage.Blocked: SwiftProtobuf.Message, SwiftP
     if !self.acisBinary.isEmpty {
       try visitor.visitRepeatedBytesField(value: self.acisBinary, fieldNumber: 4)
     }
+    if !self.blockedE164S.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.blockedE164S, fieldNumber: 5)
+    }
+    if !self.blockedAcis.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.blockedAcis, fieldNumber: 6)
+    }
+    if !self.blockedGroups.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.blockedGroups, fieldNumber: 7)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -7538,12 +8092,132 @@ extension SignalServiceProtos_SyncMessage.Blocked: SwiftProtobuf.Message, SwiftP
     if lhs.acis != rhs.acis {return false}
     if lhs.groupIds != rhs.groupIds {return false}
     if lhs.acisBinary != rhs.acisBinary {return false}
+    if lhs.blockedE164S != rhs.blockedE164S {return false}
+    if lhs.blockedAcis != rhs.blockedAcis {return false}
+    if lhs.blockedGroups != rhs.blockedGroups {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension SignalServiceProtos_SyncMessage.Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.Blocked.BlockedE164: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = SignalServiceProtos_SyncMessage.Blocked.protoMessageName + ".BlockedE164"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}e164\0\u{1}timestamp\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self._e164) }()
+      case 2: try { try decoder.decodeSingularUInt64Field(value: &self._timestamp) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._e164 {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._timestamp {
+      try visitor.visitSingularUInt64Field(value: v, fieldNumber: 2)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: SignalServiceProtos_SyncMessage.Blocked.BlockedE164, rhs: SignalServiceProtos_SyncMessage.Blocked.BlockedE164) -> Bool {
+    if lhs._e164 != rhs._e164 {return false}
+    if lhs._timestamp != rhs._timestamp {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension SignalServiceProtos_SyncMessage.Blocked.BlockedAci: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = SignalServiceProtos_SyncMessage.Blocked.protoMessageName + ".BlockedAci"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}aciBinary\0\u{1}timestamp\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularBytesField(value: &self._aciBinary) }()
+      case 2: try { try decoder.decodeSingularUInt64Field(value: &self._timestamp) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._aciBinary {
+      try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._timestamp {
+      try visitor.visitSingularUInt64Field(value: v, fieldNumber: 2)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: SignalServiceProtos_SyncMessage.Blocked.BlockedAci, rhs: SignalServiceProtos_SyncMessage.Blocked.BlockedAci) -> Bool {
+    if lhs._aciBinary != rhs._aciBinary {return false}
+    if lhs._timestamp != rhs._timestamp {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension SignalServiceProtos_SyncMessage.Blocked.BlockedGroup: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = SignalServiceProtos_SyncMessage.Blocked.protoMessageName + ".BlockedGroup"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}groupId\0\u{1}timestamp\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularBytesField(value: &self._groupID) }()
+      case 2: try { try decoder.decodeSingularUInt64Field(value: &self._timestamp) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._groupID {
+      try visitor.visitSingularBytesField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._timestamp {
+      try visitor.visitSingularUInt64Field(value: v, fieldNumber: 2)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: SignalServiceProtos_SyncMessage.Blocked.BlockedGroup, rhs: SignalServiceProtos_SyncMessage.Blocked.BlockedGroup) -> Bool {
+    if lhs._groupID != rhs._groupID {return false}
+    if lhs._timestamp != rhs._timestamp {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension SignalServiceProtos_SyncMessage.Request: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".Request"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0")
 
@@ -7577,11 +8251,11 @@ extension SignalServiceProtos_SyncMessage.Request: SwiftProtobuf.Message, SwiftP
   }
 }
 
-extension SignalServiceProtos_SyncMessage.Request.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.Request.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0UNKNOWN\0\u{1}CONTACTS\0\u{2}\u{2}BLOCKED\0\u{1}CONFIGURATION\0\u{1}KEYS\0")
 }
 
-extension SignalServiceProtos_SyncMessage.Read: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.Read: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".Read"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\u{2}timestamp\0\u{1}senderAci\0\u{1}senderAciBinary\0\u{c}\u{1}\u{1}")
 
@@ -7625,7 +8299,7 @@ extension SignalServiceProtos_SyncMessage.Read: SwiftProtobuf.Message, SwiftProt
   }
 }
 
-extension SignalServiceProtos_SyncMessage.Viewed: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.Viewed: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".Viewed"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\u{2}timestamp\0\u{1}senderAci\0\u{1}senderAciBinary\0\u{c}\u{1}\u{1}")
 
@@ -7669,7 +8343,7 @@ extension SignalServiceProtos_SyncMessage.Viewed: SwiftProtobuf.Message, SwiftPr
   }
 }
 
-extension SignalServiceProtos_SyncMessage.Configuration: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.Configuration: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".Configuration"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}readReceipts\0\u{1}unidentifiedDeliveryIndicators\0\u{1}typingIndicators\0\u{2}\u{2}provisioningVersion\0\u{1}linkPreviews\0\u{c}\u{4}\u{1}")
 
@@ -7723,7 +8397,7 @@ extension SignalServiceProtos_SyncMessage.Configuration: SwiftProtobuf.Message, 
   }
 }
 
-extension SignalServiceProtos_SyncMessage.StickerPackOperation: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.StickerPackOperation: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".StickerPackOperation"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}packId\0\u{1}packKey\0\u{1}type\0")
 
@@ -7767,11 +8441,11 @@ extension SignalServiceProtos_SyncMessage.StickerPackOperation: SwiftProtobuf.Me
   }
 }
 
-extension SignalServiceProtos_SyncMessage.StickerPackOperation.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.StickerPackOperation.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0INSTALL\0\u{1}REMOVE\0")
 }
 
-extension SignalServiceProtos_SyncMessage.ViewOnceOpen: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.ViewOnceOpen: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".ViewOnceOpen"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\u{2}timestamp\0\u{1}senderAci\0\u{1}senderAciBinary\0\u{c}\u{1}\u{1}")
 
@@ -7815,7 +8489,7 @@ extension SignalServiceProtos_SyncMessage.ViewOnceOpen: SwiftProtobuf.Message, S
   }
 }
 
-extension SignalServiceProtos_SyncMessage.FetchLatest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.FetchLatest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".FetchLatest"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0")
 
@@ -7849,13 +8523,13 @@ extension SignalServiceProtos_SyncMessage.FetchLatest: SwiftProtobuf.Message, Sw
   }
 }
 
-extension SignalServiceProtos_SyncMessage.FetchLatest.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.FetchLatest.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0UNKNOWN\0\u{1}LOCAL_PROFILE\0\u{1}STORAGE_MANIFEST\0\u{1}SUBSCRIPTION_STATUS\0")
 }
 
-extension SignalServiceProtos_SyncMessage.Keys: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.Keys: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".Keys"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\u{2}master\0\u{1}accountEntropyPool\0\u{1}mediaRootBackupKey\0\u{c}\u{1}\u{1}")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\u{3}accountEntropyPool\0\u{1}mediaRootBackupKey\0\u{c}\u{1}\u{1}\u{c}\u{2}\u{1}")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -7863,7 +8537,6 @@ extension SignalServiceProtos_SyncMessage.Keys: SwiftProtobuf.Message, SwiftProt
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 2: try { try decoder.decodeSingularBytesField(value: &self._master) }()
       case 3: try { try decoder.decodeSingularStringField(value: &self._accountEntropyPool) }()
       case 4: try { try decoder.decodeSingularBytesField(value: &self._mediaRootBackupKey) }()
       default: break
@@ -7876,9 +8549,6 @@ extension SignalServiceProtos_SyncMessage.Keys: SwiftProtobuf.Message, SwiftProt
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
     // https://github.com/apple/swift-protobuf/issues/1182
-    try { if let v = self._master {
-      try visitor.visitSingularBytesField(value: v, fieldNumber: 2)
-    } }()
     try { if let v = self._accountEntropyPool {
       try visitor.visitSingularStringField(value: v, fieldNumber: 3)
     } }()
@@ -7889,7 +8559,6 @@ extension SignalServiceProtos_SyncMessage.Keys: SwiftProtobuf.Message, SwiftProt
   }
 
   static func ==(lhs: SignalServiceProtos_SyncMessage.Keys, rhs: SignalServiceProtos_SyncMessage.Keys) -> Bool {
-    if lhs._master != rhs._master {return false}
     if lhs._accountEntropyPool != rhs._accountEntropyPool {return false}
     if lhs._mediaRootBackupKey != rhs._mediaRootBackupKey {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
@@ -7897,7 +8566,7 @@ extension SignalServiceProtos_SyncMessage.Keys: SwiftProtobuf.Message, SwiftProt
   }
 }
 
-extension SignalServiceProtos_SyncMessage.MessageRequestResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.MessageRequestResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".MessageRequestResponse"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\u{2}threadAci\0\u{1}groupId\0\u{1}type\0\u{1}threadAciBinary\0\u{c}\u{1}\u{1}")
 
@@ -7946,11 +8615,11 @@ extension SignalServiceProtos_SyncMessage.MessageRequestResponse: SwiftProtobuf.
   }
 }
 
-extension SignalServiceProtos_SyncMessage.MessageRequestResponse.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.MessageRequestResponse.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0UNKNOWN\0\u{1}ACCEPT\0\u{1}DELETE\0\u{1}BLOCK\0\u{1}BLOCK_AND_DELETE\0\u{1}SPAM\0\u{1}BLOCK_AND_SPAM\0")
 }
 
-extension SignalServiceProtos_SyncMessage.OutgoingPayment: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.OutgoingPayment: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".OutgoingPayment"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}recipientServiceId\0\u{1}note\0\u{1}mobileCoin\0")
 
@@ -7994,7 +8663,7 @@ extension SignalServiceProtos_SyncMessage.OutgoingPayment: SwiftProtobuf.Message
   }
 }
 
-extension SignalServiceProtos_SyncMessage.OutgoingPayment.MobileCoin: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.OutgoingPayment.MobileCoin: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.OutgoingPayment.protoMessageName + ".MobileCoin"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}recipientAddress\0\u{1}amountPicoMob\0\u{1}feePicoMob\0\u{1}receipt\0\u{1}ledgerBlockTimestamp\0\u{1}ledgerBlockIndex\0\u{1}spentKeyImages\0\u{1}outputPublicKeys\0")
 
@@ -8063,7 +8732,7 @@ extension SignalServiceProtos_SyncMessage.OutgoingPayment.MobileCoin: SwiftProto
   }
 }
 
-extension SignalServiceProtos_SyncMessage.PniChangeNumber: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.PniChangeNumber: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".PniChangeNumber"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}identityKeyPair\0\u{1}signedPreKey\0\u{1}registrationId\0\u{1}newE164\0\u{1}lastResortKyberPreKey\0")
 
@@ -8117,7 +8786,7 @@ extension SignalServiceProtos_SyncMessage.PniChangeNumber: SwiftProtobuf.Message
   }
 }
 
-extension SignalServiceProtos_SyncMessage.CallEvent: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.CallEvent: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".CallEvent"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}conversationId\0\u{1}callId\0\u{1}timestamp\0\u{1}type\0\u{1}direction\0\u{1}event\0")
 
@@ -8176,21 +8845,21 @@ extension SignalServiceProtos_SyncMessage.CallEvent: SwiftProtobuf.Message, Swif
   }
 }
 
-extension SignalServiceProtos_SyncMessage.CallEvent.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.CallEvent.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0UNKNOWN_TYPE\0\u{1}AUDIO_CALL\0\u{1}VIDEO_CALL\0\u{1}GROUP_CALL\0\u{1}AD_HOC_CALL\0")
 }
 
-extension SignalServiceProtos_SyncMessage.CallEvent.Direction: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.CallEvent.Direction: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0UNKNOWN_DIRECTION\0\u{1}INCOMING\0\u{1}OUTGOING\0")
 }
 
-extension SignalServiceProtos_SyncMessage.CallEvent.Event: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.CallEvent.Event: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0UNKNOWN_ACTION\0\u{1}ACCEPTED\0\u{1}NOT_ACCEPTED\0\u{1}DELETED\0\u{1}OBSERVED\0")
 }
 
-extension SignalServiceProtos_SyncMessage.CallLinkUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.CallLinkUpdate: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".CallLinkUpdate"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}rootKey\0\u{1}adminPasskey\0\u{1}type\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}rootKey\0\u{1}adminPasskey\0\u{1}type\0\u{c}\u{4}\u{1}")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -8232,11 +8901,11 @@ extension SignalServiceProtos_SyncMessage.CallLinkUpdate: SwiftProtobuf.Message,
   }
 }
 
-extension SignalServiceProtos_SyncMessage.CallLinkUpdate.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.CallLinkUpdate.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0UPDATE\0")
 }
 
-extension SignalServiceProtos_SyncMessage.CallLogEvent: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.CallLogEvent: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".CallLogEvent"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0\u{1}timestamp\0\u{1}conversationId\0\u{1}callId\0")
 
@@ -8285,11 +8954,11 @@ extension SignalServiceProtos_SyncMessage.CallLogEvent: SwiftProtobuf.Message, S
   }
 }
 
-extension SignalServiceProtos_SyncMessage.CallLogEvent.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.CallLogEvent.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0CLEARED\0\u{1}MARKED_AS_READ\0\u{1}MARKED_AS_READ_IN_CONVERSATION\0")
 }
 
-extension SignalServiceProtos_SyncMessage.DeleteForMe: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.DeleteForMe: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".DeleteForMe"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}messageDeletes\0\u{1}conversationDeletes\0\u{1}localOnlyConversationDeletes\0\u{1}attachmentDeletes\0")
 
@@ -8334,105 +9003,7 @@ extension SignalServiceProtos_SyncMessage.DeleteForMe: SwiftProtobuf.Message, Sw
   }
 }
 
-extension SignalServiceProtos_SyncMessage.DeleteForMe.ConversationIdentifier: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = SignalServiceProtos_SyncMessage.DeleteForMe.protoMessageName + ".ConversationIdentifier"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}threadServiceId\0\u{1}threadGroupId\0\u{1}threadE164\0\u{1}threadServiceIdBinary\0")
-
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self._threadServiceID) }()
-      case 2: try { try decoder.decodeSingularBytesField(value: &self._threadGroupID) }()
-      case 3: try { try decoder.decodeSingularStringField(value: &self._threadE164) }()
-      case 4: try { try decoder.decodeSingularBytesField(value: &self._threadServiceIDBinary) }()
-      default: break
-      }
-    }
-  }
-
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every if/case branch local when no optimizations
-    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-    // https://github.com/apple/swift-protobuf/issues/1182
-    try { if let v = self._threadServiceID {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 1)
-    } }()
-    try { if let v = self._threadGroupID {
-      try visitor.visitSingularBytesField(value: v, fieldNumber: 2)
-    } }()
-    try { if let v = self._threadE164 {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 3)
-    } }()
-    try { if let v = self._threadServiceIDBinary {
-      try visitor.visitSingularBytesField(value: v, fieldNumber: 4)
-    } }()
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  static func ==(lhs: SignalServiceProtos_SyncMessage.DeleteForMe.ConversationIdentifier, rhs: SignalServiceProtos_SyncMessage.DeleteForMe.ConversationIdentifier) -> Bool {
-    if lhs._threadServiceID != rhs._threadServiceID {return false}
-    if lhs._threadGroupID != rhs._threadGroupID {return false}
-    if lhs._threadE164 != rhs._threadE164 {return false}
-    if lhs._threadServiceIDBinary != rhs._threadServiceIDBinary {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-extension SignalServiceProtos_SyncMessage.DeleteForMe.AddressableMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = SignalServiceProtos_SyncMessage.DeleteForMe.protoMessageName + ".AddressableMessage"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}authorServiceId\0\u{1}authorE164\0\u{1}sentTimestamp\0\u{1}authorServiceIdBinary\0")
-
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self._authorServiceID) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self._authorE164) }()
-      case 3: try { try decoder.decodeSingularUInt64Field(value: &self._sentTimestamp) }()
-      case 4: try { try decoder.decodeSingularBytesField(value: &self._authorServiceIDBinary) }()
-      default: break
-      }
-    }
-  }
-
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every if/case branch local when no optimizations
-    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-    // https://github.com/apple/swift-protobuf/issues/1182
-    try { if let v = self._authorServiceID {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 1)
-    } }()
-    try { if let v = self._authorE164 {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 2)
-    } }()
-    try { if let v = self._sentTimestamp {
-      try visitor.visitSingularUInt64Field(value: v, fieldNumber: 3)
-    } }()
-    try { if let v = self._authorServiceIDBinary {
-      try visitor.visitSingularBytesField(value: v, fieldNumber: 4)
-    } }()
-    try unknownFields.traverse(visitor: &visitor)
-  }
-
-  static func ==(lhs: SignalServiceProtos_SyncMessage.DeleteForMe.AddressableMessage, rhs: SignalServiceProtos_SyncMessage.DeleteForMe.AddressableMessage) -> Bool {
-    if lhs._authorServiceID != rhs._authorServiceID {return false}
-    if lhs._authorE164 != rhs._authorE164 {return false}
-    if lhs._authorServiceIDBinary != rhs._authorServiceIDBinary {return false}
-    if lhs._sentTimestamp != rhs._sentTimestamp {return false}
-    if lhs.unknownFields != rhs.unknownFields {return false}
-    return true
-  }
-}
-
-extension SignalServiceProtos_SyncMessage.DeleteForMe.MessageDeletes: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.DeleteForMe.MessageDeletes: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.DeleteForMe.protoMessageName + ".MessageDeletes"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}conversation\0\u{1}messages\0")
 
@@ -8471,7 +9042,7 @@ extension SignalServiceProtos_SyncMessage.DeleteForMe.MessageDeletes: SwiftProto
   }
 }
 
-extension SignalServiceProtos_SyncMessage.DeleteForMe.AttachmentDelete: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.DeleteForMe.AttachmentDelete: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.DeleteForMe.protoMessageName + ".AttachmentDelete"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}conversation\0\u{1}targetMessage\0\u{1}clientUuid\0\u{1}fallbackDigest\0\u{1}fallbackPlaintextHash\0")
 
@@ -8525,7 +9096,7 @@ extension SignalServiceProtos_SyncMessage.DeleteForMe.AttachmentDelete: SwiftPro
   }
 }
 
-extension SignalServiceProtos_SyncMessage.DeleteForMe.ConversationDelete: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.DeleteForMe.ConversationDelete: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.DeleteForMe.protoMessageName + ".ConversationDelete"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}conversation\0\u{1}mostRecentMessages\0\u{1}isFullDelete\0\u{1}mostRecentNonExpiringMessages\0")
 
@@ -8574,7 +9145,7 @@ extension SignalServiceProtos_SyncMessage.DeleteForMe.ConversationDelete: SwiftP
   }
 }
 
-extension SignalServiceProtos_SyncMessage.DeleteForMe.LocalOnlyConversationDelete: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.DeleteForMe.LocalOnlyConversationDelete: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.DeleteForMe.protoMessageName + ".LocalOnlyConversationDelete"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}conversation\0")
 
@@ -8608,7 +9179,7 @@ extension SignalServiceProtos_SyncMessage.DeleteForMe.LocalOnlyConversationDelet
   }
 }
 
-extension SignalServiceProtos_SyncMessage.DeviceNameChange: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.DeviceNameChange: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".DeviceNameChange"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\u{2}deviceId\0\u{c}\u{1}\u{1}")
 
@@ -8642,9 +9213,9 @@ extension SignalServiceProtos_SyncMessage.DeviceNameChange: SwiftProtobuf.Messag
   }
 }
 
-extension SignalServiceProtos_AttachmentPointer: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".AttachmentPointer"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}cdnId\0\u{1}contentType\0\u{1}key\0\u{1}size\0\u{1}thumbnail\0\u{1}digest\0\u{1}fileName\0\u{1}flags\0\u{1}width\0\u{1}height\0\u{1}caption\0\u{1}blurHash\0\u{1}uploadTimestamp\0\u{1}cdnNumber\0\u{1}cdnKey\0\u{2}\u{5}clientUuid\0")
+nonisolated extension SignalServiceProtos_SyncMessage.AttachmentBackfillRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".AttachmentBackfillRequest"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}targetMessage\0\u{1}targetConversation\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -8652,22 +9223,8 @@ extension SignalServiceProtos_AttachmentPointer: SwiftProtobuf.Message, SwiftPro
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularFixed64Field(value: &self._cdnID) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self._contentType) }()
-      case 3: try { try decoder.decodeSingularBytesField(value: &self._key) }()
-      case 4: try { try decoder.decodeSingularUInt32Field(value: &self._size) }()
-      case 5: try { try decoder.decodeSingularBytesField(value: &self._thumbnail) }()
-      case 6: try { try decoder.decodeSingularBytesField(value: &self._digest) }()
-      case 7: try { try decoder.decodeSingularStringField(value: &self._fileName) }()
-      case 8: try { try decoder.decodeSingularUInt32Field(value: &self._flags) }()
-      case 9: try { try decoder.decodeSingularUInt32Field(value: &self._width) }()
-      case 10: try { try decoder.decodeSingularUInt32Field(value: &self._height) }()
-      case 11: try { try decoder.decodeSingularStringField(value: &self._caption) }()
-      case 12: try { try decoder.decodeSingularStringField(value: &self._blurHash) }()
-      case 13: try { try decoder.decodeSingularUInt64Field(value: &self._uploadTimestamp) }()
-      case 14: try { try decoder.decodeSingularUInt32Field(value: &self._cdnNumber) }()
-      case 15: try { try decoder.decodeSingularStringField(value: &self._cdnKey) }()
-      case 20: try { try decoder.decodeSingularBytesField(value: &self._clientUuid) }()
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._targetMessage) }()
+      case 2: try { try decoder.decodeSingularMessageField(value: &self._targetConversation) }()
       default: break
       }
     }
@@ -8678,84 +9235,362 @@ extension SignalServiceProtos_AttachmentPointer: SwiftProtobuf.Message, SwiftPro
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
     // https://github.com/apple/swift-protobuf/issues/1182
-    try { if let v = self._cdnID {
-      try visitor.visitSingularFixed64Field(value: v, fieldNumber: 1)
+    try { if let v = self._targetMessage {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
     } }()
-    try { if let v = self._contentType {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 2)
-    } }()
-    try { if let v = self._key {
-      try visitor.visitSingularBytesField(value: v, fieldNumber: 3)
-    } }()
-    try { if let v = self._size {
-      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
-    } }()
-    try { if let v = self._thumbnail {
-      try visitor.visitSingularBytesField(value: v, fieldNumber: 5)
-    } }()
-    try { if let v = self._digest {
-      try visitor.visitSingularBytesField(value: v, fieldNumber: 6)
-    } }()
-    try { if let v = self._fileName {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 7)
-    } }()
-    try { if let v = self._flags {
-      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 8)
-    } }()
-    try { if let v = self._width {
-      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 9)
-    } }()
-    try { if let v = self._height {
-      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 10)
-    } }()
-    try { if let v = self._caption {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 11)
-    } }()
-    try { if let v = self._blurHash {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 12)
-    } }()
-    try { if let v = self._uploadTimestamp {
-      try visitor.visitSingularUInt64Field(value: v, fieldNumber: 13)
-    } }()
-    try { if let v = self._cdnNumber {
-      try visitor.visitSingularUInt32Field(value: v, fieldNumber: 14)
-    } }()
-    try { if let v = self._cdnKey {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 15)
-    } }()
-    try { if let v = self._clientUuid {
-      try visitor.visitSingularBytesField(value: v, fieldNumber: 20)
+    try { if let v = self._targetConversation {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
     } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: SignalServiceProtos_AttachmentPointer, rhs: SignalServiceProtos_AttachmentPointer) -> Bool {
-    if lhs._cdnID != rhs._cdnID {return false}
-    if lhs._cdnKey != rhs._cdnKey {return false}
-    if lhs._clientUuid != rhs._clientUuid {return false}
-    if lhs._contentType != rhs._contentType {return false}
-    if lhs._key != rhs._key {return false}
-    if lhs._size != rhs._size {return false}
-    if lhs._thumbnail != rhs._thumbnail {return false}
-    if lhs._digest != rhs._digest {return false}
-    if lhs._fileName != rhs._fileName {return false}
-    if lhs._flags != rhs._flags {return false}
-    if lhs._width != rhs._width {return false}
-    if lhs._height != rhs._height {return false}
-    if lhs._caption != rhs._caption {return false}
-    if lhs._blurHash != rhs._blurHash {return false}
-    if lhs._uploadTimestamp != rhs._uploadTimestamp {return false}
-    if lhs._cdnNumber != rhs._cdnNumber {return false}
+  static func ==(lhs: SignalServiceProtos_SyncMessage.AttachmentBackfillRequest, rhs: SignalServiceProtos_SyncMessage.AttachmentBackfillRequest) -> Bool {
+    if lhs._targetMessage != rhs._targetMessage {return false}
+    if lhs._targetConversation != rhs._targetConversation {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension SignalServiceProtos_AttachmentPointer.Flags: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_SyncMessage.AttachmentBackfillResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".AttachmentBackfillResponse"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}targetMessage\0\u{1}targetConversation\0\u{1}attachments\0\u{1}error\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._targetMessage) }()
+      case 2: try { try decoder.decodeSingularMessageField(value: &self._targetConversation) }()
+      case 3: try { try decoder.decodeSingularMessageField(value: &self._attachments) }()
+      case 4: try { try decoder.decodeSingularEnumField(value: &self._error) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._targetMessage {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._targetConversation {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
+    } }()
+    try { if let v = self._attachments {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
+    } }()
+    try { if let v = self._error {
+      try visitor.visitSingularEnumField(value: v, fieldNumber: 4)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: SignalServiceProtos_SyncMessage.AttachmentBackfillResponse, rhs: SignalServiceProtos_SyncMessage.AttachmentBackfillResponse) -> Bool {
+    if lhs._targetMessage != rhs._targetMessage {return false}
+    if lhs._targetConversation != rhs._targetConversation {return false}
+    if lhs._attachments != rhs._attachments {return false}
+    if lhs._error != rhs._error {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.Error: SwiftProtobuf._ProtoNameProviding {
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0MESSAGE_NOT_FOUND\0")
+}
+
+nonisolated extension SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.AttachmentData: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.protoMessageName + ".AttachmentData"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}attachment\0\u{1}status\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._attachment) }()
+      case 2: try { try decoder.decodeSingularEnumField(value: &self._status) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._attachment {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._status {
+      try visitor.visitSingularEnumField(value: v, fieldNumber: 2)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.AttachmentData, rhs: SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.AttachmentData) -> Bool {
+    if lhs._attachment != rhs._attachment {return false}
+    if lhs._status != rhs._status {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.AttachmentData.Status: SwiftProtobuf._ProtoNameProviding {
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0PENDING\0\u{1}TERMINAL_ERROR\0")
+}
+
+nonisolated extension SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.AttachmentDataList: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.protoMessageName + ".AttachmentDataList"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}attachments\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeRepeatedMessageField(value: &self.attachments) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.attachments.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.attachments, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.AttachmentDataList, rhs: SignalServiceProtos_SyncMessage.AttachmentBackfillResponse.AttachmentDataList) -> Bool {
+    if lhs.attachments != rhs.attachments {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension SignalServiceProtos_SyncMessage.UsernameChange: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = SignalServiceProtos_SyncMessage.protoMessageName + ".UsernameChange"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    // Load everything into unknown fields
+    while try decoder.nextFieldNumber() != nil {}
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: SignalServiceProtos_SyncMessage.UsernameChange, rhs: SignalServiceProtos_SyncMessage.UsernameChange) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension SignalServiceProtos_AttachmentPointer: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".AttachmentPointer"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}cdnId\0\u{1}contentType\0\u{1}key\0\u{1}size\0\u{1}thumbnail\0\u{1}digest\0\u{1}fileName\0\u{1}flags\0\u{1}width\0\u{1}height\0\u{1}caption\0\u{1}blurHash\0\u{1}uploadTimestamp\0\u{1}cdnNumber\0\u{1}cdnKey\0\u{2}\u{5}clientUuid\0\u{1}audioWaveform\0\u{1}audioDurationSeconds\0")
+
+  fileprivate class _StorageClass {
+    var _cdnID: UInt64? = nil
+    var _cdnKey: String? = nil
+    var _clientUuid: Data? = nil
+    var _contentType: String? = nil
+    var _key: Data? = nil
+    var _size: UInt32? = nil
+    var _thumbnail: Data? = nil
+    var _digest: Data? = nil
+    var _fileName: String? = nil
+    var _flags: UInt32? = nil
+    var _width: UInt32? = nil
+    var _height: UInt32? = nil
+    var _caption: String? = nil
+    var _blurHash: String? = nil
+    var _uploadTimestamp: UInt64? = nil
+    var _cdnNumber: UInt32? = nil
+    var _audioWaveform: Data? = nil
+    var _audioDurationSeconds: Float? = nil
+
+      // This property is used as the initial default value for new instances of the type.
+      // The type itself is protecting the reference to its storage via CoW semantics.
+      // This will force a copy to be made of this reference when the first mutation occurs;
+      // hence, it is safe to mark this as `nonisolated(unsafe)`.
+      static nonisolated(unsafe) let defaultInstance = _StorageClass()
+
+    private init() {}
+
+    init(copying source: _StorageClass) {
+      _cdnID = source._cdnID
+      _cdnKey = source._cdnKey
+      _clientUuid = source._clientUuid
+      _contentType = source._contentType
+      _key = source._key
+      _size = source._size
+      _thumbnail = source._thumbnail
+      _digest = source._digest
+      _fileName = source._fileName
+      _flags = source._flags
+      _width = source._width
+      _height = source._height
+      _caption = source._caption
+      _blurHash = source._blurHash
+      _uploadTimestamp = source._uploadTimestamp
+      _cdnNumber = source._cdnNumber
+      _audioWaveform = source._audioWaveform
+      _audioDurationSeconds = source._audioDurationSeconds
+    }
+  }
+
+  fileprivate mutating func _uniqueStorage() -> _StorageClass {
+    if !isKnownUniquelyReferenced(&_storage) {
+      _storage = _StorageClass(copying: _storage)
+    }
+    return _storage
+  }
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    _ = _uniqueStorage()
+    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      while let fieldNumber = try decoder.nextFieldNumber() {
+        // The use of inline closures is to circumvent an issue where the compiler
+        // allocates stack space for every case branch when no optimizations are
+        // enabled. https://github.com/apple/swift-protobuf/issues/1034
+        switch fieldNumber {
+        case 1: try { try decoder.decodeSingularFixed64Field(value: &_storage._cdnID) }()
+        case 2: try { try decoder.decodeSingularStringField(value: &_storage._contentType) }()
+        case 3: try { try decoder.decodeSingularBytesField(value: &_storage._key) }()
+        case 4: try { try decoder.decodeSingularUInt32Field(value: &_storage._size) }()
+        case 5: try { try decoder.decodeSingularBytesField(value: &_storage._thumbnail) }()
+        case 6: try { try decoder.decodeSingularBytesField(value: &_storage._digest) }()
+        case 7: try { try decoder.decodeSingularStringField(value: &_storage._fileName) }()
+        case 8: try { try decoder.decodeSingularUInt32Field(value: &_storage._flags) }()
+        case 9: try { try decoder.decodeSingularUInt32Field(value: &_storage._width) }()
+        case 10: try { try decoder.decodeSingularUInt32Field(value: &_storage._height) }()
+        case 11: try { try decoder.decodeSingularStringField(value: &_storage._caption) }()
+        case 12: try { try decoder.decodeSingularStringField(value: &_storage._blurHash) }()
+        case 13: try { try decoder.decodeSingularUInt64Field(value: &_storage._uploadTimestamp) }()
+        case 14: try { try decoder.decodeSingularUInt32Field(value: &_storage._cdnNumber) }()
+        case 15: try { try decoder.decodeSingularStringField(value: &_storage._cdnKey) }()
+        case 20: try { try decoder.decodeSingularBytesField(value: &_storage._clientUuid) }()
+        case 21: try { try decoder.decodeSingularBytesField(value: &_storage._audioWaveform) }()
+        case 22: try { try decoder.decodeSingularFloatField(value: &_storage._audioDurationSeconds) }()
+        default: break
+        }
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every if/case branch local when no optimizations
+      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+      // https://github.com/apple/swift-protobuf/issues/1182
+      try { if let v = _storage._cdnID {
+        try visitor.visitSingularFixed64Field(value: v, fieldNumber: 1)
+      } }()
+      try { if let v = _storage._contentType {
+        try visitor.visitSingularStringField(value: v, fieldNumber: 2)
+      } }()
+      try { if let v = _storage._key {
+        try visitor.visitSingularBytesField(value: v, fieldNumber: 3)
+      } }()
+      try { if let v = _storage._size {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 4)
+      } }()
+      try { if let v = _storage._thumbnail {
+        try visitor.visitSingularBytesField(value: v, fieldNumber: 5)
+      } }()
+      try { if let v = _storage._digest {
+        try visitor.visitSingularBytesField(value: v, fieldNumber: 6)
+      } }()
+      try { if let v = _storage._fileName {
+        try visitor.visitSingularStringField(value: v, fieldNumber: 7)
+      } }()
+      try { if let v = _storage._flags {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 8)
+      } }()
+      try { if let v = _storage._width {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 9)
+      } }()
+      try { if let v = _storage._height {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 10)
+      } }()
+      try { if let v = _storage._caption {
+        try visitor.visitSingularStringField(value: v, fieldNumber: 11)
+      } }()
+      try { if let v = _storage._blurHash {
+        try visitor.visitSingularStringField(value: v, fieldNumber: 12)
+      } }()
+      try { if let v = _storage._uploadTimestamp {
+        try visitor.visitSingularUInt64Field(value: v, fieldNumber: 13)
+      } }()
+      try { if let v = _storage._cdnNumber {
+        try visitor.visitSingularUInt32Field(value: v, fieldNumber: 14)
+      } }()
+      try { if let v = _storage._cdnKey {
+        try visitor.visitSingularStringField(value: v, fieldNumber: 15)
+      } }()
+      try { if let v = _storage._clientUuid {
+        try visitor.visitSingularBytesField(value: v, fieldNumber: 20)
+      } }()
+      try { if let v = _storage._audioWaveform {
+        try visitor.visitSingularBytesField(value: v, fieldNumber: 21)
+      } }()
+      try { if let v = _storage._audioDurationSeconds {
+        try visitor.visitSingularFloatField(value: v, fieldNumber: 22)
+      } }()
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: SignalServiceProtos_AttachmentPointer, rhs: SignalServiceProtos_AttachmentPointer) -> Bool {
+    if lhs._storage !== rhs._storage {
+      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
+        let _storage = _args.0
+        let rhs_storage = _args.1
+        if _storage._cdnID != rhs_storage._cdnID {return false}
+        if _storage._cdnKey != rhs_storage._cdnKey {return false}
+        if _storage._clientUuid != rhs_storage._clientUuid {return false}
+        if _storage._contentType != rhs_storage._contentType {return false}
+        if _storage._key != rhs_storage._key {return false}
+        if _storage._size != rhs_storage._size {return false}
+        if _storage._thumbnail != rhs_storage._thumbnail {return false}
+        if _storage._digest != rhs_storage._digest {return false}
+        if _storage._fileName != rhs_storage._fileName {return false}
+        if _storage._flags != rhs_storage._flags {return false}
+        if _storage._width != rhs_storage._width {return false}
+        if _storage._height != rhs_storage._height {return false}
+        if _storage._caption != rhs_storage._caption {return false}
+        if _storage._blurHash != rhs_storage._blurHash {return false}
+        if _storage._uploadTimestamp != rhs_storage._uploadTimestamp {return false}
+        if _storage._cdnNumber != rhs_storage._cdnNumber {return false}
+        if _storage._audioWaveform != rhs_storage._audioWaveform {return false}
+        if _storage._audioDurationSeconds != rhs_storage._audioDurationSeconds {return false}
+        return true
+      }
+      if !storagesAreEqual {return false}
+    }
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension SignalServiceProtos_AttachmentPointer.Flags: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}VOICE_MESSAGE\0\u{1}BORDERLESS\0\u{2}\u{6}GIF\0")
 }
 
-extension SignalServiceProtos_GroupContextV2: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_GroupContextV2: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".GroupContextV2"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}masterKey\0\u{1}revision\0\u{1}groupChange\0")
 
@@ -8799,7 +9634,7 @@ extension SignalServiceProtos_GroupContextV2: SwiftProtobuf.Message, SwiftProtob
   }
 }
 
-extension SignalServiceProtos_ContactDetails: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_ContactDetails: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".ContactDetails"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}contactE164\0\u{1}name\0\u{1}avatar\0\u{2}\u{5}expireTimer\0\u{1}aci\0\u{1}inboxPosition\0\u{2}\u{2}expireTimerVersion\0\u{1}aciBinary\0\u{c}\u{4}\u{1}\u{c}\u{5}\u{1}\u{c}\u{6}\u{1}\u{c}\u{7}\u{1}\u{c}\u{b}\u{1}")
 
@@ -8868,7 +9703,7 @@ extension SignalServiceProtos_ContactDetails: SwiftProtobuf.Message, SwiftProtob
   }
 }
 
-extension SignalServiceProtos_ContactDetails.Avatar: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_ContactDetails.Avatar: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_ContactDetails.protoMessageName + ".Avatar"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}contentType\0\u{1}length\0")
 
@@ -8907,7 +9742,7 @@ extension SignalServiceProtos_ContactDetails.Avatar: SwiftProtobuf.Message, Swif
   }
 }
 
-extension SignalServiceProtos_Pack: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_Pack: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Pack"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}title\0\u{1}author\0\u{1}cover\0\u{1}stickers\0")
 
@@ -8956,7 +9791,7 @@ extension SignalServiceProtos_Pack: SwiftProtobuf.Message, SwiftProtobuf._Messag
   }
 }
 
-extension SignalServiceProtos_Pack.Sticker: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_Pack.Sticker: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_Pack.protoMessageName + ".Sticker"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{1}emoji\0\u{1}contentType\0")
 
@@ -9000,7 +9835,7 @@ extension SignalServiceProtos_Pack.Sticker: SwiftProtobuf.Message, SwiftProtobuf
   }
 }
 
-extension SignalServiceProtos_PaymentAddress: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_PaymentAddress: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".PaymentAddress"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}mobileCoin\0")
 
@@ -9034,7 +9869,7 @@ extension SignalServiceProtos_PaymentAddress: SwiftProtobuf.Message, SwiftProtob
   }
 }
 
-extension SignalServiceProtos_PaymentAddress.MobileCoin: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_PaymentAddress.MobileCoin: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SignalServiceProtos_PaymentAddress.protoMessageName + ".MobileCoin"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}publicAddress\0\u{1}signature\0")
 
@@ -9073,7 +9908,7 @@ extension SignalServiceProtos_PaymentAddress.MobileCoin: SwiftProtobuf.Message, 
   }
 }
 
-extension SignalServiceProtos_DecryptionErrorMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_DecryptionErrorMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".DecryptionErrorMessage"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}ratchetKey\0\u{1}timestamp\0\u{1}deviceId\0")
 
@@ -9117,7 +9952,7 @@ extension SignalServiceProtos_DecryptionErrorMessage: SwiftProtobuf.Message, Swi
   }
 }
 
-extension SignalServiceProtos_PniSignatureMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_PniSignatureMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".PniSignatureMessage"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}pni\0\u{1}signature\0")
 
@@ -9156,7 +9991,7 @@ extension SignalServiceProtos_PniSignatureMessage: SwiftProtobuf.Message, SwiftP
   }
 }
 
-extension SignalServiceProtos_BodyRange: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_BodyRange: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".BodyRange"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}start\0\u{1}length\0\u{1}mentionAci\0\u{1}style\0\u{1}mentionAciBinary\0")
 
@@ -9210,11 +10045,11 @@ extension SignalServiceProtos_BodyRange: SwiftProtobuf.Message, SwiftProtobuf._M
   }
 }
 
-extension SignalServiceProtos_BodyRange.Style: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_BodyRange.Style: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0NONE\0\u{1}BOLD\0\u{1}ITALIC\0\u{1}SPOILER\0\u{1}STRIKETHROUGH\0\u{1}MONOSPACE\0")
 }
 
-extension SignalServiceProtos_EditMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SignalServiceProtos_EditMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".EditMessage"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}targetSentTimestamp\0\u{1}dataMessage\0")
 
@@ -9248,6 +10083,104 @@ extension SignalServiceProtos_EditMessage: SwiftProtobuf.Message, SwiftProtobuf.
   static func ==(lhs: SignalServiceProtos_EditMessage, rhs: SignalServiceProtos_EditMessage) -> Bool {
     if lhs._targetSentTimestamp != rhs._targetSentTimestamp {return false}
     if lhs._dataMessage != rhs._dataMessage {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension SignalServiceProtos_AddressableMessage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".AddressableMessage"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}authorServiceId\0\u{1}authorE164\0\u{1}sentTimestamp\0\u{1}authorServiceIdBinary\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self._authorServiceID) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self._authorE164) }()
+      case 3: try { try decoder.decodeSingularUInt64Field(value: &self._sentTimestamp) }()
+      case 4: try { try decoder.decodeSingularBytesField(value: &self._authorServiceIDBinary) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._authorServiceID {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._authorE164 {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 2)
+    } }()
+    try { if let v = self._sentTimestamp {
+      try visitor.visitSingularUInt64Field(value: v, fieldNumber: 3)
+    } }()
+    try { if let v = self._authorServiceIDBinary {
+      try visitor.visitSingularBytesField(value: v, fieldNumber: 4)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: SignalServiceProtos_AddressableMessage, rhs: SignalServiceProtos_AddressableMessage) -> Bool {
+    if lhs._authorServiceID != rhs._authorServiceID {return false}
+    if lhs._authorE164 != rhs._authorE164 {return false}
+    if lhs._authorServiceIDBinary != rhs._authorServiceIDBinary {return false}
+    if lhs._sentTimestamp != rhs._sentTimestamp {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension SignalServiceProtos_ConversationIdentifier: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".ConversationIdentifier"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}threadServiceId\0\u{1}threadGroupId\0\u{1}threadE164\0\u{1}threadServiceIdBinary\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self._threadServiceID) }()
+      case 2: try { try decoder.decodeSingularBytesField(value: &self._threadGroupID) }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self._threadE164) }()
+      case 4: try { try decoder.decodeSingularBytesField(value: &self._threadServiceIDBinary) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._threadServiceID {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._threadGroupID {
+      try visitor.visitSingularBytesField(value: v, fieldNumber: 2)
+    } }()
+    try { if let v = self._threadE164 {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 3)
+    } }()
+    try { if let v = self._threadServiceIDBinary {
+      try visitor.visitSingularBytesField(value: v, fieldNumber: 4)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: SignalServiceProtos_ConversationIdentifier, rhs: SignalServiceProtos_ConversationIdentifier) -> Bool {
+    if lhs._threadServiceID != rhs._threadServiceID {return false}
+    if lhs._threadGroupID != rhs._threadGroupID {return false}
+    if lhs._threadE164 != rhs._threadE164 {return false}
+    if lhs._threadServiceIDBinary != rhs._threadServiceIDBinary {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

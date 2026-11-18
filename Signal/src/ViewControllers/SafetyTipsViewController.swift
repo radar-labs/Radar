@@ -4,19 +4,251 @@
 //
 
 import Foundation
-public import SignalUI
 import SignalServiceKit
+public import SignalUI
 
 public enum SafetyTipsType {
     case contact
     case group
 }
 
+public enum SafetyTipsMode {
+    case smsRequest
+    case messageRequest
+}
+
 public class SafetyTipsViewController: InteractiveSheetViewController, UIScrollViewDelegate {
+    public struct Button {
+        let title: String
+        let action: () -> Void
+    }
+
+    override public var placeOnGlassIfAvailable: Bool { true }
+    let primaryButton: Button
+    let mode: SafetyTipsMode
+
+    init(mode: SafetyTipsMode, primaryButton: Button) {
+        self.mode = mode
+        self.primaryButton = primaryButton
+    }
+
+    private enum SafetyTips {
+        case chatsFromSignal
+        case reviewNames
+        case scams
+        case keepVerificationCodeSafe
+        case enableReglock
+
+        var image: UIImage? {
+            switch self {
+            case .chatsFromSignal:
+                return UIImage(resource: .safetytip4801)
+            case .reviewNames:
+                return UIImage(resource: .safetytip4802)
+            case .scams:
+                return UIImage(resource: .safetytip4803)
+            case .keepVerificationCodeSafe:
+                return UIImage(resource: .safetytip4804)
+            case .enableReglock:
+                return UIImage(resource: .safetytip4805)
+            }
+        }
+
+        var title: String {
+            switch self {
+            case .chatsFromSignal:
+                return OWSLocalizedString(
+                    "SAFETY_TIPS_SIGNAL_CHATS_TITLE",
+                    comment: "Message title describing the signal chats tip.",
+                )
+            case .reviewNames:
+                return OWSLocalizedString(
+                    "SAFETY_TIPS_REVIEW_NAMES_TITLE",
+                    comment: "Message title describing the review names safety tip.",
+                )
+            case .scams:
+                return OWSLocalizedString(
+                    "SAFETY_TIPS_LOOK_OUT_FOR_SCAMS_TITLE",
+                    comment: "Message title describing the scams safety tip.",
+                )
+            case .keepVerificationCodeSafe:
+                return OWSLocalizedString(
+                    "SAFETY_TIPS_KEEP_CODE_SAFE_TITLE",
+                    comment: "Message title describing the keeping codes safe safety tip.",
+                )
+            case .enableReglock:
+                return OWSLocalizedString(
+                    "SAFETY_TIPS_ENABLE_REGLOCK_TITLE",
+                    comment: "Message title describing the enable reglock safety tip.",
+                )
+            }
+        }
+
+        var body: String {
+            switch self {
+            case .chatsFromSignal:
+                return OWSLocalizedString(
+                    "SAFETY_TIPS_SIGNAL_CHATS_BODY",
+                    comment: "Message body describing the signal chats tip.",
+                )
+            case .reviewNames:
+                return OWSLocalizedString(
+                    "SAFETY_TIPS_REVIEW_NAMES_BODY",
+                    comment: "Message body describing the review names safety tip.",
+                )
+            case .scams:
+                return OWSLocalizedString(
+                    "SAFETY_TIPS_LOOK_OUT_FOR_SCAMS_BODY",
+                    comment: "Message body describing the scams safety tip.",
+                )
+            case .keepVerificationCodeSafe:
+                return OWSLocalizedString(
+                    "SAFETY_TIPS_KEEP_CODE_SAFE_BODY",
+                    comment: "Message body describing the keeping codes safe safety tip.",
+                )
+            case .enableReglock:
+                return OWSLocalizedString(
+                    "SAFETY_TIPS_ENABLE_REGLOCK_BODY",
+                    comment: "Message body describing the enable reglock safety tip.",
+                )
+            }
+        }
+    }
+
     let contentScrollView = UIScrollView()
     let stackView = UIStackView()
-    public override var interactiveScrollViews: [UIScrollView] { [contentScrollView] }
-    public override var sheetBackgroundColor: UIColor { Theme.tableView2PresentedBackgroundColor }
+
+    override public func viewDidLoad() {
+        super.viewDidLoad()
+
+        minimizedHeight = min(612, CurrentAppContext().frame.height)
+        super.allowsExpansion = false
+
+        let header = UILabel()
+        header.text = OWSLocalizedString(
+            "SAFETY_TIPS_HEADER_TITLE",
+            comment: "Title for Safety Tips education screen.",
+        )
+        header.font = .dynamicTypeHeadline
+        header.textAlignment = .center
+        header.isAccessibilityElement = true
+        header.accessibilityTraits.insert(.header)
+        contentView.addSubview(header)
+        header.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            header.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            header.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 16),
+        ])
+
+        contentView.addSubview(contentScrollView)
+        contentScrollView.addSubview(stackView)
+
+        stackView.axis = .vertical
+        stackView.spacing = 20
+
+        contentScrollView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            contentScrollView.topAnchor.constraint(equalTo: header.bottomAnchor, constant: 24),
+            contentScrollView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -90),
+            contentScrollView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            contentScrollView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+
+            stackView.topAnchor.constraint(equalTo: contentScrollView.contentLayoutGuide.topAnchor),
+            stackView.bottomAnchor.constraint(equalTo: contentScrollView.contentLayoutGuide.bottomAnchor),
+            stackView.leadingAnchor.constraint(equalTo: contentScrollView.contentLayoutGuide.leadingAnchor, constant: 24),
+            stackView.trailingAnchor.constraint(equalTo: contentScrollView.contentLayoutGuide.trailingAnchor, constant: 24),
+            stackView.widthAnchor.constraint(equalTo: contentScrollView.frameLayoutGuide.widthAnchor, constant: -48),
+        ])
+
+        let cases: [SafetyTips] = switch mode {
+        case .smsRequest: [.chatsFromSignal, .keepVerificationCodeSafe, .enableReglock]
+        case .messageRequest: [.chatsFromSignal, .reviewNames, .scams]
+        }
+
+        for bullet in cases {
+            let bulletView = SafetyBulletView(bullet)
+            stackView.addArrangedSubview(bulletView)
+        }
+
+        var config = UIButton.Configuration.filled()
+        config.baseBackgroundColor = UIColor.Signal.secondaryFill
+        config.cornerStyle = .capsule
+        var attrString = AttributedString(primaryButton.title)
+        attrString.font = .dynamicTypeBodyClamped.medium()
+        config.attributedTitle = attrString
+        config.baseForegroundColor = UIColor.Signal.label
+        config.contentInsets = .init(margin: 14)
+        let button = UIButton(
+            configuration: config,
+            primaryAction: .init(handler: { [weak self] _ in
+                self?.dismiss(animated: true, completion: {
+                    self?.primaryButton.action()
+                })
+            }),
+        )
+
+        button.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(button)
+        NSLayoutConstraint.activate([
+            button.bottomAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.bottomAnchor),
+            button.leadingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            button.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            button.heightAnchor.constraint(equalToConstant: 52),
+        ])
+    }
+
+    private class SafetyBulletView: UIStackView {
+        init(_ bullet: SafetyTips) {
+            super.init(frame: .zero)
+
+            self.axis = .horizontal
+            self.alignment = .firstBaseline
+            self.spacing = 24
+            self.isLayoutMarginsRelativeArrangement = true
+            self.layoutMargins = .zero
+
+            let textStack = UIStackView()
+            textStack.axis = .vertical
+            textStack.spacing = 8
+
+            let headerLabel = UILabel()
+            headerLabel.text = bullet.title
+            headerLabel.numberOfLines = 0
+            headerLabel.textColor = UIColor.Signal.label
+            headerLabel.font = .dynamicTypeBody.semibold()
+            textStack.addArrangedSubview(headerLabel)
+
+            let bodyLabel = UILabel()
+            bodyLabel.text = bullet.body
+            bodyLabel.numberOfLines = 0
+            bodyLabel.textColor = UIColor.Signal.secondaryLabel
+            bodyLabel.font = .dynamicTypeBody
+            textStack.addArrangedSubview(bodyLabel)
+
+            let bulletPoint = UIImageView(image: bullet.image)
+            bulletPoint.contentMode = .scaleAspectFit
+            bulletPoint.translatesAutoresizingMaskIntoConstraints = false
+            bulletPoint.widthAnchor.constraint(equalToConstant: 48).isActive = true
+            bulletPoint.heightAnchor.constraint(equalToConstant: 48).isActive = true
+
+            addArrangedSubview(bulletPoint)
+            addArrangedSubview(textStack)
+        }
+
+        required init(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+    }
+}
+
+public class MoreSafetyTipsViewController: InteractiveSheetViewController, UIScrollViewDelegate {
+    override public var placeOnGlassIfAvailable: Bool { true }
+
+    let contentScrollView = UIScrollView()
+    override public var interactiveScrollViews: [UIScrollView] { [contentScrollView] }
+    override public var sheetBackgroundColor: UIColor { OWSTableViewController2.tableBackgroundColor }
 
     private enum Constants {
         static let stackSpacing: CGFloat = 12.0
@@ -25,144 +257,142 @@ public class SafetyTipsViewController: InteractiveSheetViewController, UIScrollV
         static let outerMargins: UIEdgeInsets = .init(hMargin: 24.0, vMargin: 0.0)
 
         static let footerSpacing: CGFloat = 16.0
-        static let footerMargins: UIEdgeInsets = .init(
-            top: 0.0,
-            left: 24.0,
-            bottom: 42.0,
-            right: 24.0
-        )
 
-        static let buttonInsets: UIEdgeInsets = .init(
-            top: 16.0,
-            leading: 36.0,
-            bottom: 12.0,
-            trailing: 36.0
-        )
-
-        static let buttonEdgeInsets: UIEdgeInsets = .init(
-            hMargin: 0.0,
-            vMargin: 14.0
-        )
+        static let buttonDiameter: CGFloat = 52.0
+        static let buttonMargin: CGFloat = 24.0
     }
 
-    fileprivate enum SafetyTips: CaseIterable {
-        case fakeNames
-        case crypto
+    fileprivate enum MoreSafetyTips: CaseIterable {
+        case chatsFromSignal
+        case reviewNames
         case vagueMessages
         case messagesWithLinks
+        case crypto
         case fakeBusiness
 
         var image: UIImage? {
             switch self {
-            case .fakeNames:
-                return UIImage(named: "safety-tip-5")
-            case .crypto:
-                return UIImage(named: "safety-tip-1")
+            case .chatsFromSignal:
+                return UIImage(resource: .safetytip24001)
+            case .reviewNames:
+                return UIImage(resource: .safetytip24002)
             case .vagueMessages:
-                return UIImage(named: "safety-tip-2")
+                return UIImage(resource: .safetytip24003)
             case .messagesWithLinks:
-                return UIImage(named: "safety-tip-3")
+                return UIImage(resource: .safetytip24004)
+            case .crypto:
+                return UIImage(resource: .safetytip24005)
             case .fakeBusiness:
-                return UIImage(named: "safety-tip-4")
+                return UIImage(resource: .safetytip24006)
             }
         }
 
         var title: String {
             switch self {
-            case .fakeNames:
+            case .chatsFromSignal:
                 return OWSLocalizedString(
-                    "SAFETY_TIPS_FAKE_NAMES_TITLE",
-                    comment: "Message title describing the fake names safety tip."
+                    "SAFETY_TIPS_SIGNAL_CHATS_TITLE",
+                    comment: "Message title describing the signal chats tip.",
                 )
-            case .crypto:
+            case .reviewNames:
                 return OWSLocalizedString(
-                    "SAFETY_TIPS_CRYPTO_TITLE",
-                    comment: "Message title describing the crypto safety tip."
+                    "SAFETY_TIPS_REVIEW_NAMES_TITLE",
+                    comment: "Message title describing the review names safety tip.",
                 )
             case .vagueMessages:
                 return OWSLocalizedString(
                     "SAFETY_TIPS_VAGUE_MESSAGE_TITLE",
-                    comment: "Message title describing the safety tip about vague messages."
+                    comment: "Message title describing the safety tip about vague messages.",
                 )
             case .messagesWithLinks:
                 return OWSLocalizedString(
                     "SAFETY_TIPS_MESSAGE_LINKS_TITLE",
-                    comment: "Message title describing the safety tip about unknown links in messages."
+                    comment: "Message title describing the safety tip about unknown links in messages.",
+                )
+            case .crypto:
+                return OWSLocalizedString(
+                    "SAFETY_TIPS_CRYPTO_TITLE",
+                    comment: "Message title describing the crypto safety tip.",
                 )
             case .fakeBusiness:
                 return OWSLocalizedString(
                     "SAFETY_TIPS_FAKE_BUSINESS_TITLE",
-                    comment: "Message title describing the safety tip about unknown or fake businesses."
+                    comment: "Message title describing the safety tip about unknown or fake businesses.",
                 )
             }
         }
 
         var body: String {
             switch self {
-            case .fakeNames:
+            case .chatsFromSignal:
                 return OWSLocalizedString(
-                    "SAFETY_TIPS_FAKE_NAMES_BODY",
-                    comment: "Message contents for the fake names safety tip."
+                    "SAFETY_TIPS_SIGNAL_CHATS_BODY_VIEW_MORE",
+                    comment: "Message body describing the signal chats tip in the 'view more' flow.",
                 )
-            case .crypto:
+            case .reviewNames:
                 return OWSLocalizedString(
-                    "SAFETY_TIPS_CRYPTO_BODY",
-                    comment: "Message contents for the crypto safety tip."
+                    "SAFETY_TIPS_REVIEW_NAMES_BODY_VIEW_MORE",
+                    comment: "Message body describing the review names safety tip in the 'view more' flow.",
                 )
             case .vagueMessages:
                 return OWSLocalizedString(
                     "SAFETY_TIPS_VAGUE_MESSAGE_BODY",
-                    comment: "Message contents for the vague message safety tip."
+                    comment: "Message contents for the vague message safety tip.",
                 )
             case .messagesWithLinks:
                 return OWSLocalizedString(
                     "SAFETY_TIPS_MESSAGE_LINKS_BODY",
-                    comment: "Message contents for the unknown links in messages safety tip."
+                    comment: "Message contents for the unknown links in messages safety tip.",
+                )
+            case .crypto:
+                return OWSLocalizedString(
+                    "SAFETY_TIPS_CRYPTO_BODY",
+                    comment: "Message contents for the crypto safety tip.",
                 )
             case .fakeBusiness:
                 return OWSLocalizedString(
                     "SAFETY_TIPS_FAKE_BUSINESS_BODY",
-                    comment: "Message contents for the safety tip concerning fake businesses."
+                    comment: "Message contents for the safety tip concerning fake businesses.",
                 )
             }
         }
     }
 
-    public var prefersNavigationBarHidden: Bool { true }
+    var prefersNavigationBarHidden: Bool { true }
 
-    private let type: SafetyTipsType
-
-    init(type: SafetyTipsType) {
-        self.type = type
-        super.init()
-    }
-
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
 
-        minimizedHeight = min(725, CurrentAppContext().frame.height)
+        minimizedHeight = min(510, CurrentAppContext().frame.height)
         super.allowsExpansion = false
 
         contentView.addSubview(contentScrollView)
-        contentScrollView.addSubview(stackView)
+        contentScrollView.addSubview(tipScrollView)
 
-        stackView.axis = .vertical
-        stackView.spacing = Constants.outerSpacing
-        stackView.isLayoutMarginsRelativeArrangement = true
-        stackView.autoPinEdgesToSuperviewEdges()
-        stackView.autoPinWidth(toWidthOf: contentScrollView)
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.autoPinEdge(.bottom, to: .bottom, of: contentView, withOffset: 0.0, relation: .greaterThanOrEqual)
+        tipScrollView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            tipScrollView.topAnchor.constraint(equalTo: contentScrollView.topAnchor),
+            tipScrollView.bottomAnchor.constraint(equalTo: contentScrollView.bottomAnchor),
+            tipScrollView.leadingAnchor.constraint(equalTo: contentScrollView.leadingAnchor),
+            tipScrollView.trailingAnchor.constraint(equalTo: contentScrollView.trailingAnchor),
+            tipScrollView.widthAnchor.constraint(equalTo: contentScrollView.frameLayoutGuide.widthAnchor),
+        ])
 
         contentScrollView.translatesAutoresizingMaskIntoConstraints = false
-        contentScrollView.autoPinEdgesToSuperviewEdges()
+        NSLayoutConstraint.activate([
+            contentScrollView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            contentScrollView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -84),
+            contentScrollView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            contentScrollView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            contentScrollView.widthAnchor.constraint(equalTo: contentView.widthAnchor),
+        ])
 
         buildContents()
         updateButtonState()
         setColorsForCurrentTheme()
     }
 
-    public override func themeDidChange() {
+    override public func themeDidChange() {
         super.themeDidChange()
         buildContents()
         updateButtonState()
@@ -181,60 +411,76 @@ public class SafetyTipsViewController: InteractiveSheetViewController, UIScrollV
 
     private lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
-        pageControl.numberOfPages = SafetyTips.allCases.count
+        pageControl.numberOfPages = MoreSafetyTips.allCases.count
         pageControl.currentPage = 0
-        pageControl.addTarget(self, action: #selector(self.changePage), for: .valueChanged)
+        pageControl.addAction(
+            UIAction { [weak self] _ in self?.changePage() },
+            for: .valueChanged,
+        )
         return pageControl
     }()
 
-    private lazy var previousTipButton: OWSFlatButton = {
-        let previousButton = OWSFlatButton.insetButton(
-            title: OWSLocalizedString(
-                "SAFETY_TIPS_PREVIOUS_TIP_BUTTON",
-                comment: "Button that will show the previous safety tip."
-            ),
-            font: .dynamicTypeHeadlineClamped,
-            titleColor: .white,
-            backgroundColor: .ows_accentBlue,
-            target: self,
-            selector: #selector(didTapPrevious))
-        previousButton.button.setBackgroundImage(UIImage.image(color: .clear), for: .disabled)
-        previousButton.button.setTitleColor(.ows_accentBlue, for: .disabled)
-        previousButton.contentEdgeInsets = Constants.buttonEdgeInsets
+    private lazy var previousTipButton: UIButton = {
+        let previousButton = UIButton(type: .system)
+        var config = UIButton.Configuration.filled()
+        config.baseForegroundColor = UIColor.Signal.label
+        config.baseBackgroundColor = UIColor.Signal.primaryFill
+        config.image = UIImage(resource: .chevronLeft26)
+        config.cornerStyle = .capsule
+        previousButton.accessibilityLabel = CommonStrings.backButton
+        previousButton.configuration = config
+        previousButton.addAction(
+            UIAction { [weak self] _ in self?.didTapPrevious() },
+            for: .primaryActionTriggered,
+        )
         return previousButton
+
     }()
 
-    private lazy var nextTipButton: OWSFlatButton = {
-        let nextButton = OWSFlatButton.insetButton(
-            title: OWSLocalizedString(
-                "SAFETY_TIPS_NEXT_TIP_BUTTON",
-                comment: "Button that will show the next safety tip."
-            ),
-            font: .dynamicTypeHeadlineClamped,
-            titleColor: .white,
-            backgroundColor: .ows_accentBlue,
-            target: self,
-            selector: #selector(didTapNext))
-        nextButton.button.setBackgroundImage(UIImage.image(color: .clear), for: .disabled)
-        nextButton.button.setTitleColor(.ows_accentBlue, for: .disabled)
-        nextButton.contentEdgeInsets = Constants.buttonEdgeInsets
+    private lazy var nextTipButton: UIButton = {
+        let nextButton = UIButton(type: .system)
+        var config = UIButton.Configuration.filled()
+        config.baseForegroundColor = UIColor.Signal.label
+        config.baseBackgroundColor = UIColor.Signal.primaryFill
+        config.image = UIImage(resource: .chevronRight26)
+        config.cornerStyle = .capsule
+        nextButton.configuration = config
+        nextButton.accessibilityLabel = CommonStrings.nextButton
+        nextButton.addAction(
+            UIAction { [weak self] _ in self?.didTapNext() },
+            for: .primaryActionTriggered,
+        )
         return nextButton
     }()
 
     private lazy var footerView: UIView = {
         let stackView = UIStackView(arrangedSubviews: [
             previousTipButton,
+            pageControl,
             nextTipButton,
         ])
+
+        nextTipButton.translatesAutoresizingMaskIntoConstraints = false
+        previousTipButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            nextTipButton.widthAnchor.constraint(equalToConstant: Constants.buttonDiameter),
+            nextTipButton.heightAnchor.constraint(equalToConstant: Constants.buttonDiameter),
+            previousTipButton.widthAnchor.constraint(equalToConstant: Constants.buttonDiameter),
+            previousTipButton.heightAnchor.constraint(equalToConstant: Constants.buttonDiameter),
+        ])
+
         let container = UIView()
         container.addSubview(stackView)
-        container.layoutMargins = Constants.footerMargins
-        container.setContentHuggingHigh()
 
         stackView.axis = .horizontal
         stackView.spacing = Constants.footerSpacing
-        stackView.distribution = .fillEqually
-        stackView.autoPinEdgesToSuperviewMargins()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            stackView.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+            stackView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -Constants.buttonMargin),
+            stackView.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: Constants.buttonMargin),
+            stackView.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -Constants.buttonMargin),
+        ])
 
         return container
     }()
@@ -243,20 +489,21 @@ public class SafetyTipsViewController: InteractiveSheetViewController, UIScrollV
 
     private func buildContents() {
         prepareTipsScrollView()
-        stackView.removeAllSubviews()
-        stackView.addArrangedSubview(Self.HeaderView(type: type))
-        stackView.addArrangedSubview(tipScrollView)
-        stackView.setCustomSpacing(8.0, after: tipScrollView)
-        stackView.addArrangedSubview(pageControl)
-        stackView.setCustomSpacing(0.0, after: pageControl)
-        stackView.addArrangedSubview(UIView.transparentSpacer())
-        stackView.addArrangedSubview(footerView)
+
+        contentView.addSubview(footerView)
+        footerView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            footerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            footerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            footerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            footerView.heightAnchor.constraint(equalToConstant: 84),
+        ])
     }
 
     private func prepareTipsScrollView() {
         var priorView: UIView?
         tipScrollView.removeAllSubviews()
-        SafetyTips.allCases.forEach { tip in
+        MoreSafetyTips.allCases.forEach { tip in
             let view = SafetyTipView(safetyTip: tip)
             tipScrollView.addSubview(view)
 
@@ -282,20 +529,22 @@ public class SafetyTipsViewController: InteractiveSheetViewController, UIScrollV
 
     // MARK: - Actions
 
-    @objc
     private func changePage() {
         let x = CGFloat(pageControl.currentPage) * tipScrollView.frame.size.width
         tipScrollView.setContentOffset(CGPoint(x: x, y: 0), animated: true)
         updateButtonState()
+
+        let currentPageView = tipScrollView.subviews[pageControl.currentPage]
+        DispatchQueue.main.async {
+            UIAccessibility.post(notification: .layoutChanged, argument: currentPageView)
+        }
     }
 
-    @objc
     private func didTapPrevious() {
         pageControl.currentPage = max(pageControl.currentPage - 1, 0)
         changePage()
     }
 
-    @objc
     private func didTapNext() {
         pageControl.currentPage = min(pageControl.currentPage + 1, pageControl.numberOfPages)
         changePage()
@@ -304,14 +553,23 @@ public class SafetyTipsViewController: InteractiveSheetViewController, UIScrollV
     private func updateButtonState() {
         switch pageControl.currentPage {
         case 0:
-            previousTipButton.setEnabled(false)
-            nextTipButton.setEnabled(true)
+            // hide previous, show next
+            previousTipButton.alpha = 0
+            previousTipButton.isUserInteractionEnabled = false
+            nextTipButton.alpha = 1
+            nextTipButton.isUserInteractionEnabled = true
         case pageControl.numberOfPages - 1:
-            previousTipButton.setEnabled(true)
-            nextTipButton.setEnabled(false)
+            // show previous, hide next
+            previousTipButton.alpha = 1
+            previousTipButton.isUserInteractionEnabled = true
+            nextTipButton.alpha = 0
+            nextTipButton.isUserInteractionEnabled = false
         default:
-            previousTipButton.setEnabled(true)
-            nextTipButton.setEnabled(true)
+            // show previous, show next
+            previousTipButton.alpha = 1
+            previousTipButton.isUserInteractionEnabled = true
+            nextTipButton.alpha = 1
+            nextTipButton.isUserInteractionEnabled = true
         }
     }
 
@@ -321,149 +579,48 @@ public class SafetyTipsViewController: InteractiveSheetViewController, UIScrollV
     }
 }
 
-extension SafetyTipsViewController {
-    class HeaderView: UIView {
-
-        private let type: SafetyTipsType
-
-        // MARK: Init
-
-        init(type: SafetyTipsType) {
-            self.type = type
-            super.init(frame: .zero)
-            layoutMargins = Constants.outerMargins
-
-            let stackView = UIStackView()
-            self.addSubview(stackView)
-
-            stackView.axis = .vertical
-            stackView.alignment = .center
-            stackView.spacing = Constants.stackSpacing
-            stackView.autoPinEdgesToSuperviewMargins()
-            stackView.addArrangedSubviews([
-                titleLabel,
-                subtitleLabel
-            ])
-
-            self.setContentHuggingHigh()
-            updateFontsForCurrentPreferredContentSize()
-            setColorsForCurrentTheme()
-        }
-
-        @available(*, unavailable, message: "Use other constructor")
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
-
-        // MARK: Views
-
-        private lazy var titleLabel: UILabel = {
-            let label = UILabel()
-            label.text = OWSLocalizedString(
-                "SAFETY_TIPS_HEADER_TITLE",
-                comment: "Title for Safety Tips education screen.")
-            label.numberOfLines = 0
-            label.textAlignment = .center
-            label.lineBreakMode = .byWordWrapping
-            label.setContentHuggingVerticalHigh()
-            return label
-        }()
-
-        private lazy var subtitleLabel: UILabel = {
-            let label = UILabel()
-            let message = {
-                switch type {
-                case .contact:
-                    return OWSLocalizedString(
-                        "SAFETY_TIPS_INDIVIDUAL_HEADER_MESSAGE",
-                        comment: "Message describing safety tips for 1:1 conversations."
-                    )
-                case .group:
-                    return OWSLocalizedString(
-                        "SAFETY_TIPS_GROUPS_HEADER_MESSAGE",
-                        comment: "Message describing safety tips for group conversations."
-                    )
-                }
-            }()
-            label.text = message
-            label.numberOfLines = 0
-            label.textAlignment = .center
-            label.lineBreakMode = .byWordWrapping
-            label.setContentHuggingVerticalHigh()
-            return label
-        }()
-
-        // MARK: - Style views
-
-        func updateFontsForCurrentPreferredContentSize() {
-            titleLabel.font = .dynamicTypeTitle2Clamped.bold()
-            subtitleLabel.font = .dynamicTypeSubheadlineClamped
-        }
-
-        func setColorsForCurrentTheme() {
-            titleLabel.textColor = Theme.primaryTextColor
-            subtitleLabel.textColor = Theme.primaryTextColor
-        }
-    }
-}
-
-extension SafetyTipsViewController {
+extension MoreSafetyTipsViewController {
     class SafetyTipView: UIView {
-        private enum Constants {
-            static let cornerRadius: CGFloat = 20.0
-            static let layoutMargin: CGFloat = 12.0
-            static let imageMargin: CGFloat = 24.0
-            static let containerMargins: UIEdgeInsets = .init(
-                top: layoutMargin,
-                left: layoutMargin,
-                bottom: 24.0,
-                right: layoutMargin
-            )
-        }
-
-        fileprivate init(safetyTip: SafetyTips) {
+        fileprivate init(safetyTip: MoreSafetyTips) {
             super.init(frame: .zero)
             layoutMargins = .init(hMargin: 24.0, vMargin: 0.0)
 
-            let containerView = UIView()
-            containerView.layer.cornerRadius = Constants.cornerRadius
-            containerView.backgroundColor = Theme.isDarkThemeEnabled ? .ows_gray75 : .ows_white
-            self.addSubview(containerView)
-            containerView.layoutMargins = Constants.containerMargins
-            containerView.autoPinEdgesToSuperviewMargins()
-
             let stackView = UIStackView()
             stackView.axis = .vertical
-            containerView.addSubview(stackView)
-            stackView.spacing = Constants.layoutMargin
-            stackView.autoPinEdgesToSuperviewMargins()
+            self.addSubview(stackView)
+            stackView.spacing = 8.0
 
-            let imageContainerView = UIView()
-            imageContainerView.backgroundColor = Theme.isDarkThemeEnabled ? .ows_gray60 : .ows_gray02
-            imageContainerView.layer.cornerRadius = Constants.cornerRadius
-            imageContainerView.layoutMargins = .init(margin: Constants.imageMargin)
-            stackView.addArrangedSubview(imageContainerView)
+            stackView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                stackView.topAnchor.constraint(equalTo: self.topAnchor, constant: 16),
+                stackView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
+                stackView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
+                stackView.bottomAnchor.constraint(lessThanOrEqualTo: self.bottomAnchor),
+            ])
 
             let imageView = UIImageView(image: safetyTip.image)
             imageView.contentMode = .scaleAspectFit
 
-            imageContainerView.addSubview(imageView)
-            imageView.autoPinEdgesToSuperviewMargins()
-            imageView.autoPinToAspectRatio(withSize: safetyTip.image?.size ?? .init(square: 1.0))
+            stackView.addArrangedSubview(imageView)
+            stackView.addArrangedSubview(SpacerView(preferredHeight: 10.0))
+
+            NSLayoutConstraint.activate([
+                imageView.heightAnchor.constraint(lessThanOrEqualToConstant: 160),
+            ])
 
             let titleLabel = UILabel()
             titleLabel.text = safetyTip.title
             titleLabel.numberOfLines = 0
-            titleLabel.textAlignment = .center
+            titleLabel.textAlignment = .left
             titleLabel.lineBreakMode = .byWordWrapping
-            titleLabel.font = .dynamicTypeBody.bold()
+            titleLabel.font = .dynamicTypeBody.semibold()
             titleLabel.textColor = Theme.primaryTextColor
             stackView.addArrangedSubview(titleLabel)
 
             let messageLabel = UILabel()
             messageLabel.text = safetyTip.body
             messageLabel.numberOfLines = 0
-            messageLabel.textAlignment = .center
+            messageLabel.textAlignment = .left
             messageLabel.lineBreakMode = .byWordWrapping
             messageLabel.font = .dynamicTypeBodyClamped
             messageLabel.textColor = Theme.secondaryTextAndIconColor

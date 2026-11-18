@@ -13,7 +13,7 @@ enum CLVRowChangeType {
 
     // MARK: -
 
-    public var logSafeDescription: String {
+    var logSafeDescription: String {
         switch self {
         case .delete(let oldIndexPath):
             return "delete(oldIndexPath: \(oldIndexPath))"
@@ -30,17 +30,12 @@ enum CLVRowChangeType {
 // MARK: -
 
 struct CLVRowChange {
-    public let type: CLVRowChangeType
-    public let threadUniqueId: String
-
-    init(type: CLVRowChangeType, threadUniqueId: String) {
-        self.type = type
-        self.threadUniqueId = threadUniqueId
-    }
+    let type: CLVRowChangeType
+    let threadUniqueId: String
 
     // MARK: -
 
-    public var logSafeDescription: String {
+    var logSafeDescription: String {
         "\(type), \(threadUniqueId)"
     }
 }
@@ -61,63 +56,55 @@ public class CLVLoader {
     static func loadRenderStateForReset(viewInfo: CLVViewInfo, transaction: DBReadTransaction) -> CLVLoadResult {
         AssertIsOnMainThread()
 
-        do {
-            let renderState = try Self.loadRenderStateInternal(viewInfo: viewInfo, transaction: transaction)
-            return CLVLoadResult.renderStateForReset(renderState: renderState)
-        } catch {
-            owsFailDebug("error: \(error)")
-            return .reloadTable
-        }
+        let renderState = Self.loadRenderStateInternal(viewInfo: viewInfo, transaction: transaction)
+        return CLVLoadResult.renderStateForReset(renderState: renderState)
     }
 
-    private static func loadRenderStateInternal(viewInfo: CLVViewInfo, transaction: DBReadTransaction) throws -> CLVRenderState {
+    private static func loadRenderStateInternal(viewInfo: CLVViewInfo, transaction: DBReadTransaction) -> CLVRenderState {
         let threadFinder = ThreadFinder()
         let isViewingArchive = viewInfo.chatListMode == .archive
 
-        let pinnedThreadUniqueIds = DependenciesBridge.shared.pinnedThreadStore
-            .pinnedThreadIds(tx: transaction)
-
+        let pinnedThreadUniqueIds: [String]
         let visibleThreadUniqueIds: [String]
         if isViewingArchive {
-            visibleThreadUniqueIds = try threadFinder.visibleArchivedThreadIds(transaction: transaction)
+            pinnedThreadUniqueIds = []
+            visibleThreadUniqueIds = threadFinder.visibleArchivedThreadUniqueIds(transaction: transaction)
         } else {
-            visibleThreadUniqueIds = try threadFinder.visibleInboxThreadIds(
+            let pinnedThreadManager = DependenciesBridge.shared.pinnedThreadManager
+            pinnedThreadUniqueIds = pinnedThreadManager.pinnedThreads(
+                filterToVisible: true,
+                tx: transaction,
+            ).map(\.uniqueId)
+            visibleThreadUniqueIds = threadFinder.visibleInboxThreadUniqueIds(
                 filteredBy: viewInfo.inboxFilter,
                 requiredVisibleThreadIds: viewInfo.requiredVisibleThreadIds,
-                transaction: transaction
+                transaction: transaction,
             )
         }
 
-        var pinnedThreadUniqueIdsToRender = Set<String>()
-        var unpinnedThreadUniqueIdsForRender = [String]()
-        for threadUniqueId in visibleThreadUniqueIds {
-            if !isViewingArchive && pinnedThreadUniqueIds.contains(threadUniqueId) {
-                pinnedThreadUniqueIdsToRender.insert(threadUniqueId)
-            } else {
-                unpinnedThreadUniqueIdsForRender.append(threadUniqueId)
-            }
-        }
-
-        // Preserve the order from pinnedThreadUniqueIds
-        let orderedPinnedThreadUniqueIdsForRender = pinnedThreadUniqueIds.filter(pinnedThreadUniqueIdsToRender.contains(_:))
+        let pinnedThreadUniqueIdsToRender = Set(pinnedThreadUniqueIds).intersection(visibleThreadUniqueIds)
 
         return CLVRenderState(
             viewInfo: viewInfo,
-            pinnedThreadUniqueIds: orderedPinnedThreadUniqueIdsForRender,
-            unpinnedThreadUniqueIds: unpinnedThreadUniqueIdsForRender
+            // Preserve the order from pinnedThreadUniqueIds
+            pinnedThreadUniqueIds: pinnedThreadUniqueIds.filter({ pinnedThreadUniqueIdsToRender.contains($0) }),
+            // Preserve the order from visibleThreadUniqueIds
+            unpinnedThreadUniqueIds: visibleThreadUniqueIds.filter({ !pinnedThreadUniqueIdsToRender.contains($0) }),
         )
     }
 
-    static func loadRenderStateAndDiff(viewInfo: CLVViewInfo,
-                                       updatedItemIds: Set<String>,
-                                       lastRenderState: CLVRenderState,
-                                       transaction: DBReadTransaction) -> CLVLoadResult {
+    static func loadRenderStateAndDiff(
+        viewInfo: CLVViewInfo,
+        updatedItemIds: Set<String>,
+        lastRenderState: CLVRenderState,
+        transaction: DBReadTransaction,
+    ) -> CLVLoadResult {
         do {
             return try loadRenderStateAndDiffInternal(
                 viewInfo: viewInfo,
                 updatedItemIds: updatedItemIds,
                 lastRenderState: lastRenderState,
-                transaction: transaction
+                transaction: transaction,
             )
         } catch {
             owsFailDebug("Error: \(error)")
@@ -131,9 +118,9 @@ public class CLVLoader {
             renderState: CLVRenderState(
                 viewInfo: viewInfo,
                 pinnedThreadUniqueIds: lastRenderState.pinnedThreadUniqueIds,
-                unpinnedThreadUniqueIds: lastRenderState.unpinnedThreadUniqueIds
+                unpinnedThreadUniqueIds: lastRenderState.unpinnedThreadUniqueIds,
             ),
-            rowChanges: []
+            rowChanges: [],
         )
     }
 
@@ -141,13 +128,14 @@ public class CLVLoader {
         viewInfo: CLVViewInfo,
         updatedItemIds allUpdatedItemIds: Set<String>,
         lastRenderState: CLVRenderState,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) throws -> CLVLoadResult {
 
         // Ignore updates to non-visible threads.
         var updatedItemIds = Set<String>()
         for threadId in allUpdatedItemIds {
-            guard let thread = TSThread.anyFetch(uniqueId: threadId, transaction: transaction) else {
+            guard let thread = TSThread.fetchViaCache(uniqueId: threadId, transaction: transaction) else {
+                // Missing thread, it was deleted and should no longer be visible.
                 continue
             }
             if thread.shouldThreadBeVisible {
@@ -155,7 +143,7 @@ public class CLVLoader {
             }
         }
 
-        let newRenderState = try Self.loadRenderStateInternal(viewInfo: viewInfo, transaction: transaction)
+        let newRenderState = Self.loadRenderStateInternal(viewInfo: viewInfo, transaction: transaction)
 
         let countsChanged = lastRenderState.pinnedThreadUniqueIds.count != newRenderState.pinnedThreadUniqueIds.count
             || lastRenderState.unpinnedThreadUniqueIds.count != newRenderState.unpinnedThreadUniqueIds.count
@@ -191,13 +179,13 @@ public class CLVLoader {
             viewType: .uiTableView,
             oldValues: oldPinnedValues,
             newValues: newPinnedValues,
-            changedValues: pinnedChangedValues
+            changedValues: pinnedChangedValues,
         )
         let unpinnedBatchUpdateItems: [BatchUpdate.Item] = try BatchUpdate.build(
             viewType: .uiTableView,
             oldValues: oldUnpinnedValues,
             newValues: newUnpinnedValues,
-            changedValues: unpinnedChangedValues
+            changedValues: unpinnedChangedValues,
         )
 
         func rowChangeType(forBatchUpdateType batchUpdateType: BatchUpdateType, section: (CLVRenderState) -> Int) -> CLVRowChangeType {
@@ -209,7 +197,7 @@ public class CLVLoader {
             case .move(let oldIndex, let newIndex):
                 .move(
                     oldIndexPath: IndexPath(row: oldIndex, section: section(lastRenderState)),
-                    newIndexPath: IndexPath(row: newIndex, section: section(newRenderState))
+                    newIndexPath: IndexPath(row: newIndex, section: section(newRenderState)),
                 )
             case .update(let oldIndex, _):
                 .update(oldIndexPath: IndexPath(row: oldIndex, section: section(lastRenderState)))
@@ -220,7 +208,7 @@ public class CLVLoader {
             batchUpdateItems.map { item in
                 CLVRowChange(
                     type: rowChangeType(forBatchUpdateType: item.updateType, section: section),
-                    threadUniqueId: item.value.threadUniqueId
+                    threadUniqueId: item.value.threadUniqueId,
                 )
             }
         }

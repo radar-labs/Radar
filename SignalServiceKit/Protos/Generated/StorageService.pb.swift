@@ -1,8 +1,3 @@
-//
-// Copyright 2019 Signal Messenger, LLC
-// SPDX-License-Identifier: AGPL-3.0-only
-//
-
 // DO NOT EDIT.
 // swift-format-ignore-file
 // swiftlint:disable all
@@ -17,7 +12,11 @@
 // Copyright 2019 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
 import Foundation
+#endif
 import SwiftProtobuf
 
 // If the compiler emits an error on this type, it is because this file
@@ -25,12 +24,12 @@ import SwiftProtobuf
 // incompatible with the version of SwiftProtobuf to which you are linking.
 // Please ensure that you are building against the same version of the API
 // that was used to generate this file.
-fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAPIVersionCheck {
+fileprivate nonisolated struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAPIVersionCheck {
   struct _2: SwiftProtobuf.ProtobufAPIVersion_2 {}
   typealias Version = _2
 }
 
-enum StorageServiceProtos_OptionalBool: SwiftProtobuf.Enum, Swift.CaseIterable {
+nonisolated enum StorageServiceProtos_OptionalBool: SwiftProtobuf.Enum, Swift.CaseIterable {
   typealias RawValue = Int
   case unset // = 0
   case `true` // = 1
@@ -77,7 +76,7 @@ enum StorageServiceProtos_OptionalBool: SwiftProtobuf.Enum, Swift.CaseIterable {
 /// - E164
 /// - ServiceIdToBinary(PNI)
 /// - Group Id
-enum StorageServiceProtos_AvatarColor: SwiftProtobuf.Enum, Swift.CaseIterable {
+nonisolated enum StorageServiceProtos_AvatarColor: SwiftProtobuf.Enum, Swift.CaseIterable {
   typealias RawValue = Int
   case a100 // = 0
   case a110 // = 1
@@ -151,7 +150,7 @@ enum StorageServiceProtos_AvatarColor: SwiftProtobuf.Enum, Swift.CaseIterable {
 
 }
 
-struct StorageServiceProtos_StorageItem: Sendable {
+nonisolated struct StorageServiceProtos_StorageItem: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -167,7 +166,7 @@ struct StorageServiceProtos_StorageItem: Sendable {
   init() {}
 }
 
-struct StorageServiceProtos_StorageItems: Sendable {
+nonisolated struct StorageServiceProtos_StorageItems: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -180,7 +179,7 @@ struct StorageServiceProtos_StorageItems: Sendable {
   init() {}
 }
 
-struct StorageServiceProtos_StorageManifest: Sendable {
+nonisolated struct StorageServiceProtos_StorageManifest: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -196,7 +195,7 @@ struct StorageServiceProtos_StorageManifest: Sendable {
   init() {}
 }
 
-struct StorageServiceProtos_ReadOperation: Sendable {
+nonisolated struct StorageServiceProtos_ReadOperation: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -208,17 +207,17 @@ struct StorageServiceProtos_ReadOperation: Sendable {
   init() {}
 }
 
-struct StorageServiceProtos_WriteOperation: Sendable {
+nonisolated struct StorageServiceProtos_WriteOperation: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var manifest: StorageServiceProtos_StorageManifest {
-    get {return _manifest ?? StorageServiceProtos_StorageManifest()}
+    get {_manifest ?? StorageServiceProtos_StorageManifest()}
     set {_manifest = newValue}
   }
   /// Returns true if `manifest` has been explicitly set.
-  var hasManifest: Bool {return self._manifest != nil}
+  var hasManifest: Bool {self._manifest != nil}
   /// Clears the value of `manifest`. Subsequent reads from it will return its default value.
   mutating func clearManifest() {self._manifest = nil}
 
@@ -235,7 +234,7 @@ struct StorageServiceProtos_WriteOperation: Sendable {
   fileprivate var _manifest: StorageServiceProtos_StorageManifest? = nil
 }
 
-struct StorageServiceProtos_ManifestRecord: Sendable {
+nonisolated struct StorageServiceProtos_ManifestRecord: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -251,7 +250,7 @@ struct StorageServiceProtos_ManifestRecord: Sendable {
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  struct Key: Sendable {
+  nonisolated struct Key: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -264,7 +263,7 @@ struct StorageServiceProtos_ManifestRecord: Sendable {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    enum TypeEnum: SwiftProtobuf.Enum, Swift.CaseIterable {
+    nonisolated enum TypeEnum: SwiftProtobuf.Enum, Swift.CaseIterable {
       typealias RawValue = Int
       case unknown // = 0
       case contact // = 1
@@ -324,7 +323,7 @@ struct StorageServiceProtos_ManifestRecord: Sendable {
   init() {}
 }
 
-struct StorageServiceProtos_StorageRecord: Sendable {
+nonisolated struct StorageServiceProtos_StorageRecord: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -381,7 +380,7 @@ struct StorageServiceProtos_StorageRecord: Sendable {
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum OneOf_Record: Equatable, Sendable {
+  nonisolated enum OneOf_Record: Equatable, Sendable {
     case contact(StorageServiceProtos_ContactRecord)
     case groupV1(StorageServiceProtos_GroupV1Record)
     case groupV2(StorageServiceProtos_GroupV2Record)
@@ -394,149 +393,177 @@ struct StorageServiceProtos_StorageRecord: Sendable {
   init() {}
 }
 
-struct StorageServiceProtos_ContactRecord: @unchecked Sendable {
+nonisolated struct StorageServiceProtos_ContactRecord: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var aci: String {
-    get {return _storage._aci}
+    get {_storage._aci}
     set {_uniqueStorage()._aci = newValue}
   }
 
   var e164: String {
-    get {return _storage._e164}
+    get {_storage._e164}
     set {_uniqueStorage()._e164 = newValue}
   }
 
   var pni: String {
-    get {return _storage._pni}
+    get {_storage._pni}
     set {_uniqueStorage()._pni = newValue}
   }
 
   var profileKey: Data {
-    get {return _storage._profileKey}
+    get {_storage._profileKey}
     set {_uniqueStorage()._profileKey = newValue}
   }
 
   var identityKey: Data {
-    get {return _storage._identityKey}
+    get {_storage._identityKey}
     set {_uniqueStorage()._identityKey = newValue}
   }
 
   var identityState: StorageServiceProtos_ContactRecord.IdentityState {
-    get {return _storage._identityState}
+    get {_storage._identityState}
     set {_uniqueStorage()._identityState = newValue}
   }
 
   var givenName: String {
-    get {return _storage._givenName}
+    get {_storage._givenName}
     set {_uniqueStorage()._givenName = newValue}
   }
 
   var familyName: String {
-    get {return _storage._familyName}
+    get {_storage._familyName}
     set {_uniqueStorage()._familyName = newValue}
   }
 
   var username: String {
-    get {return _storage._username}
+    get {_storage._username}
     set {_uniqueStorage()._username = newValue}
   }
 
   var blocked: Bool {
-    get {return _storage._blocked}
+    get {_storage._blocked}
     set {_uniqueStorage()._blocked = newValue}
   }
 
   var whitelisted: Bool {
-    get {return _storage._whitelisted}
+    get {_storage._whitelisted}
     set {_uniqueStorage()._whitelisted = newValue}
   }
 
   var archived: Bool {
-    get {return _storage._archived}
+    get {_storage._archived}
     set {_uniqueStorage()._archived = newValue}
   }
 
   var markedUnread: Bool {
-    get {return _storage._markedUnread}
+    get {_storage._markedUnread}
     set {_uniqueStorage()._markedUnread = newValue}
   }
 
   var mutedUntilTimestamp: UInt64 {
-    get {return _storage._mutedUntilTimestamp}
+    get {_storage._mutedUntilTimestamp}
     set {_uniqueStorage()._mutedUntilTimestamp = newValue}
   }
 
   var hideStory: Bool {
-    get {return _storage._hideStory}
+    get {_storage._hideStory}
     set {_uniqueStorage()._hideStory = newValue}
   }
 
   var unregisteredAtTimestamp: UInt64 {
-    get {return _storage._unregisteredAtTimestamp}
+    get {_storage._unregisteredAtTimestamp}
     set {_uniqueStorage()._unregisteredAtTimestamp = newValue}
   }
 
   var systemGivenName: String {
-    get {return _storage._systemGivenName}
+    get {_storage._systemGivenName}
     set {_uniqueStorage()._systemGivenName = newValue}
   }
 
   var systemFamilyName: String {
-    get {return _storage._systemFamilyName}
+    get {_storage._systemFamilyName}
     set {_uniqueStorage()._systemFamilyName = newValue}
   }
 
   var systemNickname: String {
-    get {return _storage._systemNickname}
+    get {_storage._systemNickname}
     set {_uniqueStorage()._systemNickname = newValue}
   }
 
   var hidden: Bool {
-    get {return _storage._hidden}
+    get {_storage._hidden}
     set {_uniqueStorage()._hidden = newValue}
   }
 
   var nickname: StorageServiceProtos_ContactRecord.Name {
-    get {return _storage._nickname ?? StorageServiceProtos_ContactRecord.Name()}
+    get {_storage._nickname ?? StorageServiceProtos_ContactRecord.Name()}
     set {_uniqueStorage()._nickname = newValue}
   }
   /// Returns true if `nickname` has been explicitly set.
-  var hasNickname: Bool {return _storage._nickname != nil}
+  var hasNickname: Bool {_storage._nickname != nil}
   /// Clears the value of `nickname`. Subsequent reads from it will return its default value.
   mutating func clearNickname() {_uniqueStorage()._nickname = nil}
 
   var note: String {
-    get {return _storage._note}
+    get {_storage._note}
     set {_uniqueStorage()._note = newValue}
   }
 
   var avatarColor: StorageServiceProtos_AvatarColor {
-    get {return _storage._avatarColor ?? .a100}
+    get {_storage._avatarColor ?? .a100}
     set {_uniqueStorage()._avatarColor = newValue}
   }
   /// Returns true if `avatarColor` has been explicitly set.
-  var hasAvatarColor: Bool {return _storage._avatarColor != nil}
+  var hasAvatarColor: Bool {_storage._avatarColor != nil}
   /// Clears the value of `avatarColor`. Subsequent reads from it will return its default value.
   mutating func clearAvatarColor() {_uniqueStorage()._avatarColor = nil}
 
   /// 16-byte UUID
   var aciBinary: Data {
-    get {return _storage._aciBinary}
+    get {_storage._aciBinary}
     set {_uniqueStorage()._aciBinary = newValue}
   }
 
   /// 16-byte UUID
   var pniBinary: Data {
-    get {return _storage._pniBinary}
+    get {_storage._pniBinary}
     set {_uniqueStorage()._pniBinary = newValue}
   }
 
+  /// if `blocked` is true, 0 means unknown block time
+  var blockedAtTimestamp: UInt64 {
+    get {_storage._blockedAtTimestamp}
+    set {_uniqueStorage()._blockedAtTimestamp = newValue}
+  }
+
+  /// If unset, use the default settings
+  var notifyForCallsIfMuted: StorageServiceProtos_OptionalBool {
+    get {_storage._notifyForCallsIfMuted}
+    set {_uniqueStorage()._notifyForCallsIfMuted = newValue}
+  }
+
+  /// If unset, use the default settings
+  var showUnreadReminders: StorageServiceProtos_OptionalBool {
+    get {_storage._showUnreadReminders}
+    set {_uniqueStorage()._showUnreadReminders = newValue}
+  }
+
+  /// Name shared from a third party
+  var sharedName: StorageServiceProtos_ContactRecord.Name {
+    get {_storage._sharedName ?? StorageServiceProtos_ContactRecord.Name()}
+    set {_uniqueStorage()._sharedName = newValue}
+  }
+  /// Returns true if `sharedName` has been explicitly set.
+  var hasSharedName: Bool {_storage._sharedName != nil}
+  /// Clears the value of `sharedName`. Subsequent reads from it will return its default value.
+  mutating func clearSharedName() {_uniqueStorage()._sharedName = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum IdentityState: SwiftProtobuf.Enum, Swift.CaseIterable {
+  nonisolated enum IdentityState: SwiftProtobuf.Enum, Swift.CaseIterable {
     typealias RawValue = Int
     case `default` // = 0
     case verified // = 1
@@ -574,7 +601,7 @@ struct StorageServiceProtos_ContactRecord: @unchecked Sendable {
 
   }
 
-  struct Name: Sendable {
+  nonisolated struct Name: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -593,7 +620,7 @@ struct StorageServiceProtos_ContactRecord: @unchecked Sendable {
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
-struct StorageServiceProtos_GroupV1Record: Sendable {
+nonisolated struct StorageServiceProtos_GroupV1Record: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -606,7 +633,7 @@ struct StorageServiceProtos_GroupV1Record: Sendable {
   init() {}
 }
 
-struct StorageServiceProtos_GroupV2Record: Sendable {
+nonisolated struct StorageServiceProtos_GroupV2Record: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -624,6 +651,7 @@ struct StorageServiceProtos_GroupV2Record: Sendable {
 
   var mutedUntilTimestamp: UInt64 = 0
 
+  /// will be deprecated in favor of [notifyForMentionsIfMuted]
   var dontNotifyForMentionsIfMuted: Bool = false
 
   var hideStory: Bool = false
@@ -631,17 +659,35 @@ struct StorageServiceProtos_GroupV2Record: Sendable {
   var storySendMode: StorageServiceProtos_GroupV2Record.StorySendMode = .default
 
   var avatarColor: StorageServiceProtos_AvatarColor {
-    get {return _avatarColor ?? .a100}
+    get {_avatarColor ?? .a100}
     set {_avatarColor = newValue}
   }
   /// Returns true if `avatarColor` has been explicitly set.
-  var hasAvatarColor: Bool {return self._avatarColor != nil}
+  var hasAvatarColor: Bool {self._avatarColor != nil}
   /// Clears the value of `avatarColor`. Subsequent reads from it will return its default value.
   mutating func clearAvatarColor() {self._avatarColor = nil}
 
+  /// SHA-256 of last verified group name
+  var verifiedNameHash: Data = Data()
+
+  /// if `blocked` is true, 0 means unknown block time
+  var blockedAtTimestamp: UInt64 = 0
+
+  /// If unset, use the default settings
+  var notifyForCallsIfMuted: StorageServiceProtos_OptionalBool = .unset
+
+  /// If unset, use the default settings. If [dontNotifyForMentionsIfMuted] is true, this should be initialized to false.
+  var notifyForMentionsIfMuted: StorageServiceProtos_OptionalBool = .unset
+
+  /// If unset, use the default settings
+  var notifyForRepliesIfMuted: StorageServiceProtos_OptionalBool = .unset
+
+  /// If unset, use the default settings
+  var showUnreadReminders: StorageServiceProtos_OptionalBool = .unset
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum StorySendMode: SwiftProtobuf.Enum, Swift.CaseIterable {
+  nonisolated enum StorySendMode: SwiftProtobuf.Enum, Swift.CaseIterable {
     typealias RawValue = Int
     case `default` // = 0
     case disabled // = 1
@@ -684,213 +730,346 @@ struct StorageServiceProtos_GroupV2Record: Sendable {
   fileprivate var _avatarColor: StorageServiceProtos_AvatarColor? = nil
 }
 
-struct StorageServiceProtos_AccountRecord: @unchecked Sendable {
+nonisolated struct StorageServiceProtos_AccountRecord: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var profileKey: Data {
-    get {return _storage._profileKey}
+    get {_storage._profileKey}
     set {_uniqueStorage()._profileKey = newValue}
   }
 
   var givenName: String {
-    get {return _storage._givenName}
+    get {_storage._givenName}
     set {_uniqueStorage()._givenName = newValue}
   }
 
   var familyName: String {
-    get {return _storage._familyName}
+    get {_storage._familyName}
     set {_uniqueStorage()._familyName = newValue}
   }
 
   var avatarURL: String {
-    get {return _storage._avatarURL}
+    get {_storage._avatarURL}
     set {_uniqueStorage()._avatarURL = newValue}
   }
 
   var noteToSelfArchived: Bool {
-    get {return _storage._noteToSelfArchived}
+    get {_storage._noteToSelfArchived}
     set {_uniqueStorage()._noteToSelfArchived = newValue}
   }
 
   var readReceipts: Bool {
-    get {return _storage._readReceipts}
+    get {_storage._readReceipts}
     set {_uniqueStorage()._readReceipts = newValue}
   }
 
   var sealedSenderIndicators: Bool {
-    get {return _storage._sealedSenderIndicators}
+    get {_storage._sealedSenderIndicators}
     set {_uniqueStorage()._sealedSenderIndicators = newValue}
   }
 
   var typingIndicators: Bool {
-    get {return _storage._typingIndicators}
+    get {_storage._typingIndicators}
     set {_uniqueStorage()._typingIndicators = newValue}
   }
 
   /// Legacy link previews flag
   var proxiedLinkPreviews: Bool {
-    get {return _storage._proxiedLinkPreviews}
+    get {_storage._proxiedLinkPreviews}
     set {_uniqueStorage()._proxiedLinkPreviews = newValue}
   }
 
   var noteToSelfMarkedUnread: Bool {
-    get {return _storage._noteToSelfMarkedUnread}
+    get {_storage._noteToSelfMarkedUnread}
     set {_uniqueStorage()._noteToSelfMarkedUnread = newValue}
   }
 
   var linkPreviews: Bool {
-    get {return _storage._linkPreviews}
+    get {_storage._linkPreviews}
     set {_uniqueStorage()._linkPreviews = newValue}
   }
 
   var phoneNumberSharingMode: StorageServiceProtos_AccountRecord.PhoneNumberSharingMode {
-    get {return _storage._phoneNumberSharingMode}
+    get {_storage._phoneNumberSharingMode}
     set {_uniqueStorage()._phoneNumberSharingMode = newValue}
   }
 
   var notDiscoverableByPhoneNumber: Bool {
-    get {return _storage._notDiscoverableByPhoneNumber}
+    get {_storage._notDiscoverableByPhoneNumber}
     set {_uniqueStorage()._notDiscoverableByPhoneNumber = newValue}
   }
 
   var pinnedConversations: [StorageServiceProtos_AccountRecord.PinnedConversation] {
-    get {return _storage._pinnedConversations}
+    get {_storage._pinnedConversations}
     set {_uniqueStorage()._pinnedConversations = newValue}
   }
 
   var preferContactAvatars: Bool {
-    get {return _storage._preferContactAvatars}
+    get {_storage._preferContactAvatars}
     set {_uniqueStorage()._preferContactAvatars = newValue}
   }
 
   var payments: StorageServiceProtos_AccountRecord.Payments {
-    get {return _storage._payments ?? StorageServiceProtos_AccountRecord.Payments()}
+    get {_storage._payments ?? StorageServiceProtos_AccountRecord.Payments()}
     set {_uniqueStorage()._payments = newValue}
   }
   /// Returns true if `payments` has been explicitly set.
-  var hasPayments: Bool {return _storage._payments != nil}
+  var hasPayments: Bool {_storage._payments != nil}
   /// Clears the value of `payments`. Subsequent reads from it will return its default value.
   mutating func clearPayments() {_uniqueStorage()._payments = nil}
 
   var universalExpireTimer: UInt32 {
-    get {return _storage._universalExpireTimer}
+    get {_storage._universalExpireTimer}
     set {_uniqueStorage()._universalExpireTimer = newValue}
   }
 
   var e164: String {
-    get {return _storage._e164}
+    get {_storage._e164}
     set {_uniqueStorage()._e164 = newValue}
   }
 
   var preferredReactionEmoji: [String] {
-    get {return _storage._preferredReactionEmoji}
+    get {_storage._preferredReactionEmoji}
     set {_uniqueStorage()._preferredReactionEmoji = newValue}
   }
 
   var donorSubscriberID: Data {
-    get {return _storage._donorSubscriberID}
+    get {_storage._donorSubscriberID}
     set {_uniqueStorage()._donorSubscriberID = newValue}
   }
 
   var donorSubscriberCurrencyCode: String {
-    get {return _storage._donorSubscriberCurrencyCode}
+    get {_storage._donorSubscriberCurrencyCode}
     set {_uniqueStorage()._donorSubscriberCurrencyCode = newValue}
   }
 
   var displayBadgesOnProfile: Bool {
-    get {return _storage._displayBadgesOnProfile}
+    get {_storage._displayBadgesOnProfile}
     set {_uniqueStorage()._displayBadgesOnProfile = newValue}
   }
 
   var donorSubscriptionManuallyCancelled: Bool {
-    get {return _storage._donorSubscriptionManuallyCancelled}
+    get {_storage._donorSubscriptionManuallyCancelled}
     set {_uniqueStorage()._donorSubscriptionManuallyCancelled = newValue}
   }
 
   var keepMutedChatsArchived: Bool {
-    get {return _storage._keepMutedChatsArchived}
+    get {_storage._keepMutedChatsArchived}
     set {_uniqueStorage()._keepMutedChatsArchived = newValue}
   }
 
   /// Removed 'has' prefix on spec definition to avoid name conflict.
   var myStoryPrivacyHasBeenSet: Bool {
-    get {return _storage._myStoryPrivacyHasBeenSet}
+    get {_storage._myStoryPrivacyHasBeenSet}
     set {_uniqueStorage()._myStoryPrivacyHasBeenSet = newValue}
   }
 
   /// Removed 'has' prefix on spec definition to avoid name conflict.
   var viewedOnboardingStory: Bool {
-    get {return _storage._viewedOnboardingStory}
+    get {_storage._viewedOnboardingStory}
     set {_uniqueStorage()._viewedOnboardingStory = newValue}
   }
 
   var storiesDisabled: Bool {
-    get {return _storage._storiesDisabled}
+    get {_storage._storiesDisabled}
     set {_uniqueStorage()._storiesDisabled = newValue}
   }
 
   var storyViewReceiptsEnabled: StorageServiceProtos_OptionalBool {
-    get {return _storage._storyViewReceiptsEnabled}
+    get {_storage._storyViewReceiptsEnabled}
     set {_uniqueStorage()._storyViewReceiptsEnabled = newValue}
   }
 
   var readOnboardingStory: Bool {
-    get {return _storage._readOnboardingStory}
+    get {_storage._readOnboardingStory}
     set {_uniqueStorage()._readOnboardingStory = newValue}
   }
 
   var username: String {
-    get {return _storage._username}
+    get {_storage._username}
     set {_uniqueStorage()._username = newValue}
   }
 
   /// Removed 'has' prefix on spec definition to avoid name conflict.
   var completedUsernameOnboarding: Bool {
-    get {return _storage._completedUsernameOnboarding}
+    get {_storage._completedUsernameOnboarding}
     set {_uniqueStorage()._completedUsernameOnboarding = newValue}
   }
 
   var usernameLink: StorageServiceProtos_AccountRecord.UsernameLink {
-    get {return _storage._usernameLink ?? StorageServiceProtos_AccountRecord.UsernameLink()}
+    get {_storage._usernameLink ?? StorageServiceProtos_AccountRecord.UsernameLink()}
     set {_uniqueStorage()._usernameLink = newValue}
   }
   /// Returns true if `usernameLink` has been explicitly set.
-  var hasUsernameLink: Bool {return _storage._usernameLink != nil}
+  var hasUsernameLink: Bool {_storage._usernameLink != nil}
   /// Clears the value of `usernameLink`. Subsequent reads from it will return its default value.
   mutating func clearUsernameLink() {_uniqueStorage()._usernameLink = nil}
 
   var backupTier: UInt64 {
-    get {return _storage._backupTier ?? 0}
+    get {_storage._backupTier ?? 0}
     set {_uniqueStorage()._backupTier = newValue}
   }
   /// Returns true if `backupTier` has been explicitly set.
-  var hasBackupTier: Bool {return _storage._backupTier != nil}
+  var hasBackupTier: Bool {_storage._backupTier != nil}
   /// Clears the value of `backupTier`. Subsequent reads from it will return its default value.
   mutating func clearBackupTier() {_uniqueStorage()._backupTier = nil}
 
   var backupSubscriberData: StorageServiceProtos_AccountRecord.IAPSubscriberData {
-    get {return _storage._backupSubscriberData ?? StorageServiceProtos_AccountRecord.IAPSubscriberData()}
+    get {_storage._backupSubscriberData ?? StorageServiceProtos_AccountRecord.IAPSubscriberData()}
     set {_uniqueStorage()._backupSubscriberData = newValue}
   }
   /// Returns true if `backupSubscriberData` has been explicitly set.
-  var hasBackupSubscriberData: Bool {return _storage._backupSubscriberData != nil}
+  var hasBackupSubscriberData: Bool {_storage._backupSubscriberData != nil}
   /// Clears the value of `backupSubscriberData`. Subsequent reads from it will return its default value.
   mutating func clearBackupSubscriberData() {_uniqueStorage()._backupSubscriberData = nil}
 
   var avatarColor: StorageServiceProtos_AvatarColor {
-    get {return _storage._avatarColor ?? .a100}
+    get {_storage._avatarColor ?? .a100}
     set {_uniqueStorage()._avatarColor = newValue}
   }
   /// Returns true if `avatarColor` has been explicitly set.
-  var hasAvatarColor: Bool {return _storage._avatarColor != nil}
+  var hasAvatarColor: Bool {_storage._avatarColor != nil}
   /// Clears the value of `avatarColor`. Subsequent reads from it will return its default value.
   mutating func clearAvatarColor() {_uniqueStorage()._avatarColor = nil}
 
+  /// 44 and 45 related to notification profiles
+  var automaticKeyVerificationDisabled: Bool {
+    get {_storage._automaticKeyVerificationDisabled}
+    set {_uniqueStorage()._automaticKeyVerificationDisabled = newValue}
+  }
+
+  var seenAdminDeleteEducationDialog: Bool {
+    get {_storage._seenAdminDeleteEducationDialog}
+    set {_uniqueStorage()._seenAdminDeleteEducationDialog = newValue}
+  }
+
+  var releaseNotesChatArchived: Bool {
+    get {_storage._releaseNotesChatArchived ?? false}
+    set {_uniqueStorage()._releaseNotesChatArchived = newValue}
+  }
+  /// Returns true if `releaseNotesChatArchived` has been explicitly set.
+  var hasReleaseNotesChatArchived: Bool {_storage._releaseNotesChatArchived != nil}
+  /// Clears the value of `releaseNotesChatArchived`. Subsequent reads from it will return its default value.
+  mutating func clearReleaseNotesChatArchived() {_uniqueStorage()._releaseNotesChatArchived = nil}
+
+  var releaseNotesChatMutedUntilTimestamp: UInt64 {
+    get {_storage._releaseNotesChatMutedUntilTimestamp ?? 0}
+    set {_uniqueStorage()._releaseNotesChatMutedUntilTimestamp = newValue}
+  }
+  /// Returns true if `releaseNotesChatMutedUntilTimestamp` has been explicitly set.
+  var hasReleaseNotesChatMutedUntilTimestamp: Bool {_storage._releaseNotesChatMutedUntilTimestamp != nil}
+  /// Clears the value of `releaseNotesChatMutedUntilTimestamp`. Subsequent reads from it will return its default value.
+  mutating func clearReleaseNotesChatMutedUntilTimestamp() {_uniqueStorage()._releaseNotesChatMutedUntilTimestamp = nil}
+
+  var releaseNotesChatBlocked: Bool {
+    get {_storage._releaseNotesChatBlocked ?? false}
+    set {_uniqueStorage()._releaseNotesChatBlocked = newValue}
+  }
+  /// Returns true if `releaseNotesChatBlocked` has been explicitly set.
+  var hasReleaseNotesChatBlocked: Bool {_storage._releaseNotesChatBlocked != nil}
+  /// Clears the value of `releaseNotesChatBlocked`. Subsequent reads from it will return its default value.
+  mutating func clearReleaseNotesChatBlocked() {_uniqueStorage()._releaseNotesChatBlocked = nil}
+
+  var releaseNotesChatMarkedUnread: Bool {
+    get {_storage._releaseNotesChatMarkedUnread ?? false}
+    set {_uniqueStorage()._releaseNotesChatMarkedUnread = newValue}
+  }
+  /// Returns true if `releaseNotesChatMarkedUnread` has been explicitly set.
+  var hasReleaseNotesChatMarkedUnread: Bool {_storage._releaseNotesChatMarkedUnread != nil}
+  /// Clears the value of `releaseNotesChatMarkedUnread`. Subsequent reads from it will return its default value.
+  mutating func clearReleaseNotesChatMarkedUnread() {_uniqueStorage()._releaseNotesChatMarkedUnread = nil}
+
+  var unreadBadgeType: StorageServiceProtos_AccountRecord.UnreadBadgeType {
+    get {_storage._unreadBadgeType}
+    set {_uniqueStorage()._unreadBadgeType = newValue}
+  }
+
+  /// If unset, consider this off
+  var includeMutedChatsInBadge: StorageServiceProtos_OptionalBool {
+    get {_storage._includeMutedChatsInBadge}
+    set {_uniqueStorage()._includeMutedChatsInBadge = newValue}
+  }
+
+  /// If unset, consider this on
+  var reactionNotifications: StorageServiceProtos_OptionalBool {
+    get {_storage._reactionNotifications}
+    set {_uniqueStorage()._reactionNotifications = newValue}
+  }
+
+  /// If unset, consider this off
+  var notifyForCallsIfMuted: StorageServiceProtos_OptionalBool {
+    get {_storage._notifyForCallsIfMuted}
+    set {_uniqueStorage()._notifyForCallsIfMuted = newValue}
+  }
+
+  /// If unset, consider this on
+  var notifyForMentionsIfMuted: StorageServiceProtos_OptionalBool {
+    get {_storage._notifyForMentionsIfMuted}
+    set {_uniqueStorage()._notifyForMentionsIfMuted = newValue}
+  }
+
+  /// If unset, consider this on
+  var notifyForRepliesIfMuted: StorageServiceProtos_OptionalBool {
+    get {_storage._notifyForRepliesIfMuted}
+    set {_uniqueStorage()._notifyForRepliesIfMuted = newValue}
+  }
+
+  var showUnreadReminders: StorageServiceProtos_OptionalBool {
+    get {_storage._showUnreadReminders}
+    set {_uniqueStorage()._showUnreadReminders = newValue}
+  }
+
+  /// If unset, consider this off
+  var notifyWhenContactJoins: StorageServiceProtos_OptionalBool {
+    get {_storage._notifyWhenContactJoins}
+    set {_uniqueStorage()._notifyWhenContactJoins = newValue}
+  }
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum PhoneNumberSharingMode: SwiftProtobuf.Enum, Swift.CaseIterable {
+  nonisolated enum UnreadBadgeType: SwiftProtobuf.Enum, Swift.CaseIterable {
+    typealias RawValue = Int
+
+    /// Interpret as "Unread messages"
+    case unknownBadgeType // = 0
+    case unreadMessages // = 1
+    case unreadChats // = 2
+    case UNRECOGNIZED(Int)
+
+    init() {
+      self = .unknownBadgeType
+    }
+
+    init?(rawValue: Int) {
+      switch rawValue {
+      case 0: self = .unknownBadgeType
+      case 1: self = .unreadMessages
+      case 2: self = .unreadChats
+      default: self = .UNRECOGNIZED(rawValue)
+      }
+    }
+
+    var rawValue: Int {
+      switch self {
+      case .unknownBadgeType: return 0
+      case .unreadMessages: return 1
+      case .unreadChats: return 2
+      case .UNRECOGNIZED(let i): return i
+      }
+    }
+
+    // The compiler won't synthesize support with the UNRECOGNIZED case.
+    static let allCases: [StorageServiceProtos_AccountRecord.UnreadBadgeType] = [
+      .unknownBadgeType,
+      .unreadMessages,
+      .unreadChats,
+    ]
+
+  }
+
+  nonisolated enum PhoneNumberSharingMode: SwiftProtobuf.Enum, Swift.CaseIterable {
     typealias RawValue = Int
     case unknown // = 0
     case everybody // = 1
@@ -928,7 +1107,7 @@ struct StorageServiceProtos_AccountRecord: @unchecked Sendable {
 
   }
 
-  struct PinnedConversation: Sendable {
+  nonisolated struct PinnedConversation: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -959,16 +1138,25 @@ struct StorageServiceProtos_AccountRecord: @unchecked Sendable {
       set {identifier = .groupMasterKey(newValue)}
     }
 
+    var releaseNotes: StorageServiceProtos_AccountRecord.PinnedConversation.ReleaseNotes {
+      get {
+        if case .releaseNotes(let v)? = identifier {return v}
+        return StorageServiceProtos_AccountRecord.PinnedConversation.ReleaseNotes()
+      }
+      set {identifier = .releaseNotes(newValue)}
+    }
+
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    enum OneOf_Identifier: Equatable, Sendable {
+    nonisolated enum OneOf_Identifier: Equatable, Sendable {
       case contact(StorageServiceProtos_AccountRecord.PinnedConversation.Contact)
       case legacyGroupID(Data)
       case groupMasterKey(Data)
+      case releaseNotes(StorageServiceProtos_AccountRecord.PinnedConversation.ReleaseNotes)
 
     }
 
-    struct Contact: Sendable {
+    nonisolated struct Contact: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -985,10 +1173,20 @@ struct StorageServiceProtos_AccountRecord: @unchecked Sendable {
       init() {}
     }
 
+    nonisolated struct ReleaseNotes: Sendable {
+      // SwiftProtobuf.Message conformance is added in an extension below. See the
+      // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+      // methods supported on all messages.
+
+      var unknownFields = SwiftProtobuf.UnknownStorage()
+
+      init() {}
+    }
+
     init() {}
   }
 
-  struct Payments: Sendable {
+  nonisolated struct Payments: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -1002,7 +1200,7 @@ struct StorageServiceProtos_AccountRecord: @unchecked Sendable {
     init() {}
   }
 
-  struct UsernameLink: Sendable {
+  nonisolated struct UsernameLink: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -1018,7 +1216,7 @@ struct StorageServiceProtos_AccountRecord: @unchecked Sendable {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    enum Color: SwiftProtobuf.Enum, Swift.CaseIterable {
+    nonisolated enum Color: SwiftProtobuf.Enum, Swift.CaseIterable {
       typealias RawValue = Int
       case unknown // = 0
       case blue // = 1
@@ -1083,7 +1281,7 @@ struct StorageServiceProtos_AccountRecord: @unchecked Sendable {
     init() {}
   }
 
-  struct IAPSubscriberData: Sendable {
+  nonisolated struct IAPSubscriberData: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -1112,7 +1310,7 @@ struct StorageServiceProtos_AccountRecord: @unchecked Sendable {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    enum OneOf_IapSubscriptionID: Equatable, Sendable {
+    nonisolated enum OneOf_IapSubscriptionID: Equatable, Sendable {
       /// Identifies an Android Play Store IAP subscription.
       case purchaseToken(String)
       /// Identifies an iOS App Store IAP subscription.
@@ -1128,7 +1326,7 @@ struct StorageServiceProtos_AccountRecord: @unchecked Sendable {
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
-struct StorageServiceProtos_StoryDistributionListRecord: Sendable {
+nonisolated struct StorageServiceProtos_StoryDistributionListRecord: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -1153,7 +1351,7 @@ struct StorageServiceProtos_StoryDistributionListRecord: Sendable {
   init() {}
 }
 
-struct StorageServiceProtos_CallLinkRecord: Sendable {
+nonisolated struct StorageServiceProtos_CallLinkRecord: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -1174,17 +1372,17 @@ struct StorageServiceProtos_CallLinkRecord: Sendable {
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
-fileprivate let _protobuf_package = "StorageServiceProtos"
+fileprivate nonisolated let _protobuf_package = "StorageServiceProtos"
 
-extension StorageServiceProtos_OptionalBool: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_OptionalBool: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0UNSET\0\u{1}TRUE\0\u{1}FALSE\0")
 }
 
-extension StorageServiceProtos_AvatarColor: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_AvatarColor: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0A100\0\u{1}A110\0\u{1}A120\0\u{1}A130\0\u{1}A140\0\u{1}A150\0\u{1}A160\0\u{1}A170\0\u{1}A180\0\u{1}A190\0\u{1}A200\0\u{1}A210\0")
 }
 
-extension StorageServiceProtos_StorageItem: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_StorageItem: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".StorageItem"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}key\0\u{1}value\0")
 
@@ -1219,7 +1417,7 @@ extension StorageServiceProtos_StorageItem: SwiftProtobuf.Message, SwiftProtobuf
   }
 }
 
-extension StorageServiceProtos_StorageItems: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_StorageItems: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".StorageItems"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}items\0")
 
@@ -1249,7 +1447,7 @@ extension StorageServiceProtos_StorageItems: SwiftProtobuf.Message, SwiftProtobu
   }
 }
 
-extension StorageServiceProtos_StorageManifest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_StorageManifest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".StorageManifest"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}version\0\u{1}value\0")
 
@@ -1284,7 +1482,7 @@ extension StorageServiceProtos_StorageManifest: SwiftProtobuf.Message, SwiftProt
   }
 }
 
-extension StorageServiceProtos_ReadOperation: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_ReadOperation: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".ReadOperation"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}readKey\0")
 
@@ -1314,7 +1512,7 @@ extension StorageServiceProtos_ReadOperation: SwiftProtobuf.Message, SwiftProtob
   }
 }
 
-extension StorageServiceProtos_WriteOperation: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_WriteOperation: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".WriteOperation"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}manifest\0\u{1}insertItem\0\u{1}deleteKey\0\u{1}deleteAll\0")
 
@@ -1363,7 +1561,7 @@ extension StorageServiceProtos_WriteOperation: SwiftProtobuf.Message, SwiftProto
   }
 }
 
-extension StorageServiceProtos_ManifestRecord: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_ManifestRecord: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".ManifestRecord"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}version\0\u{1}keys\0\u{1}sourceDevice\0\u{1}recordIkm\0")
 
@@ -1408,7 +1606,7 @@ extension StorageServiceProtos_ManifestRecord: SwiftProtobuf.Message, SwiftProto
   }
 }
 
-extension StorageServiceProtos_ManifestRecord.Key: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_ManifestRecord.Key: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = StorageServiceProtos_ManifestRecord.protoMessageName + ".Key"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}data\0\u{1}type\0")
 
@@ -1443,11 +1641,11 @@ extension StorageServiceProtos_ManifestRecord.Key: SwiftProtobuf.Message, SwiftP
   }
 }
 
-extension StorageServiceProtos_ManifestRecord.Key.TypeEnum: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_ManifestRecord.Key.TypeEnum: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0UNKNOWN\0\u{1}CONTACT\0\u{1}GROUPV1\0\u{1}GROUPV2\0\u{1}ACCOUNT\0\u{1}STORY_DISTRIBUTION_LIST\0\u{2}\u{2}CALL_LINK\0")
 }
 
-extension StorageServiceProtos_StorageRecord: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_StorageRecord: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".StorageRecord"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}contact\0\u{1}groupV1\0\u{1}groupV2\0\u{1}account\0\u{1}storyDistributionList\0\u{2}\u{2}callLink\0")
 
@@ -1582,9 +1780,9 @@ extension StorageServiceProtos_StorageRecord: SwiftProtobuf.Message, SwiftProtob
   }
 }
 
-extension StorageServiceProtos_ContactRecord: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_ContactRecord: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".ContactRecord"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}aci\0\u{1}e164\0\u{1}profileKey\0\u{1}identityKey\0\u{1}identityState\0\u{1}givenName\0\u{1}familyName\0\u{1}username\0\u{1}blocked\0\u{1}whitelisted\0\u{1}archived\0\u{1}markedUnread\0\u{1}mutedUntilTimestamp\0\u{1}hideStory\0\u{1}pni\0\u{1}unregisteredAtTimestamp\0\u{1}systemGivenName\0\u{1}systemFamilyName\0\u{1}systemNickname\0\u{1}hidden\0\u{2}\u{2}nickname\0\u{1}note\0\u{1}avatarColor\0\u{1}aciBinary\0\u{1}pniBinary\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}aci\0\u{1}e164\0\u{1}profileKey\0\u{1}identityKey\0\u{1}identityState\0\u{1}givenName\0\u{1}familyName\0\u{1}username\0\u{1}blocked\0\u{1}whitelisted\0\u{1}archived\0\u{1}markedUnread\0\u{1}mutedUntilTimestamp\0\u{1}hideStory\0\u{1}pni\0\u{1}unregisteredAtTimestamp\0\u{1}systemGivenName\0\u{1}systemFamilyName\0\u{1}systemNickname\0\u{1}hidden\0\u{2}\u{2}nickname\0\u{1}note\0\u{1}avatarColor\0\u{1}aciBinary\0\u{1}pniBinary\0\u{1}blockedAtTimestamp\0\u{1}notifyForCallsIfMuted\0\u{1}showUnreadReminders\0\u{1}sharedName\0")
 
   fileprivate class _StorageClass {
     var _aci: String = String()
@@ -1612,6 +1810,10 @@ extension StorageServiceProtos_ContactRecord: SwiftProtobuf.Message, SwiftProtob
     var _avatarColor: StorageServiceProtos_AvatarColor? = nil
     var _aciBinary: Data = Data()
     var _pniBinary: Data = Data()
+    var _blockedAtTimestamp: UInt64 = 0
+    var _notifyForCallsIfMuted: StorageServiceProtos_OptionalBool = .unset
+    var _showUnreadReminders: StorageServiceProtos_OptionalBool = .unset
+    var _sharedName: StorageServiceProtos_ContactRecord.Name? = nil
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -1647,6 +1849,10 @@ extension StorageServiceProtos_ContactRecord: SwiftProtobuf.Message, SwiftProtob
       _avatarColor = source._avatarColor
       _aciBinary = source._aciBinary
       _pniBinary = source._pniBinary
+      _blockedAtTimestamp = source._blockedAtTimestamp
+      _notifyForCallsIfMuted = source._notifyForCallsIfMuted
+      _showUnreadReminders = source._showUnreadReminders
+      _sharedName = source._sharedName
     }
   }
 
@@ -1690,6 +1896,10 @@ extension StorageServiceProtos_ContactRecord: SwiftProtobuf.Message, SwiftProtob
         case 24: try { try decoder.decodeSingularEnumField(value: &_storage._avatarColor) }()
         case 25: try { try decoder.decodeSingularBytesField(value: &_storage._aciBinary) }()
         case 26: try { try decoder.decodeSingularBytesField(value: &_storage._pniBinary) }()
+        case 27: try { try decoder.decodeSingularUInt64Field(value: &_storage._blockedAtTimestamp) }()
+        case 28: try { try decoder.decodeSingularEnumField(value: &_storage._notifyForCallsIfMuted) }()
+        case 29: try { try decoder.decodeSingularEnumField(value: &_storage._showUnreadReminders) }()
+        case 30: try { try decoder.decodeSingularMessageField(value: &_storage._sharedName) }()
         default: break
         }
       }
@@ -1777,6 +1987,18 @@ extension StorageServiceProtos_ContactRecord: SwiftProtobuf.Message, SwiftProtob
       if !_storage._pniBinary.isEmpty {
         try visitor.visitSingularBytesField(value: _storage._pniBinary, fieldNumber: 26)
       }
+      if _storage._blockedAtTimestamp != 0 {
+        try visitor.visitSingularUInt64Field(value: _storage._blockedAtTimestamp, fieldNumber: 27)
+      }
+      if _storage._notifyForCallsIfMuted != .unset {
+        try visitor.visitSingularEnumField(value: _storage._notifyForCallsIfMuted, fieldNumber: 28)
+      }
+      if _storage._showUnreadReminders != .unset {
+        try visitor.visitSingularEnumField(value: _storage._showUnreadReminders, fieldNumber: 29)
+      }
+      try { if let v = _storage._sharedName {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 30)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -1811,6 +2033,10 @@ extension StorageServiceProtos_ContactRecord: SwiftProtobuf.Message, SwiftProtob
         if _storage._avatarColor != rhs_storage._avatarColor {return false}
         if _storage._aciBinary != rhs_storage._aciBinary {return false}
         if _storage._pniBinary != rhs_storage._pniBinary {return false}
+        if _storage._blockedAtTimestamp != rhs_storage._blockedAtTimestamp {return false}
+        if _storage._notifyForCallsIfMuted != rhs_storage._notifyForCallsIfMuted {return false}
+        if _storage._showUnreadReminders != rhs_storage._showUnreadReminders {return false}
+        if _storage._sharedName != rhs_storage._sharedName {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -1820,11 +2046,11 @@ extension StorageServiceProtos_ContactRecord: SwiftProtobuf.Message, SwiftProtob
   }
 }
 
-extension StorageServiceProtos_ContactRecord.IdentityState: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_ContactRecord.IdentityState: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0DEFAULT\0\u{1}VERIFIED\0\u{1}UNVERIFIED\0")
 }
 
-extension StorageServiceProtos_ContactRecord.Name: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_ContactRecord.Name: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = StorageServiceProtos_ContactRecord.protoMessageName + ".Name"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}given\0\u{1}family\0")
 
@@ -1859,7 +2085,7 @@ extension StorageServiceProtos_ContactRecord.Name: SwiftProtobuf.Message, SwiftP
   }
 }
 
-extension StorageServiceProtos_GroupV1Record: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_GroupV1Record: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".GroupV1Record"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{c}\u{2}\u{1}\u{c}\u{3}\u{1}\u{c}\u{4}\u{1}\u{c}\u{5}\u{1}\u{c}\u{6}\u{1}")
 
@@ -1889,9 +2115,9 @@ extension StorageServiceProtos_GroupV1Record: SwiftProtobuf.Message, SwiftProtob
   }
 }
 
-extension StorageServiceProtos_GroupV2Record: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_GroupV2Record: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".GroupV2Record"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}masterKey\0\u{1}blocked\0\u{1}whitelisted\0\u{1}archived\0\u{1}markedUnread\0\u{1}mutedUntilTimestamp\0\u{1}dontNotifyForMentionsIfMuted\0\u{1}hideStory\0\u{2}\u{2}storySendMode\0\u{1}avatarColor\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}masterKey\0\u{1}blocked\0\u{1}whitelisted\0\u{1}archived\0\u{1}markedUnread\0\u{1}mutedUntilTimestamp\0\u{1}dontNotifyForMentionsIfMuted\0\u{1}hideStory\0\u{2}\u{2}storySendMode\0\u{1}avatarColor\0\u{1}verifiedNameHash\0\u{1}blockedAtTimestamp\0\u{1}notifyForCallsIfMuted\0\u{1}notifyForMentionsIfMuted\0\u{1}notifyForRepliesIfMuted\0\u{1}showUnreadReminders\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1909,6 +2135,12 @@ extension StorageServiceProtos_GroupV2Record: SwiftProtobuf.Message, SwiftProtob
       case 8: try { try decoder.decodeSingularBoolField(value: &self.hideStory) }()
       case 10: try { try decoder.decodeSingularEnumField(value: &self.storySendMode) }()
       case 11: try { try decoder.decodeSingularEnumField(value: &self._avatarColor) }()
+      case 12: try { try decoder.decodeSingularBytesField(value: &self.verifiedNameHash) }()
+      case 13: try { try decoder.decodeSingularUInt64Field(value: &self.blockedAtTimestamp) }()
+      case 14: try { try decoder.decodeSingularEnumField(value: &self.notifyForCallsIfMuted) }()
+      case 15: try { try decoder.decodeSingularEnumField(value: &self.notifyForMentionsIfMuted) }()
+      case 16: try { try decoder.decodeSingularEnumField(value: &self.notifyForRepliesIfMuted) }()
+      case 17: try { try decoder.decodeSingularEnumField(value: &self.showUnreadReminders) }()
       default: break
       }
     }
@@ -1949,6 +2181,24 @@ extension StorageServiceProtos_GroupV2Record: SwiftProtobuf.Message, SwiftProtob
     try { if let v = self._avatarColor {
       try visitor.visitSingularEnumField(value: v, fieldNumber: 11)
     } }()
+    if !self.verifiedNameHash.isEmpty {
+      try visitor.visitSingularBytesField(value: self.verifiedNameHash, fieldNumber: 12)
+    }
+    if self.blockedAtTimestamp != 0 {
+      try visitor.visitSingularUInt64Field(value: self.blockedAtTimestamp, fieldNumber: 13)
+    }
+    if self.notifyForCallsIfMuted != .unset {
+      try visitor.visitSingularEnumField(value: self.notifyForCallsIfMuted, fieldNumber: 14)
+    }
+    if self.notifyForMentionsIfMuted != .unset {
+      try visitor.visitSingularEnumField(value: self.notifyForMentionsIfMuted, fieldNumber: 15)
+    }
+    if self.notifyForRepliesIfMuted != .unset {
+      try visitor.visitSingularEnumField(value: self.notifyForRepliesIfMuted, fieldNumber: 16)
+    }
+    if self.showUnreadReminders != .unset {
+      try visitor.visitSingularEnumField(value: self.showUnreadReminders, fieldNumber: 17)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1963,18 +2213,24 @@ extension StorageServiceProtos_GroupV2Record: SwiftProtobuf.Message, SwiftProtob
     if lhs.hideStory != rhs.hideStory {return false}
     if lhs.storySendMode != rhs.storySendMode {return false}
     if lhs._avatarColor != rhs._avatarColor {return false}
+    if lhs.verifiedNameHash != rhs.verifiedNameHash {return false}
+    if lhs.blockedAtTimestamp != rhs.blockedAtTimestamp {return false}
+    if lhs.notifyForCallsIfMuted != rhs.notifyForCallsIfMuted {return false}
+    if lhs.notifyForMentionsIfMuted != rhs.notifyForMentionsIfMuted {return false}
+    if lhs.notifyForRepliesIfMuted != rhs.notifyForRepliesIfMuted {return false}
+    if lhs.showUnreadReminders != rhs.showUnreadReminders {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension StorageServiceProtos_GroupV2Record.StorySendMode: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_GroupV2Record.StorySendMode: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0DEFAULT\0\u{1}DISABLED\0\u{1}ENABLED\0")
 }
 
-extension StorageServiceProtos_AccountRecord: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_AccountRecord: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".AccountRecord"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}profileKey\0\u{1}givenName\0\u{1}familyName\0\u{1}avatarUrl\0\u{1}noteToSelfArchived\0\u{1}readReceipts\0\u{1}sealedSenderIndicators\0\u{1}typingIndicators\0\u{1}proxiedLinkPreviews\0\u{1}noteToSelfMarkedUnread\0\u{1}linkPreviews\0\u{1}phoneNumberSharingMode\0\u{1}notDiscoverableByPhoneNumber\0\u{1}pinnedConversations\0\u{1}preferContactAvatars\0\u{1}payments\0\u{1}universalExpireTimer\0\u{2}\u{2}e164\0\u{1}preferredReactionEmoji\0\u{1}donorSubscriberID\0\u{1}donorSubscriberCurrencyCode\0\u{1}displayBadgesOnProfile\0\u{1}donorSubscriptionManuallyCancelled\0\u{1}keepMutedChatsArchived\0\u{1}myStoryPrivacyHasBeenSet\0\u{1}viewedOnboardingStory\0\u{2}\u{2}storiesDisabled\0\u{1}storyViewReceiptsEnabled\0\u{1}readOnboardingStory\0\u{2}\u{2}username\0\u{1}completedUsernameOnboarding\0\u{1}usernameLink\0\u{2}\u{5}backupTier\0\u{1}backupSubscriberData\0\u{1}avatarColor\0\u{c}\u{12}\u{1}\u{c}\u{1c}\u{1}\u{c} \u{1}\u{c}$\u{1}\u{c}%\u{1}\u{c}&\u{1}\u{c}'\u{1}")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}profileKey\0\u{1}givenName\0\u{1}familyName\0\u{1}avatarUrl\0\u{1}noteToSelfArchived\0\u{1}readReceipts\0\u{1}sealedSenderIndicators\0\u{1}typingIndicators\0\u{1}proxiedLinkPreviews\0\u{1}noteToSelfMarkedUnread\0\u{1}linkPreviews\0\u{1}phoneNumberSharingMode\0\u{1}notDiscoverableByPhoneNumber\0\u{1}pinnedConversations\0\u{1}preferContactAvatars\0\u{1}payments\0\u{1}universalExpireTimer\0\u{2}\u{2}e164\0\u{1}preferredReactionEmoji\0\u{1}donorSubscriberID\0\u{1}donorSubscriberCurrencyCode\0\u{1}displayBadgesOnProfile\0\u{1}donorSubscriptionManuallyCancelled\0\u{1}keepMutedChatsArchived\0\u{1}myStoryPrivacyHasBeenSet\0\u{1}viewedOnboardingStory\0\u{2}\u{2}storiesDisabled\0\u{1}storyViewReceiptsEnabled\0\u{1}readOnboardingStory\0\u{2}\u{2}username\0\u{1}completedUsernameOnboarding\0\u{1}usernameLink\0\u{2}\u{5}backupTier\0\u{1}backupSubscriberData\0\u{1}avatarColor\0\u{2}\u{4}automaticKeyVerificationDisabled\0\u{1}seenAdminDeleteEducationDialog\0\u{1}releaseNotesChatArchived\0\u{1}releaseNotesChatMutedUntilTimestamp\0\u{1}releaseNotesChatBlocked\0\u{1}releaseNotesChatMarkedUnread\0\u{2}\u{2}unreadBadgeType\0\u{1}includeMutedChatsInBadge\0\u{1}reactionNotifications\0\u{1}notifyForCallsIfMuted\0\u{1}notifyForMentionsIfMuted\0\u{1}notifyForRepliesIfMuted\0\u{1}showUnreadReminders\0\u{1}notifyWhenContactJoins\0\u{c}\u{12}\u{1}\u{c}\u{1c}\u{1}\u{c} \u{1}\u{c}$\u{1}\u{c}%\u{1}\u{c}&\u{1}\u{c}'\u{1}\u{c}+\u{1}")
 
   fileprivate class _StorageClass {
     var _profileKey: Data = Data()
@@ -2012,6 +2268,20 @@ extension StorageServiceProtos_AccountRecord: SwiftProtobuf.Message, SwiftProtob
     var _backupTier: UInt64? = nil
     var _backupSubscriberData: StorageServiceProtos_AccountRecord.IAPSubscriberData? = nil
     var _avatarColor: StorageServiceProtos_AvatarColor? = nil
+    var _automaticKeyVerificationDisabled: Bool = false
+    var _seenAdminDeleteEducationDialog: Bool = false
+    var _releaseNotesChatArchived: Bool? = nil
+    var _releaseNotesChatMutedUntilTimestamp: UInt64? = nil
+    var _releaseNotesChatBlocked: Bool? = nil
+    var _releaseNotesChatMarkedUnread: Bool? = nil
+    var _unreadBadgeType: StorageServiceProtos_AccountRecord.UnreadBadgeType = .unknownBadgeType
+    var _includeMutedChatsInBadge: StorageServiceProtos_OptionalBool = .unset
+    var _reactionNotifications: StorageServiceProtos_OptionalBool = .unset
+    var _notifyForCallsIfMuted: StorageServiceProtos_OptionalBool = .unset
+    var _notifyForMentionsIfMuted: StorageServiceProtos_OptionalBool = .unset
+    var _notifyForRepliesIfMuted: StorageServiceProtos_OptionalBool = .unset
+    var _showUnreadReminders: StorageServiceProtos_OptionalBool = .unset
+    var _notifyWhenContactJoins: StorageServiceProtos_OptionalBool = .unset
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -2057,6 +2327,20 @@ extension StorageServiceProtos_AccountRecord: SwiftProtobuf.Message, SwiftProtob
       _backupTier = source._backupTier
       _backupSubscriberData = source._backupSubscriberData
       _avatarColor = source._avatarColor
+      _automaticKeyVerificationDisabled = source._automaticKeyVerificationDisabled
+      _seenAdminDeleteEducationDialog = source._seenAdminDeleteEducationDialog
+      _releaseNotesChatArchived = source._releaseNotesChatArchived
+      _releaseNotesChatMutedUntilTimestamp = source._releaseNotesChatMutedUntilTimestamp
+      _releaseNotesChatBlocked = source._releaseNotesChatBlocked
+      _releaseNotesChatMarkedUnread = source._releaseNotesChatMarkedUnread
+      _unreadBadgeType = source._unreadBadgeType
+      _includeMutedChatsInBadge = source._includeMutedChatsInBadge
+      _reactionNotifications = source._reactionNotifications
+      _notifyForCallsIfMuted = source._notifyForCallsIfMuted
+      _notifyForMentionsIfMuted = source._notifyForMentionsIfMuted
+      _notifyForRepliesIfMuted = source._notifyForRepliesIfMuted
+      _showUnreadReminders = source._showUnreadReminders
+      _notifyWhenContactJoins = source._notifyWhenContactJoins
     }
   }
 
@@ -2110,6 +2394,20 @@ extension StorageServiceProtos_AccountRecord: SwiftProtobuf.Message, SwiftProtob
         case 40: try { try decoder.decodeSingularUInt64Field(value: &_storage._backupTier) }()
         case 41: try { try decoder.decodeSingularMessageField(value: &_storage._backupSubscriberData) }()
         case 42: try { try decoder.decodeSingularEnumField(value: &_storage._avatarColor) }()
+        case 46: try { try decoder.decodeSingularBoolField(value: &_storage._automaticKeyVerificationDisabled) }()
+        case 47: try { try decoder.decodeSingularBoolField(value: &_storage._seenAdminDeleteEducationDialog) }()
+        case 48: try { try decoder.decodeSingularBoolField(value: &_storage._releaseNotesChatArchived) }()
+        case 49: try { try decoder.decodeSingularUInt64Field(value: &_storage._releaseNotesChatMutedUntilTimestamp) }()
+        case 50: try { try decoder.decodeSingularBoolField(value: &_storage._releaseNotesChatBlocked) }()
+        case 51: try { try decoder.decodeSingularBoolField(value: &_storage._releaseNotesChatMarkedUnread) }()
+        case 53: try { try decoder.decodeSingularEnumField(value: &_storage._unreadBadgeType) }()
+        case 54: try { try decoder.decodeSingularEnumField(value: &_storage._includeMutedChatsInBadge) }()
+        case 55: try { try decoder.decodeSingularEnumField(value: &_storage._reactionNotifications) }()
+        case 56: try { try decoder.decodeSingularEnumField(value: &_storage._notifyForCallsIfMuted) }()
+        case 57: try { try decoder.decodeSingularEnumField(value: &_storage._notifyForMentionsIfMuted) }()
+        case 58: try { try decoder.decodeSingularEnumField(value: &_storage._notifyForRepliesIfMuted) }()
+        case 59: try { try decoder.decodeSingularEnumField(value: &_storage._showUnreadReminders) }()
+        case 60: try { try decoder.decodeSingularEnumField(value: &_storage._notifyWhenContactJoins) }()
         default: break
         }
       }
@@ -2227,6 +2525,48 @@ extension StorageServiceProtos_AccountRecord: SwiftProtobuf.Message, SwiftProtob
       try { if let v = _storage._avatarColor {
         try visitor.visitSingularEnumField(value: v, fieldNumber: 42)
       } }()
+      if _storage._automaticKeyVerificationDisabled != false {
+        try visitor.visitSingularBoolField(value: _storage._automaticKeyVerificationDisabled, fieldNumber: 46)
+      }
+      if _storage._seenAdminDeleteEducationDialog != false {
+        try visitor.visitSingularBoolField(value: _storage._seenAdminDeleteEducationDialog, fieldNumber: 47)
+      }
+      try { if let v = _storage._releaseNotesChatArchived {
+        try visitor.visitSingularBoolField(value: v, fieldNumber: 48)
+      } }()
+      try { if let v = _storage._releaseNotesChatMutedUntilTimestamp {
+        try visitor.visitSingularUInt64Field(value: v, fieldNumber: 49)
+      } }()
+      try { if let v = _storage._releaseNotesChatBlocked {
+        try visitor.visitSingularBoolField(value: v, fieldNumber: 50)
+      } }()
+      try { if let v = _storage._releaseNotesChatMarkedUnread {
+        try visitor.visitSingularBoolField(value: v, fieldNumber: 51)
+      } }()
+      if _storage._unreadBadgeType != .unknownBadgeType {
+        try visitor.visitSingularEnumField(value: _storage._unreadBadgeType, fieldNumber: 53)
+      }
+      if _storage._includeMutedChatsInBadge != .unset {
+        try visitor.visitSingularEnumField(value: _storage._includeMutedChatsInBadge, fieldNumber: 54)
+      }
+      if _storage._reactionNotifications != .unset {
+        try visitor.visitSingularEnumField(value: _storage._reactionNotifications, fieldNumber: 55)
+      }
+      if _storage._notifyForCallsIfMuted != .unset {
+        try visitor.visitSingularEnumField(value: _storage._notifyForCallsIfMuted, fieldNumber: 56)
+      }
+      if _storage._notifyForMentionsIfMuted != .unset {
+        try visitor.visitSingularEnumField(value: _storage._notifyForMentionsIfMuted, fieldNumber: 57)
+      }
+      if _storage._notifyForRepliesIfMuted != .unset {
+        try visitor.visitSingularEnumField(value: _storage._notifyForRepliesIfMuted, fieldNumber: 58)
+      }
+      if _storage._showUnreadReminders != .unset {
+        try visitor.visitSingularEnumField(value: _storage._showUnreadReminders, fieldNumber: 59)
+      }
+      if _storage._notifyWhenContactJoins != .unset {
+        try visitor.visitSingularEnumField(value: _storage._notifyWhenContactJoins, fieldNumber: 60)
+      }
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -2271,6 +2611,20 @@ extension StorageServiceProtos_AccountRecord: SwiftProtobuf.Message, SwiftProtob
         if _storage._backupTier != rhs_storage._backupTier {return false}
         if _storage._backupSubscriberData != rhs_storage._backupSubscriberData {return false}
         if _storage._avatarColor != rhs_storage._avatarColor {return false}
+        if _storage._automaticKeyVerificationDisabled != rhs_storage._automaticKeyVerificationDisabled {return false}
+        if _storage._seenAdminDeleteEducationDialog != rhs_storage._seenAdminDeleteEducationDialog {return false}
+        if _storage._releaseNotesChatArchived != rhs_storage._releaseNotesChatArchived {return false}
+        if _storage._releaseNotesChatMutedUntilTimestamp != rhs_storage._releaseNotesChatMutedUntilTimestamp {return false}
+        if _storage._releaseNotesChatBlocked != rhs_storage._releaseNotesChatBlocked {return false}
+        if _storage._releaseNotesChatMarkedUnread != rhs_storage._releaseNotesChatMarkedUnread {return false}
+        if _storage._unreadBadgeType != rhs_storage._unreadBadgeType {return false}
+        if _storage._includeMutedChatsInBadge != rhs_storage._includeMutedChatsInBadge {return false}
+        if _storage._reactionNotifications != rhs_storage._reactionNotifications {return false}
+        if _storage._notifyForCallsIfMuted != rhs_storage._notifyForCallsIfMuted {return false}
+        if _storage._notifyForMentionsIfMuted != rhs_storage._notifyForMentionsIfMuted {return false}
+        if _storage._notifyForRepliesIfMuted != rhs_storage._notifyForRepliesIfMuted {return false}
+        if _storage._showUnreadReminders != rhs_storage._showUnreadReminders {return false}
+        if _storage._notifyWhenContactJoins != rhs_storage._notifyWhenContactJoins {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -2280,13 +2634,17 @@ extension StorageServiceProtos_AccountRecord: SwiftProtobuf.Message, SwiftProtob
   }
 }
 
-extension StorageServiceProtos_AccountRecord.PhoneNumberSharingMode: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_AccountRecord.UnreadBadgeType: SwiftProtobuf._ProtoNameProviding {
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0UNKNOWN_BADGE_TYPE\0\u{1}UNREAD_MESSAGES\0\u{1}UNREAD_CHATS\0")
+}
+
+nonisolated extension StorageServiceProtos_AccountRecord.PhoneNumberSharingMode: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0UNKNOWN\0\u{1}EVERYBODY\0\u{1}NOBODY\0")
 }
 
-extension StorageServiceProtos_AccountRecord.PinnedConversation: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_AccountRecord.PinnedConversation: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = StorageServiceProtos_AccountRecord.protoMessageName + ".PinnedConversation"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}contact\0\u{2}\u{2}legacyGroupId\0\u{1}groupMasterKey\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}contact\0\u{2}\u{2}legacyGroupId\0\u{1}groupMasterKey\0\u{1}releaseNotes\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -2323,6 +2681,19 @@ extension StorageServiceProtos_AccountRecord.PinnedConversation: SwiftProtobuf.M
           self.identifier = .groupMasterKey(v)
         }
       }()
+      case 5: try {
+        var v: StorageServiceProtos_AccountRecord.PinnedConversation.ReleaseNotes?
+        var hadOneofValue = false
+        if let current = self.identifier {
+          hadOneofValue = true
+          if case .releaseNotes(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.identifier = .releaseNotes(v)
+        }
+      }()
       default: break
       }
     }
@@ -2346,6 +2717,10 @@ extension StorageServiceProtos_AccountRecord.PinnedConversation: SwiftProtobuf.M
       guard case .groupMasterKey(let v)? = self.identifier else { preconditionFailure() }
       try visitor.visitSingularBytesField(value: v, fieldNumber: 4)
     }()
+    case .releaseNotes?: try {
+      guard case .releaseNotes(let v)? = self.identifier else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
+    }()
     case nil: break
     }
     try unknownFields.traverse(visitor: &visitor)
@@ -2358,7 +2733,7 @@ extension StorageServiceProtos_AccountRecord.PinnedConversation: SwiftProtobuf.M
   }
 }
 
-extension StorageServiceProtos_AccountRecord.PinnedConversation.Contact: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_AccountRecord.PinnedConversation.Contact: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = StorageServiceProtos_AccountRecord.PinnedConversation.protoMessageName + ".Contact"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}serviceId\0\u{1}e164\0\u{1}serviceIdBinary\0")
 
@@ -2398,7 +2773,26 @@ extension StorageServiceProtos_AccountRecord.PinnedConversation.Contact: SwiftPr
   }
 }
 
-extension StorageServiceProtos_AccountRecord.Payments: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_AccountRecord.PinnedConversation.ReleaseNotes: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = StorageServiceProtos_AccountRecord.PinnedConversation.protoMessageName + ".ReleaseNotes"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    // Load everything into unknown fields
+    while try decoder.nextFieldNumber() != nil {}
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: StorageServiceProtos_AccountRecord.PinnedConversation.ReleaseNotes, rhs: StorageServiceProtos_AccountRecord.PinnedConversation.ReleaseNotes) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension StorageServiceProtos_AccountRecord.Payments: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = StorageServiceProtos_AccountRecord.protoMessageName + ".Payments"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}enabled\0\u{1}paymentsEntropy\0")
 
@@ -2433,7 +2827,7 @@ extension StorageServiceProtos_AccountRecord.Payments: SwiftProtobuf.Message, Sw
   }
 }
 
-extension StorageServiceProtos_AccountRecord.UsernameLink: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_AccountRecord.UsernameLink: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = StorageServiceProtos_AccountRecord.protoMessageName + ".UsernameLink"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}entropy\0\u{1}serverId\0\u{1}color\0")
 
@@ -2473,11 +2867,11 @@ extension StorageServiceProtos_AccountRecord.UsernameLink: SwiftProtobuf.Message
   }
 }
 
-extension StorageServiceProtos_AccountRecord.UsernameLink.Color: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_AccountRecord.UsernameLink.Color: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0UNKNOWN\0\u{1}BLUE\0\u{1}WHITE\0\u{1}GREY\0\u{1}OLIVE\0\u{1}GREEN\0\u{1}ORANGE\0\u{1}PINK\0\u{1}PURPLE\0")
 }
 
-extension StorageServiceProtos_AccountRecord.IAPSubscriberData: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_AccountRecord.IAPSubscriberData: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = StorageServiceProtos_AccountRecord.protoMessageName + ".IAPSubscriberData"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}subscriberId\0\u{1}purchaseToken\0\u{1}originalTransactionId\0")
 
@@ -2539,7 +2933,7 @@ extension StorageServiceProtos_AccountRecord.IAPSubscriberData: SwiftProtobuf.Me
   }
 }
 
-extension StorageServiceProtos_StoryDistributionListRecord: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_StoryDistributionListRecord: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".StoryDistributionListRecord"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}identifier\0\u{1}name\0\u{1}recipientServiceIds\0\u{1}deletedAtTimestamp\0\u{1}allowsReplies\0\u{1}isBlockList\0\u{1}recipientServiceIdsBinary\0")
 
@@ -2599,9 +2993,9 @@ extension StorageServiceProtos_StoryDistributionListRecord: SwiftProtobuf.Messag
   }
 }
 
-extension StorageServiceProtos_CallLinkRecord: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension StorageServiceProtos_CallLinkRecord: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".CallLinkRecord"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}rootKey\0\u{1}adminPasskey\0\u{1}deletedAtTimestampMs\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}rootKey\0\u{1}adminPasskey\0\u{1}deletedAtTimestampMs\0\u{c}\u{4}\u{1}")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {

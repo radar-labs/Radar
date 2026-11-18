@@ -24,17 +24,25 @@ public protocol AttachmentValidationBackfillMigrator {
 
     /// Runs another batch, returns true if all batches completed.
     /// If returns false, another batch may be needed and should be run.
-    func runNextBatch() async throws -> Bool
+    func runNextBatch() async -> Bool
 }
 
-internal enum ValidationBackfill: Int, CaseIterable {
+enum ValidationBackfill: Int, CaseIterable {
 
     case recomputeAudioDurations = 1
 
     // MARK: - Migration insertion point
+
     // Insert new backfills here, incrementing the last raw value by 1.
 
     // MARK: - Properties
+
+    /// Whether this backfill should still be run, or is considered "inactive".
+    var isActive: Bool {
+        switch self {
+        case .recomputeAudioDurations: false
+        }
+    }
 
     /// Which content type + mime type to re-validate.
     enum ContentTypeFilter: Hashable {
@@ -44,12 +52,12 @@ internal enum ValidationBackfill: Int, CaseIterable {
 
         /// Filter to just a content type; don't sub-filter by mime type. Other filters can be applied
         /// but typically this will take advantage of the contentType,mimeType index.
-        case contentType(Attachment.ContentTypeRaw)
+        case contentType(Attachment.ContentType)
 
         /// Filter to both a content and mime type. You cannot filter to just a mime type (that doesn't
         /// really make sense, anyway, all mime types are subscoped to a content type). Takes
         /// advantage of the contentType,mimeType index.
-        case mimeTypes(Attachment.ContentTypeRaw, mimeTypes: [String])
+        case mimeTypes(Attachment.ContentType, mimeType: String)
     }
 
     /// Filters _which_ existing attachments should be re-validated by content and optionally mime type.
@@ -59,7 +67,7 @@ internal enum ValidationBackfill: Int, CaseIterable {
     var contentTypeFilter: ContentTypeFilter {
         switch self {
         case .recomputeAudioDurations:
-            return .contentType(.audio)
+            return .none
         }
     }
 
@@ -81,13 +89,7 @@ internal enum ValidationBackfill: Int, CaseIterable {
     var columnFilters: [Filter] {
         switch self {
         case .recomputeAudioDurations:
-            return [
-                .init(
-                    column: .cachedAudioDurationSeconds,
-                    operator: ==,
-                    value: 0
-                )
-            ]
+            return []
         }
     }
 }
@@ -96,6 +98,7 @@ public class AttachmentValidationBackfillMigratorImpl: AttachmentValidationBackf
 
     private let attachmentStore: AttachmentStore
     private let databaseStorage: SDSDatabaseStorage
+    private let dateProvider: DateProvider
     private let orphanedAttachmentCleaner: OrphanedAttachmentCleaner
     private let orphanedAttachmentStore: OrphanedAttachmentStore
     private let store: AttachmentValidationBackfillStore
@@ -105,12 +108,14 @@ public class AttachmentValidationBackfillMigratorImpl: AttachmentValidationBackf
         attachmentStore: AttachmentStore,
         attachmentValidationBackfillStore: AttachmentValidationBackfillStore,
         databaseStorage: SDSDatabaseStorage,
+        dateProvider: @escaping DateProvider,
         orphanedAttachmentCleaner: OrphanedAttachmentCleaner,
         orphanedAttachmentStore: OrphanedAttachmentStore,
-        validator: AttachmentContentValidator
+        validator: AttachmentContentValidator,
     ) {
         self.attachmentStore = attachmentStore
         self.databaseStorage = databaseStorage
+        self.dateProvider = dateProvider
         self.orphanedAttachmentCleaner = orphanedAttachmentCleaner
         self.orphanedAttachmentStore = orphanedAttachmentStore
         self.store = attachmentValidationBackfillStore
@@ -119,27 +124,26 @@ public class AttachmentValidationBackfillMigratorImpl: AttachmentValidationBackf
 
     // MARK: - Public
 
-    public func runNextBatch() async throws -> Bool {
-        let didEnqueue = try await enqueueForBackfillIfNeeded()
-        if didEnqueue {
-            return false
-         }
-        return try await runNextValidationBatch()
+    public func runNextBatch() async -> Bool {
+        await enqueueForBackfillIfNeeded()
+        return await runNextValidationBatch()
     }
 
     // MARK: - Private
 
     /// Re-validate enqueued attachments, one batch at a time.
     /// Returns true if there is nothing left to re-validate (finished).
-    private func runNextValidationBatch() async throws -> Bool {
+    private func runNextValidationBatch() async -> Bool {
         // Pop attachments off the queue, newest first.
-        let attachments: [Attachment.IDType: Attachment.Record?] = try databaseStorage.read { tx in
-            let attachmentIds = try store.getNextAttachmentIdBatch(tx: tx)
+        let attachments: [Attachment.IDType: Attachment.Record?] = databaseStorage.read { tx in
+            let attachmentIds = store.getNextAttachmentIdBatch(tx: tx)
 
-            let attachments = try Attachment.Record.fetchAll(
-                tx.database,
-                keys: attachmentIds
-            )
+            let attachments = failIfThrows {
+                try Attachment.Record.fetchAll(
+                    tx.database,
+                    keys: attachmentIds,
+                )
+            }
             return attachmentIds.dictionaryMappingToValues { id in
                 return attachments.first(where: { $0.sqliteId == id })
             }
@@ -166,7 +170,7 @@ public class AttachmentValidationBackfillMigratorImpl: AttachmentValidationBackf
                     ofEncryptedFileAt: fileUrl,
                     attachmentKey: AttachmentKey(combinedKey: attachment.encryptionKey),
                     plaintextLength: plaintextLength,
-                    mimeType: attachment.mimeType
+                    mimeType: attachment.mimeType,
                 )
                 revalidatedAttachmentIds.append((attachmentId, revalidationResult))
             } catch let error {
@@ -184,14 +188,14 @@ public class AttachmentValidationBackfillMigratorImpl: AttachmentValidationBackf
         // Commit the batch.
         // 1. Remove the enqueued row (including for "skipped" ids)
         // 2. Update the content type everywhere needed to the newly validated type.
-        try await databaseStorage.awaitableWrite { tx in
-            try skippedAttachmentIds.forEach { try self.store.dequeue(attachmentId: $0, tx: tx) }
-            try revalidatedAttachmentIds.forEach { (attachmentId, revalidatedAttachment) in
-                try self.store.dequeue(attachmentId: attachmentId, tx: tx)
-                try self.updateRevalidatedAttachment(
+        await databaseStorage.awaitableWrite { tx in
+            skippedAttachmentIds.forEach { self.store.dequeue(attachmentId: $0, tx: tx) }
+            revalidatedAttachmentIds.forEach { attachmentId, revalidatedAttachment in
+                self.store.dequeue(attachmentId: attachmentId, tx: tx)
+                self.updateRevalidatedAttachment(
                     revalidatedAttachment,
                     id: attachmentId,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
@@ -203,27 +207,28 @@ public class AttachmentValidationBackfillMigratorImpl: AttachmentValidationBackf
         ofEncryptedFileAt fileUrl: URL,
         attachmentKey: AttachmentKey,
         plaintextLength: UInt32,
-        mimeType: String
+        mimeType: String,
     ) async throws -> RevalidatedAttachment {
         try await self.validator.reValidateContents(
             ofEncryptedFileAt: fileUrl,
             attachmentKey: attachmentKey,
             plaintextLength: plaintextLength,
-            mimeType: mimeType
+            mimeType: mimeType,
         )
     }
 
     private func updateRevalidatedAttachment(
         _ revalidatedAttachment: RevalidatedAttachment,
         id: Attachment.IDType,
-        tx: DBWriteTransaction
-    ) throws {
+        tx: DBWriteTransaction,
+    ) {
         let hasOrphanRecord = orphanedAttachmentStore.orphanAttachmentExists(
             with: revalidatedAttachment.orphanRecordId,
-            tx: tx
+            tx: tx,
         )
         guard hasOrphanRecord else {
-            throw OWSAssertionError("Orphan record deleted before creation")
+            owsFailDebug("Orphan record deleted before creation")
+            return
         }
 
         guard let attachment = attachmentStore.fetch(id: id, tx: tx) else {
@@ -233,43 +238,39 @@ public class AttachmentValidationBackfillMigratorImpl: AttachmentValidationBackf
 
         // "Ancillary" files (e.g. video still frame) are regenerated on revalidation.
         // Whatever old ancillary files existed before must be orphaned.
-        let oldAncillaryFilesOrphanRecord: OrphanedAttachmentRecord? = {
-            switch attachment.streamInfo?.contentType {
-            case nil, .invalid, .file, .image, .animatedImage:
+        // Not the audio waveform file, though: revalidation leaves audio
+        // details (and therefore that file) alone.
+        let oldAncillaryFilesOrphanRecord: OrphanedAttachmentRecord.InsertableRecord? = {
+            guard let streamInfo = attachment.streamInfo else {
                 return nil
-            case .video(_, _, let stillFrameRelativeFilePath):
-                return .init(
-                    localRelativeFilePath: nil,
-                    localRelativeFilePathThumbnail: nil,
-                    localRelativeFilePathAudioWaveform: nil,
-                    localRelativeFilePathVideoStillFrame: stillFrameRelativeFilePath
-                )
-            case .audio(_, let waveformRelativeFilePath):
-                return .init(
-                    localRelativeFilePath: nil,
-                    localRelativeFilePathThumbnail: nil,
-                    localRelativeFilePathAudioWaveform: waveformRelativeFilePath,
-                    localRelativeFilePathVideoStillFrame: nil
-                )
             }
+
+            return OrphanedAttachmentRecord.InsertableRecord(
+                isPendingAttachment: false,
+                localRelativeFilePath: nil,
+                localRelativeFilePathThumbnail: nil,
+                localRelativeFilePathAudioWaveform: nil,
+                localRelativeFilePathVideoStillFrame: streamInfo.cachedVideoStillFrameRelativeFilePath,
+                timestamp: dateProvider().ows_millisecondsSince1970,
+            )
         }()
 
         // Update the attachment
-        try attachmentStore.updateAttachment(
+        attachmentStore.updateRevalidatedAttachment(
             attachment,
-            revalidatedContentType: revalidatedAttachment.validatedContentType,
-            mimeType: revalidatedAttachment.mimeType,
-            blurHash: revalidatedAttachment.blurHash,
-            tx: tx
+            mediaPixelSize: revalidatedAttachment.mediaPixelSize,
+            videoDuration: revalidatedAttachment.videoDuration,
+            videoStillFrameRelativeFilePath: revalidatedAttachment.videoStillFrameRelativeFilePath,
+            tx: tx,
         )
         // Clear out the orphan record for the _new_ ancillary files.
         orphanedAttachmentCleaner.releasePendingAttachment(
             withId: revalidatedAttachment.orphanRecordId,
-            tx: tx
+            tx: tx,
         )
         // Insert the orphan record for the _old_ ancillary files.
-        if var oldAncillaryFilesOrphanRecord {
-            try orphanedAttachmentStore.insert(&oldAncillaryFilesOrphanRecord, tx: tx)
+        if let oldAncillaryFilesOrphanRecord {
+            _ = OrphanedAttachmentRecord.insertRecord(oldAncillaryFilesOrphanRecord, tx: tx)
         }
     }
 
@@ -279,67 +280,57 @@ public class AttachmentValidationBackfillMigratorImpl: AttachmentValidationBackf
     /// we only need to enqueue once per backfill.
     ///
     /// Returns true if anything was enqueued.
-    private func enqueueForBackfillIfNeeded() async throws -> Bool {
-        // Check with a cheap read if we need to do any enqueuing.
-        if databaseStorage.read(block: { tx in self.store.backfillsThatNeedEnqueuing(tx: tx) }).isEmpty {
-            return false
-        }
-
-        return try await databaseStorage.awaitableWrite { tx in
+    private func enqueueForBackfillIfNeeded() async {
+        return await databaseStorage.awaitableWrite { tx in
             let backfillsToEnqueue = self.store.backfillsThatNeedEnqueuing(tx: tx)
             if backfillsToEnqueue.isEmpty {
-                return false
+                return
             }
-            try self.enqueueForBackfill(backfillsToEnqueue, tx: tx)
+            self.enqueueForBackfill(backfillsToEnqueue, tx: tx)
             self.store.setLastEnqueuedBackfill(
                 backfillsToEnqueue.max(by: { $0.rawValue < $1.rawValue })!,
-                tx: tx
+                tx: tx,
             )
-            return true
         }
     }
 
     /// Given a set of backfills that have yet to have the enqueue pass, enqueues all attachments that need re-validation.
     ///
     /// Filters across all the backfills and enqueues any attachment that passes the filter of _any_ of the backfills.
-    private func enqueueForBackfill(_ backfills: [ValidationBackfill], tx: DBWriteTransaction) throws {
+    private func enqueueForBackfill(_ backfills: [ValidationBackfill], tx: DBWriteTransaction) {
         let contentTypeColumn = Column(Attachment.Record.CodingKeys.contentType)
         let mimeTypeColumn = Column(Attachment.Record.CodingKeys.mimeType)
 
-        // We OR these; we enqueue any attachment that matches any backfill's filters.
-        var perBackfillPredicates: [SQLSpecificExpressible] = []
         for backfill in backfills {
+            guard backfill.isActive else {
+                continue
+            }
+
             // We AND these; any given backfill's filters must all match.
             var backfillPredicates = [SQLSpecificExpressible]()
             switch backfill.contentTypeFilter {
             case .none:
-                Logger.warn("Backfilling without any content type filter")
+                break
             case .contentType(let contentType):
                 backfillPredicates.append(contentTypeColumn == contentType.rawValue)
-            case .mimeTypes(let contentType, let mimeTypes):
+            case .mimeTypes(let contentType, let mimeType):
                 backfillPredicates.append(contentTypeColumn == contentType.rawValue)
-                mimeTypes.forEach { mimeType in
-                    backfillPredicates.append(mimeTypeColumn == mimeType)
-                }
+                backfillPredicates.append(mimeTypeColumn == mimeType)
             }
 
             for columnFilter in backfill.columnFilters {
                 backfillPredicates.append(columnFilter.operator(Column(columnFilter.column), columnFilter.value))
             }
 
-            // AND all predicates for this backfill.
-            let backfillPredicate = backfillPredicates.joined(operator: .and)
-            perBackfillPredicates.append(backfillPredicate)
-        }
-
-        let query = Attachment.Record
-            // OR all the predicates across backfills.
-            .filter(perBackfillPredicates.joined(operator: .or))
-            .select(Column(Attachment.Record.CodingKeys.sqliteId))
-        let cursor = try Int64.fetchCursor(tx.database, query)
-
-        while let nextId = try cursor.next() {
-            try self.store.enqueue(attachmentId: nextId, tx: tx)
+            let query = Attachment.Record
+                .filter(backfillPredicates.joined(operator: .and))
+                .select(Column(Attachment.Record.CodingKeys.sqliteId))
+            failIfThrows {
+                let cursor = try Int64.fetchCursor(tx.database, query)
+                while let nextId = try cursor.next() {
+                    self.store.enqueue(attachmentId: nextId, tx: tx)
+                }
+            }
         }
     }
 

@@ -13,8 +13,8 @@ open class SentMessageTranscriptReceiverMock: SentMessageTranscriptReceiver {
 
     public func process(
         _: SentMessageTranscript,
-        localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        registeredState: RegisteredState,
+        tx: DBWriteTransaction,
     ) -> Result<TSOutgoingMessage?, Error> {
         // Do nothing
         return .success(nil)

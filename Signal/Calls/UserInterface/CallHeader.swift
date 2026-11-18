@@ -10,20 +10,20 @@ import SignalServiceKit
 import SignalUI
 import UIKit
 
-@objc
 protocol CallHeaderDelegate: AnyObject {
     func didTapBackButton()
     func didTapMembersButton()
 }
 
 class CallHeader: UIView {
+
     // MARK: - Views
 
     private lazy var gradientView: UIView = {
         let gradientLayer = CAGradientLayer()
         gradientLayer.colors = [
             UIColor.ows_blackAlpha60.cgColor,
-            UIColor.black.withAlphaComponent(0).cgColor
+            UIColor.black.withAlphaComponent(0).cgColor,
         ]
         let view = OWSLayerView(frame: .zero) { view in
             gradientLayer.frame = view.bounds
@@ -53,10 +53,13 @@ class CallHeader: UIView {
         // Back button
 
         let backButton = UIButton()
-        backButton.setTemplateImage(UIImage(imageLiteralResourceName: "NavBarBack"), tintColor: .ows_white)
+        backButton.setTemplateImage(UIImage(imageLiteralResourceName: "NavBarBack"), tintColor: .white)
         backButton.autoSetDimensions(to: CGSize(square: 40))
         backButton.ows_imageEdgeInsets = UIEdgeInsets(top: -12, leading: -18, bottom: 0, trailing: 0)
-        backButton.addTarget(delegate, action: #selector(CallHeaderDelegate.didTapBackButton), for: .touchUpInside)
+        backButton.addAction(
+            UIAction { [unowned delegate] _ in delegate.didTapBackButton() },
+            for: .primaryActionTriggered,
+        )
         addShadow(to: backButton)
 
         addSubview(backButton)
@@ -65,15 +68,18 @@ class CallHeader: UIView {
 
         // Group members button
 
-        let topRightButton = OWSButton(
-            imageName: "info",
-            tintColor: .ows_white,
-            dimsWhenHighlighted: true
-        ) { [weak delegate] in
-            delegate?.didTapMembersButton()
+        var buttonConfig = UIButton.Configuration.plain()
+        buttonConfig.image = UIImage(resource: .info)
+        buttonConfig.baseForegroundColor = .white
+        let topRightButton = UIButton(
+            configuration: buttonConfig,
+            primaryAction: UIAction { [weak delegate] _ in
+                delegate?.didTapMembersButton()
+            },
+        )
+        if #unavailable(iOS 26) {
+            addShadow(to: topRightButton)
         }
-
-        addShadow(to: topRightButton)
 
         addSubview(topRightButton)
         topRightButton.autoPinTrailingToSuperviewMargin(withInset: 8)
@@ -97,7 +103,7 @@ class CallHeader: UIView {
             let avatarView = ConversationAvatarView(
                 sizeClass: .customDiameter(96),
                 localUserDisplayMode: .asLocalUser,
-                badged: false
+                badged: false,
             )
             avatarView.updateWithSneakyTransactionIfNecessary {
                 $0.setGroupIdWithSneakyTransaction(groupId: call.groupId.serialize())
@@ -132,7 +138,7 @@ class CallHeader: UIView {
 #if TESTABLE_BUILD
         // For debugging purposes, make it easy to force the call to disconnect.
         callTitleLabel.addGestureRecognizer(
-            UILongPressGestureRecognizer(target: self, action: #selector(injectDisconnect))
+            UILongPressGestureRecognizer(target: self, action: #selector(injectDisconnect)),
         )
         callTitleLabel.isUserInteractionEnabled = true
 #endif
@@ -187,15 +193,15 @@ class CallHeader: UIView {
         zeroMemberString: @autoclosure () -> String,
         oneMemberFormat: @autoclosure () -> String,
         twoMemberFormat: @autoclosure () -> String,
-        manyMemberFormat: @autoclosure () -> String
+        manyMemberFormat: @autoclosure () -> String,
     ) -> String {
         switch count {
         case 0:
             return zeroMemberString()
         case 1:
-            return String(format: oneMemberFormat(), names[0])
+            return String.nonPluralLocalizedStringWithFormat(oneMemberFormat(), names[0])
         case 2:
-            return String(format: twoMemberFormat(), names[0], names[1])
+            return String.nonPluralLocalizedStringWithFormat(twoMemberFormat(), names[0], names[1])
         default:
             return String.localizedStringWithFormat(manyMemberFormat(), count - 2, names[0], names[1])
         }
@@ -204,14 +210,14 @@ class CallHeader: UIView {
     private func fetchGroupSizeAndMemberNamesWithSneakyTransaction(groupThreadCall: GroupThreadCall) -> (Int, [String]) {
         return SSKEnvironment.shared.databaseStorageRef.read { transaction in
             // FIXME: Register for notifications so we can update if someone leaves the group while the screen is up?
-            guard let groupThread = TSGroupThread.fetch(forGroupId: groupThreadCall.groupId, tx: transaction) else {
+            guard let groupThread = TSGroupThread.fetchThread(forGroupId: groupThreadCall.groupId, tx: transaction) else {
                 owsFailDebug("Couldn't fetch thread for active call.")
                 return (0, [] as [String])
             }
             let memberNames = groupThread.sortedMemberNames(
                 includingBlocked: false,
                 useShortNameIfAvailable: true,
-                transaction: transaction
+                transaction: transaction,
             )
             return (memberNames.count, Array(memberNames.prefix(2)))
         }
@@ -244,19 +250,19 @@ class CallHeader: UIView {
             case .callLink:
                 return whoIsHereText(joinedMembers: (
                     ringRtcCall.peekInfo?.joinedMembers.nilIfEmpty
-                    ?? Array(repeating: nil, count: Int(ringRtcCall.peekInfo?.deviceCountExcludingPendingDevices ?? 0))
+                        ?? Array(repeating: nil, count: Int(ringRtcCall.peekInfo?.deviceCountExcludingPendingDevices ?? 0)),
                 ))
             }
         case .pending:
             return OWSLocalizedString(
                 "CALL_WAITING_TO_BE_LET_IN",
-                comment: "Shown in the header below the name of the call while waiting for the host to allow you to enter the call."
+                comment: "Shown in the header below the name of the call while waiting for the host to allow you to enter the call.",
             )
         case .joined:
             if ringRtcCall.localDeviceState.connectionState == .reconnecting {
                 return OWSLocalizedString(
                     "GROUP_CALL_RECONNECTING",
-                    comment: "Text indicating that the user has lost their connection to the call and we are reconnecting."
+                    comment: "Text indicating that the user has lost their connection to the call and we are reconnecting.",
                 )
             }
             switch groupCall.concreteType {
@@ -286,9 +292,9 @@ class CallHeader: UIView {
         }
         let formatString = OWSLocalizedString(
             "GROUP_CALL_INCOMING_RING_FORMAT",
-            comment: "Text explaining that someone has sent a ring to the group. Embeds {ring sender name}"
+            comment: "Text explaining that someone has sent a ring to the group. Embeds {ring sender name}",
         )
-        return String(format: formatString, callerName)
+        return String.nonPluralLocalizedStringWithFormat(formatString, callerName)
     }
 
     private func whoIsHereText(joinedMembers: [UUID?]) -> String {
@@ -305,7 +311,7 @@ class CallHeader: UIView {
                 .map { $0.resolvedValue(useShortNameIfAvailable: true) }
         }
         let noneOneOrBothKnownMemberNames: (String, String?)? = (
-            upToTwoKnownMemberNames.first.map { ($0, upToTwoKnownMemberNames.dropFirst().first) }
+            upToTwoKnownMemberNames.first.map { ($0, upToTwoKnownMemberNames.dropFirst().first) },
         )
         let otherOrUnknownMemberCount = joinedMembers.count - upToTwoKnownMemberNames.count
         switch (noneOneOrBothKnownMemberNames, otherOrUnknownMemberCount) {
@@ -313,22 +319,22 @@ class CallHeader: UIView {
             // exactly one member, known
             let format = OWSLocalizedString(
                 "GROUP_CALL_ONE_PERSON_HERE_FORMAT",
-                comment: "Text explaining that there is one person in the group call. Embeds {member name}"
+                comment: "Text explaining that there is one person in the group call. Embeds {member name}",
             )
-            return String(format: format, someMember)
+            return String.nonPluralLocalizedStringWithFormat(format, someMember)
         case ((let someMember, let someOtherMember?)?, 0):
             // exactly two members, both known
             let format = OWSLocalizedString(
                 "GROUP_CALL_TWO_PEOPLE_HERE_FORMAT",
-                comment: "Text explaining that there are two people in the group call. Embeds {{ %1$@ participant1, %2$@ participant2 }}"
+                comment: "Text explaining that there are two people in the group call. Embeds {{ %1$@ participant1, %2$@ participant2 }}",
             )
-            return String(format: format, someMember, someOtherMember)
+            return String.nonPluralLocalizedStringWithFormat(format, someMember, someOtherMember)
         case ((let someMember, let someOtherMember?)?, let otherCount):
             // two or more members, at least two known
             let format = OWSLocalizedString(
                 "GROUP_CALL_MANY_PEOPLE_HERE_%d",
                 tableName: "PluralAware",
-                comment: "Text explaining that there are three or more people in the group call. Embeds {{ %1$@ participantCount-2, %2$@ participant1, %3$@ participant2 }}"
+                comment: "Text explaining that there are three or more people in the group call. Embeds {{ %1$@ participantCount-2, %2$@ participant1, %3$@ participant2 }}",
             )
             return String.localizedStringWithFormat(format, otherCount, someMember, someOtherMember)
         case ((let someMember, nil)?, let unknownCount):
@@ -336,7 +342,7 @@ class CallHeader: UIView {
             let format = OWSLocalizedString(
                 "GROUP_CALL_ONE_KNOWN_AND_MANY_OTHERS_HERE",
                 tableName: "PluralAware",
-                comment: "Text explaining that there is at least one person whose name is known in the call as well as others whose names may or may not be known."
+                comment: "Text explaining that there is at least one person whose name is known in the call as well as others whose names may or may not be known.",
             )
             return String.localizedStringWithFormat(format, unknownCount, someMember)
         case (nil, let unknownCount):
@@ -344,7 +350,7 @@ class CallHeader: UIView {
             let format = OWSLocalizedString(
                 "GROUP_CALL_MANY_OTHERS_HERE",
                 tableName: "PluralAware",
-                comment: "Text explaining that there are people in the call whose names we don't know. The argument is how many people are in the call."
+                comment: "Text explaining that there are people in the call whose names we don't know. The argument is how many people are in the call.",
             )
             return String.localizedStringWithFormat(format, unknownCount)
         }
@@ -358,17 +364,17 @@ class CallHeader: UIView {
             zeroMemberString: "",
             oneMemberFormat: OWSLocalizedString(
                 "GROUP_CALL_WILL_RING_ONE_PERSON_FORMAT",
-                comment: "Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name}"
+                comment: "Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name}",
             ),
             twoMemberFormat: OWSLocalizedString(
                 "GROUP_CALL_WILL_RING_TWO_PEOPLE_FORMAT",
-                comment: "Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }}"
+                comment: "Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }}",
             ),
             manyMemberFormat: OWSLocalizedString(
                 "GROUP_CALL_WILL_RING_MANY_PEOPLE_%d",
                 tableName: "PluralAware",
-                comment: "Text shown before the user starts a group call if the user has enabled ringing and there are three or more other people in the group. Embeds {{ %1$@ participantCount-2, %2$@ participant1, %3$@ participant2 }}"
-            )
+                comment: "Text shown before the user starts a group call if the user has enabled ringing and there are three or more other people in the group. Embeds {{ %1$@ participantCount-2, %2$@ participant1, %3$@ participant2 }}",
+            ),
         )
     }
 
@@ -380,17 +386,17 @@ class CallHeader: UIView {
             zeroMemberString: "",
             oneMemberFormat: OWSLocalizedString(
                 "GROUP_CALL_WILL_NOTIFY_ONE_PERSON_FORMAT",
-                comment: "Text shown before the user starts a group call if the user has not enabled ringing and there is one other person in the group. Embeds {member name}"
+                comment: "Text shown before the user starts a group call if the user has not enabled ringing and there is one other person in the group. Embeds {member name}",
             ),
             twoMemberFormat: OWSLocalizedString(
                 "GROUP_CALL_WILL_NOTIFY_TWO_PEOPLE_FORMAT",
-                comment: "Text shown before the user starts a group call if the user has not enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }}"
+                comment: "Text shown before the user starts a group call if the user has not enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }}",
             ),
             manyMemberFormat: OWSLocalizedString(
                 "GROUP_CALL_WILL_NOTIFY_MANY_PEOPLE_%d",
                 tableName: "PluralAware",
-                comment: "Text shown before the user starts a group call if the user has not enabled ringing and there are three or more other people in the group. Embeds {{ %1$@ participantCount-2, %2$@ participant1, %3$@ participant2 }}"
-            )
+                comment: "Text shown before the user starts a group call if the user has not enabled ringing and there are three or more other people in the group. Embeds {{ %1$@ participantCount-2, %2$@ participant1, %3$@ participant2 }}",
+            ),
         )
     }
 
@@ -402,24 +408,24 @@ class CallHeader: UIView {
             zeroMemberString: "",
             oneMemberFormat: OWSLocalizedString(
                 "GROUP_CALL_IS_RINGING_ONE_PERSON_FORMAT",
-                comment: "Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name}"
+                comment: "Text shown before the user starts a group call if the user has enabled ringing and there is one other person in the group. Embeds {member name}",
             ),
             twoMemberFormat: OWSLocalizedString(
                 "GROUP_CALL_IS_RINGING_TWO_PEOPLE_FORMAT",
-                comment: "Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }}"
+                comment: "Text shown before the user starts a group call if the user has enabled ringing and there are two other people in the group. Embeds {{ %1$@ participant1, %2$@ participant2 }}",
             ),
             manyMemberFormat: OWSLocalizedString(
                 "GROUP_CALL_IS_RINGING_MANY_PEOPLE_%d",
                 tableName: "PluralAware",
-                comment: "Text shown before the user starts a group call if the user has enabled ringing and there are three or more other people in the group. Embeds {{ %1$@ participantCount-2, %2$@ participant1, %3$@ participant2 }}"
-            )
+                comment: "Text shown before the user starts a group call if the user has enabled ringing and there are three or more other people in the group. Embeds {{ %1$@ participantCount-2, %2$@ participant1, %3$@ participant2 }}",
+            ),
         )
     }
 
     private func noOneElseIsHereText() -> String {
         return OWSLocalizedString(
             "GROUP_CALL_NO_ONE_HERE",
-            comment: "Text explaining that you are the only person currently in the group call"
+            comment: "Text explaining that you are the only person currently in the group call",
         )
     }
 
@@ -427,7 +433,7 @@ class CallHeader: UIView {
         let format = OWSLocalizedString(
             "CALL_PEOPLE_WAITING",
             tableName: "PluralAware",
-            comment: "Text shown in the header of a call to indicate how many people have requested to join and need to be approved."
+            comment: "Text shown in the header of a call to indicate how many people have requested to join and need to be approved.",
         )
         return String.localizedStringWithFormat(format, count)
     }
@@ -436,7 +442,7 @@ class CallHeader: UIView {
         let format = OWSLocalizedString(
             "CALL_PEOPLE_HERE",
             tableName: "PluralAware",
-            comment: "Text shown in the header of a call to indicate how many people are present."
+            comment: "Text shown in the header of a call to indicate how many people are present.",
         )
         return String.localizedStringWithFormat(format, count)
     }
@@ -456,9 +462,9 @@ class CallHeader: UIView {
             }
             let formatString = OWSLocalizedString(
                 "GROUP_CALL_PRESENTING_FORMAT",
-                comment: "Text explaining that a member is presenting. Embeds {member name}"
+                comment: "Text explaining that a member is presenting. Embeds {member name}",
             )
-            return String(format: formatString, presentingName)
+            return String.nonPluralLocalizedStringWithFormat(formatString, presentingName)
         }
         switch groupCall.concreteType {
         case .groupThread(let groupThreadCall):
@@ -466,7 +472,7 @@ class CallHeader: UIView {
             let databaseStorage = SSKEnvironment.shared.databaseStorageRef
             return databaseStorage.read { tx in
                 let contactManager = SSKEnvironment.shared.contactManagerRef
-                guard let groupThread = TSGroupThread.fetch(forGroupId: groupThreadCall.groupId, tx: tx) else {
+                guard let groupThread = TSGroupThread.fetchThread(forGroupId: groupThreadCall.groupId, tx: tx) else {
                     return TSGroupThread.defaultGroupName
                 }
                 return contactManager.displayName(for: groupThread, transaction: tx)
@@ -509,7 +515,7 @@ extension CallHeader: GroupCallObserver {
         updateCallStatusLabel()
     }
 
-    func groupCallEnded(_ call: GroupCall, reason: GroupCallEndReason) {
+    func groupCallEnded(_ call: GroupCall, reason: CallEndReason) {
         updateCallStatusLabel()
     }
 }

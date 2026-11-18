@@ -4,13 +4,16 @@
 //
 
 import Foundation
+public import UIKit
 
 public extension UIEdgeInsets {
     init(top: CGFloat, leading: CGFloat, bottom: CGFloat, trailing: CGFloat) {
-        self.init(top: top,
-                  left: CurrentAppContext().isRTL ? trailing : leading,
-                  bottom: bottom,
-                  right: CurrentAppContext().isRTL ? leading : trailing)
+        self.init(
+            top: top,
+            left: CurrentAppContext().isRTL ? trailing : leading,
+            bottom: bottom,
+            right: CurrentAppContext().isRTL ? leading : trailing,
+        )
     }
 
     init(hMargin: CGFloat, vMargin: CGFloat) {
@@ -35,8 +38,10 @@ public extension UIEdgeInsets {
     }
 
     var asSize: CGSize {
-        CGSize(width: left + right,
-               height: top + bottom)
+        CGSize(
+            width: left + right,
+            height: top + bottom,
+        )
     }
 }
 
@@ -48,14 +53,23 @@ public extension NSDirectionalEdgeInsets {
     init(margin: CGFloat) {
         self.init(top: margin, leading: margin, bottom: margin, trailing: margin)
     }
+
+    var asSize: CGSize {
+        CGSize(
+            width: leading + trailing,
+            height: top + bottom,
+        )
+    }
 }
 
 // MARK: -
 
 public extension CGPoint {
     func toUnitCoordinates(viewBounds: CGRect, shouldClamp: Bool) -> CGPoint {
-        CGPoint(x: (x - viewBounds.origin.x).inverseLerp(0, viewBounds.width, shouldClamp: shouldClamp),
-                y: (y - viewBounds.origin.y).inverseLerp(0, viewBounds.height, shouldClamp: shouldClamp))
+        CGPoint(
+            x: (x - viewBounds.origin.x).inverseLerp(0, viewBounds.width, shouldClamp: shouldClamp),
+            y: (y - viewBounds.origin.y).inverseLerp(0, viewBounds.height, shouldClamp: shouldClamp),
+        )
     }
 
     func toUnitCoordinates(viewSize: CGSize, shouldClamp: Bool) -> CGPoint {
@@ -63,8 +77,10 @@ public extension CGPoint {
     }
 
     func fromUnitCoordinates(viewBounds: CGRect) -> CGPoint {
-        CGPoint(x: viewBounds.origin.x + x.lerp(0, viewBounds.size.width),
-                y: viewBounds.origin.y + y.lerp(0, viewBounds.size.height))
+        CGPoint(
+            x: viewBounds.origin.x + x.lerp(0, viewBounds.size.width),
+            y: viewBounds.origin.y + y.lerp(0, viewBounds.size.height),
+        )
     }
 
     func fromUnitCoordinates(viewSize: CGSize) -> CGPoint {
@@ -97,14 +113,18 @@ public extension CGPoint {
 
     func min(_ value: CGPoint) -> CGPoint {
         // We use "Swift" to disambiguate the global function min() from this method.
-        CGPoint(x: Swift.min(x, value.x),
-                y: Swift.min(y, value.y))
+        CGPoint(
+            x: Swift.min(x, value.x),
+            y: Swift.min(y, value.y),
+        )
     }
 
     func max(_ value: CGPoint) -> CGPoint {
         // We use "Swift" to disambiguate the global function max() from this method.
-        CGPoint(x: Swift.max(x, value.x),
-                y: Swift.max(y, value.y))
+        CGPoint(
+            x: Swift.max(x, value.x),
+            y: Swift.max(y, value.y),
+        )
     }
 
     var length: CGFloat {
@@ -130,38 +150,42 @@ public extension CGPoint {
     }
 
     func fuzzyEquals(_ other: CGPoint, tolerance: CGFloat = 0.001) -> Bool {
-        (x.fuzzyEquals(other.x, tolerance: tolerance) &&
-            y.fuzzyEquals(other.y, tolerance: tolerance))
+        x.fuzzyEquals(other.x, tolerance: tolerance) &&
+            y.fuzzyEquals(other.y, tolerance: tolerance)
     }
 
     static func tan(angle: CGFloat) -> CGPoint {
-        CGPoint(x: sin(angle),
-                y: cos(angle))
+        CGPoint(
+            x: sin(angle),
+            y: cos(angle),
+        )
     }
 
     func clamp(_ rect: CGRect) -> CGPoint {
-        CGPoint(x: x.clamp(rect.minX, rect.maxX),
-                y: y.clamp(rect.minY, rect.maxY))
+        CGPoint(
+            x: x.clamp(rect.minX, rect.maxX),
+            y: y.clamp(rect.minY, rect.maxY),
+        )
     }
 
-    static func + (left: CGPoint, right: CGPoint) -> CGPoint {
+    static func +(left: CGPoint, right: CGPoint) -> CGPoint {
         left.plus(right)
     }
 
-    static func += (left: inout CGPoint, right: CGPoint) {
+    static func +=(left: inout CGPoint, right: CGPoint) {
         left.x += right.x
         left.y += right.y
     }
 
-    static func - (left: CGPoint, right: CGPoint) -> CGPoint {
+    static func -(left: CGPoint, right: CGPoint) -> CGPoint {
         CGPoint(x: left.x - right.x, y: left.y - right.y)
     }
 
-    static func * (left: CGPoint, right: CGFloat) -> CGPoint {
+    static func *(left: CGPoint, right: CGFloat) -> CGPoint {
         CGPoint(x: left.x * right, y: left.y * right)
     }
 
-    static func *= (left: inout CGPoint, right: CGFloat) {
+    static func *=(left: inout CGPoint, right: CGFloat) {
         left.x *= right
         left.y *= right
     }
@@ -219,26 +243,32 @@ public extension CGSize {
     }
 
     func max(_ other: CGSize) -> CGSize {
-        return CGSize(width: Swift.max(self.width, other.width),
-                      height: Swift.max(self.height, other.height))
+        return CGSize(
+            width: Swift.max(self.width, other.width),
+            height: Swift.max(self.height, other.height),
+        )
     }
 
     static func square(_ size: CGFloat) -> CGSize {
         CGSize(width: size, height: size)
     }
 
-    static func + (left: CGSize, right: CGSize) -> CGSize {
+    static func +(left: CGSize, right: CGSize) -> CGSize {
         left.plus(right)
     }
 
-    static func - (left: CGSize, right: CGSize) -> CGSize {
-        CGSize(width: left.width - right.width,
-               height: left.height - right.height)
+    static func -(left: CGSize, right: CGSize) -> CGSize {
+        CGSize(
+            width: left.width - right.width,
+            height: left.height - right.height,
+        )
     }
 
-    static func * (left: CGSize, right: CGFloat) -> CGSize {
-        CGSize(width: left.width * right,
-               height: left.height * right)
+    static func *(left: CGSize, right: CGFloat) -> CGSize {
+        CGSize(
+            width: left.width * right,
+            height: left.height * right,
+        )
     }
 }
 
@@ -380,7 +410,7 @@ public extension NSDirectionalEdgeInsets {
 
 public extension CGFloat {
     var pointsAsPixels: CGFloat {
-        self * UIScreen.main.scale
+        self * UITraitCollection.current.displayScale
     }
 
     // An epsilon is a small, non-zero value.

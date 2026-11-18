@@ -6,22 +6,15 @@
 import SignalServiceKit
 import SignalUI
 
-final class MessageTimerView: ManualLayoutView {
+private enum Constants {
+    static let layoutSize: CGFloat = 12
+    // 0 == about to expire, 12 == just started countdown.
+    static let quantizationLevelCount: UInt64 = 12
+}
 
-    private enum Constants {
-        static let layoutSize: CGFloat = 12
-        // 0 == about to expire, 12 == just started countdown.
-        static let quantizationLevelCount: UInt64 = 12
-    }
+final class MessageTimerUpdater {
 
-    private let imageView = CVImageView()
     private var animationTimer: Timer?
-
-    init() {
-        super.init(name: "OWSMessageTimerView")
-
-        addSubviewToFillSuperviewEdges(imageView)
-    }
 
     deinit {
         clearAnimation()
@@ -30,15 +23,44 @@ final class MessageTimerView: ManualLayoutView {
     func configure(
         expirationTimestampMs: UInt64,
         disappearingMessageInterval: UInt32,
-        tintColor: UIColor
-    ) {
-        let expirationProgress = self.expirationProgress(
+        update: @escaping (UInt64) -> Void,
+    ) -> UInt64 {
+        let expirationProgress = Self.expirationProgress(
             expirationTimestampMs: expirationTimestampMs,
             disappearingMessageInterval: disappearingMessageInterval,
-            nowMs: Date.ows_millisecondTimestamp()
+            nowMs: Date.ows_millisecondTimestamp(),
         )
-        updateIcon(quantizedValue: expirationProgress.quantizedValue, tintColor: tintColor)
-        startAnimation(expirationProgress: expirationProgress, tintColor: tintColor)
+        startAnimation(expirationProgress: expirationProgress, update: update)
+        return expirationProgress.quantizedValue
+    }
+
+    static func quantizedValue(
+        expirationTimestampMs: UInt64,
+        disappearingMessageInterval: UInt32,
+    ) -> UInt64 {
+        expirationProgress(
+            expirationTimestampMs: expirationTimestampMs,
+            disappearingMessageInterval: disappearingMessageInterval,
+            nowMs: Date.ows_millisecondTimestamp(),
+        ).quantizedValue
+    }
+
+    static func signalSymbol(quantizedValue: UInt64) -> SignalSymbol {
+        switch quantizedValue {
+        case 0: .messageTimer00
+        case 1: .messageTimer05
+        case 2: .messageTimer10
+        case 3: .messageTimer15
+        case 4: .messageTimer20
+        case 5: .messageTimer25
+        case 6: .messageTimer30
+        case 7: .messageTimer35
+        case 8: .messageTimer40
+        case 9: .messageTimer45
+        case 10: .messageTimer50
+        case 11: .messageTimer55
+        default: .messageTimer60
+        }
     }
 
     private struct ExpirationProgress {
@@ -51,10 +73,10 @@ final class MessageTimerView: ManualLayoutView {
         let refreshIntervalMs: UInt64
     }
 
-    private func expirationProgress(
+    private static func expirationProgress(
         expirationTimestampMs: UInt64,
         disappearingMessageInterval: UInt32,
-        nowMs: UInt64
+        nowMs: UInt64,
     ) -> ExpirationProgress {
         // Every N milliseconds we move to the next progress level.
         let refreshIntervalMs = UInt64(disappearingMessageInterval) * 1000 / Constants.quantizationLevelCount
@@ -70,7 +92,7 @@ final class MessageTimerView: ManualLayoutView {
             return ExpirationProgress(quantizedValue: 0)
         }
 
-        let intermediateValue = remainingMs.partialValue.addingReportingOverflow(refreshIntervalMs/2)
+        let intermediateValue = remainingMs.partialValue.addingReportingOverflow(refreshIntervalMs / 2)
         // The disappearing interval is way too large -- something is wrong.
         guard !intermediateValue.overflow else {
             return ExpirationProgress(quantizedValue: Constants.quantizationLevelCount)
@@ -84,11 +106,74 @@ final class MessageTimerView: ManualLayoutView {
                     return nil
                 }
                 return TimerConfiguration(
-                    nextRefreshMs: expirationTimestampMs - (quantizedValue - 1) * refreshIntervalMs - refreshIntervalMs/2,
-                    refreshIntervalMs: refreshIntervalMs
+                    nextRefreshMs: expirationTimestampMs - (quantizedValue - 1) * refreshIntervalMs - refreshIntervalMs / 2,
+                    refreshIntervalMs: refreshIntervalMs,
                 )
-            }()
+            }(),
         )
+    }
+
+    private func startAnimation(
+        expirationProgress: ExpirationProgress,
+        update: @escaping (UInt64) -> Void,
+    ) {
+        AssertIsOnMainThread()
+
+        clearAnimation()
+        guard let timerConfiguration = expirationProgress.timerConfiguration else {
+            return
+        }
+
+        var quantizedValue = expirationProgress.quantizedValue
+        let animationTimer = Timer(
+            fire: Date(millisecondsSince1970: timerConfiguration.nextRefreshMs),
+            interval: TimeInterval(timerConfiguration.refreshIntervalMs) / 1000,
+            repeats: true,
+            block: { timer in
+                quantizedValue -= 1
+                update(quantizedValue)
+                guard quantizedValue > 0 else {
+                    timer.invalidate()
+                    return
+                }
+            },
+        )
+        self.animationTimer = animationTimer
+        RunLoop.main.add(animationTimer, forMode: .common)
+    }
+
+    func clearAnimation() {
+        AssertIsOnMainThread()
+
+        animationTimer?.invalidate()
+        animationTimer = nil
+    }
+}
+
+final class MessageTimerView: ManualLayoutView {
+
+    private let imageView = CVImageView()
+    private let timerUpdater = MessageTimerUpdater()
+
+    init() {
+        super.init(name: "OWSMessageTimerView")
+
+        addSubviewToFillSuperviewEdges(imageView)
+    }
+
+    func configure(
+        expirationTimestampMs: UInt64,
+        disappearingMessageInterval: UInt32,
+        tintColor: UIColor,
+    ) {
+        let quantizedValue = timerUpdater.configure(
+            expirationTimestampMs: expirationTimestampMs,
+            disappearingMessageInterval: disappearingMessageInterval,
+            update: { [weak self] quantizedValue in
+                self?.updateIcon(quantizedValue: quantizedValue, tintColor: tintColor)
+            },
+        )
+        updateIcon(quantizedValue: quantizedValue, tintColor: tintColor)
     }
 
     private func updateIcon(quantizedValue: UInt64, tintColor: UIColor) {
@@ -109,45 +194,8 @@ final class MessageTimerView: ManualLayoutView {
         return image
     }
 
-    private func startAnimation(expirationProgress: ExpirationProgress, tintColor: UIColor) {
-        AssertIsOnMainThread()
-
-        clearAnimation()
-        guard let timerConfiguration = expirationProgress.timerConfiguration else {
-            return
-        }
-
-        var quantizedValue = expirationProgress.quantizedValue
-        let animationTimer = Timer(
-            fire: Date(millisecondsSince1970: timerConfiguration.nextRefreshMs),
-            interval: TimeInterval(timerConfiguration.refreshIntervalMs)/1000,
-            repeats: true,
-            block: { [weak self] timer in
-                guard let self else {
-                    timer.invalidate()
-                    return
-                }
-                quantizedValue -= 1
-                self.updateIcon(quantizedValue: quantizedValue, tintColor: tintColor)
-                guard quantizedValue > 0 else {
-                    timer.invalidate()
-                    return
-                }
-            }
-        )
-        self.animationTimer = animationTimer
-        RunLoop.main.add(animationTimer, forMode: .common)
-    }
-
-    private func clearAnimation() {
-        AssertIsOnMainThread()
-
-        animationTimer?.invalidate()
-        animationTimer = nil
-    }
-
     func prepareForReuse() {
-        clearAnimation()
+        timerUpdater.clearAnimation()
         imageView.image = nil
     }
 

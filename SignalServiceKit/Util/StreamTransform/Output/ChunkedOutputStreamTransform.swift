@@ -7,22 +7,28 @@ import Foundation
 
 public class ChunkedOutputStreamTransform: StreamTransform {
 
-    public func transform(data: Data) throws -> Data {
-        let byteLength = UInt32(data.count)
-        var result = Data()
-        result.append(Self.writeVariableLengthUInt32(byteLength))
-        result.append(data)
-        return result
+    public func transform(data: Data, options: Options) throws -> Data {
+        return data.prefixedWithVarintLength()
     }
+}
 
-    public static func writeVariableLengthUInt32(_ value: UInt32) -> Data {
+// MARK: -
+
+extension Data {
+
+    /// Returns a `Data` containing ourselves, prefixed with a varint
+    /// representing the length of ourselves.
+    public func prefixedWithVarintLength() -> Data {
         var result = Data()
-        var v = value
+
+        var v = UInt32(self.count)
         while v > 0x7F {
-            result.append(contentsOf: [(UInt8(v & 0x7f | 0x80))])
+            result.append(contentsOf: [UInt8(v & 0x7f | 0x80)])
             v >>= 7
         }
         result.append(contentsOf: [UInt8(v)])
+
+        result.append(self)
         return result
     }
 }

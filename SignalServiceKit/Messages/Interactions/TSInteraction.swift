@@ -7,7 +7,7 @@ import Foundation
 
 extension TSInteraction {
 
-    public override func anyDidInsert(with tx: DBWriteTransaction) {
+    override public func anyDidInsert(with tx: DBWriteTransaction) {
         super.anyDidInsert(with: tx)
 
         if let thread = thread(tx: tx) {
@@ -15,7 +15,7 @@ extension TSInteraction {
         }
     }
 
-    public override func anyDidUpdate(with tx: DBWriteTransaction) {
+    override public func anyDidUpdate(with tx: DBWriteTransaction) {
         let interactionReadCache = SSKEnvironment.shared.modelReadCachesRef.interactionReadCache
 
         super.anyDidUpdate(with: tx)
@@ -35,10 +35,14 @@ extension TSInteraction {
             owsFailDebug("Unexpected sortId: \(sortId).")
             return
         }
-        guard let sortId = BaseModel.grdbIdByUniqueId(tableMetadata: TSInteractionSerializer.table,
-                                                      uniqueIdColumnName: InteractionRecord.columnName(.uniqueId),
-                                                      uniqueIdColumnValue: self.uniqueId,
-                                                      transaction: transaction) else {
+        guard
+            let sortId = BaseModel.grdbIdByUniqueId(
+                tableMetadata: TSInteractionSerializer.table,
+                uniqueIdColumnName: InteractionRecord.columnName(.uniqueId),
+                uniqueIdColumnValue: self.uniqueId,
+                transaction: transaction,
+            )
+        else {
             owsFailDebug("Missing sortId.")
             return
         }
@@ -50,22 +54,25 @@ extension TSInteraction {
         owsAssertDebug(self.sortId > 0)
     }
 
-    /// Returns `true` if the receiver was inserted into the database by updating the placeholder
-    /// Returns `false` if the receiver needs to be inserted into the database.
+    // MARK: -
+
+    /// - Returns
+    /// `true` if this interaction replaced an existing placeholder inline; `false`
+    /// if this interaction should be freshly inserted into the database.
     private func updatePlaceholder(
         from sender: SignalServiceAddress,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) -> Bool {
         let placeholders: [OWSRecoverableDecryptionPlaceholder]
         do {
             placeholders = try InteractionFinder.fetchInteractions(
                 timestamp: timestamp,
-                transaction: transaction
+                transaction: transaction,
             ).compactMap { candidate -> OWSRecoverableDecryptionPlaceholder? in
                 guard let placeholder = candidate as? OWSRecoverableDecryptionPlaceholder else {
                     return nil
                 }
-                guard placeholder.sender == sender && placeholder.timestamp == self.timestamp else {
+                guard placeholder.sender == sender, placeholder.timestamp == self.timestamp else {
                     return nil
                 }
                 return placeholder
@@ -81,8 +88,22 @@ extension TSInteraction {
 
         Logger.info("Fetched placeholder with timestamp: \(timestamp) from sender: \(sender). Performing replacement...")
 
-        if placeholder.supportsReplacement {
-            placeholder.replaceWithInteraction(self, writeTx: transaction)
+        if
+            placeholder.expirationDate.isAfterNow,
+            !placeholder.wasRead
+        {
+            // We can replace if the placeholder isn't expired, and the user
+            // hasn't "read" it. We don't actually render placeholders, so
+            // "read" here is a proxy for "has viewed the spot in the chat where
+            // the placeholder lives"; we don't want to replace content inline
+            // that the user has already scrolled past.
+            Logger.info("Replacing placeholder with recovered interaction: \(timestamp)")
+
+            let placeholderRowId = placeholder.sqliteRowId!
+            replaceRowId(placeholderRowId, uniqueId: placeholder.uniqueId)
+            replaceSortId(UInt64(placeholderRowId))
+
+            anyOverwritingUpdate(transaction: transaction)
             return true
         } else {
             Logger.info("Placeholder not eligible for replacement, deleting.")
@@ -107,14 +128,35 @@ extension TSInteraction {
             owsAssertDebug(sortId > 0)
         }
     }
-}
 
-// MARK: - shouldAppearInInbox
+    // MARK: - shouldAppearInInbox
 
-extension TSInteraction {
+    /// Returns whether the given interaction should pull a conversation to the top of the list
+    ///
+    /// In most cases, this is equivalent to checking shouldAppearInInbox. But in some cases, we may want to show
+    /// a message in the chat list but not bump the thread to the top.
 
-    /// Returns whether the given interaction should pull a conversation to the top of the list and
-    /// marked unread.
+    @objc
+    public func shouldBumpThreadToTopOfChatList(transaction: DBReadTransaction) -> Bool {
+        switch self {
+        case let infoMessage as TSInfoMessage:
+            switch infoMessage.messageType {
+            case
+                .typePinnedMessage,
+                .blockedOtherUser,
+                .blockedGroup,
+                .unblockedOtherUser,
+                .unblockedGroup:
+                return false
+            default:
+                return shouldAppearInInbox(transaction: transaction)
+            }
+        default:
+            return shouldAppearInInbox(transaction: transaction)
+        }
+    }
+
+    /// Returns whether the given interaction should appear in the chat list preview.
     ///
     /// This operation necessarily happens after the interaction has been pulled out of the
     /// database. If possible, they should also be filtered as part of the database queries in the
@@ -127,7 +169,7 @@ extension TSInteraction {
                     .localIdentifiers(tx: transaction),
                 let updates = infoMessage.computedGroupUpdateItems(
                     localIdentifiers: localIdentifiers,
-                    tx: transaction
+                    tx: transaction,
                 )
             else {
                 return nil
@@ -136,16 +178,15 @@ extension TSInteraction {
         })
     }
 
-    /// Returns whether the given interaction should pull a conversation to the top of the list and
-    /// marked unread.
+    /// Returns whether the given interaction should show in the chat list preview
     ///
     /// - parameter groupUpdateItemsBuilder: If the message is a group update info message,
     /// a block that builds the PersistableGroupUpdateItems for the message, which is run synchronously
     /// and may make use of a transaction if needed.
     public func shouldAppearInInbox(
-        groupUpdateItemsBuilder: (TSInfoMessage) -> [TSInfoMessage.PersistableGroupUpdateItem]?
+        groupUpdateItemsBuilder: (TSInfoMessage) -> [TSInfoMessage.PersistableGroupUpdateItem]?,
     ) -> Bool {
-        if !shouldBeSaved || isDynamicInteraction || self is OWSOutgoingSyncMessage {
+        if !shouldBeSaved || isDynamicInteraction || self is OutgoingSyncMessage {
             owsFailDebug("Unexpected interaction type: \(type(of: self))")
             return false
         }
@@ -156,7 +197,7 @@ extension TSInteraction {
         case let infoMessage as TSInfoMessage:
             return Self.shouldInfoMessageAppearInInbox(
                 infoMessage,
-                groupUpdateItemsBuilder: groupUpdateItemsBuilder
+                groupUpdateItemsBuilder: groupUpdateItemsBuilder,
             )
         case let message as TSMessage:
             return Self.shouldMessageAppearInInbox(message)
@@ -192,7 +233,7 @@ extension TSInteraction {
 
     private static func shouldInfoMessageAppearInInbox(
         _ message: TSInfoMessage,
-        groupUpdateItemsBuilder: (TSInfoMessage) -> [TSInfoMessage.PersistableGroupUpdateItem]?
+        groupUpdateItemsBuilder: (TSInfoMessage) -> [TSInfoMessage.PersistableGroupUpdateItem]?,
     ) -> Bool {
         switch message.messageType {
         case .verificationStateChange: return false
@@ -237,6 +278,7 @@ extension TSInteraction {
         case .unblockedOtherUser: return true
         case .unblockedGroup: return true
         case .typeEndPoll: return true
+        case .typePinnedMessage: return true
         }
     }
 }

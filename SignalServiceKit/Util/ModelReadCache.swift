@@ -82,7 +82,7 @@ class ModelReadCache<KeyType: Hashable & Equatable, ValueType> {
 
     init(
         adapter: ModelCacheAdapter<KeyType, ValueType>,
-        appReadiness: AppReadiness
+        appReadiness: AppReadiness,
     ) {
         self.appReadiness = appReadiness
         self.adapter = adapter
@@ -92,13 +92,13 @@ class ModelReadCache<KeyType: Hashable & Equatable, ValueType> {
             self,
             selector: #selector(didReceiveCrossProcessNotification),
             name: SDSDatabaseStorage.didReceiveCrossProcessNotificationAlwaysSync,
-            object: nil
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(didReceiveEvacuateCacheNotification),
             name: ModelReadCaches.evacuateAllModelCaches,
-            object: nil
+            object: nil,
         )
     }
 
@@ -159,7 +159,7 @@ class ModelReadCache<KeyType: Hashable & Equatable, ValueType> {
     func getValues(
         for cacheKeys: [ModelCacheKey<KeyType>],
         transaction: DBReadTransaction,
-        returnNilOnCacheMiss: Bool = false
+        returnNilOnCacheMiss: Bool = false,
     ) -> [ValueType?] {
         return performSync {
             return cacheKeys.map { cacheKey in
@@ -344,7 +344,7 @@ class ModelReadCache<KeyType: Hashable & Equatable, ValueType> {
 public class ThreadReadCache: NSObject {
     private class Adapter: ModelCacheAdapter<String, TSThread> {
         override func read(key: String, transaction: DBReadTransaction) -> TSThread? {
-            return TSThread.anyFetch(uniqueId: key, transaction: transaction, ignoreCache: true)
+            return TSThread.anyFetch(uniqueId: key, transaction: transaction)
         }
 
         override func key(forValue value: TSThread) -> String {
@@ -356,7 +356,7 @@ public class ThreadReadCache: NSObject {
         }
 
         override func copy(value: TSThread) throws -> TSThread {
-            return try DeepCopies.deepCopy(value)
+            return value.deepCopy()
         }
     }
 
@@ -396,7 +396,7 @@ public class ThreadReadCache: NSObject {
 public class InteractionReadCache: NSObject {
     private class Adapter: ModelCacheAdapter<String, TSInteraction> {
         override func read(key: String, transaction: DBReadTransaction) -> TSInteraction? {
-            return TSInteraction.anyFetch(uniqueId: key, transaction: transaction, ignoreCache: true)
+            return TSInteraction.anyFetch(uniqueId: key, transaction: transaction)
         }
 
         override func key(forValue value: TSInteraction) -> String {
@@ -453,86 +453,19 @@ public class InteractionReadCache: NSObject {
 // MARK: -
 
 @objc
-public class InstalledStickerCache: NSObject {
-    private class Adapter: ModelCacheAdapter<String, InstalledSticker> {
-        override func read(key: String, transaction: DBReadTransaction) -> InstalledSticker? {
-            return InstalledSticker.anyFetch(uniqueId: key, transaction: transaction, ignoreCache: true)
-        }
-
-        override func key(forValue value: InstalledSticker) -> String {
-            value.uniqueId
-        }
-
-        override func cacheKey(forKey key: String) -> ModelCacheKey<String> {
-            return ModelCacheKey(key: key)
-        }
-
-        override func copy(value: InstalledSticker) throws -> InstalledSticker {
-            return try DeepCopies.deepCopy(value)
-        }
-    }
-
-    private let cache: ModelReadCache<String, InstalledSticker>
-    private static var cacheCountLimit: Int {
-        if CurrentAppContext().isMainApp {
-            // Large enough to hold three pages of max-size stickers.
-            return 600
-        } else {
-            // Large enough to hold the current default 49 stickers with a little room to grow.
-            return 64
-        }
-    }
-    private let adapter = Adapter(cacheName: "InstalledSticker", cacheCountLimit: InstalledStickerCache.cacheCountLimit)
-
-    @objc
-    public init(_ factory: ModelReadCacheFactory) {
-        cache = factory.create(adapter: adapter)
-    }
-
-    @objc(getInstalledStickerForUniqueId:transaction:)
-    public func getInstalledSticker(uniqueId: String, transaction: DBReadTransaction) -> InstalledSticker? {
-        let cacheKey = adapter.cacheKey(forKey: uniqueId)
-        return cache.getValue(for: cacheKey, transaction: transaction)
-    }
-
-    @objc(didRemoveInstalledSticker:transaction:)
-    public func didRemove(installedSticker: InstalledSticker, transaction: DBWriteTransaction) {
-        cache.didRemove(value: installedSticker, transaction: transaction)
-    }
-
-    @objc(didInsertOrUpdateInstalledSticker:transaction:)
-    public func didInsertOrUpdate(installedSticker: InstalledSticker, transaction: DBWriteTransaction) {
-        cache.didInsertOrUpdate(value: installedSticker, transaction: transaction)
-    }
-
-    @objc
-    public func didReadInstalledSticker(_ installedSticker: InstalledSticker, transaction: DBReadTransaction) {
-        cache.didRead(value: installedSticker, transaction: transaction)
-    }
-}
-
-// MARK: -
-
-@objc
 public class ModelReadCaches: NSObject {
     @objc(initWithModelReadCacheFactory:)
     public init(factory: ModelReadCacheFactory) {
         threadReadCache = ThreadReadCache(factory)
         interactionReadCache = InteractionReadCache(factory)
-        installedStickerCache = InstalledStickerCache(factory)
     }
 
     @objc
     public let threadReadCache: ThreadReadCache
-    @objc
     public let interactionReadCache: InteractionReadCache
-    @objc
-    public let installedStickerCache: InstalledStickerCache
 
-    @objc
     fileprivate static let evacuateAllModelCaches = Notification.Name("EvacuateAllModelCaches")
 
-    @objc
     public func evacuateAllCaches() {
         NotificationCenter.default.post(name: Self.evacuateAllModelCaches, object: nil)
     }
@@ -547,7 +480,7 @@ public class ModelReadCacheFactory: NSObject {
     }
 
     func create<KeyType: Hashable & Equatable, ValueType>(
-        adapter: ModelCacheAdapter<KeyType, ValueType>
+        adapter: ModelCacheAdapter<KeyType, ValueType>,
     ) -> ModelReadCache<KeyType, ValueType> {
         return ModelReadCache(adapter: adapter, appReadiness: appReadiness)
     }

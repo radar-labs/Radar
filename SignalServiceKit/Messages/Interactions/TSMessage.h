@@ -93,6 +93,10 @@ typedef NS_CLOSED_ENUM(NSInteger, TSEditState) {
 @property (nonatomic, readonly) uint32_t expiresInSeconds;
 @property (nonatomic, readonly) uint64_t expireStartedAt;
 @property (nonatomic, readonly) uint64_t expiresAt;
+/// - Important Deprecated. Do not use!
+/// - SeeAlso ``expiresAt``
+@property (nonatomic, readonly) BOOL storedShouldStartExpireTimer;
+
 /// Nullable UInt32, with 0 and null treated as equivalent.
 /// An incrementing clock value for the expire timer that determines if we update the thread-level
 /// timer when receiving a message. Taken from the local VersionedDisappearingMessageToken
@@ -132,7 +136,6 @@ typedef NS_CLOSED_ENUM(NSInteger, TSEditState) {
 /// not use presence of this field; use `isStoryReply` instead. Treat nil values as expired stories.
 @property (nonatomic, readonly, nullable) NSNumber *storyTimestamp;
 @property (nonatomic, readonly, nullable) AciObjC *storyAuthorAci;
-@property (nonatomic, readonly, nullable) SignalServiceAddress *storyAuthorAddress;
 @property (nonatomic, readonly, nullable) NSString *storyAuthorUuidString;
 @property (nonatomic, readonly) BOOL isGroupStoryReply;
 @property (nonatomic, readonly) BOOL isStoryReply;
@@ -141,12 +144,10 @@ typedef NS_CLOSED_ENUM(NSInteger, TSEditState) {
 // Polls
 @property (nonatomic, readonly) BOOL isPoll;
 
-@property (nonatomic, readonly) BOOL isStarred;
-
 - (instancetype)initWithCustomUniqueId:(NSString *)uniqueId
                              timestamp:(uint64_t)timestamp
                    receivedAtTimestamp:(uint64_t)receivedAtTimestamp
-                                thread:(TSThread *)thread NS_UNAVAILABLE;
+                        threadUniqueId:(nonnull NSString *)threadUniqueId NS_UNAVAILABLE;
 - (instancetype)initWithTimestamp:(uint64_t)timestamp
               receivedAtTimestamp:(uint64_t)receivedAtTimestamp
                            thread:(TSThread *)thread NS_UNAVAILABLE;
@@ -188,7 +189,6 @@ typedef NS_CLOSED_ENUM(NSInteger, TSEditState) {
                isGroupStoryReply:(BOOL)isGroupStoryReply
                           isPoll:(BOOL)isPoll
   isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
-                       isStarred:(BOOL)isStarred
               isViewOnceComplete:(BOOL)isViewOnceComplete
                isViewOnceMessage:(BOOL)isViewOnceMessage
                      linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -199,7 +199,7 @@ typedef NS_CLOSED_ENUM(NSInteger, TSEditState) {
               storyReactionEmoji:(nullable NSString *)storyReactionEmoji
                   storyTimestamp:(nullable NSNumber *)storyTimestamp
               wasRemotelyDeleted:(BOOL)wasRemotelyDeleted
-NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp:sortId:timestamp:uniqueThreadId:body:bodyRanges:contactShare:deprecated_attachmentIds:editState:expireStartedAt:expireTimerVersion:expiresAt:expiresInSeconds:giftBadge:isGroupStoryReply:isPoll:isSmsMessageRestoredFromBackup:isStarred:isViewOnceComplete:isViewOnceMessage:linkPreview:messageSticker:quotedMessage:storedShouldStartExpireTimer:storyAuthorUuidString:storyReactionEmoji:storyTimestamp:wasRemotelyDeleted:));
+NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp:sortId:timestamp:uniqueThreadId:body:bodyRanges:contactShare:deprecated_attachmentIds:editState:expireStartedAt:expireTimerVersion:expiresAt:expiresInSeconds:giftBadge:isGroupStoryReply:isPoll:isSmsMessageRestoredFromBackup:isViewOnceComplete:isViewOnceMessage:linkPreview:messageSticker:quotedMessage:storedShouldStartExpireTimer:storyAuthorUuidString:storyReactionEmoji:storyTimestamp:wasRemotelyDeleted:));
 
 // clang-format on
 
@@ -208,8 +208,6 @@ NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp
 - (BOOL)shouldStartExpireTimer;
 
 #pragma mark - Update With... Methods
-
-- (void)updateStoredShouldStartExpireTimer;
 
 - (void)updateWithExpireStartedAt:(uint64_t)expireStartedAt transaction:(DBWriteTransaction *)transaction;
 
@@ -222,8 +220,6 @@ NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp
 - (void)updateWithContactShare:(OWSContact *)contactShare transaction:(DBWriteTransaction *)transaction;
 
 - (void)updateWithIsPoll:(BOOL)isPoll transaction:(DBWriteTransaction *)transaction;
-
-- (void)updateWithIsStarred:(BOOL)isStarred transaction:(DBWriteTransaction *)transaction;
 
 #ifdef TESTABLE_BUILD
 

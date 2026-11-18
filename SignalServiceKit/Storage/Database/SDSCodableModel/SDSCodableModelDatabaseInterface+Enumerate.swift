@@ -10,13 +10,13 @@ public enum BatchingPreference {
     case unbatched
 }
 
-extension SDSCodableModelDatabaseInterfaceImpl {
+extension SDSCodableModelDatabaseInterface {
     /// Traverse all records, in no particular order.
     func enumerateModels<Model: SDSCodableModel>(
         modelType: Model.Type,
         transaction: DBReadTransaction,
         batchingPreference: BatchingPreference,
-        block: (Model, UnsafeMutablePointer<ObjCBool>) -> Void
+        block: (Model, inout Bool) -> Void,
     ) {
         let batchSize = batchSize(batchingPreference: batchingPreference)
         enumerateModels(
@@ -25,7 +25,7 @@ extension SDSCodableModelDatabaseInterfaceImpl {
             sql: nil,
             arguments: nil,
             batchSize: batchSize,
-            block: block
+            block: block,
         )
     }
 
@@ -36,7 +36,7 @@ extension SDSCodableModelDatabaseInterfaceImpl {
         sql: String,
         arguments: StatementArguments,
         batchingPreference: BatchingPreference,
-        block: (Model, UnsafeMutablePointer<ObjCBool>) -> Void
+        block: (Model, inout Bool) -> Void,
     ) {
         let batchSize = batchSize(batchingPreference: batchingPreference)
         enumerateModels(
@@ -45,7 +45,7 @@ extension SDSCodableModelDatabaseInterfaceImpl {
             sql: sql,
             arguments: arguments,
             batchSize: batchSize,
-            block: block
+            block: block,
         )
     }
 
@@ -68,15 +68,15 @@ extension SDSCodableModelDatabaseInterfaceImpl {
         sql: String? = nil,
         arguments: StatementArguments? = nil,
         batchSize: UInt,
-        block: (Model, UnsafeMutablePointer<ObjCBool>) -> Void
+        block: (Model, inout Bool) -> Void,
     ) {
-        do {
+        failIfThrows {
             var recordCursor: RecordCursor<Model>
-            if let sql = sql, let arguments = arguments {
+            if let sql, let arguments {
                 recordCursor = try Model.fetchCursor(
                     transaction.database,
                     sql: sql,
-                    arguments: arguments
+                    arguments: arguments,
                 )
             } else {
                 recordCursor = try modelType.fetchCursor(transaction.database)
@@ -84,18 +84,12 @@ extension SDSCodableModelDatabaseInterfaceImpl {
 
             try Batching.loop(batchSize: batchSize) { stop in
                 guard let value = try recordCursor.next() else {
-                    stop.pointee = true
+                    stop = true
                     return
                 }
                 value.anyDidEnumerateOne(transaction: transaction)
-                block(value, stop)
+                block(value, &stop)
             }
-        } catch let error {
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(
-                userDefaults: CurrentAppContext().appUserDefaults(),
-                error: error
-            )
-            owsFailDebug("Failed to fetch models: \(error)!")
         }
     }
 }

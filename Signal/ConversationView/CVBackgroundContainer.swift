@@ -4,15 +4,13 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
-public protocol CVBackgroundContainerDelegate: AnyObject {
+protocol CVBackgroundContainerDelegate: AnyObject {
     func updateScrollingContent()
 }
 
-// MARK: -
-
-public class CVBackgroundContainer: ManualLayoutViewWithLayer {
+class CVBackgroundContainer: ManualLayoutViewWithLayer, WallpaperBlurProvider {
 
     private enum ZPositioning: CGFloat {
         case wallpaperContent = 0
@@ -22,23 +20,29 @@ public class CVBackgroundContainer: ManualLayoutViewWithLayer {
 
     fileprivate var wallpaperView: WallpaperView?
 
-    public weak var delegate: CVBackgroundContainerDelegate?
+    weak var delegate: CVBackgroundContainerDelegate?
 
-    public init() {
+    init() {
         super.init(name: "CVBackgroundContainer")
 
         self.shouldDeactivateConstraints = false
         self.isUserInteractionEnabled = false
         // Render all background views behind the collection view.
         self.layer.zPosition = -1
+
+        // Wallpaper blocks voiceover's ability to focus on the
+        // correct message when a user opens a conversation since it
+        // appears later in the subview array than the message collection view.
+        // Hide it from the accessibility tree so voiceover users can read messages properly.
+        self.accessibilityElementsHidden = true
     }
 
-    public func set(wallpaperView: WallpaperView?) {
+    func set(wallpaperView: WallpaperView?) {
         self.wallpaperView?.contentView?.removeFromSuperview()
         self.wallpaperView?.dimmingView?.removeFromSuperview()
         self.wallpaperView = wallpaperView
 
-        if let wallpaperView = wallpaperView {
+        if let wallpaperView {
             self.backgroundColor = .clear
 
             if let contentView = wallpaperView.contentView {
@@ -56,7 +60,7 @@ public class CVBackgroundContainer: ManualLayoutViewWithLayer {
         }
     }
 
-    public override func layoutSubviews() {
+    override func layoutSubviews() {
         AssertIsOnMainThread()
 
         super.layoutSubviews()
@@ -66,12 +70,10 @@ public class CVBackgroundContainer: ManualLayoutViewWithLayer {
 
         delegate?.updateScrollingContent()
     }
-}
 
-// MARK: -
+    // MARK: - WallpaperBlurProvider
 
-extension CVBackgroundContainer: WallpaperBlurProvider {
-    public var wallpaperBlurState: WallpaperBlurState? {
+    var wallpaperBlurState: WallpaperBlurState? {
         wallpaperView?.blurProvider?.wallpaperBlurState
     }
 }
@@ -80,7 +82,7 @@ extension CVBackgroundContainer: WallpaperBlurProvider {
 
 extension ConversationViewController: CVBackgroundContainerDelegate {
 
-    public func updateScrollingContent() {
+    func updateScrollingContent() {
         AssertIsOnMainThread()
 
         UIView.performWithoutAnimation {

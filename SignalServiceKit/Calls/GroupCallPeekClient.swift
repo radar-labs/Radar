@@ -30,7 +30,7 @@ public class GroupCallPeekClient {
 
     init(
         db: any DB,
-        groupsV2: any GroupsV2
+        groupsV2: any GroupsV2,
     ) {
         self.db = db
         self.groupsV2 = groupsV2
@@ -43,7 +43,7 @@ public class GroupCallPeekClient {
     @MainActor
     public func fetchPeekInfo(groupId: GroupIdentifier) async throws -> PeekInfo {
         let secretParams = try self.db.read { tx in
-            let groupThread = TSGroupThread.fetch(forGroupId: groupId, tx: tx)
+            let groupThread = TSGroupThread.fetchThread(forGroupId: groupId, tx: tx)
             return try (groupThread?.groupModel as? TSGroupModelV2)?.secretParams()
         }
         guard let secretParams else {
@@ -59,7 +59,7 @@ public class GroupCallPeekClient {
         let peekRequest = PeekRequest(
             sfuURL: self.sfuUrl,
             membershipProof: membershipProof,
-            groupMembers: membership
+            groupMembers: membership,
         )
 
         let peekResponse = await self.sfuClient.peek(request: peekRequest)
@@ -83,7 +83,7 @@ public class GroupCallPeekClient {
     }
 
     public func groupMemberInfo(forGroupId groupId: GroupIdentifier, tx: DBReadTransaction) throws -> [GroupMemberInfo] {
-        let groupThread = TSGroupThread.fetch(forGroupId: groupId, tx: tx)
+        let groupThread = TSGroupThread.fetchThread(forGroupId: groupId, tx: tx)
         guard let groupModel = groupThread?.groupModel as? TSGroupModelV2 else {
             throw OWSAssertionError("Expected V2 group model!")
         }
@@ -103,7 +103,7 @@ public class GroupCallPeekClient {
 
             return GroupMemberInfo(
                 userId: aci.rawUUID,
-                userIdCipherText: aciCiphertext
+                userIdCipherText: aciCiphertext,
             )
         }
     }

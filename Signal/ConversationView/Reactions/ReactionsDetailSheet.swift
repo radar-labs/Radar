@@ -6,7 +6,7 @@
 import SignalServiceKit
 import SignalUI
 
-class ReactionsDetailSheet: InteractiveSheetViewController {
+class ReactionsDetailSheet: InteractiveSheetViewController, UIScrollViewDelegate {
     let messageId: String
 
     private var reactionState: InteractionReactionState
@@ -19,14 +19,6 @@ class ReactionsDetailSheet: InteractiveSheetViewController {
 
     override var placeOnGlassIfAvailable: Bool { true }
 
-    private var emojiCounts: [InteractionReactionState.EmojiCount] {
-        reactionState.emojiCounts
-    }
-
-    private var allEmoji: [Emoji] {
-        return emojiCounts.compactMap { Emoji($0.emoji) }
-    }
-
     init(reactionState: InteractionReactionState, message: TSMessage) {
         self.reactionState = reactionState
         self.messageId = message.uniqueId
@@ -37,7 +29,7 @@ class ReactionsDetailSheet: InteractiveSheetViewController {
 
     // MARK: -
 
-    override public func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
 
         stackView.axis = .vertical
@@ -86,7 +78,7 @@ class ReactionsDetailSheet: InteractiveSheetViewController {
         // If the currently selected emoji still exists, keep it selected.
         // Otherwise, select the "all" page by setting selected emoji to nil.
         let newSelectedEmoji: Emoji?
-        if let selectedEmoji = selectedEmoji, allEmoji.contains(selectedEmoji) {
+        if let selectedEmoji, reactionState.emojiReactions[selectedEmoji] != nil {
             newSelectedEmoji = selectedEmoji
         } else {
             newSelectedEmoji = nil
@@ -96,14 +88,16 @@ class ReactionsDetailSheet: InteractiveSheetViewController {
     }
 
     func buildEmojiCountItems() {
-        let allReactionsItem = EmojiItem(emoji: nil, count: emojiCounts.lazy.map { $0.count }.reduce(0, +)) { [weak self] in
+        let allReactionsItem = EmojiItem(emoji: nil, count: reactionState.emojiCounts.lazy.map { $0.count }.reduce(0, +)) { [weak self] in
             self?.setSelectedEmoji(nil)
         }
 
-        emojiCountsCollectionView.items = [allReactionsItem] + emojiCounts.map { (emojiCount) in
-            EmojiItem(emoji: emojiCount.emoji,
-                      count: emojiCount.count) { [weak self] in
-                self?.setSelectedEmoji(Emoji(emojiCount.emoji))
+        emojiCountsCollectionView.items = [allReactionsItem] + reactionState.emojiCounts.map { emojiCount in
+            EmojiItem(
+                emoji: emojiCount.emojiVariant,
+                count: emojiCount.count,
+            ) { [weak self] in
+                self?.setSelectedEmoji(emojiCount.emoji)
             }
         }
     }
@@ -131,7 +125,7 @@ class ReactionsDetailSheet: InteractiveSheetViewController {
     private lazy var emojiReactorsViews = [
         EmojiReactorsTableView(),
         EmojiReactorsTableView(),
-        EmojiReactorsTableView()
+        EmojiReactorsTableView(),
     ]
     private var emojiReactorsViewConstraints = [NSLayoutConstraint]()
 
@@ -151,24 +145,38 @@ class ReactionsDetailSheet: InteractiveSheetViewController {
 
     private var nextPageEmoji: Emoji? {
         // If we don't have an emoji defined, the first emoji is always up next
-        guard let emoji = selectedEmoji else { return allEmoji.first }
+        guard let emoji = selectedEmoji else {
+            return reactionState.emojiCounts.first?.emoji
+        }
 
         // If we don't have an index, or we're at the end of the array, "all" is up next
-        guard let index = allEmoji.firstIndex(of: emoji), index < (allEmoji.count - 1) else { return nil }
+        guard
+            let index = reactionState.emojiCounts.firstIndex(where: { $0.emoji == emoji }),
+            index < (reactionState.emojiCounts.endIndex - 1)
+        else {
+            return nil
+        }
 
         // Otherwise, use the next emoji in the array
-        return allEmoji[index + 1]
+        return reactionState.emojiCounts[index + 1].emoji
     }
 
     private var previousPageEmoji: Emoji? {
         // If we don't have an emoji defined, the last emoji is always previous
-        guard let emoji = selectedEmoji else { return allEmoji.last }
+        guard let emoji = selectedEmoji else {
+            return reactionState.emojiCounts.last?.emoji
+        }
 
         // If we don't have an index, or we're at the start of the array, "all" is previous
-        guard let index = allEmoji.firstIndex(of: emoji), index > 0 else { return nil }
+        guard
+            let index = reactionState.emojiCounts.firstIndex(where: { $0.emoji == emoji }),
+            index > reactionState.emojiCounts.startIndex
+        else {
+            return nil
+        }
 
         // Otherwise, use the previous emoji in the array
-        return allEmoji[index - 1]
+        return reactionState.emojiCounts[index - 1].emoji
     }
 
     private var pageWidth: CGFloat { return min(contentView.frame.width, maxWidth) }
@@ -213,17 +221,17 @@ class ReactionsDetailSheet: InteractiveSheetViewController {
             reactorsView.autoPinEdge(toSuperviewEdge: .bottom)
 
             emojiReactorsViewConstraints.append(
-                reactorsView.autoPinEdge(toSuperviewEdge: .left, withInset: CGFloat(index) * pageWidth)
+                reactorsView.autoPinEdge(toSuperviewEdge: .left, withInset: CGFloat(index) * pageWidth),
             )
         }
     }
 
-    private func reactions(for emoji: Emoji?, transaction: DBReadTransaction) -> [OWSReaction] {
-        guard let emoji = emoji else {
-            return reactionFinder.allReactions(transaction: transaction)
+    private func findReactions(forEmoji emoji: Emoji?) -> [OWSReaction] {
+        guard let emoji else {
+            return reactionState.reactions
         }
 
-        guard let reactions = reactionState.reactionsByEmoji[emoji] else {
+        guard let reactions = reactionState.emojiReactions[emoji] else {
             owsFailDebug("missing reactions for emoji \(emoji)")
             return []
         }
@@ -242,10 +250,10 @@ class ReactionsDetailSheet: InteractiveSheetViewController {
             emojiReactorsViews.insert(emojiReactorsViews.removeLast(), at: 0)
             emojiReactorsViewConstraints.insert(emojiReactorsViewConstraints.removeLast(), at: 0)
 
-            let previousPageReactions = reactions(for: previousPageEmoji, transaction: transaction)
+            let previousPageReactions = findReactions(forEmoji: previousPageEmoji)
             previousPageReactorsView.configure(for: previousPageReactions, transaction: transaction)
 
-        // We're paging forwards!
+            // We're paging forwards!
         } else if oldSelectedEmoji == previousPageEmoji, oldSelectedEmoji != selectedEmoji {
             // The next page becomes the current page and the current page becomes
             // the previous page. We have to load the new next.
@@ -253,25 +261,25 @@ class ReactionsDetailSheet: InteractiveSheetViewController {
             emojiReactorsViews.append(emojiReactorsViews.removeFirst())
             emojiReactorsViewConstraints.append(emojiReactorsViewConstraints.removeFirst())
 
-            let nextPageReactions = reactions(for: nextPageEmoji, transaction: transaction)
+            let nextPageReactions = findReactions(forEmoji: nextPageEmoji)
             nextPageReactorsView.configure(for: nextPageReactions, transaction: transaction)
 
-        // We didn't get here through paging, stuff probably changed. Reload all the things.
+            // We didn't get here through paging, stuff probably changed. Reload all the things.
         } else {
-            let currentPageReactions = reactions(for: selectedEmoji, transaction: transaction)
+            let currentPageReactions = findReactions(forEmoji: selectedEmoji)
             currentPageReactorsView.configure(for: currentPageReactions, transaction: transaction)
 
-            let previousPageReactions = reactions(for: previousPageEmoji, transaction: transaction)
+            let previousPageReactions = findReactions(forEmoji: previousPageEmoji)
             previousPageReactorsView.configure(for: previousPageReactions, transaction: transaction)
 
-            let nextPageReactions = reactions(for: nextPageEmoji, transaction: transaction)
+            let nextPageReactions = findReactions(forEmoji: nextPageEmoji)
             nextPageReactorsView.configure(for: nextPageReactions, transaction: transaction)
         }
 
         updatePageConstraints()
 
         // Update selection on the counts view to reflect our new selected emoji
-        if let selectedEmoji = selectedEmoji, let index = allEmoji.firstIndex(of: selectedEmoji) {
+        if let selectedEmoji, let index = reactionState.emojiCounts.firstIndex(where: { $0.emoji == selectedEmoji }) {
             emojiCountsCollectionView.setSelectedIndex(index + 1)
         } else {
             emojiCountsCollectionView.setSelectedIndex(0)
@@ -285,14 +293,14 @@ class ReactionsDetailSheet: InteractiveSheetViewController {
         }
 
         // Scrolling backwards
-        if !ignoreScrollingState && emojiPagingScrollView.contentOffset.x <= previousPageThreshold {
+        if !ignoreScrollingState, emojiPagingScrollView.contentOffset.x <= previousPageThreshold {
             emojiPagingScrollView.contentOffset.x += pageWidth
 
-        // Scrolling forward
-        } else if !ignoreScrollingState && emojiPagingScrollView.contentOffset.x >= nextPageThreshold {
+            // Scrolling forward
+        } else if !ignoreScrollingState, emojiPagingScrollView.contentOffset.x >= nextPageThreshold {
             emojiPagingScrollView.contentOffset.x -= pageWidth
 
-        // Not moving forward or back, just scroll back to center so we can go forward and back again
+            // Not moving forward or back, just scroll back to center so we can go forward and back again
         } else {
             emojiPagingScrollView.contentOffset.x = pageWidth
         }
@@ -340,7 +348,7 @@ class ReactionsDetailSheet: InteractiveSheetViewController {
         if offsetX <= previousPageThreshold {
             setSelectedEmoji(previousPageEmoji)
 
-        // Scrolled right a page
+            // Scrolled right a page
         } else if offsetX >= nextPageThreshold {
             setSelectedEmoji(nextPageEmoji)
 
@@ -348,24 +356,22 @@ class ReactionsDetailSheet: InteractiveSheetViewController {
 
         isScrollingChange = false
     }
-}
 
-// MARK: -
+    // MARK: - UIScrollViewDelegate
 
-extension ReactionsDetailSheet: UIScrollViewDelegate {
-    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
         checkForPageChange()
     }
 
-    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         userStartedScrolling()
     }
 
-    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         userStoppedScrolling(waitingForDeceleration: decelerate)
     }
 
-    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         userStoppedScrolling()
     }
 }

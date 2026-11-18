@@ -35,14 +35,14 @@ public final class ThreadUtil {
         message: PreparedOutgoingMessage,
         limitToCurrentProcessLifetime: Bool = false,
         isHighPriority: Bool = false,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) -> Promise<Void> {
         let promise = SSKEnvironment.shared.messageSenderJobQueueRef.add(
             .promise,
             message: message,
             limitToCurrentProcessLifetime: limitToCurrentProcessLifetime,
             isHighPriority: isHighPriority,
-            transaction: transaction
+            transaction: transaction,
         )
         if let messageForIntent = message.messageForIntentDonation(tx: transaction) {
             messageForIntent.thread(tx: transaction)?.donateSendMessageIntent(for: messageForIntent, transaction: transaction)
@@ -58,7 +58,7 @@ public extension ThreadUtil {
     @discardableResult
     class func enqueueMessage(
         withContactShare contactShareDraft: ContactShareDraft,
-        thread: TSThread
+        thread: TSThread,
     ) -> TSOutgoingMessage {
         AssertIsOnMainThread()
         assert(contactShareDraft.ows_isValid)
@@ -84,7 +84,7 @@ public extension ThreadUtil {
             let unpreparedMessage = UnpreparedOutgoingMessage.forMessage(
                 message,
                 body: nil,
-                contactShareDraft: sendableContactShareDraft
+                contactShareDraft: sendableContactShareDraft,
             )
 
             await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
@@ -111,8 +111,14 @@ public extension ThreadUtil {
 public extension ThreadUtil {
 
     @discardableResult
-    class func enqueueMessage(withInstalledSticker stickerInfo: StickerInfo, thread: TSThread) -> TSOutgoingMessage {
+    class func enqueueMessage(
+        withInstalledSticker stickerInfo: StickerInfo,
+        quotedReplyDraft: DraftQuotedReplyModel?,
+        thread: TSThread,
+    ) -> TSOutgoingMessage {
         AssertIsOnMainThread()
+
+        let stickerManager = DependenciesBridge.shared.stickerManager
 
         let builder = TSOutgoingMessageBuilder.outgoingMessageBuilder(thread: thread)
         let message = SSKEnvironment.shared.databaseStorageRef.read { tx in
@@ -122,7 +128,7 @@ public extension ThreadUtil {
 
         Self.enqueueSendQueue.enqueue {
             let stickerDraft: MessageStickerDraft? = SSKEnvironment.shared.databaseStorageRef.read { tx in
-                guard let stickerMetadata = StickerManager.installedStickerMetadata(stickerInfo: stickerInfo, transaction: tx) else {
+                guard let stickerMetadata = stickerManager.installedStickerMetadata(stickerInfo: stickerInfo, transaction: tx) else {
                     owsFailDebug("Could not find sticker file.")
                     return nil
                 }
@@ -136,7 +142,7 @@ public extension ThreadUtil {
                     info: stickerInfo,
                     stickerData: stickerData,
                     stickerType: stickerMetadata.stickerType,
-                    emoji: stickerMetadata.firstEmoji
+                    emoji: stickerMetadata.firstEmoji,
                 )
             }
 
@@ -147,14 +153,25 @@ public extension ThreadUtil {
             let stickerDataSource: MessageStickerDataSource
             do {
                 stickerDataSource = try await DependenciesBridge.shared.messageStickerManager.buildDataSource(
-                    fromDraft: stickerDraft
+                    fromDraft: stickerDraft,
                 )
             } catch {
                 owsFailDebug("Failed to build sticker!")
                 return
             }
+
+            let quotedReplyDraft = try await quotedReplyDraft.mapAsync {
+                try await DependenciesBridge.shared.quotedReplyManager.prepareDraftForSending($0)
+            }
+
             await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
-                self.enqueueMessage(message, stickerDataSource: stickerDataSource, thread: thread, tx: tx)
+                self.enqueueMessage(
+                    message,
+                    stickerDataSource: stickerDataSource,
+                    quotedReplyDraft: quotedReplyDraft,
+                    thread: thread,
+                    tx: tx,
+                )
             }
         }
 
@@ -165,7 +182,7 @@ public extension ThreadUtil {
     class func enqueueMessage(
         withUninstalledSticker stickerMetadata: any StickerMetadata,
         stickerData: Data,
-        thread: TSThread
+        thread: TSThread,
     ) -> TSOutgoingMessage {
         AssertIsOnMainThread()
 
@@ -179,21 +196,27 @@ public extension ThreadUtil {
             info: stickerMetadata.stickerInfo,
             stickerData: stickerData,
             stickerType: stickerMetadata.stickerType,
-            emoji: stickerMetadata.firstEmoji
+            emoji: stickerMetadata.firstEmoji,
         )
 
         Self.enqueueSendQueue.enqueue {
             let stickerDataSource: MessageStickerDataSource
             do {
                 stickerDataSource = try await DependenciesBridge.shared.messageStickerManager.buildDataSource(
-                    fromDraft: stickerDraft
+                    fromDraft: stickerDraft,
                 )
             } catch {
                 owsFailDebug("Failed to build sticker!")
                 return
             }
             await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
-                self.enqueueMessage(message, stickerDataSource: stickerDataSource, thread: thread, tx: tx)
+                self.enqueueMessage(
+                    message,
+                    stickerDataSource: stickerDataSource,
+                    quotedReplyDraft: nil,
+                    thread: thread,
+                    tx: tx,
+                )
             }
         }
 
@@ -203,18 +226,22 @@ public extension ThreadUtil {
     private class func enqueueMessage(
         _ message: TSOutgoingMessage,
         stickerDataSource: MessageStickerDataSource,
+        quotedReplyDraft: DraftQuotedReplyModel.ForSending?,
         thread: TSThread,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         AssertNotOnMainThread()
 
         // stickers don't have bodies
         owsPrecondition(message.body == nil)
 
+        let quotedReplyDraftIfEnabled = BuildFlags.stickerReply ? quotedReplyDraft : nil
+
         let unpreparedMessage = UnpreparedOutgoingMessage.forMessage(
             message,
             body: nil,
-            messageStickerDraft: stickerDataSource
+            quotedReplyDraft: quotedReplyDraftIfEnabled,
+            messageStickerDraft: stickerDataSource,
         )
         let preparedMessage: PreparedOutgoingMessage
         do {
@@ -241,32 +268,36 @@ extension ThreadUtil {
     private static func shouldSetUniversalTimer(contactThread: TSContactThread, tx: DBReadTransaction) -> Bool {
         ThreadFinder().shouldSetDefaultDisappearingMessageTimer(
             contactThread: contactThread,
-            transaction: tx
+            transaction: tx,
         )
     }
 
     private static func setUniversalTimer(contactThread: TSContactThread, tx: DBWriteTransaction) {
         let dmConfigurationStore = DependenciesBridge.shared.disappearingMessagesConfigurationStore
+
         let dmUniversalToken = dmConfigurationStore.fetchOrBuildDefault(for: .universal, tx: tx)
-        let version = dmConfigurationStore.fetchOrBuildDefault(
-            for: .thread(contactThread),
-            tx: tx
-        ).timerVersion
+        guard
+            let newToken = try? dmConfigurationStore.versionedTokenForLocalChange(
+                token: dmUniversalToken.asToken,
+                contactThread: contactThread,
+                tx: tx,
+            )
+        else {
+            return
+        }
+
         let dmResult = dmConfigurationStore.set(
-            token: .init(
-                isEnabled: dmUniversalToken.isEnabled,
-                durationSeconds: dmUniversalToken.durationSeconds,
-                version: version
-            ),
+            token: newToken,
             for: .thread(contactThread),
-            tx: tx
+            tx: tx,
         )
+
         OWSDisappearingConfigurationUpdateInfoMessage(
             contactThread: contactThread,
             timestamp: MessageTimestampGenerator.sharedInstance.generateTimestamp(),
             isConfigurationEnabled: dmResult.newConfiguration.isEnabled,
             configurationDurationSeconds: dmResult.newConfiguration.durationSeconds,
-            createdByRemoteName: nil
+            createdByRemoteName: nil,
         ).anyInsert(transaction: tx)
     }
 
@@ -280,11 +311,15 @@ extension ThreadUtil {
 
     @discardableResult
     public class func addThreadToProfileWhitelistIfEmptyOrPendingRequestAndSetDefaultTimerWithSneakyTransaction(
-        _ thread: TSThread
+        _ thread: TSThread,
     ) -> Bool {
+        let databaseStorage = SSKEnvironment.shared.databaseStorageRef
+        let profileManager = SSKEnvironment.shared.profileManagerRef
+        let recipientFetcher = DependenciesBridge.shared.recipientFetcher
+
         let threadAsContactThread = thread as? TSContactThread
 
-        let (shouldSetUniversalTimer, shouldAddToProfileWhitelist) = SSKEnvironment.shared.databaseStorageRef.read { tx -> (Bool, Bool) in
+        let (shouldSetUniversalTimer, shouldAddToProfileWhitelist) = databaseStorage.read { tx -> (Bool, Bool) in
             let universalTimer: Bool = {
                 guard let threadAsContactThread else { return false }
                 return Self.shouldSetUniversalTimer(contactThread: threadAsContactThread, tx: tx)
@@ -294,15 +329,33 @@ extension ThreadUtil {
             return (universalTimer, profileWhitelist)
         }
         if shouldSetUniversalTimer, let threadAsContactThread {
-            SSKEnvironment.shared.databaseStorageRef.write { tx in setUniversalTimer(contactThread: threadAsContactThread, tx: tx) }
+            databaseStorage.write { tx in setUniversalTimer(contactThread: threadAsContactThread, tx: tx) }
         }
         if shouldAddToProfileWhitelist {
-            SSKEnvironment.shared.databaseStorageRef.write { tx in
-                SSKEnvironment.shared.profileManagerRef.addThread(
-                    toProfileWhitelist: thread,
-                    userProfileWriter: .localUser,
-                    transaction: tx
-                )
+            databaseStorage.write { tx in
+                switch thread {
+                case let thread as TSGroupThread:
+                    let groupRecord = GroupStore().fetchGroup(forGroupIdData: thread.groupId, tx: tx)
+                    guard var groupRecord else {
+                        owsFailDebug("can't fetch GroupRecord that must exist for TSGroupThread")
+                        break
+                    }
+                    profileManager.addGroupToProfileWhitelist(
+                        &groupRecord,
+                        userProfileWriter: .localUser,
+                        tx: tx,
+                    )
+                case let thread as TSContactThread:
+                    if var recipient = recipientFetcher.fetchOrCreate(address: thread.contactAddress, tx: tx) {
+                        profileManager.addRecipientToProfileWhitelist(
+                            &recipient,
+                            userProfileWriter: .localUser,
+                            tx: tx,
+                        )
+                    }
+                default:
+                    owsFailDebug("can't whitelist \(type(of: thread))")
+                }
             }
         }
         return shouldAddToProfileWhitelist
@@ -312,8 +365,11 @@ extension ThreadUtil {
     public class func addThreadToProfileWhitelistIfEmptyOrPendingRequest(
         _ thread: TSThread,
         setDefaultTimerIfNecessary: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> Bool {
+        let profileManager = SSKEnvironment.shared.profileManagerRef
+        let recipientFetcher = DependenciesBridge.shared.recipientFetcher
+
         if
             setDefaultTimerIfNecessary,
             let contactThread = thread as? TSContactThread,
@@ -323,11 +379,29 @@ extension ThreadUtil {
         }
         let shouldAddToProfileWhitelist = shouldAddThreadToProfileWhitelist(thread, tx: tx)
         if shouldAddToProfileWhitelist {
-            SSKEnvironment.shared.profileManagerRef.addThread(
-                toProfileWhitelist: thread,
-                userProfileWriter: .localUser,
-                transaction: tx
-            )
+            switch thread {
+            case let thread as TSGroupThread:
+                let groupRecord = GroupStore().fetchGroup(forGroupIdData: thread.groupId, tx: tx)
+                guard var groupRecord else {
+                    owsFailDebug("can't fetch GroupRecord that must exist for TSGroupThread")
+                    break
+                }
+                profileManager.addGroupToProfileWhitelist(
+                    &groupRecord,
+                    userProfileWriter: .localUser,
+                    tx: tx,
+                )
+            case let thread as TSContactThread:
+                if var recipient = recipientFetcher.fetchOrCreate(address: thread.contactAddress, tx: tx) {
+                    profileManager.addRecipientToProfileWhitelist(
+                        &recipient,
+                        userProfileWriter: .localUser,
+                        tx: tx,
+                    )
+                }
+            default:
+                owsFailDebug("can't whitelist \(type(of: thread))")
+            }
         }
         return shouldAddToProfileWhitelist
     }
@@ -339,11 +413,12 @@ public extension ThreadUtil {
 
     class func enqueueMessage(
         withPoll poll: CreatePollMessage,
-        thread: TSThread
+        thread: TSThread,
     ) {
         AssertIsOnMainThread()
-        guard poll.question.count <= OWSPoll.Constants.maxCharacterLength
-                && poll.question.trimmedIfNeeded(maxByteCount: OWSMediaUtils.kOversizeTextMessageSizeThresholdBytes) == nil
+        guard
+            poll.question.count <= OWSPoll.Constants.maxQuestionCharacterLength,
+            poll.question.trimmedIfNeeded(maxByteCount: OWSMediaUtils.kOversizeTextMessageSizeThresholdBytes) == nil
         else {
             owsFailDebug("Poll question too large")
             return
@@ -351,7 +426,8 @@ public extension ThreadUtil {
 
         let validatedPollQuestion = SSKEnvironment.shared.databaseStorageRef.write { tx in DependenciesBridge.shared.attachmentContentValidator.truncatedMessageBodyForInlining(
             MessageBody(text: poll.question, ranges: .empty),
-            tx: tx)
+            tx: tx,
+        )
         }
 
         let builder = TSOutgoingMessageBuilder.outgoingMessageBuilder(thread: thread, messageBody: validatedPollQuestion)
@@ -363,7 +439,7 @@ public extension ThreadUtil {
         let unpreparedMessage = UnpreparedOutgoingMessage.forMessage(
             message,
             body: nil,
-            poll: poll
+            poll: poll,
         )
 
         Self.enqueueSendQueue.enqueue {
@@ -409,7 +485,7 @@ extension TSThread {
         interaction.groupIdentifier = uniqueId
         interaction.direction = .outgoing
         interaction.donate(completion: { error in
-            guard let error = error else { return }
+            guard let error else { return }
             owsFailDebug("Failed to donate message intent for \(self.uniqueId) \(error)")
         })
     }
@@ -422,19 +498,19 @@ extension TSThread {
 
     func generateSendMessageIntent(
         context: IntentContext,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> ResolvableValue<INIntent>? {
         let builder = _generateSendMessageIntent(context: context, transaction: transaction)
         return builder?.resolvableValue(
             db: SSKEnvironment.shared.databaseStorageRef,
             profileFetcher: SSKEnvironment.shared.profileFetcherRef,
-            tx: transaction
+            tx: transaction,
         )
     }
 
     private func _generateSendMessageIntent(
         context: IntentContext,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> ResolvableDisplayNameBuilder<INIntent>? {
         guard SSKPreferences.areIntentDonationsEnabled(transaction: transaction) else {
             return nil
@@ -473,9 +549,9 @@ extension TSThread {
             if isGroupStoryReply {
                 let format = OWSLocalizedString(
                     "QUOTED_REPLY_STORY_AUTHOR_INDICATOR_FORMAT",
-                    comment: "Message header when you are quoting a story. Embeds {{ story author name }}"
+                    comment: "Message header when you are quoting a story. Embeds {{ story author name }}",
                 )
-                return String(format: format, $0)
+                return String.nonPluralLocalizedStringWithFormat(format, $0)
             }
             return $0
         }
@@ -499,7 +575,7 @@ extension TSThread {
             return Self.buildPerson(
                 address: $0,
                 displayName: SSKEnvironment.shared.contactManagerRef.displayName(for: $0, tx: transaction),
-                tx: transaction
+                tx: transaction,
             )
         }
 
@@ -515,7 +591,7 @@ extension TSThread {
                     conversationIdentifier: conversationIdentifier,
                     serviceName: nil,
                     sender: senderPerson,
-                    attachments: nil
+                    attachments: nil,
                 )
                 if let speakableGroupNameImage {
                     sendMessageIntent.setImage(speakableGroupNameImage, forParameterNamed: \.speakableGroupName)
@@ -525,20 +601,20 @@ extension TSThread {
                 }
                 return sendMessageIntent
             },
-            contactManager: SSKEnvironment.shared.contactManagerRef
+            contactManager: SSKEnvironment.shared.contactManagerRef,
         )
     }
 
     func generateIncomingCallIntent(
         callerAci: Aci,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> ResolvableValue<INIntent>? {
         if self.isGroupThread {
             // Fall back to a "send message" intent for group calls,
             // because the "start call" intent makes the notification look too much like a 1:1 call.
             return self.generateSendMessageIntent(
                 context: .senderAddress(SignalServiceAddress(callerAci)),
-                transaction: tx
+                transaction: tx,
             )
         } else {
             guard SSKPreferences.areIntentDonationsEnabled(transaction: tx) else {
@@ -555,14 +631,14 @@ extension TSThread {
                         audioRoute: .unknown,
                         destinationType: .normal,
                         contacts: [caller],
-                        callCapability: .unknown
+                        callCapability: .unknown,
                     )
                 },
-                contactManager: SSKEnvironment.shared.contactManagerRef
+                contactManager: SSKEnvironment.shared.contactManagerRef,
             ).resolvableValue(
                 db: SSKEnvironment.shared.databaseStorageRef,
                 profileFetcher: SSKEnvironment.shared.profileFetcherRef,
-                tx: tx
+                tx: tx,
             )
         }
     }
@@ -570,7 +646,7 @@ extension TSThread {
     private static func buildPerson(
         address: SignalServiceAddress,
         displayName: DisplayName,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> INPerson {
         let nameComponents: PersonNameComponents?
         switch displayName {
@@ -580,6 +656,8 @@ extension TSThread {
             nameComponents = systemContactName.nameComponents
         case .profileName(let profileNameComponents):
             nameComponents = profileNameComponents
+        case .sharedName(let sharedName):
+            nameComponents = sharedName.nameComponents
         case .phoneNumber, .username, .deletedAccount, .unknown:
             nameComponents = nil
         }
@@ -610,7 +688,7 @@ extension TSThread {
             contactIdentifier: nil,
             customIdentifier: nil,
             isMe: false,
-            suggestionType: suggestionType
+            suggestionType: suggestionType,
         )
     }
 
@@ -628,7 +706,7 @@ extension TSThread {
                 }
                 return Self.intentRecipientAvatarImage(recipient: localAddress, transaction: tx)
             } else {
-                let rawImage = UIImage(named: "custom-story-light-36")
+                let rawImage = UIImage(named: "custom-story-36")
                 return rawImage?.pngData().map(INImage.init(imageData:))
             }
         } else {
@@ -639,13 +717,15 @@ extension TSThread {
     private static func intentRecipientAvatarImage(recipient: SignalServiceAddress, transaction: DBReadTransaction) -> INImage? {
         // Generate avatar
         let image: INImage
-        if let contactAvatar = SSKEnvironment.shared.avatarBuilderRef.avatarImage(
-            forAddress: recipient,
-            diameterPixels: Self.intentAvatarDiameterPixels,
-            localUserDisplayMode: .asUser,
-            transaction: transaction
-        ),
-           let contactAvatarPNG = contactAvatar.pngData() {
+        if
+            let contactAvatar = SSKEnvironment.shared.avatarBuilderRef.avatarImage(
+                forAddress: recipient,
+                diameterPixels: Self.intentAvatarDiameterPixels,
+                localUserDisplayMode: .asUser,
+                transaction: transaction,
+            ),
+            let contactAvatarPNG = contactAvatar.pngData()
+        {
             image = INImage(imageData: contactAvatarPNG)
         } else {
             image = INImage(named: "profile-placeholder-56")
@@ -655,13 +735,15 @@ extension TSThread {
 
     private func intentThreadAvatarImage(transaction: DBReadTransaction) -> INImage? {
         let image: INImage
-        if let threadAvatar = SSKEnvironment.shared.avatarBuilderRef.avatarImage(
-            forThread: self,
-            diameterPixels: Self.intentAvatarDiameterPixels,
-            localUserDisplayMode: .noteToSelf,
-            transaction: transaction
-        ),
-           let threadAvatarPng = threadAvatar.pngData() {
+        if
+            let threadAvatar = SSKEnvironment.shared.avatarBuilderRef.avatarImage(
+                forThread: self,
+                diameterPixels: Self.intentAvatarDiameterPixels,
+                localUserDisplayMode: .noteToSelf,
+                transaction: transaction,
+            ),
+            let threadAvatarPng = threadAvatar.pngData()
+        {
             image = INImage(imageData: threadAvatarPng)
         } else {
             image = INImage(named: isGroupThread ? "group-placeholder-56" : "profile-placeholder-56")

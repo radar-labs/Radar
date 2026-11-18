@@ -30,38 +30,12 @@ class OWSRequestFactoryTest: XCTestCase {
     func testDeviceProvisioning() {
         let request = OWSRequestFactory.provisionDevice(
             withMessageBody: .init([1, 2, 3]),
-            ephemeralDeviceId: "foo bar"
+            ephemeralDeviceId: "foo bar",
         )
 
         XCTAssertEqual(request.url.relativeString, "v1/provisioning/foo%20bar")
         XCTAssertEqual(request.method, "PUT")
         XCTAssertEqual(request.parameters as! [String: String], ["body": "AQID"])
-    }
-
-    // MARK: - Message requests
-
-    func testSubmitMessageRequest() throws {
-        let udAccessKey = getUdAccessKey()
-
-        let serviceId = Aci.randomForTesting()
-
-        let request = OWSRequestFactory.submitMessageRequest(
-            serviceId: serviceId,
-            messages: [],
-            timestamp: 1234,
-            isOnline: true,
-            isUrgent: false,
-            auth: .accessKey(udAccessKey)
-        )
-
-        XCTAssertEqual(request.method, "PUT")
-        XCTAssertEqual(request.url.path, "v1/messages/\(serviceId.serviceIdString)")
-        XCTAssertEqual(Set(request.parameters.keys), Set(["messages", "timestamp", "online", "urgent"]))
-        XCTAssertEqual(request.parameters["messages"] as? NSArray, [])
-        XCTAssertEqual(request.parameters["timestamp"] as? UInt64, 1234)
-        XCTAssertEqual(request.parameters["online"] as? Bool, true)
-        XCTAssertEqual(request.parameters["urgent"] as? Bool, false)
-        XCTAssertEqual(try queryItemsAsDictionary(url: request.url), ["story": "false"])
     }
 
     // MARK: - Donations
@@ -77,11 +51,16 @@ class OWSRequestFactoryTest: XCTestCase {
                 integerMoneyValue: 123,
                 inCurrencyCode: "CHF",
                 level: 456,
-                paymentMethod: paymentMethod
+                paymentMethod: paymentMethod,
+                donationPermit: DonationPermit(
+                    serializedPermit: Data([255, 128]),
+                    expiration: Date().addingTimeInterval(8 * .hour),
+                ),
             )
 
             XCTAssertEqual(request.url.path, "v1/subscription/boost/create")
             XCTAssertEqual(request.method, "POST")
+            XCTAssertEqual(request.headers["Donation-Permit"], "/4A=")
             XCTAssertEqual(Set(request.parameters.keys), Set(["currency", "amount", "level", "paymentMethod"]))
             XCTAssertEqual(request.parameters["currency"] as? String, "chf")
             XCTAssertEqual(request.parameters["amount"] as? UInt, 123)
@@ -96,14 +75,17 @@ class OWSRequestFactoryTest: XCTestCase {
             inCurrencyCode: "CHF",
             level: 456,
             returnUrl: URL(string: "https://example.com/approved")!,
-            cancelUrl: URL(string: "https://example.com/canceled")!
+            cancelUrl: URL(string: "https://example.com/canceled")!,
         )
 
         XCTAssertEqual(request.url.path, "v1/subscription/boost/paypal/create")
         XCTAssertEqual(request.method, "POST")
         XCTAssertEqual(Set(request.parameters.keys), Set([
-            "currency", "amount", "level",
-            "returnUrl", "cancelUrl"
+            "currency",
+            "amount",
+            "level",
+            "returnUrl",
+            "cancelUrl",
         ]))
         XCTAssertEqual(request.parameters["currency"] as? String, "chf")
         XCTAssertEqual(request.parameters["amount"] as? UInt, 123)
@@ -112,11 +94,29 @@ class OWSRequestFactoryTest: XCTestCase {
         XCTAssertEqual(request.parameters["cancelUrl"] as? String, "https://example.com/canceled")
     }
 
-    func testSetSubscriberID() {
-        let request = OWSRequestFactory.setSubscriberID(.init([255, 128]))
+    func testSetSubscriberID_permit() {
+        let request = OWSRequestFactory.setSubscriberID(
+            Data([255, 128]),
+            donationPermit: DonationPermit(
+                serializedPermit: Data([255, 128]),
+                expiration: Date().addingTimeInterval(8 * .hour),
+            ),
+        )
 
         XCTAssertEqual(request.url.path, "v1/subscription/_4A")
         XCTAssertEqual(request.method, "PUT")
+        XCTAssertEqual(request.headers["Donation-Permit"], "/4A=")
+    }
+
+    func testSetSubscriberID_noPermit() {
+        let request = OWSRequestFactory.setSubscriberID(
+            Data([255, 128]),
+            donationPermit: nil,
+        )
+
+        XCTAssertEqual(request.url.path, "v1/subscription/_4A")
+        XCTAssertEqual(request.method, "PUT")
+        XCTAssertEqual(request.headers["Donation-Permit"], nil)
     }
 
     func testDeleteSubscriberID() {
@@ -130,7 +130,7 @@ class OWSRequestFactoryTest: XCTestCase {
         let request = OWSRequestFactory.subscriptionSetDefaultPaymentMethod(
             subscriberId: Data([255, 128]),
             processor: "STRIPE",
-            paymentMethodId: "xyz"
+            paymentMethodId: "xyz",
         )
 
         XCTAssertEqual(request.url.path, "v1/subscription/_4A/default_payment_method/STRIPE/xyz")
@@ -139,24 +139,30 @@ class OWSRequestFactoryTest: XCTestCase {
 
     func testSubscriptionCreateStripePaymentMethodRequest() {
         let request = OWSRequestFactory.subscriptionCreateStripePaymentMethodRequest(
-            subscriberID: .init([255, 128])
+            subscriberID: Data([255, 128]),
+            donationPermit: DonationPermit(
+                serializedPermit: Data([255, 128]),
+                expiration: Date().addingTimeInterval(8 * .hour),
+            ),
         )
 
         XCTAssertEqual(request.url.path, "v1/subscription/_4A/create_payment_method")
         XCTAssertEqual(request.method, "POST")
+        XCTAssertEqual(request.headers["Donation-Permit"], "/4A=")
     }
 
     func testSubscriptionCreatePaypalPaymentMethodRequest() {
         let request = OWSRequestFactory.subscriptionCreatePaypalPaymentMethodRequest(
             subscriberID: .init([255, 128]),
             returnURL: URL(string: "https://example.com/approved")!,
-            cancelURL: URL(string: "https://example.com/canceled")!
+            cancelURL: URL(string: "https://example.com/canceled")!,
         )
 
         XCTAssertEqual(request.url.path, "v1/subscription/_4A/create_payment_method/paypal")
         XCTAssertEqual(request.method, "POST")
         XCTAssertEqual(Set(request.parameters.keys), Set([
-            "returnUrl", "cancelUrl"
+            "returnUrl",
+            "cancelUrl",
         ]))
         XCTAssertEqual(request.parameters["returnUrl"] as? String, "https://example.com/approved")
         XCTAssertEqual(request.parameters["cancelUrl"] as? String, "https://example.com/canceled")
@@ -167,7 +173,7 @@ class OWSRequestFactoryTest: XCTestCase {
             subscriberID: .init([255, 128]),
             level: 123,
             currency: "CHF",
-            idempotencyKey: "t3DUeQcC0laEdwMJ"
+            idempotencyKey: "t3DUeQcC0laEdwMJ",
         )
 
         XCTAssertEqual(request.url.path, "v1/subscription/_4A/level/123/CHF/t3DUeQcC0laEdwMJ")
@@ -184,7 +190,8 @@ class OWSRequestFactoryTest: XCTestCase {
         XCTAssertEqual(request.method, "POST")
         XCTAssertEqual(Set(request.parameters.keys), Set([
             "receiptCredentialPresentation",
-            "visible", "primary",
+            "visible",
+            "primary",
         ]))
         XCTAssertEqual(request.parameters["receiptCredentialPresentation"] as? String, "/4A=")
         XCTAssertEqual(request.parameters["visible"] as? Bool, false)
@@ -197,12 +204,12 @@ class OWSRequestFactoryTest: XCTestCase {
         let request = OWSRequestFactory.reportSpam(
             from: Aci.constantForTesting("37EBAFB5-91D6-4C63-BFF7-82F540856386"),
             withServerGuid: "abc 123",
-            reportingToken: nil
+            reportingToken: nil,
         )
 
         XCTAssertEqual(
             request.url.relativeString,
-            "v1/messages/report/37ebafb5-91d6-4c63-bff7-82f540856386/abc%20123"
+            "v1/messages/report/37ebafb5-91d6-4c63-bff7-82f540856386/abc%20123",
         )
         XCTAssertEqual(request.method, "POST")
         XCTAssertEqual(request.parameters as! [String: String], [:])
@@ -213,12 +220,12 @@ class OWSRequestFactoryTest: XCTestCase {
         let request = OWSRequestFactory.reportSpam(
             from: Aci.constantForTesting("EB7B0432-BE7F-4A62-9859-4D7835D0D724"),
             withServerGuid: "",
-            reportingToken: nil
+            reportingToken: nil,
         )
 
         XCTAssertEqual(
             request.url.relativeString,
-            "v1/messages/report/eb7b0432-be7f-4a62-9859-4d7835d0d724/"
+            "v1/messages/report/eb7b0432-be7f-4a62-9859-4d7835d0d724/",
         )
     }
 
@@ -226,72 +233,9 @@ class OWSRequestFactoryTest: XCTestCase {
         let request = OWSRequestFactory.reportSpam(
             from: Aci.randomForTesting(),
             withServerGuid: "abc123",
-            reportingToken: .init(data: .init([97, 98, 99]))
+            reportingToken: .init(data: .init([97, 98, 99])),
         )
 
         XCTAssertEqual(request.parameters as! [String: String], ["token": "YWJj"])
-    }
-
-    // MARK: - Usernames
-
-    func testReserveUsername() {
-        let request = OWSRequestFactory.reserveUsernameRequest(usernameHashes: ["boba", "fett"])
-
-        XCTAssertEqual(request.url.path, "v1/accounts/username_hash/reserve")
-        XCTAssertEqual(request.method, "PUT")
-        XCTAssertEqual(request.parameters as! [String: [String]], ["usernameHashes": ["boba", "fett"]])
-    }
-
-    func testConfirmReservedUsername() {
-        let request = OWSRequestFactory.confirmReservedUsernameRequest(
-            reservedUsernameHash: "jango",
-            reservedUsernameZKProof: "fett",
-            encryptedUsernameForLink: "aa?".data(using: .utf8)! // Force a character that's special in base64Url
-        )
-
-        XCTAssertEqual(request.url.path, "v1/accounts/username_hash/confirm")
-        XCTAssertEqual(request.method, "PUT")
-        XCTAssertEqual(request.parameters as! [String: String], [
-            "usernameHash": "jango",
-            "zkProof": "fett",
-            "encryptedUsername": "YWE_" // base64Url
-        ])
-    }
-
-    func testDeleteExistingUsername() {
-        let request = OWSRequestFactory.deleteExistingUsernameRequest()
-
-        XCTAssertEqual(request.url.path, "v1/accounts/username_hash")
-        XCTAssertEqual(request.method, "DELETE")
-        XCTAssertEqual(request.parameters as! [String: String], [:])
-    }
-
-    func testLookupAciForUsername() {
-        let request = OWSRequestFactory.lookupAciUsernameRequest(usernameHashToLookup: "obi-wan")
-
-        XCTAssertEqual(request.url.path, "v1/accounts/username_hash/obi-wan")
-        XCTAssertEqual(request.method, "GET")
-        XCTAssertEqual(request.parameters as! [String: String], [:])
-    }
-
-    func testSetUsernameLink() {
-        let request = OWSRequestFactory.setUsernameLinkRequest(
-            encryptedUsername: "aa?".data(using: .utf8)!, // Force a character that's special in base64Url
-            keepLinkHandle: true
-        )
-
-        XCTAssertEqual(request.url.path, "v1/accounts/username_link")
-        XCTAssertEqual(request.method, "PUT")
-        XCTAssertEqual(request.parameters["usernameLinkEncryptedValue"] as! String, "YWE_") // base64Url
-        XCTAssertEqual(request.parameters["keepLinkHandle"] as! Bool, true)
-    }
-
-    func testLookupUsernameLink() {
-        let handle = UUID()
-        let request = OWSRequestFactory.lookupUsernameLinkRequest(handle: handle)
-
-        XCTAssertEqual(request.url.path, "v1/accounts/username_link/\(handle)")
-        XCTAssertEqual(request.method, "GET")
-        XCTAssertEqual(request.parameters as! [String: String], [:])
     }
 }

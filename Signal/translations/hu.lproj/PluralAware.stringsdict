@@ -29,6 +29,22 @@
 			<string>%2$d másodperc</string>
 		</dict>
 	</dict>
+	<key>ACCESSIBILITY_LABEL_MULTIPLE_ATTACHMENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d médiafájl</string>
+			<key>other</key>
+			<string>%1$d médiafájl</string>
+		</dict>
+	</dict>
 	<key>ACCESSIBILITY_LABEL_SHORT_VOICE_MEMO_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -365,6 +381,70 @@
 			<string>Szöveg + %1$d napnyi médiafájl</string>
 		</dict>
 	</dict>
+	<key>COLLAPSE_SET_CALL_EVENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld hívás</string>
+			<key>other</key>
+			<string>%1$ld hívás</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_CHAT_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld csevegésfrissítés</string>
+			<key>other</key>
+			<string>%1$ld csevegésfrissítés</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_GROUP_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld csoportfrissítés</string>
+			<key>other</key>
+			<string>%1$ld csoportfrissítés</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_TIMER_CHANGES_WITH_FINAL_TIMER_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld eltűnő üzenet időzítőjének módosítása · %2$@</string>
+			<key>other</key>
+			<string>%1$ld eltűnő üzenet időzítőjének módosítása · %2$@</string>
+		</dict>
+	</dict>
 	<key>CONVERSATION_DELETE_CONFIRMATIONS_ALERT_TITLE_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -438,6 +518,22 @@
 			<string>találat</string>
 			<key>other</key>
 			<string>/%2$d találat</string>
+		</dict>
+	</dict>
+	<key>CONVERSATION_SETTINGS_FORMER_MEMBERS_SECTION_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d korábbi tag</string>
+			<key>other</key>
+			<string>%1$d korábbi tag</string>
 		</dict>
 	</dict>
 	<key>CONVERSATION_SETTINGS_MEMBERS_SECTION_TITLE_%d</key>
@@ -563,9 +659,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>A Signal csoportok %1$d vagy kevesebb taggal működnek hatékonyan. Ennél több tag esetén lassulások tapasztalhatók az üzenetek küldése és fogadása során.</string>
+			<string>A Radar csoportok %1$d vagy kevesebb taggal működnek hatékonyan. Ennél több tag esetén lassulások tapasztalhatók az üzenetek küldése és fogadása során.</string>
 			<key>other</key>
-			<string>A Signal csoportok %1$d vagy kevesebb taggal működnek hatékonyan. Ennél több tag esetén lassulások tapasztalhatók az üzenetek küldése és fogadása során.</string>
+			<string>A Radar csoportok %1$d vagy kevesebb taggal működnek hatékonyan. Ennél több tag esetén lassulások tapasztalhatók az üzenetek küldése és fogadása során.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -723,9 +819,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>A Signal hívni fogja %2$@, %3$@ és %1$d további ismerősödet</string>
+			<string>A Radar hívni fogja %2$@, %3$@ és %1$d további ismerősödet</string>
 			<key>other</key>
-			<string>A Signal hívni fogja %2$@, %3$@ és %1$d további ismerősödet</string>
+			<string>A Radar hívni fogja %2$@, %3$@ és %1$d további ismerősödet</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1011,9 +1107,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>A(z) „%2$@” összekapcsolásának megtartásához nyissa meg a Signalt az adott eszközön %1$d napon belül.</string>
+			<string>A(z) „%2$@” összekapcsolásának megtartásához nyissa meg a Radart az adott eszközön %1$d napon belül.</string>
 			<key>other</key>
-			<string>A(z) „%2$@” összekapcsolásának megtartásához nyissa meg a Signalt az adott eszközön %1$d napon belül.</string>
+			<string>A(z) „%2$@” összekapcsolásának megtartásához nyissa meg a Radart az adott eszközön %1$d napon belül.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1219,9 +1315,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Minden Signal Névjegy · %1$d néző</string>
+			<string>Minden Radar Névjegy · %1$d néző</string>
 			<key>other</key>
-			<string>Minden Signal Névjegy · %1$d néző</string>
+			<string>Minden Radar Névjegy · %1$d néző</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1235,9 +1331,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Minden Signal Névjegy · Kivéve %1$d</string>
+			<string>Minden Radar Névjegy · Kivéve %1$d</string>
 			<key>other</key>
-			<string>Minden Signal Névjegy · Kivéve %1$d</string>
+			<string>Minden Radar Névjegy · Kivéve %1$d</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>
@@ -1384,6 +1480,22 @@
 			<string>Visszavonod a(z) „%2$@” által kiküldött %1$d meghívót?</string>
 		</dict>
 	</dict>
+	<key>PINNED_CONVERSATION_LIMIT</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Maximum %1$d csevegést rögzíthetsz.</string>
+			<key>other</key>
+			<string>Maximum %1$d csevegést rögzíthetsz.</string>
+		</dict>
+	</dict>
 	<key>POLL_VOTE_COUNT</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -1448,10 +1560,10 @@
 			<string>%1$d próbálkozás</string>
 		</dict>
 	</dict>
-	<key>STORIES_SHARESHEET_PARTIAL_SEND_SUBTITLE_%d</key>
+	<key>SETTINGS_CHANGE_PHONE_NUMBER_SPLASH_CANT_CHANGE_BODY</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%1$#@text@</string>
+		<string>%#@text@</string>
 		<key>text</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -1459,9 +1571,29 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Nem minden elemet lehetett elküldeni a kiválasztott Történethez, mert a fájltípus nem támogatott.</string>
+			<string>Mivel nemrég regisztráltad ezt a fiókot, jelenleg nem módosíthatod a telefonszámokat. Ez a rövid várakozási idő segít megvédeni a fiókodat.
+
+Próbáld meg %1$d óra múlva.</string>
 			<key>other</key>
-			<string>Nem minden elemet lehetett elküldeni a kiválasztott Történetekhez, mert a fájltípus nem támogatott.</string>
+			<string>Mivel nemrég regisztráltad ezt a fiókot, jelenleg nem módosíthatod a telefonszámokat. Ez a rövid várakozási idő segít megvédeni a fiókodat.
+
+Próbáld meg %1$d óra múlva.</string>
+		</dict>
+	</dict>
+	<key>STICKER_PACK_STICKER_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d matrica</string>
+			<key>other</key>
+			<string>%1$d matrica</string>
 		</dict>
 	</dict>
 	<key>STORY_REPLIES_COUNT_%d</key>
@@ -1558,6 +1690,22 @@
 			<string>%1$d megtekintés</string>
 			<key>other</key>
 			<string>&lt;bold&gt;%1$d&lt;/bold&gt; megtekintés</string>
+		</dict>
+	</dict>
+	<key>THREAD_DETAILS_MEMBERS_AND_INVITED_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%2$@ (+%1$ld meghívva)</string>
+			<key>other</key>
+			<string>%2$@ (+%1$ld meghívva)</string>
 		</dict>
 	</dict>
 	<key>THREAD_DETAILS_MORE_MUTUAL_GROUP_%3$ld</key>
@@ -1670,6 +1818,86 @@
 			<string>A felhasználóneveknek legalább %1$d karakterrel kell kezdődniük</string>
 			<key>other</key>
 			<string>A felhasználóneveknek legalább %1$d karakterrel kell kezdődniük</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d alkalommal említett meg téged %2$@ és mások</string>
+			<key>other</key>
+			<string>%1$d alkalommal említett meg téged %2$@ és mások</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d alkalommal említett meg téged %2$@ és %3$@</string>
+			<key>other</key>
+			<string>%1$d alkalommal említett meg téged %2$@ és %3$@</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__messages</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d olvasatlan üzenet</string>
+			<key>other</key>
+			<string>%1$d olvasatlan üzenet</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d válasz %2$@ és más névjegyektől</string>
+			<key>other</key>
+			<string>%1$d válasz %2$@ és más névjegyektől</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d válasz %2$@ és %3$@ névjegytől</string>
+			<key>other</key>
+			<string>%1$d válasz %2$@ és %3$@ névjegytől</string>
 		</dict>
 	</dict>
 </dict>

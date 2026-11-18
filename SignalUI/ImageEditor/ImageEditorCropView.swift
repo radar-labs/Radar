@@ -7,9 +7,15 @@ import SignalServiceKit
 
 enum CropRegion {
     // The sides of the crop region.
-    case left, right, top, bottom
+    case left
+    case right
+    case top
+    case bottom
     // The corners of the crop region.
-    case topLeft, topRight, bottomLeft, bottomRight
+    case topLeft
+    case topRight
+    case bottomLeft
+    case bottomRight
 }
 
 private class CropCornerView: UIView {
@@ -18,27 +24,32 @@ private class CropCornerView: UIView {
 
     var size: CGSize = CGSize(square: CropView.desiredCornerSize) {
         didSet {
-            widthConstraint.constant = size.width
-            heightConstraint.constant = size.height
+            invalidateIntrinsicContentSize()
         }
     }
 
-    lazy private var widthConstraint: NSLayoutConstraint = self.widthAnchor.constraint(equalToConstant: size.width)
-    lazy private var heightConstraint: NSLayoutConstraint = self.heightAnchor.constraint(equalToConstant: size.width)
-
     init(cropRegion: CropRegion) {
         self.cropRegion = cropRegion
+
         super.init(frame: .zero)
+
         isUserInteractionEnabled = false
-        translatesAutoresizingMaskIntoConstraints = false
-        shapeLayer?.fillColor = UIColor.white.cgColor
-        addConstraints([ widthConstraint, heightConstraint ])
+
+        // We need to track `UITraitUserInterfaceStyle` on all iOS versions because
+        // the view wouldn't receive it's final interface style until after being added to the superview.
+        updateColor()
+        if #available(iOS 17, *) {
+            registerForTraitChanges([UITraitUserInterfaceStyle.self], handler: { (self: Self, _) in
+                self.updateColor()
+            })
+        }
     }
 
-    @available(*, unavailable, message: "Use init(cropRegion:) instead.")
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    override var intrinsicContentSize: CGSize { size }
 
     override class var layerClass: AnyClass {
         return CAShapeLayer.self
@@ -56,8 +67,20 @@ private class CropCornerView: UIView {
         }
     }
 
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        if #unavailable(iOS 17), traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
+            updateColor()
+        }
+    }
+
+    private func updateColor() {
+        shapeLayer?.fillColor = UIColor.Signal.label.cgColor
+    }
+
     private func updatePath() {
-        guard let shapeLayer = shapeLayer else {
+        guard let shapeLayer else {
             return
         }
 
@@ -72,7 +95,7 @@ private class CropCornerView: UIView {
                 CGPoint(x: shapeFrame.maxX - cornerThickness, y: shapeFrame.minY + cornerThickness),
                 CGPoint(x: shapeFrame.minX + cornerThickness, y: shapeFrame.minY + cornerThickness),
                 CGPoint(x: shapeFrame.minX + cornerThickness, y: shapeFrame.maxY - cornerThickness),
-                CGPoint(x: shapeFrame.minX, y: shapeFrame.maxY - cornerThickness)
+                CGPoint(x: shapeFrame.minX, y: shapeFrame.maxY - cornerThickness),
             ])
         case .topRight:
             bezierPath.addRegion(withPoints: [
@@ -81,7 +104,7 @@ private class CropCornerView: UIView {
                 CGPoint(x: shapeFrame.maxX - cornerThickness, y: shapeFrame.maxY - cornerThickness),
                 CGPoint(x: shapeFrame.maxX - cornerThickness, y: shapeFrame.minY + cornerThickness),
                 CGPoint(x: shapeFrame.minX + cornerThickness, y: shapeFrame.minY + cornerThickness),
-                CGPoint(x: shapeFrame.minX + cornerThickness, y: shapeFrame.minY)
+                CGPoint(x: shapeFrame.minX + cornerThickness, y: shapeFrame.minY),
             ])
         case .bottomLeft:
             bezierPath.addRegion(withPoints: [
@@ -90,7 +113,7 @@ private class CropCornerView: UIView {
                 CGPoint(x: shapeFrame.minX + cornerThickness, y: shapeFrame.minY + cornerThickness),
                 CGPoint(x: shapeFrame.minX + cornerThickness, y: shapeFrame.maxY - cornerThickness),
                 CGPoint(x: shapeFrame.maxX - cornerThickness, y: shapeFrame.maxY - cornerThickness),
-                CGPoint(x: shapeFrame.maxX - cornerThickness, y: shapeFrame.maxY)
+                CGPoint(x: shapeFrame.maxX - cornerThickness, y: shapeFrame.maxY),
             ])
         case .bottomRight:
             bezierPath.addRegion(withPoints: [
@@ -99,7 +122,7 @@ private class CropCornerView: UIView {
                 CGPoint(x: shapeFrame.minX + cornerThickness, y: shapeFrame.maxY - cornerThickness),
                 CGPoint(x: shapeFrame.maxX - cornerThickness, y: shapeFrame.maxY - cornerThickness),
                 CGPoint(x: shapeFrame.maxX - cornerThickness, y: shapeFrame.minY + cornerThickness),
-                CGPoint(x: shapeFrame.maxX, y: shapeFrame.minY + cornerThickness)
+                CGPoint(x: shapeFrame.maxX, y: shapeFrame.minY + cornerThickness),
             ])
         default:
             owsFailDebug("Invalid crop region: \(cropRegion)")
@@ -126,26 +149,28 @@ private class CropBackgroundView: UIView {
     private let blurView = UIVisualEffectView()
     private let darkeningView: UIView = {
         let view = UIView()
-        view.backgroundColor = .black
+        view.backgroundColor = .Signal.mediaBackground
         return view
     }()
 
     init(style: Style) {
         self.style = style
+
         super.init(frame: .zero)
+
         isUserInteractionEnabled = false
         addSubview(blurView)
         addSubview(darkeningView)
         updateStyle()
     }
 
-    @available(*, unavailable, message: "Use init(style:)")
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     override func layoutSubviews() {
         super.layoutSubviews()
+
         blurView.frame = bounds
         darkeningView.frame = bounds
     }
@@ -154,7 +179,7 @@ private class CropBackgroundView: UIView {
         switch style {
         case .blur:
             darkeningView.alpha = 0
-            blurView.effect = UIBlurEffect(style: .dark)
+            blurView.effect = UIBlurEffect(style: .regular)
 
         case .darkening:
             darkeningView.alpha = 0.5
@@ -168,7 +193,7 @@ private class CropBackgroundView: UIView {
     var lastKnownMaskRect: CGRect?
 
     fileprivate func setMaskRect(_ maskRect: CGRect, animationDuration: TimeInterval) {
-        if let lastKnownMaskRect = lastKnownMaskRect, lastKnownMaskRect == maskRect {
+        if let lastKnownMaskRect, lastKnownMaskRect == maskRect {
             return
         }
 
@@ -200,35 +225,31 @@ private class CropBackgroundView: UIView {
     }
 }
 
-class CropView: UIView {
+final class CropView: UIView {
 
     static let desiredCornerSize: CGFloat = 22 // adjusted for stroke width, visible size is 24
     private(set) var cornerSize = CGSize(square: CropView.desiredCornerSize)
 
     private lazy var backgroundView = CropBackgroundView(style: CropView.backgroundStyle(forState: state))
 
-    private let cropFrameView: UIView = {
-        let view = UIView()
-        view.addBorder(with: .white)
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
+    private let cropFrameView = UIView()
 
     private let cropCornerViews: [CropCornerView] = [
         CropCornerView(cropRegion: .topLeft),
         CropCornerView(cropRegion: .topRight),
         CropCornerView(cropRegion: .bottomLeft),
-        CropCornerView(cropRegion: .bottomRight)
+        CropCornerView(cropRegion: .bottomRight),
     ]
 
-    private let verticalGridLines: [UIView] = [ UIView(), UIView() ]
-    private let horizontalGridLines: [UIView] = [ UIView(), UIView() ]
+    private let verticalGridLines: [UIView] = [UIView(), UIView()]
+    private let horizontalGridLines: [UIView] = [UIView(), UIView()]
 
     enum State {
-        case initial    // no crop frame visible, background set to `blackout`
-        case normal     // default look: crop frame visible, grid lines hidden, background set to `blur`
-        case resizing   // user is resizing: crop frame and grid lines visible, background set to `darkening`
+        case initial // no crop frame visible, background set to `blackout`
+        case normal // default look: crop frame visible, grid lines hidden, background set to `blur`
+        case resizing // user is resizing: crop frame and grid lines visible, background set to `darkening`
     }
+
     private var state: State = .initial
 
     // Defines crop frame.
@@ -244,31 +265,35 @@ class CropView: UIView {
         // Crop Frame
         cropFrameLayoutGuide.identifier = "CropFrame"
         addLayoutGuide(cropFrameLayoutGuide)
+
+        cropFrameView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(cropFrameView)
-        addConstraints([
+        NSLayoutConstraint.activate([
             cropFrameView.leadingAnchor.constraint(equalTo: cropFrameLayoutGuide.leadingAnchor),
             cropFrameView.topAnchor.constraint(equalTo: cropFrameLayoutGuide.topAnchor),
             cropFrameView.trailingAnchor.constraint(equalTo: cropFrameLayoutGuide.trailingAnchor),
-            cropFrameView.bottomAnchor.constraint(equalTo: cropFrameLayoutGuide.bottomAnchor)
+            cropFrameView.bottomAnchor.constraint(equalTo: cropFrameLayoutGuide.bottomAnchor),
         ])
 
         // Crop Frame Corners
         for cropCornerView in cropCornerViews {
+            cropCornerView.translatesAutoresizingMaskIntoConstraints = false
             cropFrameView.addSubview(cropCornerView)
 
+            // Note that we use "left" and "right" here.
             switch cropCornerView.cropRegion {
             case .topLeft, .bottomLeft:
-                cropCornerView.autoPinEdge(toSuperviewEdge: .left)
+                NSLayoutConstraint.activate([cropCornerView.leftAnchor.constraint(equalTo: cropFrameView.leftAnchor)])
             case .topRight, .bottomRight:
-                cropCornerView.autoPinEdge(toSuperviewEdge: .right)
+                NSLayoutConstraint.activate([cropCornerView.rightAnchor.constraint(equalTo: cropFrameView.rightAnchor)])
             default:
                 owsFailDebug("Invalid crop region: \(String(describing: cropCornerView.cropRegion))")
             }
             switch cropCornerView.cropRegion {
             case .topLeft, .topRight:
-                cropCornerView.autoPinEdge(toSuperviewEdge: .top)
+                NSLayoutConstraint.activate([cropCornerView.topAnchor.constraint(equalTo: cropFrameView.topAnchor)])
             case .bottomLeft, .bottomRight:
-                cropCornerView.autoPinEdge(toSuperviewEdge: .bottom)
+                NSLayoutConstraint.activate([cropCornerView.bottomAnchor.constraint(equalTo: cropFrameView.bottomAnchor)])
             default:
                 owsFailDebug("Invalid crop region: \(String(describing: cropCornerView.cropRegion))")
             }
@@ -277,52 +302,91 @@ class CropView: UIView {
         // Spacer Layout Guide that allows to space grid lines evenly
         let spacerLayoutGuide = UILayoutGuide()
         cropFrameView.addLayoutGuide(spacerLayoutGuide)
-        NSLayoutConstraint(item: spacerLayoutGuide, attribute: .left, relatedBy: .equal,
-                           toItem: cropFrameView, attribute: .left, multiplier: 1, constant: 0).isActive = true
-        NSLayoutConstraint(item: spacerLayoutGuide, attribute: .top, relatedBy: .equal,
-                           toItem: cropFrameView, attribute: .top, multiplier: 1, constant: 0).isActive = true
-        NSLayoutConstraint(item: spacerLayoutGuide, attribute: .width, relatedBy: .equal,
-                           toItem: cropFrameView, attribute: .width, multiplier: 1/CGFloat(verticalGridLines.count + 1), constant: 0).isActive = true
-        NSLayoutConstraint(item: spacerLayoutGuide, attribute: .height, relatedBy: .equal,
-                           toItem: cropFrameView, attribute: .height, multiplier: 1/CGFloat(horizontalGridLines.count + 1), constant: 0).isActive = true
+        NSLayoutConstraint.activate([
+            spacerLayoutGuide.leftAnchor.constraint(equalTo: cropFrameView.leftAnchor),
+            spacerLayoutGuide.topAnchor.constraint(equalTo: cropFrameView.topAnchor),
+            spacerLayoutGuide.widthAnchor.constraint(
+                equalTo: cropFrameView.widthAnchor,
+                multiplier: 1 / CGFloat(verticalGridLines.count + 1),
+            ),
+            spacerLayoutGuide.heightAnchor.constraint(
+                equalTo: cropFrameView.heightAnchor,
+                multiplier: 1 / CGFloat(horizontalGridLines.count + 1),
+            ),
+        ])
 
         // Grid Lines
         for (index, line) in verticalGridLines.enumerated() {
-            line.backgroundColor = .ows_white
+            line.backgroundColor = .white // fixed color by design
+            line.translatesAutoresizingMaskIntoConstraints = false
             cropFrameView.addSubview(line)
-            line.autoSetDimension(.width, toSize: 1)
-            line.autoPinHeightToSuperview()
-            NSLayoutConstraint(item: line, attribute: .centerX, relatedBy: .equal,
-                               toItem: spacerLayoutGuide, attribute: .right,
-                               multiplier: CGFloat(index + 1),
-                               constant: 0).isActive = true
+            NSLayoutConstraint.activate([
+                line.widthAnchor.constraint(equalToConstant: 1),
+                line.topAnchor.constraint(equalTo: cropFrameView.topAnchor),
+                line.bottomAnchor.constraint(equalTo: cropFrameView.bottomAnchor),
+                NSLayoutConstraint(
+                    item: line,
+                    attribute: .centerX,
+                    relatedBy: .equal,
+                    toItem: spacerLayoutGuide,
+                    attribute: .right,
+                    multiplier: CGFloat(index + 1),
+                    constant: 0,
+                ),
+            ])
         }
         for (index, line) in horizontalGridLines.enumerated() {
-            line.backgroundColor = .ows_white
+            line.backgroundColor = .white // fixed color by design
+            line.translatesAutoresizingMaskIntoConstraints = false
             cropFrameView.addSubview(line)
-            line.autoSetDimension(.height, toSize: 1)
-            line.autoPinWidthToSuperview()
-            NSLayoutConstraint(item: line, attribute: .centerY, relatedBy: .equal,
-                               toItem: spacerLayoutGuide, attribute: .bottom,
-                               multiplier: CGFloat(index + 1),
-                               constant: 0).isActive = true
+            NSLayoutConstraint.activate([
+                line.heightAnchor.constraint(equalToConstant: 1),
+                line.leftAnchor.constraint(equalTo: cropFrameView.leftAnchor),
+                line.rightAnchor.constraint(equalTo: cropFrameView.rightAnchor),
+                NSLayoutConstraint(
+                    item: line,
+                    attribute: .centerY,
+                    relatedBy: .equal,
+                    toItem: spacerLayoutGuide,
+                    attribute: .bottom,
+                    multiplier: CGFloat(index + 1),
+                    constant: 0,
+                ),
+            ])
         }
         setState(.initial, animated: false)
+
+        cropFrameView.layer.borderWidth = 1
+        updateFrameColor()
+        if #available(iOS 17, *) {
+            registerForTraitChanges([UITraitUserInterfaceStyle.self], handler: { (self: Self, _) in
+                self.updateFrameColor()
+            })
+        }
     }
 
-    @available(*, unavailable, message: "Use init(frame:)")
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        if #unavailable(iOS 17), traitCollection.userInterfaceStyle != previousTraitCollection?.userInterfaceStyle {
+            updateFrameColor()
+        }
+    }
+
     override func layoutSubviews() {
         super.layoutSubviews()
+
         backgroundView.frame = bounds
         // `inheritedAnimationDuration` will return a non-zero value when called from within an animation block.
         // That allows me to attach CAAnimation with the correct duration (if necessary).
         let animationDuration = UIView.inheritedAnimationDuration
         let maskRect = backgroundView.convert(cropFrameView.frame, from: self)
         backgroundView.setMaskRect(maskRect, animationDuration: animationDuration)
+
         updateCornerSize()
     }
 
@@ -353,11 +417,17 @@ class CropView: UIView {
     }
 
     private func updateCornerSize() {
-        guard cropFrameView.width > 0, cropFrameView.height > 0 else { return }
+        guard cropFrameView.frame.size.isNonEmpty else { return }
 
-        self.cornerSize = CGSize(width: min(cropFrameView.width * 0.5, CropView.desiredCornerSize),
-                                 height: min(cropFrameView.height * 0.5, CropView.desiredCornerSize))
+        cornerSize = CGSize(
+            width: min(cropFrameView.frame.size.width * 0.5, CropView.desiredCornerSize),
+            height: min(cropFrameView.frame.size.height * 0.5, CropView.desiredCornerSize),
+        )
         cropCornerViews.forEach { $0.size = cornerSize }
+    }
+
+    private func updateFrameColor() {
+        cropFrameView.layer.borderColor = UIColor.Signal.label.cgColor
     }
 }
 

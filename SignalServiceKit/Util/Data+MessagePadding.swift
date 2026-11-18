@@ -5,8 +5,6 @@
 
 import Foundation
 
-// This code is ported from Android.
-// See <https://github.com/signalapp/Signal-Android/blob/cdcb1de3d4c0a6c7ff7f80eed37b490743c311e5/libsignal/service/src/main/java/org/whispersystems/signalservice/internal/push/PushTransportDetails.java#L12-L57>.
 extension Data {
     public var paddedMessageBody: Data {
         let paddingLength: Int = {
@@ -27,7 +25,8 @@ extension Data {
     public func withoutPadding() -> Data {
         guard
             let lastNonZeroByteIndex = self.lastIndex(where: { $0 != 0 }),
-            self[lastNonZeroByteIndex] == 0x80 else {
+            self[lastNonZeroByteIndex] == 0x80
+        else {
             Logger.warn("Failed to find padding byte, returning unstripped data")
             return self
         }

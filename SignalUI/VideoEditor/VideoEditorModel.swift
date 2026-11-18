@@ -53,14 +53,13 @@ class VideoEditorModel: NSObject {
     //
     // * They are invalid.
     // * We can't determine their size / aspect-ratio.
-    init(srcVideoPath: String) throws {
-        self.srcVideoPath = srcVideoPath
+    init?(_ attachment: PreviewableAttachment) throws {
+        guard attachment.rawValue.isVideo, !attachment.rawValue.isLoopingVideo else {
+            return nil
+        }
+        let mediaUrl = attachment.rawValue.dataSource.fileUrl
+        self.srcVideoPath = mediaUrl.path
 
-        try OWSMediaUtils.validateVideoExtension(ofPath: srcVideoPath)
-        try OWSMediaUtils.validateVideoSize(atPath: srcVideoPath)
-        try OWSMediaUtils.validateVideoAsset(atPath: srcVideoPath)
-
-        let mediaUrl = URL(fileURLWithPath: srcVideoPath)
         let asset = AVURLAsset(url: mediaUrl)
 
         let duration: CMTime = asset.duration
@@ -156,7 +155,10 @@ class VideoEditorModel: NSObject {
         let startTime = MonotonicDate()
 
         let asset = AVURLAsset(url: URL(fileURLWithPath: self.srcVideoPath))
-        let exportUrl = OWSFileSystem.temporaryFileUrl(fileExtension: "mp4")
+        let exportUrl = OWSFileSystem.temporaryFileUrl(
+            fileExtension: "mp4",
+            isAvailableWhileDeviceLocked: false,
+        )
 
         guard let session = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetPassthrough) else {
             throw OWSAssertionError("couldn't create export session")

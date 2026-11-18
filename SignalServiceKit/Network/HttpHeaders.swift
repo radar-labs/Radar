@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import UIKit
 
 // This class can be used to build "outgoing" headers for requests
 // or to parse "incoming" headers for responses.
@@ -85,7 +86,7 @@ public struct HttpHeaders: Codable, CustomDebugStringConvertible, ExpressibleByD
     }
 
     public mutating func addHeaderMap(_ newHttpHeaders: [String: String]?, overwriteOnConflict: Bool) {
-        guard let newHttpHeaders = newHttpHeaders else {
+        guard let newHttpHeaders else {
             return
         }
         for (key, value) in newHttpHeaders {
@@ -114,7 +115,7 @@ public struct HttpHeaders: Codable, CustomDebugStringConvertible, ExpressibleByD
     }
 
     public mutating func addHeaderList(_ newHttpHeaders: [String]?, overwriteOnConflict: Bool) {
-        guard let newHttpHeaders = newHttpHeaders else {
+        guard let newHttpHeaders else {
             return
         }
         for header in newHttpHeaders {
@@ -190,7 +191,7 @@ public struct HttpHeaders: Codable, CustomDebugStringConvertible, ExpressibleByD
                 // ["If no 'q' parameter is present, the default weight is 1."][0]
                 // [0]: https://www.rfc-editor.org/rfc/rfc9110.html#section-12.4.2
                 if q == 1 { return language }
-                return String(format: "\(language);q=%0.1g", q)
+                return language + String(format: ";q=%0.1g", q)
             }
         return formattedLanguages.isEmpty ? "*" : formattedLanguages.joined(separator: ", ")
     }
@@ -231,7 +232,7 @@ public struct HttpHeaders: Codable, CustomDebugStringConvertible, ExpressibleByD
 
     static let whitelistedLoggedHeaderKeys = Set([
         "retry-after",
-        "x-signal-timestamp"
+        "x-signal-timestamp",
         // Have a header key who's value you'd like to see logged? Add it here (lowercased)!
     ])
 

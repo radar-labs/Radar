@@ -5,71 +5,79 @@
 
 import Foundation
 
-/// Responsible for hard-deleting a thread. This is an exceptional action:
-/// threads are typically "soft-deleted" by removing their contents and metadata
-/// without deleting the ``TSThread`` database record itself. Hard-deletion is
-/// only appropriate for scenarios in which we know a thread will be truly
-/// *gone forever*; for example, when two threads are merged.
+/// Responsible for hard-deleting a thread.
 ///
-/// If you're looking to colloquially "delete a thread", e.g. in response to a
-/// user action, you probably want ``ThreadSoftDeleteManager``.
+/// This type is an implementation detail; if you're looking to colloquially
+/// "delete a thread", e.g. in response to a user action, you probably want
+/// ``ThreadDeletionManager``.
 public protocol ThreadRemover {
-    func remove(_ thread: TSContactThread, tx: DBWriteTransaction)
-    func remove(_ thread: TSPrivateStoryThread, tx: DBWriteTransaction)
+    func remove(_ thread: TSThread, tx: DBWriteTransaction)
+}
+
+public protocol ThreadRemoverObserver {
+    func didRemoveThread(_ thread: TSThread, tx: DBWriteTransaction)
 }
 
 class ThreadRemoverImpl: ThreadRemover {
     private let chatColorSettingStore: ChatColorSettingStore
     private let databaseStorage: Shims.DatabaseStorage
+    private let deletedCallRecordStore: any DeletedCallRecordStore
     private let disappearingMessagesConfigurationStore: DisappearingMessagesConfigurationStore
+    private let groupMemberUpdater: any GroupMemberUpdater
     private let lastVisibleInteractionStore: LastVisibleInteractionStore
-    private let threadAssociatedDataStore: ThreadAssociatedDataStore
     private let threadReadCache: Shims.ThreadReadCache
     private let threadReplyInfoStore: ThreadReplyInfoStore
-    private let threadSoftDeleteManager: ThreadSoftDeleteManager
     private let threadStore: ThreadStore
     private let wallpaperStore: WallpaperStore
+    private let observers: [any ThreadRemoverObserver]
 
     init(
         chatColorSettingStore: ChatColorSettingStore,
         databaseStorage: Shims.DatabaseStorage,
+        deletedCallRecordStore: any DeletedCallRecordStore,
         disappearingMessagesConfigurationStore: DisappearingMessagesConfigurationStore,
+        groupMemberUpdater: any GroupMemberUpdater,
         lastVisibleInteractionStore: LastVisibleInteractionStore,
-        threadAssociatedDataStore: ThreadAssociatedDataStore,
         threadReadCache: Shims.ThreadReadCache,
         threadReplyInfoStore: ThreadReplyInfoStore,
-        threadSoftDeleteManager: ThreadSoftDeleteManager,
         threadStore: ThreadStore,
-        wallpaperStore: WallpaperStore
+        wallpaperStore: WallpaperStore,
+        observers: [any ThreadRemoverObserver],
     ) {
         self.chatColorSettingStore = chatColorSettingStore
         self.databaseStorage = databaseStorage
+        self.deletedCallRecordStore = deletedCallRecordStore
         self.disappearingMessagesConfigurationStore = disappearingMessagesConfigurationStore
+        self.groupMemberUpdater = groupMemberUpdater
         self.lastVisibleInteractionStore = lastVisibleInteractionStore
-        self.threadAssociatedDataStore = threadAssociatedDataStore
         self.threadReadCache = threadReadCache
         self.threadReplyInfoStore = threadReplyInfoStore
-        self.threadSoftDeleteManager = threadSoftDeleteManager
         self.threadStore = threadStore
         self.wallpaperStore = wallpaperStore
+        self.observers = observers
     }
 
-    func remove(_ thread: TSContactThread, tx: DBWriteTransaction) { removeAny(thread, tx: tx) }
-
-    func remove(_ thread: TSPrivateStoryThread, tx: DBWriteTransaction) { removeAny(thread, tx: tx) }
-
-    private func removeAny(_ thread: TSThread, tx: DBWriteTransaction) {
+    func remove(_ thread: TSThread, tx: DBWriteTransaction) {
+        let threadId = thread.id.owsFailUnwrap("must have rowid")
         chatColorSettingStore.setRawSetting(nil, for: thread.uniqueId, tx: tx)
         databaseStorage.updateIdMapping(thread: thread, tx: tx)
-        // No sync message, since hard-delete is a local-only concept.
-        threadSoftDeleteManager.removeAllInteractions(thread: thread, sendDeleteForMeSyncMessage: false, tx: tx)
+        deletedCallRecordStore.deleteRecords(forThreadId: threadId, tx: tx)
         disappearingMessagesConfigurationStore.remove(for: thread, tx: tx)
-        threadAssociatedDataStore.remove(for: thread.uniqueId, tx: tx)
         threadReplyInfoStore.remove(for: thread.uniqueId, tx: tx)
+        if thread is TSGroupThread {
+            groupMemberUpdater.updateRecords(
+                groupThreadUniqueId: thread.uniqueId,
+                groupMembership: .empty,
+                transaction: tx,
+            )
+        }
         threadStore.removeThread(thread, tx: tx)
         threadReadCache.didRemove(thread: thread, tx: tx)
-        try? wallpaperStore.reset(for: thread, tx: tx)
+        wallpaperStore.reset(for: thread, tx: tx)
         lastVisibleInteractionStore.clearLastVisibleInteraction(for: thread, tx: tx)
+        for observer in observers {
+            observer.didRemoveThread(thread, tx: tx)
+        }
     }
 }
 
@@ -96,6 +104,7 @@ class _ThreadRemoverImpl_ThreadReadCacheWrapper: _ThreadRemoverImpl_ThreadReadCa
     init(_ threadReadCache: ThreadReadCache) {
         self.threadReadCache = threadReadCache
     }
+
     func didRemove(thread: TSThread, tx: DBWriteTransaction) {
         threadReadCache.didRemove(thread: thread, transaction: tx)
     }
@@ -110,6 +119,7 @@ class _ThreadRemoverImpl_DatabaseStorageWrapper: _ThreadRemoverImpl_DatabaseStor
     init(_ databaseStorage: SDSDatabaseStorage) {
         self.databaseStorage = databaseStorage
     }
+
     func updateIdMapping(thread: TSThread, tx: DBWriteTransaction) {
         databaseStorage.updateIdMapping(thread: thread, transaction: tx)
     }

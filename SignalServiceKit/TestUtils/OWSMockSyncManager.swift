@@ -7,8 +7,8 @@ import Foundation
 
 #if TESTABLE_BUILD
 
-public class OWSMockSyncManager: SyncManagerProtocol {
-    public func sendConfigurationSyncMessage() {
+public class OWSMockSyncManager: SyncManager {
+    public func sendConfigurationSyncMessage(tx: DBWriteTransaction) {
         Logger.info("")
     }
 
@@ -34,15 +34,11 @@ public class OWSMockSyncManager: SyncManagerProtocol {
         Logger.info("")
     }
 
-    public func sendFetchLatestStorageManifestSyncMessage() async {
+    public func sendFetchLatestStorageManifestSyncMessage(tx: DBWriteTransaction) {
         Logger.info("")
     }
 
-    public func sendFetchLatestSubscriptionStatusSyncMessage() {
-        Logger.info("")
-    }
-
-    public func sendKeysSyncMessage() {
+    public func sendFetchLatestSubscriptionStatusSyncMessage(tx: DBWriteTransaction) {
         Logger.info("")
     }
 
@@ -70,15 +66,21 @@ public class OWSMockSyncManager: SyncManagerProtocol {
         Logger.info("")
     }
 
-    public func processIncomingMessageRequestResponseSyncMessage(_ syncMessage: SSKProtoSyncMessageMessageRequestResponse, transaction: DBWriteTransaction) {
+    public func processIncomingMessageRequestResponseSyncMessage(
+        _ syncMessage: SSKProtoSyncMessageMessageRequestResponse,
+        timestamp: UInt64,
+        localIdentifiers: LocalIdentifiers,
+        tx: DBWriteTransaction,
+    ) {
         Logger.info("")
     }
 
-    public func sendMessageRequestResponseSyncMessage(thread: TSThread, responseType: OWSSyncMessageRequestResponseType) {
-        Logger.info("")
-    }
-
-    public func sendMessageRequestResponseSyncMessage(thread: TSThread, responseType: OWSSyncMessageRequestResponseType, transaction: DBWriteTransaction) {
+    public func sendMessageRequestResponseSyncMessage(
+        forThread thread: TSThread,
+        timestamp: UInt64,
+        responseType: OutgoingMessageRequestResponseSyncMessage.ResponseType,
+        tx: DBWriteTransaction,
+    ) {
         Logger.info("")
     }
 

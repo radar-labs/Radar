@@ -40,19 +40,20 @@ class CallLinkAdminManager {
                     name,
                     rootKey: self.rootKey,
                     adminPasskey: self.adminPasskey,
-                    authCredential: authCredential
+                    authCredential: authCredential,
                 )
-            }
+            },
         )
     }
 
     func toggleApproveAllMembersWithActivityIndicator(
         _ sender: UISwitch,
-        from viewController: UIViewController
+        from viewController: UIViewController,
     ) {
         let isOn = sender.isOn
         ModalActivityIndicatorViewController.present(
             fromViewController: viewController,
+            title: CommonStrings.updatingModal,
             presentationDelay: 0.25,
             asyncBlock: { modal in
                 let updateResult = await Result {
@@ -61,7 +62,7 @@ class CallLinkAdminManager {
                             requiresAdminApproval: isOn,
                             rootKey: self.rootKey,
                             adminPasskey: self.adminPasskey,
-                            authCredential: authCredential
+                            authCredential: authCredential,
                         )
                     }
                 }
@@ -78,29 +79,35 @@ class CallLinkAdminManager {
                             OWSActionSheets.showActionSheet(
                                 title: CallStrings.callLinkErrorSheetTitle,
                                 message: CallStrings.callLinkUpdateErrorSheetDescription,
-                                fromViewController: viewController
+                                fromViewController: viewController,
                             )
                         }
                     }
                 }
-            }
+            },
         )
     }
 
     // MARK: Private
 
     private func updateCallLink(
-        _ performUpdate: (CallLinkManager, SignalServiceKit.CallLinkAuthCredential) async throws -> CallLinkState
+        _ performUpdate: (CallLinkManager, SignalServiceKit.CallLinkAuthCredential) async throws -> CallLinkState,
     ) async throws {
         let callLinkManager = AppEnvironment.shared.callService.callLinkManager
         let callLinkStateUpdater = AppEnvironment.shared.callService.callLinkStateUpdater
         let databaseStorage = SSKEnvironment.shared.databaseStorageRef
-        _ = try await callLinkStateUpdater.updateExclusively(rootKey: rootKey) { authCredential in
+        let messageSenderJobQueue = SSKEnvironment.shared.messageSenderJobQueueRef
+        _ = try await callLinkStateUpdater.updateExclusively(rootKey: rootKey) { authCredential, registeredState in
             let callLinkState = try await performUpdate(callLinkManager, authCredential)
             await databaseStorage.awaitableWrite { [rootKey, adminPasskey] tx in
                 CallLinkUpdateMessageSender(
-                    messageSenderJobQueue: SSKEnvironment.shared.messageSenderJobQueueRef
-                ).sendCallLinkUpdateMessage(rootKey: rootKey, adminPasskey: adminPasskey, tx: tx)
+                    messageSenderJobQueue: messageSenderJobQueue,
+                ).sendCallLinkUpdateMessage(
+                    rootKey: rootKey,
+                    adminPasskey: adminPasskey,
+                    localIdentifiers: registeredState.localIdentifiers,
+                    tx: tx,
+                )
             }
             self.callLinkState = callLinkState
             self.didUpdateCallLinkState?(callLinkState)

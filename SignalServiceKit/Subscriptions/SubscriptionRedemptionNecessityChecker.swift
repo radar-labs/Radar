@@ -24,22 +24,22 @@ protocol SubscriptionRedemptionNecessityCheckerStore {
 struct SubscriptionRedemptionNecessityChecker<RedemptionJobContext> {
     typealias FetchSubscriptionBlock = (
         _ db: DB,
-        _ subscriptionFetcher: SubscriptionFetcher
+        _ subscriptionFetcher: SubscriptionFetcher,
     ) async throws -> (subscriberID: Data, subscription: Subscription)?
 
     typealias ParseEntitlementExpirationBlock = (
-        _ entitlements: WhoAmIRequestFactory.Responses.WhoAmI.Entitlements,
-        _ subscription: Subscription
+        _ entitlements: AccountIdentityResponse.Entitlements,
+        _ subscription: Subscription,
     ) -> TimeInterval?
 
     typealias SaveRedemptionJobBlock = (
         _ subscriberId: Data,
         _ subscription: Subscription,
-        _ tx: DBWriteTransaction
+        _ tx: DBWriteTransaction,
     ) throws -> RedemptionJobContext?
 
     typealias StartRedemptionJobBlock = (
-        _ jobContext: RedemptionJobContext
+        _ jobContext: RedemptionJobContext,
     ) async throws -> Void
 
     private enum Constants {
@@ -60,7 +60,7 @@ struct SubscriptionRedemptionNecessityChecker<RedemptionJobContext> {
         db: any DB,
         logger: PrefixedLogger,
         networkManager: NetworkManager,
-        tsAccountManager: TSAccountManager
+        tsAccountManager: TSAccountManager,
     ) {
         self.checkerStore = checkerStore
         self.dateProvider = dateProvider
@@ -94,18 +94,18 @@ struct SubscriptionRedemptionNecessityChecker<RedemptionJobContext> {
         fetchSubscriptionBlock: FetchSubscriptionBlock,
         parseEntitlementExpirationBlock: ParseEntitlementExpirationBlock,
         saveRedemptionJobBlock: SaveRedemptionJobBlock,
-        startRedemptionJobBlock: StartRedemptionJobBlock
+        startRedemptionJobBlock: StartRedemptionJobBlock,
     ) async throws {
         let (
             registrationState,
-            lastRedemptionNecessaryCheck
+            lastRedemptionNecessaryCheck,
         ): (
             TSRegistrationState,
-            Date?
+            Date?,
         ) = db.read { tx in
             return (
                 tsAccountManager.registrationState(tx: tx),
-                checkerStore.getLastRedemptionNecessaryCheck(tx: tx)
+                checkerStore.getLastRedemptionNecessaryCheck(tx: tx),
             )
         }
 
@@ -122,13 +122,15 @@ struct SubscriptionRedemptionNecessityChecker<RedemptionJobContext> {
             return
         }
 
-        guard let (subscriberId, subscription) = try await fetchSubscriptionBlock(
-            db,
-            SubscriptionFetcher(
-                networkManager: networkManager,
-                retryPolicy: .hopefullyRecoverable
+        guard
+            let (subscriberId, subscription) = try await fetchSubscriptionBlock(
+                db,
+                SubscriptionFetcher(
+                    networkManager: networkManager,
+                    retryPolicy: .hopefullyRecoverable,
+                ),
             )
-        ) else {
+        else {
             logger.warn("Not redeeming, subscription missing!")
 
             /// If there's no subscription there's nothing for us to redeem, so
@@ -140,7 +142,7 @@ struct SubscriptionRedemptionNecessityChecker<RedemptionJobContext> {
             return
         }
 
-        logger.info("Checking if subscription should be redeemed.")
+        logger.info("Checking if subscription should be redeemed. \(subscription.debugDescription)")
 
         /// This "heartbeat" is important to do regularly, as the server will
         /// take cleanup steps on subscriber IDs that haven't had a client
@@ -153,7 +155,7 @@ struct SubscriptionRedemptionNecessityChecker<RedemptionJobContext> {
 
             let currentEntitlementExpiration: TimeInterval? = parseEntitlementExpirationBlock(
                 currentEntitlements,
-                subscription
+                subscription,
             )
 
             if let expiration = currentEntitlementExpiration.map({ Date(timeIntervalSince1970: $0) }) {
@@ -228,14 +230,16 @@ struct SubscriptionRedemptionNecessityChecker<RedemptionJobContext> {
     /// Let the server know that a client still cares about this subscriberId.
     private func performSubscriberIdHeartbeat(_ subscriberId: Data) async throws {
         let registerSubscriberIdResponse = try await networkManager.asyncRequest(
-            OWSRequestFactory.setSubscriberID(subscriberId)
+            OWSRequestFactory.setSubscriberID(
+                subscriberId,
+                // We don't need a DonationPermit if the subscriberID already
+                // exists, only to create one.
+                donationPermit: nil,
+            ),
         )
 
         guard registerSubscriberIdResponse.responseStatusCode == 200 else {
-            throw OWSAssertionError(
-                "Unexpected status code registering new Backup subscriber ID! \(registerSubscriberIdResponse.responseStatusCode)",
-                logger: logger
-            )
+            throw registerSubscriberIdResponse.asError()
         }
     }
 }

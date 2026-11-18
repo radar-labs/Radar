@@ -14,11 +14,17 @@ struct CLVViewInfo: Equatable {
     let isMultiselectActive: Bool
     let hasVisibleReminders: Bool
     let shouldBackupDownloadProgressViewBeVisible: Bool
+    let shouldBackupExportProgressViewBeVisible: Bool
+    let shouldLocalFileBackupRestoreProgressViewBeVisible: Bool
+    let shouldLocalFileBackupExportProgressViewBeVisible: Bool
     let lastSelectedThreadId: String?
     let requiredVisibleThreadIds: Set<String>
 
     var hasArchivedThreadsRow: Bool {
-        chatListMode == .inbox && !isMultiselectActive && inboxFilter == .none && archiveCount > 0
+        chatListMode == .inbox
+            && !isMultiselectActive
+            && inboxFilter == .unfiltered
+            && archiveCount > 0
     }
 
     static var empty: CLVViewInfo {
@@ -26,12 +32,15 @@ struct CLVViewInfo: Equatable {
             chatListMode: .inbox,
             archiveCount: 0,
             inboxCount: 0,
-            inboxFilter: .none,
+            inboxFilter: .unfiltered,
             isMultiselectActive: false,
             hasVisibleReminders: false,
             shouldBackupDownloadProgressViewBeVisible: false,
+            shouldBackupExportProgressViewBeVisible: false,
+            shouldLocalFileBackupRestoreProgressViewBeVisible: false,
+            shouldLocalFileBackupExportProgressViewBeVisible: false,
             lastSelectedThreadId: nil,
-            requiredVisibleThreadIds: []
+            requiredVisibleThreadIds: [],
         )
     }
 
@@ -42,31 +51,33 @@ struct CLVViewInfo: Equatable {
         lastSelectedThreadId: String?,
         hasVisibleReminders: Bool,
         shouldBackupDownloadProgressViewBeVisible: Bool,
-        transaction: DBReadTransaction
+        shouldBackupExportProgressViewBeVisible: Bool,
+        shouldLocalFileBackupRestoreProgressViewBeVisible: Bool,
+        shouldLocalFileBackupExportProgressViewBeVisible: Bool,
+        transaction: DBReadTransaction,
     ) -> CLVViewInfo {
-        do {
-            let requiredThreadIds: Set<String> = if inboxFilter != .none, let lastSelectedThreadId {
-                [lastSelectedThreadId]
-            } else {
-                []
-            }
-            let threadFinder = ThreadFinder()
-            let archiveCount = try threadFinder.visibleThreadCount(isArchived: true, transaction: transaction)
-            let inboxCount = try threadFinder.visibleThreadCount(isArchived: false, transaction: transaction)
-            return CLVViewInfo(
-                chatListMode: chatListMode,
-                archiveCount: archiveCount,
-                inboxCount: inboxCount,
-                inboxFilter: inboxFilter,
-                isMultiselectActive: isMultiselectActive,
-                hasVisibleReminders: hasVisibleReminders,
-                shouldBackupDownloadProgressViewBeVisible: shouldBackupDownloadProgressViewBeVisible,
-                lastSelectedThreadId: lastSelectedThreadId,
-                requiredVisibleThreadIds: requiredThreadIds
-            )
-        } catch {
-            owsFailDebug("Error: \(error)")
-            return .empty
+        let requiredThreadIds: Set<String> = switch (inboxFilter, lastSelectedThreadId) {
+        case (.unread, .some(let lastSelectedThreadId)):
+            [lastSelectedThreadId]
+        case (.unread, nil), (.unfiltered, _):
+            []
         }
+        let threadFinder = ThreadFinder()
+        let archiveCount = threadFinder.visibleThreadCount(isArchived: true, transaction: transaction)
+        let inboxCount = threadFinder.visibleThreadCount(isArchived: false, transaction: transaction)
+        return CLVViewInfo(
+            chatListMode: chatListMode,
+            archiveCount: archiveCount,
+            inboxCount: inboxCount,
+            inboxFilter: inboxFilter,
+            isMultiselectActive: isMultiselectActive,
+            hasVisibleReminders: hasVisibleReminders,
+            shouldBackupDownloadProgressViewBeVisible: shouldBackupDownloadProgressViewBeVisible,
+            shouldBackupExportProgressViewBeVisible: shouldBackupExportProgressViewBeVisible,
+            shouldLocalFileBackupRestoreProgressViewBeVisible: shouldLocalFileBackupRestoreProgressViewBeVisible,
+            shouldLocalFileBackupExportProgressViewBeVisible: shouldLocalFileBackupExportProgressViewBeVisible,
+            lastSelectedThreadId: lastSelectedThreadId,
+            requiredVisibleThreadIds: requiredThreadIds,
+        )
     }
 }

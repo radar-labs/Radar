@@ -47,30 +47,18 @@ public extension Notification.Name {
 
 // MARK: -
 
-/// Reports whether we are able to upload Backup attachments, via various
-/// consolidated inputs.
+/// Tracks and reports the status of the Backup attachment upload queue.
 ///
 /// `@MainActor`-isolated because most of the inputs are themselves isolated.
+///
+/// - SeeAlso `BackupAttachmentUploadTracker`
 @MainActor
-public protocol BackupAttachmentUploadQueueStatusReporter {
+public protocol BackupAttachmentUploadQueueStatusManager {
+
+    /// The current status of the upload queue.
+    /// - Important
+    /// Only returns meaningful values once `beginObservingIfNecessary` has been called.
     func currentStatus(for mode: BackupAttachmentUploadQueueMode) -> BackupAttachmentUploadQueueStatus
-}
-
-extension BackupAttachmentUploadQueueStatusReporter {
-    fileprivate func notifyStatusDidChange(for mode: BackupAttachmentUploadQueueMode) {
-        NotificationCenter.default.postOnMainThread(
-            name: .backupAttachmentUploadQueueStatusDidChange(for: mode),
-            object: nil,
-        )
-    }
-}
-
-// MARK: -
-
-/// API for callers to manage the `StatusReporter` in response to relevant
-/// external events.
-@MainActor
-protocol BackupAttachmentUploadQueueStatusManager: BackupAttachmentUploadQueueStatusReporter {
 
     /// Begin observing status updates, if necessary.
     func beginObservingIfNecessary(for mode: BackupAttachmentUploadQueueMode) -> BackupAttachmentUploadQueueStatus
@@ -84,34 +72,30 @@ protocol BackupAttachmentUploadQueueStatusManager: BackupAttachmentUploadQueueSt
 // MARK: -
 
 @MainActor
-public class BackupAttachmentUploadQueueStatusManagerImpl: BackupAttachmentUploadQueueStatusManager {
+class BackupAttachmentUploadQueueStatusManagerImpl: BackupAttachmentUploadQueueStatusManager {
 
-    // MARK: - BackupAttachmentUploadQueueStatusReporter
-
-    public func currentStatus(for mode: BackupAttachmentUploadQueueMode) -> BackupAttachmentUploadQueueStatus {
+    func currentStatus(for mode: BackupAttachmentUploadQueueMode) -> BackupAttachmentUploadQueueStatus {
         return state.asQueueStatus(for: mode)
     }
 
-    // MARK: - BackupAttachmentUploadQueueStatusManager
-
-    public func beginObservingIfNecessary(for mode: BackupAttachmentUploadQueueMode) -> BackupAttachmentUploadQueueStatus {
+    func beginObservingIfNecessary(for mode: BackupAttachmentUploadQueueMode) -> BackupAttachmentUploadQueueStatus {
         observeDeviceAndLocalStatesIfNecessary()
         return currentStatus(for: mode)
     }
 
-    public func didEmptyQueue(for mode: BackupAttachmentUploadQueueMode) {
+    func didEmptyQueue(for mode: BackupAttachmentUploadQueueMode) {
         switch mode {
         case .fullsize:
             state.isFullsizeQueueEmpty = true
         case .thumbnail:
             state.isThumbnailQueueEmpty = true
         }
-        if state.isFullsizeQueueEmpty == true && state.isThumbnailQueueEmpty == true {
+        if state.isFullsizeQueueEmpty == true, state.isThumbnailQueueEmpty == true {
             stopObservingDeviceAndLocalStates()
         }
     }
 
-    public func setIsMainAppAndActiveOverride(_ newValue: Bool) {
+    func setIsMainAppAndActiveOverride(_ newValue: Bool) {
         state.isMainAppAndActiveOverride = newValue
     }
 
@@ -139,7 +123,7 @@ public class BackupAttachmentUploadQueueStatusManagerImpl: BackupAttachmentUploa
         deviceBatteryLevelManager: (any DeviceBatteryLevelManager)?,
         reachabilityManager: SSKReachabilityManager,
         remoteConfigManager: RemoteConfigManager,
-        tsAccountManager: TSAccountManager
+        tsAccountManager: TSAccountManager,
     ) {
         self.appContext = appContext
         self.appReadiness = appReadiness
@@ -166,7 +150,7 @@ public class BackupAttachmentUploadQueueStatusManagerImpl: BackupAttachmentUploa
             batteryLevel: nil,
             isLowPowerMode: nil,
             isMainAppAndActive: appContext.isMainAppAndActive,
-            areUploadsSuspended: false
+            areUploadsSuspended: false,
         )
 
         appReadiness.runNowOrWhenMainAppDidBecomeReadyAsync { [weak self] in
@@ -214,7 +198,7 @@ public class BackupAttachmentUploadQueueStatusManagerImpl: BackupAttachmentUploa
             batteryLevel: Float?,
             isLowPowerMode: Bool?,
             isMainAppAndActive: Bool,
-            areUploadsSuspended: Bool?
+            areUploadsSuspended: Bool?,
         ) {
             self.isFullsizeQueueEmpty = isFullsizeQueueEmpty
             self.isThumbnailQueueEmpty = isThumbnailQueueEmpty
@@ -286,7 +270,7 @@ public class BackupAttachmentUploadQueueStatusManagerImpl: BackupAttachmentUploa
                 return .lowPowerMode
             }
 
-            if !isMainAppAndActive && !isMainAppAndActiveOverride {
+            if !isMainAppAndActive, !isMainAppAndActiveOverride {
                 return .appBackgrounded
             }
 
@@ -296,6 +280,13 @@ public class BackupAttachmentUploadQueueStatusManagerImpl: BackupAttachmentUploa
 
     private var state: State {
         didSet {
+            func notifyStatusDidChange(for mode: BackupAttachmentUploadQueueMode) {
+                NotificationCenter.default.postOnMainThread(
+                    name: .backupAttachmentUploadQueueStatusDidChange(for: mode),
+                    object: nil,
+                )
+            }
+
             if oldValue.asQueueStatus(for: .fullsize) != state.asQueueStatus(for: .fullsize) {
                 notifyStatusDidChange(for: .fullsize)
             }
@@ -321,8 +312,8 @@ public class BackupAttachmentUploadQueueStatusManagerImpl: BackupAttachmentUploa
 
         let (isFullsizeQueueEmpty, isThumbnailQueueEmpty) = db.read { tx in
             return (
-                ((try? backupAttachmentUploadStore.fetchNextUploads(count: 1, isFullsize: true, tx: tx)) ?? []).isEmpty,
-                ((try? backupAttachmentUploadStore.fetchNextUploads(count: 1, isFullsize: false, tx: tx)) ?? []).isEmpty
+                backupAttachmentUploadStore.fetchNextUploads(count: 1, isFullsize: true, tx: tx).isEmpty,
+                backupAttachmentUploadStore.fetchNextUploads(count: 1, isFullsize: false, tx: tx).isEmpty,
             )
         }
         state.isFullsizeQueueEmpty = isFullsizeQueueEmpty
@@ -343,13 +334,13 @@ public class BackupAttachmentUploadQueueStatusManagerImpl: BackupAttachmentUploa
             backupPlan,
             hasConsumedMediaTierCapacity,
             shouldAllowBackupUploadsOnCellular,
-            areUploadsSuspended
+            areUploadsSuspended,
         ) = db.read { tx in
             (
                 backupSettingsStore.backupPlan(tx: tx),
                 backupSettingsStore.hasConsumedMediaTierCapacity(tx: tx),
                 backupSettingsStore.shouldAllowBackupUploadsOnCellular(tx: tx),
-                backupSettingsStore.isBackupAttachmentUploadQueueSuspended(tx: tx)
+                backupSettingsStore.isBackupAttachmentUploadQueueSuspended(tx: tx),
             )
         }
 
@@ -358,7 +349,7 @@ public class BackupAttachmentUploadQueueStatusManagerImpl: BackupAttachmentUploa
             (.backupPlanChanged, #selector(backupPlanDidChange)),
             (.hasConsumedMediaTierCapacityStatusDidChange, #selector(hasConsumedMediaTierCapacityDidChange)),
             (.shouldAllowBackupUploadsOnCellularChanged, #selector(shouldAllowBackupUploadsOnCellularDidChange)),
-            (.reachabilityChanged, #selector(reachabilityDidChange)),
+            (SSKReachability.owsReachabilityDidChange, #selector(reachabilityDidChange)),
             (.backupAttachmentUploadQueueSuspensionStatusDidChange, #selector(suspensionStatusDidChange)),
             (.batteryLevelChanged, #selector(batteryLevelDidChange)),
             (.batteryLowPowerModeChanged, #selector(lowPowerModeDidChange)),
@@ -370,11 +361,11 @@ public class BackupAttachmentUploadQueueStatusManagerImpl: BackupAttachmentUploa
                 self,
                 selector: selector,
                 name: name,
-                object: nil
+                object: nil,
             )
         }
 
-        self.batteryLevelMonitor = deviceBatteryLevelManager?.beginMonitoring(reason: "BackupDownloadQueue")
+        self.batteryLevelMonitor = deviceBatteryLevelManager?.beginMonitoring(reason: "BackupUploadQueue")
         self.state = State(
             isFullsizeQueueEmpty: state.isFullsizeQueueEmpty,
             isThumbnailQueueEmpty: state.isThumbnailQueueEmpty,
@@ -389,7 +380,7 @@ public class BackupAttachmentUploadQueueStatusManagerImpl: BackupAttachmentUploa
             batteryLevel: batteryLevelMonitor?.batteryLevel,
             isLowPowerMode: deviceBatteryLevelManager?.isLowPowerModeEnabled,
             isMainAppAndActive: appContext.isMainAppAndActive,
-            areUploadsSuspended: areUploadsSuspended
+            areUploadsSuspended: areUploadsSuspended,
         )
     }
 
@@ -454,7 +445,7 @@ public class BackupAttachmentUploadQueueStatusManagerImpl: BackupAttachmentUploa
     }
 
     @objc
-    public func suspensionStatusDidChange() {
+    func suspensionStatusDidChange() {
         self.state.areUploadsSuspended = db.read { tx in
             backupSettingsStore.isBackupAttachmentUploadQueueSuspended(tx: tx)
         }

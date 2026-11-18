@@ -11,34 +11,46 @@ import SignalUI
 protocol RegistrationPhoneNumberPresenter: RegistrationMethodPresenter {
     func goToNextStep(withE164: E164)
 
+    func switchToDeviceLinking()
+
     /// Completely exit registration. Not to be confused with  `cancelChosenRestoreMethod`
     /// which returns to the splash screen.
     func exitRegistration()
+
+    func registerWithoutNumber()
 }
 
 // MARK: - RegistrationPhoneNumberViewController
 
 class RegistrationPhoneNumberViewController: OWSViewController {
-    public init(
+    init(
         state: RegistrationPhoneNumberViewState.RegistrationMode,
-        presenter: RegistrationPhoneNumberPresenter
+        presenter: RegistrationPhoneNumberPresenter,
     ) {
         self.state = state
         self.presenter = presenter
 
+        let phoneNumberUtil = SSKEnvironment.shared.phoneNumberUtilRef
+
         self.phoneNumberInput = RegistrationPhoneNumberInputView(initialPhoneNumber: {
             switch state {
             case let .initialRegistration(state):
-                if let e164 = state.previouslyEnteredE164, let result = RegistrationPhoneNumberParser(phoneNumberUtil: SSKEnvironment.shared.phoneNumberUtilRef).parseE164(e164) {
+                if let e164 = state.previouslyEnteredE164, let result = RegistrationPhoneNumberParser(phoneNumberUtil: phoneNumberUtil).parseE164(e164) {
                     return result
                 }
                 return RegistrationPhoneNumber(
                     country: .defaultValue,
-                    nationalNumber: ""
+                    nationalNumber: "",
                 )
             case let .reregistration(state):
-                guard let result = RegistrationPhoneNumberParser(phoneNumberUtil: SSKEnvironment.shared.phoneNumberUtilRef).parseE164(state.e164) else {
-                    owsFail("Could not parse re-registration E164")
+                guard let phoneNumber = state.localPhoneNumber else {
+                    owsFail("#less not supported")
+                }
+                guard
+                    let phoneNumber = E164(phoneNumber),
+                    let result = RegistrationPhoneNumberParser(phoneNumberUtil: phoneNumberUtil).parseE164(phoneNumber)
+                else {
+                    owsFail("couldn't parse re-registration E164")
                 }
                 return result
             }
@@ -49,12 +61,12 @@ class RegistrationPhoneNumberViewController: OWSViewController {
         self.phoneNumberInput.delegate = self
     }
 
-    public func updateState(_ state: RegistrationPhoneNumberViewState.RegistrationMode) {
+    func updateState(_ state: RegistrationPhoneNumberViewState.RegistrationMode) {
         self.state = state
     }
 
     @available(*, unavailable)
-    public override init() {
+    override init() {
         owsFail("This should not be called")
     }
 
@@ -68,11 +80,9 @@ class RegistrationPhoneNumberViewController: OWSViewController {
     private var state: RegistrationPhoneNumberViewState.RegistrationMode {
         didSet { configureUI() }
     }
+
     private weak var presenter: RegistrationPhoneNumberPresenter?
 
-    private var now = Date() {
-        didSet { configureUI() }
-    }
     private var nowTimer: Timer?
 
     private var nationalNumber: String { phoneNumberInput.nationalNumber }
@@ -120,31 +130,21 @@ class RegistrationPhoneNumberViewController: OWSViewController {
         if canChangePhoneNumber {
             return OWSLocalizedString(
                 "REGISTRATION_PHONE_NUMBER_SUBTITLE",
-                comment: "During registration, users are asked to enter their phone number. This is the subtitle on that screen, which gives users some instructions."
+                comment: "During registration, users are asked to enter their phone number. This is the subtitle on that screen, which gives users some instructions.",
             )
         }
         return OWSLocalizedString(
             "REGISTRATION_PHONE_NUMBER_SUBTITLE_2",
-            comment: "During re-registration, users are asked to confirm their phone number. This is the subtitle on that screen, which gives users some instructions."
+            comment: "During re-registration, users are asked to confirm their phone number. This is the subtitle on that screen, which gives users some instructions.",
         )
     }
 
     // MARK: UI
 
-    private lazy var contextButton: ContextMenuButton = {
-        let result = ContextMenuButton(empty: ())
-        result.setImage(Theme.iconImage(.buttonMore), for: .normal)
-        if #unavailable(iOS 26) {
-            result.tintColor = .Signal.accent
-        }
-        result.autoSetDimensions(to: .square(40))
-        return result
-    }()
-
     private lazy var titleLabel: UILabel = {
         let result = UILabel.titleLabelForRegistration(text: OWSLocalizedString(
             "REGISTRATION_PHONE_NUMBER_TITLE",
-            comment: "During registration, users are asked to enter their phone number. This is the title on that screen."
+            comment: "During registration, users are asked to enter their phone number. This is the title on that screen.",
         ))
         result.accessibilityIdentifier = "registration.phonenumber.titleLabel"
         return result
@@ -160,41 +160,36 @@ class RegistrationPhoneNumberViewController: OWSViewController {
 
     private lazy var validationWarningLabel: UILabel = {
         let result = UILabel()
-        result.textColor = .ows_accentRed
+        result.textColor = .Signal.red
         result.numberOfLines = 0
         result.font = .dynamicTypeSubheadlineClamped
         result.accessibilityIdentifier = "registration.phonenumber.validationWarningLabel"
         return result
     }()
 
-    private lazy var cancelButton = UIButton(
-        configuration: .mediumSecondary(title: CommonStrings.cancelButton),
+    private lazy var cancelButton = UIBarButtonItem.cancelButton { [weak self] in
+        self?.phoneNumberInput.resignFirstResponder()
+        self?.presenter?.cancelChosenRestoreMethod()
+    }
+
+    private lazy var registerWithoutNumberButton = UIButton(
+        configuration: .mediumSecondary(title: OWSLocalizedString(
+            "REGISTER_WITHOUT_NUMBER",
+            comment: "A button in registration that allows the user to register by purchasing a Signal Login rather than providing their phone number.",
+        )),
         primaryAction: UIAction { [weak self] _ in
-            self?.phoneNumberInput.resignFirstResponder()
-            self?.presenter?.cancelChosenRestoreMethod()
-        }
+            self?.presenter?.registerWithoutNumber()
+        },
     )
 
-    public override func viewDidLoad() {
+    private lazy var nextButton = UIBarButtonItem.nextButton { [weak self] in
+        self?.didTapNext()
+    }
+
+    override func viewDidLoad() {
         super.viewDidLoad()
 
         view.backgroundColor = .Signal.background
-
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
-            customView: contextButton,
-            accessibilityIdentifier: "registration.verificationCode.contextButton"
-        )
-        navigationItem.rightBarButtonItem = {
-            let barButtonItem = UIBarButtonItem(
-                title: CommonStrings.nextButton,
-                style: .done,
-                target: self,
-                action: #selector(didTapNext),
-                accessibilityIdentifier: "registration.phonenumber.nextButton"
-            )
-            barButtonItem.tintColor = .Signal.accent
-            return barButtonItem
-        }()
 
         let stackView = addStaticContentStackView(
             arrangedSubviews: [
@@ -203,23 +198,17 @@ class RegistrationPhoneNumberViewController: OWSViewController {
                 phoneNumberInput,
                 validationWarningLabel,
                 .vStretchingSpacer(),
-                cancelButton.enclosedInVerticalStackView(isFullWidthButton: false),
-            ],
-            shouldAvoidKeyboard: true
+            ] + (
+                BuildFlags.phoneNumberlessRegistration ? [registerWithoutNumberButton.enclosedInVerticalStackView(isFullWidthButton: false)] : []
+            ),
+            shouldAvoidKeyboard: true,
         )
         stackView.setCustomSpacing(24, after: explanationLabel)
 
         configureUI()
-
-        // We only need this timer if the user has been rate limited, but it's simpler to always
-        // start it.
-        nowTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            guard let self else { return }
-            self.now = Date()
-        }
     }
 
-    public override func viewDidAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         Logger.info("")
@@ -245,47 +234,71 @@ class RegistrationPhoneNumberViewController: OWSViewController {
     }
 
     private func configureUI() {
-        var actions: [UIAction] = [
+        var actions = [UIAction]()
+        let canCancelChosenRegistrationMethod: Bool
+        let canSwitchToLinking: Bool
+        let canExitRegistration: Bool
+        switch state {
+        case .initialRegistration(let subState):
+            canCancelChosenRegistrationMethod = true
+            canSwitchToLinking = true
+            canExitRegistration = subState.canExitRegistration
+            Logger.debug("initialRegistration")
+        case .reregistration(let subState):
+            canCancelChosenRegistrationMethod = false
+            canSwitchToLinking = false
+            canExitRegistration = subState.canExitRegistration
+            Logger.debug("reregistration")
+        }
+
+        if canSwitchToLinking {
+            actions.append(UIAction(
+                title: OWSLocalizedString(
+                    "LINK_DEVICE_MENU_ACTION",
+                    comment: "Menu action on the phone number entry screen to link this device as a secondary device.",
+                ),
+                handler: { [weak presenter] _ in
+                    presenter?.switchToDeviceLinking()
+                },
+            ))
+        }
+
+        if canCancelChosenRegistrationMethod {
+            navigationItem.leftBarButtonItem = cancelButton
+        } else {
+            navigationItem.leftBarButtonItem = nil
+        }
+
+        actions.append(
             UIAction(
                 title: OWSLocalizedString(
                     "USE_PROXY_BUTTON",
-                    comment: "Button to activate the signal proxy"
+                    comment: "Button to activate the signal proxy",
                 ),
                 handler: { [weak self] _ in
                     guard let self else { return }
                     let vc = ProxySettingsViewController()
                     self.presentFormSheet(OWSNavigationController(rootViewController: vc), animated: true)
-                }
-            )
-        ]
-        let canCancelChosenRegistrationMethod: Bool
-        let canExitRegistration: Bool
-        switch state {
-        case .initialRegistration(let subState):
-            canCancelChosenRegistrationMethod = true
-            canExitRegistration = subState.canExitRegistration
-            Logger.debug("initialRegistration")
-        case .reregistration(let subState):
-            canCancelChosenRegistrationMethod = false
-            canExitRegistration = subState.canExitRegistration
-            Logger.debug("reregistration")
-        }
-
-        cancelButton.isHidden = !canCancelChosenRegistrationMethod
-        cancelButton.isEnabled = canCancelChosenRegistrationMethod
+                },
+            ),
+        )
 
         if canExitRegistration {
             actions.append(UIAction(
                 title: OWSLocalizedString(
                     "EXIT_REREGISTRATION",
-                    comment: "Button to exit re-registration, shown in context menu."
+                    comment: "Button to exit re-registration, shown in context menu.",
                 ),
                 handler: { [weak self] _ in
                     self?.presenter?.exitRegistration()
-                }
+                },
             ))
         }
-        contextButton.setActions(actions: actions)
+
+        navigationItem.rightBarButtonItems = [
+            nextButton,
+            .contextMenuButton(actions: actions),
+        ]
 
         let now = Date()
 
@@ -302,7 +315,18 @@ class RegistrationPhoneNumberViewController: OWSViewController {
             }
         }()
 
-        navigationItem.rightBarButtonItem?.isEnabled = canSubmit(isBlockedByValidationError: isBlockedByValidationError)
+        if isBlockedByValidationError, case .rateLimited = validationError {
+            if nowTimer == nil {
+                nowTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+                    self?.configureUI()
+                }
+            }
+        } else {
+            nowTimer?.invalidate()
+            nowTimer = nil
+        }
+
+        nextButton.isEnabled = canSubmit(isBlockedByValidationError: isBlockedByValidationError)
 
         phoneNumberInput.isEnabled = canChangePhoneNumber
 
@@ -338,12 +362,12 @@ class RegistrationPhoneNumberViewController: OWSViewController {
             OWSActionSheets.showActionSheet(
                 title: OWSLocalizedString(
                     "REGISTRATION_VIEW_INVALID_PHONE_NUMBER_ALERT_TITLE",
-                    comment: "Title of alert indicating that users needs to enter a valid phone number to register."
+                    comment: "Title of alert indicating that users needs to enter a valid phone number to register.",
                 ),
                 message: OWSLocalizedString(
                     "REGISTRATION_VIEW_INVALID_PHONE_NUMBER_ALERT_MESSAGE",
-                    comment: "Message of alert indicating that users needs to enter a valid phone number to register."
-                )
+                    comment: "Message of alert indicating that users needs to enter a valid phone number to register.",
+                ),
             )
         }
 
@@ -352,7 +376,6 @@ class RegistrationPhoneNumberViewController: OWSViewController {
 
     // MARK: Events
 
-    @objc
     private func didTapNext() {
         goToNextStep()
     }
@@ -386,7 +409,7 @@ class RegistrationPhoneNumberViewController: OWSViewController {
             mode: .sms,
             e164: e164.stringValue,
             didConfirm: { [weak self] in self?.presenter?.goToNextStep(withE164: e164) },
-            didRequestEdit: { [weak self] in self?.phoneNumberInput.becomeFirstResponder() }
+            didRequestEdit: { [weak self] in self?.phoneNumberInput.becomeFirstResponder() },
         ))
     }
 }

@@ -71,17 +71,12 @@ public final actor ConcurrentTaskQueue {
     ///     return try await block()
     ///
     /// - Throws: An error thrown from `block` or a `CancellationError`.
-    ///
-    /// Disfavored so that non-throwing blocks keep resolving to the
-    /// `throws(CancellationError)` overload below. Swift 6.4 (Xcode 27)
-    /// otherwise reports "ambiguous use of 'run'" for them.
-    @_disfavoredOverload
-    public func run<T>(_ block: () async throws -> T) async throws -> T {
+    public func runWithThrowingTask<T>(_ block: () async throws -> T) async throws -> T {
         return try await _run(isCancellable: true, block).get()
     }
 
     /// See documentation for method above; variant for non-throwing blocks that just throws CancellationError.
-    public func run<T>(_ block: () async -> T) async throws(CancellationError) -> T {
+    public func run<T>(_ block: () async throws(CancellationError) -> T) async throws(CancellationError) -> T {
         return try await _run(isCancellable: true, block).get()
     }
 

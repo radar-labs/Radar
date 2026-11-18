@@ -23,7 +23,7 @@ public extension SDSSerializer {
     // MARK: - Numeric Primitive
 
     func archiveOptionalNSNumber<T>(_ value: NSNumber?, conversion: (NSNumber) -> T) -> T? {
-        guard let value = value else {
+        guard let value else {
             return nil
         }
         return conversion(value)
@@ -36,7 +36,7 @@ public extension SDSSerializer {
     // MARK: - Date
 
     func archiveOptionalDate(_ value: Date?) -> Double? {
-        guard let value = value else {
+        guard let value else {
             return nil
         }
         return archiveDate(value)
@@ -48,31 +48,43 @@ public extension SDSSerializer {
 
     // MARK: - Blob
 
-    func optionalArchive(_ value: Any?) -> Data? {
-        guard let value = value else {
+    func optionalArchive<T: NSObject & NSSecureCoding>(_ value: T?) -> Data? {
+        guard let value else {
             return nil
         }
         return requiredArchive(value)
+    }
+
+    func optionalArchive(_ value: [SignalServiceAddress: TSOutgoingMessageRecipientState]?) -> Data? {
+        return optionalArchive(value as NSDictionary?)
+    }
+
+    func optionalArchive(_ value: [InfoMessageUserInfoKey: Any]?) -> Data? {
+        return optionalArchive(value as NSDictionary?)
     }
 
     /// Avoid the cost of actually archiving empty string arrays that are
     /// declared optional (e.g. TSInteraction.attachmentIds)
     func optionalArchive(_ value: [String]?) -> Data? {
-        guard let value = value, !value.isEmpty else {
+        guard let value, !value.isEmpty else {
             return nil
         }
-        return requiredArchive(value)
+        return requiredArchive(value as [NSString] as NSArray)
     }
 
     /// Avoide the cost of actually archiving empty message body range objects.
     func optionalArchive(_ value: MessageBodyRanges?) -> Data? {
-        guard let value = value, value.hasRanges else {
+        guard let value, value.hasRanges else {
             return nil
         }
         return requiredArchive(value)
     }
 
-    func requiredArchive(_ value: Any) -> Data {
-        return try! NSKeyedArchiver.archivedData(withRootObject: value, requiringSecureCoding: false)
+    func requiredArchive<T: NSObject & NSSecureCoding>(_ value: [T]) -> Data {
+        return requiredArchive(value as NSArray)
+    }
+
+    func requiredArchive<T: NSObject & NSSecureCoding>(_ value: T) -> Data {
+        return try! NSKeyedArchiver.archivedData(withRootObject: value, requiringSecureCoding: true)
     }
 }

@@ -39,15 +39,6 @@ typedef NS_CLOSED_ENUM(NSInteger, TSOutgoingMessageState) {
 
 NSString *NSStringForOutgoingMessageState(TSOutgoingMessageState value);
 
-typedef NS_ENUM(NSInteger, TSGroupMetaMessage) {
-    TSGroupMetaMessageUnspecified,
-    TSGroupMetaMessageNew,
-    TSGroupMetaMessageUpdate,
-    TSGroupMetaMessageDeliver,
-    TSGroupMetaMessageQuit,
-    TSGroupMetaMessageRequestInfo,
-};
-
 typedef NS_ENUM(NSInteger, EncryptionStyle) {
     EncryptionStyleWhisper,
     EncryptionStylePlaintext
@@ -65,7 +56,7 @@ typedef NS_ENUM(NSInteger, EncryptionStyle) {
 
 #pragma mark -
 
-@interface TSOutgoingMessage : TSMessage
+@interface TSOutgoingMessage : TSMessage <NSSecureCoding>
 
 - (instancetype)initMessageWithBuilder:(TSMessageBuilder *)messageBuilder NS_UNAVAILABLE;
 
@@ -88,7 +79,6 @@ typedef NS_ENUM(NSInteger, EncryptionStyle) {
                  isGroupStoryReply:(BOOL)isGroupStoryReply
                             isPoll:(BOOL)isPoll
     isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
-                         isStarred:(BOOL)isStarred
                 isViewOnceComplete:(BOOL)isViewOnceComplete
                  isViewOnceMessage:(BOOL)isViewOnceMessage
                        linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -146,7 +136,6 @@ typedef NS_ENUM(NSInteger, EncryptionStyle) {
                isGroupStoryReply:(BOOL)isGroupStoryReply
                           isPoll:(BOOL)isPoll
   isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
-                       isStarred:(BOOL)isStarred
               isViewOnceComplete:(BOOL)isViewOnceComplete
                isViewOnceMessage:(BOOL)isViewOnceMessage
                      linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -158,7 +147,7 @@ typedef NS_ENUM(NSInteger, EncryptionStyle) {
                   storyTimestamp:(nullable NSNumber *)storyTimestamp
               wasRemotelyDeleted:(BOOL)wasRemotelyDeleted
                    customMessage:(nullable NSString *)customMessage
-                groupMetaMessage:(TSGroupMetaMessage)groupMetaMessage
+                groupMetaMessage:(NSInteger)groupMetaMessage
            hasLegacyMessageState:(BOOL)hasLegacyMessageState
              hasSyncedTranscript:(BOOL)hasSyncedTranscript
                   isVoiceMessage:(BOOL)isVoiceMessage
@@ -168,7 +157,7 @@ typedef NS_ENUM(NSInteger, EncryptionStyle) {
           recipientAddressStates:(nullable NSDictionary<SignalServiceAddress *,TSOutgoingMessageRecipientState *> *)recipientAddressStates
               storedMessageState:(TSOutgoingMessageState)storedMessageState
             wasNotCreatedLocally:(BOOL)wasNotCreatedLocally
-NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp:sortId:timestamp:uniqueThreadId:body:bodyRanges:contactShare:deprecated_attachmentIds:editState:expireStartedAt:expireTimerVersion:expiresAt:expiresInSeconds:giftBadge:isGroupStoryReply:isPoll:isSmsMessageRestoredFromBackup:isStarred:isViewOnceComplete:isViewOnceMessage:linkPreview:messageSticker:quotedMessage:storedShouldStartExpireTimer:storyAuthorUuidString:storyReactionEmoji:storyTimestamp:wasRemotelyDeleted:customMessage:groupMetaMessage:hasLegacyMessageState:hasSyncedTranscript:isVoiceMessage:legacyMessageState:legacyWasDelivered:mostRecentFailureText:recipientAddressStates:storedMessageState:wasNotCreatedLocally:));
+NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp:sortId:timestamp:uniqueThreadId:body:bodyRanges:contactShare:deprecated_attachmentIds:editState:expireStartedAt:expireTimerVersion:expiresAt:expiresInSeconds:giftBadge:isGroupStoryReply:isPoll:isSmsMessageRestoredFromBackup:isViewOnceComplete:isViewOnceMessage:linkPreview:messageSticker:quotedMessage:storedShouldStartExpireTimer:storyAuthorUuidString:storyReactionEmoji:storyTimestamp:wasRemotelyDeleted:customMessage:groupMetaMessage:hasLegacyMessageState:hasSyncedTranscript:isVoiceMessage:legacyMessageState:legacyWasDelivered:mostRecentFailureText:recipientAddressStates:storedMessageState:wasNotCreatedLocally:));
 
 // clang-format on
 
@@ -187,7 +176,7 @@ NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp
 @property (atomic, readonly, nullable) NSString *customMessage;
 @property (atomic, nullable) NSString *mostRecentFailureText;
 
-@property (atomic, readonly) TSGroupMetaMessage groupMetaMessage;
+@property (atomic, readonly) NSInteger groupMetaMessage;
 
 @property (nonatomic, readonly) BOOL isVoiceMessage;
 
@@ -207,7 +196,9 @@ NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp
 /**
  * The data representation of this message, to be encrypted, before being sent.
  */
-- (nullable NSData *)buildPlainTextData:(TSThread *)thread transaction:(DBWriteTransaction *)transaction;
+- (nullable NSData *)buildPlaintextDataInThread:(TSThread *)thread
+                                             tx:(DBWriteTransaction *)transaction
+                                          error:(NSError **)error NS_SWIFT_NAME(buildPlaintextData(inThread:tx:));
 
 /**
  * Intermediate protobuf representation
@@ -233,9 +224,10 @@ NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp
  */
 - (BOOL)shouldSyncTranscript;
 
-- (nullable OWSOutgoingSyncMessage *)buildTranscriptSyncMessageWithLocalThread:(TSContactThread *)localThread
+- (nullable OWSOutgoingSyncMessage *)buildSyncTranscriptMessageWithLocalThread:(TSContactThread *)localThread
                                                                    transaction:(DBWriteTransaction *)transaction
-    NS_SWIFT_NAME(buildTranscriptSyncMessage(localThread:transaction:));
+                                                                         error:(NSError **)error
+    NS_SWIFT_NAME(buildSyncTranscriptMessage(localThread:tx:));
 
 #pragma mark - Update With... Methods
 

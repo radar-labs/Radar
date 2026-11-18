@@ -5,10 +5,9 @@
 
 import GRDB
 import LibSignalClient
-import UIKit
 public import SignalServiceKit
+import UIKit
 
-// swiftlint:disable:next class_delegate_protocol
 public protocol ConversationAvatarViewDelegate: UIViewController {
     func didTapBadge()
 
@@ -25,13 +24,13 @@ public extension ConversationAvatarViewDelegate {
                 title: OWSLocalizedString("VIEW_PHOTO", comment: "View the photo of a group or user"),
                 handler: { [weak self] _ in
                     self?.presentAvatarViewController()
-                }
+                },
             ))
             actionSheet.addAction(.init(
                 title: OWSLocalizedString("VIEW_STORY", comment: "View the story of a group or user"),
                 handler: { [weak self] _ in
                     self?.presentStoryViewController()
-                }
+                },
             ))
             presentActionSheet(actionSheet, animated: true)
         } else {
@@ -47,7 +46,7 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
         localUserDisplayMode: LocalUserDisplayMode,
         badged: Bool = true,
         shape: Configuration.Shape = .circular,
-        useAutolayout: Bool = true
+        useAutolayout: Bool = true,
     ) {
         self.configuration = Configuration(
             sizeClass: sizeClass,
@@ -55,7 +54,8 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
             localUserDisplayMode: localUserDisplayMode,
             addBadgeIfApplicable: badged,
             shape: shape,
-            useAutolayout: useAutolayout)
+            useAutolayout: useAutolayout,
+        )
 
         super.init(frame: .zero)
 
@@ -83,6 +83,7 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
             case fortyEight
             case fiftySix
             case sixtyFour
+            case seventyFour
             case eighty
             case eightyEight
             case oneHundredTwelve
@@ -111,6 +112,8 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
                     self = .fiftySix
                 case Self.sixtyFour.diameter:
                     self = .sixtyFour
+                case Self.seventyFour.diameter:
+                    self = .seventyFour
                 case Self.eighty.diameter:
                     self = .eighty
                 case Self.eightyEight.diameter:
@@ -153,7 +156,7 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
             }
             let databaseStorage = SSKEnvironment.shared.databaseStorageRef
             self.dataSource = databaseStorage.read { tx in
-                return TSGroupThread.fetch(groupId: groupId, transaction: tx)
+                return TSGroupThread.fetchThread(forGroupIdData: groupId, tx: tx)
             }.map {
                 return .thread($0)
             }
@@ -180,10 +183,11 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
         public mutating func applyConfigurationSynchronously() {
             forceSyncUpdate = true
         }
+
         fileprivate mutating func checkForSyncUpdateAndClear() -> Bool {
             // If we don't have a data source then there's no slow-path asset fetching. We can just take the sync update path always
             var shouldUpdateSync = true
-            if let dataSource = dataSource, !forceSyncUpdate {
+            if let dataSource, !forceSyncUpdate {
                 // if we have data and are not forced to perform a sync call
                 // we will perform an async call if we shouldn't use the cache (placeholder shall be shown) or the data is not cached
                 shouldUpdateSync = useCachedImages && dataSource.isDataImmediatelyAvailable
@@ -249,11 +253,11 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
         // Any changes to avatar size or provider will trigger a model update
         let needsModelUpdate: Bool = (
             sizeClassDidChange ||
-            avatarSizeClassDidChange ||
-            dataSourceDidChange ||
-            localUserDisplayModeDidChange ||
-            shouldShowBadgeDidChange ||
-            fallbackBadgeDidChange
+                avatarSizeClassDidChange ||
+                dataSourceDidChange ||
+                localUserDisplayModeDidChange ||
+                shouldShowBadgeDidChange ||
+                fallbackBadgeDidChange,
         )
         if needsModelUpdate {
             setNeedsModelUpdate()
@@ -325,7 +329,7 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
                 avatarImage = dataSource.fetchCachedImage(configuration: configuration, transaction: readTx)
                 badgeImage = dataSource.fetchBadge(configuration: configuration, transaction: readTx)
             } else {
-                avatarImage = UIImage(named: Theme.iconName(.profilePlaceholder))
+                avatarImage = Theme.iconImage(.profilePlaceholder)
             }
         }
         updateViewContent(avatarImage: avatarImage, primaryBadgeImage: badgeImage)
@@ -339,7 +343,7 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
 
         avatarView.image = avatarImage
         badgeView.image = {
-            if let primaryBadgeImage = primaryBadgeImage {
+            if let primaryBadgeImage {
                 return primaryBadgeImage
             } else if let fallbackAssets = configuration.fallbackBadge?.assets {
                 return configuration.sizeClass.fetchImageFromBadgeAssets(fallbackAssets)
@@ -361,7 +365,7 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
     // `nextModelGeneration` can be read on a background thread, so it needs to be atomic.
     // All updates are performed on the main thread.
     private var currentModelGeneration: UInt = 0
-    private var nextModelGeneration = AtomicUInt(0, lock: .sharedGlobal)
+    private let nextModelGeneration = AtomicUInt(0, lock: .init())
     @discardableResult
     private func setNeedsModelUpdate() -> UInt { nextModelGeneration.increment() }
 
@@ -370,8 +374,11 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
     // so the most recently enqueued avatars are most likely to be
     // visible. To put it another way, we don't cancel loads so
     // the oldest loads are most likely to be unnecessary.
-    private static let serialQueue = ReverseDispatchQueue(label: "org.signal.conversation-avatar.loading",
-                                                          qos: .userInitiated, autoreleaseFrequency: .workItem)
+    private static let serialQueue = ReverseDispatchQueue(
+        label: "org.signal.conversation-avatar.loading",
+        qos: .userInitiated,
+        autoreleaseFrequency: .workItem,
+    )
 
     private func enqueueAsyncModelUpdate() {
         AssertIsOnMainThread()
@@ -379,25 +386,22 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
         let configurationAtEnqueue = configuration
 
         Self.serialQueue.async { [weak self] in
-            guard let self = self, self.nextModelGeneration.get() == generationAtEnqueue else {
+            guard self?.nextModelGeneration.get() == generationAtEnqueue else {
                 return
             }
 
-            let (updatedAvatar, updatedBadge) = SSKEnvironment.shared.databaseStorageRef.read { transaction -> (UIImage?, UIImage?) in
-                guard self.nextModelGeneration.get() == generationAtEnqueue else {
-                    return (nil, nil)
-                }
-
-                let avatarImage = configurationAtEnqueue.dataSource?.buildImage(configuration: configurationAtEnqueue, transaction: transaction)
-                let badgeImage = configurationAtEnqueue.dataSource?.fetchBadge(configuration: configurationAtEnqueue, transaction: transaction)
+            let databaseStorage = SSKEnvironment.shared.databaseStorageRef
+            let (updatedAvatar, updatedBadge) = databaseStorage.read { tx -> (UIImage?, UIImage?) in
+                let avatarImage = configurationAtEnqueue.dataSource?.buildImage(configuration: configurationAtEnqueue, transaction: tx)
+                let badgeImage = configurationAtEnqueue.dataSource?.fetchBadge(configuration: configurationAtEnqueue, transaction: tx)
                 return (avatarImage, badgeImage)
             }
 
             DispatchQueue.main.async {
-                guard self.nextModelGeneration.get() == generationAtEnqueue else {
+                guard self?.nextModelGeneration.get() == generationAtEnqueue else {
                     return
                 }
-                self.updateViewContent(avatarImage: updatedAvatar, primaryBadgeImage: updatedBadge)
+                self?.updateViewContent(avatarImage: updatedAvatar, primaryBadgeImage: updatedBadge)
             }
         }
     }
@@ -435,10 +439,12 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
             constraints.width.constant = targetSize.width
             constraints.height.constant = targetSize.height
         case (true, nil):
-            sizeConstraints = (width: autoSetDimension(.width, toSize: targetSize.width),
-                               height: autoSetDimension(.height, toSize: targetSize.height))
+            sizeConstraints = (
+                width: autoSetDimension(.width, toSize: targetSize.width),
+                height: autoSetDimension(.height, toSize: targetSize.height),
+            )
         case (false, _):
-            if let sizeConstraints = sizeConstraints {
+            if let sizeConstraints {
                 NSLayoutConstraint.deactivate([sizeConstraints.width, sizeConstraints.height])
             }
             sizeConstraints = nil
@@ -469,7 +475,7 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
             storyStateView.layer.borderWidth = configuration.sizeClass.storyViewedBorderSize
         case .unviewed:
             storyStateView.isHidden = false
-            storyStateView.layer.borderColor = UIColor.ows_accentBlue.cgColor
+            storyStateView.layer.borderColor = UIColor.Signal.accent.cgColor
             storyStateView.layer.borderWidth = configuration.sizeClass.storyUnviewedBorderSize
         }
 
@@ -492,20 +498,20 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
         }
     }
 
-    public override var intrinsicContentSize: CGSize { configuration.sizeClass.size }
+    override public var intrinsicContentSize: CGSize { configuration.sizeClass.size }
 
-    public override func sizeThatFits(_ size: CGSize) -> CGSize { intrinsicContentSize }
+    override public func sizeThatFits(_ size: CGSize) -> CGSize { intrinsicContentSize }
 
     // MARK: - Controls
 
-    lazy private var avatarTapGestureRecognizer: UITapGestureRecognizer = {
+    private lazy var avatarTapGestureRecognizer: UITapGestureRecognizer = {
         let tapGestureRecognizer = UITapGestureRecognizer()
         tapGestureRecognizer.addTarget(self, action: #selector(didTapAvatar(_:)))
         tapGestureRecognizer.numberOfTapsRequired = 1
         return tapGestureRecognizer
     }()
 
-    lazy private var badgeTapGestureRecognizer: UITapGestureRecognizer = {
+    private lazy var badgeTapGestureRecognizer: UITapGestureRecognizer = {
         let tapGestureRecognizer = UITapGestureRecognizer()
         tapGestureRecognizer.addTarget(self, action: #selector(didTapBadge(_:)))
         tapGestureRecognizer.numberOfTapsRequired = 1
@@ -548,50 +554,64 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
         // TODO: Badges — Notify on an updated badge asset?
 
         NotificationCenter.default.removeObserver(self)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(themeDidChange),
-                                               name: .themeDidChange,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(themeDidChange),
+            name: .themeDidChange,
+            object: nil,
+        )
 
         guard let dataSource = configuration.dataSource else { return }
 
         if dataSource.isContactAvatar {
             if dataSource.contactAddress?.isLocalAddress == true {
-                NotificationCenter.default.addObserver(self,
-                                                       selector: #selector(localUsersProfileDidChange(notification:)),
-                                                       name: UserProfileNotifications.localProfileDidChange,
-                                                       object: nil)
+                NotificationCenter.default.addObserver(
+                    self,
+                    selector: #selector(localUsersProfileDidChange(notification:)),
+                    name: UserProfileNotifications.localProfileDidChange,
+                    object: nil,
+                )
             } else {
-                NotificationCenter.default.addObserver(self,
-                                                       selector: #selector(otherUsersProfileDidChange(notification:)),
-                                                       name: UserProfileNotifications.otherUsersProfileDidChange,
-                                                       object: nil)
+                NotificationCenter.default.addObserver(
+                    self,
+                    selector: #selector(otherUsersProfileDidChange(notification:)),
+                    name: UserProfileNotifications.otherUsersProfileDidChange,
+                    object: nil,
+                )
             }
 
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(handleSignalAccountsChanged(notification:)),
-                                                   name: .OWSContactsManagerSignalAccountsDidChange,
-                                                   object: nil)
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(skipContactAvatarBlurDidChange(notification:)),
-                                                   name: OWSContactsManager.skipContactAvatarBlurDidChange,
-                                                   object: nil)
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(handleSignalAccountsChanged(notification:)),
+                name: .OWSContactsManagerSignalAccountsDidChange,
+                object: nil,
+            )
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(skipContactAvatarBlurDidChange(notification:)),
+                name: OWSContactsManager.skipContactAvatarBlurDidChange,
+                object: nil,
+            )
         } else if dataSource.isGroupAvatar {
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(handleGroupAvatarChanged(notification:)),
-                                                   name: .TSGroupThreadAvatarChanged,
-                                                   object: nil)
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(skipGroupAvatarBlurDidChange(notification:)),
-                                                   name: OWSContactsManager.skipGroupAvatarBlurDidChange,
-                                                   object: nil)
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(handleGroupAvatarChanged(notification:)),
+                name: .TSGroupThreadAvatarChanged,
+                object: nil,
+            )
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(skipGroupAvatarBlurDidChange(notification:)),
+                name: OWSContactsManager.skipGroupAvatarBlurDidChange,
+                object: nil,
+            )
         }
 
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(startObservingStoryChangesIfNeeded),
             name: .storiesEnabledStateDidChange,
-            object: nil
+            object: nil,
         )
 
         startObservingStoryChangesIfNeeded()
@@ -662,7 +682,7 @@ public class ConversationAvatarView: UIView, CVView, PrimaryImageView {
                             self?.setNeedsLayout()
                         }
                     }
-                }
+                },
             )
         }
     }
@@ -847,7 +867,7 @@ public enum ConversationAvatarDataSource: Equatable, CustomStringConvertible {
         case .address(let address):
             targetAddress = address
         case .thread(let contactThread as TSContactThread):
-            targetAddress = (contactThread).contactAddress
+            targetAddress = contactThread.contactAddress
         case .thread:
             return nil
         case .asset(avatar: _, badge: let badge):
@@ -875,7 +895,8 @@ public enum ConversationAvatarDataSource: Equatable, CustomStringConvertible {
                     forAddress: contactThread.contactAddress,
                     diameterPoints: UInt(configuration.avatarSizeClass.diameter),
                     localUserDisplayMode: configuration.localUserDisplayMode,
-                    transaction: $0)
+                    transaction: $0,
+                )
             }
 
         case .address(let address):
@@ -884,7 +905,8 @@ public enum ConversationAvatarDataSource: Equatable, CustomStringConvertible {
                     forAddress: address,
                     diameterPoints: UInt(configuration.avatarSizeClass.diameter),
                     localUserDisplayMode: configuration.localUserDisplayMode,
-                    transaction: $0)
+                    transaction: $0,
+                )
             }
 
         case .thread(let groupThread as TSGroupThread):
@@ -892,7 +914,8 @@ public enum ConversationAvatarDataSource: Equatable, CustomStringConvertible {
                 SSKEnvironment.shared.avatarBuilderRef.avatarImage(
                     forGroupThread: groupThread,
                     diameterPoints: UInt(configuration.avatarSizeClass.diameter),
-                    transaction: $0)
+                    transaction: $0,
+                )
             }
 
         case .asset(let avatar, _):
@@ -912,7 +935,8 @@ public enum ConversationAvatarDataSource: Equatable, CustomStringConvertible {
                     forAddress: contactThread.contactAddress,
                     diameterPoints: UInt(configuration.avatarSizeClass.diameter),
                     localUserDisplayMode: configuration.localUserDisplayMode,
-                    transaction: $0)
+                    transaction: $0,
+                )
             }
 
         case .address(let address):
@@ -921,7 +945,8 @@ public enum ConversationAvatarDataSource: Equatable, CustomStringConvertible {
                     forAddress: address,
                     diameterPoints: UInt(configuration.avatarSizeClass.diameter),
                     localUserDisplayMode: configuration.localUserDisplayMode,
-                    transaction: $0)
+                    transaction: $0,
+                )
             }
 
         case .thread(let groupThread as TSGroupThread):
@@ -929,7 +954,8 @@ public enum ConversationAvatarDataSource: Equatable, CustomStringConvertible {
                 SSKEnvironment.shared.avatarBuilderRef.precachedAvatarImage(
                     forGroupThread: groupThread,
                     diameterPoints: UInt(configuration.avatarSizeClass.diameter),
-                    transaction: $0)
+                    transaction: $0,
+                )
             }
 
         case .asset(let avatar, _):
@@ -966,6 +992,7 @@ extension ConversationAvatarView.Configuration.SizeClass {
         case .fortyEight: return 48
         case .fiftySix: return 56
         case .sixtyFour: return 64
+        case .seventyFour: return 74
         case .eighty: return 80
         case .eightyEight: return 88
         case .oneHundredTwelve: return 112
@@ -981,8 +1008,8 @@ extension ConversationAvatarView.Configuration.SizeClass {
         case ..<24: return 0
         case 24...36: return 16
         case 36..<40: return CGFloat(diameter).inverseLerp(36, 40).lerp(16, 24)
-        case 40...64: return 24
-        case 64..<80: return CGFloat(diameter).inverseLerp(64, 80).lerp(24, 36)
+        case 40...74: return 24
+        case 64..<80: return CGFloat(diameter).inverseLerp(74, 80).lerp(24, 36)
         case 80...112: return 36
         case 112...: return (CGFloat(diameter) / 112) * 36
         default: return 0
@@ -1001,6 +1028,7 @@ extension ConversationAvatarView.Configuration.SizeClass {
         case .fortyEight: return CGPoint(x: 28, y: 30)
         case .fiftySix: return CGPoint(x: 32, y: 38)
         case .sixtyFour: return CGPoint(x: 40, y: 46)
+        case .seventyFour: return CGPoint(x: 48, y: 54)
         case .eighty: return CGPoint(x: 44, y: 52)
         case .eightyEight: return CGPoint(x: 49, y: 56)
         case .oneHundredTwelve: return CGPoint(x: 74, y: 80)
@@ -1039,6 +1067,7 @@ extension ConversationAvatarView.Configuration.SizeClass {
         case .fortyEight: return 5
         case .fiftySix: return 5
         case .sixtyFour: return 5
+        case .seventyFour: return 5
         case .eighty: return 5
         case .eightyEight: return 6
         case .oneHundredTwelve: return 6
@@ -1057,6 +1086,7 @@ extension ConversationAvatarView.Configuration.SizeClass {
         case .fortyEight: return 2
         case .fiftySix: return 2
         case .sixtyFour: return 2
+        case .seventyFour: return 3
         case .eighty: return 3
         case .eightyEight: return 3
         case .oneHundredTwelve: return 3

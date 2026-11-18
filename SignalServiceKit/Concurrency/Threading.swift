@@ -24,10 +24,3 @@ public func DispatchSyncMainThreadSafe(_ block: @escaping @MainActor () -> Void)
         DispatchQueue.main.sync(execute: block)
     }
 }
-
-@objcMembers
-public final class ThreadingObjcBridge: NSObject {
-    public static func dispatchMainThreadSafe(_ block: @escaping @MainActor () -> Void) {
-        DispatchMainThreadSafe(block)
-    }
-}

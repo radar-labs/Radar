@@ -16,18 +16,26 @@ extension DonationViewsUtil {
         type donationType: Stripe.IDEALCallbackType,
         rootViewController: UIViewController,
         databaseStorage: SDSDatabaseStorage,
-        appReadiness: AppReadinessSetter
+        donationSubscriptionManager: DonationSubscriptionManager,
+        idealStore: PendingIDEALDonationStore,
+        profileBadgeManager: ProfileBadgeManager,
     ) async throws {
-        let donationStore = DependenciesBridge.shared.externalPendingIDEALDonationStore
         let (success, intent, localIntent) = databaseStorage.read { tx in
             switch donationType {
             case let .oneTime(didSucceed: success, paymentIntentId: intentId):
-                let localIntentId = donationStore.getPendingOneTimeDonation(tx: tx)
+                let localIntentId = idealStore.getPendingOneTimeDonation(tx: tx)
                 return (success, intentId, localIntentId?.paymentIntentId)
             case let .monthly(didSucceed: success, _, setupIntentId: intentId):
-                let localIntentId = donationStore.getPendingSubscription(tx: tx)
+                let localIntentId = idealStore.getPendingSubscription(tx: tx)
                 return (success, intentId, localIntentId?.setupIntentId)
             }
+        }
+
+        // The pending donation doesn't match the passed in donation type.
+        // Log the issue, but don't update the UI
+        guard localIntent == intent else {
+            Logger.info("[Donations] Ignoring iDEAL callback with no matching pending donation")
+            return
         }
 
         if rootViewController.presentedViewController != nil {
@@ -39,25 +47,27 @@ extension DonationViewsUtil {
         }
 
         // Build up the Donation UI
-        let appSettings = AppSettingsViewController.inModalNavigationController(appReadiness: appReadiness)
+        let appSettings = AppSettingsViewController.inModalNavigationController()
         let donationsVC = DonationSettingsViewController()
         donationsVC.showExpirationSheet = false
-        appSettings.viewControllers += [ donationsVC ]
+        appSettings.viewControllers += [donationsVC]
 
         await frontVc.awaitablePresentFormSheet(appSettings, animated: false)
 
-        if success, let localIntent, intent == localIntent {
-            try await Self.completeDonation(
-                type: donationType,
-                from: donationsVC,
-                databaseStorage: databaseStorage
+        if success {
+            try await Self.completeIDEALDonation(
+                fromViewController: donationsVC,
+                donationType: donationType,
+                databaseStorage: databaseStorage,
+                donationSubscriptionManager: donationSubscriptionManager,
+                idealStore: idealStore,
+                profileBadgeManager: profileBadgeManager,
             )
         } else {
             Self.handleIDEALDonationIssue(
-                success: success,
                 donationType: donationType,
                 from: donationsVC,
-                databaseStorage: databaseStorage
+                databaseStorage: databaseStorage,
             )
         }
     }
@@ -71,7 +81,7 @@ extension DonationViewsUtil {
     @MainActor
     static func attemptToContinueActiveIDEALDonation(
         type donationType: Stripe.IDEALCallbackType,
-        databaseStorage: SDSDatabaseStorage
+        databaseStorage: SDSDatabaseStorage,
     ) async -> Bool {
         // Inspect this view controller to find out if the layout is as expected.
         guard
@@ -102,22 +112,42 @@ extension DonationViewsUtil {
         // failed, pass that into the existing donation flow to be handled inline
         return donationPaymentVC.completeExternal3DS(
             success: success,
-            intentID: intentId
+            intentID: intentId,
         )
     }
 
     @MainActor
-    private static func completeDonation(
-        type donationType: Stripe.IDEALCallbackType,
-        from donationsVC: DonationSettingsViewController,
-        databaseStorage: SDSDatabaseStorage
+    private static func completeIDEALDonation(
+        fromViewController donationsVC: DonationSettingsViewController,
+        donationType: Stripe.IDEALCallbackType,
+        databaseStorage: SDSDatabaseStorage,
+        donationSubscriptionManager: DonationSubscriptionManager,
+        idealStore: PendingIDEALDonationStore,
+        profileBadgeManager: ProfileBadgeManager,
     ) async throws {
-        let badge = try await Self.loadBadgeForDonation(type: donationType, databaseStorage: databaseStorage)
-
         defer {
             // refresh the local state upon completing the donation
             // to refresh any pending donation messages
             Task { await donationsVC.loadAndUpdateState() }
+        }
+
+        let profileBadge: ProfileBadge?
+        switch donationType {
+        case .oneTime:
+            profileBadge = databaseStorage.read { tx in
+                profileBadgeManager.fetchBoostBadge(id: .boost, tx: tx)
+            }
+        case .monthly:
+            let pendingSubscriptionLevel = databaseStorage.read { tx in
+                idealStore.getPendingSubscription(tx: tx)?.newSubscriptionLevel
+            }
+            if let pendingSubscriptionLevel {
+                profileBadge = try? await donationSubscriptionManager
+                    .getSubscriptionLevel(rawLevel: pendingSubscriptionLevel)
+                    .badge
+            } else {
+                profileBadge = nil
+            }
         }
 
         do {
@@ -126,30 +156,32 @@ extension DonationViewsUtil {
                 operation: {
                     try await DonationViewsUtil.completeIDEALDonation(
                         donationType: donationType,
-                        databaseStorage: databaseStorage
+                        databaseStorage: databaseStorage,
+                        donationSubscriptionManager: donationSubscriptionManager,
+                        idealStore: idealStore,
                     )
-                }
+                },
             )
             // Do this after the `wrapPromiseInProgressView` completes
             // to dismiss the progress spinner.  Then display the
             // result of the donation.
             let badgeThanksSheetPresenter = BadgeThanksSheetPresenter.fromGlobalsWithSneakyTransaction(
-                successMode: donationType.asSuccessMode
+                successMode: donationType.asSuccessMode,
             )
 
             Task {
                 await badgeThanksSheetPresenter?.presentAndRecordBadgeThanks(
-                    fromViewController: donationsVC
+                    fromViewController: donationsVC,
                 )
             }
         } catch {
-            if let badge {
+            if let profileBadge {
                 DonationViewsUtil.presentErrorSheet(
                     from: donationsVC,
                     error: error,
                     mode: donationType.asDonationMode,
-                    badge: badge,
-                    paymentMethod: .ideal
+                    badge: profileBadge,
+                    paymentMethod: .ideal,
                 )
             } else {
                 owsFailDebug("[Donations] Failed to load donation badge")
@@ -160,13 +192,12 @@ extension DonationViewsUtil {
 
     @MainActor
     private static func handleIDEALDonationIssue(
-        success: Bool,
         donationType: Stripe.IDEALCallbackType,
         from donationsVC: DonationSettingsViewController,
-        databaseStorage: SDSDatabaseStorage
+        databaseStorage: SDSDatabaseStorage,
     ) {
         let clearPendingDonation = { @MainActor in
-            let idealStore = DependenciesBridge.shared.externalPendingIDEALDonationStore
+            let idealStore = DependenciesBridge.shared.pendingIDEALDonationStore
             databaseStorage.write { tx in
                 switch donationType {
                 case .monthly:
@@ -180,59 +211,38 @@ extension DonationViewsUtil {
         let actionSheet = ActionSheetController(
             title: OWSLocalizedString(
                 "DONATION_SETTINGS_MY_SUPPORT_DONATION_FAILED_ALERT_TITLE",
-                comment: "Title for a sheet explaining that a payment failed."
+                comment: "Title for a sheet explaining that a payment failed.",
             ),
             message: OWSLocalizedString(
                 "DONATION_REDIRECT_ERROR_PAYMENT_DENIED_MESSAGE",
-                comment: "Error message displayed if something goes wrong with 3DSecure/iDEAL payment authorization.  This will be encountered if the user denies the payment."
-            )
+                comment: "Error message displayed if something goes wrong with 3DSecure/iDEAL payment authorization.  This will be encountered if the user denies the payment.",
+            ),
         )
         actionSheet.addAction(.init(title: CommonStrings.okButton, style: .default, handler: { _ in
-            if !success {
-                // Failing a donation will cause it to fail on the Stripe
-                // side no matter what, so clear it out before presenting
-                clearPendingDonation()
-            }
+            // Failing a donation will cause it to fail on the Stripe
+            // side no matter what, so clear it out before presenting
+            clearPendingDonation()
         }))
-        actionSheet.addAction(.init(
-            title: OWSLocalizedString(
-                "DONATION_BADGE_ISSUE_SHEET_TRY_AGAIN_BUTTON_TITLE",
-                comment: "Title for a button asking the user to try their donation again, because something went wrong."
-            ),
-            style: .default,
-            handler: { _ in
-                clearPendingDonation()
-                donationsVC.showDonateViewController(preferredDonateMode: donationType.asDonationMode)
-            })
-        )
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        if
+            let registeredState = try? tsAccountManager.registeredStateWithMaybeSneakyTransaction(),
+            let donationAllowedToken = DonationAllowedToken(registeredState: registeredState, remoteConfig: .current),
+            donationAllowedToken.canDonate(inMode: donationType.asDonationMode.asDonationMode)
+        {
+            actionSheet.addAction(
+                .init(
+                    title: CommonStrings.tryAgainButton,
+                    style: .default,
+                    handler: { _ in
+                        clearPendingDonation()
+                        donationsVC.showDonateViewController(preferredDonateMode: donationType.asDonationMode, donationAllowedToken: donationAllowedToken)
+                    },
+                ),
+            )
+        }
 
         if let frontVc = CurrentAppContext().frontmostViewController() {
             frontVc.presentActionSheet(actionSheet, animated: true)
-        }
-    }
-
-    private static func loadBadgeForDonation(
-        type donationType: Stripe.IDEALCallbackType,
-        databaseStorage: SDSDatabaseStorage
-    ) async throws -> ProfileBadge? {
-        switch donationType {
-        case .oneTime:
-            switch try await DonationSubscriptionManager.getCachedBadge(level: .boostBadge).fetchIfNeeded().awaitable() {
-            case .notFound:
-                return nil
-            case let .profileBadge(profileBadge):
-                return profileBadge
-            }
-        case .monthly:
-            let donationStore = DependenciesBridge.shared.externalPendingIDEALDonationStore
-            let monthlyDonation = databaseStorage.read { tx in
-                return donationStore.getPendingSubscription(tx: tx)
-            }
-            guard let monthlyDonation else {
-                return nil
-            }
-            try await SSKEnvironment.shared.profileManagerRef.badgeStore.populateAssetsOnBadge(monthlyDonation.newSubscriptionLevel.badge)
-            return monthlyDonation.newSubscriptionLevel.badge
         }
     }
 }

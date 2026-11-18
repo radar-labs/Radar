@@ -10,27 +10,80 @@ public final class LocalIdentifiers {
     /// The ACI for the current user.
     public let aci: Aci
 
+    // TODO: [#less] Use within LocalIdentifiers.
+    public struct PhoneNumber: Equatable {
+        /// The phone number for the current user.
+        public let e164: E164
+
+        /// The PNI for the current user.
+        public let pni: Pni
+
+        public init(e164: E164, pni: Pni) {
+            self.e164 = e164
+            self.pni = pni
+        }
+    }
+
+    public enum AccountType {
+        case phoneNumberfull(phoneNumber: String, pni: Pni?)
+        case phoneNumberless(AuthCredentialSalt)
+
+        public static func forPhoneNumber(_ phoneNumber: LocalIdentifiers.PhoneNumber) -> Self {
+            return .phoneNumberfull(phoneNumber: phoneNumber.e164.stringValue, pni: phoneNumber.pni)
+        }
+    }
+
+    public let accountType: AccountType
+
+    /// The `accountType`, wrapped in a boolean result.
+    public var hasPhoneNumber: Bool {
+        switch self.accountType {
+        case .phoneNumberfull:
+            return true
+        case .phoneNumberless:
+            return false
+        }
+    }
+
     /// The PNI for the current user.
     ///
     /// - Note: Primary & linked devices may not have access to their PNI. The
     /// primary may need to fetch it from the server, and a linked device may be
     /// waiting to learn about it from the primary.
-    public let pni: Pni?
+    public var pni: Pni? {
+        switch self.accountType {
+        case .phoneNumberfull(_, let pni):
+            return pni
+        case .phoneNumberless:
+            return nil
+        }
+    }
 
     /// The phone number for the current user.
     ///
     /// - Note: This is a `String` because the phone number we've saved to disk
     /// in prior versions of the application may not be a valid E164.
-    public let phoneNumber: String
-
-    public init(aci: Aci, pni: Pni?, phoneNumber: String) {
-        self.aci = aci
-        self.pni = pni
-        self.phoneNumber = phoneNumber
+    public var phoneNumber: String? {
+        switch self.accountType {
+        case .phoneNumberfull(let phoneNumber, _):
+            return phoneNumber
+        case .phoneNumberless:
+            return nil
+        }
     }
 
-    public convenience init(aci: Aci, pni: Pni?, e164: E164) {
-        self.init(aci: aci, pni: pni, phoneNumber: e164.stringValue)
+    public var authCredentialSalt: AuthCredentialSalt? {
+        switch self.accountType {
+        case .phoneNumberfull:
+            return nil
+        case .phoneNumberless(let authCredentialSalt):
+            return authCredentialSalt
+        }
+    }
+
+    public init(aci: Aci, accountType: AccountType) {
+        self.aci = aci
+        self.accountType = accountType
     }
 
     /// Checks if `serviceId` refers to ourself.
@@ -69,11 +122,12 @@ public final class LocalIdentifiers {
         return false
     }
 
-    public func containsAnyOf(aci: Aci?, phoneNumber: E164?, pni: Pni?) -> Bool {
+    // TODO: [#less] Accept an E164 (when LocalIdentifiers also accepts one).
+    public func containsAnyOf(aci: Aci?, phoneNumber: String?, pni: Pni?) -> Bool {
         if let aci, self.aci == aci {
             return true
         }
-        if let phoneNumber, self.phoneNumber == phoneNumber.stringValue {
+        if let phoneNumber, self.phoneNumber == phoneNumber {
             return true
         }
         if let pni, self.pni == pni {
@@ -87,6 +141,15 @@ public final class LocalIdentifiers {
             return serviceId == self.aci
         }
         return address.phoneNumber == self.phoneNumber
+    }
+
+    public var asReregisteringLocalIdentifiers: ReregisteringLocalIdentifiers {
+        switch self.accountType {
+        case .phoneNumberfull(let phoneNumber, pni: _):
+            return .phoneNumberfull(phoneNumber: phoneNumber, aci: self.aci)
+        case .phoneNumberless:
+            return .phoneNumberless(aci: self.aci)
+        }
     }
 }
 
@@ -104,13 +167,11 @@ extension LocalIdentifiers {
     static var forUnitTests: LocalIdentifiers {
         return LocalIdentifiers(
             aci: Aci.constantForTesting("00000000-0000-4000-8000-000000000AAA"),
-            pni: Pni.constantForTesting("PNI:00000000-0000-4000-8000-000000000BBB"),
-            phoneNumber: "+16505550100"
+            accountType: .phoneNumberfull(
+                phoneNumber: "+16505550100",
+                pni: Pni.constantForTesting("PNI:00000000-0000-4000-8000-000000000BBB"),
+            ),
         )
-    }
-
-    func withoutPni() -> Self {
-        return Self(aci: self.aci, pni: nil, phoneNumber: self.phoneNumber)
     }
 }
 

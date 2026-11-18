@@ -4,7 +4,6 @@
 //
 
 #import "OWSRecoverableDecryptionPlaceholder.h"
-#import "TSThread.h"
 #import <SignalServiceKit/SignalServiceKit-Swift.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -19,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
     SignalServiceAddress *sender = [[SignalServiceAddress alloc] initWithServiceIdObjC:sourceAci];
     TSThread *thread;
     if (untrustedGroupId.length > 0) {
-        TSGroupThread *_Nullable groupThread = [TSGroupThread fetchWithGroupId:untrustedGroupId transaction:writeTx];
+        TSGroupThread *_Nullable groupThread = [TSGroupThread fetchThreadForGroupIdData:untrustedGroupId tx:writeTx];
         // If we aren't sure that the sender is a member of the reported groupId, we should fall back
         // to inserting the placeholder in the contact thread.
         if ([groupThread.groupMembership isFullMember:sender]) {
@@ -28,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
         OWSAssertDebug(thread);
     }
     if (!thread) {
-        thread = [TSContactThread getThreadWithContactAddress:sender transaction:writeTx];
+        thread = [TSContactThread getWithContactAddress:sender transaction:writeTx];
         OWSAssertDebug(thread);
     }
     if (!thread) {
@@ -39,11 +38,6 @@ NS_ASSUME_NONNULL_BEGIN
     builder.timestamp = timestamp;
     builder.senderAddress = sender;
     return [super initErrorMessageWithBuilder:builder];
-}
-
-- (nullable instancetype)initWithCoder:(NSCoder *)coder
-{
-    return [super initWithCoder:coder];
 }
 
 - (instancetype)initWithGrdbId:(int64_t)grdbId
@@ -65,7 +59,6 @@ NS_ASSUME_NONNULL_BEGIN
                  isGroupStoryReply:(BOOL)isGroupStoryReply
                             isPoll:(BOOL)isPoll
     isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
-                         isStarred:(BOOL)isStarred
                 isViewOnceComplete:(BOOL)isViewOnceComplete
                  isViewOnceMessage:(BOOL)isViewOnceMessage
                        linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -101,7 +94,6 @@ NS_ASSUME_NONNULL_BEGIN
                      isGroupStoryReply:isGroupStoryReply
                                 isPoll:isPoll
         isSmsMessageRestoredFromBackup:isSmsMessageRestoredFromBackup
-                             isStarred:isStarred
                     isViewOnceComplete:isViewOnceComplete
                      isViewOnceMessage:isViewOnceMessage
                            linkPreview:linkPreview
@@ -131,11 +123,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Methods
 
-- (BOOL)supportsReplacement
-{
-    return [self.expirationDate isAfterNow] && !self.wasRead;
-}
-
 - (NSString *)previewTextWithTransaction:(DBReadTransaction *)transaction
 {
     NSString *_Nullable senderName = nil;
@@ -148,7 +135,10 @@ NS_ASSUME_NONNULL_BEGIN
         OWSFailDebug(@"Should not be directly surfaced to user");
         NSString *formatString = OWSLocalizedString(@"ERROR_MESSAGE_DECRYPTION_FAILURE",
             @"Error message for a decryption failure. Embeds {{sender short name}}.");
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
         return [[NSString alloc] initWithFormat:formatString, senderName];
+#pragma clang diagnostic pop
     } else {
         OWSFailDebug(@"Should not be directly surfaced to user");
         return OWSLocalizedString(

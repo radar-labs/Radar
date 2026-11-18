@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import SignalUI
 import SignalServiceKit
+import SignalUI
 
 class LinkedDevicesEducationSheet: StackSheetViewController {
 
@@ -28,7 +28,7 @@ class LinkedDevicesEducationSheet: StackSheetViewController {
         titleLabel.textAlignment = .center
         titleLabel.text = OWSLocalizedString(
             "LINKED_DEVICES_EDUCATION_TITLE",
-            comment: "Title for the linked device education sheet"
+            comment: "Title for the linked device education sheet",
         )
         stackView.addArrangedSubview(titleLabel)
         stackView.setCustomSpacing(24, after: titleLabel)
@@ -37,8 +37,8 @@ class LinkedDevicesEducationSheet: StackSheetViewController {
             icon: "lock",
             text: OWSLocalizedString(
                 "LINKED_DEVICES_EDUCATION_POINT_PRIVACY",
-                comment: "Bullet point about privacy on the linked devices education sheet"
-            )
+                comment: "Bullet point about privacy on the linked devices education sheet",
+            ),
         )
         stackView.addArrangedSubview(privacyBulletPoint)
 
@@ -46,35 +46,35 @@ class LinkedDevicesEducationSheet: StackSheetViewController {
             icon: "thread",
             text: OWSLocalizedString(
                 "LINKED_DEVICES_EDUCATION_POINT_MESSAGES",
-                comment: "Bullet point about message sync on the linked devices education sheet"
-            )
+                comment: "Bullet point about message sync on the linked devices education sheet",
+            ),
         )
         stackView.addArrangedSubview(messagesBulletPoint)
 
-        let iPadDownloadLinkString = "radar.chat/install"
-        let iPadDownloadURL = URL(string: "https://radar.chat/install/")!
+        let downloadLinkString = "radar.chat/install"
+        let downloadURL = URL(string: "https://radar.chat/install/")!
 
-        let downloadsString = String(
-            format: OWSLocalizedString(
+        let downloadString = String.nonPluralLocalizedStringWithFormat(
+            OWSLocalizedString(
                 "LINKED_DEVICES_EDUCATION_POINT_DOWNLOADS",
-                comment: "Bullet point about downloads on the linked devices education sheet. Embeds {{ %1$@ iPad download link }}"
+                comment: "Bullet point about a download link on the linked devices education sheet. Embeds {{ %1$@ download link }}",
             ),
-            iPadDownloadLinkString
+            downloadLinkString,
         )
 
-        let downloadsAttributedString = NSMutableAttributedString(string: downloadsString)
+        let downloadAttributedString = NSMutableAttributedString(string: downloadString)
 
-        downloadsAttributedString.addAttributes(
-            [.link: iPadDownloadURL],
-            range: (downloadsString as NSString).range(of: iPadDownloadLinkString)
+        downloadAttributedString.addAttributes(
+            [.link: downloadURL],
+            range: (downloadString as NSString).range(of: downloadLinkString),
         )
 
-        let downloadsBulletPoint = Self.bulletPoint(
+        let downloadBulletPoint = Self.bulletPoint(
             icon: "save",
-            text: downloadsAttributedString
+            text: downloadAttributedString,
         )
 
-        stackView.addArrangedSubview(downloadsBulletPoint)
+        stackView.addArrangedSubview(downloadBulletPoint)
     }
 
     private static func bulletPoint(icon: String, text: String) -> UIView {
@@ -83,7 +83,7 @@ class LinkedDevicesEducationSheet: StackSheetViewController {
 
     private static func bulletPoint(
         icon: String,
-        text: NSAttributedString
+        text: NSAttributedString,
     ) -> UIView {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -99,7 +99,7 @@ class LinkedDevicesEducationSheet: StackSheetViewController {
         textView.setContentHuggingLow()
         textView.attributedText = text.styled(
             with: .font(.dynamicTypeSubheadline),
-            .color(UIColor.Signal.label)
+            .color(UIColor.Signal.label),
         )
         stackView.addArrangedSubview(textView)
 

@@ -4,7 +4,6 @@
 //
 
 import BonMot
-import Foundation
 import Lottie
 import QuartzCore
 import SignalServiceKit
@@ -13,15 +12,7 @@ import SignalUI
 class GiftBadgeView: ManualStackView {
 
     struct State {
-        enum Badge {
-            // The badge isn't loaded. Calling the block will load it.
-            case notLoaded(() -> Promise<Void>)
-            // The badge is loaded. The associated value is the badge.
-            case loaded(ProfileBadge)
-            // No badge was found for the level in the gift.
-            case notFound
-        }
-        let badge: Badge
+        let profileBadge: ProfileBadge?
         let messageUniqueId: String
         let timeRemainingText: String
         let otherUserShortName: String
@@ -37,7 +28,7 @@ class GiftBadgeView: ManualStackView {
             axis: .vertical,
             alignment: .fill,
             spacing: 15,
-            layoutMargins: .init(hMargin: 0, vMargin: 8)
+            layoutMargins: .init(hMargin: 0, vMargin: 8),
         )
     }
 
@@ -49,7 +40,7 @@ class GiftBadgeView: ManualStackView {
             axis: .horizontal,
             alignment: .center,
             spacing: 12,
-            layoutMargins: .init(hMargin: 4, vMargin: 0)
+            layoutMargins: .init(hMargin: 4, vMargin: 0),
         )
     }
 
@@ -66,15 +57,15 @@ class GiftBadgeView: ManualStackView {
         if state.isIncoming {
             textFormat = OWSLocalizedString(
                 "DONATION_ON_BEHALF_OF_A_FRIEND_RECEIVED_TITLE_FORMAT",
-                comment: "You received a donation from a friend. This is the title of that message in the chat. Embeds {{short contact name}}."
+                comment: "You received a donation from a friend. This is the title of that message in the chat. Embeds {{short contact name}}.",
             )
         } else {
             textFormat = OWSLocalizedString(
                 "DONATION_ON_BEHALF_OF_A_FRIEND_SENT_TITLE_FORMAT",
-                comment: "You sent a donation to a friend. This is the title of that message in the chat. Embeds {{short contact name}}."
+                comment: "You sent a donation to a friend. This is the title of that message in the chat. Embeds {{short contact name}}.",
             )
         }
-        let text = String(format: textFormat, state.otherUserShortName)
+        let text = String.nonPluralLocalizedStringWithFormat(textFormat, state.otherUserShortName)
 
         let textColor = state.conversationStyle.bubbleTextColor(isIncoming: state.isIncoming)
 
@@ -82,7 +73,7 @@ class GiftBadgeView: ManualStackView {
             text,
             font: .dynamicTypeBody,
             textColor: textColor,
-            numberOfLines: 0
+            numberOfLines: 0,
         )
     }
 
@@ -91,7 +82,7 @@ class GiftBadgeView: ManualStackView {
         guard timeRemaining > 0 else {
             return OWSLocalizedString(
                 "DONATE_ON_BEHALF_OF_A_FRIEND_CHAT_EXPIRED",
-                comment: "If a donation badge has been sent, indicates that it's expired and can no longer be redeemed. This is shown in the chat."
+                comment: "If a donation badge has been sent, indicates that it's expired and can no longer be redeemed. This is shown in the chat.",
             )
         }
         return self.localizedDurationText(for: timeRemaining)
@@ -122,19 +113,19 @@ class GiftBadgeView: ManualStackView {
             state.timeRemainingText,
             font: .dynamicTypeSubheadline,
             textColor: textColor,
-            numberOfLines: 0
+            numberOfLines: 0,
         )
     }
 
     // Use a stack with one item to get layout & padding for free.
-    public let buttonStack = ManualStackViewWithLayer(name: "GiftBadgeView.buttonStack")
+    let buttonStack = ManualStackViewWithLayer(name: "GiftBadgeView.buttonStack")
     private static let measurementKey_buttonStack = "GiftBadgeView.measurementKey_buttonStack"
     private static var buttonStackConfig: CVStackViewConfig {
         CVStackViewConfig(
             axis: .horizontal,
             alignment: .center,
             spacing: 0,
-            layoutMargins: UIEdgeInsets(margin: 10)
+            layoutMargins: UIEdgeInsets(margin: 10),
         )
     }
 
@@ -150,23 +141,15 @@ class GiftBadgeView: ManualStackView {
     private let redeemButtonLabel = CVLabel()
     private static func redeemButtonLabelConfig(for state: State) -> CVLabelConfig {
         let font: UIFont = .dynamicTypeHeadline
-        let color = self.redeemButtonTextColor(for: state)
+        let color: UIColor = state.isIncoming ? Theme.primaryTextColor : .ows_gray90
         return CVLabelConfig(
             text: .attributedText(Self.redeemButtonText(for: state, font: font)),
             displayConfig: .forUnstyledText(font: font, textColor: color),
             font: font,
             textColor: color,
             lineBreakMode: .byTruncatingTail,
-            textAlignment: .center
+            textAlignment: .center,
         )
-    }
-
-    private static func redeemButtonTextColor(for state: State) -> UIColor {
-        if state.isIncoming {
-            return state.conversationStyle.bubbleTextColorIncoming
-        } else {
-            return .ows_gray90
-        }
     }
 
     private static func redeemButtonText(for state: State, font: UIFont) -> NSAttributedString {
@@ -185,14 +168,14 @@ class GiftBadgeView: ManualStackView {
                 attrString.append("\u{2004}\u{2009}")
                 attrString.append(OWSLocalizedString(
                     "DONATION_ON_BEHALF_OF_A_FRIEND_BADGE_REDEEMED",
-                    comment: "Label for a button to see details about a badge you've already redeemed, received as a result of a donation from a friend. This text is shown next to a check mark."
+                    comment: "Label for a button to see details about a badge you've already redeemed, received as a result of a donation from a friend. This text is shown next to a check mark.",
                 ))
                 return attrString
             }
         } else {
             nonAttributedString = OWSLocalizedString(
                 "DONATION_ON_BEHALF_OF_A_FRIEND_VIEW",
-                comment: "A button shown on a donation message you send, to view additional details about the badge that was sent."
+                comment: "A button shown on a donation message you send, to view additional details about the badge that was sent.",
             )
         }
         return NSAttributedString(string: nonAttributedString)
@@ -209,7 +192,7 @@ class GiftBadgeView: ManualStackView {
     private var _activityIndicator: ActivityIndicator?
     private func activityIndicator(for state: State) -> LottieAnimationView {
         let animationName: String
-        if state.isIncoming && !state.conversationStyle.isDarkThemeEnabled {
+        if state.isIncoming, !state.conversationStyle.isDarkThemeEnabled {
             animationName = "indeterminate_spinner_blue"
         } else {
             animationName = "indeterminate_spinner_white"
@@ -250,7 +233,7 @@ class GiftBadgeView: ManualStackView {
             self.timeRemainingLabel,
             self.redeemButtonLabel,
             self.badgeView,
-            self._activityIndicator?.view
+            self._activityIndicator?.view,
         ]
         for subview in allSubviews {
             subview?.removeFromSuperview()
@@ -268,38 +251,27 @@ class GiftBadgeView: ManualStackView {
             config: Self.buttonStackConfig,
             cellMeasurement: cellMeasurement,
             measurementKey: Self.measurementKey_buttonStack,
-            subviews: [self.redeemButtonLabel]
+            subviews: [self.redeemButtonLabel],
         )
 
         let innerStackSubviews: [UIView]
-        switch state.badge {
-        case .notLoaded(let loadPromise):
-            loadPromise().done { [weak componentDelegate] in
-                componentDelegate?.enqueueReload()
-            }.cauterize()
-            // TODO: (GB) If an error occurs, we'll be stuck with a spinner.
-
-            let activityIndicator = self.activityIndicator(for: state)
-            activityIndicator.play()
-            innerStackSubviews = [activityIndicator]
-            self.buttonStack.alpha = 0.5
-
-        case .notFound:
+        switch state.profileBadge {
+        case nil:
             // Show the same UI as we do when loading.
             let activityIndicator = self.activityIndicator(for: state)
             activityIndicator.play()
             innerStackSubviews = [activityIndicator]
             self.buttonStack.alpha = 0.5
 
-        case .loaded(let profileBadge):
-            self.badgeView.image = profileBadge.assets?.universal64
+        case .some(let profileBadge):
+            self.badgeView.image = profileBadge.assets.universal64
             Self.titleLabelConfig(for: state).applyForRendering(label: self.titleLabel)
             Self.timeRemainingLabelConfig(for: state).applyForRendering(label: self.timeRemainingLabel)
             self.labelStack.configure(
                 config: Self.labelStackConfig,
                 cellMeasurement: cellMeasurement,
                 measurementKey: Self.measurementKey_labelStack,
-                subviews: [self.titleLabel, self.timeRemainingLabel]
+                subviews: [self.titleLabel, self.timeRemainingLabel],
             )
             innerStackSubviews = [self.badgeView, self.labelStack]
             self.buttonStack.alpha = 1.0
@@ -308,14 +280,14 @@ class GiftBadgeView: ManualStackView {
             config: Self.innerStackConfig,
             cellMeasurement: cellMeasurement,
             measurementKey: Self.measurementKey_innerStack,
-            subviews: innerStackSubviews
+            subviews: innerStackSubviews,
         )
 
         self.configure(
             config: Self.outerStackConfig,
             cellMeasurement: cellMeasurement,
             measurementKey: Self.measurementKey_outerStack,
-            subviews: [self.innerStack, self.buttonStack]
+            subviews: [self.innerStack, self.buttonStack],
         )
 
         if state.wrapState == .unwrapped || !componentDelegate.willWrapGift(state.messageUniqueId) {
@@ -340,7 +312,7 @@ class GiftBadgeView: ManualStackView {
     private static func maxWidthForView(
         placedWithin stackConfigs: [CVStackViewConfig],
         startingAt maxWidth: CGFloat,
-        subtracting value: CGFloat
+        subtracting value: CGFloat,
     ) -> CGFloat {
         return maxWidth - value - stackConfigs.reduce(0) { $0 + $1.layoutMargins.totalWidth }
     }
@@ -363,7 +335,7 @@ class GiftBadgeView: ManualStackView {
         let labelMaxWidth = self.maxWidthForView(
             placedWithin: [labelStackConfig, innerStackConfig, outerStackConfig],
             startingAt: maxWidth,
-            subtracting: badgeViewSize.width + innerStackConfig.spacing
+            subtracting: badgeViewSize.width + innerStackConfig.spacing,
         )
         let titleLabelSize = self.titleLabelConfig(for: state).measure(maxWidth: labelMaxWidth)
         let timeRemainingLabelSize = self.timeRemainingMeasurement(for: state, maxWidth: labelMaxWidth)
@@ -372,7 +344,7 @@ class GiftBadgeView: ManualStackView {
             config: labelStackConfig,
             measurementBuilder: measurementBuilder,
             measurementKey: Self.measurementKey_labelStack,
-            subviewInfos: [titleLabelSize.asManualSubviewInfo, timeRemainingLabelSize.asManualSubviewInfo]
+            subviewInfos: [titleLabelSize.asManualSubviewInfo, timeRemainingLabelSize.asManualSubviewInfo],
         )
 
         let innerStackMeasurement = ManualStackView.measure(
@@ -381,14 +353,14 @@ class GiftBadgeView: ManualStackView {
             measurementKey: Self.measurementKey_innerStack,
             subviewInfos: [
                 badgeViewSize.asManualSubviewInfo,
-                labelStackMeasurement.measuredSize.asManualSubviewInfo
-            ]
+                labelStackMeasurement.measuredSize.asManualSubviewInfo,
+            ],
         )
 
         let buttonMaxWidth = self.maxWidthForView(
             placedWithin: [buttonStackConfig, outerStackConfig],
             startingAt: maxWidth,
-            subtracting: 0
+            subtracting: 0,
         )
         let redeemButtonLabelSize = self.redeemButtonLabelConfig(for: state).measure(maxWidth: buttonMaxWidth)
 
@@ -396,7 +368,7 @@ class GiftBadgeView: ManualStackView {
             config: buttonStackConfig,
             measurementBuilder: measurementBuilder,
             measurementKey: Self.measurementKey_buttonStack,
-            subviewInfos: [redeemButtonLabelSize.asManualSubviewInfo]
+            subviewInfos: [redeemButtonLabelSize.asManualSubviewInfo],
         )
 
         let outerStackMeasurement = ManualStackView.measure(
@@ -405,8 +377,8 @@ class GiftBadgeView: ManualStackView {
             measurementKey: Self.measurementKey_outerStack,
             subviewInfos: [
                 innerStackMeasurement.measuredSize.asManualSubviewInfo,
-                buttonStackMeasurement.measuredSize.asManualSubviewInfo
-            ]
+                buttonStackMeasurement.measuredSize.asManualSubviewInfo,
+            ],
         )
 
         return outerStackMeasurement.measuredSize
@@ -432,7 +404,7 @@ class GiftBadgeView: ManualStackView {
                 // ensures that we don't reserve space for the second line unless the value
                 // we're going to show needs two lines and (b) still maintains a roughly
                 // constant overall bubble width.
-                lineBreakMode: .byTruncatingTail
+                lineBreakMode: .byTruncatingTail,
             )
             let candidateSize = candidateConfig.measure(maxWidth: maxWidth)
             labelSize.width = max(labelSize.width, candidateSize.width)
@@ -543,18 +515,18 @@ private class GiftWrapView: UIView {
         wrappingContainer.autoPinEdgesToSuperviewEdges()
 
         let wrappingView = self.wrappingView
-        wrappingView.backgroundColor = .ows_accentBlue
+        wrappingView.backgroundColor = .Signal.accent
         wrappingContainer.addSubview(wrappingView)
 
         let horizontalWrap = UIView()
-        horizontalWrap.backgroundColor = .ows_white
+        horizontalWrap.backgroundColor = .white
         wrappingContainer.addSubview(horizontalWrap)
         horizontalWrap.autoSetDimension(.height, toSize: wrapWidth)
         horizontalWrap.autoPinWidthToSuperview()
         horizontalWrap.autoCenterInSuperview()
 
         let verticalWrap = UIView()
-        verticalWrap.backgroundColor = .ows_white
+        verticalWrap.backgroundColor = .white
         wrappingContainer.addSubview(verticalWrap)
         verticalWrap.autoSetDimension(.width, toSize: wrapWidth)
         verticalWrap.autoPinHeightToSuperview()
@@ -589,7 +561,7 @@ private class GiftWrapView: UIView {
             shakeCount: shakeCount,
             shakeMagnitude: shakeMagnitude,
             startDelay: 0,
-            duration: duration
+            duration: duration,
         )
         // The bow animates with a 40ms delay compared to the wrapping.
         self.animateShake(
@@ -597,7 +569,7 @@ private class GiftWrapView: UIView {
             shakeCount: shakeCount,
             shakeMagnitude: shakeMagnitude * 0.5,
             startDelay: bowDelay,
-            duration: duration
+            duration: duration,
         )
     }
 
@@ -621,7 +593,7 @@ private class GiftWrapView: UIView {
         shakeCount: Int,
         shakeMagnitude: CGFloat,
         startDelay: CGFloat,
-        duration: CGFloat
+        duration: CGFloat,
     ) {
         // Build the equally-spaced positions for the animation.
         var values = [CGFloat]()
@@ -692,7 +664,7 @@ private class UnwrapAnimationView: UIView, CAAnimationDelegate {
             (0.400, 3 * directionMultipler),
             (1.030, -8 * directionMultipler),
             (1.400, 5 * directionMultipler),
-            (1.800, 5 * directionMultipler)
+            (1.800, 5 * directionMultipler),
         ])
         // The bubble rotates back and forth, opposite from the bow.
         self.layer.animateRotation(animationKey: animationKey, duration: 1.8, keyFrames: [
@@ -700,7 +672,7 @@ private class UnwrapAnimationView: UIView, CAAnimationDelegate {
             (0.400, 0 * directionMultipler),
             (1.030, 8 * directionMultipler),
             (1.400, -5 * directionMultipler),
-            (1.800, -5 * directionMultipler)
+            (1.800, -5 * directionMultipler),
         ])
         // The vertical movement is "approximately gravity". As a result, the path
         // is closer to a parabola than a standard easeInEaseOut curve (that curve
@@ -711,7 +683,7 @@ private class UnwrapAnimationView: UIView, CAAnimationDelegate {
         self.layer.animateTranslation(animationKey: animationKey, coordinateKey: "y", duration: 1.8, keyFrames: [
             (0.400, 0, .init(name: .linear)),
             (0.730, -74, .init(controlPoints: 0.00, 0.00, 0.25, 1.00)),
-            (1.800, 1366, .init(controlPoints: 0.90, 0.00, 1.00, 1.00))
+            (1.800, 1366, .init(controlPoints: 0.90, 0.00, 1.00, 1.00)),
         ]).delegate = self
 
         // The horizontal movement uses easeInEaseOut, split across the two phases.
@@ -719,7 +691,7 @@ private class UnwrapAnimationView: UIView, CAAnimationDelegate {
             (0.400, 0 * directionMultipler, .init(name: .linear)),
             (0.730, 11 * directionMultipler, .init(name: .easeIn)),
             (1.400, 18 * directionMultipler, .init(name: .easeOut)),
-            (1.800, 18 * directionMultipler, .init(name: .linear))
+            (1.800, 18 * directionMultipler, .init(name: .linear)),
         ])
 
         // The vertical motion uses a constant of 1366, which is (currently) the
@@ -733,7 +705,7 @@ private class UnwrapAnimationView: UIView, CAAnimationDelegate {
         // Set the final position off the screen so that the view doesn't "jump
         // back" before it gets removed.
         self.layer.setAffineTransform(
-            CGAffineTransform(translationX: 18 * directionMultipler, y: 1366)
+            CGAffineTransform(translationX: 18 * directionMultipler, y: 1366),
         )
     }
 
@@ -762,7 +734,7 @@ private extension CALayer {
     func animateRotation(
         animationKey: String,
         duration: CFTimeInterval,
-        keyFrames: [(keyTime: CFTimeInterval, degrees: CGFloat)]
+        keyFrames: [(keyTime: CFTimeInterval, degrees: CGFloat)],
     ) {
         let keyPath = "transform.rotation"
         let animation = CAKeyframeAnimation(keyPath: keyPath)
@@ -799,7 +771,7 @@ private extension CALayer {
         animationKey: String,
         coordinateKey: String,
         duration: CFTimeInterval,
-        keyFrames: [(keyTime: CFTimeInterval, value: CGFloat, timingFunction: CAMediaTimingFunction)]
+        keyFrames: [(keyTime: CFTimeInterval, value: CGFloat, timingFunction: CAMediaTimingFunction)],
     ) -> CAAnimation {
         let keyPath = "transform.translation.\(coordinateKey)"
         let animation = CAKeyframeAnimation(keyPath: keyPath)

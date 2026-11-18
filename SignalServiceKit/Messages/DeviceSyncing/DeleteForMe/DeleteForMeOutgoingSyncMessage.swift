@@ -10,7 +10,36 @@ import LibSignalClient
 ///
 /// - SeeAlso ``DeleteForMeOutgoingSyncMessageManager``
 @objc(DeleteForMeOutgoingSyncMessage)
-class DeleteForMeOutgoingSyncMessage: OWSOutgoingSyncMessage {
+final class DeleteForMeOutgoingSyncMessage: OutgoingSyncMessage {
+    override class var supportsSecureCoding: Bool { true }
+
+    required init?(coder: NSCoder) {
+        guard let contents = coder.decodeObject(of: NSData.self, forKey: "contents") as Data? else {
+            return nil
+        }
+        self.contents = contents
+        super.init(coder: coder)
+    }
+
+    override func encode(with coder: NSCoder) {
+        super.encode(with: coder)
+        coder.encode(contents, forKey: "contents")
+    }
+
+    override var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(super.hash)
+        hasher.combine(contents)
+        return hasher.finalize()
+    }
+
+    override func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard super.isEqual(object) else { return false }
+        guard self.contents == object.contents else { return false }
+        return true
+    }
+
     typealias Outgoing = DeleteForMeSyncMessage.Outgoing
 
     struct Contents: Codable {
@@ -29,25 +58,25 @@ class DeleteForMeOutgoingSyncMessage: OWSOutgoingSyncMessage {
         let conversationDeletes: [Outgoing.ConversationDelete]
         let localOnlyConversationDelete: [Outgoing.LocalOnlyConversationDelete]
 
-        #if TESTABLE_BUILD
+#if TESTABLE_BUILD
         init(
             messageDeletes: [Outgoing.MessageDeletes],
             nilAttachmentDeletes: Void,
             conversationDeletes: [Outgoing.ConversationDelete],
-            localOnlyConversationDelete: [Outgoing.LocalOnlyConversationDelete]
+            localOnlyConversationDelete: [Outgoing.LocalOnlyConversationDelete],
         ) {
             self.messageDeletes = messageDeletes
             self.attachmentDeletes = nil
             self.conversationDeletes = conversationDeletes
             self.localOnlyConversationDelete = localOnlyConversationDelete
         }
-        #endif
+#endif
 
         init(
             messageDeletes: [Outgoing.MessageDeletes],
             attachmentDeletes: [Outgoing.AttachmentDelete],
             conversationDeletes: [Outgoing.ConversationDelete],
-            localOnlyConversationDelete: [Outgoing.LocalOnlyConversationDelete]
+            localOnlyConversationDelete: [Outgoing.LocalOnlyConversationDelete],
         ) {
             self.attachmentDeletes = attachmentDeletes
             self.messageDeletes = messageDeletes
@@ -58,7 +87,7 @@ class DeleteForMeOutgoingSyncMessage: OWSOutgoingSyncMessage {
         fileprivate var asProto: SSKProtoSyncMessageDeleteForMe {
             let protoBuilder = SSKProtoSyncMessageDeleteForMe.builder()
             protoBuilder.setMessageDeletes(messageDeletes.map { $0.asProto })
-            if let attachmentDeletes = attachmentDeletes {
+            if let attachmentDeletes {
                 protoBuilder.setAttachmentDeletes(attachmentDeletes.map { $0.asProto })
             }
             protoBuilder.setConversationDeletes(conversationDeletes.map { $0.asProto })
@@ -68,43 +97,29 @@ class DeleteForMeOutgoingSyncMessage: OWSOutgoingSyncMessage {
     }
 
     /// A JSON-serialized ``Contents`` struct.
-    ///
-    /// - Important: The ObjC name must not change, for Mantle compatibility.
-    /// - Note
-    /// Nullability is intentional, since Mantle will set this property via its
-    /// reflection-based `init(coder:)` when we call `super.init(coder:)`.
-    @objc(contents)
-    private(set) var contentsData: Data!
+    private(set) var contents: Data
 
     init?(
         contents: Contents,
         localThread: TSContactThread,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) {
         do {
-            self.contentsData = try JSONEncoder().encode(contents)
+            self.contents = try JSONEncoder().encode(contents)
         } catch {
             owsFailDebug("Failed to encode sync message contents!")
             return nil
         }
 
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
+    override var isUrgent: Bool { false }
 
-    required init(dictionary dictionaryValue: [String: Any]!) throws {
-        try super.init(dictionary: dictionaryValue)
-    }
-
-    override public var isUrgent: Bool { false }
-
-    override public func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let contents: Contents
         do {
-            contents = try JSONDecoder().decode(Contents.self, from: contentsData)
+            contents = try JSONDecoder().decode(Contents.self, from: self.contents)
         } catch let error {
             owsFailDebug("Failed to decode serialized sync message contents! \(error)")
             return nil
@@ -119,20 +134,28 @@ class DeleteForMeOutgoingSyncMessage: OWSOutgoingSyncMessage {
 // MARK: -
 
 extension DeleteForMeSyncMessage.Outgoing {
-    enum ConversationIdentifier: Codable, Equatable {
+
+    enum CodableConversationIdentifier: Codable, Equatable {
         case threadServiceId(serviceId: ServiceIdUppercaseString<ServiceId>)
         case threadE164(e164: String)
         case threadGroupId(groupId: Data)
 
-        fileprivate var asProto: SSKProtoSyncMessageDeleteForMeConversationIdentifier {
-            let protoBuilder = SSKProtoSyncMessageDeleteForMeConversationIdentifier.builder()
+        init(_ conversationIdentifier: ConversationIdentifier) {
+            switch conversationIdentifier {
+            case .serviceId(let serviceId):
+                self = .threadServiceId(serviceId: ServiceIdUppercaseString(wrappedValue: serviceId))
+            case .e164(let e164):
+                self = .threadE164(e164: e164.stringValue)
+            case .groupIdentifier(let groupIdentifier):
+                self = .threadGroupId(groupId: groupIdentifier.serialize())
+            }
+        }
+
+        var asProto: SSKProtoConversationIdentifier {
+            let protoBuilder = SSKProtoConversationIdentifier.builder()
             switch self {
             case .threadServiceId(let serviceId):
-                if BuildFlags.serviceIdBinaryOneOf {
-                    protoBuilder.setThreadServiceIDBinary(serviceId.wrappedValue.serviceIdBinary)
-                } else {
-                    protoBuilder.setThreadServiceID(serviceId.wrappedValue.serviceIdString)
-                }
+                protoBuilder.setThreadServiceIDBinary(serviceId.wrappedValue.serviceIdBinary)
             case .threadE164(let e164): protoBuilder.setThreadE164(e164)
             case .threadGroupId(let groupId): protoBuilder.setThreadGroupID(groupId)
             }
@@ -140,73 +163,31 @@ extension DeleteForMeSyncMessage.Outgoing {
         }
     }
 
-    struct AddressableMessage: Codable, Equatable {
+    struct CodableAddressableMessage: Codable, Equatable {
         enum Author: Codable, Equatable {
-            /// The author's ACI. Note that the author of a message must be an
-            /// ACI, never a PNI.
             case aci(aci: ServiceIdUppercaseString<Aci>)
-            /// The author's E164, if their ACI is absent. This should only be
-            /// relevant for old (pre-ACI) messages.
             case e164(e164: String)
         }
 
         let author: Author
         let sentTimestamp: UInt64
 
-        private init(author: Author, sentTimestamp: UInt64) {
-            self.author = author
-            self.sentTimestamp = sentTimestamp
-        }
-
-        #if TESTABLE_BUILD
-        static func forTests(author: Author, sentTimestamp: UInt64) -> AddressableMessage {
-            return AddressableMessage(author: author, sentTimestamp: sentTimestamp)
-        }
-        #endif
-
-        static func addressing(
-            message: TSMessage,
-            localIdentifiers: LocalIdentifiers
-        ) -> AddressableMessage? {
-            if let incomingMessage = message as? TSIncomingMessage {
-                return AddressableMessage(incomingMessage: incomingMessage)
-            } else if let outgoingMessage = message as? TSOutgoingMessage {
-                return AddressableMessage(
-                    outgoingMessage: outgoingMessage,
-                    localIdentifiers: localIdentifiers
-                )
+        init(_ addressableMessage: AddressableMessage) {
+            switch addressableMessage.author {
+            case .aci(let aci):
+                author = .aci(aci: ServiceIdUppercaseString(wrappedValue: aci))
+            case .e164(let e164):
+                author = .e164(e164: e164.stringValue)
             }
-
-            return nil
+            sentTimestamp = addressableMessage.sentTimestamp
         }
 
-        private init?(incomingMessage: TSIncomingMessage) {
-            if let authorAci = incomingMessage.authorAddress.aci {
-                author = .aci(aci: ServiceIdUppercaseString(wrappedValue: authorAci))
-            } else if let authorE164 = incomingMessage.authorAddress.e164 {
-                author = .e164(e164: authorE164.stringValue)
-            } else {
-                return nil
-            }
-
-            sentTimestamp = incomingMessage.timestamp
-        }
-
-        private init(outgoingMessage: TSOutgoingMessage, localIdentifiers: LocalIdentifiers) {
-            author = .aci(aci: ServiceIdUppercaseString(wrappedValue: localIdentifiers.aci))
-            sentTimestamp = outgoingMessage.timestamp
-        }
-
-        fileprivate var asProto: SSKProtoSyncMessageDeleteForMeAddressableMessage {
-            let protoBuilder = SSKProtoSyncMessageDeleteForMeAddressableMessage.builder()
+        var asProto: SSKProtoAddressableMessage {
+            let protoBuilder = SSKProtoAddressableMessage.builder()
             protoBuilder.setSentTimestamp(sentTimestamp)
             switch author {
             case .aci(let aci):
-                if BuildFlags.serviceIdBinaryOneOf {
-                    protoBuilder.setAuthorServiceIDBinary(aci.wrappedValue.serviceIdBinary)
-                } else {
-                    protoBuilder.setAuthorServiceID(aci.wrappedValue.serviceIdString)
-                }
+                protoBuilder.setAuthorServiceIDBinary(aci.wrappedValue.serviceIdBinary)
             case .e164(let e164): protoBuilder.setAuthorE164(e164)
             }
             return protoBuilder.buildInfallibly()
@@ -214,8 +195,16 @@ extension DeleteForMeSyncMessage.Outgoing {
     }
 
     struct MessageDeletes: Codable, Equatable {
-        let conversationIdentifier: ConversationIdentifier
-        let addressableMessages: [AddressableMessage]
+        let conversationIdentifier: CodableConversationIdentifier
+        let addressableMessages: [CodableAddressableMessage]
+
+        init(
+            conversationIdentifier: ConversationIdentifier,
+            addressableMessages: [AddressableMessage],
+        ) {
+            self.conversationIdentifier = CodableConversationIdentifier(conversationIdentifier)
+            self.addressableMessages = addressableMessages.map { CodableAddressableMessage($0) }
+        }
 
         fileprivate var asProto: SSKProtoSyncMessageDeleteForMeMessageDeletes {
             let protoBuilder = SSKProtoSyncMessageDeleteForMeMessageDeletes.builder()
@@ -226,11 +215,33 @@ extension DeleteForMeSyncMessage.Outgoing {
     }
 
     struct AttachmentDelete: Codable, Equatable {
-        let conversationIdentifier: ConversationIdentifier
-        let targetMessage: AddressableMessage
+        let conversationIdentifier: CodableConversationIdentifier
+        let targetMessage: CodableAddressableMessage
         let clientUuid: UUID?
-        let encryptedDigest: Data?
+        let ciphertextDigest: Data?
         let plaintextHash: Data?
+
+        enum CodingKeys: String, CodingKey {
+            case conversationIdentifier
+            case targetMessage
+            case clientUuid
+            case ciphertextDigest = "encryptedDigest"
+            case plaintextHash
+        }
+
+        init(
+            conversationIdentifier: ConversationIdentifier,
+            targetMessage: AddressableMessage,
+            clientUuid: UUID?,
+            ciphertextDigest: Data?,
+            plaintextHash: Data?,
+        ) {
+            self.conversationIdentifier = CodableConversationIdentifier(conversationIdentifier)
+            self.targetMessage = CodableAddressableMessage(targetMessage)
+            self.clientUuid = clientUuid
+            self.ciphertextDigest = ciphertextDigest
+            self.plaintextHash = plaintextHash
+        }
 
         fileprivate var asProto: SSKProtoSyncMessageDeleteForMeAttachmentDelete {
             let protoBuilder = SSKProtoSyncMessageDeleteForMeAttachmentDelete.builder()
@@ -239,8 +250,8 @@ extension DeleteForMeSyncMessage.Outgoing {
             if let clientUuid {
                 protoBuilder.setClientUuid(clientUuid.data)
             }
-            if let encryptedDigest {
-                protoBuilder.setFallbackDigest(encryptedDigest)
+            if let ciphertextDigest {
+                protoBuilder.setFallbackDigest(ciphertextDigest)
             }
             if let plaintextHash {
                 protoBuilder.setFallbackPlaintextHash(plaintextHash)
@@ -257,37 +268,37 @@ extension DeleteForMeSyncMessage.Outgoing {
             case isFullDelete
         }
 
-        let conversationIdentifier: ConversationIdentifier
-        let mostRecentAddressableMessages: [AddressableMessage]
+        let conversationIdentifier: CodableConversationIdentifier
+        let mostRecentAddressableMessages: [CodableAddressableMessage]
         /// Non-expiring messages were added after this type may already have
         /// been persisted, so this needs to be an optional property that
         /// decodes as `nil` from existing data.
-        let mostRecentNonExpiringAddressableMessages: [AddressableMessage]?
+        let mostRecentNonExpiringAddressableMessages: [CodableAddressableMessage]?
         let isFullDelete: Bool
 
-        #if TESTABLE_BUILD
+#if TESTABLE_BUILD
         init(
             conversationIdentifier: ConversationIdentifier,
             mostRecentAddressableMessages: [AddressableMessage],
             nilNonExpiringAddressableMessages: Void,
-            isFullDelete: Bool
+            isFullDelete: Bool,
         ) {
-            self.conversationIdentifier = conversationIdentifier
-            self.mostRecentAddressableMessages = mostRecentAddressableMessages
+            self.conversationIdentifier = CodableConversationIdentifier(conversationIdentifier)
+            self.mostRecentAddressableMessages = mostRecentAddressableMessages.map { CodableAddressableMessage($0) }
             self.mostRecentNonExpiringAddressableMessages = nil
             self.isFullDelete = isFullDelete
         }
-        #endif
+#endif
 
         init(
             conversationIdentifier: ConversationIdentifier,
             mostRecentAddressableMessages: [AddressableMessage],
             mostRecentNonExpiringAddressableMessages: [AddressableMessage],
-            isFullDelete: Bool
+            isFullDelete: Bool,
         ) {
-            self.conversationIdentifier = conversationIdentifier
-            self.mostRecentAddressableMessages = mostRecentAddressableMessages
-            self.mostRecentNonExpiringAddressableMessages = mostRecentNonExpiringAddressableMessages
+            self.conversationIdentifier = CodableConversationIdentifier(conversationIdentifier)
+            self.mostRecentAddressableMessages = mostRecentAddressableMessages.map { CodableAddressableMessage($0) }
+            self.mostRecentNonExpiringAddressableMessages = mostRecentNonExpiringAddressableMessages.map { CodableAddressableMessage($0) }
             self.isFullDelete = isFullDelete
         }
 
@@ -304,7 +315,11 @@ extension DeleteForMeSyncMessage.Outgoing {
     }
 
     struct LocalOnlyConversationDelete: Codable, Equatable {
-        let conversationIdentifier: ConversationIdentifier
+        let conversationIdentifier: CodableConversationIdentifier
+
+        init(conversationIdentifier: ConversationIdentifier) {
+            self.conversationIdentifier = CodableConversationIdentifier(conversationIdentifier)
+        }
 
         fileprivate var asProto: SSKProtoSyncMessageDeleteForMeLocalOnlyConversationDelete {
             let protoBuilder = SSKProtoSyncMessageDeleteForMeLocalOnlyConversationDelete.builder()

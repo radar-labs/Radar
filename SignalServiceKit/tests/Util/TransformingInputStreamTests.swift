@@ -17,35 +17,36 @@ final class TransformingInputStreamTests: XCTestCase {
             transforms: [
                 ChunkedOutputStreamTransform(),
                 try GzipStreamTransform(.compress),
-                try EncryptingStreamTransform(iv: iv, encryptionKey: encryptionKey)
+                try EncryptingStreamTransform(iv: iv, encryptionKey: encryptionKey),
             ],
-            outputStream: outputStream
+            outputStream: outputStream,
         )
 
-        try transformingOutputStream.write(data: "w".data(using: .utf8)!)
-        try transformingOutputStream.write(data: "xx".data(using: .utf8)!)
-        try transformingOutputStream.write(data: "yyy".data(using: .utf8)!)
+        try transformingOutputStream.write(data: "w".data(using: .utf8)!, options: [:])
+        try transformingOutputStream.write(data: "xx".data(using: .utf8)!, options: [:])
+        try transformingOutputStream.write(data: "yyy".data(using: .utf8)!, options: [:])
 
         try transformingOutputStream.close()
 
         let inputData = outputStream.accumulation
-        let inputStream = TextBackedInputStream(data: inputData)
+        let inputStream = InputStream(data: inputData)
+        inputStream.open()
 
         let transformingIntputStream = TransformingInputStream(
             transforms: [
                 try DecryptingStreamTransform(encryptionKey: encryptionKey),
                 try GzipStreamTransform(.decompress),
-                ChunkedInputStreamTransform()
+                ChunkedInputStreamTransform(),
             ],
-            inputStream: inputStream
+            inputStream: inputStream,
         )
 
         var results = [Data]()
         while transformingIntputStream.hasBytesAvailable {
             results.append(try transformingIntputStream.read(maxLength: 1024))
         }
-        try transformingIntputStream.close()
+        transformingIntputStream.close()
 
-        XCTAssertEqual(results.filter({$0.count > 0}).count, 3)
+        XCTAssertEqual(results.filter({ $0.count > 0 }).count, 3)
     }
 }

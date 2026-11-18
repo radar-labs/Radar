@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
 import SignalServiceKit
 import SignalUI
 
@@ -19,6 +18,7 @@ class NameEditorViewController: OWSTableViewController2 {
     class var nameByteLimit: Int { owsFail("Must be implemented by subclasses") }
     class var nameGlyphLimit: Int { owsFail("Must be implemented by subclasses") }
 
+    var allowEmptyName: Bool { true }
     var placeholderText: String? { nil }
 
     private lazy var nameField = OWSTextField(
@@ -31,8 +31,8 @@ class NameEditorViewController: OWSTableViewController2 {
             self.updateHasUnsavedChanges()
         },
         returnPressed: { [unowned self] in
-            if hasUnsavedChanges { self.didTapDone() }
-        }
+            if canSaveChanges { self.didTapDone() }
+        },
     )
 
     private let oldName: String
@@ -51,7 +51,6 @@ class NameEditorViewController: OWSTableViewController2 {
         self.isPresentedInSheet = true
         let navigationController = OWSNavigationController(rootViewController: self)
         if forceDarkMode {
-            self.forceDarkMode = true
             navigationController.overrideUserInterfaceStyle = .dark
         }
         viewController.presentFormSheet(navigationController, animated: true)
@@ -63,7 +62,7 @@ class NameEditorViewController: OWSTableViewController2 {
         if isPresentedInSheet {
             self.navigationItem.leftBarButtonItem = .cancelButton(
                 dismissingFrom: self,
-                hasUnsavedChanges: { [unowned self] in self.hasUnsavedChanges }
+                hasUnsavedChanges: { [unowned self] in self.canSaveChanges },
             )
         }
         self.navigationItem.rightBarButtonItem = .doneButton { [unowned self] in self.didTapDone() }
@@ -74,7 +73,7 @@ class NameEditorViewController: OWSTableViewController2 {
         self.contents = OWSTableContents(sections: [
             OWSTableSection(items: [.textFieldItem(
                 self.nameField,
-                textColor: UIColor.Signal.label
+                textColor: UIColor.Signal.label,
             )]),
         ])
     }
@@ -98,26 +97,30 @@ class NameEditorViewController: OWSTableViewController2 {
     }
 
     override var isModalInPresentation: Bool {
-        get { hasUnsavedChanges }
+        get { canSaveChanges }
         set {}
     }
 
     private func updateHasUnsavedChanges() {
-        self.hasUnsavedChanges = self.nameField.text != self.oldName
+        let hasUnsavedChanges = self.nameField.text != self.oldName
+        let hasUnallowedEmptyName = !self.allowEmptyName && self.nameField.text.isEmptyOrNil
+
+        self.navigationItem.rightBarButtonItem?.isEnabled = hasUnsavedChanges && !hasUnallowedEmptyName
     }
 
-    private var hasUnsavedChanges: Bool = false {
+    private var canSaveChanges: Bool = false {
         didSet {
-            if oldValue == hasUnsavedChanges {
+            if oldValue == canSaveChanges {
                 return
             }
-            self.navigationItem.rightBarButtonItem?.isEnabled = hasUnsavedChanges
+            self.navigationItem.rightBarButtonItem?.isEnabled = canSaveChanges
         }
     }
 
     private func didTapDone() {
         ModalActivityIndicatorViewController.present(
             fromViewController: self,
+            title: CommonStrings.updatingModal,
             presentationDelay: 0.25,
             asyncBlock: { [weak self] modal in
                 guard let self else { return }
@@ -137,7 +140,7 @@ class NameEditorViewController: OWSTableViewController2 {
                         self?.handleError(error)
                     }
                 }
-            }
+            },
         )
     }
 
@@ -152,7 +155,7 @@ extension NameEditorViewController: UITextFieldDelegate {
             shouldChangeCharactersInRange: range,
             replacementString: string,
             maxByteCount: Self.nameByteLimit,
-            maxGlyphCount: Self.nameGlyphLimit
+            maxGlyphCount: Self.nameGlyphLimit,
         )
     }
 }

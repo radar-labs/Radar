@@ -8,7 +8,7 @@ public import SignalUI
 
 public class PinConfirmationViewController: OWSViewController {
 
-    private let completionHandler: ((Bool) -> Void)
+    private let completionHandler: (Bool) -> Void
     private let titleText: String
     private let explanationText: String
     private let actionText: String
@@ -19,16 +19,14 @@ public class PinConfirmationViewController: OWSViewController {
     private lazy var backgroundView: UIView = {
         let view = UIView()
         view.backgroundColor = .Signal.groupedBackground
-#if compiler(>=6.2)
         if #available(iOS 26, *) {
             view.cornerConfiguration = .corners(
                 topLeftRadius: .containerConcentric(minimum: 40),
                 topRightRadius: .containerConcentric(minimum: 40),
                 bottomLeftRadius: .none,
-                bottomRightRadius: .none
+                bottomRightRadius: .none,
             )
         }
-#endif
         return view
     }()
 
@@ -45,21 +43,19 @@ public class PinConfirmationViewController: OWSViewController {
         textField.defaultTextAttributes.updateValue(5, forKey: .kern)
         textField.accessibilityIdentifier = "pinConfirmation.pinTextField"
         textField.delegate = self
-#if compiler(>=6.2)
         if #available(iOS 26, *) {
             textField.cornerConfiguration = .capsule()
         } else {
             textField.layer.cornerRadius = 10
         }
-#else
-        textField.layer.cornerRadius = 10
-#endif
+        let twoFactorManager = SSKEnvironment.shared.ows2FAManagerRef
         let currentPinType = context.db.read { tx in
-            context.svr.currentPinType(transaction: tx)
+            let pinCode = twoFactorManager.pinCode(transaction: tx)
+            return pinCode.map(OWS2FAManager.PinType.forPin(_:)) ?? .alphanumeric
         }
         textField.keyboardType = currentPinType == .alphanumeric ? .default : .asciiCapableNumberPad
         return textField
-   }()
+    }()
 
     private lazy var validationWarningLabel: UILabel = {
         let label = UILabel()
@@ -68,7 +64,7 @@ public class PinConfirmationViewController: OWSViewController {
         label.font = .dynamicTypeFootnoteClamped
         label.accessibilityIdentifier = "pinConfirmation.validationWarningLabel"
         return label
-   }()
+    }()
 
     enum ValidationState {
         case valid
@@ -79,6 +75,7 @@ public class PinConfirmationViewController: OWSViewController {
             return self != .valid
         }
     }
+
     private var validationState: ValidationState = .valid {
         didSet {
             updateValidationWarnings()
@@ -88,6 +85,7 @@ public class PinConfirmationViewController: OWSViewController {
             }
         }
     }
+
     private var hasGuessedWrong = false
 
     private let context: ViewControllerContext
@@ -104,27 +102,27 @@ public class PinConfirmationViewController: OWSViewController {
         transitioningDelegate = self
     }
 
-    public override func viewWillAppear(_ animated: Bool) {
+    override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         pinTextField.becomeFirstResponder()
     }
 
-    public override func viewDidAppear(_ animated: Bool) {
+    override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         // For now, the design only allows for portrait layout on non-iPads
-        if !UIDevice.current.isIPad && view.window?.windowScene?.interfaceOrientation != .portrait {
+        if !UIDevice.current.isIPad, view.window?.windowScene?.interfaceOrientation != .portrait {
             UIDevice.current.ows_setOrientation(.portrait)
         }
     }
 
-    public override func viewWillDisappear(_ animated: Bool) {
+    override public func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         pinContentView()
         pinTextField.resignFirstResponder()
     }
 
-    public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    override public var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return UIDevice.current.isIPad ? .all : .portrait
     }
 
@@ -182,7 +180,7 @@ public class PinConfirmationViewController: OWSViewController {
         explanationLabel.text = explanationText
 
         // Pin text field and warning text
-        let pinStack = UIStackView(arrangedSubviews: [ pinTextField, validationWarningLabel ])
+        let pinStack = UIStackView(arrangedSubviews: [pinTextField, validationWarningLabel])
         pinStack.axis = .vertical
         pinStack.alignment = .fill
         pinStack.spacing = 16
@@ -204,7 +202,7 @@ public class PinConfirmationViewController: OWSViewController {
             configuration: .largePrimary(title: actionText),
             primaryAction: UIAction { [weak self] _ in
                 self?.submitPressed()
-            }
+            },
         )
         submitButton.accessibilityIdentifier = "pinConfirmation.submitButton"
 
@@ -212,7 +210,7 @@ public class PinConfirmationViewController: OWSViewController {
             configuration: .mediumBorderless(title: CommonStrings.cancelButton),
             primaryAction: UIAction { [weak self] _ in
                 self?.cancelPressed()
-            }
+            },
         )
         cancelButton.accessibilityIdentifier = "pinConfirmation.cancelButton"
 
@@ -261,12 +259,12 @@ public class PinConfirmationViewController: OWSViewController {
         view.addConstraints([
             contentView.bottomAnchor.constraint(
                 equalTo: view.bottomAnchor,
-                constant: contentView.frame.maxY - view.bounds.maxY
-            )
+                constant: contentView.frame.maxY - view.bounds.maxY,
+            ),
         ])
     }
 
-    public override func viewDidLayoutSubviews() {
+    override public func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
         if #unavailable(iOS 26) {
@@ -280,7 +278,7 @@ public class PinConfirmationViewController: OWSViewController {
         let path = UIBezierPath(
             roundedRect: backgroundView.bounds,
             byRoundingCorners: [.topLeft, .topRight],
-            cornerRadii: CGSize(square: cornerRadius)
+            cornerRadii: CGSize(square: cornerRadius),
         )
         let shapeLayer = CAShapeLayer()
         shapeLayer.path = path.cgPath
@@ -307,13 +305,19 @@ public class PinConfirmationViewController: OWSViewController {
             validationState = .tooShort
             return
         }
+        let db = context.db
+        let twoFactorManager = SSKEnvironment.shared.ows2FAManagerRef
 
-        SSKEnvironment.shared.ows2FAManagerRef.verifyPin(pin) { success in
-            if success {
-                self.dismiss(animated: true) { self.completionHandler(true) }
-            } else {
-                self.validationState = .mismatch
+        let success = db.read { tx in
+            return twoFactorManager.verifyPin(pin, tx: tx)
+        }
+
+        if success {
+            self.dismiss(animated: true) {
+                self.completionHandler(true)
             }
+        } else {
+            self.validationState = .mismatch
         }
     }
 
@@ -324,11 +328,15 @@ public class PinConfirmationViewController: OWSViewController {
 
         switch validationState {
         case .tooShort:
-            validationWarningLabel.text = OWSLocalizedString("PIN_REMINDER_TOO_SHORT_ERROR",
-                                                            comment: "Label indicating that the attempted PIN is too short")
+            validationWarningLabel.text = OWSLocalizedString(
+                "PIN_REMINDER_TOO_SHORT_ERROR",
+                comment: "Label indicating that the attempted PIN is too short",
+            )
         case .mismatch:
-            validationWarningLabel.text = OWSLocalizedString("PIN_REMINDER_MISMATCH_ERROR",
-                                                            comment: "Label indicating that the attempted PIN does not match the user's PIN")
+            validationWarningLabel.text = OWSLocalizedString(
+                "PIN_REMINDER_MISMATCH_ERROR",
+                comment: "Label indicating that the attempted PIN does not match the user's PIN",
+            )
         default:
             break
         }
@@ -350,7 +358,7 @@ private class PinConfirmationPresentationController: UIPresentationController {
 
         backdropView.alpha = 0
         backdropView.frame = containerView.bounds
-        backdropView.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
+        backdropView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         containerView.addSubview(backdropView)
 
         presentedViewController.transitionCoordinator?.animate(alongsideTransition: { _ in
@@ -365,7 +373,7 @@ private class PinConfirmationPresentationController: UIPresentationController {
             },
             completion: { _ in
                 self.backdropView.removeFromSuperview()
-            }
+            },
         )
     }
 
@@ -392,8 +400,10 @@ extension PinConfirmationViewController: UIViewControllerTransitioningDelegate {
 extension PinConfirmationViewController: UITextFieldDelegate {
     public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let hasPendingChanges: Bool
+        let twoFactorManager = SSKEnvironment.shared.ows2FAManagerRef
         let currentPinType = context.db.read { tx in
-            context.svr.currentPinType(transaction: tx)
+            let pinCode = twoFactorManager.pinCode(transaction: tx)
+            return pinCode.map(OWS2FAManager.PinType.forPin(_:)) ?? .alphanumeric
         }
         if currentPinType == .alphanumeric {
             hasPendingChanges = true

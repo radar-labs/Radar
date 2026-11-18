@@ -20,20 +20,20 @@ final class IdentityKeyCheckerTest: XCTestCase {
     override func setUp() {
         db = InMemoryDB()
         let recipientDbTable = RecipientDatabaseTable()
-        let recipientFetcher = RecipientFetcherImpl(
+        let recipientFetcher = RecipientFetcher(
             recipientDatabaseTable: recipientDbTable,
             searchableNameIndexer: MockSearchableNameIndexer(),
         )
         let recipientIdFinder = RecipientIdFinder(
             recipientDatabaseTable: recipientDbTable,
-            recipientFetcher: recipientFetcher
+            recipientFetcher: recipientFetcher,
         )
         identityManagerMock = .init(recipientIdFinder: recipientIdFinder)
         profileFetcherMock = ProfileFetcherMock()
         identityKeyChecker = IdentityKeyCheckerImpl(
             db: db,
             identityManager: identityManagerMock,
-            profileFetcher: profileFetcherMock
+            profileFetcher: profileFetcherMock,
         )
         identityKey1 = ECKeyPair.generateKeyPair()
         identityKey2 = ECKeyPair.generateKeyPair()

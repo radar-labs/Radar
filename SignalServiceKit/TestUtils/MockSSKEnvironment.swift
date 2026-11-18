@@ -15,10 +15,33 @@ public class MockSSKEnvironment {
         appReadiness: any AppReadiness = AppReadinessImpl(),
         callMessageHandler: any CallMessageHandler = NoopCallMessageHandler(),
         currentCallProvider: any CurrentCallProvider = CurrentCallNoOpProvider(),
+        messageSender: any MessageSender = FakeMessageSender(),
         notificationPresenter: any NotificationPresenter = NoopNotificationPresenterImpl(),
-        incrementalMessageTSAttachmentMigratorFactory: any IncrementalMessageTSAttachmentMigratorFactory = IncrementalMessageTSAttachmentMigratorFactoryMock(),
-        testDependencies: AppSetup.TestDependencies? = nil
+        testDependencies: AppSetup.TestDependencies? = nil,
     ) async {
+        let sampleDatabase = await initializeSampleDatabase()
+        _ = await _activate(
+            appReadiness: appReadiness,
+            callMessageHandler: callMessageHandler,
+            currentCallProvider: currentCallProvider,
+            messageSender: messageSender,
+            notificationPresenter: notificationPresenter,
+            testDependencies: testDependencies,
+            sampleDatabase: sampleDatabase,
+        )
+    }
+
+    @MainActor
+    private static func _activate(
+        appReadiness: any AppReadiness = AppReadinessImpl(),
+        callMessageHandler: any CallMessageHandler = NoopCallMessageHandler(),
+        currentCallProvider: any CurrentCallProvider = CurrentCallNoOpProvider(),
+        keychainStorage: MockKeychainStorage = MockKeychainStorage(),
+        messageSender: any MessageSender = FakeMessageSender(),
+        notificationPresenter: any NotificationPresenter = NoopNotificationPresenterImpl(),
+        testDependencies: AppSetup.TestDependencies? = nil,
+        sampleDatabase: SampleDatabase?,
+    ) async -> SampleDatabase {
         owsPrecondition(!(CurrentAppContext() is TestAppContext))
         owsPrecondition(!SSKEnvironment.hasShared)
         owsPrecondition(!DependenciesBridge.hasShared)
@@ -33,17 +56,26 @@ public class MockSSKEnvironment {
         /// For a ``TestAppContext`` as configured above, this will be a
         /// subdirectory of our temp directory unique to the instantiation of
         /// the app context.
+        let databaseUrl = SDSDatabaseStorage.grdbDatabaseFileUrl
+
+        let keychainStorage: MockKeychainStorage
+        if let sampleDatabase {
+            sampleDatabase.copyTo(databaseUrl)
+            keychainStorage = sampleDatabase.keychainStorage.clone()
+        } else {
+            keychainStorage = MockKeychainStorage()
+        }
 
         let finalContinuation = await AppSetup().start(
             appContext: testAppContext,
             databaseStorage: try! SDSDatabaseStorage(
                 appReadiness: appReadiness,
-                databaseFileUrl: SDSDatabaseStorage.grdbDatabaseFileUrl,
-                keychainStorage: MockKeychainStorage()
+                databaseFileUrl: databaseUrl,
+                keychainStorage: keychainStorage,
             ),
         ).migrateDatabaseSchema().initGlobals(
+            appContext: testAppContext,
             appReadiness: appReadiness,
-            backupArchiveErrorPresenterFactory: NoOpBackupArchiveErrorPresenterFactory(),
             deviceBatteryLevelManager: nil,
             deviceSleepManager: nil,
             paymentsEvents: PaymentsEventsNoop(),
@@ -51,12 +83,11 @@ public class MockSSKEnvironment {
             callMessageHandler: callMessageHandler,
             currentCallProvider: currentCallProvider,
             notificationPresenter: notificationPresenter,
-            incrementalMessageTSAttachmentMigratorFactory: incrementalMessageTSAttachmentMigratorFactory,
             testDependencies: testDependencies ?? AppSetup.TestDependencies(
                 contactManager: FakeContactsManager(),
                 groupV2Updates: MockGroupV2Updates(),
                 groupsV2: MockGroupsV2(),
-                messageSender: { FakeMessageSender(accountChecker: $0) },
+                messageSender: messageSender,
                 networkManager: OWSFakeNetworkManager(appReadiness: appReadiness, libsignalNet: nil),
                 paymentsCurrencies: MockPaymentsCurrencies(),
                 paymentsHelper: MockPaymentsHelper(),
@@ -69,10 +100,36 @@ public class MockSSKEnvironment {
                 syncManager: OWSMockSyncManager(),
                 systemStoryManager: SystemStoryManagerMock(),
                 versionedProfiles: MockVersionedProfiles(),
-                webSocketFactory: WebSocketFactoryMock()
-            )
+                webSocketFactory: WebSocketFactoryMock(),
+            ),
         ).migrateDatabaseData()
         finalContinuation.runLaunchTasksIfNeededAndReloadCaches()
+        return SampleDatabase(fileUrl: databaseUrl, keychainStorage: keychainStorage)
+    }
+
+    struct SampleDatabase {
+        var fileUrl: URL
+        var keychainStorage: MockKeychainStorage
+
+        func copyTo(_ databaseUrl: URL) {
+            try! FileManager.default.copyItem(at: self.fileUrl, to: databaseUrl)
+        }
+    }
+
+    @MainActor
+    private static var sampleDatabase: SampleDatabase?
+
+    @MainActor
+    private static func initializeSampleDatabase() async -> SampleDatabase {
+        if let sampleDatabase {
+            return sampleDatabase
+        }
+        let oldContext = CurrentAppContext()
+        let result = await MockSSKEnvironment._activate(sampleDatabase: nil)
+        try! SSKEnvironment.shared.databaseStorageRef.grdbStorage.syncTruncatingCheckpoint()
+        self.sampleDatabase = result
+        await MockSSKEnvironment.deactivateAsync(oldContext: oldContext)
+        return result
     }
 
     @MainActor

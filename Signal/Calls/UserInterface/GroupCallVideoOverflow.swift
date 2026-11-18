@@ -5,13 +5,14 @@
 
 import SignalRingRTC
 import SignalServiceKit
+import UIKit
 
 protocol GroupCallVideoOverflowDelegate: AnyObject {
     var firstOverflowMemberIndex: Int { get }
     func updateVideoOverflowTrailingConstraint()
 }
 
-class GroupCallVideoOverflow: UICollectionView {
+class GroupCallVideoOverflow: UICollectionView, UICollectionViewDataSource, UICollectionViewDelegate, GroupCallObserver {
     weak var memberViewErrorPresenter: CallMemberErrorPresenter?
     weak var overflowDelegate: GroupCallVideoOverflowDelegate?
 
@@ -69,7 +70,7 @@ class GroupCallVideoOverflow: UICollectionView {
             self,
             selector: #selector(updateOrientationOverride),
             name: UIDevice.orientationDidChangeNotification,
-            object: nil
+            object: nil,
         )
     }
 
@@ -81,6 +82,7 @@ class GroupCallVideoOverflow: UICollectionView {
         case landscapeLeft
         case landscapeRight
     }
+
     private var orientationOverride: OrientationOverride? {
         didSet {
             guard orientationOverride != oldValue else { return }
@@ -93,7 +95,7 @@ class GroupCallVideoOverflow: UICollectionView {
         // If we're on iPhone and screen sharing, we want to allow
         // the user to change the orientation. We fake this by
         // manually transforming the cells.
-        guard !UIDevice.current.isIPad && isAnyRemoteDeviceScreenSharing else {
+        guard !UIDevice.current.isIPad, isAnyRemoteDeviceScreenSharing else {
             orientationOverride = nil
             return
         }
@@ -131,7 +133,7 @@ class GroupCallVideoOverflow: UICollectionView {
             if hasVisibleCells { super.reloadData() }
             UIView.animate(
                 withDuration: 0.15,
-                animations: { self.alpha = hasVisibleCells ? 1 : 0 }
+                animations: { self.alpha = hasVisibleCells ? 1 : 0 },
             ) { _ in
                 self.isAnimating = false
                 self.reloadData()
@@ -140,9 +142,9 @@ class GroupCallVideoOverflow: UICollectionView {
             super.reloadData()
         }
     }
-}
 
-extension GroupCallVideoOverflow: UICollectionViewDelegate {
+    // MARK: - UICollectionViewDelegate
+
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? GroupCallVideoOverflowCell else { return }
         cell.cleanupVideoViews()
@@ -155,7 +157,7 @@ extension GroupCallVideoOverflow: UICollectionViewDelegate {
         }
         cell.configureRemoteVideo(device: remoteDevice)
 
-        if let orientationOverride = orientationOverride {
+        if let orientationOverride {
             switch orientationOverride {
             case .landscapeRight:
                 cell.transform = .init(rotationAngle: -.halfPi)
@@ -166,9 +168,35 @@ extension GroupCallVideoOverflow: UICollectionViewDelegate {
             cell.transform = .identity
         }
     }
-}
 
-extension GroupCallVideoOverflow: UICollectionViewDataSource {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        contextMenuConfigurationForItemsAt indexPaths: [IndexPath],
+        point: CGPoint,
+    ) -> UIContextMenuConfiguration? {
+        guard
+            indexPaths.count == 1,
+            let indexPath = indexPaths.first,
+            let remoteDevice = overflowedRemoteDeviceStates[safe: indexPath.row]
+        else {
+            return nil
+        }
+
+        return GroupCallVideoContextMenuConfiguration.build(
+            call: call,
+            groupCall: groupCall,
+            ringRtcCall: ringRtcCall,
+            remoteDevice: remoteDevice,
+            interactionProvider: { [weak self] in
+                return self?.interactions
+                    .compactMap({ $0 as? UIContextMenuInteraction })
+                    .first
+            },
+        )
+    }
+
+    // MARK: - UICollectionViewDataSource
+
     var hasOverflowMembers: Bool { overflowRemoteDeviceCount != 0 }
 
     private var overflowRemoteDeviceCount: Int {
@@ -195,7 +223,7 @@ extension GroupCallVideoOverflow: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: GroupCallVideoOverflowCell.reuseIdentifier,
-            for: indexPath
+            for: indexPath,
         ) as! GroupCallVideoOverflowCell
 
         guard let remoteDevice = overflowedRemoteDeviceStates[safe: indexPath.row] else {
@@ -207,9 +235,9 @@ extension GroupCallVideoOverflow: UICollectionViewDataSource {
         cell.configure(call: call, device: remoteDevice)
         return cell
     }
-}
 
-extension GroupCallVideoOverflow: GroupCallObserver {
+    // MARK: - GroupCallObserver
+
     func groupCallRemoteDeviceStatesChanged(_ call: GroupCall) {
         AssertIsOnMainThread()
 
@@ -223,7 +251,7 @@ extension GroupCallVideoOverflow: GroupCallObserver {
         reloadData()
     }
 
-    func groupCallEnded(_ call: GroupCall, reason: GroupCallEndReason) {
+    func groupCallEnded(_ call: GroupCall, reason: CallEndReason) {
         AssertIsOnMainThread()
         reloadData()
     }

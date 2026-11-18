@@ -5,30 +5,27 @@
 
 import Foundation
 import SignalServiceKit
+import UIKit
 
-class CreateUsernameMegaphone: MegaphoneView {
-    private let usernameSelectionCoordinator: UsernameSelectionCoordinator
-
+class CreateUsernameMegaphone: Megaphone {
     init(
         usernameSelectionCoordinator: UsernameSelectionCoordinator,
         experienceUpgrade: ExperienceUpgrade,
-        fromViewController: UIViewController
+        fromViewController: UIViewController,
     ) {
-        self.usernameSelectionCoordinator = usernameSelectionCoordinator
-
         super.init(experienceUpgrade: experienceUpgrade)
 
         titleText = OWSLocalizedString(
             "CREATE_USERNAME_MEGAPHONE_TITLE",
-            comment: "Title for an interactive in-app prompt to set up a Signal username."
+            comment: "Title for an interactive in-app prompt to set up a Signal username.",
         )
 
         bodyText = OWSLocalizedString(
             "CREATE_USERNAME_MEGAPHONE_BODY",
-            comment: "Body text for an interactive in-app prompt to set up a Signal username."
+            comment: "Body text for an interactive in-app prompt to set up a Signal username.",
         )
 
-        imageName = "usernames-48-color"
+        image = .usernames48
         imageContentMode = .center
 
         let setUpButton = Button(title: CommonStrings.learnMore) { [weak self, weak fromViewController] in
@@ -37,33 +34,15 @@ class CreateUsernameMegaphone: MegaphoneView {
                 let fromViewController
             else { return }
 
-            self.onSetUpTapped(fromViewController: fromViewController)
+            markAsCompleteWithSneakyTransaction()
+            usernameSelectionCoordinator.present(fromViewController: fromViewController)
         }
 
         let notNowButton = Button(title: CommonStrings.notNowButton) { [weak self] in
             guard let self else { return }
-            self.onNotNowTapped()
+            markAsCompleteWithSneakyTransaction()
         }
 
-        setButtons(primary: setUpButton, secondary: notNowButton)
-    }
-
-    @available(*, unavailable, message: "Use other constructor!")
-    required init(coder: NSCoder) {
-        owsFail("Use other constructor!")
-    }
-
-    private func onSetUpTapped(fromViewController: UIViewController) {
-        markAsSnoozedWithSneakyTransaction()
-
-        dismiss(animated: true) {
-            self.usernameSelectionCoordinator.present(fromViewController: fromViewController)
-        }
-    }
-
-    private func onNotNowTapped() {
-        markAsSnoozedWithSneakyTransaction()
-
-        dismiss(animated: true)
+        buttons = [setUpButton, notNowButton]
     }
 }

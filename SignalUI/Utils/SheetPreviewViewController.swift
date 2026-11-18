@@ -29,8 +29,8 @@ public class SheetPreviewViewController: UIViewController {
         animateFirstAppearance: Bool = false,
         presentSheet: @escaping (
             _ viewController: SheetPreviewViewController,
-            _ animated: Bool
-        ) -> Void
+            _ animated: Bool,
+        ) -> Void,
     ) {
         self.animateFirstAppearance = animateFirstAppearance
         self.presentAction = .presentSheet(presentSheet)
@@ -39,7 +39,7 @@ public class SheetPreviewViewController: UIViewController {
 
     public init(
         animateFirstAppearance: Bool = false,
-        sheet: @escaping @autoclosure () -> UIViewController
+        sheet: @escaping @autoclosure () -> UIViewController,
     ) {
         self.animateFirstAppearance = animateFirstAppearance
         self.presentAction = .createSheet(sheet)
@@ -48,7 +48,7 @@ public class SheetPreviewViewController: UIViewController {
 
     public init(
         animateFirstAppearance: Bool = false,
-        createSheet: @escaping () -> UIViewController
+        createSheet: @escaping () -> UIViewController,
     ) {
         self.animateFirstAppearance = animateFirstAppearance
         self.presentAction = .createSheet(createSheet)
@@ -59,17 +59,21 @@ public class SheetPreviewViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
-        let button = OWSButton(title: "Present sheet") { [unowned self] in
-            self.presentAction.present(from: self, animated: true)
-        }
+        let button = UIButton(
+            configuration: .plain(),
+            primaryAction: UIAction { [unowned self] _ in
+                self.presentAction.present(from: self, animated: true)
+            },
+        )
+        button.tintColor = .Signal.accent
+        button.configuration?.title = "Present Sheet"
         view.addSubview(button)
         button.autoCenterInSuperview()
-        button.setTitleColor(UIColor.Signal.accent, for: .normal)
     }
 
-    public override func viewDidAppear(_ animated: Bool) {
+    override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.presentAction.present(from: self, animated: animateFirstAppearance)
     }

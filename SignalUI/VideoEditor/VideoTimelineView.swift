@@ -30,184 +30,148 @@ class VideoTimelineView: UIView {
     weak var delegate: VideoTimelineViewDelegate?
 
     private let thumbnailLayerView = OWSLayerView()
-    private let thumbnailOverlayLayer = CAShapeLayer()
-    private let trimLayerView = OWSLayerView()
+    private let thumbnailDimmingLayer = CAShapeLayer()
+    private let trimFrameView = TrimFrameView()
 
-    private let trimHandleLeft = TrimHandleView(position: .left)
-    private let trimHandleRight = TrimHandleView(position: .right)
     private var trimGestureLocationOffset: CGFloat = 0
 
-    private let cursorView = TimelineCursorView(frame: CGRect(origin: .zero, size: Constants.cursorSize))
+    private let cursorView = TimelineCursorView()
     private var isCursorHidden: Bool {
-        get {
-            cursorView.alpha == 0
-        }
-        set {
-            cursorView.alpha = newValue ? 0 : 1
-        }
+        get { cursorView.alpha == 0 }
+        set { cursorView.alpha = newValue ? 0 : 1 }
     }
 
-    private enum Mode {
+    /// Type of user interaction with the view.
+    private enum UserInteraction {
+        /// User is not doing anything.
         case none
+        /// User is trimming beginning of the video.
         case trimmingStart
+        /// User is trimming end of the video.
         case trimmingEnd
+        /// User is scrubbing along the video timeline.
         case scrubbing
     }
-    private var mode: Mode = .none
 
-    fileprivate enum Constants {
+    private var userInteraction = UserInteraction.none
+
+    private enum Constants {
         static let timelineHeight: CGFloat = 40
         static let extraHotArea: CGFloat = 10
-        static let cursorSize = CGSize(width: 4, height: timelineHeight + 4)
-        static let cornerRadius: CGFloat = 4
+        static let cornerRadius: CGFloat = if #available(iOS 26, *) { 8 } else { 4 }
     }
-    static let preferredHeight = Constants.timelineHeight
+
+    static let thumbnailStripHeight = Constants.timelineHeight
 
     private lazy var timeBubbleTextLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .white
+        label.textColor = .Signal.label
         label.font = .dynamicTypeCaption1.medium()
         return label
     }()
-    private lazy var timeBubbleView: UIView = {
-        let view = OWSLayerView()
-        view.alpha = 0
-        view.backgroundColor = .ows_blackAlpha60
-        view.isUserInteractionEnabled = false
-        view.layoutMargins = UIEdgeInsets(hMargin: 8, vMargin: 4)
-        view.addSubview(timeBubbleTextLabel)
-        timeBubbleTextLabel.autoPinEdgesToSuperviewMargins()
 
-        view.layoutCallback = { view in
-            let maskLayer = CAShapeLayer()
-            maskLayer.path = UIBezierPath(roundedRect: view.bounds, cornerRadius: 6).cgPath
-            view.layer.mask = maskLayer
+    private lazy var timeBubbleView: UIView = {
+        let visualEffect: UIVisualEffect
+        if #available(iOS 26, *) {
+            visualEffect = UIGlassEffect(style: .regular)
+        } else {
+            visualEffect = UIBlurEffect(style: .regular)
+        }
+        let view = UIVisualEffectView(effect: visualEffect)
+        view.alpha = 0
+        view.isUserInteractionEnabled = false
+        view.clipsToBounds = true
+        view.layoutMargins = UIEdgeInsets(hMargin: 8, vMargin: 4)
+        timeBubbleTextLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.contentView.addSubview(timeBubbleTextLabel)
+        NSLayoutConstraint.activate([
+            timeBubbleTextLabel.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
+            timeBubbleTextLabel.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            timeBubbleTextLabel.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
+            timeBubbleTextLabel.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor),
+        ])
+        if #available(iOS 26, *) {
+            view.cornerConfiguration = .capsule()
+        } else {
+            view.layer.cornerRadius = 6
         }
 
         return view
     }()
+
     private var timeBubbleViewPositionConstraint: NSLayoutConstraint?
 
     init() {
         super.init(frame: .zero)
 
-        createContents()
-    }
+        backgroundColor = .ows_gray65
 
-    @available(*, unavailable, message: "use other init() instead.")
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    private func createContents() {
+        clipsToBounds = true
+        trimFrameView.clipsToBounds = true
+        if #available(iOS 26, *) {
+            let cornerConfig = UICornerConfiguration.uniformCorners(radius: .fixed(Constants.cornerRadius))
+            cornerConfiguration = cornerConfig
+            trimFrameView.cornerConfiguration = cornerConfig
+        } else {
+            layer.cornerRadius = Constants.cornerRadius
+            trimFrameView.layer.cornerRadius = Constants.cornerRadius
+        }
 
         // Thumbnail strip.
+        thumbnailLayerView.backgroundColor = backgroundColor
+        thumbnailLayerView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(thumbnailLayerView)
-        thumbnailLayerView.backgroundColor = .ows_gray65 // This value matches color of a trim handle in default state.
-        thumbnailLayerView.clipsToBounds = true
-        thumbnailLayerView.autoPinEdgesToSuperviewEdges()
+        NSLayoutConstraint.activate([
+            thumbnailLayerView.topAnchor.constraint(
+                equalTo: topAnchor,
+                constant: TrimFrameView.horizontalEdgeThickness,
+            ),
+            thumbnailLayerView.leftAnchor.constraint(
+                equalTo: leftAnchor,
+                constant: TrimFrameView.verticalEdgeThickness,
+            ),
+            thumbnailLayerView.rightAnchor.constraint(
+                equalTo: rightAnchor,
+                constant: -TrimFrameView.verticalEdgeThickness,
+            ),
+            thumbnailLayerView.bottomAnchor.constraint(
+                equalTo: bottomAnchor,
+                constant: -TrimFrameView.horizontalEdgeThickness,
+            ),
+        ])
 
         // This layer dims thumbnail strip outside of trimmed area.
         // TODO: check if it is possible to change opacity on thumbnailLayerView instead.
-        thumbnailOverlayLayer.fillColor = UIColor.ows_blackAlpha50.cgColor
-        thumbnailOverlayLayer.fillRule = .evenOdd
-        thumbnailOverlayLayer.zPosition = 10000
-        thumbnailLayerView.layer.addSublayer(thumbnailOverlayLayer)
+        thumbnailDimmingLayer.fillColor = UIColor.ows_blackAlpha50.cgColor
+        thumbnailDimmingLayer.fillRule = .evenOdd
+        thumbnailDimmingLayer.zPosition = 10000
+        thumbnailLayerView.layer.addSublayer(thumbnailDimmingLayer)
 
+        // Layout callback that sets dimming frame.
         thumbnailLayerView.layoutCallback = { [weak self] view in
-            guard let self = self else { return }
+            guard let self else { return }
 
-            // Rounded corners for thumbnailLayerView.
-            // Even though actual thumbnail area is inset on both ends
-            // it is necessary to apply rounded corners because thumbnailLayerView's background
-            // becomes exposed when either trim handle is moved from their default position.
-            let maskLayer = CAShapeLayer()
-            maskLayer.path = UIBezierPath(roundedRect: view.bounds, cornerRadius: Constants.cornerRadius).cgPath
-            view.layer.mask = maskLayer
-
-            // Dimming overlays.
             let overlayPath = UIBezierPath()
             overlayPath.append(UIBezierPath(rect: self.thumbnailStripOverlayRectLeft))
             overlayPath.append(UIBezierPath(rect: self.thumbnailStripOverlayRectRight))
-            self.thumbnailOverlayLayer.path = overlayPath.cgPath
-            self.thumbnailOverlayLayer.frame = view.bounds
+            self.thumbnailDimmingLayer.path = overlayPath.cgPath
+            self.thumbnailDimmingLayer.frame = view.bounds
 
-            self.updateThumbnailView()
+            updateThumbnailStrip()
         }
 
-        // View that contains trim handles and playback cursor.
-        trimLayerView.shouldAnimate = false
-        addSubview(trimLayerView)
-        trimLayerView.autoPinEdgesToSuperviewEdges()
+        // Trim frame
+        trimFrameView.frame = bounds
+        addSubview(trimFrameView)
 
-        trimLayerView.addSubview(trimHandleLeft)
-        trimLayerView.addSubview(trimHandleRight)
-        trimLayerView.addSubview(cursorView)
-        trimLayerView.layoutCallback = { [weak self] view in
-            guard let self = self else {
-                return
-            }
-
-            self.trimHandleLeft.center = self.leftTrimHandleCenter
-            self.trimHandleRight.center = self.rightTrimHandleCenter
-
-            // Repurpose `UIImageView.isHighlighted` to show different image (yellow handles) when video is trimmed.
-            let shouldHighlightHandles = self.isTrimmedOrBeingTrimmed
-            self.trimHandleLeft.isHighlighted = shouldHighlightHandles
-            self.trimHandleRight.isHighlighted = shouldHighlightHandles
-
-            self.updateCursorPosition()
-        }
+        // Cursor
+        addSubview(cursorView)
 
         addGestureRecognizer(PermissiveGestureRecognizer(target: self, action: #selector(gestureDidChange)))
     }
 
-    func updateThumbnailView() {
-        if let sublayers = thumbnailLayerView.layer.sublayers {
-            for sublayer in sublayers {
-                if sublayer != thumbnailOverlayLayer {
-                    sublayer.removeFromSuperlayer()
-                }
-            }
-        }
-
-        guard let dataSource = dataSource,
-              let videoThumbnails = dataSource.videoThumbnails else {
-            return
-        }
-
-        // Lengthwise thumbnails fill the entire space within trim handles in their default state.
-        let thumbnailStripRect = thumbnailStripRect
-        let thumbnailHeight = thumbnailStripRect.height
-        guard thumbnailHeight > 0 else {
-            return
-        }
-
-        // We want thumbnails to have the same aspect ratio as the video,
-        // but also fill the entire thumbnail strip with a whole number of thumbnails.
-        // Therefore the number of thumbnails of preferred width is rounded ("schoolbook rounding")
-        // to minimize the difference between video and thumbnail aspect ratios.
-        let videoAspectRatio = dataSource.videoAspectRatio
-        let preferredThumbnailWidth = floor(thumbnailHeight * videoAspectRatio.width / videoAspectRatio.height)
-        let thumbnailCount = UInt(round(thumbnailStripRect.width / preferredThumbnailWidth))
-        let thumbnailWidth = thumbnailStripRect.width / CGFloat(thumbnailCount)
-
-        for index in 0..<thumbnailCount {
-            // The timeline shows a series of thumbnails reflecting the video
-            // content at the point. It's ambiguous whether each thumbnail
-            // should reflect the content at the thumbnail's left edge or
-            // center. I've chosen to use the center.
-            let thumbnailAlpha = (Double(index) + 0.5) / Double(thumbnailCount - 1)
-            let thumbnailIndex = Int(round(thumbnailAlpha * Double(videoThumbnails.count))).clamp(0, videoThumbnails.count - 1)
-            let thumbnail: UIImage = videoThumbnails[thumbnailIndex]
-            let imageLayer = CALayer()
-            imageLayer.contents = thumbnail.cgImage
-            imageLayer.frame = CGRect(x: thumbnailStripRect.minX + CGFloat(index) * thumbnailWidth,
-                                      y: thumbnailStripRect.minY,
-                                      width: thumbnailWidth,
-                                      height: thumbnailHeight)
-            thumbnailLayerView.layer.addSublayer(imageLayer)
-        }
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
     // There's a few reasons we use this approach to extending the hot area
@@ -223,39 +187,113 @@ class VideoTimelineView: UIView {
     }
 
     override var intrinsicContentSize: CGSize {
-        CGSize(width: UIView.noIntrinsicMetric, height: Constants.timelineHeight)
+        CGSize(
+            width: UIView.noIntrinsicMetric,
+            height: Constants.timelineHeight + 2 * TrimFrameView.horizontalEdgeThickness,
+        )
     }
 
-    // We need to ensure that "trim rect" always reflects the
-    // trim state in a coherent way.
-    //
-    // * When the video is untrimmed, the trim rect should fully
-    //   fully occupy the timeline.
-    // * When the video is trimmed down to the shortest valid
-    //   snippet, the trim rect should be proportionally "small".
-    //
-    // Therefore we scale in _inner_ trim rect to reflect the
-    // ratio of the trimmed video length to the original,
-    // untrimmed video length.
-    private var innerTrimRect: CGRect {
-        guard let dataSource = dataSource else {
-            return bounds
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        updateTrimFrame()
+        updateThumbnailStrip()
+        updateCursorPosition()
+    }
+
+    // MARK: - Updates
+
+    private var lastKnownThumbnailStripWidth: CGFloat?
+
+    func updateThumbnailStrip() {
+        guard thumbnailLayerView.frame.isEmpty == false else { return }
+
+        let thumbnailStripRect = thumbnailLayerView.bounds
+        guard thumbnailStripRect.width != lastKnownThumbnailStripWidth else { return }
+
+        if let sublayers = thumbnailLayerView.layer.sublayers {
+            for sublayer in sublayers {
+                guard sublayer != thumbnailDimmingLayer else { continue }
+                sublayer.removeFromSuperlayer()
+            }
         }
+
+        guard let dataSource, let videoThumbnails = dataSource.videoThumbnails else { return }
+
+        // We want thumbnails to have the same aspect ratio as the video,
+        // but also fill the entire thumbnail strip with a whole number of thumbnails.
+        // Therefore the number of thumbnails of preferred width is rounded ("schoolbook rounding")
+        // to minimize the difference between video and thumbnail aspect ratios.
+        let videoAspectRatio = dataSource.videoAspectRatio
+        let thumbnailHeight = thumbnailStripRect.height
+        let preferredThumbnailWidth = floor(thumbnailHeight * videoAspectRatio.width / videoAspectRatio.height)
+        let thumbnailCount = UInt(round(thumbnailStripRect.width / preferredThumbnailWidth))
+        let thumbnailWidth = thumbnailStripRect.width / CGFloat(thumbnailCount)
+
+        for index in 0..<thumbnailCount {
+            // The timeline shows a series of thumbnails reflecting the video
+            // content at the point. It's ambiguous whether each thumbnail
+            // should reflect the content at the thumbnail's left edge or
+            // center. I've chosen to use the center.
+            let thumbnailAlpha = (Double(index) + 0.5) / Double(thumbnailCount - 1)
+            let thumbnailIndex = Int(round(thumbnailAlpha * Double(videoThumbnails.count))).clamp(0, videoThumbnails.count - 1)
+            let thumbnail: UIImage = videoThumbnails[thumbnailIndex]
+            let imageLayer = CALayer()
+            imageLayer.contents = thumbnail.cgImage
+            imageLayer.frame = CGRect(
+                x: thumbnailStripRect.minX + CGFloat(index) * thumbnailWidth,
+                y: thumbnailStripRect.minY,
+                width: thumbnailWidth,
+                height: thumbnailHeight,
+            )
+            thumbnailLayerView.layer.addSublayer(imageLayer)
+        }
+
+        lastKnownThumbnailStripWidth = thumbnailStripRect.width
+    }
+
+    func updateContents() {
+        thumbnailLayerView.updateContent() // triggers `thumbnailLayerView.layoutCallback`
+        updateTrimFrame()
+        updateCursorPosition()
+        updateTimeBubble()
+    }
+
+    private func updateTrimFrame() {
+        trimFrameView.frame = trimFrameRect
+        trimFrameView.frameColor = isTrimmedOrBeingTrimmed ? .Signal.yellow : .clear
+    }
+
+    func updateCursorPosition() {
+        cursorView.center = cursorPosition
+    }
+
+    private var trimFrameRect: CGRect {
+        innerTrimRect.insetBy(
+            dx: -TrimFrameView.verticalEdgeThickness,
+            dy: -TrimFrameView.horizontalEdgeThickness,
+        )
+    }
+
+    /// - Returns Frame for the trimmed video fragment's thumbnail strip, in `VideoTimelineView` coordinate space.
+    private var innerTrimRect: CGRect {
+        let untrimmedRect = thumbnailLayerView.frame
+
+        guard let dataSource else { return untrimmedRect }
+
         let untrimmedDurationSeconds = CGFloat(dataSource.untrimmedDurationSeconds)
         let startSeconds = CGFloat(dataSource.trimmedStartSeconds)
         let endSeconds = CGFloat(dataSource.trimmedEndSeconds)
 
-        let maxTrimRect = convert(thumbnailStripRect, from: thumbnailLayerView)
-        var result = maxTrimRect
-        result.origin.x += startSeconds / untrimmedDurationSeconds * maxTrimRect.width
+        var result = untrimmedRect
+        result.origin.x += startSeconds / untrimmedDurationSeconds * untrimmedRect.width
         result.size.width *= (endSeconds - startSeconds) / untrimmedDurationSeconds
         return result
     }
 
+    /// - Returns Center coordinates for the `cursorView`, in `VideoTimelineView` coordinate space.
     private var cursorPosition: CGPoint {
-        guard let dataSource = dataSource else {
-            return bounds.center
-        }
+        guard let dataSource else { return bounds.center }
+
         let startSeconds = CGFloat(dataSource.trimmedStartSeconds)
         let endSeconds = CGFloat(dataSource.trimmedEndSeconds)
         let currentTimeSeconds = CGFloat(dataSource.currentTimeSeconds)
@@ -265,96 +303,62 @@ class VideoTimelineView: UIView {
 
         let innerTrimRect = innerTrimRect
         let cursorPositionX = playbackAlpha.lerp(innerTrimRect.minX, innerTrimRect.maxX)
-        let cursorPositionXInTrimLayerView = trimLayerView.convert(CGPoint(x: cursorPositionX, y: 0), from: self).x
-        return CGPoint(x: cursorPositionXInTrimLayerView, y: trimLayerView.bounds.midY)
+        return CGPoint(x: cursorPositionX, y: innerTrimRect.midY)
     }
 
     /**
-     * Returns the area within `thumbnailLayerView` that should be filled with video thumbnails.
-     */
-    private var thumbnailStripRect: CGRect {
-        let insets = UIEdgeInsets(top: 0, left: trimHandleLeft.width, bottom: 0, right: trimHandleRight.width)
-        return thumbnailLayerView.bounds.inset(by: insets)
-    }
-
-    /**
-     * Returns left part of `thumbnailLayerView` that should be dimmed because it is outside of trim handles.
+     * - Returns Left part of `thumbnailLayerView` that is outside of the trim frame and should be dimmed,
+     * in coordinates of `thumbnailLayerView`.
      */
     private var thumbnailStripOverlayRectLeft: CGRect {
         let adjustedInnerTrimRect = thumbnailLayerView.convert(innerTrimRect, from: self)
-        var result = thumbnailStripRect
+        var result = thumbnailLayerView.bounds
+        // Left part has always the same origin as thumbnail strip, but shorter length.
         result.size.width = adjustedInnerTrimRect.minX - result.minX
         return result
     }
 
     /**
-     * Returns right part of `thumbnailLayerView` that should be dimmed because it is outside of trim handles.
+     * - Returns Right part of `thumbnailLayerView` that is outside of the trim frame and should be dimmed,
+     * in coordinates of `thumbnailLayerView`.
      */
     private var thumbnailStripOverlayRectRight: CGRect {
         let adjustedInnerTrimRect = thumbnailLayerView.convert(innerTrimRect, from: self)
-        var result = thumbnailStripRect
+        var result = thumbnailLayerView.bounds
+        // Right part has always the same maxX as thumbnailLayerView, but shorter length.
         result.size.width = result.maxX - adjustedInnerTrimRect.maxX
         result.origin.x = adjustedInnerTrimRect.maxX
         return result
     }
 
-    private var leftTrimHandleCenter: CGPoint {
-        let point = CGPoint(x: innerTrimRect.minX - 0.5 * trimHandleLeft.width, y: bounds.midY)
-        return trimLayerView.convert(point, from: self)
-    }
-
-    private var rightTrimHandleCenter: CGPoint {
-        let point = CGPoint(x: innerTrimRect.maxX + 0.5 * trimHandleRight.width, y: bounds.midY)
-        return trimLayerView.convert(point, from: self)
-    }
-
     private var isTrimmedOrBeingTrimmed: Bool {
-        switch mode {
+        switch userInteraction {
         case .trimmingStart, .trimmingEnd:
             return true
 
         default:
             break
         }
-        if let dataSource = dataSource {
+        if let dataSource {
             return dataSource.isTrimmed
         }
         return false
     }
 
-    func updateContents() {
-        thumbnailLayerView.updateContent()
-        trimLayerView.updateContent()
-        updateCursorPosition()
-        updateTimeBubble()
-    }
-
-    func updateCursorPosition() {
-        cursorView.center = cursorPosition
-    }
-}
-
-// MARK: - Gestures
-
-extension VideoTimelineView {
-
-    private var outerTrimRect: CGRect {
-        let trimRectInset = UIEdgeInsets(top: 0, leading: -trimHandleLeft.width, bottom: 0, trailing: -trimHandleRight.width)
-        return innerTrimRect.inset(by: trimRectInset)
-    }
+    // MARK: - Gestures
 
     @objc
     private func gestureDidChange(gesture: UIGestureRecognizer) {
         if gesture.state == .began {
-            mode = modeForNewGesture(gesture)
+            userInteraction = interactionForNewGesture(gesture)
         }
-        guard mode != .none else {
+        guard userInteraction != .none else {
             return
         }
 
         switch gesture.state {
         case .began:
-            switch mode {
+            switch userInteraction {
             case .trimmingStart, .trimmingEnd:
                 beginTrimming(withGesture: gesture)
 
@@ -381,28 +385,34 @@ extension VideoTimelineView {
         }
     }
 
-    private func modeForNewGesture(_ gesture: UIGestureRecognizer) -> Mode {
-        guard let dataSource = dataSource else {
+    private func interactionForNewGesture(_ gesture: UIGestureRecognizer) -> UserInteraction {
+        guard let dataSource else {
             return .none
         }
 
         let location = gesture.location(in: self)
-        let outerTrimRect = outerTrimRect
         let innerTrimRect = innerTrimRect
+        let outerTrimRect = innerTrimRect.insetBy(dx: -TrimFrameView.verticalEdgeThickness, dy: 0)
 
         // Our gesture handling is permissive, trim gestures can start
         // a little bit outside the visible "trim handles".
-        let couldBeTrimStart = (dataSource.canBeTrimmed &&
-                                location.x >= (outerTrimRect.minX - Constants.extraHotArea) &&
-                                location.x <= (innerTrimRect.minX + Constants.extraHotArea))
-        let couldBeTrimEnd = (dataSource.canBeTrimmed &&
-                              location.x >= (innerTrimRect.maxX - Constants.extraHotArea) &&
-                              location.x <= (outerTrimRect.maxX + Constants.extraHotArea))
-        let couldBeScrub = (location.x >= innerTrimRect.minX &&
-                            location.x <= innerTrimRect.maxX)
+        let couldBeTrimStart = (
+            dataSource.canBeTrimmed &&
+                location.x >= (outerTrimRect.minX - Constants.extraHotArea) &&
+                location.x <= (innerTrimRect.minX + Constants.extraHotArea),
+        )
+        let couldBeTrimEnd = (
+            dataSource.canBeTrimmed &&
+                location.x >= (innerTrimRect.maxX - Constants.extraHotArea) &&
+                location.x <= (outerTrimRect.maxX + Constants.extraHotArea),
+        )
+        let couldBeScrub = (
+            location.x >= innerTrimRect.minX &&
+                location.x <= innerTrimRect.maxX,
+        )
 
         // Prefer trimming to scrubbing.
-        if couldBeTrimStart && couldBeTrimEnd {
+        if couldBeTrimStart, couldBeTrimEnd {
             // Because our gesture handling is permissive,
             // we need to disambiguate.
             let startDistance = abs(location.x - outerTrimRect.minX)
@@ -424,12 +434,12 @@ extension VideoTimelineView {
     }
 
     private func applyGestureInProgress(_ gesture: UIGestureRecognizer) {
-        guard let dataSource = dataSource, let delegate = delegate else {
+        guard let dataSource, let delegate else {
             return
         }
 
-        let adjustedHorizontalPosition = gesture.location(in: trimLayerView).x - trimGestureLocationOffset
-        let thumbnailStripRect = thumbnailStripRect
+        let adjustedHorizontalPosition = gesture.location(in: self).x - trimGestureLocationOffset
+        let thumbnailStripRect = thumbnailLayerView.frame
         // alpha = 0 when gesture is at start of untrimmed clip.
         // alpha = 1 when gesture is at end of untrimmed clip.
         let untrimmedAlpha = Double(adjustedHorizontalPosition.inverseLerp(thumbnailStripRect.minX, thumbnailStripRect.maxX, shouldClamp: true))
@@ -439,7 +449,7 @@ extension VideoTimelineView {
         let untrimmedDurationSeconds = dataSource.untrimmedDurationSeconds
         let untrimmedSeconds = untrimmedDurationSeconds * untrimmedAlpha
 
-        switch mode {
+        switch userInteraction {
         case .trimmingStart:
             // Don't let users trim clip to less than the minimum duration.
             let maxValue = max(0, endSeconds - VideoEditorModel.minimumDurationSeconds)
@@ -463,8 +473,8 @@ extension VideoTimelineView {
     }
 
     private func completeGestureProcessing() {
-        let previousMode = mode
-        mode = .none
+        let previousMode = userInteraction
+        userInteraction = .none
 
         switch previousMode {
         case .trimmingStart, .trimmingEnd:
@@ -484,10 +494,10 @@ extension VideoTimelineView {
             self.isCursorHidden = true
         }
 
-        let location = gesture.location(in: trimLayerView)
-        let thumbnailStripRect = thumbnailStripRect
-        if !thumbnailStripRect.contains(location) {
-            switch mode {
+        let location = gesture.location(in: self)
+        let thumbnailStripRect = thumbnailLayerView.frame
+        if thumbnailStripRect.contains(location) == false {
+            switch userInteraction {
             case .trimmingStart:
                 trimGestureLocationOffset = min(0, location.x - thumbnailStripRect.minX)
 
@@ -495,7 +505,7 @@ extension VideoTimelineView {
                 trimGestureLocationOffset = max(0, location.x - thumbnailStripRect.maxX)
 
             default:
-                owsFailDebug("Invalid mode. [\(mode)]")
+                owsFailDebug("Invalid mode. [\(userInteraction)]")
             }
         }
 
@@ -511,11 +521,8 @@ extension VideoTimelineView {
 
         delegate?.videoTimelineViewDidEndTrimming(self)
     }
-}
 
-// MARK: - Time Bubble
-
-extension VideoTimelineView {
+    // MARK: - Time Bubble
 
     private enum TimeBubbleAlignment {
         case left
@@ -524,11 +531,11 @@ extension VideoTimelineView {
     }
 
     func updateTimeBubble() {
-        guard let dataSource = dataSource else {
+        guard let dataSource else {
             hideTimeBubble(animated: false)
             return
         }
-        switch mode {
+        switch userInteraction {
         case .none:
             hideTimeBubble(animated: true)
         case .trimmingStart:
@@ -542,17 +549,18 @@ extension VideoTimelineView {
 
     private func showTimeBubble(time: TimeInterval, alignment: TimeBubbleAlignment) {
         if timeBubbleView.superview == nil {
+            timeBubbleView.translatesAutoresizingMaskIntoConstraints = false
             addSubview(timeBubbleView)
-            timeBubbleView.autoPinEdge(.bottom, to: .top, of: self, withOffset: -24)
+            NSLayoutConstraint.activate([
+                timeBubbleView.bottomAnchor.constraint(equalTo: topAnchor, constant: -24),
+            ])
         }
 
         var timeBubbleViewPositionConstraint: NSLayoutConstraint
         if let existingConstraint = self.timeBubbleViewPositionConstraint {
             timeBubbleViewPositionConstraint = existingConstraint
         } else {
-            timeBubbleViewPositionConstraint =
-            NSLayoutConstraint(item: timeBubbleView, attribute: .centerX, relatedBy: .equal,
-                               toItem: self, attribute: .left, multiplier: 1, constant: 0)
+            timeBubbleViewPositionConstraint = timeBubbleView.centerXAnchor.constraint(equalTo: leftAnchor)
             addConstraint(timeBubbleViewPositionConstraint)
             self.timeBubbleViewPositionConstraint = timeBubbleViewPositionConstraint
         }
@@ -561,14 +569,15 @@ extension VideoTimelineView {
             switch alignment {
             case .left:
                 // Position strictly above left trim handle.
-                return convert(trimHandleLeft.center, from: trimLayerView).x
+                return trimFrameView.frame.minX + 0.5 * TrimFrameView.verticalEdgeThickness
             case .right:
                 // Position strictly above right trim handle.
-                return convert(trimHandleRight.center, from: trimLayerView).x
+                return trimFrameView.frame.maxX - 0.5 * TrimFrameView.verticalEdgeThickness
             case .center:
                 // Position where current video playback is.
-                return convert(cursorView.center, from: trimLayerView).x
-            }}()
+                return cursorView.center.x
+            }
+        }()
 
         timeBubbleTextLabel.text = OWSFormat.localizedDurationString(from: round(time))
 
@@ -592,79 +601,112 @@ extension VideoTimelineView {
             self.timeBubbleView.alpha = 0
         }
     }
-}
 
-private class TrimHandleView: UIImageView {
+    private class TrimFrameView: UIView {
 
-    enum Position {
-        case left
-        case right
-    }
-    let position: Position
+        static let horizontalEdgeThickness: CGFloat = 6
+        static let verticalEdgeThickness: CGFloat = 16
 
-    private static func handleImage(forPosition position: Position, isHighlighted: Bool) -> UIImage? {
-        let imageName = isHighlighted ? "media-editor-video-trim-yellow" : "media-editor-video-trim-gray"
-        let image = UIImage(imageLiteralResourceName: imageName)
-        if position == .left {
-            return image.withHorizontallyFlippedOrientation()
+        var frameColor: UIColor = .clear {
+            didSet { shapeLayer.fillColor = frameColor.cgColor }
         }
-        return image
-    }
 
-    override var isHighlighted: Bool {
-        willSet {
-            if newValue && highlightedImage == nil {
-                highlightedImage = TrimHandleView.handleImage(forPosition: position, isHighlighted: true)
+        private let shapeLayer = CAShapeLayer()
+        private let leftHandle = UIImageView(image: UIImage(imageLiteralResourceName: "video-trim-handle"))
+        private let rightHandle = UIImageView(
+            image: UIImage(imageLiteralResourceName: "video-trim-handle").withHorizontallyFlippedOrientation(),
+        )
+
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+
+            isOpaque = false
+
+            // Frame
+            shapeLayer.fillRule = .evenOdd
+            shapeLayer.fillColor = frameColor.cgColor
+            layer.addSublayer(shapeLayer)
+
+            // Handles
+            leftHandle.tintColor = .white
+            leftHandle.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(leftHandle)
+
+            rightHandle.tintColor = .white
+            rightHandle.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(rightHandle)
+
+            NSLayoutConstraint.activate([
+                leftHandle.centerXAnchor.constraint(
+                    equalTo: leftAnchor,
+                    constant: Self.verticalEdgeThickness / 2,
+                ),
+                leftHandle.centerYAnchor.constraint(equalTo: centerYAnchor),
+                rightHandle.centerXAnchor.constraint(
+                    equalTo: rightAnchor,
+                    constant: -Self.verticalEdgeThickness / 2,
+                ),
+                rightHandle.centerYAnchor.constraint(equalTo: centerYAnchor),
+            ])
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        override func layoutSubviews() {
+            super.layoutSubviews()
+
+            shapeLayer.frame = bounds
+            shapeLayer.path = framePath(in: bounds)
+        }
+
+        private func framePath(in rect: CGRect) -> CGPath {
+            let path = UIBezierPath(rect: rect)
+
+            let innerRect = rect.insetBy(dx: Self.verticalEdgeThickness, dy: Self.horizontalEdgeThickness)
+            if innerRect.isEmpty == false {
+                path.append(UIBezierPath(rect: innerRect))
             }
+
+            return path.cgPath
+        }
+
+        override var intrinsicContentSize: CGSize {
+            CGSize(
+                width: UIView.noIntrinsicMetric,
+                height: Constants.timelineHeight + 2 * Self.horizontalEdgeThickness,
+            )
         }
     }
 
-    init(position: Position) {
-        self.position = position
-        super.init(image: TrimHandleView.handleImage(forPosition: position, isHighlighted: false))
-    }
+    private class TimelineCursorView: UIView {
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
+        private static let preferredSize = CGSize(
+            width: 4,
+            height: Constants.timelineHeight + TrimFrameView.horizontalEdgeThickness,
+        )
 
-private class TimelineCursorView: UIView {
+        init() {
+            super.init(frame: CGRect(origin: .zero, size: TimelineCursorView.preferredSize))
 
-    override static var layerClass: AnyClass {
-        CAShapeLayer.self
-    }
+            isUserInteractionEnabled = false
+            clipsToBounds = true
+            backgroundColor = .white
 
-    private var shapeLayer: CAShapeLayer? {
-        return layer as? CAShapeLayer
-    }
+            layer.shadowColor = UIColor.black.cgColor
+            layer.shadowOffset = .zero
+            layer.shadowRadius = 4
+            layer.shadowOpacity = 0.25
+            layer.cornerRadius = Self.preferredSize.smallerAxis * 0.5
+        }
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
 
-        isUserInteractionEnabled = false
-
-        shapeLayer?.shadowColor = UIColor.black.cgColor
-        shapeLayer?.shadowOffset = .zero
-        shapeLayer?.shadowRadius = 4
-        shapeLayer?.shadowOpacity = 0.25
-        shapeLayer?.fillColor = UIColor.white.cgColor
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override var intrinsicContentSize: CGSize {
-        VideoTimelineView.Constants.cursorSize
-    }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        updatePath()
-    }
-
-    private func updatePath() {
-        shapeLayer?.path = UIBezierPath(roundedRect: bounds, cornerRadius: width * 0.5).cgPath
+        override var intrinsicContentSize: CGSize {
+            TimelineCursorView.preferredSize
+        }
     }
 }

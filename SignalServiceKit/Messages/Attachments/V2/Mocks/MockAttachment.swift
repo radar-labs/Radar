@@ -10,23 +10,24 @@ import Foundation
 // MARK: - Infos
 
 extension Attachment.StreamInfo {
-    public static func mock(
-        sha256ContentHash: Data? = nil,
-        mediaName: String? = nil,
-        encryptedByteCount: UInt32? = nil,
-        unencryptedByteCount: UInt32? = nil,
-        contentType: Attachment.ContentType? = nil,
-        digestSHA256Ciphertext: Data? = nil,
-        localRelativeFilePath: String? = nil
+    static func mock(
+        plaintextHash: Data = Randomness.generateRandomBytes(32),
+        encryptionKey: AttachmentKey = .generate(),
+        encryptedByteCount: UInt32 = .random(in: 0..<95_000_000),
+        unencryptedByteCount: UInt32 = .random(in: 0..<95_000_000),
+        ciphertextDigest: Data = Randomness.generateRandomBytes(32),
+        localRelativeFilePath: String = UUID().uuidString,
     ) -> Attachment.StreamInfo {
         return Attachment.StreamInfo(
-            sha256ContentHash: sha256ContentHash ?? Randomness.generateRandomBytes(32),
-            mediaName: mediaName ?? UUID().uuidString,
-            encryptedByteCount: encryptedByteCount ?? UInt32.random(in: 0..<(UInt32(OWSMediaUtils.kMaxFileSizeGeneric))),
-            unencryptedByteCount: unencryptedByteCount ?? UInt32.random(in: 0..<(UInt32(OWSMediaUtils.kMaxFileSizeGeneric))),
-            contentType: contentType ?? .file,
-            digestSHA256Ciphertext: digestSHA256Ciphertext ?? Randomness.generateRandomBytes(32),
-            localRelativeFilePath: localRelativeFilePath ?? UUID().uuidString
+            plaintextHash: plaintextHash,
+            encryptionKey: encryptionKey.combinedKey,
+            encryptedByteCount: encryptedByteCount,
+            unencryptedByteCount: unencryptedByteCount,
+            cachedMediaSizePixels: nil,
+            cachedVideoDuration: nil,
+            cachedVideoStillFrameRelativeFilePath: nil,
+            ciphertextDigest: ciphertextDigest,
+            localRelativeFilePath: localRelativeFilePath,
         )
     }
 }
@@ -40,17 +41,17 @@ extension Attachment.TransitTierInfo {
         unencryptedByteCount: UInt32? = nil,
         integrityCheck: AttachmentIntegrityCheck? = nil,
         incrementalMacInfo: Attachment.IncrementalMacInfo? = nil,
-        lastDownloadAttemptTimestamp: UInt64? = nil
+        lastDownloadAttemptTimestamp: UInt64? = nil,
     ) -> Attachment.TransitTierInfo {
         return Attachment.TransitTierInfo(
             cdnNumber: cdnNumber ?? 3,
             cdnKey: cdnKey ?? "\(UInt64.random(in: 0..<(.max)))",
             uploadTimestamp: uploadTimestamp ?? Date().ows_millisecondsSince1970,
             encryptionKey: encryptionKey ?? Randomness.generateRandomBytes(64),
-            unencryptedByteCount: unencryptedByteCount ?? UInt32.random(in: 0..<(UInt32(OWSMediaUtils.kMaxFileSizeGeneric))),
-            integrityCheck: integrityCheck ?? .digestSHA256Ciphertext(Randomness.generateRandomBytes(32)),
+            unencryptedByteCount: unencryptedByteCount ?? UInt32.random(in: 0..<95_000_000),
+            integrityCheck: integrityCheck ?? .ciphertextDigest(Randomness.generateRandomBytes(32)),
             incrementalMacInfo: incrementalMacInfo,
-            lastDownloadAttemptTimestamp: lastDownloadAttemptTimestamp
+            lastDownloadAttemptTimestamp: lastDownloadAttemptTimestamp,
         )
     }
 }
@@ -59,18 +60,18 @@ extension Attachment.MediaTierInfo {
     public static func mock(
         cdnNumber: UInt32? = nil,
         unencryptedByteCount: UInt32? = nil,
-        sha256ContentHash: Data? = nil,
+        plaintextHash: Data? = nil,
         incrementalMacInfo: Attachment.IncrementalMacInfo? = nil,
         uploadEra: String? = nil,
-        lastDownloadAttemptTimestamp: UInt64? = nil
+        lastDownloadAttemptTimestamp: UInt64? = nil,
     ) -> Attachment.MediaTierInfo {
         return Attachment.MediaTierInfo(
             cdnNumber: cdnNumber ?? 3,
             unencryptedByteCount: unencryptedByteCount ?? 16,
-            sha256ContentHash: sha256ContentHash ?? Randomness.generateRandomBytes(32),
+            plaintextHash: plaintextHash ?? Randomness.generateRandomBytes(32),
             incrementalMacInfo: incrementalMacInfo,
             uploadEra: uploadEra ?? "1",
-            lastDownloadAttemptTimestamp: lastDownloadAttemptTimestamp
+            lastDownloadAttemptTimestamp: lastDownloadAttemptTimestamp,
         )
     }
 }
@@ -79,123 +80,119 @@ extension Attachment.ThumbnailMediaTierInfo {
     public static func mock(
         cdnNumber: UInt32? = nil,
         uploadEra: String? = nil,
-        lastDownloadAttemptTimestamp: UInt64? = nil
+        lastDownloadAttemptTimestamp: UInt64? = nil,
     ) -> Attachment.ThumbnailMediaTierInfo {
         return Attachment.ThumbnailMediaTierInfo(
             cdnNumber: cdnNumber ?? 3,
             uploadEra: uploadEra ?? "1",
-            lastDownloadAttemptTimestamp: lastDownloadAttemptTimestamp
+            lastDownloadAttemptTimestamp: lastDownloadAttemptTimestamp,
         )
     }
 }
 
-// MARK: - Params
-
-extension Attachment.ConstructionParams {
+extension Attachment.Record {
 
     public static func mockPointer(
         blurHash: String? = UUID().uuidString,
         mimeType: String = MimeType.imageJpeg.rawValue,
-        encryptionKey: Data = UUID().data,
-        transitTierInfo: Attachment.TransitTierInfo = .mock()
-    ) -> Attachment.ConstructionParams {
-        return Attachment.ConstructionParams.fromPointer(
+        encryptionKey: Data = Randomness.generateRandomBytes(64),
+        audioDetails: Attachment.AudioDetails? = nil,
+        transitTierInfo: Attachment.TransitTierInfo = .mock(),
+    ) -> Attachment.Record {
+        return .forInsertingPointer(
             blurHash: blurHash,
             mimeType: mimeType,
+            contentType: Attachment.ContentType(mimeType: mimeType),
             encryptionKey: encryptionKey,
-            latestTransitTierInfo: transitTierInfo
+            audioDetails: audioDetails,
+            latestTransitTierInfo: transitTierInfo,
         )
     }
 
-    public static func mockStream(
+    static func mockStream(
         blurHash: String? = UUID().uuidString,
         mimeType: String = MimeType.imageJpeg.rawValue,
-        encryptionKey: Data = UUID().data,
-        sha256ContentHash: Data? = nil,
-        mediaName: String? = nil,
-        streamInfo: Attachment.StreamInfo = .mock()
-    ) -> Attachment.ConstructionParams {
-        return Attachment.ConstructionParams.fromStream(
+        encryptionKey: AttachmentKey = .generate(),
+        plaintextHash: Data = Randomness.generateRandomBytes(32),
+        streamInfo: Attachment.StreamInfo? = nil,
+        audioDetails: Attachment.AudioDetails? = nil,
+    ) -> Attachment.Record {
+        return .forInsertingStream(
             blurHash: blurHash,
             mimeType: mimeType,
-            encryptionKey: encryptionKey,
-            streamInfo: streamInfo,
-            sha256ContentHash: sha256ContentHash ?? streamInfo.sha256ContentHash,
-            mediaName: mediaName ?? streamInfo.mediaName
+            contentType: Attachment.ContentType(mimeType: mimeType),
+            encryptionKey: encryptionKey.combinedKey,
+            streamInfo: streamInfo ?? .mock(
+                plaintextHash: plaintextHash,
+                encryptionKey: encryptionKey,
+            ),
+            audioDetails: audioDetails,
+            plaintextHash: plaintextHash,
         )
     }
 }
 
-// MARK: - Attachment
-
-public class MockAttachment: Attachment {
+extension Attachment {
 
     public static func mock(
         blurHash: String? = nil,
-        mimeType: String? = nil,
-        encryptionKey: Data? = nil,
-        sha256ContentHash: Data? = nil,
-        mediaName: String? = nil,
+        mimeType: String = MimeType.applicationOctetStream.rawValue,
+        encryptionKey: Data = Randomness.generateRandomBytes(64),
+        plaintextHash: Data? = nil,
         streamInfo: Attachment.StreamInfo? = nil,
+        audioDetails: Attachment.AudioDetails? = nil,
         transitTierInfo: Attachment.TransitTierInfo? = nil,
         mediaTierInfo: Attachment.MediaTierInfo? = nil,
         thumbnailInfo: Attachment.ThumbnailMediaTierInfo? = nil,
         localRelativeFilePathThumbnail: String? = nil,
         originalAttachmentIdForQuotedReply: Attachment.IDType? = nil,
         lastFullscreenViewTimestamp: UInt64? = nil,
-    ) -> MockAttachment {
+    ) -> Attachment {
         let record = Attachment.Record(
-           sqliteId: .random(in: 0..<(.max)),
-           blurHash: blurHash,
-           mimeType: mimeType ?? MimeType.applicationOctetStream.rawValue,
-           encryptionKey: encryptionKey ?? Randomness.generateRandomBytes(64),
-           sha256ContentHash: sha256ContentHash ?? streamInfo?.sha256ContentHash ?? UUID().data,
-           mediaName: mediaName ?? streamInfo?.mediaName ?? UUID().uuidString,
-           localRelativeFilePathThumbnail: localRelativeFilePathThumbnail,
-           streamInfo: streamInfo,
-           latestTransitTierInfo: transitTierInfo,
-           originalTransitTierInfo: transitTierInfo?.encryptionKey == encryptionKey ? transitTierInfo : nil,
-           mediaTierInfo: mediaTierInfo,
-           thumbnailMediaTierInfo: thumbnailInfo,
-           originalAttachmentIdForQuotedReply: originalAttachmentIdForQuotedReply,
-           lastFullscreenViewTimestamp: lastFullscreenViewTimestamp,
-       )
+            sqliteId: .random(in: 0..<(.max)),
+            blurHash: blurHash,
+            mimeType: mimeType,
+            contentType: Attachment.ContentType(mimeType: mimeType),
+            encryptionKey: encryptionKey,
+            plaintextHash: plaintextHash ?? streamInfo?.plaintextHash,
+            localRelativeFilePathThumbnail: localRelativeFilePathThumbnail,
+            streamInfo: streamInfo,
+            audioDetails: audioDetails,
+            latestTransitTierInfo: transitTierInfo,
+            originalTransitTierInfo: transitTierInfo?.encryptionKey == encryptionKey ? transitTierInfo : nil,
+            mediaTierInfo: mediaTierInfo,
+            thumbnailMediaTierInfo: thumbnailInfo,
+            originalAttachmentIdForQuotedReply: originalAttachmentIdForQuotedReply,
+            lastFullscreenViewTimestamp: lastFullscreenViewTimestamp,
+        )
 
-        return try! MockAttachment(record: record)
-    }
-
-    public override func asStream() -> AttachmentStream? {
-        return MockAttachmentStream(attachment: self)
+        return Attachment(record: record)
     }
 }
 
-public class MockAttachmentStream: AttachmentStream {
+extension AttachmentStream {
 
-    public static func mock(
+    static func mock(
         blurHash: String? = nil,
-        mimeType: String? = nil,
-        mediaName: String? = nil,
+        mimeType: String = MimeType.applicationOctetStream.rawValue,
         streamInfo: Attachment.StreamInfo = .mock(),
+        audioDetails: Attachment.AudioDetails? = nil,
         transitTierInfo: Attachment.TransitTierInfo? = nil,
         mediaTierInfo: Attachment.MediaTierInfo? = nil,
         thumbnailInfo: Attachment.ThumbnailMediaTierInfo? = nil,
-        localRelativeFilePathThumbnail: String? = nil
-    ) -> MockAttachmentStream {
-        let attachment = MockAttachment.mock(
+        localRelativeFilePathThumbnail: String? = nil,
+    ) -> AttachmentStream {
+        let attachment = Attachment.mock(
             blurHash: blurHash,
             mimeType: mimeType,
-            mediaName: mediaName,
             streamInfo: streamInfo,
+            audioDetails: audioDetails,
             transitTierInfo: transitTierInfo,
             mediaTierInfo: mediaTierInfo,
             thumbnailInfo: thumbnailInfo,
-            localRelativeFilePathThumbnail: localRelativeFilePathThumbnail
+            localRelativeFilePathThumbnail: localRelativeFilePathThumbnail,
         )
-        return MockAttachmentStream(attachment: attachment)!
-    }
-
-    public override var fileURL: URL {
-        return URL(string: localRelativeFilePath)!
+        return AttachmentStream(attachment: attachment)!
     }
 }
 

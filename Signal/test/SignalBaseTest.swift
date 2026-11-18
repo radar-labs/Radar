@@ -11,7 +11,7 @@ open class SignalBaseTest: XCTestCase {
     private var oldContext: (any AppContext)!
 
     @MainActor
-    public override func setUp() {
+    override public func setUp() {
         super.setUp()
         let setupExpectation = expectation(description: "mock ssk environment setup completed")
         self.oldContext = CurrentAppContext()
@@ -19,11 +19,11 @@ open class SignalBaseTest: XCTestCase {
             await MockSSKEnvironment.activate()
             setupExpectation.fulfill()
         }
-        waitForExpectations(timeout: 2)
+        waitForExpectations(timeout: 30)
     }
 
     @MainActor
-    open override func tearDown() {
+    override open func tearDown() {
         MockSSKEnvironment.deactivate(oldContext: self.oldContext)
         super.tearDown()
     }

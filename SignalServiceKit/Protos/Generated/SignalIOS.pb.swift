@@ -1,8 +1,3 @@
-//
-// Copyright 2018 Signal Messenger, LLC
-// SPDX-License-Identifier: AGPL-3.0-only
-//
-
 // DO NOT EDIT.
 // swift-format-ignore-file
 // swiftlint:disable all
@@ -20,7 +15,11 @@
 /// iOS - since we use a modern proto-compiler, we must specify
 /// the legacy proto format.
 
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
 import Foundation
+#endif
 import SwiftProtobuf
 
 // If the compiler emits an error on this type, it is because this file
@@ -28,43 +27,43 @@ import SwiftProtobuf
 // incompatible with the version of SwiftProtobuf to which you are linking.
 // Please ensure that you are building against the same version of the API
 // that was used to generate this file.
-fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAPIVersionCheck {
+fileprivate nonisolated struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAPIVersionCheck {
   struct _2: SwiftProtobuf.ProtobufAPIVersion_2 {}
   typealias Version = _2
 }
 
-struct IOSProtos_DeviceName: Sendable {
+nonisolated struct IOSProtos_DeviceName: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// @required
   var ephemeralPublic: Data {
-    get {return _ephemeralPublic ?? Data()}
+    get {_ephemeralPublic ?? Data()}
     set {_ephemeralPublic = newValue}
   }
   /// Returns true if `ephemeralPublic` has been explicitly set.
-  var hasEphemeralPublic: Bool {return self._ephemeralPublic != nil}
+  var hasEphemeralPublic: Bool {self._ephemeralPublic != nil}
   /// Clears the value of `ephemeralPublic`. Subsequent reads from it will return its default value.
   mutating func clearEphemeralPublic() {self._ephemeralPublic = nil}
 
   /// @required
   var syntheticIv: Data {
-    get {return _syntheticIv ?? Data()}
+    get {_syntheticIv ?? Data()}
     set {_syntheticIv = newValue}
   }
   /// Returns true if `syntheticIv` has been explicitly set.
-  var hasSyntheticIv: Bool {return self._syntheticIv != nil}
+  var hasSyntheticIv: Bool {self._syntheticIv != nil}
   /// Clears the value of `syntheticIv`. Subsequent reads from it will return its default value.
   mutating func clearSyntheticIv() {self._syntheticIv = nil}
 
   /// @required
   var ciphertext: Data {
-    get {return _ciphertext ?? Data()}
+    get {_ciphertext ?? Data()}
     set {_ciphertext = newValue}
   }
   /// Returns true if `ciphertext` has been explicitly set.
-  var hasCiphertext: Bool {return self._ciphertext != nil}
+  var hasCiphertext: Bool {self._ciphertext != nil}
   /// Clears the value of `ciphertext`. Subsequent reads from it will return its default value.
   mutating func clearCiphertext() {self._ciphertext = nil}
 
@@ -79,9 +78,9 @@ struct IOSProtos_DeviceName: Sendable {
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
-fileprivate let _protobuf_package = "IOSProtos"
+fileprivate nonisolated let _protobuf_package = "IOSProtos"
 
-extension IOSProtos_DeviceName: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension IOSProtos_DeviceName: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".DeviceName"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}ephemeralPublic\0\u{1}syntheticIv\0\u{1}ciphertext\0")
 

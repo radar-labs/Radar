@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
 import SignalServiceKit
 
 enum CVCBottomViewType: Equatable {
@@ -17,6 +16,12 @@ enum CVCBottomViewType: Equatable {
     case selection
     case blockingLegacyGroup
     case announcementOnlyGroup
+    case appExpired
+    case notRegistered
+    case notLinked
+    case groupEnded
+    case notMemberOfGroup
+    case releaseNotes
 }
 
 protocol ConversationBottomBar: UIView {
@@ -25,11 +30,9 @@ protocol ConversationBottomBar: UIView {
     var shouldAttachToKeyboardLayoutGuide: Bool { get }
 }
 
-// MARK: -
+extension ConversationViewController {
 
-public extension ConversationViewController {
-
-    internal var bottomViewType: CVCBottomViewType {
+    var bottomViewType: CVCBottomViewType {
         get { viewState.bottomViewType }
         set {
             // For perf reasons, we avoid adding any "bottom view"
@@ -40,7 +43,7 @@ public extension ConversationViewController {
             if viewState.bottomViewType != newValue {
                 if viewState.bottomViewType == .inputToolbar {
                     // Dismiss the keyboard if we're swapping out the input toolbar
-                    dismissKeyBoard()
+                    dismissKeyboard()
                 }
                 viewState.bottomViewType = newValue
                 updateBottomBar()
@@ -51,9 +54,12 @@ public extension ConversationViewController {
     func ensureBottomViewType() {
         AssertIsOnMainThread()
 
-        guard viewState.selectionAnimationState == .idle && !self.onlyStarred else {
+        guard viewState.selectionAnimationState == .idle, !self.onlyStarred else {
             return
         }
+
+        let appExpiry = DependenciesBridge.shared.appExpiry
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
 
         bottomViewType = { () -> CVCBottomViewType in
             // The ordering of this method determines
@@ -61,31 +67,63 @@ public extension ConversationViewController {
 
             if !hasViewWillAppearEverBegun {
                 return .none
-            } else if threadViewModel.hasPendingMessageRequest {
+            }
+            switch uiMode {
+            case .search:
+                return .search
+            case .selection:
+                return .selection
+            case .normal:
+                break
+            }
+            if thread.isReleaseNotesThread {
+                if viewState.isInPreviewPlatter {
+                    return .none
+                }
+                return .releaseNotes
+            }
+            if threadViewModel.hasPendingMessageRequest {
                 let messageRequestType = SSKEnvironment.shared.databaseStorageRef.read { tx in
                     return MessageRequestView.messageRequestType(forThread: self.threadViewModel.threadRecord, transaction: tx)
                 }
                 return .messageRequestView(messageRequestType: messageRequestType)
-            } else if isLocalUserRequestingMember {
+            }
+            if isLocalUserRequestingMember {
                 return .memberRequestView
-            } else if hasBlockingLegacyGroup {
-                return .blockingLegacyGroup
-            } else if isBlockedFromSendingByAnnouncementOnlyGroup {
-                return .announcementOnlyGroup
-            } else {
-                switch uiMode {
-                case .search:
-                    return .search
-                case .selection:
-                    return .selection
-                case .normal:
-                    if viewState.isInPreviewPlatter || userLeftGroup {
-                        return .none
-                    } else {
-                        return .inputToolbar
-                    }
+            }
+
+            // Anything that uses BlockingErrorBottomPanelView should go below this check,
+            // it doesn't render correctly in the preview platter so we skip it.
+            if viewState.isInPreviewPlatter {
+                return .none
+            }
+            if appExpiry.isExpired(now: Date()) {
+                return .appExpired
+            }
+            if let deregisteredState = tsAccountManager.registrationStateWithMaybeSneakyTransaction.deregisteredState {
+                if deregisteredState.isPrimary {
+                    return .notRegistered
+                } else {
+                    return .notLinked
                 }
             }
+            if
+                let groupModel = thread.groupModelIfGroupThread as? TSGroupModelV2,
+                groupModel.isTerminated
+            {
+                return .groupEnded
+            }
+
+            if hasBlockingLegacyGroup {
+                return .blockingLegacyGroup
+            }
+            if userLeftGroup {
+                return .notMemberOfGroup
+            }
+            if isBlockedFromSendingByAnnouncementOnlyGroup {
+                return .announcementOnlyGroup
+            }
+            return .inputToolbar
         }()
     }
 
@@ -112,8 +150,10 @@ public extension ConversationViewController {
             requestView = messageRequestView
             bottomView = messageRequestView
         case .memberRequestView:
-            let memberRequestView = MemberRequestView(threadViewModel: threadViewModel,
-                                                      fromViewController: self)
+            let memberRequestView = MemberRequestView(
+                threadViewModel: threadViewModel,
+                fromViewController: self,
+            )
             memberRequestView.delegate = self
             requestView = memberRequestView
             bottomView = memberRequestView
@@ -125,14 +165,77 @@ public extension ConversationViewController {
             loadInputToolbarIfNeeded()
             bottomView = inputToolbar
         case .blockingLegacyGroup:
-            let legacyGroupView = BlockingLegacyGroupView(fromViewController: self)
+            let legacyGroupView = BlockingErrorBottomPanelView(
+                text: blockingLegacyGroupText(),
+                onTap: { [weak self] in
+                    guard let self else { return }
+                    LegacyGroupLearnMoreUI.presentActionSheet(for: .explainUnsupportedLegacyGroups, from: self)
+                },
+            )
             requestView = legacyGroupView
             bottomView = legacyGroupView
         case .announcementOnlyGroup:
-            let announcementOnlyView = BlockingAnnouncementOnlyView(threadViewModel: threadViewModel,
-                                                                    fromViewController: self)
+            let announcementOnlyView = BlockingAnnouncementOnlyView(
+                threadViewModel: threadViewModel,
+                fromViewController: self,
+            )
             requestView = announcementOnlyView
             bottomView = announcementOnlyView
+        case .appExpired:
+            let appExpiredView = BlockingErrorBottomPanelView(
+                text: appExpiredErrorText(),
+                onTap: { [weak self] in self?.didTapShowUpgradeAppUI() },
+            )
+            requestView = appExpiredView
+            bottomView = appExpiredView
+        case .notRegistered:
+            let notRegisteredView = BlockingErrorBottomPanelView(
+                text: notRegisteredErrorText(),
+                onTap: { [unowned self] in
+                    let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+                    let registrationState = tsAccountManager.registrationStateWithMaybeSneakyTransaction
+                    let deregisteredState = registrationState.deregisteredState.owsFailUnwrap("must be deregistered")
+                    RegistrationUtils.showReRegistrationPrompt(fromViewController: self, deregisteredState: deregisteredState)
+                },
+            )
+            requestView = notRegisteredView
+            bottomView = notRegisteredView
+        case .notLinked:
+            let notRegisteredView = BlockingErrorBottomPanelView(
+                text: notLinkedErrorText(),
+                onTap: {
+                    let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+                    let registrationState = tsAccountManager.registrationStateWithMaybeSneakyTransaction
+                    let deregisteredState = registrationState.deregisteredState.owsFailUnwrap("must be deregistered")
+                    RegistrationUtils.showReLinking(deregisteredState: deregisteredState)
+                },
+            )
+            requestView = notRegisteredView
+            bottomView = notRegisteredView
+        case .groupEnded:
+            let groupEndedView = BlockingErrorBottomPanelView(
+                text: NSAttributedString(string: OWSLocalizedString("END_GROUP_BOTTOM_PANEL_LABEL", comment: "Label for group chats that have been ended")),
+                onTap: {},
+            )
+            requestView = groupEndedView
+            bottomView = groupEndedView
+        case .notMemberOfGroup:
+            let notMemberView = BlockingErrorBottomPanelView(
+                text: NSAttributedString(string: OWSLocalizedString(
+                    "GROUP_NOT_MEMBER_BOTTOM_PANEL_LABEL",
+                    comment: "Bottom bar label for group chats the local user is not a member of",
+                )),
+                onTap: {},
+            )
+            requestView = notMemberView
+            bottomView = notMemberView
+        case .releaseNotes:
+            let releaseNotesView = BlockingErrorBottomPanelView(
+                text: NSAttributedString(string: OWSLocalizedString("RELEASE_NOTES_BOTTOM_BAR_LABEL", comment: "Bottom bar label for the release notes thread")),
+                onTap: {},
+            )
+            requestView = releaseNotesView
+            bottomView = releaseNotesView
         }
 
         bottomBarContainer.removeAllSubviews()
@@ -146,8 +249,9 @@ public extension ConversationViewController {
                 bottomView.trailingAnchor.constraint(equalTo: bottomBarContainer.trailingAnchor),
             ])
 
-            if let conversationBottomBar = bottomView as? ConversationBottomBar,
-               conversationBottomBar.shouldAttachToKeyboardLayoutGuide
+            if
+                let conversationBottomBar = bottomView as? ConversationBottomBar,
+                conversationBottomBar.shouldAttachToKeyboardLayoutGuide
             {
                 NSLayoutConstraint.activate([
                     bottomView.bottomAnchor.constraint(equalTo: keyboardLayoutGuide.topAnchor),
@@ -160,6 +264,72 @@ public extension ConversationViewController {
         }
 
         updateContentInsets()
+    }
+
+    private func blockingLegacyGroupText() -> NSAttributedString {
+        let format = OWSLocalizedString(
+            "LEGACY_GROUP_UNSUPPORTED_MESSAGE",
+            comment: "Message explaining that this group can no longer be used because it is unsupported. Embeds a {{ learn more link }}.",
+        )
+        let learnMoreText = CommonStrings.learnMore
+
+        let attributedString = NSMutableAttributedString(string: String.nonPluralLocalizedStringWithFormat(format, learnMoreText))
+        attributedString.setAttributes(
+            [.foregroundColor: UIColor.Signal.link],
+            forSubstring: learnMoreText,
+        )
+        return attributedString
+    }
+
+    private func appExpiredErrorText() -> NSAttributedString {
+        let format = OWSLocalizedString(
+            "APP_EXPIRED_BOTTOM",
+            comment: "Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. The embedded value is 'Update now' (translated via APP_EXPIRED_BOTTOM_UPDATE), and it will be formatted as a tappable link.",
+        )
+        let updateNowText = OWSLocalizedString(
+            "APP_EXPIRED_BOTTOM_UPDATE",
+            comment: "Shown in place of the text input box in a conversation when the app has expired and the user is no longer allowed to send messages. This value is a tappable link embedded in a larger sentence.",
+        )
+        let attributedString = NSMutableAttributedString(string: String.nonPluralLocalizedStringWithFormat(format, updateNowText))
+        attributedString.setAttributes(
+            [.foregroundColor: UIColor.Signal.link],
+            forSubstring: updateNowText,
+        )
+        return attributedString
+    }
+
+    private func notRegisteredErrorText() -> NSAttributedString {
+        let format = OWSLocalizedString(
+            "NOT_REGISTERED_BOTTOM",
+            comment: "Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-register' (translated via NOT_REGISTERED_BOTTOM_REREGISTER), and it will be formatted as a tappable link.",
+        )
+        let updateNowText = OWSLocalizedString(
+            "NOT_REGISTERED_BOTTOM_REREGISTER",
+            comment: "Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence.",
+        )
+        let attributedString = NSMutableAttributedString(string: String.nonPluralLocalizedStringWithFormat(format, updateNowText))
+        attributedString.setAttributes(
+            [.foregroundColor: UIColor.Signal.link],
+            forSubstring: updateNowText,
+        )
+        return attributedString
+    }
+
+    private func notLinkedErrorText() -> NSAttributedString {
+        let format = OWSLocalizedString(
+            "NOT_LINKED_BOTTOM",
+            comment: "Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. The embedded value is 'Re-link' (translated via NOT_LINKED_BOTTOM_RELINK), and it will be formatted as a tappable link.",
+        )
+        let updateNowText = OWSLocalizedString(
+            "NOT_LINKED_BOTTOM_RELINK",
+            comment: "Shown in place of the text input box in a conversation when the user is no longer registered can't send messages. This value is a tappable link embedded in a larger sentence.",
+        )
+        let attributedString = NSMutableAttributedString(string: String.nonPluralLocalizedStringWithFormat(format, updateNowText))
+        attributedString.setAttributes(
+            [.foregroundColor: UIColor.Signal.link],
+            forSubstring: updateNowText,
+        )
+        return attributedString
     }
 
     func loadInputToolbarIfNeeded() {
@@ -186,7 +356,7 @@ public extension ConversationViewController {
             messageDraft: messageDraft,
             draftReply: replyDraft,
             voiceMemoDraft: voiceMemoDraft,
-            editTarget: editTarget
+            editTarget: editTarget,
         )
 
         // Obscures content underneath bottom bar to improve legibility.
@@ -203,13 +373,14 @@ public extension ConversationViewController {
     func reloadDraft() {
         AssertIsOnMainThread()
 
-        guard let messageDraft = (SSKEnvironment.shared.databaseStorageRef.read { transaction in
-            self.thread.currentDraft(transaction: transaction)
-        }) else {
+        guard
+            let messageDraft = (SSKEnvironment.shared.databaseStorageRef.read { transaction in
+                self.thread.currentDraft(transaction: transaction)
+            })
+        else {
             return
         }
         guard let inputToolbar = self.inputToolbar else {
-            owsFailDebug("Missing inputToolbar.")
             return
         }
         inputToolbar.setMessageBody(messageDraft, animated: false)
@@ -238,15 +409,14 @@ public extension ConversationViewController {
             owsFailDebug("InputToolbar not yet ready.")
             return
         }
-        guard let inputToolbar = inputToolbar else {
-            owsFailDebug("Missing inputToolbar.")
+        guard let inputToolbar else {
             return
         }
 
         inputToolbar.beginEditingMessage()
     }
 
-    func dismissKeyBoard() {
+    func dismissKeyboard() {
         AssertIsOnMainThread()
 
         guard hasViewWillAppearEverBegun else {
@@ -258,8 +428,7 @@ public extension ConversationViewController {
             return
         }
 
-        guard let inputToolbar = inputToolbar else {
-            owsFailDebug("Missing inputToolbar.")
+        guard let inputToolbar else {
             return
         }
 
@@ -289,7 +458,7 @@ public extension ConversationViewController {
 
         UIView.animate(withDuration: 0.2, delay: 0, options: []) {
             requestView.bounds = endFrame
-        } completion: { (_) in
+        } completion: { _ in
             requestView.removeFromSuperview()
         }
     }

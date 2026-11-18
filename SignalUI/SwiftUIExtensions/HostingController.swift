@@ -32,7 +32,7 @@ extension EnvironmentValues {
 /// Useful when you want to manually set navigation item bar buttons from a
 /// UIKit context, to avoid `UIHostingController`'s behavior of only displaying
 /// bar buttons once fully appeared.
-open class HostingContainer<Wrapped: View>: UIViewController {
+open class HostingContainer<Wrapped: View>: UIViewController, OWSNavigationChildController {
     private let hostingController: HostingController<Wrapped>
 
     public init(wrappedView: Wrapped) {
@@ -45,19 +45,33 @@ open class HostingContainer<Wrapped: View>: UIViewController {
         fatalError("unimplemented")
     }
 
-    open override func viewDidLoad() {
+    override open func viewDidLoad() {
         addChild(hostingController)
         view.addSubview(hostingController.view)
         hostingController.view.autoPinEdgesToSuperviewEdges()
         hostingController.didMove(toParent: self)
     }
-}
 
-// MARK: OWSNavigationChildController
+    // MARK: - OWSNavigationChildController
 
-extension HostingContainer: OWSNavigationChildController {
-    public var childForOWSNavigationConfiguration: (any OWSNavigationChildController)? {
-        hostingController
+    open var shouldCancelNavigationBack: Bool {
+        false
+    }
+
+    public var preferredNavigationBarStyle: OWSNavigationBarStyle {
+        hostingController.preferredNavigationBarStyle
+    }
+
+    public var navbarBackgroundColorOverride: UIColor? {
+        hostingController.navbarBackgroundColorOverride
+    }
+
+    public var navbarTintColorOverride: UIColor? {
+        hostingController.navbarTintColorOverride
+    }
+
+    public var prefersNavigationBarHidden: Bool {
+        hostingController.prefersNavigationBarHidden
     }
 }
 
@@ -89,7 +103,7 @@ open class HostingController<Wrapped: View>: UIHostingController<_HostingControl
         fatalError("unimplemented")
     }
 
-    open override func viewWillAppear(_ animated: Bool) {
+    override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         rootView.scrollOffsetDidChange = { [weak self] scrollOffset in
@@ -105,7 +119,7 @@ open class HostingController<Wrapped: View>: UIHostingController<_HostingControl
         }
     }
 
-    open override func viewDidAppear(_ animated: Bool) {
+    override open func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         if transitionCoordinator == nil {
@@ -113,7 +127,7 @@ open class HostingController<Wrapped: View>: UIHostingController<_HostingControl
         }
     }
 
-    open override func viewWillDisappear(_ animated: Bool) {
+    override open func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
         rootView.appearanceTransitionState = nil

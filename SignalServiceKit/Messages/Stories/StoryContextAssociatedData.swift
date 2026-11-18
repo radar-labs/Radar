@@ -14,11 +14,9 @@ import UIKit
 /// Outgoing story threads are not represented, but this table could be extended to include
 /// them in the future.
 public final class StoryContextAssociatedData: SDSCodableModel, Decodable {
-    public static var recordType: UInt { 0 }
-
     public static let databaseTableName = "model_StoryContextAssociatedData"
 
-    public enum CodingKeys: String, CodingKey, ColumnExpression, CaseIterable {
+    public enum CodingKeys: String, CodingKey, ColumnExpression {
         case id
         case recordType
         case uniqueId
@@ -59,7 +57,7 @@ public final class StoryContextAssociatedData: SDSCodableModel, Decodable {
     /// Set for all known incoming stories, including those since expired or deleted.
     public private(set) var lastReceivedTimestamp: UInt64? {
         didSet {
-            if let oldValue = oldValue, let newValue = lastReceivedTimestamp, newValue > oldValue {
+            if let oldValue, let newValue = lastReceivedTimestamp, newValue > oldValue {
                 updateLatestUnexpiredTimestampIfNeeded()
             }
         }
@@ -69,7 +67,7 @@ public final class StoryContextAssociatedData: SDSCodableModel, Decodable {
         // We only ever move lastReceivedTimestamp forward for undeleted story messages, so its safe
         // to copy this over to latestUnexpiredTimestamp.
         if
-            let lastReceivedTimestamp = lastReceivedTimestamp,
+            let lastReceivedTimestamp,
             lastReceivedTimestamp > Date().ows_millisecondsSince1970 - StoryManager.storyLifetimeMillis
         {
             latestUnexpiredTimestamp = lastReceivedTimestamp
@@ -87,7 +85,7 @@ public final class StoryContextAssociatedData: SDSCodableModel, Decodable {
         guard let newValue = lastViewedTimestamp else {
             return
         }
-        guard newValue >= (lastReadTimestamp ??  0) else {
+        guard newValue >= (lastReadTimestamp ?? 0) else {
             return
         }
         lastReadTimestamp = newValue
@@ -98,10 +96,10 @@ public final class StoryContextAssociatedData: SDSCodableModel, Decodable {
     }
 
     public var hasUnviewedStories: Bool {
-        guard let latestUnexpiredTimestamp = latestUnexpiredTimestamp else {
+        guard let latestUnexpiredTimestamp else {
             return false
         }
-        guard let lastViewedTimestamp = lastViewedTimestamp else {
+        guard let lastViewedTimestamp else {
             return true
         }
         return lastViewedTimestamp < latestUnexpiredTimestamp
@@ -112,7 +110,7 @@ public final class StoryContextAssociatedData: SDSCodableModel, Decodable {
         isHidden: Bool = false,
         lastReceivedTimestamp: UInt64? = nil,
         lastReadTimestamp: UInt64? = nil,
-        lastViewedTimestamp: UInt64? = nil
+        lastViewedTimestamp: UInt64? = nil,
     ) {
         self.uniqueId = UUID().uuidString
         switch sourceContext {
@@ -138,22 +136,22 @@ public final class StoryContextAssociatedData: SDSCodableModel, Decodable {
         lastReceivedTimestamp: UInt64? = nil,
         lastReadTimestamp: UInt64? = nil,
         lastViewedTimestamp: UInt64? = nil,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) {
         var didTouchStorageServiceProperty = false
 
         let block = { (record: StoryContextAssociatedData) in
-            if let isHidden = isHidden {
+            if let isHidden {
                 record.isHidden = isHidden
                 didTouchStorageServiceProperty = true
             }
-            if let lastReceivedTimestamp = lastReceivedTimestamp {
+            if let lastReceivedTimestamp {
                 record.lastReceivedTimestamp = lastReceivedTimestamp
             }
-            if let lastReadTimestamp = lastReadTimestamp, lastReadTimestamp > (record.lastReadTimestamp ?? 0) {
+            if let lastReadTimestamp, lastReadTimestamp > (record.lastReadTimestamp ?? 0) {
                 record.lastReadTimestamp = lastReadTimestamp
             }
-            if let lastViewedTimestamp = lastViewedTimestamp, lastViewedTimestamp > (record.lastViewedTimestamp ?? 0) {
+            if let lastViewedTimestamp, lastViewedTimestamp > (record.lastViewedTimestamp ?? 0) {
                 record.lastViewedTimestamp = lastViewedTimestamp
             }
         }
@@ -183,10 +181,13 @@ public final class StoryContextAssociatedData: SDSCodableModel, Decodable {
         if updateStorageService, didTouchStorageServiceProperty {
             switch sourceContext {
             case .group(let groupId):
-                guard let thread = TSGroupThread.fetch(groupId: groupId, transaction: transaction) else {
-                    return owsFailDebug("Unexpectedly missing thread for storage service update.")
+                guard
+                    let groupRecord = GroupStore().fetchGroup(forGroupIdData: groupId, tx: transaction),
+                    let masterKey = groupRecord.masterKey
+                else {
+                    return owsFailDebug("missing master key for storage service update")
                 }
-                SSKEnvironment.shared.storageServiceManagerRef.recordPendingUpdates(groupModel: thread.groupModel)
+                SSKEnvironment.shared.storageServiceManagerRef.recordPendingUpdates(updatedGroupV2MasterKeys: [masterKey])
             case .contact(let contactAci):
                 SSKEnvironment.shared.storageServiceManagerRef.recordPendingUpdates(updatedAddresses: [SignalServiceAddress(contactAci)])
             }
@@ -195,7 +196,7 @@ public final class StoryContextAssociatedData: SDSCodableModel, Decodable {
         if !self.isHidden, isHidden == true, let groupId = self.groupId {
             // When hiding a group, disable sends for the group as well.
             if
-                let groupThread = TSGroupThread.fetch(groupId: groupId, transaction: transaction),
+                let groupThread = TSGroupThread.fetchThread(forGroupIdData: groupId, tx: transaction),
                 groupThread.storyViewMode != .disabled
             {
                 groupThread.updateWithStorySendEnabled(false, transaction: transaction, updateStorageService: updateStorageService)
@@ -212,7 +213,7 @@ public final class StoryContextAssociatedData: SDSCodableModel, Decodable {
                 if message.direction == .incoming, message.timestamp > latestUnexpiredTimestamp ?? 0 {
                     latestUnexpiredTimestamp = message.timestamp
                 }
-            }
+            },
         )
 
         let block = { (record: StoryContextAssociatedData) in
@@ -246,7 +247,7 @@ public final class StoryContextAssociatedData: SDSCodableModel, Decodable {
 
     public static func fetchOrDefault(
         sourceContext: SourceContext,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> StoryContextAssociatedData {
         if let existing = StoryFinder.getAssociatedData(forContext: sourceContext, transaction: transaction) {
             return existing
@@ -258,9 +259,6 @@ public final class StoryContextAssociatedData: SDSCodableModel, Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        let decodedRecordType = try container.decode(Int.self, forKey: .recordType)
-        owsAssertDebug(decodedRecordType == Self.recordType, "Unexpectedly decoded record with wrong type.")
 
         id = try container.decodeIfPresent(RowId.self, forKey: .id)
         uniqueId = try container.decode(String.self, forKey: .uniqueId)
@@ -278,11 +276,11 @@ public final class StoryContextAssociatedData: SDSCodableModel, Decodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        if let id = id { try container.encode(id, forKey: .id) }
-        try container.encode(Self.recordType, forKey: .recordType)
+        if let id { try container.encode(id, forKey: .id) }
+        try container.encode(0, forKey: .recordType)
         try container.encode(uniqueId, forKey: .uniqueId)
         try container.encode(contactAci?.rawUUID, forKey: .contactAci)
-        if let groupId = groupId { try container.encode(groupId, forKey: .groupId) }
+        if let groupId { try container.encode(groupId, forKey: .groupId) }
         try container.encode(isHidden, forKey: .isHidden)
         try container.encode(latestUnexpiredTimestamp, forKey: .latestUnexpiredTimestamp)
         try container.encode(lastReceivedTimestamp, forKey: .lastReceivedTimestamp)

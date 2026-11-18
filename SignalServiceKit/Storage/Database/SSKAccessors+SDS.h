@@ -5,26 +5,15 @@
 
 #import <Foundation/Foundation.h>
 #import <SignalServiceKit/TSCall.h>
-#import <SignalServiceKit/TSContactThread.h>
 #import <SignalServiceKit/TSIncomingMessage.h>
 #import <SignalServiceKit/TSInvalidIdentityKeyReceivingErrorMessage.h>
 #import <SignalServiceKit/TSInvalidIdentityKeySendingErrorMessage.h>
-#import <SignalServiceKit/TSThread.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class MessageBodyRanges;
 
 // This header exposes private properties for SDS serialization.
-
-#pragma mark -
-
-@interface TSMessage (SDS)
-
-// This property is only intended to be used by GRDB queries.
-@property (nonatomic, readonly) BOOL storedShouldStartExpireTimer;
-
-@end
 
 #pragma mark -
 
@@ -77,18 +66,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TSInvalidIdentityKeySendingErrorMessage (SDS)
 
 @property (nonatomic, readonly) NSData *preKeyBundle;
-
-@end
-
-#pragma mark -
-
-@interface OWSOutgoingSentMessageTranscript (SDS)
-
-@property (nonatomic, readonly) TSOutgoingMessage *message;
-
-@property (nonatomic, readonly, nullable) NSString *sentRecipientId;
-
-@property (nonatomic, readonly) BOOL isRecipientUpdate;
 
 @end
 

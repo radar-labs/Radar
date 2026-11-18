@@ -16,19 +16,19 @@ public extension HydratedMessageBody.DisplayConfiguration {
 
     static func forUnstyledText(
         font: UIFont,
-        textColor: UIColor
+        textColor: UIColor,
     ) -> Self {
         return .init(
             baseFont: font,
             baseTextColor: .fixed(textColor),
-            revealAllSpoilers: true
+            revealAllSpoilers: true,
         )
     }
 
     static func messageBubble(
         isIncoming: Bool,
-        revealedSpoilerIds: Set<StyleIdType>,
-        searchRanges: SearchRanges?
+        revealedSpoilerIds: Set<StyleId>,
+        searchRanges: SearchRanges?,
     ) -> Self {
         let textColor = isIncoming ? ConversationStyle.bubbleTextColorIncomingThemed : ConversationStyle.bubbleTextColorOutgoingThemed
         let mentionBgColor: ThemedColor = isIncoming ? .incomingMessageBubbleMentionBg : .fixed(UIColor(white: 0, alpha: 0.25))
@@ -37,12 +37,12 @@ public extension HydratedMessageBody.DisplayConfiguration {
             baseTextColor: textColor,
             mentionBackgroundColor: mentionBgColor,
             revealedSpoilerIds: revealedSpoilerIds,
-            searchRanges: searchRanges
+            searchRanges: searchRanges,
         )
     }
 
     static func composing(
-        textViewColor: UIColor?
+        textViewColor: UIColor?,
     ) -> Self {
         let baseTextColor: ThemedColor
         if let textViewColor {
@@ -55,53 +55,53 @@ public extension HydratedMessageBody.DisplayConfiguration {
             baseTextColor: baseTextColor,
             mentionBackgroundColor: .incomingMessageBubbleMentionBg,
             revealedSpoilerBgColor: .incomingMessageBubbleMentionBg,
-            revealAllSpoilers: true
+            revealAllSpoilers: true,
         )
     }
 
     static func composingAttachment() -> Self {
         return .init(
             baseFont: .defaultBaseFont,
-            baseTextColor: .fixed(Theme.darkThemePrimaryColor),
-            mentionBackgroundColor: .fixed(.ows_gray75),
-            revealedSpoilerBgColor: .fixed(.ows_gray75),
-            revealAllSpoilers: true
+            baseTextColor: .fixed(.Signal.label),
+            mentionBackgroundColor: .incomingMessageBubbleMentionBg,
+            revealedSpoilerBgColor: .incomingMessageBubbleMentionBg,
+            revealAllSpoilers: true,
         )
     }
 
     static func quotedReply(
         font: UIFont,
-        textColor: ThemedColor
+        textColor: ThemedColor,
     ) -> Self {
         // Note: we never reveal spoilers in quoted replies under any circumstances.
         return .init(
             baseFont: font,
-            baseTextColor: textColor
+            baseTextColor: textColor,
         )
     }
 
     static func longMessageView(
-        revealedSpoilerIds: Set<StyleIdType>
+        revealedSpoilerIds: Set<StyleId>,
     ) -> Self {
         return .init(
             baseFont: .defaultBaseFont,
             baseTextColor: .primaryText,
             mentionBackgroundColor: ThemedColor(
                 light: .ows_blackAlpha20,
-                dark: .ows_signalBlueDark
+                dark: .Signal.accent,
             ),
-            revealedSpoilerIds: revealedSpoilerIds
+            revealedSpoilerIds: revealedSpoilerIds,
         )
     }
 
     static func groupStoryReply(
-        revealedSpoilerIds: Set<StyleIdType>
+        revealedSpoilerIds: Set<StyleId>,
     ) -> Self {
         return .init(
             baseFont: .defaultBaseFont,
             baseTextColor: .groupStoryReplyText,
             mentionBackgroundColor: .groupStoryReplyMentionBg,
-            revealedSpoilerIds: revealedSpoilerIds
+            revealedSpoilerIds: revealedSpoilerIds,
         )
     }
 
@@ -111,18 +111,18 @@ public extension HydratedMessageBody.DisplayConfiguration {
             baseTextColor: .groupStoryReplyText,
             mentionBackgroundColor: .groupStoryReplyMentionBg,
             revealedSpoilerBgColor: .groupStoryReplyMentionBg,
-            revealAllSpoilers: true
+            revealAllSpoilers: true,
         )
     }
 
     static func conversationListSnippet(
         font: UIFont,
-        textColor: ThemedColor
+        textColor: ThemedColor,
     ) -> Self {
         return .init(
             baseFont: font,
             baseTextColor: textColor,
-            spoilerAnimationColorOverride: ConversationStyle.bubbleTextColorIncomingThemed
+            spoilerAnimationColorOverride: ConversationStyle.bubbleTextColorIncomingThemed,
         )
     }
 
@@ -130,40 +130,41 @@ public extension HydratedMessageBody.DisplayConfiguration {
         return .init(
             baseFont: .dynamicTypeSubheadline,
             baseTextColor: .secondaryTextAndIcon,
-            spoilerAnimationColorOverride: ConversationStyle.bubbleTextColorIncomingThemed
+            spoilerAnimationColorOverride: ConversationStyle.bubbleTextColorIncomingThemed,
         )
     }
 
     static func mediaCaption(
-        revealedSpoilerIds: Set<StyleIdType>
+        textColor: UIColor,
+        revealedSpoilerIds: Set<StyleId>,
     ) -> Self {
         return .init(
             baseFont: .dynamicTypeBodyClamped,
-            baseTextColor: .fixed(.white),
-            revealedSpoilerIds: revealedSpoilerIds
+            baseTextColor: .fixed(textColor),
+            revealedSpoilerIds: revealedSpoilerIds,
         )
     }
 
     static func storyCaption(
         font: UIFont,
-        revealedSpoilerIds: Set<StyleIdType>
+        revealedSpoilerIds: Set<StyleId>,
     ) -> Self {
         return .init(
             baseFont: font,
             baseTextColor: .fixed(Theme.darkThemePrimaryColor),
-            revealedSpoilerIds: revealedSpoilerIds
+            revealedSpoilerIds: revealedSpoilerIds,
         )
     }
 
     static func textStory(
         font: UIFont,
         textColor: UIColor,
-        revealedSpoilerIds: Set<StyleIdType>
+        revealedSpoilerIds: Set<StyleId>,
     ) -> Self {
         return .init(
             baseFont: font,
             baseTextColor: .fixed(textColor),
-            revealedSpoilerIds: revealedSpoilerIds
+            revealedSpoilerIds: revealedSpoilerIds,
         )
     }
 }
@@ -171,11 +172,11 @@ public extension HydratedMessageBody.DisplayConfiguration {
 extension ThemedColor {
     fileprivate static let primaryText = ThemedColor(
         light: Theme.lightThemePrimaryColor,
-        dark: Theme.darkThemePrimaryColor
+        dark: Theme.darkThemePrimaryColor,
     )
     fileprivate static let secondaryTextAndIcon = ThemedColor(
         light: Theme.lightThemeSecondaryTextAndIconColor,
-        dark: Theme.darkThemeSecondaryTextAndIconColor
+        dark: Theme.darkThemeSecondaryTextAndIconColor,
     )
 
     fileprivate static let incomingMessageBubbleMentionBg = ThemedColor(light: .ows_gray20, dark: .ows_gray60)
@@ -199,8 +200,8 @@ extension HydratedMessageBody.DisplayConfiguration {
         spoilerAnimationColorOverride: ThemedColor? = nil,
         revealedSpoilerBgColor: ThemedColor? = nil,
         revealAllSpoilers: Bool = false,
-        revealedSpoilerIds: Set<StyleIdType> = Set(),
-        searchRanges: SearchRanges? = nil
+        revealedSpoilerIds: Set<StyleId> = Set(),
+        searchRanges: SearchRanges? = nil,
     ) {
         self.init(
             baseFont: baseFont,
@@ -213,7 +214,7 @@ extension HydratedMessageBody.DisplayConfiguration {
             revealAllSpoilers: revealAllSpoilers,
             revealedSpoilerIds: revealedSpoilerIds,
             searchRanges: searchRanges,
-            useAnimatedSpoilers: SpoilerAnimationManager.canRenderAnimatedSpoilers
+            useAnimatedSpoilers: SpoilerAnimationManager.canRenderAnimatedSpoilers,
         )
     }
 }

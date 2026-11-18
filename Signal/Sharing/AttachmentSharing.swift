@@ -4,6 +4,7 @@
 //
 
 public import SignalServiceKit
+public import UIKit
 
 public class AttachmentSharing {
 
@@ -14,24 +15,24 @@ public class AttachmentSharing {
     public static func showShareUI(
         for attachment: ShareableAttachment,
         sender: Any? = nil,
-        completion: (() -> Void)? = nil
+        completion: (() -> Void)? = nil,
     ) {
         showShareUIForActivityItems(
             [attachment],
             sender: sender,
-            completion: completion
+            completion: completion,
         )
     }
 
     public static func showShareUI(
         for attachments: [ShareableAttachment],
         sender: Any? = nil,
-        completion: (() -> Void)? = nil
+        completion: (() -> Void)? = nil,
     ) {
         showShareUIForActivityItems(
             attachments,
             sender: sender,
-            completion: completion
+            completion: completion,
         )
     }
 
@@ -40,15 +41,21 @@ public class AttachmentSharing {
     public static func showShareUI(
         for url: URL,
         sender: Any? = nil,
-        completion: (() -> Void)? = nil
+        from viewController: UIViewController? = nil,
+        completion: (() -> Void)? = nil,
     ) {
-        showShareUIForActivityItems([url], sender: sender, completion: completion)
+        showShareUIForActivityItems(
+            [url],
+            sender: sender,
+            from: viewController,
+            completion: completion,
+        )
     }
 
     public static func showShareUI(
         for urls: [URL],
         sender: Any? = nil,
-        completion: (() -> Void)? = nil
+        completion: (() -> Void)? = nil,
     ) {
         showShareUIForActivityItems(urls, sender: sender, completion: completion)
     }
@@ -58,31 +65,40 @@ public class AttachmentSharing {
     public static func showShareUI(
         for text: String,
         sender: Any? = nil,
-        completion: (() -> Void)? = nil
+        from viewController: UIViewController? = nil,
+        completion: (() -> Void)? = nil,
     ) {
-        showShareUIForActivityItems([text], sender: sender, completion: completion)
+        showShareUIForActivityItems(
+            [text],
+            sender: sender,
+            from: viewController,
+            completion: completion,
+        )
     }
 
     // MARK: -
 
-    #if USE_DEBUG_UI
+#if USE_DEBUG_UI
 
     public static func showShareUI(
         for image: UIImage,
         sender: Any? = nil,
-        completion: (() -> Void)? = nil
+        completion: (() -> Void)? = nil,
     ) {
         showShareUIForActivityItems([image], sender: sender, completion: completion)
     }
 
-    #endif
+#endif
 
     // MARK: -
 
-    internal static func showShareUIForActivityItems(
+    /// - Parameter viewController: The view controller to present from. If nil,
+    /// presents from the frontmost view controller in the main window.
+    static func showShareUIForActivityItems(
         _ activityItems: [Any],
         sender: Any?,
-        completion: (() -> Void)? = nil
+        from viewController: UIViewController? = nil,
+        completion: (() -> Void)? = nil,
     ) {
         DispatchMainThreadSafe {
             let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
@@ -98,7 +114,7 @@ public class AttachmentSharing {
                 }
             }
 
-            var fromViewController = CurrentAppContext().frontmostViewController()
+            var fromViewController = viewController ?? CurrentAppContext().frontmostViewController()
             while fromViewController?.presentedViewController != nil {
                 fromViewController = fromViewController?.presentedViewController
             }
@@ -119,7 +135,7 @@ public class AttachmentSharing {
                         x: fromViewController.view.center.x,
                         y: fromViewController.view.frame.maxY,
                         width: 0,
-                        height: 0
+                        height: 0,
                     )
 
                     popoverPresentationController.sourceView = fromViewController.view
@@ -138,8 +154,6 @@ extension Array where Element == ReferencedAttachmentStream {
     public func asShareableAttachments() throws -> [ShareableAttachment] {
         var hadUrlType = false
         var types = [ShareableAttachment.ShareType]()
-        var dedupedSourceFilenames = [String?]()
-        var sourceFilenamesSet = Set<String>()
         for attachment in self {
             let shareType = ShareableAttachment.shareType(attachment.attachmentStream)
             switch shareType {
@@ -149,24 +163,18 @@ extension Array where Element == ReferencedAttachmentStream {
             case .image:
                 types.append(.image)
             }
-
-            let filename = AttachmentSaving.uniqueFilename(
-                sourceFilename: attachment.reference.sourceFilename,
-                existingFilenames: &sourceFilenamesSet
-            )
-            dedupedSourceFilenames.append(filename)
         }
         if hadUrlType {
             // Once one of them are all file, they all have to be files.
             types = [ShareableAttachment.ShareType](repeating: .decryptedFileURL, count: self.count)
         }
 
-        return try zip(zip(self, types), dedupedSourceFilenames).compactMap {
-            let ((attachment, shareType), sourceFilename) = $0
+        return try zip(self, types).compactMap {
+            let (attachment, shareType) = $0
             return try ShareableAttachment(
                 attachment.attachmentStream,
-                sourceFilename: sourceFilename,
-                shareType: shareType
+                sourceFilename: attachment.reference.sourceFilename,
+                shareType: shareType,
             )
         }
     }
@@ -193,7 +201,7 @@ public class ShareableAttachment: NSObject, UIActivityItemSource {
     fileprivate init?(
         _ attachmentStream: AttachmentStream,
         sourceFilename: String?,
-        shareType: ShareType
+        shareType: ShareType,
     ) throws {
         self.attachmentStream = attachmentStream
         switch shareType {
@@ -208,7 +216,7 @@ public class ShareableAttachment: NSObject, UIActivityItemSource {
         case .audio, .file:
             self.shareType = .decryptedFileURL(try attachmentStream.makeDecryptedCopy(filename: sourceFilename))
             return
-        case .image, .animatedImage:
+        case .image:
             self.shareType = .decryptedFileURL(try attachmentStream.makeDecryptedCopy(filename: sourceFilename))
         case .video:
             let decryptedFileUrl = try attachmentStream.makeDecryptedCopy(filename: sourceFilename)
@@ -217,12 +225,6 @@ public class ShareableAttachment: NSObject, UIActivityItemSource {
                 return nil
             }
             self.shareType = .decryptedFileURL(decryptedFileUrl)
-        case .invalid:
-            // Let the user try to share as long as its a visual mime type.
-            guard MimeTypeUtil.isSupportedVisualMediaMimeType(attachmentStream.mimeType) else {
-                return nil
-            }
-            self.shareType = .decryptedFileURL(try attachmentStream.makeDecryptedCopy(filename: sourceFilename))
         }
     }
 
@@ -273,7 +275,7 @@ public class ShareableAttachment: NSObject, UIActivityItemSource {
     // called to fetch data after an activity is selected. you can return nil.
     public func activityViewController(
         _ activityViewController: UIActivityViewController,
-        itemForActivityType activityType: UIActivity.ActivityType?
+        itemForActivityType activityType: UIActivity.ActivityType?,
     ) -> Any? {
         switch shareType {
         case .decryptedFileURL(let url):

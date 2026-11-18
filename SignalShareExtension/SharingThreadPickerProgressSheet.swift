@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import SignalUI
 public import SignalServiceKit
+public import SignalUI
 
 public class SharingThreadPickerProgressSheet: ActionSheetController {
 
@@ -15,7 +15,7 @@ public class SharingThreadPickerProgressSheet: ActionSheetController {
 
     public init(
         attachmentIds: [Attachment.IDType],
-        delegate: ShareViewDelegate?
+        delegate: ShareViewDelegate?,
     ) {
         self.attachmentIds = attachmentIds
         super.init()
@@ -23,8 +23,8 @@ public class SharingThreadPickerProgressSheet: ActionSheetController {
         setupSubviews()
 
         let cancelAction = ActionSheetAction(
-            title: CommonStrings.cancelButton,
-            style: .cancel
+            title: CommonStrings.dismissButton,
+            style: .cancel,
         ) { [weak delegate] _ in
             delegate?.shareViewWasCancelled()
         }
@@ -34,7 +34,7 @@ public class SharingThreadPickerProgressSheet: ActionSheetController {
             self,
             selector: #selector(handleAttachmentProgressNotification(_:)),
             name: Upload.Constants.attachmentUploadProgressNotification,
-            object: nil
+            object: nil,
         )
     }
 
@@ -87,10 +87,10 @@ public class SharingThreadPickerProgressSheet: ActionSheetController {
     // MARK: - Updating UI
 
     private func renderProgress() {
-        guard attachmentIds.isEmpty.negated else {
+        guard !attachmentIds.isEmpty else {
             progressLabel.text = OWSLocalizedString(
                 "MESSAGE_STATUS_SENDING",
-                comment: "message status while message is sending."
+                comment: "message status while message is sending.",
             )
             return
         }
@@ -106,16 +106,16 @@ public class SharingThreadPickerProgressSheet: ActionSheetController {
         // reach 100%.
         let totalCompleted = progressValues.filter { $0 == 1 }.count
 
-        progressLabel.text = String(
-            format: Self.progressFormat,
+        progressLabel.text = String.nonPluralLocalizedStringWithFormat(
+            Self.progressFormat,
             OWSFormat.formatInt(min(totalCompleted + 1, attachmentIds.count)),
-            OWSFormat.formatInt(attachmentIds.count)
+            OWSFormat.formatInt(attachmentIds.count),
         )
     }
 
     private static let progressFormat = OWSLocalizedString(
         "SHARE_EXTENSION_SENDING_IN_PROGRESS_FORMAT",
-        comment: "Send progress for share extension. Embeds {{ %1$@ number of attachments uploaded, %2$@ total number of attachments}}"
+        comment: "Send progress for share extension. Embeds {{ %1$@ number of attachments uploaded, %2$@ total number of attachments}}",
     )
 
     // MARK: Notifications
@@ -128,12 +128,12 @@ public class SharingThreadPickerProgressSheet: ActionSheetController {
             owsFailDebug("Missing notificationAttachmentId.")
             return
         }
-        guard let progress = notification.userInfo?[Upload.Constants.uploadProgressKey] as? NSNumber else {
+        guard let progress = notification.userInfo?[Upload.Constants.uploadProgressKey] as? Float else {
             owsFailDebug("Missing progress.")
             return
         }
 
-        progressPerAttachment[notificationAttachmentId] = progress.floatValue
+        progressPerAttachment[notificationAttachmentId] = progress
 
         renderProgress()
     }

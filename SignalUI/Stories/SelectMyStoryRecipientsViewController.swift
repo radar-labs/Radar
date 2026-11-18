@@ -12,7 +12,7 @@ public class SelectMyStoryRecipientsViewController: BaseMemberViewController {
     var recipientSet: OrderedSet<PickedRecipient>
     let originalRecipientSet: Set<PickedRecipient>
 
-    public override var hasUnsavedChanges: Bool { originalRecipientSet != recipientSet.unorderedMembers }
+    override public var hasUnsavedChanges: Bool { originalRecipientSet != recipientSet.unorderedMembers }
 
     let completionBlock: () -> Void
 
@@ -20,16 +20,14 @@ public class SelectMyStoryRecipientsViewController: BaseMemberViewController {
         for thread: TSPrivateStoryThread,
         mode: TSThreadStoryViewMode,
         tx: DBReadTransaction,
-        completionBlock: @escaping () -> Void
+        completionBlock: @escaping () -> Void,
     ) -> SelectMyStoryRecipientsViewController {
         let storyRecipientManager = DependenciesBridge.shared.storyRecipientManager
         return SelectMyStoryRecipientsViewController(
             thread: thread,
-            recipientAddresses: failIfThrows {
-                try storyRecipientManager.fetchRecipients(forStoryThread: thread, tx: tx)
-            }.map { $0.address },
+            recipientAddresses: storyRecipientManager.fetchRecipients(forStoryThread: thread, tx: tx).map { $0.address },
             mode: mode,
-            completionBlock: completionBlock
+            completionBlock: completionBlock,
         )
     }
 
@@ -37,7 +35,7 @@ public class SelectMyStoryRecipientsViewController: BaseMemberViewController {
         thread: TSPrivateStoryThread,
         recipientAddresses: [SignalServiceAddress],
         mode: TSThreadStoryViewMode,
-        completionBlock: @escaping () -> Void
+        completionBlock: @escaping () -> Void,
     ) {
         self.thread = thread
         self.mode = mode
@@ -55,7 +53,7 @@ public class SelectMyStoryRecipientsViewController: BaseMemberViewController {
 
     // MARK: - View Lifecycle
 
-    public override func viewWillAppear(_ animated: Bool) {
+    override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         updateBarButtons()
     }
@@ -75,13 +73,13 @@ public class SelectMyStoryRecipientsViewController: BaseMemberViewController {
             if recipientSet.isEmpty {
                 title = OWSLocalizedString(
                     "STORY_SELECT_ALLOWED_CONNECTIONS_VIEW_TITLE",
-                    comment: "The title for the 'select connections for story' view."
+                    comment: "The title for the 'select connections for story' view.",
                 )
             } else {
                 let format = OWSLocalizedString(
                     "STORY_SELECT_ALLOWED_CONNECTIONS_VIEW_TITLE_%d",
                     tableName: "PluralAware",
-                    comment: "The title for the 'select connections for story' view if already some connections are selected. Embeds {{number}} of connections."
+                    comment: "The title for the 'select connections for story' view if already some connections are selected. Embeds {{number}} of connections.",
                 )
                 title = String.localizedStringWithFormat(format, recipientSet.count)
             }
@@ -89,13 +87,13 @@ public class SelectMyStoryRecipientsViewController: BaseMemberViewController {
             if recipientSet.isEmpty {
                 title = OWSLocalizedString(
                     "STORY_SELECT_EXCLUDED_CONNECTIONS_VIEW_TITLE",
-                    comment: "The title for the 'select excluded connections for story' view."
+                    comment: "The title for the 'select excluded connections for story' view.",
                 )
             } else {
                 let format = OWSLocalizedString(
                     "STORY_SELECT_EXCLUDED_CONNECTIONS_VIEW_TITLE_%d",
                     tableName: "PluralAware",
-                    comment: "The title for the 'select excluded connections for story' view if already some connections are selected. Embeds {{number}} of excluded connections."
+                    comment: "The title for the 'select excluded connections for story' view if already some connections are selected. Embeds {{number}} of excluded connections.",
                 )
                 title = String.localizedStringWithFormat(format, recipientSet.count)
             }
@@ -118,7 +116,7 @@ public class SelectMyStoryRecipientsViewController: BaseMemberViewController {
                 self.mode,
                 storyRecipientIds: .setTo(Array(recipientIds)),
                 updateStorageService: true,
-                transaction: transaction
+                transaction: transaction,
             )
         }
 
@@ -154,12 +152,12 @@ extension SelectMyStoryRecipientsViewController: MemberViewDelegate {
 
     public func memberViewIsPreExistingMember(_ recipient: PickedRecipient, transaction: DBReadTransaction) -> Bool { false }
 
-    public func memberViewCustomIconNameForPickedMember(_ recipient: PickedRecipient) -> String? {
-        mode == .blockList ? "x-circle-fill" : nil
-    }
+    public func memberViewCustomIndicatorForPickedMember(_ recipient: PickedRecipient) -> UIView? {
+        guard mode == .blockList else { return nil }
 
-    public func memberViewCustomIconColorForPickedMember(_ recipient: PickedRecipient) -> UIColor? {
-        mode == .blockList ? .ows_accentRed : nil
+        let indicatorImage = UIImageView(image: UIImage(named: "x-circle-fill"))
+        indicatorImage.tintColor = .Signal.red
+        return indicatorImage
     }
 
     public func memberViewDismiss() {

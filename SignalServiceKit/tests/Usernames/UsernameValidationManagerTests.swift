@@ -17,7 +17,7 @@ final class UsernameValidationManagerTest: XCTestCase {
     private var mockLocalUsernameManager: MockLocalUsernameManager!
     private var mockMessageProcessor: MockMessageProcessor!
     private var mockStorageServiceManager: MockStorageServiceManager!
-    private var mockUsernameLinkManager: MockUsernameLinkManager!
+    private var mockUsernamesService: MockUsernamesService!
     private var mockWhoAmIManager: MockWhoAmIManager!
 
     private var validationManager: UsernameValidationManagerImpl!
@@ -27,16 +27,16 @@ final class UsernameValidationManagerTest: XCTestCase {
         mockLocalUsernameManager = MockLocalUsernameManager()
         mockMessageProcessor = MockMessageProcessor()
         mockStorageServiceManager = MockStorageServiceManager()
-        mockUsernameLinkManager = MockUsernameLinkManager()
+        mockUsernamesService = MockUsernamesService()
         mockWhoAmIManager = MockWhoAmIManager()
 
         validationManager = UsernameValidationManagerImpl(context: .init(
             database: mockDB,
             localUsernameManager: mockLocalUsernameManager,
             messageProcessor: mockMessageProcessor,
+            serviceProvider: MockServiceProvider(mockServices: [mockUsernamesService!]),
             storageServiceManager: mockStorageServiceManager,
-            usernameLinkManager: mockUsernameLinkManager,
-            whoAmIManager: mockWhoAmIManager
+            whoAmIManager: mockWhoAmIManager,
         ))
     }
 
@@ -44,19 +44,19 @@ final class UsernameValidationManagerTest: XCTestCase {
         mockWhoAmIManager.whoAmIResponse.ensureUnset()
         owsPrecondition(!mockMessageProcessor.canWait)
         mockStorageServiceManager.pendingRestoreResult.ensureUnset()
-        owsPrecondition(mockUsernameLinkManager.decryptEncryptedLinkMocks.isEmpty)
+        owsPrecondition(mockUsernamesService.lookUpUsernameLinkMocks.get().isEmpty)
     }
 
-    func testUnsetValidationSuccessful() async {
+    func testUnsetValidationSuccessful() async throws {
         mockLocalUsernameManager.startingUsernameState = .unset
         mockMessageProcessor.canWait = true
         mockStorageServiceManager.pendingRestoreResult = .value(())
         mockWhoAmIManager.whoAmIResponse = .value(.noRemoteUsername)
 
-        await validationManager.validateUsernameIfNecessary()
+        let isValid = try await validationManager.validateUsername()
+        XCTAssertTrue(isValid)
 
         mockDB.read { tx in
-            XCTAssertNotNil(validationManager.lastValidationDate(tx))
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedUsername)
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedLink)
         }
@@ -68,44 +68,44 @@ final class UsernameValidationManagerTest: XCTestCase {
         mockStorageServiceManager.pendingRestoreResult = .value(())
         mockWhoAmIManager.whoAmIResponse = .error()
 
-        await validationManager.validateUsernameIfNecessary()
+        let isValid = await Result(catching: { try await validationManager.validateUsername() })
+        XCTAssertThrowsError(try isValid.get())
 
         mockDB.read { tx in
-            XCTAssertNil(validationManager.lastValidationDate(tx))
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedUsername)
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedLink)
         }
     }
 
-    func testUnsetValidationFailsIfRemoteUsernamePresent() async {
+    func testUnsetValidationFailsIfRemoteUsernamePresent() async throws {
         mockLocalUsernameManager.startingUsernameState = .unset
         mockMessageProcessor.canWait = true
         mockStorageServiceManager.pendingRestoreResult = .value(())
         mockWhoAmIManager.whoAmIResponse = .value(.withRemoteUsername("boba_fett.42"))
 
-        await validationManager.validateUsernameIfNecessary()
+        let isValid = try await validationManager.validateUsername()
+        XCTAssertFalse(isValid)
 
         mockDB.read { tx in
-            XCTAssertNil(validationManager.lastValidationDate(tx))
             XCTAssertTrue(mockLocalUsernameManager.didSetCorruptedUsername)
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedLink)
         }
     }
 
-    func testAvailableValidationSuccessful() async {
+    func testAvailableValidationSuccessful() async throws {
         mockLocalUsernameManager.startingUsernameState = .available(
             username: "boba_fett.42",
-            usernameLink: .mocked
+            usernameLink: .mocked,
         )
         mockMessageProcessor.canWait = true
         mockStorageServiceManager.pendingRestoreResult = .value(())
         mockWhoAmIManager.whoAmIResponse = .value(.withRemoteUsername("boba_fett.42"))
-        mockUsernameLinkManager.decryptEncryptedLinkMocks = [{ _ in "boba_fett.42" }]
+        mockUsernamesService.lookUpUsernameLinkMocks.set([{ _, _ in try! LibSignalClient.Username("boba_fett.42") }])
 
-        await validationManager.validateUsernameIfNecessary()
+        let isValid = try await validationManager.validateUsername()
+        XCTAssertTrue(isValid)
 
         mockDB.read { tx in
-            XCTAssertNotNil(validationManager.lastValidationDate(tx))
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedUsername)
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedLink)
         }
@@ -114,34 +114,34 @@ final class UsernameValidationManagerTest: XCTestCase {
     func testAvailableValidationFailsIfWhoamiFails() async {
         mockLocalUsernameManager.startingUsernameState = .available(
             username: "boba_fett.42",
-            usernameLink: .mocked
+            usernameLink: .mocked,
         )
         mockMessageProcessor.canWait = true
         mockStorageServiceManager.pendingRestoreResult = .value(())
         mockWhoAmIManager.whoAmIResponse = .error()
 
-        await validationManager.validateUsernameIfNecessary()
+        let isValid = await Result(catching: { try await validationManager.validateUsername() })
+        XCTAssertThrowsError(try isValid.get())
 
         mockDB.read { tx in
-            XCTAssertNil(validationManager.lastValidationDate(tx))
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedUsername)
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedLink)
         }
     }
 
-    func testAvailableValidationFailsIfRemoteUsernameMismatch() async {
+    func testAvailableValidationFailsIfRemoteUsernameMismatch() async throws {
         mockLocalUsernameManager.startingUsernameState = .available(
             username: "boba_fett.42",
-            usernameLink: .mocked
+            usernameLink: .mocked,
         )
         mockMessageProcessor.canWait = true
         mockStorageServiceManager.pendingRestoreResult = .value(())
         mockWhoAmIManager.whoAmIResponse = .value(.withRemoteUsername("boba_fett.43"))
 
-        await validationManager.validateUsernameIfNecessary()
+        let isValid = try await validationManager.validateUsername()
+        XCTAssertFalse(isValid)
 
         mockDB.read { tx in
-            XCTAssertNil(validationManager.lastValidationDate(tx))
             XCTAssertTrue(mockLocalUsernameManager.didSetCorruptedUsername)
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedLink)
         }
@@ -150,51 +150,51 @@ final class UsernameValidationManagerTest: XCTestCase {
     func testAvailableValidationFailsIfLinkDecryptFails() async {
         mockLocalUsernameManager.startingUsernameState = .available(
             username: "boba_fett.42",
-            usernameLink: .mocked
+            usernameLink: .mocked,
         )
         mockMessageProcessor.canWait = true
         mockStorageServiceManager.pendingRestoreResult = .value(())
         mockWhoAmIManager.whoAmIResponse = .value(.withRemoteUsername("boba_fett.42"))
-        mockUsernameLinkManager.decryptEncryptedLinkMocks = [{ _ in throw OWSGenericError("") }]
+        mockUsernamesService.lookUpUsernameLinkMocks.set([{ _, _ in throw OWSGenericError("") }])
 
-        await validationManager.validateUsernameIfNecessary()
+        let isValid = await Result(catching: { try await validationManager.validateUsername() })
+        XCTAssertThrowsError(try isValid.get())
 
         mockDB.read { tx in
-            XCTAssertNil(validationManager.lastValidationDate(tx))
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedUsername)
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedLink)
         }
     }
 
-    func testAvailableValidationFailsIfUsernameLinkMismatch() async {
+    func testAvailableValidationFailsIfUsernameLinkMismatch() async throws {
         mockLocalUsernameManager.startingUsernameState = .available(
             username: "boba_fett.42",
-            usernameLink: .mocked
+            usernameLink: .mocked,
         )
         mockMessageProcessor.canWait = true
         mockStorageServiceManager.pendingRestoreResult = .value(())
         mockWhoAmIManager.whoAmIResponse = .value(.withRemoteUsername("boba_fett.42"))
-        mockUsernameLinkManager.decryptEncryptedLinkMocks = [{ _ in "boba_fett.43" }]
+        mockUsernamesService.lookUpUsernameLinkMocks.set([{ _, _ in try! LibSignalClient.Username("boba_fett.43") }])
 
-        await validationManager.validateUsernameIfNecessary()
+        let isValid = try await validationManager.validateUsername()
+        XCTAssertFalse(isValid)
 
         mockDB.read { tx in
-            XCTAssertNil(validationManager.lastValidationDate(tx))
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedUsername)
             XCTAssertTrue(mockLocalUsernameManager.didSetCorruptedLink)
         }
     }
 
-    func testLinkCorruptedValidationSuccessful() async {
+    func testLinkCorruptedValidationSuccessful() async throws {
         mockLocalUsernameManager.startingUsernameState = .linkCorrupted(username: "boba_fett.42")
         mockMessageProcessor.canWait = true
         mockStorageServiceManager.pendingRestoreResult = .value(())
         mockWhoAmIManager.whoAmIResponse = .value(.withRemoteUsername("boba_fett.42"))
 
-        await validationManager.validateUsernameIfNecessary()
+        let isValid = try await validationManager.validateUsername()
+        XCTAssertTrue(isValid)
 
         mockDB.read { tx in
-            XCTAssertNotNil(validationManager.lastValidationDate(tx))
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedUsername)
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedLink)
         }
@@ -206,39 +206,39 @@ final class UsernameValidationManagerTest: XCTestCase {
         mockStorageServiceManager.pendingRestoreResult = .value(())
         mockWhoAmIManager.whoAmIResponse = .error()
 
-        await validationManager.validateUsernameIfNecessary()
+        let isValid = await Result(catching: { try await validationManager.validateUsername() })
+        XCTAssertThrowsError(try isValid.get())
 
         mockDB.read { tx in
-            XCTAssertNil(validationManager.lastValidationDate(tx))
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedUsername)
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedLink)
         }
     }
 
-    func testLinkCorruptedValidationFailsIfRemoteUsernameMismatch() async {
+    func testLinkCorruptedValidationFailsIfRemoteUsernameMismatch() async throws {
         mockLocalUsernameManager.startingUsernameState = .linkCorrupted(username: "boba_fett.42")
         mockMessageProcessor.canWait = true
         mockStorageServiceManager.pendingRestoreResult = .value(())
         mockWhoAmIManager.whoAmIResponse = .value(.withRemoteUsername("boba_fett.43"))
 
-        await validationManager.validateUsernameIfNecessary()
+        let isValid = try await validationManager.validateUsername()
+        XCTAssertFalse(isValid)
 
         mockDB.read { tx in
-            XCTAssertNil(validationManager.lastValidationDate(tx))
             XCTAssertTrue(mockLocalUsernameManager.didSetCorruptedUsername)
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedLink)
         }
     }
 
-    func testUsernameCorruptedValidationSuccessful() async {
+    func testUsernameCorruptedValidationSuccessful() async throws {
         mockLocalUsernameManager.startingUsernameState = .usernameAndLinkCorrupted
         mockMessageProcessor.canWait = true
         mockStorageServiceManager.pendingRestoreResult = .value(())
 
-        await validationManager.validateUsernameIfNecessary()
+        let isValid = try await validationManager.validateUsername()
+        XCTAssertFalse(isValid)
 
         mockDB.read { tx in
-            XCTAssertNotNil(validationManager.lastValidationDate(tx))
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedUsername)
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedLink)
         }
@@ -249,80 +249,33 @@ final class UsernameValidationManagerTest: XCTestCase {
         mockMessageProcessor.canWait = true
         mockStorageServiceManager.pendingRestoreResult = .error()
 
-        await validationManager.validateUsernameIfNecessary()
+        let isValid = await Result(catching: { try await validationManager.validateUsername() })
+        XCTAssertThrowsError(try isValid.get())
 
         mockDB.read { tx in
-            XCTAssertNil(validationManager.lastValidationDate(tx))
-            XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedUsername)
-            XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedLink)
-        }
-    }
-
-    func testValidationSkippedIfValidatedRecently() async {
-        mockDB.write { tx in
-            validationManager.setLastValidation(
-                date: Date().addingTimeInterval(-100),
-                tx
-            )
-        }
-
-        await validationManager.validateUsernameIfNecessary()
-
-        mockDB.read { tx in
-            XCTAssertNotNil(validationManager.lastValidationDate(tx))
-            XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedUsername)
-            XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedLink)
-        }
-    }
-
-    func testValidationFiresIfValidatedAWhileAgo() async {
-        mockDB.write { tx in
-            validationManager.setLastValidation(
-                date: Date().addingTimeInterval(-.day).addingTimeInterval(-1),
-                tx
-            )
-        }
-
-        mockLocalUsernameManager.startingUsernameState = .usernameAndLinkCorrupted
-        mockMessageProcessor.canWait = true
-        mockStorageServiceManager.pendingRestoreResult = .value(())
-
-        await validationManager.validateUsernameIfNecessary()
-
-        mockDB.read { tx in
-            XCTAssertNotNil(validationManager.lastValidationDate(tx))
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedUsername)
             XCTAssertFalse(mockLocalUsernameManager.didSetCorruptedLink)
         }
     }
 }
 
-private extension WhoAmIManager.WhoAmIResponse {
-    static let noRemoteUsername: Self = .init(
-        aci: Aci.randomForTesting(),
-        pni: Pni.randomForTesting(),
-        e164: E164("+16125550101")!,
-        usernameHash: nil,
-        entitlements: Entitlements(backup: nil, badges: [])
-    )
+private extension AccountIdentityResponse {
+    static let noRemoteUsername = AccountIdentityResponse(localIdentifiers: .forUnitTests)
 
-    static func withRemoteUsername(_ remoteUsername: String) -> Self {
-        return .init(
-            aci: Aci.randomForTesting(),
-            pni: Pni.randomForTesting(),
-            e164: E164("+16125550101")!,
-            usernameHash: try! Usernames.HashedUsername(forUsername: remoteUsername).hashString,
-            entitlements: Entitlements(backup: nil, badges: [])
+    static func withRemoteUsername(_ remoteUsername: String) -> AccountIdentityResponse {
+        return AccountIdentityResponse(
+            localIdentifiers: .forUnitTests,
+            usernameHash: try! LibSignalClient.Username(remoteUsername).hash,
         )
     }
 }
 
 private extension Usernames.UsernameLink {
-    static var mocked: Usernames.UsernameLink {
-        return Usernames.UsernameLink(
+    static var mocked: UsernameLink {
+        return UsernameLink(
             handle: UUID(),
-            entropy: Data(repeating: 5, count: 32)
-        )!
+            entropy: try! UsernameLink.Entropy(rawValue: Data(repeating: 5, count: 32)),
+        )
     }
 }
 
@@ -340,7 +293,7 @@ extension UsernameValidationManagerTest {
     private class MockMessageProcessor: Usernames.Validation.Shims.MessageProcessor {
         var canWait = false
 
-        public func waitForFetchingAndProcessing() async throws(CancellationError) {
+        func waitForFetchingAndProcessing() async throws(CancellationError) {
             owsPrecondition(canWait)
             canWait = false
         }

@@ -343,6 +343,7 @@ class BaseContext(object):
             "fixed64",
             "bool",
             "double",
+            "float",
         )
 
     def can_field_be_optional(self, field):
@@ -416,6 +417,8 @@ class BaseContext(object):
         elif field.proto_type == "fixed64":
             return "0"
         elif field.proto_type == "double":
+            return "0"
+        elif field.proto_type == "float":
             return "0"
         elif field.proto_type == "bool":
             return "false"
@@ -990,13 +993,17 @@ public func serializedData() throws -> Data {
                 )
 
             if field.rules == "repeated":
+                if field.name_swift == "blockedE164s":
+                    proto_name_swift = "blockedE164S"
+                else:
+                    proto_name_swift = field.name_swift
                 if self.is_field_an_enum(field):
                     enum_context = self.context_for_proto_type(field)
                     writer.add(
                         "%s = proto.%s.map { %s($0) }"
                         % (
                             field.name_swift,
-                            field.name_swift,
+                            proto_name_swift,
                             enum_context.wrap_func_name(),
                         )
                     )
@@ -1005,7 +1012,7 @@ public func serializedData() throws -> Data {
                         "%s = try proto.%s.map { try %s($0) }"
                         % (
                             field.name_swift,
-                            field.name_swift,
+                            proto_name_swift,
                             self.base_swift_type_for_field(field),
                         )
                     )
@@ -1014,7 +1021,7 @@ public func serializedData() throws -> Data {
                         "%s = proto.%s.map { %s($0) }"
                         % (
                             field.name_swift,
-                            field.name_swift,
+                            proto_name_swift,
                             self.base_swift_type_for_field(field),
                         )
                     )
@@ -1023,7 +1030,7 @@ public func serializedData() throws -> Data {
                         "%s = proto.%s"
                         % (
                             field.name_swift,
-                            field.name_swift,
+                            proto_name_swift,
                         )
                     )
             else:
@@ -1357,6 +1364,10 @@ public func serializedData() throws -> Data {
         # Setters
         for field in self.fields():
             if field.rules == "repeated":
+                if field.name_swift == "blockedE164s":
+                    proto_name_swift = "blockedE164S"
+                else:
+                    proto_name_swift = field.name_swift
                 # Add
                 accessor_name = field.name_swift
                 accessor_name = "add" + accessor_name[0].upper() + accessor_name[1:]
@@ -1388,7 +1399,7 @@ public func serializedData() throws -> Data {
                     param = "valueParam.proto"
                 else:
                     param = "valueParam"
-                writer.add("proto.%s.append(%s)" % (field.name_swift, param))
+                writer.add("proto.%s.append(%s)" % (proto_name_swift, param))
                 writer.pop_indent()
                 writer.add("}")
                 writer.newline()
@@ -1419,16 +1430,16 @@ public func serializedData() throws -> Data {
                     writer.add(
                         "proto.%s = wrappedItems.map { %s($0) }"
                         % (
-                            field.name_swift,
+                            proto_name_swift,
                             enum_context.unwrap_func_name(),
                         )
                     )
                 elif self.is_field_a_proto(field):
                     writer.add(
-                        "proto.%s = wrappedItems.map { $0.proto }" % (field.name_swift,)
+                        "proto.%s = wrappedItems.map { $0.proto }" % (proto_name_swift,)
                     )
                 else:
-                    writer.add("proto.%s = wrappedItems" % (field.name_swift,))
+                    writer.add("proto.%s = wrappedItems" % (proto_name_swift,))
                 writer.pop_indent()
                 writer.add("}")
                 writer.newline()

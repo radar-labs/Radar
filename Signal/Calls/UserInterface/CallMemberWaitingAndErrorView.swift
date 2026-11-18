@@ -6,6 +6,7 @@
 import Foundation
 import SignalRingRTC
 import SignalServiceKit
+import UIKit
 
 /// Only used for group calls currently; adjust if individual calls come to need it.
 class CallMemberWaitingAndErrorView: UIView, CallMemberComposableView {
@@ -46,7 +47,7 @@ class CallMemberWaitingAndErrorView: UIView, CallMemberComposableView {
     func configure(
         call: SignalCall,
         isFullScreen: Bool = false,
-        remoteGroupMemberDeviceState: RemoteDeviceState?
+        remoteGroupMemberDeviceState: RemoteDeviceState?,
     ) {
         switch type {
         case .local, .remoteInIndividual:
@@ -85,11 +86,12 @@ class CallMemberWaitingAndErrorView: UIView, CallMemberComposableView {
                     withTimeInterval: scheduledInterval,
                     repeats: false,
                     block: { [weak self] _ in
-                        guard let self = self else { return }
-                        guard let updatedState = ringRtcCall.remoteDeviceStates.values
-                            .first(where: { $0.demuxId == configuredDemuxId }) else { return }
+                        guard let self else { return }
+                        guard
+                            let updatedState = ringRtcCall.remoteDeviceStates.values
+                                .first(where: { $0.demuxId == configuredDemuxId }) else { return }
                         self.configure(call: call, remoteGroupMemberDeviceState: updatedState)
-                    }
+                    },
                 )
             } else if !remoteGroupMemberDeviceState.mediaKeysReceived {
                 // No media keys. Display error view
@@ -109,7 +111,7 @@ class CallMemberWaitingAndErrorView: UIView, CallMemberComposableView {
 
         self.blurredAvatarBackgroundView.update(
             type: self.type,
-            remoteGroupMemberDeviceState: remoteGroupMemberDeviceState
+            remoteGroupMemberDeviceState: remoteGroupMemberDeviceState,
         )
     }
 
@@ -117,7 +119,8 @@ class CallMemberWaitingAndErrorView: UIView, CallMemberComposableView {
         if address.isLocalAddress {
             return OWSLocalizedString(
                 "GROUP_CALL_YOU_ON_ANOTHER_DEVICE",
-                comment: "Text describing the local user in the group call members sheet when connected from another device.")
+                comment: "Text describing the local user in the group call members sheet when connected from another device.",
+            )
         } else {
             return SSKEnvironment.shared.databaseStorageRef.read { tx in SSKEnvironment.shared.contactManagerRef.displayName(for: address, tx: tx).resolvedValue() }
         }
@@ -130,18 +133,18 @@ class CallMemberWaitingAndErrorView: UIView, CallMemberComposableView {
         case .blocked(let addr):
             let blockFormat = OWSLocalizedString(
                 "GROUP_CALL_BLOCKED_USER_FORMAT",
-                comment: "String displayed in group call grid cell when a user is blocked. Embeds {user's name}"
+                comment: "String displayed in group call grid cell when a user is blocked. Embeds {user's name}",
             )
             let displayName = displayName(address: addr)
-            label = String(format: blockFormat, arguments: [displayName])
+            label = String.nonPluralLocalizedStringWithFormat(blockFormat, displayName)
             image = UIImage(named: "block")
         case .noMediaKeys(let addr):
             let missingKeyFormat = OWSLocalizedString(
                 "GROUP_CALL_MISSING_MEDIA_KEYS_FORMAT",
-                comment: "String displayed in cell when media from a user can't be displayed in group call grid. Embeds {user's name}"
+                comment: "String displayed in cell when media from a user can't be displayed in group call grid. Embeds {user's name}",
             )
             let displayName = displayName(address: addr)
-            label = String(format: missingKeyFormat, arguments: [displayName])
+            label = String.nonPluralLocalizedStringWithFormat(missingKeyFormat, displayName)
             image = UIImage(named: "error-circle-fill")
         }
 
@@ -150,10 +153,10 @@ class CallMemberWaitingAndErrorView: UIView, CallMemberComposableView {
         errorView.iconImage = image
         errorView.labelText = label
         errorView.userTapAction = { [weak self] _ in
-            guard let self = self else { return }
+            guard let self else { return }
             self.errorPresenter?.presentErrorSheet(
                 title: errorSheetTitle,
-                message: errorSheetMessage
+                message: errorSheetMessage,
             )
         }
     }
@@ -166,24 +169,28 @@ class CallMemberWaitingAndErrorView: UIView, CallMemberComposableView {
         case let .blocked(address):
             message = OWSLocalizedString(
                 "GROUP_CALL_BLOCKED_ALERT_MESSAGE",
-                comment: "Message body for alert explaining that a group call participant is blocked")
+                comment: "Message body for alert explaining that a group call participant is blocked",
+            )
 
             let titleFormat = OWSLocalizedString(
                 "GROUP_CALL_BLOCKED_ALERT_TITLE_FORMAT",
-                comment: "Title for alert explaining that a group call participant is blocked. Embeds {{ user's name }}")
+                comment: "Title for alert explaining that a group call participant is blocked. Embeds {{ user's name }}",
+            )
             let displayName = SSKEnvironment.shared.databaseStorageRef.read { tx in SSKEnvironment.shared.contactManagerRef.displayName(for: address, tx: tx).resolvedValue() }
-            title = String(format: titleFormat, displayName)
+            title = String.nonPluralLocalizedStringWithFormat(titleFormat, displayName)
 
         case let .noMediaKeys(address):
             message = OWSLocalizedString(
                 "GROUP_CALL_NO_KEYS_ALERT_MESSAGE",
-                comment: "Message body for alert explaining that a group call participant cannot be displayed because of missing keys")
+                comment: "Message body for alert explaining that a group call participant cannot be displayed because of missing keys",
+            )
 
             let titleFormat = OWSLocalizedString(
                 "GROUP_CALL_NO_KEYS_ALERT_TITLE_FORMAT",
-                comment: "Title for alert explaining that a group call participant cannot be displayed because of missing keys. Embeds {{ user's name }}")
+                comment: "Title for alert explaining that a group call participant cannot be displayed because of missing keys. Embeds {{ user's name }}",
+            )
             let displayName = SSKEnvironment.shared.databaseStorageRef.read { tx in SSKEnvironment.shared.contactManagerRef.displayName(for: address, tx: tx).resolvedValue() }
-            title = String(format: titleFormat, displayName)
+            title = String.nonPluralLocalizedStringWithFormat(titleFormat, displayName)
         }
 
         return (title, message)

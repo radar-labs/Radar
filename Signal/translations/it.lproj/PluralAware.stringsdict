@@ -29,6 +29,22 @@
 			<string>%2$d secondi</string>
 		</dict>
 	</dict>
+	<key>ACCESSIBILITY_LABEL_MULTIPLE_ATTACHMENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d elemento multimediale</string>
+			<key>other</key>
+			<string>%1$d elementi multimediali</string>
+		</dict>
+	</dict>
 	<key>ACCESSIBILITY_LABEL_SHORT_VOICE_MEMO_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -365,6 +381,70 @@
 			<string>Messaggi + %1$d giorni di media</string>
 		</dict>
 	</dict>
+	<key>COLLAPSE_SET_CALL_EVENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld chiamata</string>
+			<key>other</key>
+			<string>%1$ld chiamate</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_CHAT_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld novità dalla chat</string>
+			<key>other</key>
+			<string>%1$ld novità dalla chat</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_GROUP_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld novità dal gruppo</string>
+			<key>other</key>
+			<string>%1$ld novità dal gruppo</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_TIMER_CHANGES_WITH_FINAL_TIMER_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld modifica alla durata dei messaggi temporanei · %2$@</string>
+			<key>other</key>
+			<string>%1$ld modifiche alla durata dei messaggi temporanei · %2$@</string>
+		</dict>
+	</dict>
 	<key>CONVERSATION_DELETE_CONFIRMATIONS_ALERT_TITLE_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -438,6 +518,22 @@
 			<string>risultato</string>
 			<key>other</key>
 			<string>di %2$d risultati</string>
+		</dict>
+	</dict>
+	<key>CONVERSATION_SETTINGS_FORMER_MEMBERS_SECTION_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d utente precedente</string>
+			<key>other</key>
+			<string>%1$d utenti precedenti</string>
 		</dict>
 	</dict>
 	<key>CONVERSATION_SETTINGS_MEMBERS_SECTION_TITLE_%d</key>
@@ -563,9 +659,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>I gruppi di Signal funzionano meglio con massimo %1$d persona o meno. Aggiungere più persone causerà ritardi nell&apos;invio e nella ricezione dei messaggi.</string>
+			<string>I gruppi di Radar funzionano meglio con massimo %1$d persona o meno. Aggiungere più persone causerà ritardi nell&apos;invio e nella ricezione dei messaggi.</string>
 			<key>other</key>
-			<string>I gruppi di Signal funzionano meglio con massimo %1$d persone o meno. Aggiungere più persone causerà ritardi nell&apos;invio e nella ricezione dei messaggi.</string>
+			<string>I gruppi di Radar funzionano meglio con massimo %1$d persone o meno. Aggiungere più persone causerà ritardi nell&apos;invio e nella ricezione dei messaggi.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -723,9 +819,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal chiamerà %2$@, %3$@ e %1$d altra persona</string>
+			<string>Radar chiamerà %2$@, %3$@ e %1$d altra persona</string>
 			<key>other</key>
-			<string>Signal chiamerà %2$@, %3$@ e altre %1$d persone</string>
+			<string>Radar chiamerà %2$@, %3$@ e altre %1$d persone</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1011,9 +1107,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Per continuare a tenere &quot;%2$@&quot; collegato, devi aprire Signal su quel dispositivo entro %1$d giorno.</string>
+			<string>Per continuare a tenere &quot;%2$@&quot; collegato, devi aprire Radar su quel dispositivo entro %1$d giorno.</string>
 			<key>other</key>
-			<string>Per continuare a tenere &quot;%2$@&quot; collegato, devi aprire Signal su quel dispositivo entro %1$d giorni.</string>
+			<string>Per continuare a tenere &quot;%2$@&quot; collegato, devi aprire Radar su quel dispositivo entro %1$d giorni.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1219,9 +1315,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Tutte le amicizie di Signal · %1$d Persona</string>
+			<string>Tutte le amicizie di Radar · %1$d Persona</string>
 			<key>other</key>
-			<string>Tutte le amicizie di Signal · %1$d Persone</string>
+			<string>Tutte le amicizie di Radar · %1$d Persone</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1235,9 +1331,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Tutte le amicizie di Signal · %1$d Persona esclusa</string>
+			<string>Tutte le amicizie di Radar · %1$d Persona esclusa</string>
 			<key>other</key>
-			<string>Tutte le amicizie di Signal · %1$d Persone escluse</string>
+			<string>Tutte le amicizie di Radar · %1$d Persone escluse</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>
@@ -1384,6 +1480,22 @@
 			<string>Annullare %1$d inviti mandati da &quot;%2$@&quot;?</string>
 		</dict>
 	</dict>
+	<key>PINNED_CONVERSATION_LIMIT</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Puoi fissare fino a %1$d chat.</string>
+			<key>other</key>
+			<string>Puoi fissare fino a %1$d chat.</string>
+		</dict>
+	</dict>
 	<key>POLL_VOTE_COUNT</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -1448,10 +1560,10 @@
 			<string>%1$d tentativi</string>
 		</dict>
 	</dict>
-	<key>STORIES_SHARESHEET_PARTIAL_SEND_SUBTITLE_%d</key>
+	<key>SETTINGS_CHANGE_PHONE_NUMBER_SPLASH_CANT_CHANGE_BODY</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%1$#@text@</string>
+		<string>%#@text@</string>
 		<key>text</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -1459,9 +1571,29 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Non è stato possibile inviare tutti gli elementi alla Storia selezionata perché il tipo di file non è supportato.</string>
+			<string>Poiché hai registrato questo account di recente, non puoi cambiare subito il tuo numero di telefono. Questo breve periodo di attesa ci consente di proteggere il tuo account.
+
+Riprova tra %1$d ora.</string>
 			<key>other</key>
-			<string>Non è stato possibile inviare tutti gli elementi alle Storie selezionate perché il tipo di file non è supportato.</string>
+			<string>Poiché hai registrato questo account di recente, non puoi cambiare subito il tuo numero di telefono. Questo breve periodo di attesa ci consente di proteggere il tuo account.
+
+Riprova tra %1$d ore.</string>
+		</dict>
+	</dict>
+	<key>STICKER_PACK_STICKER_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d sticker</string>
+			<key>other</key>
+			<string>%1$d sticker</string>
 		</dict>
 	</dict>
 	<key>STORY_REPLIES_COUNT_%d</key>
@@ -1558,6 +1690,22 @@
 			<string>&lt;bold&gt;1&lt;/bold&gt; visualizzazione</string>
 			<key>other</key>
 			<string>&lt;bold&gt;%1$d&lt;/bold&gt; visualizzazioni</string>
+		</dict>
+	</dict>
+	<key>THREAD_DETAILS_MEMBERS_AND_INVITED_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%2$@ (+%1$ld persona invitata)</string>
+			<key>other</key>
+			<string>%2$@ (+%1$ld persone invitate)</string>
 		</dict>
 	</dict>
 	<key>THREAD_DETAILS_MORE_MUTUAL_GROUP_%3$ld</key>
@@ -1670,6 +1818,86 @@
 			<string>I nomi utente devono iniziare con almeno %1$d carattere</string>
 			<key>other</key>
 			<string>I nomi utente devono iniziare con almeno %1$d caratteri</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d menzione da %2$@ e altre persone</string>
+			<key>other</key>
+			<string>%1$d menzioni da %2$@ e altre persone</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d menzione da %2$@ e %3$@</string>
+			<key>other</key>
+			<string>%1$d menzioni da %2$@ e %3$@</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__messages</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d messaggio da leggere</string>
+			<key>other</key>
+			<string>%1$d messaggi da leggere</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d risposta da %2$@ e altre persone</string>
+			<key>other</key>
+			<string>%1$d risposte da %2$@ e altre persone</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d risposta da %2$@ e %3$@</string>
+			<key>other</key>
+			<string>%1$d risposte da %2$@ e %3$@</string>
 		</dict>
 	</dict>
 </dict>

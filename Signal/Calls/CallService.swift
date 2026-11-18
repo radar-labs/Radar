@@ -17,9 +17,9 @@ import WebRTC
 /// any, as well as any other updates to other calls that we learn about.
 @MainActor
 final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
-    public typealias CallManagerType = CallManager<SignalCall, CallService>
+    typealias CallManagerType = CallManager<SignalCall, CallService>
 
-    public let callManager: CallManagerType
+    let callManager: CallManagerType
     // Even though we never use this, we need to retain it to ensure
     // `callManager` continues to work properly.
     private let callManagerHttpClient: AnyObject
@@ -27,7 +27,7 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
     private var adHocCallRecordManager: any AdHocCallRecordManager { DependenciesBridge.shared.adHocCallRecordManager }
     private let appReadiness: AppReadiness
     private var audioSession: AudioSession { SUIEnvironment.shared.audioSessionRef }
-    private var callLinkStore: any CallLinkRecordStore { DependenciesBridge.shared.callLinkStore }
+    private var callLinkStore: CallLinkRecordStore { DependenciesBridge.shared.callLinkStore }
     private var chatConnectionManager: any ChatConnectionManager { DependenciesBridge.shared.chatConnectionManager }
     let authCredentialManager: any AuthCredentialManager
     private var databaseStorage: SDSDatabaseStorage { SSKEnvironment.shared.databaseStorageRef }
@@ -35,8 +35,9 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
     private var groupCallManager: GroupCallManager { SSKEnvironment.shared.groupCallManagerRef }
     private var messageSenderJobQueue: MessageSenderJobQueue { SSKEnvironment.shared.messageSenderJobQueueRef }
     private var reachabilityManager: SSKReachabilityManager { SSKEnvironment.shared.reachabilityManagerRef }
+    private let tsAccountManager: any TSAccountManager
 
-    public var callUIAdapter: CallUIAdapter
+    var callUIAdapter: CallUIAdapter
 
     let deviceSleepManager: DeviceSleepManagerImpl
     nonisolated let individualCallService: IndividualCallService
@@ -44,12 +45,10 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
     let callLinkManager: CallLinkManagerImpl
     let callLinkFetcher: CallLinkFetcherImpl
     let callLinkStateUpdater: CallLinkStateUpdater
+    private let callingAssetsFetcher: CallingAssetsFetcher
+    private var callingAssetsRegistrationLog: Set<CallingAssetManifestEntry> = []
 
     private var adHocCallStateObserver: AdHocCallStateObserver?
-
-    public class func serverPublicParams() -> ServerPublicParams {
-        return try! ServerPublicParams(contents: TSConstants.serverPublicParams)
-    }
 
     /// Needs to be lazily initialized, because it uses singletons that are not
     /// available when this class is initialized.
@@ -57,7 +56,7 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
         return GroupCallAccessoryMessageHandler(
             databaseStorage: databaseStorage,
             groupCallRecordManager: DependenciesBridge.shared.groupCallRecordManager,
-            messageSenderJobQueue: messageSenderJobQueue
+            messageSenderJobQueue: messageSenderJobQueue,
         )
     }()
 
@@ -66,9 +65,10 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
     private lazy var groupCallRecordRingUpdateDelegate: GroupCallRecordRingUpdateDelegate = {
         return GroupCallRecordRingUpdateHandler(
             callRecordStore: DependenciesBridge.shared.callRecordStore,
+            disappearingMessagesConfigurationStore: DependenciesBridge.shared.disappearingMessagesConfigurationStore,
             groupCallRecordManager: DependenciesBridge.shared.groupCallRecordManager,
             interactionStore: DependenciesBridge.shared.interactionStore,
-            threadStore: DependenciesBridge.shared.threadStore
+            threadStore: DependenciesBridge.shared.threadStore,
         )
     }()
 
@@ -78,49 +78,55 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
         return result
     }()
 
-    public let earlyRingNextIncomingCall = AtomicBool(false, lock: .init())
+    let earlyRingNextIncomingCall = AtomicBool(false, lock: .init())
 
+    let callServiceSettingsStore: CallServiceSettingsStore
     let callServiceState: CallServiceState
     var notificationObservers: [any NSObjectProtocol] = []
 
-    public init(
+    init(
         appContext: any AppContext,
         appReadiness: AppReadiness,
         authCredentialManager: any AuthCredentialManager,
         callLinkPublicParams: GenericServerPublicParams,
-        callLinkStore: any CallLinkRecordStore,
+        callLinkStore: CallLinkRecordStore,
         callRecordDeleteManager: any CallRecordDeleteManager,
         callRecordStore: any CallRecordStore,
+        callServiceSettingsStore: CallServiceSettingsStore,
+        cron: Cron,
+        databaseChangeObserver: DatabaseChangeObserver,
         db: any DB,
         deviceSleepManager: DeviceSleepManagerImpl,
         mutableCurrentCall: AtomicValue<SignalCall?>,
         networkManager: NetworkManager,
         remoteConfig: RemoteConfig,
-        tsAccountManager: any TSAccountManager
+        signalService: OWSSignalServiceProtocol,
+        tsAccountManager: any TSAccountManager,
     ) {
         self.appReadiness = appReadiness
         self.authCredentialManager = authCredentialManager
         let httpClient = CallHTTPClient()
         self.callManager = CallManager<SignalCall, CallService>(
             httpClient: httpClient.ringRtcHttpClient,
-            fieldTrials: RingrtcFieldTrials.trials(with: remoteConfig)
+            fieldTrials: RingrtcFieldTrials.trials(with: remoteConfig),
         )
         self.callManagerHttpClient = httpClient
         let callUIAdapter = CallUIAdapter()
         self.callUIAdapter = callUIAdapter
+        self.callServiceSettingsStore = callServiceSettingsStore
         self.callServiceState = CallServiceState(currentCall: mutableCurrentCall)
         self.individualCallService = IndividualCallService(
             callManager: self.callManager,
-            callServiceState: self.callServiceState
+            callServiceState: self.callServiceState,
         )
         self.groupCallRemoteVideoManager = GroupCallRemoteVideoManager(
-            callServiceState: self.callServiceState
+            callServiceState: self.callServiceState,
         )
         self.callLinkFetcher = CallLinkFetcherImpl()
         self.callLinkManager = CallLinkManagerImpl(
             networkManager: networkManager,
             serverParams: callLinkPublicParams,
-            tsAccountManager: tsAccountManager
+            tsAccountManager: tsAccountManager,
         )
         self.callLinkStateUpdater = CallLinkStateUpdater(
             authCredentialManager: authCredentialManager,
@@ -130,12 +136,16 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
             callRecordDeleteManager: callRecordDeleteManager,
             callRecordStore: callRecordStore,
             db: db,
-            tsAccountManager: tsAccountManager
+            tsAccountManager: tsAccountManager,
+        )
+        self.callingAssetsFetcher = CallingAssetsFetcher(
+            signalService: signalService,
         )
         self.db = db
         self.deviceSleepManager = deviceSleepManager
+        self.tsAccountManager = tsAccountManager
         self.callManager.delegate = self
-        SwiftSingletons.register(self)
+        self.callServiceState.delegate = self
         self.callServiceState.addObserver(self)
 
         notificationObservers.append(NotificationCenter.default.addObserver(forName: .OWSApplicationDidEnterBackground, object: nil, queue: .main) { [weak self] _ in
@@ -144,13 +154,11 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
         notificationObservers.append(NotificationCenter.default.addObserver(forName: .OWSApplicationDidBecomeActive, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.didBecomeActive() }
         })
-        notificationObservers.append(NotificationCenter.default.addObserver(forName: Self.callServicePreferencesDidChange, object: nil, queue: .main) { [weak self] _ in
+        notificationObservers.append(NotificationCenter.default.addObserver(forName: .callServicePreferencesDidChange, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.configureDataMode() }
         })
 
-        // Note that we're not using the usual .owsReachabilityChanged
-        // We want to update our data mode if the app has been backgrounded
-        notificationObservers.append(NotificationCenter.default.addObserver(forName: .reachabilityChanged, object: nil, queue: .main) { [weak self] _ in
+        notificationObservers.append(NotificationCenter.default.addObserver(forName: SSKReachability.owsReachabilityDidChange, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.configureDataMode() }
         })
 
@@ -163,8 +171,8 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
         }
 
         appReadiness.runNowOrWhenAppWillBecomeReady { [self] in
-            if let localAci = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.aci {
-                self.callManager.setSelfUuid(localAci.rawUUID)
+            if let registeredState = try? tsAccountManager.registeredStateWithMaybeSneakyTransaction() {
+                self.callManager.setSelfUuid(registeredState.localIdentifiers.aci.rawUUID)
             }
             self.notificationObservers.append(NotificationCenter.default.addObserver(forName: .registrationStateDidChange, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated { self?.registrationChanged() }
@@ -172,11 +180,48 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
         }
 
         appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
-            DependenciesBridge.shared.databaseChangeObserver.appendDatabaseChangeDelegate(self)
+            databaseChangeObserver.appendDatabaseChangeDelegate(self)
 
             self.callServiceState.addObserver(self.groupCallAccessoryMessageDelegate, syncStateImmediately: true)
             self.callServiceState.addObserver(self.groupCallRemoteVideoManager, syncStateImmediately: true)
         }
+
+        cron.schedulePeriodically(
+            uniqueKey: .fetchCallingAssets,
+            approximateInterval: .day,
+            mustBeRegistered: false,
+            mustBeConnected: true,
+            operation: { [weak self] in
+                guard let self else { return }
+
+                var fetchErrors: [Error] = []
+                for fetchResult in await callingAssetsFetcher.fetchMissingRemoteAssets() {
+                    switch fetchResult {
+                    case .success:
+                        break
+                    case .failure(let error):
+                        fetchErrors.append(error)
+                    }
+                }
+
+                if let retryableFetchError = fetchErrors.first(where: { $0.isRetryable }) {
+                    throw retryableFetchError
+                } else if let firstFetchError = fetchErrors.first {
+                    throw firstFetchError
+                }
+            },
+        )
+
+        cron.schedulePeriodically(
+            uniqueKey: .cleanUpCallingAssets,
+            approximateInterval: .week,
+            mustBeRegistered: false,
+            mustBeConnected: false,
+            operation: { [weak self] in
+                guard let self else { return }
+                try self.callingAssetsFetcher.cleanupStaleAssets()
+            },
+        )
     }
 
     deinit {
@@ -192,7 +237,7 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
      * Choose whether to use CallKit or a Notification backed interface for calling.
      */
     @MainActor
-    public func rebuildCallUIAdapter() {
+    func rebuildCallUIAdapter() {
         if let currentCall = callServiceState.currentCall {
             Logger.warn("Ending current call because the user toggled a CallKit preference during a call.")
             self.callUIAdapter.localHangupCall(currentCall)
@@ -238,8 +283,9 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
                 callLinkCall: call,
                 adHocCallRecordManager: adHocCallRecordManager,
                 callLinkStore: callLinkStore,
+                db: db,
                 messageSenderJobQueue: messageSenderJobQueue,
-                db: db
+                tsAccountManager: tsAccountManager,
             )
             call.addObserver(self, syncStateImmediately: true)
         }
@@ -299,11 +345,25 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
             Task {
                 await self.groupCallManager.peekGroupCallAndUpdateThread(
                     forGroupId: call.groupId,
-                    peekTrigger: .localEvent()
+                    peekTrigger: .localEvent(),
                 )
             }
         case .callLink:
             break
+        }
+    }
+
+    private func registerLocalAssets() {
+        for (manifestEntry, content) in callingAssetsFetcher.fetchLocalAssets(ignore: self.callingAssetsRegistrationLog) {
+            do {
+                try callManager.addAsset(
+                    assetGroup: manifestEntry.assetGroup,
+                    content: content,
+                )
+                self.callingAssetsRegistrationLog.insert(manifestEntry)
+            } catch {
+                Logger.warn("Failed to add asset '\(manifestEntry.name)' to CallManager: \(error)")
+            }
         }
     }
 
@@ -435,8 +495,8 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
     }
 
     func shouldUseLowDataWithSneakyTransaction(for networkRoute: NetworkRoute) -> Bool {
-        let highDataInterfaces = databaseStorage.read { readTx in
-            Self.highDataNetworkInterfaces(readTx: readTx)
+        let highDataInterfaces = databaseStorage.read { tx in
+            callServiceSettingsStore.highDataNetworkInterfaces(tx: tx)
         }
         if let allowsHighData = highDataInterfaces.includes(networkRoute.localAdapterType) {
             return !allowsHighData
@@ -454,14 +514,18 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
     // * If we know which call it was, we should update that call's state
     //   to reflect the error.
     // * IFF that call is the current call, we want to terminate it.
-    public func handleFailedCall(failedCall: SignalCall, error: Error) {
+    func handleFailedCall(
+        failedCall: SignalCall,
+        resetUI: Bool,
+        error: Error,
+    ) {
         switch failedCall.mode {
         case .individual:
             individualCallService.handleFailedCall(
                 failedCall: failedCall,
                 error: error,
-                shouldResetUI: false,
-                shouldResetRingRTC: true
+                shouldResetUI: resetUI,
+                shouldResetRingRTC: true,
             )
         case .groupThread(let groupCall as GroupCall), .callLink(let groupCall as GroupCall):
             leaveAndTerminateGroupCall(failedCall, groupCall: groupCall)
@@ -476,14 +540,14 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
             if case .incomingRing(_, let ringId) = groupThreadCall.groupCallRingState {
                 groupCallAccessoryMessageDelegate.localDeviceDeclinedGroupRing(
                     ringId: ringId,
-                    groupId: groupThreadCall.groupId
+                    groupId: groupThreadCall.groupId,
                 )
 
                 do {
                     try callManager.cancelGroupRing(
                         groupId: groupThreadCall.groupId.serialize(),
                         ringId: ringId,
-                        reason: .declinedByUser
+                        reason: .declinedByUser,
                     )
                 } catch {
                     owsFailDebug("RingRTC failed to cancel group ring \(ringId): \(error)")
@@ -506,7 +570,7 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
         // support or emulation (http://goo.gl/rHAnC1) so don't bother
         // trying to open a local stream.
         guard !Platform.isSimulator else { return false }
-        guard UIApplication.shared.applicationState != .background else { return false }
+        guard !CurrentAppContext().isInBackground() else { return false }
 
         switch call.mode {
         case .individual(let individualCall):
@@ -547,16 +611,32 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
 
     // MARK: -
 
+    private static let audioLevelsIntervalMillis: UInt64 = 200
+
+    static func buildSvcConfig() -> SvcConfig? {
+        if RingrtcSvcConfig.enableSvc(with: RemoteConfig.current), RingrtcVp9Config.enableVp9Encode(with: RemoteConfig.current) {
+            let mode = RingrtcSvcConfig.svcMode(with: RemoteConfig.current)
+            let modeForScreenshare = RingrtcSvcConfig.svcModeForScreenshare(with: RemoteConfig.current)
+            let maxBitrateBps = RingrtcSvcConfig.svcMaxBitrateBps(with: RemoteConfig.current)
+            return SvcConfig(mode: mode, modeForScreenshare: modeForScreenshare, maxBitrateBps: maxBitrateBps != 0 ? maxBitrateBps : nil)
+        } else {
+            return nil
+        }
+    }
+
     func buildAndConnectGroupCall(for groupId: GroupIdentifier, isVideoMuted: Bool) -> (SignalCall, GroupThreadCall)? {
         return _buildAndConnectGroupCall(isOutgoingVideoMuted: isVideoMuted) { () -> (SignalCall, GroupThreadCall)? in
             let videoCaptureController = VideoCaptureController()
             let sfuUrl = DebugFlags.callingUseTestSFU.get() ? TSConstants.sfuTestURL : TSConstants.sfuURL
+            let svcConfig = CallService.buildSvcConfig()
             let ringRtcCall = callManager.createGroupCall(
                 groupId: groupId.serialize(),
                 sfuUrl: sfuUrl,
                 hkdfExtraInfo: Data(),
-                audioLevelsIntervalMillis: nil,
-                videoCaptureController: videoCaptureController
+                audioLevelsIntervalMillis: Self.audioLevelsIntervalMillis,
+                dredDuration: RemoteConfig.current.ringrtcDredDuration,
+                svcConfig: svcConfig,
+                videoCaptureController: videoCaptureController,
             )
             guard let ringRtcCall else {
                 return nil
@@ -565,7 +645,7 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
                 delegate: self,
                 ringRtcCall: ringRtcCall,
                 groupId: groupId,
-                videoCaptureController: videoCaptureController
+                videoCaptureController: videoCaptureController,
             )
             guard let groupThreadCall else {
                 return nil
@@ -586,7 +666,7 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
 
     func buildAndConnectCallLinkCall(
         callLink: CallLink,
-        callLinkStateRetrievalStrategy: CallLinkStateRetrievalStrategy
+        callLinkStateRetrievalStrategy: CallLinkStateRetrievalStrategy,
     ) async throws -> (SignalCall, CallLinkCall)? {
         let state: SignalServiceKit.CallLinkState
         switch callLinkStateRetrievalStrategy {
@@ -595,13 +675,14 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
         case .fetch:
             state = try await callLinkStateUpdater.readCallLink(rootKey: callLink.rootKey).get()
         }
-        let localIdentifiers = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction!
+        let registeredState = try tsAccountManager.registeredStateWithMaybeSneakyTransaction()
+        let localIdentifiers = registeredState.localIdentifiers
         let authCredential = try await authCredentialManager.fetchCallLinkAuthCredential(localIdentifiers: localIdentifiers)
-        let (adminPasskey, isDeleted) = try databaseStorage.read { tx -> (Data?, Bool) in
-            let callLinkRecord = try callLinkStore.fetch(roomId: callLink.rootKey.deriveRoomId(), tx: tx)
+        let (adminPasskey, isDeleted) = databaseStorage.read { tx -> (Data?, Bool) in
+            let callLinkRecord = callLinkStore.fetch(roomId: callLink.rootKey.deriveRoomId(), tx: tx)
             return (callLinkRecord?.adminPasskey, callLinkRecord?.isDeleted == true)
         }
-        let serverPublicParams = CallService.serverPublicParams()
+        let serverPublicParams = TSConstants.serverPublicParams()
         if isDeleted {
             throw OWSGenericError("Can't join a call link that you've deleted.")
         }
@@ -610,6 +691,7 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
             let sfuUrl = DebugFlags.callingUseTestSFU.get() ? TSConstants.sfuTestURL : TSConstants.sfuURL
             let secretParams = CallLinkSecretParams.deriveFromRootKey(callLink.rootKey.bytes)
             let authCredentialPresentation = authCredential.present(callLinkParams: secretParams)
+            let svcConfig = CallService.buildSvcConfig()
             let ringRtcCall = callManager.createCallLinkCall(
                 sfuUrl: sfuUrl,
                 endorsementPublicKey: serverPublicParams.endorsementPublicKey,
@@ -617,8 +699,10 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
                 linkRootKey: callLink.rootKey,
                 adminPasskey: adminPasskey,
                 hkdfExtraInfo: Data(),
-                audioLevelsIntervalMillis: nil,
-                videoCaptureController: videoCaptureController
+                audioLevelsIntervalMillis: Self.audioLevelsIntervalMillis,
+                dredDuration: RemoteConfig.current.ringrtcDredDuration,
+                svcConfig: svcConfig,
+                videoCaptureController: videoCaptureController,
             )
             guard let ringRtcCall else {
                 return nil
@@ -628,7 +712,7 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
                 adminPasskey: adminPasskey,
                 callLinkState: state,
                 ringRtcCall: ringRtcCall,
-                videoCaptureController: videoCaptureController
+                videoCaptureController: videoCaptureController,
             )
             return (SignalCall(callLinkCall: callLinkCall), callLinkCall)
         }
@@ -636,7 +720,7 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
 
     private func _buildAndConnectGroupCall<T: GroupCall>(
         isOutgoingVideoMuted: Bool,
-        createCall: () -> (SignalCall, T)?
+        createCall: () -> (SignalCall, T)?,
     ) -> (SignalCall, T)? {
         guard callServiceState.currentCall == nil else {
             return nil
@@ -677,6 +761,9 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
             owsFailDebug("Can't join a group call if we can't connect()")
             return
         }
+
+        // Must register calling assets before invoking GroupCall::join()
+        self.registerLocalAssets()
 
         // If we're not yet joined, join now. In general, it's unexpected that
         // this method would be called when you're already joined, but it is
@@ -750,13 +837,15 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
             return
         }
 
-        guard await SafetyNumberConfirmationSheet.presentRepeatedlyAsNecessary(
-            for: { [thread.contactAddress] },
-            from: frontmostViewController,
-            confirmationText: CallStrings.confirmAndCallButtonTitle,
-            untrustedThreshold: untrustedThreshold,
-            forceDarkTheme: true
-        ) else {
+        guard
+            await SafetyNumberConfirmationSheet.presentRepeatedlyAsNecessary(
+                for: { [thread.contactAddress] },
+                from: frontmostViewController,
+                confirmationText: CallStrings.confirmAndCallButtonTitle,
+                untrustedThreshold: untrustedThreshold,
+                forceDarkTheme: true,
+            )
+        else {
             return
         }
 
@@ -769,7 +858,7 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
         let individualCall = IndividualCall.outgoingIndividualCall(
             thread: thread,
             offerMediaType: hasVideo ? .video : .audio,
-            localDeviceId: localDeviceId
+            localDeviceId: localDeviceId,
         )
 
         let call = SignalCall(individualCall: individualCall)
@@ -788,8 +877,8 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
     }
 
     private func registrationChanged() {
-        if let localAci = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.aci {
-            callManager.setSelfUuid(localAci.rawUUID)
+        if let registeredState = try? tsAccountManager.registeredStateWithMaybeSneakyTransaction() {
+            callManager.setSelfUuid(registeredState.localIdentifiers.aci.rawUUID)
         }
     }
 
@@ -869,7 +958,7 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
                 membershipInfo = try self.databaseStorage.read { tx in
                     try self.groupCallManager.groupCallPeekClient.groupMemberInfo(
                         forGroupId: groupThreadCall.groupId,
-                        tx: tx
+                        tx: tx,
                     )
                 }
             } catch {
@@ -878,30 +967,6 @@ final class CallService: CallServiceStateObserver, CallServiceStateDelegate {
             }
             groupThreadCall.ringRtcCall.updateGroupMembers(members: membershipInfo)
         }
-    }
-
-    // MARK: - Data Modes
-
-    static nonisolated let callServicePreferencesDidChange = Notification.Name("CallServicePreferencesDidChange")
-    private static nonisolated let keyValueStore = KeyValueStore(collection: "CallService")
-    // This used to be called "high bandwidth", but "data" is more accurate.
-    private static nonisolated let highDataPreferenceKey = "HighBandwidthPreferenceKey"
-
-    static nonisolated func setHighDataInterfaces(_ interfaceSet: NetworkInterfaceSet, writeTx: DBWriteTransaction) {
-        Logger.info("Updating preferred low data interfaces: \(interfaceSet.rawValue)")
-
-        keyValueStore.setUInt(interfaceSet.rawValue, key: highDataPreferenceKey, transaction: writeTx)
-        writeTx.addSyncCompletion {
-            NotificationCenter.default.postOnMainThread(name: callServicePreferencesDidChange, object: nil)
-        }
-    }
-
-    static nonisolated func highDataNetworkInterfaces(readTx: DBReadTransaction) -> NetworkInterfaceSet {
-        guard let highDataPreference = keyValueStore.getUInt(
-                highDataPreferenceKey,
-                transaction: readTx) else { return .wifiAndCellular }
-
-        return NetworkInterfaceSet(rawValue: highDataPreference)
     }
 }
 
@@ -945,13 +1010,13 @@ extension CallService: GroupCallObserver {
                     groupCallAccessoryMessageDelegate.localDeviceMaybeJoinedGroupCall(
                         eraId: eraId,
                         groupId: call.groupId,
-                        groupCallRingState: call.groupCallRingState
+                        groupCallRingState: call.groupCallRingState,
                     )
                 }
             } else {
                 groupCallAccessoryMessageDelegate.localDeviceMaybeLeftGroupCall(
                     groupId: call.groupId,
-                    groupCall: ringRtcCall
+                    groupCall: ringRtcCall,
                 )
             }
 
@@ -978,7 +1043,7 @@ extension CallService: GroupCallObserver {
                 groupCallAccessoryMessageDelegate.localDeviceMaybeJoinedGroupCall(
                     eraId: eraId,
                     groupId: call.groupId,
-                    groupCallRingState: call.groupCallRingState
+                    groupCallRingState: call.groupCallRingState,
                 )
             }
 
@@ -987,7 +1052,7 @@ extension CallService: GroupCallObserver {
                     peekInfo: peekInfo,
                     groupId: groupId,
                     triggerEventTimestamp: MessageTimestampGenerator.sharedInstance.generateTimestamp(),
-                    tx: tx
+                    tx: tx,
                 )
             }
 
@@ -997,7 +1062,7 @@ extension CallService: GroupCallObserver {
         }
     }
 
-    func groupCallEnded(_ groupCall: GroupCall, reason: GroupCallEndReason) {
+    func groupCallEnded(_ groupCall: GroupCall, reason: CallEndReason) {
         groupCallAccessoryMessageDelegate.localDeviceGroupCallDidEnd()
 
         let call = callServiceState.currentCall
@@ -1012,7 +1077,7 @@ extension CallService: GroupCallObserver {
         }
     }
 
-    public func groupCallRemoteDeviceStatesChanged(_ call: GroupCall) {
+    func groupCallRemoteDeviceStatesChanged(_ call: GroupCall) {
         switch call.concreteType {
         case .groupThread(let call):
             if
@@ -1038,7 +1103,7 @@ extension CallService: GroupThreadCallDelegate {
         Task { [groupCallManager] in
             let databaseStorage = SSKEnvironment.shared.databaseStorageRef
             let groupThread = databaseStorage.read { tx in
-                return TSGroupThread.fetch(forGroupId: call.groupId, tx: tx)
+                return TSGroupThread.fetchThread(forGroupId: call.groupId, tx: tx)
             }
             guard let groupModel = groupThread?.groupModel as? TSGroupModelV2 else {
                 owsFailDebug("Missing v2 model for group call.")
@@ -1048,11 +1113,7 @@ extension CallService: GroupThreadCallDelegate {
                 let proof = try await groupCallManager.groupCallPeekClient.fetchGroupMembershipProof(secretParams: try groupModel.secretParams())
                 groupCall.updateMembershipProof(proof: proof)
             } catch {
-                if error.isNetworkFailureOrTimeout {
-                    Logger.warn("Failed to fetch group call credentials \(error)")
-                } else {
-                    owsFailDebug("Failed to fetch group call credentials \(error)")
-                }
+                owsFailDebugUnlessNetworkFailure(error)
             }
         }
     }
@@ -1090,7 +1151,7 @@ private extension LocalDeviceState {
 
 extension CallService: DatabaseChangeDelegate {
 
-    public func databaseChangesDidUpdate(databaseChanges: DatabaseChanges) {
+    func databaseChangesDidUpdate(databaseChanges: DatabaseChanges) {
         owsAssertDebug(appReadiness.isAppReady)
 
         switch callServiceState.currentCall?.mode {
@@ -1103,13 +1164,13 @@ extension CallService: DatabaseChangeDelegate {
         }
     }
 
-    public func databaseChangesDidUpdateExternally() {
+    func databaseChangesDidUpdateExternally() {
         owsAssertDebug(appReadiness.isAppReady)
 
         updateGroupMembersForCurrentCallIfNecessary()
     }
 
-    public func databaseChangesDidReset() {
+    func databaseChangesDidReset() {
         owsAssertDebug(appReadiness.isAppReady)
 
         updateGroupMembersForCurrentCallIfNecessary()
@@ -1117,18 +1178,18 @@ extension CallService: DatabaseChangeDelegate {
 }
 
 extension CallService: CallManagerDelegate {
-    public typealias CallManagerDelegateCallType = SignalCall
+    typealias CallManagerDelegateCallType = SignalCall
 
     /**
      * Send a generic call message to the given remote recipient.
      * Invoked on the main thread, asynchronously.
      * If there is any error, the UI can reset UI state and invoke the reset() API.
      */
-    public func callManager(
+    func callManager(
         _ callManager: CallManager<SignalCall, CallService>,
         shouldSendCallMessage recipientUuid: UUID,
         message: Data,
-        urgency: CallMessageUrgency
+        urgency: CallMessageUrgency,
     ) {
         Logger.info("")
 
@@ -1140,7 +1201,7 @@ extension CallService: CallManagerDelegate {
             await self.sendCallMessage(
                 opaqueBuilder.buildInfallibly(),
                 to: Aci(fromUUID: recipientUuid),
-                callAtStart: callAtStart
+                callAtStart: callAtStart,
             )
         }
     }
@@ -1148,28 +1209,27 @@ extension CallService: CallManagerDelegate {
     private func sendCallMessage(
         _ opaqueMessage: SSKProtoCallMessageOpaque,
         to recipientAci: Aci,
-        callAtStart: SignalCall?
+        callAtStart: SignalCall?,
     ) async {
         do {
             let sendPromise = await databaseStorage.awaitableWrite { transaction in
                 let thread = TSContactThread.getOrCreateThread(
                     withContactAddress: SignalServiceAddress(recipientAci),
-                    transaction: transaction
+                    transaction: transaction,
                 )
-                let callMessage = OWSOutgoingCallMessage(
+                let callMessage = OutgoingCallMessage(
                     thread: thread,
-                    opaqueMessage: opaqueMessage,
-                    overrideRecipients: nil,
-                    transaction: transaction
+                    messageType: .opaqueMessage(opaqueMessage),
+                    tx: transaction,
                 )
                 let preparedMessage = PreparedOutgoingMessage.preprepared(
-                    transientMessageWithoutAttachments: callMessage
+                    transientMessageWithoutAttachments: callMessage,
                 )
                 return ThreadUtil.enqueueMessagePromise(
                     message: preparedMessage,
                     limitToCurrentProcessLifetime: true,
                     isHighPriority: true,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             }
             try await sendPromise.awaitable()
@@ -1189,12 +1249,12 @@ extension CallService: CallManagerDelegate {
      * Invoked on the main thread, asynchronously.
      * If there is any error, the UI can reset UI state and invoke the reset() API.
      */
-    public func callManager(
+    func callManager(
         _ callManager: CallManager<SignalCall, CallService>,
         shouldSendCallMessageToGroup groupId: Data,
         message: Data,
         urgency: CallMessageUrgency,
-        overrideRecipients: [UUID]
+        overrideRecipients: [UUID],
     ) {
         Logger.info("")
         let callAtStart = self.callServiceState.currentCall
@@ -1206,40 +1266,56 @@ extension CallService: CallManagerDelegate {
                 opaqueBuilder.buildInfallibly(),
                 groupId: groupId,
                 overrideRecipients: overrideRecipients,
-                callAtStart: callAtStart
+                callAtStart: callAtStart,
             )
         }
+    }
+
+    /**
+     * Send a generic call message to an adhoc group. Send to all members of the group
+     * using multi-recipient sealed sender. If the sealed sender request fails,
+     * clients should provide a fallback mechanism.
+     * If there is any error, the UI can reset UI state and invoke the reset() API.
+     */
+    func callManager(
+        _ callManager: CallManager<SignalCall, CallService>,
+        shouldSendCallMessageToAdhocGroup message: Data,
+        urgency: SignalRingRTC.CallMessageUrgency,
+        expiration: Date,
+        recipientsToEndorsements: [UUID: Data],
+    ) {
+        Logger.warn("shouldSendCallMessageToAdhocGroup() not handled yet!")
     }
 
     private func sendCallMessageToGroup(
         _ opaqueMessage: SSKProtoCallMessageOpaque,
         groupId: Data,
         overrideRecipients: [UUID],
-        callAtStart: SignalCall?
+        callAtStart: SignalCall?,
     ) async {
         do {
             let sendPromise = try await self.databaseStorage.awaitableWrite { transaction in
-                guard let thread = TSGroupThread.fetch(groupId: groupId, transaction: transaction) else {
+                guard
+                    let groupId = try? GroupIdentifier(contents: groupId),
+                    let thread = TSGroupThread.fetchThread(forGroupId: groupId, tx: transaction)
+                else {
                     throw OWSAssertionError("tried to send call message to unknown group")
                 }
-                let overrideRecipients = overrideRecipients.map {
-                    return AciObjC(Aci(fromUUID: $0))
-                }
-                let callMessage = OWSOutgoingCallMessage(
+                let callMessage = OutgoingCallMessage(
                     thread: thread,
-                    opaqueMessage: opaqueMessage,
-                    overrideRecipients: overrideRecipients.isEmpty ? nil : overrideRecipients,
-                    transaction: transaction
+                    messageType: .opaqueMessage(opaqueMessage),
+                    overrideRecipients: overrideRecipients.map(Aci.init(fromUUID:)),
+                    tx: transaction,
                 )
                 let preparedMessage = PreparedOutgoingMessage.preprepared(
-                    transientMessageWithoutAttachments: callMessage
+                    transientMessageWithoutAttachments: callMessage,
                 )
 
                 return ThreadUtil.enqueueMessagePromise(
                     message: preparedMessage,
                     limitToCurrentProcessLifetime: true,
                     isHighPriority: true,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             }
             try await sendPromise.awaitable()
@@ -1267,15 +1343,19 @@ extension CallService: CallManagerDelegate {
 
     // MARK: - 1:1 Call Delegates
 
-    public func callManager(
+    func callManager(
         _ callManager: CallManager<SignalCall, CallService>,
         shouldStartCall call: SignalCall,
         callId: UInt64,
         isOutgoing: Bool,
-        callMediaType: CallMediaType
+        callMediaType: CallMediaType,
     ) {
         guard callServiceState.currentCall == nil else {
-            handleFailedCall(failedCall: call, error: OWSGenericError("a current call is already set"))
+            handleFailedCall(
+                failedCall: call,
+                resetUI: false,
+                error: OWSGenericError("a current call is already set"),
+            )
             return
         }
 
@@ -1294,25 +1374,44 @@ extension CallService: CallManagerDelegate {
         // The call to be started is provided by the event.
         callServiceState.setCurrentCall(call)
 
+        // Must register calling assets before CallManager::proceed()
+        self.registerLocalAssets()
+
         individualCallService.callManager(
             callManager,
             shouldStartCall: call,
             callId: callId,
             isOutgoing: isOutgoing,
             callMediaType: callMediaType,
-            shouldEarlyRing: shouldEarlyRing
+            shouldEarlyRing: shouldEarlyRing,
         )
     }
 
-    public func callManager(
+    func callManager(
+        _ callManager: SignalRingRTC.CallManager<SignalCall, CallService>,
+        onCallEnded call: SignalCall,
+        callId: UInt64,
+        reason: CallEndReason,
+        summary: CallSummary,
+    ) {
+        individualCallService.callManager(
+            callManager,
+            onCallEnded: call,
+            callId: callId,
+            reason: reason,
+            summary: summary,
+        )
+    }
+
+    func callManager(
         _ callManager: CallManager<SignalCall, CallService>,
         onEvent call: SignalCall,
-        event: CallManagerEvent
+        event: CallManagerEvent,
     ) {
         individualCallService.callManager(
             callManager,
             onEvent: call,
-            event: event
+            event: event,
         )
     }
 
@@ -1320,10 +1419,10 @@ extension CallService: CallManagerDelegate {
      * onNetworkRouteChangedFor will be invoked when changes to the network routing (e.g. wifi/cellular) are detected.
      * Invoked on the main thread, asynchronously.
      */
-    public func callManager(
+    func callManager(
         _ callManager: CallManager<SignalCall, CallService>,
         onNetworkRouteChangedFor call: SignalCall,
-        networkRoute: NetworkRoute
+        networkRoute: NetworkRoute,
     ) {
         Logger.info("Network route changed for call: \(call): \(networkRoute.localAdapterType.rawValue)")
         switch call.mode {
@@ -1335,30 +1434,30 @@ extension CallService: CallManagerDelegate {
         }
     }
 
-    public nonisolated func callManager(
+    nonisolated func callManager(
         _ callManager: CallManager<SignalCall, CallService>,
         onAudioLevelsFor call: SignalCall,
         capturedLevel: UInt16,
-        receivedLevel: UInt16
+        receivedLevel: UInt16,
     ) {
         // TODO: Implement audio level handling for individual calls.
     }
 
-    public func callManager(
+    func callManager(
         _ callManager: CallManager<SignalCall, CallService>,
         onLowBandwidthForVideoFor call: SignalCall,
-        recovered: Bool
+        recovered: Bool,
     ) {
         // TODO: Implement handling of the "low outgoing bandwidth for video" notification.
     }
 
-    public func callManager(
+    func callManager(
         _ callManager: CallManager<SignalCall, CallService>,
         shouldSendOffer callId: UInt64,
         call: SignalCall,
         destinationDeviceId: UInt32?,
         opaque: Data,
-        callMediaType: CallMediaType
+        callMediaType: CallMediaType,
     ) {
         individualCallService.callManager(
             callManager,
@@ -1366,49 +1465,49 @@ extension CallService: CallManagerDelegate {
             call: call,
             destinationDeviceId: destinationDeviceId,
             opaque: opaque,
-            callMediaType: callMediaType
+            callMediaType: callMediaType,
         )
     }
 
-    public func callManager(
+    func callManager(
         _ callManager: CallManager<SignalCall, CallService>,
         shouldSendAnswer callId: UInt64,
         call: SignalCall,
         destinationDeviceId: UInt32?,
-        opaque: Data
+        opaque: Data,
     ) {
         individualCallService.callManager(
             callManager,
             shouldSendAnswer: callId,
             call: call,
             destinationDeviceId: destinationDeviceId,
-            opaque: opaque
+            opaque: opaque,
         )
     }
 
-    public func callManager(
+    func callManager(
         _ callManager: CallManager<SignalCall, CallService>,
         shouldSendIceCandidates callId: UInt64,
         call: SignalCall,
         destinationDeviceId: UInt32?,
-        candidates: [Data]
+        candidates: [Data],
     ) {
         individualCallService.callManager(
             callManager,
             shouldSendIceCandidates: callId,
             call: call,
             destinationDeviceId: destinationDeviceId,
-            candidates: candidates
+            candidates: candidates,
         )
     }
 
-    public func callManager(
+    func callManager(
         _ callManager: CallManager<SignalCall, CallService>,
         shouldSendHangup callId: UInt64,
         call: SignalCall,
         destinationDeviceId: UInt32?,
         hangupType: HangupType,
-        deviceId: UInt32
+        deviceId: UInt32,
     ) {
         individualCallService.callManager(
             callManager,
@@ -1416,45 +1515,45 @@ extension CallService: CallManagerDelegate {
             call: call,
             destinationDeviceId: destinationDeviceId,
             hangupType: hangupType,
-            deviceId: deviceId
+            deviceId: deviceId,
         )
     }
 
-    public func callManager(
+    func callManager(
         _ callManager: CallManager<SignalCall, CallService>,
         shouldSendBusy callId: UInt64,
         call: SignalCall,
-        destinationDeviceId: UInt32?
+        destinationDeviceId: UInt32?,
     ) {
         individualCallService.callManager(
             callManager,
             shouldSendBusy: callId,
             call: call,
-            destinationDeviceId: destinationDeviceId
+            destinationDeviceId: destinationDeviceId,
         )
     }
 
-    public func callManager(
+    func callManager(
         _ callManager: CallManager<SignalCall, CallService>,
         onUpdateLocalVideoSession call: SignalCall,
-        session: AVCaptureSession?
+        session: AVCaptureSession?,
     ) {
         individualCallService.callManager(
             callManager,
             onUpdateLocalVideoSession: call,
-            session: session
+            session: session,
         )
     }
 
-    public func callManager(
+    func callManager(
         _ callManager: CallManager<SignalCall, CallService>,
         onAddRemoteVideoTrack call: SignalCall,
-        track: RTCVideoTrack
+        track: RTCVideoTrack,
     ) {
         individualCallService.callManager(
             callManager,
             onAddRemoteVideoTrack: call,
-            track: track
+            track: track,
         )
     }
 
@@ -1465,23 +1564,27 @@ extension CallService: CallManagerDelegate {
      *
      * Invoked on the main thread, asynchronously.
      */
-    public func callManager(
+    func callManager(
         _ callManager: CallManager<SignalCall, CallService>,
-        didUpdateRingForGroup groupId: Data,
+        didUpdateRingForGroup groupIdData: Data,
         ringId: Int64,
         sender: UUID,
-        update: RingUpdate
+        update: RingUpdate,
     ) {
         let senderAci = Aci(fromUUID: sender)
+        let groupId = try? GroupIdentifier(contents: groupIdData)
 
         /// Let our ``CallRecord`` delegate know we got a ring update.
         databaseStorage.asyncWrite { tx in
+            guard let groupId else {
+                return
+            }
             self.groupCallRecordRingUpdateDelegate.didReceiveRingUpdate(
                 groupId: groupId,
                 ringId: ringId,
                 ringUpdate: update,
                 ringUpdateSender: senderAci,
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -1516,8 +1619,10 @@ extension CallService: CallManagerDelegate {
             databaseStorage.asyncWrite { transaction in
                 do {
                     try CancelledGroupRing(id: ringId).insert(transaction.database)
-                    try CancelledGroupRing.deleteExpired(expiration: Date().addingTimeInterval(-30 * .minute),
-                                                         transaction: transaction)
+                    try CancelledGroupRing.deleteExpired(
+                        expiration: Date().addingTimeInterval(-30 * .minute),
+                        transaction: transaction,
+                    )
                 } catch {
                     owsFailDebug("failed to update cancellation table: \(error)")
                 }
@@ -1532,27 +1637,38 @@ extension CallService: CallManagerDelegate {
         }
 
         let action: RingAction = databaseStorage.read { transaction in
-            guard let groupId = try? GroupIdentifier(contents: groupId) else {
+            guard let groupId else {
                 owsFailDebug("discarding group ring \(ringId) from \(senderAci) for invalid group")
                 return .cancel
             }
 
-            guard let thread = TSGroupThread.fetch(forGroupId: groupId, tx: transaction) else {
+            guard let thread = TSGroupThread.fetchThread(forGroupId: groupId, tx: transaction) else {
                 owsFailDebug("discarding group ring \(ringId) from \(senderAci) for unknown group")
                 return .cancel
             }
 
-            guard GroupMessageProcessorManager.discardMode(
-                forMessageFrom: senderAci,
-                groupId: groupId,
-                tx: transaction
-            ) == .doNotDiscard else {
+            guard
+                GroupMessageProcessorManager.discardMode(
+                    forMessageFrom: senderAci,
+                    groupId: groupId,
+                    tx: transaction,
+                ) == .doNotDiscard
+            else {
                 Logger.warn("discarding group ring \(ringId) from \(senderAci)")
                 return .cancel
             }
 
             guard thread.groupMembership.fullMembers.count <= RemoteConfig.current.maxGroupCallRingSize else {
                 Logger.warn("discarding group ring \(ringId) from \(senderAci) for too-large group")
+                return .cancel
+            }
+
+            if
+                BuildFlags.improvedNotifications,
+                thread.isMuted,
+                !DependenciesBridge.shared.notificationPreferencesManager.notifyForCallsWhenMuted(thread: thread, tx: transaction)
+            {
+                Logger.info("silently ignoring group ring \(ringId) due to mute settings")
                 return .cancel
             }
 
@@ -1570,7 +1686,7 @@ extension CallService: CallManagerDelegate {
         switch action {
         case .cancel:
             do {
-                try callManager.cancelGroupRing(groupId: groupId, ringId: ringId, reason: nil)
+                try callManager.cancelGroupRing(groupId: groupIdData, ringId: ringId, reason: nil)
             } catch {
                 owsFailDebug("RingRTC failed to cancel group ring \(ringId): \(error)")
             }
@@ -1592,10 +1708,12 @@ extension CallService: CallManagerDelegate {
             // Mute video by default unless the user has already approved it.
             // This keeps us from popping the "give permission to use your camera" alert before the user answers.
             let videoMuted = AVCaptureDevice.authorizationStatus(for: .video) != .authorized
-            guard let (call, groupThreadCall) = buildAndConnectGroupCall(
-                for: groupId,
-                isVideoMuted: videoMuted
-            ) else {
+            guard
+                let (call, groupThreadCall) = buildAndConnectGroupCall(
+                    for: groupId,
+                    isVideoMuted: videoMuted,
+                )
+            else {
                 return owsFailDebug("Failed to build group call")
             }
 
@@ -1608,10 +1726,10 @@ extension CallService: CallManagerDelegate {
 
 extension CallMessageUrgency {
     var protobufValue: SSKProtoCallMessageOpaqueUrgency {
-    switch self {
-    case .droppable: return .droppable
-    case .handleImmediately: return .handleImmediately
-    }
+        switch self {
+        case .droppable: return .droppable
+        case .handleImmediately: return .handleImmediately
+        }
     }
 }
 

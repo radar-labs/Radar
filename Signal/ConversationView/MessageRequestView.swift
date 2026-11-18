@@ -7,7 +7,7 @@ import SignalServiceKit
 import SignalUI
 
 protocol MessageRequestDelegate: AnyObject {
-    func messageRequestViewDidTapBlock(mode: MessageRequestMode)
+    func messageRequestViewDidTapBlock()
     func messageRequestViewDidTapDelete()
     func messageRequestViewDidTapAccept(mode: MessageRequestMode, unblockThread: Bool, unhideRecipient: Bool)
     func messageRequestViewDidTapUnblock(mode: MessageRequestMode)
@@ -17,7 +17,7 @@ protocol MessageRequestDelegate: AnyObject {
 
 // MARK: -
 
-public enum MessageRequestMode: UInt {
+enum MessageRequestMode: UInt {
     case none
     case contactOrGroupRequest
     case groupInviteRequest
@@ -25,7 +25,7 @@ public enum MessageRequestMode: UInt {
 
 // MARK: -
 
-public struct MessageRequestType: Equatable {
+struct MessageRequestType: Equatable {
     let isGroupV1Thread: Bool
     let isGroupV2Thread: Bool
     let isThreadBlocked: Bool
@@ -33,6 +33,7 @@ public struct MessageRequestType: Equatable {
     let isThreadFromHiddenRecipient: Bool
     let hasReportedSpam: Bool
     let isLocalUserInvitedMember: Bool
+    let showReviewRequestsCarefullyWarning: Bool
 }
 
 // MARK: -
@@ -42,27 +43,27 @@ class MessageRequestView: ConversationBottomPanelView {
     enum LocalizedStrings {
         static let block = OWSLocalizedString(
             "MESSAGE_REQUEST_VIEW_BLOCK_BUTTON",
-            comment: "A button used to block a user on an incoming message request."
+            comment: "A button used to block a user on an incoming message request.",
         )
         static let unblock = OWSLocalizedString(
             "MESSAGE_REQUEST_VIEW_UNBLOCK_BUTTON",
-            comment: "A button used to unlock a blocked conversation."
+            comment: "A button used to unlock a blocked conversation.",
         )
         static let delete = OWSLocalizedString(
             "MESSAGE_REQUEST_VIEW_DELETE_BUTTON",
-            comment: "incoming message request button text which deletes a conversation"
+            comment: "incoming message request button text which deletes a conversation",
         )
         static let report = OWSLocalizedString(
             "MESSAGE_REQUEST_VIEW_REPORT_BUTTON",
-            comment: "incoming message request button text which reports a conversation as spam"
+            comment: "incoming message request button text which reports a conversation as spam",
         )
         static let accept = OWSLocalizedString(
             "MESSAGE_REQUEST_VIEW_ACCEPT_BUTTON",
-            comment: "A button used to accept a user on an incoming message request."
+            comment: "A button used to accept a user on an incoming message request.",
         )
         static let `continue` = OWSLocalizedString(
             "MESSAGE_REQUEST_VIEW_CONTINUE_BUTTON",
-            comment: "A button used to continue a conversation and share your profile."
+            comment: "A button used to continue a conversation and share your profile.",
         )
     }
 
@@ -73,23 +74,38 @@ class MessageRequestView: ConversationBottomPanelView {
     private var isGroupV1Thread: Bool {
         messageRequestType.isGroupV1Thread
     }
+
     private var isGroupV2Thread: Bool {
         messageRequestType.isGroupV2Thread
     }
+
     private var isThreadBlocked: Bool {
         messageRequestType.isThreadBlocked
     }
+
     private var hasSentMessages: Bool {
         messageRequestType.hasSentMessages
     }
+
     private var isThreadFromHiddenRecipient: Bool {
         messageRequestType.isThreadFromHiddenRecipient
     }
+
     private var hasReportedSpam: Bool {
         messageRequestType.hasReportedSpam
     }
 
+    private var showReviewRequestsCarefullyWarning: Bool {
+        messageRequestType.showReviewRequestsCarefullyWarning
+    }
+
     weak var delegate: MessageRequestDelegate?
+
+    // MARK: - ConversationBottomPanelView
+
+    override var useGlassPanel: Bool {
+        false
+    }
 
     init(threadViewModel: ThreadViewModel) {
         let thread = threadViewModel.threadRecord
@@ -99,9 +115,11 @@ class MessageRequestView: ConversationBottomPanelView {
         }
 
         if let groupThread = thread as? TSGroupThread, groupThread.isGroupV2Thread {
-            self.mode = (groupThread.groupModel.groupMembership.isLocalUserInvitedMember
-                ? .groupInviteRequest
-                : .contactOrGroupRequest)
+            self.mode = (
+                groupThread.groupModel.groupMembership.isLocalUserInvitedMember
+                    ? .groupInviteRequest
+                    : .contactOrGroupRequest,
+            )
         } else {
             self.mode = .contactOrGroupRequest
         }
@@ -114,11 +132,15 @@ class MessageRequestView: ConversationBottomPanelView {
                 owsFailDebug("Invalid mode.")
                 return []
             case .contactOrGroupRequest:
-                return [ prepareMessageRequestPrompt(),
-                         prepareMessageRequestButtons() ]
+                return [
+                    prepareMessageRequestPrompt(),
+                    prepareMessageRequestButtons(),
+                ]
             case .groupInviteRequest:
-                return [ prepareGroupV2InvitePrompt(),
-                         prepareGroupV2InviteButtons() ]
+                return [
+                    prepareGroupV2InvitePrompt(),
+                    prepareGroupV2InviteButtons(),
+                ]
             }
         }()
 
@@ -136,8 +158,10 @@ class MessageRequestView: ConversationBottomPanelView {
         ])
     }
 
-    public static func messageRequestType(forThread thread: TSThread,
-                                          transaction: DBReadTransaction) -> MessageRequestType {
+    static func messageRequestType(
+        forThread thread: TSThread,
+        transaction: DBReadTransaction,
+    ) -> MessageRequestType {
         let isGroupV1Thread = thread.isGroupV1Thread
         let isGroupV2Thread = thread.isGroupV2Thread
         let isThreadBlocked = SSKEnvironment.shared.blockingManagerRef.isThreadBlocked(thread, transaction: transaction)
@@ -145,7 +169,7 @@ class MessageRequestView: ConversationBottomPanelView {
         if let thread = thread as? TSContactThread {
             isThreadFromHiddenRecipient = DependenciesBridge.shared.recipientHidingManager.isHiddenAddress(
                 thread.contactAddress,
-                tx: transaction
+                tx: transaction,
             )
         }
         let finder = InteractionFinder(threadUniqueId: thread.uniqueId)
@@ -157,6 +181,26 @@ class MessageRequestView: ConversationBottomPanelView {
             isLocalUserInvitedMember = true
         }
 
+        var showReviewRequestsCarefullyWarning = false
+        if let contactThread = thread as? TSContactThread {
+            if isThreadBlocked || isThreadFromHiddenRecipient || hasSentMessages {
+                showReviewRequestsCarefullyWarning = false
+            } else {
+                let displayName = SSKEnvironment.shared.contactManagerRef.displayName(
+                    for: contactThread.contactAddress,
+                    tx: transaction,
+                )
+                switch displayName {
+                case .nickname:
+                    showReviewRequestsCarefullyWarning = false
+                default:
+                    showReviewRequestsCarefullyWarning = true
+                }
+            }
+        } else {
+            showReviewRequestsCarefullyWarning = isLocalUserInvitedMember
+        }
+
         return MessageRequestType(
             isGroupV1Thread: isGroupV1Thread,
             isGroupV2Thread: isGroupV2Thread,
@@ -164,7 +208,8 @@ class MessageRequestView: ConversationBottomPanelView {
             hasSentMessages: hasSentMessages,
             isThreadFromHiddenRecipient: isThreadFromHiddenRecipient,
             hasReportedSpam: hasReportedSpam,
-            isLocalUserInvitedMember: isLocalUserInvitedMember
+            isLocalUserInvitedMember: isLocalUserInvitedMember,
+            showReviewRequestsCarefullyWarning: showReviewRequestsCarefullyWarning,
         )
     }
 
@@ -187,18 +232,18 @@ class MessageRequestView: ConversationBottomPanelView {
                 if isThreadBlocked {
                     string = OWSLocalizedString(
                         "MESSAGE_REQUEST_VIEW_BLOCKED_GROUP_PROMPT",
-                        comment: "A prompt notifying that the user must unblock this group to continue."
+                        comment: "A prompt notifying that the user must unblock this group to continue.",
                     )
                 } else if hasSentMessages {
                     string = OWSLocalizedString(
                         "MESSAGE_REQUEST_VIEW_EXISTING_GROUP_PROMPT",
-                        comment: "A prompt notifying that the user must share their profile with this group."
+                        comment: "A prompt notifying that the user must share their profile with this group.",
                     )
                     appendLearnMoreLink = true
                 } else {
                     string = OWSLocalizedString(
                         "MESSAGE_REQUEST_VIEW_NEW_GROUP_PROMPT",
-                        comment: "A prompt asking if the user wants to accept a group invite."
+                        comment: "A prompt asking if the user wants to accept a group invite.",
                     )
                 }
             } else {
@@ -207,12 +252,12 @@ class MessageRequestView: ConversationBottomPanelView {
                 if isThreadBlocked {
                     string = OWSLocalizedString(
                         "MESSAGE_REQUEST_VIEW_BLOCKED_GROUP_PROMPT_V2",
-                        comment: "A prompt notifying that the user must unblock this group to continue."
+                        comment: "A prompt notifying that the user must unblock this group to continue.",
                     )
                 } else {
                     string = OWSLocalizedString(
                         "MESSAGE_REQUEST_VIEW_NEW_GROUP_PROMPT_V2",
-                        comment: "A prompt asking if the user wants to accept a group invite."
+                        comment: "A prompt asking if the user wants to accept a group invite.",
                     )
                 }
             }
@@ -220,9 +265,9 @@ class MessageRequestView: ConversationBottomPanelView {
             return prepareTextView(
                 attributedString: NSAttributedString(string: string, attributes: [
                     .font: UIFont.dynamicTypeSubheadlineClamped,
-                    .foregroundColor: Theme.secondaryTextAndIconColor
+                    .foregroundColor: UIColor.Signal.label,
                 ]),
-                appendLearnMoreLink: appendLearnMoreLink
+                appendLearnMoreLink: appendLearnMoreLink,
             )
         } else if let thread = thread as? TSContactThread {
             let formatString: String
@@ -231,7 +276,7 @@ class MessageRequestView: ConversationBottomPanelView {
             if isThreadBlocked {
                 formatString = OWSLocalizedString(
                     "MESSAGE_REQUEST_VIEW_BLOCKED_CONTACT_PROMPT_FORMAT",
-                    comment: "A prompt notifying that the user must unblock this conversation to continue. Embeds {{contact name}}."
+                    comment: "A prompt notifying that the user must unblock this conversation to continue. Embeds {{contact name}}.",
                 )
             } else if isThreadFromHiddenRecipient {
                 formatString = OWSLocalizedString("MESSAGE_REQUEST_VIEW_REMOVED_CONTACT_PROMPT_FORMAT", comment: "A prompt asking if the user wants to accept a conversation invite from a person whom they previously removed. Embeds {{contact name}}.")
@@ -239,14 +284,15 @@ class MessageRequestView: ConversationBottomPanelView {
             } else if hasSentMessages {
                 formatString = OWSLocalizedString(
                     "MESSAGE_REQUEST_VIEW_EXISTING_CONTACT_PROMPT_FORMAT",
-                    comment: "A prompt notifying that the user must share their profile with this conversation. Embeds {{contact name}}."
+                    comment: "A prompt notifying that the user must share their profile with this conversation. Embeds {{contact name}}.",
                 )
                 appendLearnMoreLink = true
             } else {
-                formatString = OWSLocalizedString(
-                    "MESSAGE_REQUEST_VIEW_NEW_CONTACT_PROMPT_FORMAT",
-                    comment: "A prompt asking if the user wants to accept a conversation invite. Embeds {{contact name}}."
+                let attrString = OWSLocalizedString(
+                    "MESSAGE_REQUEST_VIEW_NEW_CONTACT_PROMPT",
+                    comment: "A prompt asking if the user wants to accept a conversation invite.",
                 )
+                return preparePromptTextView(prompt: attrString)
             }
 
             let shortName = SSKEnvironment.shared.databaseStorageRef.read { transaction in
@@ -256,7 +302,7 @@ class MessageRequestView: ConversationBottomPanelView {
             return preparePromptTextView(
                 formatString: formatString,
                 embeddedString: shortName,
-                appendLearnMoreLink: appendLearnMoreLink
+                appendLearnMoreLink: appendLearnMoreLink,
             )
         } else {
             owsFailDebug("unexpected thread type")
@@ -277,61 +323,61 @@ class MessageRequestView: ConversationBottomPanelView {
             buttons.append(
                 prepareButton(title: LocalizedStrings.delete, destructive: true) { [weak self] in
                     self?.delegate?.messageRequestViewDidTapDelete()
-                }
+                },
             )
             if !hasReportedSpam {
                 buttons.append(
                     prepareButton(title: LocalizedStrings.report, destructive: true) { [weak self] in
                         self?.delegate?.messageRequestViewDidTapReport()
-                    }
+                    },
                 )
             }
             buttons.append(
                 prepareButton(title: LocalizedStrings.unblock) { [weak self] in
                     self?.delegate?.messageRequestViewDidTapUnblock(mode: mode)
-                }
+                },
             )
         } else if isThreadFromHiddenRecipient {
             buttons.append(
                 prepareButton(title: LocalizedStrings.block, destructive: true) { [weak self] in
-                    self?.delegate?.messageRequestViewDidTapBlock(mode: mode)
-                }
+                    self?.delegate?.messageRequestViewDidTapBlock()
+                },
             )
             if !hasReportedSpam {
                 buttons.append(
                     prepareButton(title: LocalizedStrings.report, destructive: true) { [weak self] in
                         self?.delegate?.messageRequestViewDidTapReport()
-                    }
+                    },
                 )
             } else {
                 buttons.append(
                     prepareButton(title: LocalizedStrings.delete, destructive: true) { [weak self] in
                         self?.delegate?.messageRequestViewDidTapDelete()
-                    }
+                    },
                 )
             }
             buttons.append(
                 prepareButton(title: LocalizedStrings.accept) { [weak self] in
                     self?.delegate?.messageRequestViewDidTapAccept(mode: mode, unblockThread: false, unhideRecipient: true)
-                }
+                },
             )
         } else if hasSentMessages {
             buttons.append(
                 prepareButton(title: LocalizedStrings.block, destructive: true) { [weak self] in
-                    self?.delegate?.messageRequestViewDidTapBlock(mode: mode)
-                }
+                    self?.delegate?.messageRequestViewDidTapBlock()
+                },
             )
             if !hasReportedSpam {
                 buttons.append(
                     prepareButton(title: LocalizedStrings.report, destructive: true) { [weak self] in
                         self?.delegate?.messageRequestViewDidTapReport()
-                    }
+                    },
                 )
             } else {
                 buttons.append(
                     prepareButton(title: LocalizedStrings.delete, destructive: true) { [weak self] in
                         self?.delegate?.messageRequestViewDidTapDelete()
-                    }
+                    },
                 )
             }
             buttons.append(
@@ -340,31 +386,31 @@ class MessageRequestView: ConversationBottomPanelView {
                     // with slightly different visuals if the user has already been messaging
                     // this user in the past but didn't share their profile.
                     self?.delegate?.messageRequestViewDidTapAccept(mode: mode, unblockThread: false, unhideRecipient: false)
-                }
+                },
             )
         } else {
             buttons.append(
                 prepareButton(title: LocalizedStrings.block, destructive: true) { [weak self] in
-                    self?.delegate?.messageRequestViewDidTapBlock(mode: mode)
-                }
+                    self?.delegate?.messageRequestViewDidTapBlock()
+                },
             )
             if !hasReportedSpam {
                 buttons.append(
                     prepareButton(title: LocalizedStrings.report, destructive: true) { [weak self] in
                         self?.delegate?.messageRequestViewDidTapReport()
-                    }
+                    },
                 )
             } else {
                 buttons.append(
                     prepareButton(title: LocalizedStrings.delete, destructive: true) { [weak self] in
                         self?.delegate?.messageRequestViewDidTapDelete()
-                    }
+                    },
                 )
             }
             buttons.append(
                 prepareButton(title: LocalizedStrings.accept) { [weak self] in
                     self?.delegate?.messageRequestViewDidTapAccept(mode: mode, unblockThread: false, unhideRecipient: false)
-                }
+                },
             )
         }
 
@@ -376,15 +422,20 @@ class MessageRequestView: ConversationBottomPanelView {
     func prepareGroupV2InvitePrompt() -> UITextView {
         let string = OWSLocalizedString(
             "MESSAGE_REQUEST_VIEW_NEW_GROUP_PROMPT",
-            comment: "A prompt asking if the user wants to accept a group invite."
+            comment: "A prompt asking if the user wants to accept a group invite.",
         )
+
+        let centered = NSMutableParagraphStyle()
+        centered.alignment = .center
+        centered.paragraphSpacingBefore = 8
 
         return prepareTextView(
             attributedString: NSAttributedString(string: string, attributes: [
                 .font: UIFont.dynamicTypeSubheadlineClamped,
-                .foregroundColor: Theme.secondaryTextAndIconColor
+                .foregroundColor: UIColor.Signal.label,
+                .paragraphStyle: centered,
             ]),
-            appendLearnMoreLink: false
+            appendLearnMoreLink: false,
         )
     }
 
@@ -394,44 +445,64 @@ class MessageRequestView: ConversationBottomPanelView {
 
         buttons.append(
             prepareButton(title: LocalizedStrings.block, destructive: true) { [weak self] in
-                self?.delegate?.messageRequestViewDidTapBlock(mode: mode)
-            }
+                self?.delegate?.messageRequestViewDidTapBlock()
+            },
         )
 
         if !hasReportedSpam {
             buttons.append(
                 prepareButton(title: LocalizedStrings.report, destructive: true) { [weak self] in
                     self?.delegate?.messageRequestViewDidTapReport()
-                }
+                },
             )
         } else {
             buttons.append(
                 prepareButton(title: LocalizedStrings.delete, destructive: true) { [weak self] in
                     self?.delegate?.messageRequestViewDidTapDelete()
-                }
+                },
             )
         }
 
         buttons.append(
             prepareButton(title: LocalizedStrings.accept) { [weak self] in
                 self?.delegate?.messageRequestViewDidTapAccept(mode: mode, unblockThread: false, unhideRecipient: false)
-            }
+            },
         )
         return prepareButtonStack(buttons)
     }
 
     // MARK: -
 
+    private func buttonConfiguration(title: String) -> UIButton.Configuration {
+        var configuration: UIButton.Configuration
+        if #available(iOS 26, *) {
+            configuration = .prominentGlass()
+            configuration.baseForegroundColor = .Signal.label
+        } else {
+            configuration = .plain()
+            configuration.baseForegroundColor = .Signal.accent
+        }
+        configuration.titleAlignment = .center
+        configuration.titleTextAttributesTransformer = .defaultFont(.dynamicTypeHeadlineClamped)
+        configuration.baseBackgroundColor = .clear
+        if #available(iOS 26, *) {
+            configuration.cornerStyle = .capsule
+        }
+        configuration.title = title
+        configuration.contentInsets = NSDirectionalEdgeInsets(hMargin: 12, vMargin: 8)
+        return configuration
+    }
+
     private func prepareButton(
         title: String,
         destructive: Bool = false,
-        actionBlock: @escaping () -> Void
+        actionBlock: @escaping () -> Void,
     ) -> UIButton {
         let button = UIButton(
-            configuration: .mediumSecondary(title: title),
+            configuration: buttonConfiguration(title: title),
             primaryAction: UIAction { _ in
                 actionBlock()
-            }
+            },
         )
         if destructive {
             button.configuration?.baseForegroundColor = .Signal.red
@@ -439,30 +510,49 @@ class MessageRequestView: ConversationBottomPanelView {
         return button
     }
 
+    private func preparePromptTextView(prompt: String) -> UITextView {
+        let centered = NSMutableParagraphStyle()
+        centered.alignment = .center
+        if showReviewRequestsCarefullyWarning {
+            centered.paragraphSpacingBefore = 8
+        }
+        let defaultAttributes: AttributedFormatArg.Attributes = [
+            .font: UIFont.dynamicTypeSubheadlineClamped,
+            .foregroundColor: UIColor.Signal.label,
+            .paragraphStyle: centered,
+        ]
+
+        let attrString = NSAttributedString(string: prompt, attributes: defaultAttributes)
+        return prepareTextView(attributedString: attrString, appendLearnMoreLink: false)
+    }
+
     private func preparePromptTextView(formatString: String, embeddedString: String, appendLearnMoreLink: Bool) -> UITextView {
         let centered = NSMutableParagraphStyle()
         centered.alignment = .center
         let defaultAttributes: AttributedFormatArg.Attributes = [
             .font: UIFont.dynamicTypeSubheadlineClamped,
-            .foregroundColor: Theme.secondaryTextAndIconColor,
+            .foregroundColor: UIColor.Signal.label,
             .paragraphStyle: centered,
         ]
 
         let attributesForEmbedded: AttributedFormatArg.Attributes = [
             .font: UIFont.dynamicTypeSubheadlineClamped.semibold(),
-            .foregroundColor: Theme.secondaryTextAndIconColor
+            .foregroundColor: UIColor.Signal.label,
         ]
 
         let attributedString = NSAttributedString.make(
             fromFormat: formatString,
             attributedFormatArgs: [.string(embeddedString, attributes: attributesForEmbedded)],
-            defaultAttributes: defaultAttributes
+            defaultAttributes: defaultAttributes,
         )
 
         return prepareTextView(attributedString: attributedString, appendLearnMoreLink: appendLearnMoreLink)
     }
 
-    private func prepareTextView(attributedString: NSAttributedString, appendLearnMoreLink: Bool) -> UITextView {
+    private func prepareTextView(
+        attributedString: NSAttributedString,
+        appendLearnMoreLink: Bool,
+    ) -> UITextView {
         let textView = LinkingTextView()
         if appendLearnMoreLink {
             textView.attributedText = .composed(of: [
@@ -470,10 +560,34 @@ class MessageRequestView: ConversationBottomPanelView {
                 " ",
                 CommonStrings.learnMore.styled(
                     with: .link(URL.Support.profilesAndMessageRequests),
-                    .font(.dynamicTypeSubheadlineClamped)
-                )
+                    .font(.dynamicTypeSubheadlineClamped),
+                ),
             ])
             .styled(with: .alignment(.center))
+        } else if showReviewRequestsCarefullyWarning {
+            let fullText = NSMutableAttributedString()
+
+            let centered = NSMutableParagraphStyle()
+            centered.alignment = .center
+            let reviewWarningAttributes: AttributedFormatArg.Attributes = [
+                .font: UIFont.dynamicTypeSubheadlineClamped.semibold(),
+                .foregroundColor: UIColor.Signal.warningLabel,
+                .paragraphStyle: centered,
+            ]
+
+            let warningIcon = SignalSymbol.errorTriangle.attributedString(
+                dynamicTypeBaseSize: UIFont.dynamicTypeSubheadlineClamped.pointSize,
+                attributes: [.foregroundColor: UIColor.Signal.warningLabel],
+            )
+
+            let warningLabel = warningIcon + " " + NSAttributedString(
+                string: OWSLocalizedString("SYSTEM_MESSAGE_UNKNOWN_THREAD_REVIEW_CAREFULLY_WARNING", comment: "Indicator warning about an unknown contact thread") + "\n",
+                attributes: reviewWarningAttributes,
+            )
+            fullText.append(warningLabel)
+            fullText.append(attributedString)
+
+            textView.attributedText = fullText.styled(with: .alignment(.center))
         } else {
             textView.attributedText = attributedString.styled(with: .alignment(.center))
         }

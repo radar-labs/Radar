@@ -4,9 +4,9 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
-public class PrivateStoryNameSettingsViewController: OWSTableViewController2 {
+class PrivateStoryNameSettingsViewController: OWSTableViewController2, UITextFieldDelegate {
 
     let thread: TSPrivateStoryThread
     let completionHandler: () -> Void
@@ -24,7 +24,7 @@ public class PrivateStoryNameSettingsViewController: OWSTableViewController2 {
 
     // MARK: - View Lifecycle
 
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
 
         title = thread.name
@@ -33,7 +33,7 @@ public class PrivateStoryNameSettingsViewController: OWSTableViewController2 {
         updateNavigationBar()
     }
 
-    public override func viewDidAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         nameTextField.becomeFirstResponder()
@@ -43,26 +43,22 @@ public class PrivateStoryNameSettingsViewController: OWSTableViewController2 {
 
     private lazy var nameTextField: UITextField = {
         let textField = UITextField()
-
         textField.text = thread.name
+        textField.textColor = .Signal.label
         textField.font = .dynamicTypeBody
         textField.backgroundColor = .clear
         textField.placeholder = OWSLocalizedString(
             "NEW_PRIVATE_STORY_NAME_PLACEHOLDER",
-            comment: "Placeholder text for a new private story name"
+            comment: "Placeholder text for a new private story name",
         )
         textField.returnKeyType = .done
         textField.delegate = self
-        textField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
-
+        textField.addAction(
+            UIAction { [weak self] _ in self?.textFieldDidChange() },
+            for: .editingChanged,
+        )
         return textField
     }()
-
-    public override func themeDidChange() {
-        super.themeDidChange()
-
-        nameTextField.textColor = Theme.primaryTextColor
-    }
 
     private func updateNavigationBar() {
         navigationItem.leftBarButtonItem = .cancelButton { [weak self] in
@@ -83,14 +79,14 @@ public class PrivateStoryNameSettingsViewController: OWSTableViewController2 {
             customCellBlock: { [weak self] in
                 let cell = OWSTableItem.newCell()
                 cell.selectionStyle = .none
-                guard let self = self else { return cell }
+                guard let self else { return cell }
 
                 cell.contentView.addSubview(self.nameTextField)
                 self.nameTextField.autoPinEdgesToSuperviewMargins()
 
                 return cell
             },
-            actionBlock: {}
+            actionBlock: {},
         ))
         contents.add(nameSection)
 
@@ -100,8 +96,6 @@ public class PrivateStoryNameSettingsViewController: OWSTableViewController2 {
     // MARK: - Actions
 
     private func didTapCancel() {
-        AssertIsOnMainThread()
-
         if hasPendingChanges {
             OWSActionSheets.showPendingChangesActionSheet {
                 self.dismiss(animated: true)
@@ -112,47 +106,42 @@ public class PrivateStoryNameSettingsViewController: OWSTableViewController2 {
     }
 
     private func didTapDone() {
-        AssertIsOnMainThread()
-
         guard let name = nameTextField.text?.nilIfEmpty?.filterForDisplay else {
             return showMissingNameAlert()
         }
         SSKEnvironment.shared.databaseStorageRef.asyncWrite { transaction in
             self.thread.updateWithName(name, updateStorageService: true, transaction: transaction)
         } completion: { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.dismiss(animated: true)
         }
     }
 
-    @objc
-    private func textFieldDidChange(_ textField: UITextField) {
+    private func textFieldDidChange() {
         updateNavigationBar()
     }
 
-    public override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+    override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
         super.dismiss(animated: flag, completion: completion)
         completionHandler()
     }
 
-    public func showMissingNameAlert() {
-        AssertIsOnMainThread()
-
+    func showMissingNameAlert() {
         OWSActionSheets.showActionSheet(
             title: OWSLocalizedString(
                 "NEW_PRIVATE_STORY_MISSING_NAME_ALERT_TITLE",
-                comment: "Title for error alert indicating that a story name is required."
+                comment: "Title for error alert indicating that a story name is required.",
             ),
             message: OWSLocalizedString(
                 "NEW_PRIVATE_STORY_MISSING_NAME_ALERT_MESSAGE",
-                comment: "Message for error alert indicating that a story name is required."
-            )
+                comment: "Message for error alert indicating that a story name is required.",
+            ),
         )
     }
-}
 
-extension PrivateStoryNameSettingsViewController: UITextFieldDelegate {
-    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    // MARK: UITextFieldDelegate
+
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         if string == "\n" {
             if hasPendingChanges {
                 didTapDone()

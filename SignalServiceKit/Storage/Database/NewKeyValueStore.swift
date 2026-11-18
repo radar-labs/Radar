@@ -23,6 +23,7 @@ public struct NewKeyValueStore {
             static let key = "key"
             static let value = "value"
         }
+
         static let tableName = "keyvalue"
     }
 
@@ -73,6 +74,15 @@ public struct NewKeyValueStore {
         }
     }
 
+    /// Fetch and decode a value (or return nil if it doesn't exist).
+    ///
+    /// - Throws: Errors encountered while decoding. Errors encountered while
+    /// fetching result in crashes.
+    public func fetchJSONAsValue<T: Decodable>(_ type: T.Type, forKey key: String, tx: DBReadTransaction) throws -> T? {
+        let encodedValue = fetchValue(Data.self, forKey: key, tx: tx)
+        return try encodedValue.map { try JSONDecoder().decode(T.self, from: $0) }
+    }
+
     /// Write/clear a value or crash if an error occurs.
     public func writeValue<T: KeyValueStoreValue>(_ value: T?, forKey key: String, tx: DBWriteTransaction) {
         failIfThrowsDatabaseError { () throws(GRDB.DatabaseError) in
@@ -83,6 +93,15 @@ public struct NewKeyValueStore {
     /// Write/clear a value or throw the error that occurs.
     public func writeValueOrThrow<T: KeyValueStoreValue>(_ value: T?, forKey key: String, tx: DBWriteTransaction) throws(GRDB.DatabaseError) {
         try withDatabaseError { try self._setValueOrThrow(value?.keyValueStoreValue, key: key, tx: tx) }
+    }
+
+    /// Write/clear a value or crash if an error occurs.
+    ///
+    /// Unlike `fetchJSONAsValue`, this method assumes all in-memory values are
+    /// well-formed and can be serialized to JSON.
+    public func writeValueAsJSON<T: Encodable>(_ encodableValue: T?, forKey key: String, tx: DBWriteTransaction) {
+        let encodedValue = failIfThrows { try encodableValue.map { try JSONEncoder().encode($0) } }
+        writeValue(encodedValue, forKey: key, tx: tx)
     }
 
     /// Clear a value or crash if an error occurs.
@@ -109,12 +128,12 @@ public struct NewKeyValueStore {
         Logger.info("KeyValueStore statistics:")
         do {
             let sql = """
-                SELECT \(TableMetadata.Columns.collection), COUNT(*)
-                FROM \(TableMetadata.tableName)
-                GROUP BY \(TableMetadata.Columns.collection)
-                ORDER BY COUNT(*) DESC
-                LIMIT 10
-                """
+            SELECT \(TableMetadata.Columns.collection), COUNT(*)
+            FROM \(TableMetadata.tableName)
+            GROUP BY \(TableMetadata.Columns.collection)
+            ORDER BY COUNT(*) DESC
+            LIMIT 10
+            """
             let cursor = try Row.fetchCursor(tx.database, sql: sql)
             while let row = try cursor.next() {
                 let collection: String = row[0]
@@ -132,12 +151,12 @@ public struct NewKeyValueStore {
         return try T.fetchOne(
             tx.database,
             sql: """
-                SELECT \(TableMetadata.Columns.value)
-                FROM \(TableMetadata.tableName)
-                WHERE
-                    \(TableMetadata.Columns.key) = ?
-                    AND \(TableMetadata.Columns.collection) == ?
-                """,
+            SELECT \(TableMetadata.Columns.value)
+            FROM \(TableMetadata.tableName)
+            WHERE
+                \(TableMetadata.Columns.key) = ?
+                AND \(TableMetadata.Columns.collection) == ?
+            """,
             arguments: [key, collection],
         )
     }
@@ -146,10 +165,10 @@ public struct NewKeyValueStore {
         return try String.fetchAll(
             tx.database,
             sql: """
-                SELECT \(TableMetadata.Columns.key)
-                FROM \(TableMetadata.tableName)
-                WHERE \(TableMetadata.Columns.collection) == ?
-                """,
+            SELECT \(TableMetadata.Columns.key)
+            FROM \(TableMetadata.tableName)
+            WHERE \(TableMetadata.Columns.collection) == ?
+            """,
             arguments: [collection],
         )
     }
@@ -160,26 +179,26 @@ public struct NewKeyValueStore {
         if let value {
             // See: https://www.sqlite.org/lang_UPSERT.html
             sql = """
-                INSERT INTO \(TableMetadata.tableName) (
-                    \(TableMetadata.Columns.key),
-                    \(TableMetadata.Columns.collection),
-                    \(TableMetadata.Columns.value)
-                ) VALUES (?, ?, ?)
-                ON CONFLICT (
-                    \(TableMetadata.Columns.key),
-                    \(TableMetadata.Columns.collection)
-                ) DO UPDATE
-                SET \(TableMetadata.Columns.value) = ?
-                """
+            INSERT INTO \(TableMetadata.tableName) (
+                \(TableMetadata.Columns.key),
+                \(TableMetadata.Columns.collection),
+                \(TableMetadata.Columns.value)
+            ) VALUES (?, ?, ?)
+            ON CONFLICT (
+                \(TableMetadata.Columns.key),
+                \(TableMetadata.Columns.collection)
+            ) DO UPDATE
+            SET \(TableMetadata.Columns.value) = ?
+            """
             arguments = [key, collection, value, value]
         } else {
             // Setting to nil is a delete.
             sql = """
-                DELETE FROM \(TableMetadata.tableName)
-                WHERE
-                    \(TableMetadata.Columns.key) == ?
-                    AND \(TableMetadata.Columns.collection) == ?
-                """
+            DELETE FROM \(TableMetadata.tableName)
+            WHERE
+                \(TableMetadata.Columns.key) == ?
+                AND \(TableMetadata.Columns.collection) == ?
+            """
             arguments = [key, collection]
         }
 
@@ -191,11 +210,11 @@ public struct NewKeyValueStore {
     private func _removeAllOrThrow(tx: DBWriteTransaction) throws {
         try tx.database.execute(
             sql: """
-                DELETE
-                FROM \(TableMetadata.tableName)
-                WHERE \(TableMetadata.Columns.collection) == ?
-                """,
-            arguments: [collection]
+            DELETE
+            FROM \(TableMetadata.tableName)
+            WHERE \(TableMetadata.Columns.collection) == ?
+            """,
+            arguments: [collection],
         )
     }
 }
@@ -260,6 +279,14 @@ struct KeyValueStoreMigrator {
         self.collection = collection
     }
 
+    func fetchKeys(tx: DBReadTransaction) throws -> [String] {
+        return try String.fetchAll(
+            tx.database,
+            sql: "SELECT key FROM keyvalue WHERE collection = ?",
+            arguments: [collection],
+        )
+    }
+
     /// Migrate a single NSKeyedArchiver-encoded value.
     ///
     /// If an error occurs fetching from/writing to the database, that error is rethrown.
@@ -316,11 +343,117 @@ struct KeyValueStoreMigrator {
         return try migrateKey(key, withValueOfType: NSDate.self, toNewValue: \.timeIntervalSince1970, tx: tx)
     }
 
+    func migrateUInt(_ key: String, tx: DBWriteTransaction) throws {
+        return try migrateKey(key, withValueOfType: NSNumber.self, toNewValue: { Int64(bitPattern: UInt64($0.uintValue)) }, tx: tx)
+    }
+
     func migrateUInt32(_ key: String, tx: DBWriteTransaction) throws {
         return try migrateKey(key, withValueOfType: NSNumber.self, toNewValue: { Int64($0.uint32Value) }, tx: tx)
     }
 
+    func migrateInt64(_ key: String, tx: DBWriteTransaction) throws {
+        return try migrateKey(key, withValueOfType: NSNumber.self, toNewValue: { $0.int64Value }, tx: tx)
+    }
+
+    func migrateUInt64(_ key: String, tx: DBWriteTransaction) throws {
+        return try migrateKey(key, withValueOfType: NSNumber.self, toNewValue: { Int64(bitPattern: $0.uint64Value) }, tx: tx)
+    }
+
     func migrateBool(_ key: String, tx: DBWriteTransaction) throws {
         return try migrateKey(key, withValueOfType: NSNumber.self, toNewValue: \.boolValue, tx: tx)
+    }
+
+    func migrateDouble(_ key: String, tx: DBWriteTransaction) throws {
+        return try migrateKey(key, withValueOfType: NSNumber.self, toNewValue: \.doubleValue, tx: tx)
+    }
+}
+
+// MARK: -
+
+public struct KeyValueStoreDeleter {
+    private let db: any DB
+
+    public init(db: any DB) {
+        self.db = db
+    }
+
+    private static let deprecatedCollections: [String] = [
+        "AvatarDefaultColorStorageServiceMigrator",
+        "BackupArchiveErrorPresenterImpl",
+        "BackupRequestManager",
+        "CallLinkAuthCredential",
+        "ChangePhoneNumber",
+        "ContactsManagerCache.allContacts",
+        "ContactsManagerCache.phoneNumberStore",
+        "ContactsManagerCache.uniqueIdStore",
+        "DeleteForMeInfoSheetCoordinator",
+        "DeleteForMeSyncMessageSettingsStoreImpl",
+        "EditManager",
+        "Emoji+availableStore",
+        "Emoji+metadataStore",
+        "ForwardMessageViewController",
+        "GroupManager.announcementOnlyGroupsCapability",
+        "GroupManager.groupsV2Capability",
+        "GroupManager.groupsV2MigrationCapability",
+        "GroupManager.senderKeyCapability",
+        "GroupsV2Impl.groupsFromStorageService_All",
+        "IncrementalMessageTSAttachmentMigrator",
+        "KeyTransparencyManager",
+        "LearnMyOwnPniManagerImpl",
+        "LinkAndSyncManagerImpl",
+        "MasterKeyOneTimeSyncManager",
+        "MessageBackupErrorPresenterImpl",
+        "MultiFingerprintVC",
+        "OWSChatConnectionWithLibSignalShadowing",
+        "OWSOrphanDataCleaner_Collection",
+        "OrchestratingSVRImpl",
+        "PinnedConversationManager",
+        "PniHelloWorldManagerImpl",
+        "PreKeyManager",
+        "RemoteMegaphoneFetcher",
+        "SSKKyberPreKeyStoreACIKeyStore",
+        "SSKKyberPreKeyStorePNIKeyStore",
+        "SSRecIkmCapStore",
+        "SVR🐝AuthCredential",
+        "SecureValueRecovery2Impl",
+        "StorageServiceUnknownFieldMigrator",
+        "TSInteraction_TSAttachmentMigration",
+        "TSStorageManagerAppUpgradeNagCollection",
+        "TSStorageManagerPNIPreKeyStoreCollection",
+        "TSStorageManagerPNISessionStoreCollection",
+        "TSStorageManagerPNISignedPreKeyStoreCollection",
+        "TSStorageManagerPreKeyStoreCollection",
+        "TSStorageManagerSessionStoreCollection",
+        "TSStorageManagerSignedPreKeyStoreCollection",
+        "UsernameValidation",
+        "VersionedProfiles.credentialStore",
+        "arePaymentsEnabledForUserStore",
+        "groupRefreshStore",
+        "kOWS2FAManager_Collection",
+        "kOWSKeyBackupService_Keys",
+        "kOWSKeyBackupService_Token",
+        "kOWSProfileManager_GroupWhitelistCollection",
+        "kOWSProfileManager_UserUUIDWhitelistCollection",
+        "kOWSProfileManager_UserWhitelistCollection",
+        "viewOnceMessages",
+    ]
+
+    public func cleanUpDeprecatedCollections() async {
+        struct KeyValueTable: TableRecord {
+            static let databaseTableName: String = NewKeyValueStore.tableName
+        }
+        let collections = db.read { tx in
+            return failIfThrows {
+                let collection = Column(NewKeyValueStore.collectionColumnName)
+                return try KeyValueTable.selectDistinct(collection, as: String.self, tx: tx)
+            }
+        }
+        let obsoleteCollections = Set(collections).intersection(Self.deprecatedCollections)
+        for obsoleteCollection in obsoleteCollections {
+            Logger.info("deleting obsolete key value collection: \(obsoleteCollection)")
+            await db.awaitableWrite { tx in
+                NewKeyValueStore(collection: obsoleteCollection).removeAll(tx: tx)
+            }
+        }
     }
 }

@@ -5,32 +5,48 @@
 
 import Foundation
 
-public protocol DatabaseChanges {
-    typealias UniqueId = String
-    typealias RowId = Int64
+public struct DatabaseChanges {
+    public typealias UniqueId = String
+    public typealias RowId = Int64
 
-    var threadUniqueIds: Set<UniqueId> { get }
+    public let threadUniqueIds: Set<UniqueId>
     /// Unique ids for threads that have been changed in a user-facing way
     /// that should affect the chat list UI.
-    var threadUniqueIdsForChatListUpdate: Set<UniqueId> { get }
-    var interactionUniqueIds: Set<UniqueId> { get }
-    var storyMessageUniqueIds: Set<UniqueId> { get }
-    var storyMessageRowIds: Set<RowId> { get }
+    public let threadUniqueIdsForChatListUpdate: Set<UniqueId>
+    public let interactionUniqueIds: Set<UniqueId>
+    public let storyMessageUniqueIds: Set<UniqueId>
+    public let storyMessageRowIds: Set<RowId>
+    public let interactionDeletedUniqueIds: Set<UniqueId>
+    public let storyMessageDeletedUniqueIds: Set<UniqueId>
+    public let tableNames: Set<String>
+    public let tableRowIds: [String: Set<Int64>]
+    public let didUpdateInteractions: Bool
+    public let didUpdateThreads: Bool
 
-    var interactionDeletedUniqueIds: Set<UniqueId> { get }
-    var storyMessageDeletedUniqueIds: Set<UniqueId> { get }
+    public let lastError: Error?
 
-    var tableNames: Set<String> { get }
+    public var isEmpty: Bool {
+        return
+            threadUniqueIds.isEmpty &&
+            interactionUniqueIds.isEmpty &&
+            storyMessageUniqueIds.isEmpty &&
+            storyMessageRowIds.isEmpty &&
+            interactionDeletedUniqueIds.isEmpty &&
+            storyMessageDeletedUniqueIds.isEmpty &&
+            tableNames.isEmpty &&
+            tableRowIds.isEmpty &&
+            lastError == nil
+    }
 
-    var tableRowIds: [String: Set<Int64>] { get }
+    public func didUpdate(tableName: String) -> Bool {
+        return tableNames.contains(tableName)
+    }
 
-    var didUpdateInteractions: Bool { get }
+    public func didUpdate(interaction: TSInteraction) -> Bool {
+        interactionUniqueIds.contains(interaction.uniqueId)
+    }
 
-    var didUpdateThreads: Bool { get }
-
-    func didUpdate(tableName: String) -> Bool
-
-    func didUpdate(interaction: TSInteraction) -> Bool
-
-    func didUpdate(thread: TSThread) -> Bool
+    public func didUpdate(thread: TSThread) -> Bool {
+        threadUniqueIds.contains(thread.uniqueId)
+    }
 }

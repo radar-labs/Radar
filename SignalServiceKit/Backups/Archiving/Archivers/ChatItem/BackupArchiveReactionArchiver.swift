@@ -6,8 +6,8 @@
 import Foundation
 import LibSignalClient
 
-internal class BackupArchiveReactionArchiver: BackupArchiveProtoStreamWriter {
-    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError<BackupArchive.InteractionUniqueId>
+class BackupArchiveReactionArchiver {
+    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError
 
     private let reactionStore: BackupArchiveReactionStore
 
@@ -19,44 +19,33 @@ internal class BackupArchiveReactionArchiver: BackupArchiveProtoStreamWriter {
 
     func archiveReactions(
         _ message: TSMessage,
-        context: BackupArchive.RecipientArchivingContext
+        context: BackupArchive.RecipientArchivingContext,
     ) -> BackupArchive.ArchiveInteractionResult<[BackupProto_Reaction]> {
-        let reactions: [OWSReaction]
-        do {
-            reactions = try reactionStore.allReactions(message: message, context: context)
-        } catch {
-            return .completeFailure(.fatalArchiveError(.reactionIteratorError(error)))
-        }
+        let reactions = reactionStore.allReactions(message: message, context: context).reversed()
 
         var errors = [ArchiveFrameError]()
         var reactionProtos = [BackupProto_Reaction]()
 
-        for reaction in reactions {
+        for (sortOrder, reaction) in reactions.enumerated() {
             guard
                 let authorAddress = BackupArchive.ContactAddress(
                     aci: reaction.reactorAci,
-                    e164: E164(reaction.reactorPhoneNumber)
+                    e164: E164(reaction.reactorPhoneNumber),
                 )?.asArchivingAddress()
             else {
                 // Skip this reaction.
-                errors.append(.archiveFrameError(.invalidReactionAddress, message.uniqueInteractionId))
+                errors.append(.archiveFrameError(.invalidReactionAddress))
                 continue
             }
 
             guard let authorId = context[authorAddress] else {
-                errors.append(.archiveFrameError(
-                    .referencedRecipientIdMissing(authorAddress),
-                    message.uniqueInteractionId
-                ))
+                errors.append(.archiveFrameError(.referencedRecipientIdMissing(authorAddress)))
                 continue
             }
 
             let sentAtTimestamp = reaction.sentAtTimestamp
             guard BackupArchive.Timestamps.isValid(sentAtTimestamp) else {
-                errors.append(.archiveFrameError(
-                    .invalidReactionTimestamp,
-                    message.uniqueInteractionId
-                ))
+                errors.append(.archiveFrameError(.invalidReactionTimestamp))
                 continue
             }
 
@@ -64,7 +53,7 @@ internal class BackupArchiveReactionArchiver: BackupArchiveProtoStreamWriter {
             reactionProto.emoji = reaction.emoji
             reactionProto.authorID = authorId.value
             reactionProto.sentTimestamp = sentAtTimestamp
-            reactionProto.sortOrder = reaction.sortOrder
+            reactionProto.sortOrder = UInt64(sortOrder)
 
             reactionProtos.append(reactionProto)
         }
@@ -80,79 +69,49 @@ internal class BackupArchiveReactionArchiver: BackupArchiveProtoStreamWriter {
 
     func restoreReactions(
         _ reactions: [BackupProto_Reaction],
-        chatItemId: BackupArchive.ChatItemId,
         message: TSMessage,
-        context: BackupArchive.RecipientRestoringContext
+        context: BackupArchive.RecipientRestoringContext,
     ) -> BackupArchive.RestoreInteractionResult<Void> {
-        var reactionErrors = [BackupArchive.RestoreFrameError<BackupArchive.ChatItemId>]()
-        for reaction in reactions {
+        var reactionErrors = [BackupArchive.RestoreFrameError]()
+        for reaction in reactions.sorted(by: { $0.sortOrder < $1.sortOrder }) {
             let reactorAddress = context[reaction.authorRecipientId]
 
-            let insertResult: Result<Void, Error>
             switch reactorAddress {
             case .localAddress:
-                insertResult = Result {
-                    try reactionStore.createReaction(
-                        uniqueMessageId: message.uniqueId,
-                        emoji: reaction.emoji,
-                        reactorAci: context.localIdentifiers.aci,
-                        sentAtTimestamp: reaction.sentTimestamp,
-                        sortOrder: reaction.sortOrder,
-                        context: context
-                    )
-                }
+                reactionStore.createReaction(
+                    uniqueMessageId: message.uniqueId,
+                    emoji: reaction.emoji,
+                    reactorAci: context.localIdentifiers.aci,
+                    sentAtTimestamp: reaction.sentTimestamp,
+                    context: context,
+                )
             case .contact(let address):
                 if let aci = address.aci {
-                    insertResult = Result {
-                        try reactionStore.createReaction(
-                            uniqueMessageId: message.uniqueId,
-                            emoji: reaction.emoji,
-                            reactorAci: aci,
-                            sentAtTimestamp: reaction.sentTimestamp,
-                            sortOrder: reaction.sortOrder,
-                            context: context
-                        )
-                    }
+                    reactionStore.createReaction(
+                        uniqueMessageId: message.uniqueId,
+                        emoji: reaction.emoji,
+                        reactorAci: aci,
+                        sentAtTimestamp: reaction.sentTimestamp,
+                        context: context,
+                    )
                 } else if let e164 = address.e164 {
-                    insertResult = Result {
-                        try reactionStore.createLegacyReaction(
-                            uniqueMessageId: message.uniqueId,
-                            emoji: reaction.emoji,
-                            reactorE164: e164,
-                            sentAtTimestamp: reaction.sentTimestamp,
-                            sortOrder: reaction.sortOrder,
-                            context: context
-                        )
-                    }
+                    reactionStore.createLegacyReaction(
+                        uniqueMessageId: message.uniqueId,
+                        emoji: reaction.emoji,
+                        reactorE164: e164,
+                        sentAtTimestamp: reaction.sentTimestamp,
+                        context: context,
+                    )
                 } else {
-                    reactionErrors.append(.restoreFrameError(
-                        .invalidProtoData(.reactionNotFromAciOrE164),
-                        chatItemId
-                    ))
-                    continue
+                    reactionErrors.append(.restoreFrameError(.invalidProtoData(.reactionNotFromAciOrE164)))
                 }
             case .group, .distributionList, .releaseNotesChannel, .callLink:
                 // Referencing a group or distributionList as the author is invalid.
-                reactionErrors.append(.restoreFrameError(
-                    .invalidProtoData(.reactionNotFromAciOrE164),
-                    chatItemId
-                ))
-                continue
+                reactionErrors.append(.restoreFrameError(.invalidProtoData(.reactionNotFromAciOrE164)))
             case nil:
                 reactionErrors.append(.restoreFrameError(
                     .invalidProtoData(.recipientIdNotFound(reaction.authorRecipientId)),
-                    chatItemId
                 ))
-                continue
-            }
-
-            switch insertResult {
-            case .success:
-                break
-            case .failure(let insertError):
-                reactionErrors.append(
-                    .restoreFrameError(.databaseInsertionFailed(insertError), chatItemId)
-                )
             }
         }
 

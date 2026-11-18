@@ -47,55 +47,6 @@ class BackupArchiveIntegrationTests: XCTestCase {
         case minimalDiff
     }
 
-    private enum WhichIntegrationTestCases {
-        case all
-        case specific(names: Set<String>)
-
-        case standardFrames
-
-        case accountData
-
-        case adHocCall
-
-        case chat
-
-        case chatItem
-        case chatItemContactMessage
-        case chatItemExpirationTimerUpdate
-        case chatItemGiftBadge
-        case chatItemGroupCall
-        case chatItemGroupChangeChatUpdate
-        case chatItemGroupChangeChatMultipleUpdate
-        case chatItemIndividualCall
-        case chatItemLearnedProfile
-        case chatItemPaymentNotification
-        case chatItemProfileChange
-        case chatItemRemoteDeleteTombstone
-        case chatItemSessionSwitchover
-        case chatItemSimpleUpdates
-        case chatItemStandardMessageFormatted
-        case chatItemStandardMessageLinkPreview
-        case chatItemStandardMessageLongText
-        case chatItemStandardMessageSms
-        case chatItemStandardMessageSpecialAttachments
-        case chatItemStandardMessageStandardAttachments
-        case chatItemStandardMessageTextOnly
-        case chatItemStandardMessageWithEdits
-        case chatItemStandardMessageWithQuote
-        case chatItemStickerMessage
-        case chatItemThreadMerge
-        case chatItemViewOnceMessage
-        case chatItemDirectStoryReply
-
-        case recipient
-        case recipientCallLink
-        case recipientContact
-        case recipientDistributionList
-        case recipientGroup
-
-        case stickerPack
-    }
-
     /// The preferred log output for test failures.
     ///
     /// Set by default to `.minimalDiff` to reduce log noise in automated test
@@ -103,12 +54,44 @@ class BackupArchiveIntegrationTests: XCTestCase {
     /// development, for more thorough inspection of the failure case.
     private let preferredFailureLogOutput: LibSignalComparisonFailureLogOutput = .minimalDiff
 
-    /// Specifies which integration test cases to run.
+    /// Specifies which integration test cases to run. If empty, runs them all.
     ///
-    /// Set by default to `.all`. May be toggled to a subset of tests during
-    /// local development for debugging purposes, but should never be committed
-    /// to `main` as anything other than `.all`.
-    private let whichIntegrationTestCases: WhichIntegrationTestCases = .all
+    /// Populate this during local development with a subset of test cases as
+    /// useful, but never commit this as anything other than empty.
+    ///
+    /// Passing a prefix (e.g., `account_data`) will run any test cases that
+    /// match said prefix.
+    private let whichIntegrationTestCases: [String] = []
+
+    /// Test cases that we knowingly skip.
+    private let knownSkippedTestCases: [String] = [
+        // Not relevant for iOS
+        "android_account_data",
+        // Not implemented yet
+        "chat_folder",
+        "chat_item_standard_message_standard_attachments_incremental_mac",
+        "notification_profile",
+        // These include group updates that include fields that iOS doesn't
+        // store, but that Desktop uses. Those fields are probably removable by
+        // Desktop, but that's complicated, so instead we've kept them in the
+        // tests and iOS is skipping the problematic test cases.
+        //
+        // (Note that Android persists the actual change action protos, rather
+        // than a reinterpretation thereof, so they generally don't care what's
+        // in them for round-trip purposes.)
+        //
+        // 09, 43, and 44 include `GroupMemberAddedUpdate`, which includes the
+        // fields `hadOpenInvitation` and `inviterAci`.
+        //
+        // 10, 47, and 48 include `GroupInvitationRevokedUpdate`, which includes
+        // the fields `inviteeAci` and `inviterPni`.
+        "chat_item_group_change_chat_multiple_update_09",
+        "chat_item_group_change_chat_multiple_update_10",
+        "chat_item_group_change_chat_update_43",
+        "chat_item_group_change_chat_update_44",
+        "chat_item_group_change_chat_update_47",
+        "chat_item_group_change_chat_update_48",
+    ]
 
     // MARK: -
 
@@ -118,91 +101,26 @@ class BackupArchiveIntegrationTests: XCTestCase {
         let binProtoFileUrls: [URL] = {
             let allBinprotoUrls = Bundle(for: type(of: self)).urls(
                 forResourcesWithExtension: "binproto",
-                subdirectory: nil
+                subdirectory: nil,
             ) ?? []
 
             return allBinprotoUrls.filter { binprotoUrl in
                 let binprotoName = (binprotoUrl.lastPathComponent as NSString).deletingPathExtension
 
-                switch whichIntegrationTestCases {
-                case .all:
+                if
+                    knownSkippedTestCases.contains(where: { testCasePrefix in
+                        binprotoName.starts(with: testCasePrefix)
+                    })
+                {
+                    return false
+                }
+
+                if whichIntegrationTestCases.isEmpty {
                     return true
-                case .specific(let names):
-                    return names.contains(binprotoName)
-                case .standardFrames:
-                    return binprotoName.contains("standard_frames")
-                case .accountData:
-                    return binprotoName.contains("account_data_")
-                case .adHocCall:
-                    return binprotoName.contains("ad_hoc_call_")
-                case .chat:
-                    return binprotoName.contains("chat_")
-                case .chatItem:
-                    return binprotoName.contains("chat_item_")
-                case .chatItemContactMessage:
-                    return binprotoName.contains("chat_item_contact_message_")
-                case .chatItemExpirationTimerUpdate:
-                    return binprotoName.contains("chat_item_expiration_timer_update_")
-                case .chatItemGiftBadge:
-                    return binprotoName.contains("chat_item_gift_badge_")
-                case .chatItemGroupCall:
-                    return binprotoName.contains("chat_item_group_call_update_")
-                case .chatItemGroupChangeChatUpdate:
-                    return binprotoName.contains("chat_item_group_change_chat_update_")
-                case .chatItemGroupChangeChatMultipleUpdate:
-                    return binprotoName.contains("chat_item_group_change_chat_multiple_update_")
-                case .chatItemIndividualCall:
-                    return binprotoName.contains("chat_item_individual_call_update_")
-                case .chatItemLearnedProfile:
-                    return binprotoName.contains("chat_item_learned_profile_update_")
-                case .chatItemPaymentNotification:
-                    return binprotoName.contains("chat_item_payment_notification_")
-                case .chatItemProfileChange:
-                    return binprotoName.contains("chat_item_profile_change_")
-                case .chatItemRemoteDeleteTombstone:
-                    return binprotoName.contains("chat_item_remote_delete_")
-                case .chatItemSessionSwitchover:
-                    return binprotoName.contains("chat_item_session_switchover_update_")
-                case .chatItemSimpleUpdates:
-                    return binprotoName.contains("chat_item_simple_updates_")
-                case .chatItemStandardMessageFormatted:
-                    return binprotoName.contains("chat_item_standard_message_formatted_")
-                case .chatItemStandardMessageLinkPreview:
-                    return binprotoName.contains("chat_item_standard_message_with_link_preview_")
-                case .chatItemStandardMessageLongText:
-                    return binprotoName.contains("chat_item_standard_message_long_text_")
-                case .chatItemStandardMessageSms:
-                    return binprotoName.contains("chat_item_standard_message_sms_")
-                case .chatItemStandardMessageSpecialAttachments:
-                    return binprotoName.contains("chat_item_standard_message_special_attachments_")
-                case .chatItemStandardMessageStandardAttachments:
-                    return binprotoName.contains("chat_item_standard_message_standard_attachments_")
-                case .chatItemStandardMessageTextOnly:
-                    return binprotoName.contains("chat_item_standard_message_text_only_")
-                case .chatItemStandardMessageWithEdits:
-                    return binprotoName.contains("chat_item_standard_message_with_edits_")
-                case .chatItemStandardMessageWithQuote:
-                    return binprotoName.contains("chat_item_standard_message_with_quote_")
-                case .chatItemStickerMessage:
-                    return binprotoName.contains("chat_item_sticker_message_")
-                case .chatItemThreadMerge:
-                    return binprotoName.contains("chat_item_thread_merge_")
-                case .chatItemViewOnceMessage:
-                    return binprotoName.contains("chat_item_view_once_")
-                case .chatItemDirectStoryReply:
-                    return binprotoName.contains("chat_item_direct_story_reply_")
-                case .recipient:
-                    return binprotoName.contains("recipient_")
-                case .recipientCallLink:
-                    return binprotoName.contains("recipient_call_link_")
-                case .recipientContact:
-                    return binprotoName.contains("recipient_contacts_")
-                case .recipientDistributionList:
-                    return binprotoName.contains("recipient_distribution_list_")
-                case .recipientGroup:
-                    return binprotoName.contains("recipient_groups_")
-                case .stickerPack:
-                    return binprotoName.contains("sticker_pack_")
+                }
+
+                return whichIntegrationTestCases.contains { testCasePrefix in
+                    binprotoName.starts(with: testCasePrefix)
                 }
             }
         }()
@@ -235,7 +153,7 @@ class BackupArchiveIntegrationTests: XCTestCase {
 
                 try await runRoundTripTest(
                     testCaseFileUrl: binprotoFileUrl,
-                    failureLogOutput: preferredFailureLogOutput
+                    failureLogOutput: preferredFailureLogOutput,
                 )
             } catch TestError.failure(let message) {
                 logFailure("""
@@ -285,7 +203,7 @@ class BackupArchiveIntegrationTests: XCTestCase {
     @MainActor
     private func runRoundTripTest(
         testCaseFileUrl: URL,
-        failureLogOutput: LibSignalComparisonFailureLogOutput
+        failureLogOutput: LibSignalComparisonFailureLogOutput,
     ) async throws {
 
         /// Backup files hardcode timestamps, some of which are interpreted
@@ -307,7 +225,7 @@ class BackupArchiveIntegrationTests: XCTestCase {
             try await self._runRoundTripTest(
                 testCaseFileUrl: testCaseFileUrl,
                 backupTimeMs: backupTimeMs,
-                failureLogOutput: failureLogOutput
+                failureLogOutput: failureLogOutput,
             )
         }
         await deinitializeApp(oldContext: oldContext)
@@ -317,7 +235,7 @@ class BackupArchiveIntegrationTests: XCTestCase {
     private func _runRoundTripTest(
         testCaseFileUrl: URL,
         backupTimeMs: UInt64,
-        failureLogOutput: LibSignalComparisonFailureLogOutput
+        failureLogOutput: LibSignalComparisonFailureLogOutput,
     ) async throws {
         /// A backup doesn't contain our own local identifiers. Rather, those
         /// are determined as part of registration for a backup import, and are
@@ -330,7 +248,7 @@ class BackupArchiveIntegrationTests: XCTestCase {
 
         try await deps.backupArchiveManager.importPlaintextBackupForTests(
             fileUrl: testCaseFileUrl,
-            localIdentifiers: localIdentifiers
+            localIdentifiers: localIdentifiers,
         )
 
         let exportedBackupUrl = try await deps.backupArchiveManager
@@ -339,7 +257,7 @@ class BackupArchiveIntegrationTests: XCTestCase {
         try compareViaLibsignal(
             sharedTestCaseBackupUrl: testCaseFileUrl,
             exportedBackupUrl: exportedBackupUrl,
-            failureLogOutput: failureLogOutput
+            failureLogOutput: failureLogOutput,
         )
     }
 
@@ -352,7 +270,7 @@ class BackupArchiveIntegrationTests: XCTestCase {
     private func compareViaLibsignal(
         sharedTestCaseBackupUrl: URL,
         exportedBackupUrl: URL,
-        failureLogOutput: LibSignalComparisonFailureLogOutput
+        failureLogOutput: LibSignalComparisonFailureLogOutput,
     ) throws {
 #if targetEnvironment(simulator)
         let sharedTestCaseBackup = try ComparableBackup(url: sharedTestCaseBackupUrl)
@@ -380,13 +298,13 @@ class BackupArchiveIntegrationTests: XCTestCase {
             case .minimalDiff:
                 let jsonStringDiff: LineByLineStringDiff = .diffing(
                     lhs: sharedTestCaseBackupString,
-                    rhs: exportedBackupString
+                    rhs: exportedBackupString,
                 )
 
                 let prettyDiff = jsonStringDiff.prettyPrint(
                     lhsLabel: "testcase",
                     rhsLabel: "exported",
-                    diffGroupDivider: "************"
+                    diffGroupDivider: "************",
                 )
 
                 throw TestError.failure("""
@@ -406,29 +324,17 @@ class BackupArchiveIntegrationTests: XCTestCase {
     /// Read the `backupTimeMs` field from the header of the Backup file at the
     /// given local URL.
     private func readBackupTimeMs(testCaseFileUrl: URL) async throws -> UInt64 {
-        let plaintextStreamProvider = BackupArchivePlaintextProtoStreamProvider()
+        let plaintextProtoStreamProvider = BackupArchivePlaintextProtoStreamProvider()
 
-        let stream: BackupArchiveProtoInputStream
-        switch plaintextStreamProvider.openPlaintextInputFileStream(
+        let stream: BackupArchiveProtoInputStream = try plaintextProtoStreamProvider.openPlaintextInputFileStream(
             fileUrl: testCaseFileUrl,
-            frameRestoreProgress: nil
-        ) {
-        case .success(let _stream, _):
-            stream = _stream
-        case .fileNotFound:
-            throw TestError.failure("Missing test case backup file!")
-        case .unableToOpenFileStream:
-            throw TestError.failure("Failed to open test case backup file!")
-        case .hmacValidationFailedOnEncryptedFile:
-            throw TestError.failure("Impossible – this is a plaintext stream!")
-        }
+            frameRestoreProgress: nil,
+        )
 
         let backupInfo: BackupProto_BackupInfo
         switch stream.readHeader() {
         case .success(let _backupInfo, _):
             backupInfo = _backupInfo
-        case .invalidByteLengthDelimiter:
-            throw TestError.failure("Invalid byte length delimiter!")
         case .emptyFinalFrame:
             throw TestError.failure("Invalid empty header frame!")
         case .protoDeserializationError(let error):
@@ -452,14 +358,13 @@ class BackupArchiveIntegrationTests: XCTestCase {
             callMessageHandler: CrashyMocks.MockCallMessageHandler(),
             currentCallProvider: CrashyMocks.MockCurrentCallThreadProvider(),
             notificationPresenter: CrashyMocks.MockNotificationPresenter(),
-            incrementalMessageTSAttachmentMigratorFactory: NoOpIncrementalMessageTSAttachmentMigratorFactory(),
             testDependencies: AppSetup.TestDependencies(
                 backupAttachmentCoordinator: MockBackupAttachmentCoordinator(),
                 dateProvider: dateProvider,
                 networkManager: CrashyMocks.MockNetworkManager(appReadiness: appReadiness, libsignalNet: nil),
                 storageServiceManager: FakeStorageServiceManager(),
-                webSocketFactory: CrashyMocks.MockWebSocketFactory()
-            )
+                webSocketFactory: CrashyMocks.MockWebSocketFactory(),
+            ),
         )
 
         await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
@@ -484,7 +389,7 @@ private extension LibSignalClient.ComparableBackup {
         try self.init(
             purpose: .remoteBackup,
             length: fileLength,
-            stream: fileHandle
+            stream: fileHandle,
         )
     }
 }
@@ -494,7 +399,7 @@ private extension LibSignalClient.ComparableBackup {
 
 private func failTest<T>(
     _ type: T.Type,
-    _ function: StaticString = #function
+    _ function: StaticString = #function,
 ) -> Never {
     let message = "Unexpectedly called \(type)#\(function)!"
     XCTFail(message)
@@ -531,6 +436,7 @@ private enum CrashyMocks {
         func registerNotificationSettings() async { failTest(Self.self) }
         func notifyUser(forIncomingMessage: TSIncomingMessage, thread: TSThread, transaction: DBWriteTransaction) { failTest(Self.self) }
         func notifyUser(forIncomingMessage: TSIncomingMessage, editTarget: TSIncomingMessage, thread: TSThread, transaction: DBWriteTransaction) { failTest(Self.self) }
+        func notifyUser(forReleaseNotesMessage: TSReleaseNotesMessage, thread: TSThread, transaction: DBWriteTransaction) { failTest(Self.self) }
         func notifyUser(forReaction: OWSReaction, onOutgoingMessage: TSOutgoingMessage, thread: TSThread, transaction: DBWriteTransaction) { failTest(Self.self) }
         func notifyUser(forErrorMessage: TSErrorMessage, thread: TSThread, transaction: DBWriteTransaction) { failTest(Self.self) }
         func notifyUser(forTSMessage: TSMessage, thread: TSThread, wantsSound: Bool, transaction: DBWriteTransaction) { failTest(Self.self) }
@@ -544,9 +450,11 @@ private enum CrashyMocks {
         func notifyForGroupCallSafetyNumberChange(callTitle: String, threadUniqueId: String?, roomId: Data?, presentAtJoin: Bool) { failTest(Self.self) }
         func notifyUserOfPollEnd(forMessage message: TSIncomingMessage, thread: TSThread, transaction: DBWriteTransaction) { failTest(Self.self) }
         func notifyUserOfPollVote(forMessage message: TSOutgoingMessage, voteAuthor: Aci, thread: TSThread, transaction: DBWriteTransaction) { failTest(Self.self) }
+        func scheduleUnreadReminder(threadUniqueId: String, threadIdentifier: String?, title: String?, body: String, initialDelay: TimeInterval, latestFireDate: Date, tx: DBWriteTransaction) { failTest(Self.self) }
+        func cancelUnreadReminder(threadUniqueId: String, tx: DBReadTransaction) { failTest(Self.self) }
         func scheduleNotifyForNewLinkedDevice(deviceLinkTimestamp: Date) { failTest(Self.self) }
         func scheduleNotifyForBackupsEnabled(backupsTimestamp: Date) { failTest(Self.self) }
-        func notifyUserOfListMediaIntegrityCheckFailure() { failTest(Self.self) }
+        func notifyUserOfBackupsMediaError() { failTest(Self.self) }
         func notifyUserToRelaunchAfterTransfer(completion: @escaping () -> Void) { failTest(Self.self) }
         func notifyUserOfDeregistration(tx: DBWriteTransaction) { failTest(Self.self) }
         func clearAllNotifications() { failTest(Self.self) }
@@ -557,6 +465,7 @@ private enum CrashyMocks {
         func cancelNotifications(reactionId: String) { failTest(Self.self) }
         func cancelNotificationsForMissedCalls(threadUniqueId: String) { failTest(Self.self) }
         func cancelNotifications(for storyMessage: StoryMessage) { failTest(Self.self) }
+        func notifyUserOfAttachmentBackfill(threadUniqueId: String, messageUniqueId: String, body: String) { failTest(Self.self) }
         func notifyUserOfMediaTierQuotaConsumed() { failTest(Self.self) }
     }
 }

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-#import <CocoaLumberjack/CocoaLumberjack.h>
+#import <CocoaLumberjack/DDLog.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,7 +15,7 @@ static const DDLogLevel ddLogLevel = DDLogLevelInfo;
 
 static inline BOOL ShouldLogFlag(DDLogFlag flag)
 {
-    return (ddLogLevel & (DDLogLevel)flag) != 0;
+    return ((DDLogFlag)ddLogLevel & flag) != 0;
 }
 
 static inline BOOL ShouldLogVerbose(void)

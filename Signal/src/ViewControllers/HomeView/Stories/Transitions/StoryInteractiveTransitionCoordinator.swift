@@ -4,12 +4,13 @@
 //
 
 import SignalServiceKit
+import UIKit
 
 class StoryInteractiveTransitionCoordinator: UIPercentDrivenInteractiveTransition, UIGestureRecognizerDelegate {
     weak var pageViewController: StoryPageViewController!
     lazy var panGestureRecognizer = UIPanGestureRecognizer(
         target: self,
-        action: #selector(handlePan(_:))
+        action: #selector(handlePan(_:)),
     )
     init(pageViewController: StoryPageViewController) {
         self.pageViewController = pageViewController
@@ -33,6 +34,7 @@ class StoryInteractiveTransitionCoordinator: UIPercentDrivenInteractiveTransitio
         case bottom
         case none
     }
+
     var interactiveEdge: Edge = .none
 
     enum Mode {
@@ -40,6 +42,7 @@ class StoryInteractiveTransitionCoordinator: UIPercentDrivenInteractiveTransitio
         case slide
         case reply
     }
+
     var mode: Mode = .zoom
 
     @objc
@@ -142,7 +145,7 @@ class StoryInteractiveTransitionCoordinator: UIPercentDrivenInteractiveTransitio
 
     func gestureRecognizer(
         _ gestureRecognizer: UIGestureRecognizer,
-        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer,
     ) -> Bool {
         gestureRecognizer == panGestureRecognizer
     }
@@ -231,7 +234,7 @@ class StoryInteractiveTransitionCoordinator: UIPercentDrivenInteractiveTransitio
             initialSpringVelocity: springVelocity,
             options: .curveLinear,
             animations: animations,
-            completion: completion
+            completion: completion,
         )
     }
 

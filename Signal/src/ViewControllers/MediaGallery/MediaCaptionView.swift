@@ -10,7 +10,7 @@ class MediaCaptionView: UIView {
 
     private let spoilerState: SpoilerRenderState
 
-    public enum Content: Equatable {
+    enum Content: Equatable {
         case attachmentStreamCaption(String)
         case messageBody(HydratedMessageBody, InteractionSnapshotIdentifier)
 
@@ -20,6 +20,15 @@ class MediaCaptionView: UIView {
                 return string.isEmpty ? nil : self
             case .messageBody(let messageBody, let identifier):
                 return messageBody.nilIfEmpty.map { .messageBody($0, identifier) }
+            }
+        }
+
+        var isEmpty: Bool {
+            switch self {
+            case .attachmentStreamCaption(let string):
+                return string.isEmpty
+            case .messageBody(let messageBody, _):
+                return messageBody.isEmpty
             }
         }
 
@@ -46,8 +55,9 @@ class MediaCaptionView: UIView {
         }
     }
 
-    var hasNilOrEmptyContent: Bool {
-        return content?.nilIfEmpty == nil
+    var isEmpty: Bool {
+        guard let content else { return true }
+        return content.isEmpty
     }
 
     var canBeExpanded: Bool {
@@ -63,17 +73,46 @@ class MediaCaptionView: UIView {
 
     init(
         frame: CGRect = .zero,
-        spoilerState: SpoilerRenderState
+        spoilerState: SpoilerRenderState,
     ) {
         self.spoilerState = spoilerState
         super.init(frame: frame)
 
-        preservesSuperviewLayoutMargins = true
         clipsToBounds = true
 
-        addSubview(captionTextView)
-        captionTextView.autoPinWidthToSuperviewMargins()
-        captionTextView.autoPinHeightToSuperview()
+        let selfOrVisualEffectContentView: UIView
+        if #available(iOS 26, *) {
+            let glassEffectView = UIVisualEffectView(effect: glassEffect())
+            glassEffectView.translatesAutoresizingMaskIntoConstraints = false
+            glassEffectView.clipsToBounds = true
+            glassEffectView.cornerConfiguration = .uniformCorners(radius: .containerConcentric(minimum: 26))
+            addSubview(glassEffectView)
+            NSLayoutConstraint.activate([
+                glassEffectView.topAnchor.constraint(equalTo: topAnchor),
+                glassEffectView.leadingAnchor.constraint(equalTo: leadingAnchor),
+                glassEffectView.trailingAnchor.constraint(equalTo: trailingAnchor),
+                glassEffectView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            ])
+
+            selfOrVisualEffectContentView = glassEffectView.contentView
+            glassBackgroundView = glassEffectView
+
+            directionalLayoutMargins = .init(margin: 16)
+            insetsLayoutMarginsFromSafeArea = false
+        } else {
+            selfOrVisualEffectContentView = self
+
+            directionalLayoutMargins = .init(hMargin: 0, vMargin: 4)
+        }
+
+        selfOrVisualEffectContentView.addSubview(captionTextView)
+        captionTextView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            captionTextView.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
+            captionTextView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
+            captionTextView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
+            captionTextView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
+        ])
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -91,17 +130,14 @@ class MediaCaptionView: UIView {
             interactionIdentifier = id
         }
 
-        let location = gestureRecognizer.location(in: captionTextView).offsetBy(
-            dx: -Self.captionTextContainerInsets.left,
-            dy: -Self.captionTextContainerInsets.top
-        )
+        let location = gestureRecognizer.location(in: captionTextView)
         guard let characterIndex = captionTextView.characterIndex(of: location) else {
             return false
         }
 
         for item in messageBody.tappableItems(
             revealedSpoilerIds: spoilerState.revealState.revealedSpoilerIds(interactionIdentifier: interactionIdentifier),
-            dataDetector: nil /* Maybe in the future we should detect links here. We never have, before. */
+            dataDetector: nil, /* Maybe in the future we should detect links here. We never have, before. */
         ) {
             switch item {
             case .data, .mention:
@@ -110,7 +146,7 @@ class MediaCaptionView: UIView {
                 if unrevealedSpoiler.range.contains(characterIndex) {
                     spoilerState.revealState.setSpoilerRevealed(
                         withID: unrevealedSpoiler.id,
-                        interactionIdentifier: interactionIdentifier
+                        interactionIdentifier: interactionIdentifier,
                     )
                     didUpdateRevealedSpoilers(spoilerState.revealState)
                     return true
@@ -124,19 +160,81 @@ class MediaCaptionView: UIView {
         captionTextView.didUpdateRevealedSpoilers()
     }
 
-    // MARK: Subviews
+    // MARK: Glass background
 
-    private static let captionTextContainerInsets = UIEdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0)
+    private var _hasGlassBackground: Bool = true
+
+    @available(iOS 26, *)
+    var hasGlassBackground: Bool {
+        get { _hasGlassBackground }
+        set {
+            _hasGlassBackground = newValue
+            updateBackground()
+        }
+    }
+
+    // Glass on iOS 26, `nil` otherwise.
+    private var glassBackgroundView: UIVisualEffectView?
+
+    @available(iOS 26, *)
+    private func glassEffect() -> UIVisualEffect? {
+        let glassEffect = UIGlassEffect(style: .regular)
+        glassEffect.isInteractive = true
+        return glassEffect
+    }
+
+    @available(iOS 26, *)
+    private func updateBackground() {
+        if hasGlassBackground {
+            if let glassBackgroundView, glassBackgroundView.effect == nil {
+                glassBackgroundView.effect = glassEffect()
+            }
+        } else {
+            if let glassBackgroundView {
+                glassBackgroundView.effect = nil
+            }
+        }
+    }
+
+    // MARK: Animations
+
+    func prepareToBeAnimatedIn() {
+        if #available(iOS 26, *), let glassBackgroundView, hasGlassBackground {
+            glassBackgroundView.effect = nil
+        }
+        captionTextView.alpha = 0
+        isHidden = false
+    }
+
+    func animateIn() {
+        if #available(iOS 26, *), let glassBackgroundView, hasGlassBackground {
+            glassBackgroundView.effect = glassEffect()
+        }
+        captionTextView.alpha = 1
+    }
+
+    func animateOut() {
+        if #available(iOS 26, *), let glassBackgroundView, hasGlassBackground {
+            glassBackgroundView.effect = nil
+        }
+        captionTextView.alpha = 0
+    }
+
+    // MARK: Subviews
 
     private class func buildCaptionTextView(spoilerState: SpoilerRenderState) -> CaptionTextView {
         let textView = CaptionTextView(spoilerState: spoilerState)
-        let config = HydratedMessageBody.DisplayConfiguration.mediaCaption(revealedSpoilerIds: Set())
+        let config = HydratedMessageBody.DisplayConfiguration.mediaCaption(
+            textColor: .Signal.label,
+            revealedSpoilerIds: Set(),
+        )
         textView.font = config.baseFont
         textView.textColor = config.baseTextColor.forCurrentTheme
         textView.backgroundColor = .clear
-        textView.textContainerInset = Self.captionTextContainerInsets
+        textView.textContainerInset = .zero
         return textView
     }
+
     private lazy var captionTextView = MediaCaptionView.buildCaptionTextView(spoilerState: spoilerState)
 
     private class CaptionTextView: UITextView, NSLayoutManagerDelegate {
@@ -146,13 +244,15 @@ class MediaCaptionView: UIView {
             spoilerConfig.animationManager = spoilerState.animationManager
             self.spoilerConfig = spoilerConfig
             self.spoilerState = spoilerState
-            super.init(frame: .zero, textContainer: nil)
 
-            self.disableAiWritingTools()
+            super.init(frame: .zero, textContainer: nil)
 
             isEditable = false
             isSelectable = false
-            self.textContainer.lineBreakMode = .byTruncatingTail
+            textContainer.lineBreakMode = .byTruncatingTail
+            textColor = .Signal.label
+
+            disableAiWritingTools()
             updateIsScrollEnabled()
         }
 
@@ -170,14 +270,14 @@ class MediaCaptionView: UIView {
 
         private lazy var spoilerAnimator = SpoilerableTextViewAnimator(textView: self)
 
-        public var content: MediaCaptionView.Content? {
+        var content: MediaCaptionView.Content? {
             didSet {
                 recomputeContents()
                 invalidateCachedSizes()
             }
         }
 
-        public func didUpdateRevealedSpoilers() {
+        func didUpdateRevealedSpoilers() {
             // No need to recompute cached sizes; spoilers have no effect on size.
             recomputeContents()
         }
@@ -202,13 +302,14 @@ class MediaCaptionView: UIView {
                 return attrString
             case .messageBody(let body, let interactionIdentifier):
                 let displayConfig = HydratedMessageBody.DisplayConfiguration.mediaCaption(
+                    textColor: textColor ?? .Signal.label,
                     revealedSpoilerIds: spoilerState.revealState.revealedSpoilerIds(
-                        interactionIdentifier: interactionIdentifier
-                    )
+                        interactionIdentifier: interactionIdentifier,
+                    ),
                 )
                 let attrString = body.asAttributedStringForDisplay(
                     config: displayConfig,
-                    isDarkThemeEnabled: Theme.isDarkThemeEnabled
+                    isDarkThemeEnabled: Theme.isDarkThemeEnabled,
                 )
                 if doUpdate {
                     super.attributedText = attrString
@@ -281,7 +382,7 @@ class MediaCaptionView: UIView {
         private static let collapsedNumberOfLines = 3
 
         private var collapsedSize: CGSize = .zero // 3 lines of text
-        private var expandedSize: CGSize = .zero  // height is limited to `maxHeight`
+        private var expandedSize: CGSize = .zero // height is limited to `maxHeight`
         private var fullSize: CGSize = .zero
 
         override var intrinsicContentSize: CGSize {
@@ -294,7 +395,7 @@ class MediaCaptionView: UIView {
             let textSize = isExpanded ? expandedSize : collapsedSize
             return CGSize(
                 width: textContainerInset.left + textSize.width + textContainerInset.right,
-                height: textContainerInset.top + textSize.height + textContainerInset.bottom
+                height: textContainerInset.top + textSize.height + textContainerInset.bottom,
             )
         }
 
@@ -319,7 +420,7 @@ class MediaCaptionView: UIView {
 
             // 3 lines of text.
             let font = font ?? .dynamicTypeBodyClamped
-            let textColor = textColor ?? .white
+            let textColor = textColor ?? .Signal.label
             let collapsedTextConfig = CVTextLabel.Config(
                 text: .attributedText(attributedText),
                 displayConfig: .forUnstyledText(font: font, textColor: textColor),
@@ -330,7 +431,7 @@ class MediaCaptionView: UIView {
                 lineBreakMode: .byWordWrapping,
                 numberOfLines: Self.collapsedNumberOfLines,
                 items: [],
-                linkifyStyle: .underlined(bodyTextColor: textColor)
+                linkifyStyle: .underlined(bodyTextColor: textColor),
             )
             collapsedSize = CVTextLabel.measureSize(config: collapsedTextConfig, maxWidth: maxWidth).size
 
@@ -345,7 +446,7 @@ class MediaCaptionView: UIView {
                 lineBreakMode: .byWordWrapping,
                 numberOfLines: 3 * Self.collapsedNumberOfLines,
                 items: [],
-                linkifyStyle: .underlined(bodyTextColor: textColor)
+                linkifyStyle: .underlined(bodyTextColor: textColor),
             )
             let expandedTextSize = CVTextLabel.measureSize(config: expandedTextConfig, maxWidth: maxWidth).size
             expandedSize = CGSize(width: expandedTextSize.width, height: min(expandedTextSize.height, Self.maxHeight))
@@ -361,7 +462,7 @@ class MediaCaptionView: UIView {
                 lineBreakMode: .byWordWrapping,
                 numberOfLines: 0,
                 items: [],
-                linkifyStyle: .underlined(bodyTextColor: textColor)
+                linkifyStyle: .underlined(bodyTextColor: textColor),
             )
             fullSize = CVTextLabel.measureSize(config: fullTextConfig, maxWidth: maxWidth).size
         }

@@ -9,9 +9,8 @@ public import LibSignalClient
 @objc(SignalAccount)
 public final class SignalAccount: NSObject, SDSCodableModel, Decodable {
     public static let databaseTableName = "model_SignalAccount"
-    public static var recordType: UInt { SDSRecordType.signalAccount.rawValue }
 
-    public enum CodingKeys: String, CodingKey, ColumnExpression, CaseIterable {
+    public enum CodingKeys: String, CodingKey, ColumnExpression {
         case id
         case recordType
         case uniqueId
@@ -55,7 +54,7 @@ public final class SignalAccount: NSObject, SDSCodableModel, Decodable {
         familyName: String,
         nickname: String,
         fullName: String,
-        contactAvatarHash: Data?
+        contactAvatarHash: Data?,
     ) {
         self.init(
             id: nil,
@@ -69,7 +68,7 @@ public final class SignalAccount: NSObject, SDSCodableModel, Decodable {
             givenName: givenName,
             familyName: familyName,
             nickname: nickname,
-            fullName: fullName
+            fullName: fullName,
         )
     }
 
@@ -85,7 +84,7 @@ public final class SignalAccount: NSObject, SDSCodableModel, Decodable {
         givenName: String,
         familyName: String,
         nickname: String,
-        fullName: String
+        fullName: String,
     ) {
         self.id = id
         self.uniqueId = uniqueId
@@ -104,9 +103,6 @@ public final class SignalAccount: NSObject, SDSCodableModel, Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        let decodedRecordType = try container.decode(UInt.self, forKey: .recordType)
-        owsAssertDebug(decodedRecordType == Self.recordType, "Unexpectedly decoded record with wrong type!")
-
         id = try container.decodeIfPresent(RowId.self, forKey: .id)
         uniqueId = try container.decode(String.self, forKey: .uniqueId)
 
@@ -114,10 +110,7 @@ public final class SignalAccount: NSObject, SDSCodableModel, Decodable {
         // result, we must test for whether or not `contact` exists to know if we
         // have a deprecated or modern representation.
         if let deprecatedContactData = try container.decodeIfPresent(Data.self, forKey: .contact) {
-            let deprecatedContact: Contact = try LegacySDSSerializer().deserializeLegacySDSData(
-                deprecatedContactData,
-                propertyName: "contact"
-            )
+            let deprecatedContact = try LegacySDSSerializer().deserializeLegacySDSData(deprecatedContactData, ofClass: Contact.self)
             self.hasDeprecatedRepresentation = true
             self.cnContactId = deprecatedContact.cnContactId
             self.givenName = deprecatedContact.firstName
@@ -143,7 +136,7 @@ public final class SignalAccount: NSObject, SDSCodableModel, Decodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        try container.encode(Self.recordType, forKey: .recordType)
+        try container.encode(0, forKey: .recordType)
 
         try id.map { try container.encode($0, forKey: .id) }
         try container.encode(uniqueId, forKey: .uniqueId)
@@ -157,10 +150,6 @@ public final class SignalAccount: NSObject, SDSCodableModel, Decodable {
         try container.encode(familyName, forKey: .familyName)
         try container.encode(nickname, forKey: .nickname)
         try container.encode(fullName, forKey: .fullName)
-    }
-
-    public func didInsert(with rowID: Int64, for column: String?) {
-        self.id = rowID
     }
 }
 
@@ -186,7 +175,7 @@ extension SignalAccount {
             familyName: "",
             nickname: "",
             fullName: "",
-            contactAvatarHash: nil
+            contactAvatarHash: nil,
         )
     }
 }
@@ -272,25 +261,25 @@ extension SignalAccount {
         // NOTE: We don't want to compare contactAvatarJpegData. It can't change
         // without contactAvatarHash changing as well.
         recipientPhoneNumber == otherAccount.recipientPhoneNumber
-        && recipientServiceId == otherAccount.recipientServiceId
-        && multipleAccountLabelText == otherAccount.multipleAccountLabelText
-        && contactAvatarHash == otherAccount.contactAvatarHash
-        && cnContactId == otherAccount.cnContactId
-        && hasSameName(otherAccount)
+            && recipientServiceId == otherAccount.recipientServiceId
+            && multipleAccountLabelText == otherAccount.multipleAccountLabelText
+            && contactAvatarHash == otherAccount.contactAvatarHash
+            && cnContactId == otherAccount.cnContactId
+            && hasSameName(otherAccount)
     }
 
     public func hasSameName(_ otherAccount: SignalAccount) -> Bool {
-        return (
+        return
             self.givenName == otherAccount.givenName
-            && self.familyName == otherAccount.familyName
-            && self.nickname == otherAccount.nickname
-            && self.fullName == otherAccount.fullName
-        )
+                && self.familyName == otherAccount.familyName
+                && self.nickname == otherAccount.nickname
+                && self.fullName == otherAccount.fullName
+
     }
 
     public static func aciForPhoneNumberVisibilityUpdate(
         oldAccount: SignalAccount?,
-        newAccount: SignalAccount?
+        newAccount: SignalAccount?,
     ) -> Aci? {
         let oldAci = oldAccount?.recipientServiceId as? Aci
         let newAci = newAccount?.recipientServiceId as? Aci
@@ -335,26 +324,5 @@ private extension String {
     var displayStringIfNonEmpty: String? {
         let filtered = self.filterForDisplay
         return filtered.nilIfEmpty
-    }
-}
-
-// MARK: - NSCopying
-
-extension SignalAccount: NSCopying {
-    public func copy(with zone: NSZone? = nil) -> Any {
-        return SignalAccount(
-            id: self.id,
-            uniqueId: self.uniqueId,
-            contactAvatarHash: self.contactAvatarHash,
-            multipleAccountLabelText: self.multipleAccountLabelText,
-            recipientPhoneNumber: self.recipientPhoneNumber,
-            recipientServiceId: self.recipientServiceId,
-            hasDeprecatedRepresentation: self.hasDeprecatedRepresentation,
-            cnContactId: self.cnContactId,
-            givenName: self.givenName,
-            familyName: self.familyName,
-            nickname: self.nickname,
-            fullName: self.fullName
-        )
     }
 }

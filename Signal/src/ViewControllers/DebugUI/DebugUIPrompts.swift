@@ -14,11 +14,17 @@ class DebugUIPrompts: DebugUIPage {
     func section(thread: TSThread?) -> OWSTableSection? {
         let db = DependenciesBridge.shared.db
         let inactiveLinkedDeviceFinder = DependenciesBridge.shared.inactiveLinkedDeviceFinder
+        let keyTransparencyStore = KeyTransparencyStore()
         let usernameEducationManager = DependenciesBridge.shared.usernameEducationManager
 
         var items = [OWSTableItem]()
 
         items += [
+            OWSTableItem(title: "Reenable KT first-time education", actionBlock: {
+                db.write { tx in
+                    keyTransparencyStore.setShouldShowFirstTimeEducation(true, tx: tx)
+                }
+            }),
 
             OWSTableItem(title: "Reenable disabled inactive linked device reminder megaphones", actionBlock: {
                 db.write { tx in

@@ -56,12 +56,12 @@ public class HmacStreamTransform: StreamTransform, FinalizableStreamTransform, B
         // Get the data up to the point reserved for the footer, and preserve
         // the provisional footer data in the input buffer.
         let remainingDataLength = inputBuffer.count - self.footerSize
-        let remainingData = inputBuffer.subdata(in: 0..<remainingDataLength)
-        inputBuffer = inputBuffer.subdata(in: remainingDataLength..<inputBuffer.count)
+        let remainingData = inputBuffer.prefix(remainingDataLength)
+        inputBuffer = inputBuffer.dropFirst(remainingDataLength)
         return remainingData
     }
 
-    public func transform(data: Data) throws -> Data {
+    public func transform(data: Data, options: Options) throws -> Data {
         inputBuffer.append(data)
         let targetData = try readBufferedData()
         if targetData.count > 0 {

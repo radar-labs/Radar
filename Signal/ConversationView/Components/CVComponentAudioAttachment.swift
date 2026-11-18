@@ -3,16 +3,26 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import SignalServiceKit
-public import SignalUI
+import SignalServiceKit
+import SignalUI
 
-public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
+class CVComponentAudioAttachment:
+    CVComponentBase,
+    CVComponent,
+    CVAudioPlayerListener,
+    DatabaseChangeDelegate,
+    CVAccessibilityComponent
+{
 
-    public var componentKey: CVComponentKey { .audioAttachment }
+    var componentKey: CVComponentKey { .audioAttachment }
 
     private let audioAttachment: AudioAttachment
     private let nextAudioAttachment: AudioAttachment?
     private var attachment: Attachment { audioAttachment.attachment }
+    private var playbackID: CVAudioPlaybackID {
+        CVAudioPlaybackID(audioAttachment: audioAttachment)
+    }
+
     private var attachmentStream: AttachmentStream? { audioAttachment.attachmentStream?.attachmentStream }
     private let footerOverlay: CVComponent?
 
@@ -31,13 +41,15 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
         }
     }
 
-    public func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
+    func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
         CVComponentViewAudioAttachment()
     }
 
-    public func configureForRendering(componentView componentViewParam: CVComponentView,
-                                      cellMeasurement: CVCellMeasurement,
-                                      componentDelegate: CVComponentDelegate) {
+    func configureForRendering(
+        componentView componentViewParam: CVComponentView,
+        cellMeasurement: CVCellMeasurement,
+        componentDelegate: CVComponentDelegate,
+    ) {
         guard let componentView = componentViewParam as? CVComponentViewAudioAttachment else {
             owsFailDebug("Unexpected componentView.")
             componentViewParam.reset()
@@ -56,9 +68,11 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
                 componentView.footerOverlayView = footerOverlayView
                 footerView = footerOverlayView
             }
-            footerOverlay.configureForRendering(componentView: footerView,
-                                                cellMeasurement: cellMeasurement,
-                                                componentDelegate: componentDelegate)
+            footerOverlay.configureForRendering(
+                componentView: footerView,
+                cellMeasurement: cellMeasurement,
+                componentDelegate: componentDelegate,
+            )
             let footerRootView = footerView.rootView
 
             let footerSize = cellMeasurement.size(key: Self.measurementKey_footerSize) ?? .zero
@@ -75,11 +89,12 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
             isIncoming: isIncoming,
             audioAttachment: audioAttachment,
             threadUniqueId: itemModel.thread.uniqueId,
-            playbackRate: AudioPlaybackRate(rawValue: itemModel.itemViewState.audioPlaybackRate))
+            playbackRate: AudioPlaybackRate(rawValue: itemModel.itemViewState.audioPlaybackRate),
+        )
         let audioMessageView = AudioMessageView(
             presentation: presentation,
             audioMessageViewDelegate: componentDelegate,
-            mediaCache: mediaCache
+            mediaCache: mediaCache,
         )
         if let incomingMessage = interaction as? TSIncomingMessage {
             audioMessageView.setViewed(incomingMessage.wasViewed, animated: false)
@@ -88,13 +103,15 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
         }
         audioMessageView.configureForRendering(
             cellMeasurement: cellMeasurement,
-            conversationStyle: conversationStyle
+            conversationStyle: conversationStyle,
         )
         componentView.audioMessageView = audioMessageView
-        stackView.configure(config: stackViewConfig,
-                            cellMeasurement: cellMeasurement,
-                            measurementKey: Self.measurementKey_stackView,
-                            subviews: [ audioMessageView ])
+        stackView.configure(
+            config: stackViewConfig,
+            cellMeasurement: cellMeasurement,
+            measurementKey: Self.measurementKey_stackView,
+            subviews: [audioMessageView],
+        )
 
         // Listen for when our audio attachment finishes playing, so we can
         // start playing the next attachment.
@@ -102,24 +119,28 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
     }
 
     private var stackViewConfig: CVStackViewConfig {
-        CVStackViewConfig(axis: .vertical,
-                          alignment: .fill,
-                          spacing: 0,
-                          layoutMargins: .zero)
+        CVStackViewConfig(
+            axis: .vertical,
+            alignment: .fill,
+            spacing: 0,
+            layoutMargins: .zero,
+        )
     }
 
     private static let measurementKey_stackView = "CVComponentAudioAttachment.measurementKey_stackView"
     private static let measurementKey_footerSize = "CVComponentAudioAttachment.measurementKey_footerSize"
 
-    public func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
+    func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
         owsAssertDebug(maxWidth > 0)
 
         let maxWidth = min(maxWidth, conversationStyle.maxAudioMessageWidth)
 
         if let footerOverlay = self.footerOverlay {
             let maxFooterWidth = max(0, maxWidth - conversationStyle.textInsets.totalWidth)
-            let footerSize = footerOverlay.measure(maxWidth: maxFooterWidth,
-                                                   measurementBuilder: measurementBuilder)
+            let footerSize = footerOverlay.measure(
+                maxWidth: maxFooterWidth,
+                measurementBuilder: measurementBuilder,
+            )
             measurementBuilder.setSize(key: Self.measurementKey_footerSize, size: footerSize)
         }
 
@@ -127,17 +148,21 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
             isIncoming: false,
             audioAttachment: audioAttachment,
             threadUniqueId: itemModel.thread.uniqueId,
-            playbackRate: AudioPlaybackRate(rawValue: itemModel.itemViewState.audioPlaybackRate))
+            playbackRate: AudioPlaybackRate(rawValue: itemModel.itemViewState.audioPlaybackRate),
+        )
         let audioSize = AudioMessageView.measure(
             maxWidth: maxWidth,
             measurementBuilder: measurementBuilder,
-            presentation: presentation).ceil
+            presentation: presentation,
+        ).ceil
         let audioInfo = audioSize.asManualSubviewInfo
-        let stackMeasurement = ManualStackView.measure(config: stackViewConfig,
-                                                       measurementBuilder: measurementBuilder,
-                                                       measurementKey: Self.measurementKey_stackView,
-                                                       subviewInfos: [ audioInfo ],
-                                                       maxWidth: maxWidth)
+        let stackMeasurement = ManualStackView.measure(
+            config: stackViewConfig,
+            measurementBuilder: measurementBuilder,
+            measurementKey: Self.measurementKey_stackView,
+            subviewInfos: [audioInfo],
+            maxWidth: maxWidth,
+        )
         var measuredSize = stackMeasurement.measuredSize
         measuredSize.width = maxWidth
         return measuredSize
@@ -145,12 +170,13 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
 
     /// Checks if the message still exists and stops playback if it does not.
     private func checkIfMessageStillExists() {
-        guard AppEnvironment.shared.cvAudioPlayerRef.audioPlaybackState(forAttachmentId: attachment.id) == .playing else {
+        let cvAudioPlayer = AppEnvironment.shared.cvAudioPlayerRef
+        guard cvAudioPlayer.audioPlaybackState(playbackID: playbackID) == .playing else {
             return
         }
 
         let messageWasDeleted = SSKEnvironment.shared.databaseStorageRef.read { tx in
-            TSInteraction.anyFetch(uniqueId: interaction.uniqueId, transaction: tx) == nil
+            TSInteraction.fetchViaCache(uniqueId: interaction.uniqueId, transaction: tx) == nil
         }
         guard messageWasDeleted else {
             return
@@ -161,11 +187,11 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
 
     // MARK: - Events
 
-    public override func handleTap(
+    override func handleTap(
         sender: UIGestureRecognizer,
         componentDelegate: CVComponentDelegate,
         componentView: CVComponentView,
-        renderItem: CVRenderItem
+        renderItem: CVRenderItem,
     ) -> Bool {
         if
             let audioMessageView = (componentView as? CVComponentViewAudioAttachment)?.audioMessageView,
@@ -174,10 +200,10 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
             return true
         }
 
-        if audioAttachment.isDownloaded {
+        if audioAttachment.attachmentStream != nil {
             AppEnvironment.shared.cvAudioPlayerRef.setPlaybackRate(
                 renderItem.itemViewState.audioPlaybackRate,
-                forThreadUniqueId: renderItem.itemModel.thread.uniqueId
+                forThreadUniqueId: renderItem.itemModel.thread.uniqueId,
             )
             AppEnvironment.shared.cvAudioPlayerRef.togglePlayState(forAudioAttachment: audioAttachment)
 
@@ -185,37 +211,29 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
             let timestamp = Date().ows_millisecondsSince1970
             let attachmentId = audioAttachment.attachment.id
             Task {
-                do {
-                    try await DependenciesBridge.shared.db.awaitableWrite { tx in
-                        guard let attachment = DependenciesBridge.shared.attachmentStore.fetch(id: attachmentId, tx: tx) else {
-                            return
-                        }
-                        try DependenciesBridge.shared.attachmentStore.markViewedFullscreen(
-                            attachment: attachment,
-                            timestamp: timestamp,
-                            tx: tx
-                        )
-                    }
-                } catch {
-                    Logger.warn("Failed to mark attachment as viewed: \(error)")
+                await DependenciesBridge.shared.db.awaitableWrite { tx in
+                    DependenciesBridge.shared.attachmentStore.markViewedFullscreen(
+                        attachmentId: attachmentId,
+                        timestamp: timestamp,
+                        tx: tx,
+                    )
                 }
             }
 
             return true
 
-        } else if audioAttachment.isDownloading, let pointerId = audioAttachment.attachmentPointer?.attachment.id {
-            Logger.debug("Cancelling in-progress download because of user action: \(interaction.uniqueId):\(pointerId)")
+        } else if audioAttachment.isDownloading {
             SSKEnvironment.shared.databaseStorageRef.write { tx in
                 DependenciesBridge.shared.attachmentDownloadManager.cancelDownload(
-                    for: pointerId,
-                    tx: tx
+                    for: audioAttachment.attachment.id,
+                    tx: tx,
                 )
             }
             return true
 
         } else if let message = interaction as? TSMessage {
             Logger.debug("Retrying download for message: \(message.uniqueId)")
-            componentDelegate.didTapFailedOrPendingDownloads(message)
+            componentDelegate.didTapSkippedDownloads(message)
             return true
 
         } else {
@@ -226,11 +244,13 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
 
     // MARK: - Scrub Audio With Pan
 
-    public override func findPanHandler(sender: UIPanGestureRecognizer,
-                                        componentDelegate: CVComponentDelegate,
-                                        componentView: CVComponentView,
-                                        renderItem: CVRenderItem,
-                                        messageSwipeActionState: CVMessageSwipeActionState) -> CVPanHandler? {
+    override func findPanHandler(
+        sender: UIPanGestureRecognizer,
+        componentDelegate: CVComponentDelegate,
+        componentView: CVComponentView,
+        renderItem: CVRenderItem,
+        messageSwipeActionState: CVMessageSwipeActionState,
+    ) -> CVPanHandler? {
         AssertIsOnMainThread()
 
         guard let componentView = componentView as? CVComponentViewAudioAttachment else {
@@ -238,7 +258,7 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
             return nil
         }
         let itemViewModel = CVItemViewModelImpl(renderItem: renderItem)
-        guard componentDelegate.shouldAllowReplyForItem(itemViewModel) else {
+        guard componentDelegate.shouldAllowMessageSendActionsForItem(itemViewModel) else {
             return nil
         }
         guard nil != attachmentStream else {
@@ -253,26 +273,32 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
             return nil
         }
 
-        return CVPanHandler(delegate: componentDelegate,
-                            panType: .scrubAudio,
-                            renderItem: renderItem)
+        return CVPanHandler(
+            delegate: componentDelegate,
+            panType: .scrubAudio,
+            renderItem: renderItem,
+        )
     }
 
-    public override func startPanGesture(sender: UIPanGestureRecognizer,
-                                         panHandler: CVPanHandler,
-                                         componentDelegate: CVComponentDelegate,
-                                         componentView: CVComponentView,
-                                         renderItem: CVRenderItem,
-                                         messageSwipeActionState: CVMessageSwipeActionState) {
+    override func startPanGesture(
+        sender: UIPanGestureRecognizer,
+        panHandler: CVPanHandler,
+        componentDelegate: CVComponentDelegate,
+        componentView: CVComponentView,
+        renderItem: CVRenderItem,
+        messageSwipeActionState: CVMessageSwipeActionState,
+    ) {
         AssertIsOnMainThread()
     }
 
-    public override func handlePanGesture(sender: UIPanGestureRecognizer,
-                                          panHandler: CVPanHandler,
-                                          componentDelegate: CVComponentDelegate,
-                                          componentView: CVComponentView,
-                                          renderItem: CVRenderItem,
-                                          messageSwipeActionState: CVMessageSwipeActionState) {
+    override func handlePanGesture(
+        sender: UIPanGestureRecognizer,
+        panHandler: CVPanHandler,
+        componentDelegate: CVComponentDelegate,
+        componentView: CVComponentView,
+        renderItem: CVRenderItem,
+        messageSwipeActionState: CVMessageSwipeActionState,
+    ) {
         AssertIsOnMainThread()
 
         guard let componentView = componentView as? CVComponentViewAudioAttachment else {
@@ -284,9 +310,6 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
             return
         }
         let location = sender.location(in: audioMessageView)
-        guard let attachmentStream = attachmentStream else {
-            return
-        }
         switch sender.state {
         case .changed:
             let progress = audioMessageView.progressForLocation(location)
@@ -296,7 +319,10 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
             // we still call `scrubToLocation` above in order to update the slider.
             audioMessageView.clearOverrideProgress(animated: false)
             let scrubbedTime = audioMessageView.scrubToLocation(location)
-            AppEnvironment.shared.cvAudioPlayerRef.setPlaybackProgress(progress: scrubbedTime, forAttachmentStream: attachmentStream)
+            AppEnvironment.shared.cvAudioPlayerRef.setPlaybackProgress(
+                scrubbedTime,
+                playbackID: playbackID,
+            )
         case .possible, .began, .failed, .cancelled:
             audioMessageView.clearOverrideProgress(animated: false)
         @unknown default:
@@ -309,7 +335,7 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
 
     // Used for rendering some portion of an Conversation View item.
     // It could be the entire item or some part thereof.
-    public class CVComponentViewAudioAttachment: NSObject, CVComponentView {
+    class CVComponentViewAudioAttachment: CVComponentView {
 
         fileprivate let stackView = ManualStackView(name: "CVComponentViewAudioAttachment.stackView")
 
@@ -317,15 +343,15 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
 
         fileprivate var footerOverlayView: CVComponentView?
 
-        public var isDedicatedCellView = false
+        var isDedicatedCellView = false
 
-        public var rootView: UIView {
+        var rootView: UIView {
             stackView
         }
 
-        public func setIsCellVisible(_ isCellVisible: Bool) {}
+        func setIsCellVisible(_ isCellVisible: Bool) {}
 
-        public func reset() {
+        func reset() {
             stackView.reset()
 
             audioMessageView?.removeFromSuperview()
@@ -335,25 +361,22 @@ public class CVComponentAudioAttachment: CVComponentBase, CVComponent {
             footerOverlayView = nil
         }
     }
-}
 
-// MARK: - CVAudioPlayerListener
+    // MARK: - CVAudioPlayerListener
 
-extension CVComponentAudioAttachment: CVAudioPlayerListener {
-    func audioPlayerStateDidChange(attachmentId: Attachment.IDType) {}
+    func audioPlayerStateDidChange(playbackID: CVAudioPlaybackID) {}
 
-    func audioPlayerDidFinish(attachmentId: Attachment.IDType) {
-        guard attachmentId == audioAttachment.attachment.id else { return }
+    func audioPlayerDidFinish(playbackID: CVAudioPlaybackID) {
+        guard playbackID == self.playbackID else { return }
+
         AppEnvironment.shared.cvAudioPlayerRef.autoplayNextAudioAttachmentIfNeeded(nextAudioAttachment)
     }
 
-    func audioPlayerDidMarkViewed(attachmentId: Attachment.IDType) {}
-}
+    func audioPlayerDidMarkViewed(playbackID: CVAudioPlaybackID) {}
 
-// MARK: - DatabaseChangeDelegate
+    // MARK: - DatabaseChangeDelegate
 
-extension CVComponentAudioAttachment: DatabaseChangeDelegate {
-    public func databaseChangesDidUpdate(databaseChanges: SignalServiceKit.DatabaseChanges) {
+    func databaseChangesDidUpdate(databaseChanges: SignalServiceKit.DatabaseChanges) {
         guard databaseChanges.didUpdate(interaction: self.interaction) else {
             return
         }
@@ -361,44 +384,49 @@ extension CVComponentAudioAttachment: DatabaseChangeDelegate {
         checkIfMessageStillExists()
     }
 
-    public func databaseChangesDidUpdateExternally() {
+    func databaseChangesDidUpdateExternally() {
         checkIfMessageStillExists()
     }
 
-    public func databaseChangesDidReset() {
+    func databaseChangesDidReset() {
         checkIfMessageStillExists()
     }
-}
 
-// MARK: -
+    // MARK: - CVAccessibilityComponent
 
-extension CVComponentAudioAttachment: CVAccessibilityComponent {
-    public var accessibilityDescription: String {
-        if audioAttachment.isVoiceMessage {
-            if audioAttachment.durationSeconds > 0 && audioAttachment.durationSeconds < 60 {
+    var accessibilityDescription: String {
+        if
+            audioAttachment.isVoiceMessage,
+            let durationSeconds = audioAttachment.durationSeconds
+        {
+            if durationSeconds < 60 {
                 let format = OWSLocalizedString(
                     "ACCESSIBILITY_LABEL_SHORT_VOICE_MEMO_%d",
                     tableName: "PluralAware",
-                    comment: "Accessibility label for a short (under 60 seconds) voice memo. Embeds: {{ the duration of the voice message in seconds }}."
+                    comment: "Accessibility label for a short (under 60 seconds) voice memo. Embeds: {{ the duration of the voice message in seconds }}.",
                 )
-                return String.localizedStringWithFormat(format, Int(audioAttachment.durationSeconds))
-            } else if audioAttachment.durationSeconds >= 60 {
-                let minutes = (audioAttachment.durationSeconds / 60).rounded(.down)
-                let seconds = audioAttachment.durationSeconds.truncatingRemainder(dividingBy: 60)
+                return String.localizedStringWithFormat(format, Int(durationSeconds))
+            } else {
+                let minutes = (durationSeconds / 60).rounded(.down)
+                let seconds = durationSeconds.truncatingRemainder(dividingBy: 60)
                 let format = OWSLocalizedString(
                     "ACCESSIBILITY_LABEL_LONG_VOICE_MEMO_%d_%d",
                     tableName: "PluralAware",
-                    comment: "Accessibility label for a long (60+ seconds) voice memo. Embeds: {{ %1$@ the minutes component of the duration, %2$@ the seconds component of the duration }}."
+                    comment: "Accessibility label for a long (60+ seconds) voice memo. Embeds: {{ %1$@ the minutes component of the duration, %2$@ the seconds component of the duration }}.",
                 )
                 return String.localizedStringWithFormat(format, Int(minutes), Int(seconds))
-            } else {
-                return OWSLocalizedString("ACCESSIBILITY_LABEL_VOICE_MEMO",
-                                         comment: "Accessibility label for a voice memo.")
             }
+        } else if audioAttachment.isVoiceMessage {
+            return OWSLocalizedString(
+                "ACCESSIBILITY_LABEL_VOICE_MEMO",
+                comment: "Accessibility label for a voice memo.",
+            )
         } else {
             // TODO: We could include information about the attachment format.
-            return OWSLocalizedString("ACCESSIBILITY_LABEL_AUDIO",
-                                     comment: "Accessibility label for audio.")
+            return OWSLocalizedString(
+                "ACCESSIBILITY_LABEL_AUDIO",
+                comment: "Accessibility label for audio.",
+            )
         }
     }
 }

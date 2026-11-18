@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import Foundation
 import CallKit
+public import Foundation
 import SignalServiceKit
 import SignalUI
-import WebRTC
 import UIKit
+import WebRTC
 
 protocol CallUIAdaptee: AnyObject {
     var callService: CallService { get }
@@ -16,20 +16,20 @@ protocol CallUIAdaptee: AnyObject {
     init(showNamesOnCallScreen: Bool, useSystemCallLog: Bool)
 
     @MainActor
-    func startOutgoingCall(call: SignalCall)
+    func startOutgoingCall(call: SignalCall, completion: @escaping (Error?) -> Void)
 
     // TODO: It might be nice to prevent call links from being passed here at compile time.
     @MainActor
-    func reportIncomingCall(_ call: SignalCall, completion: @escaping (Error?) -> Void)
+    func reportIncomingCall(call: SignalCall, completion: @escaping (Error?) -> Void)
 
     @MainActor
-    func answerCall(_ call: SignalCall)
+    func answerCall(_ call: SignalCall, completion: @escaping (Error?) -> Void)
 
     @MainActor
     func recipientAcceptedCall(_ call: CallMode)
 
     @MainActor
-    func localHangupCall(_ call: SignalCall)
+    func localHangupCall(_ call: SignalCall, completion: @escaping (Error?) -> Void)
 
     @MainActor
     func remoteDidHangupCall(_ call: SignalCall)
@@ -73,25 +73,25 @@ public class CallUIAdapter: NSObject {
 #endif
         let (showNames, useSystemCallLog) = SSKEnvironment.shared.databaseStorageRef.read { tx in
             return (
-                SSKEnvironment.shared.preferencesRef.notificationPreviewType(tx: tx) != .noNameNoPreview,
-                SSKEnvironment.shared.preferencesRef.isSystemCallLogEnabled(tx: tx)
+                DependenciesBridge.shared.notificationPreferencesManager.previewType(tx: tx) != .noNameNoPreview,
+                SSKEnvironment.shared.preferencesRef.isSystemCallLogEnabledOrDefault(tx: tx),
             )
         }
         return callUIAdapteeType.init(
             showNamesOnCallScreen: showNames,
-            useSystemCallLog: useSystemCallLog
+            useSystemCallLog: useSystemCallLog,
         )
     }()
 
     @MainActor
-    public override init() {
+    override public init() {
         super.init()
 
         // We cannot assert singleton here, because this class gets rebuilt when the user changes relevant call settings
     }
 
     @MainActor
-    internal func reportIncomingCall(_ call: SignalCall) {
+    func reportIncomingCall(_ call: SignalCall) {
         guard let caller = call.caller else {
             return
         }
@@ -100,10 +100,10 @@ public class CallUIAdapter: NSObject {
         // make sure we don't terminate audio session during call
         _ = SUIEnvironment.shared.audioSessionRef.startAudioActivity(call.commonState.audioActivity)
 
-        adaptee.reportIncomingCall(call) { error in
+        adaptee.reportIncomingCall(call: call) { error in
             AssertIsOnMainThread()
 
-            guard var error = error else {
+            guard var error else {
                 self.showCall(call)
                 return
             }
@@ -119,12 +119,16 @@ public class CallUIAdapter: NSObject {
                 break
             }
 
-            self.callService.handleFailedCall(failedCall: call, error: error)
+            self.callService.handleFailedCall(
+                failedCall: call,
+                resetUI: true,
+                error: error,
+            )
         }
     }
 
     @MainActor
-    internal func reportMissedCall(_ call: SignalCall, individualCall: IndividualCall) {
+    func reportMissedCall(_ call: SignalCall, individualCall: IndividualCall) {
         guard let callerAci = individualCall.thread.contactAddress.aci else {
             owsFailDebug("Can't receive a call without an ACI.")
             return
@@ -136,35 +140,51 @@ public class CallUIAdapter: NSObject {
                 notificationInfo: CallNotificationInfo(
                     groupingId: individualCall.commonState.localId,
                     thread: individualCall.thread,
-                    caller: callerAci
+                    caller: callerAci,
                 ),
                 offerMediaType: individualCall.offerMediaType,
                 sentAt: sentAtTimestamp,
-                tx: tx
+                tx: tx,
             )
         }
     }
 
     @MainActor
-    internal func startOutgoingCall(call: SignalCall) {
+    func startOutgoingCall(call: SignalCall) {
         // make sure we don't terminate audio session during call
         _ = SUIEnvironment.shared.audioSessionRef.startAudioActivity(call.commonState.audioActivity)
 
-        adaptee.startOutgoingCall(call: call)
+        adaptee.startOutgoingCall(call: call) { error in
+            guard let error else { return }
+            self.callService.handleFailedCall(
+                failedCall: call,
+                resetUI: true,
+                error: error,
+            )
+        }
     }
 
     @MainActor
-    internal func answerCall(_ call: SignalCall) {
-        adaptee.answerCall(call)
+    func answerCall(_ call: SignalCall) {
+        adaptee.answerCall(call) { error in
+            guard let error else { return }
+            self.callService.handleFailedCall(
+                failedCall: call,
+                resetUI: true,
+                error: error,
+            )
+        }
     }
 
     @MainActor
     func startAndShowOutgoingCall(thread: TSContactThread, prepareResult: CallStarter.PrepareToStartCallResult, hasLocalVideo: Bool) {
-        guard let (call, individualCall) = self.callService.buildOutgoingIndividualCallIfPossible(
-            thread: thread,
-            localDeviceId: prepareResult.localDeviceId,
-            hasVideo: hasLocalVideo
-        ) else {
+        guard
+            let (call, individualCall) = self.callService.buildOutgoingIndividualCallIfPossible(
+                thread: thread,
+                localDeviceId: prepareResult.localDeviceId,
+                hasVideo: hasLocalVideo,
+            )
+        else {
             // @integration This is not unexpected, it could happen if Bob tries
             // to start an outgoing call at the same moment Alice has already
             // sent him an Offer that is being processed.
@@ -178,42 +198,49 @@ public class CallUIAdapter: NSObject {
     }
 
     @MainActor
-    internal func recipientAcceptedCall(_ call: CallMode) {
+    func recipientAcceptedCall(_ call: CallMode) {
         adaptee.recipientAcceptedCall(call)
     }
 
     @MainActor
-    internal func remoteDidHangupCall(_ call: SignalCall) {
+    func remoteDidHangupCall(_ call: SignalCall) {
         adaptee.remoteDidHangupCall(call)
     }
 
     @MainActor
-    internal func remoteBusy(_ call: SignalCall) {
+    func remoteBusy(_ call: SignalCall) {
         adaptee.remoteBusy(call)
     }
 
     @MainActor
-    internal func didAnswerElsewhere(call: SignalCall) {
+    func didAnswerElsewhere(call: SignalCall) {
         adaptee.didAnswerElsewhere(call: call)
     }
 
     @MainActor
-    internal func didDeclineElsewhere(call: SignalCall) {
+    func didDeclineElsewhere(call: SignalCall) {
         adaptee.didDeclineElsewhere(call: call)
     }
 
     @MainActor
-    internal func wasBusyElsewhere(call: SignalCall) {
+    func wasBusyElsewhere(call: SignalCall) {
         adaptee.wasBusyElsewhere(call: call)
     }
 
     @MainActor
-    internal func localHangupCall(_ call: SignalCall) {
-        adaptee.localHangupCall(call)
+    func localHangupCall(_ call: SignalCall) {
+        adaptee.localHangupCall(call) { error in
+            guard let error else { return }
+            self.callService.handleFailedCall(
+                failedCall: call,
+                resetUI: true,
+                error: error,
+            )
+        }
     }
 
     @MainActor
-    internal func failCall(_ call: SignalCall, error: CallError) {
+    func failCall(_ call: SignalCall, error: CallError) {
         adaptee.failCall(call, error: error)
     }
 
@@ -241,18 +268,18 @@ public class CallUIAdapter: NSObject {
     }
 
     @MainActor
-    internal func setIsMuted(call: SignalCall, isMuted: Bool) {
+    func setIsMuted(call: SignalCall, isMuted: Bool) {
         // With CallKit, muting is handled by a CXAction, so it must go through the adaptee
         adaptee.setIsMuted(call: call, isMuted: isMuted)
     }
 
     @MainActor
-    internal func setHasLocalVideo(call: SignalCall, hasLocalVideo: Bool) {
+    func setHasLocalVideo(call: SignalCall, hasLocalVideo: Bool) {
         adaptee.setHasLocalVideo(call: call, hasLocalVideo: hasLocalVideo)
     }
 
     @MainActor
-    internal func setCameraSource(call: SignalCall, isUsingFrontCamera: Bool) {
+    func setCameraSource(call: SignalCall, isUsingFrontCamera: Bool) {
         callService.updateCameraSource(call: call, isUsingFrontCamera: isUsingFrontCamera)
     }
 }

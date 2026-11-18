@@ -38,18 +38,30 @@ class PaymentsTest: SignalBaseTest {
         // Standard BIP-39 reference vectors (entropy <-> mnemonic), so the phrase
         // stays interoperable with other BIP-39 wallets.
         let vectors: [(entropyHex: String, mnemonic: String)] = [
-            ("00000000000000000000000000000000",
-             "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"),
-            ("7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f",
-             "legal winner thank year wave sausage worth useful legal winner thank yellow"),
-            ("80808080808080808080808080808080",
-             "letter advice cage absurd amount doctor acoustic avoid letter advice cage above"),
-            ("ffffffffffffffffffffffffffffffff",
-             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"),
-            ("0000000000000000000000000000000000000000000000000000000000000000",
-             "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art"),
-            ("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-             "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote"),
+            (
+                "00000000000000000000000000000000",
+                "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
+            ),
+            (
+                "7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f",
+                "legal winner thank year wave sausage worth useful legal winner thank yellow",
+            ),
+            (
+                "80808080808080808080808080808080",
+                "letter advice cage absurd amount doctor acoustic avoid letter advice cage above",
+            ),
+            (
+                "ffffffffffffffffffffffffffffffff",
+                "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong",
+            ),
+            (
+                "0000000000000000000000000000000000000000000000000000000000000000",
+                "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art",
+            ),
+            (
+                "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote",
+            ),
         ]
         for vector in vectors {
             let entropy = Data.data(fromHex: vector.entropyHex)!
@@ -72,25 +84,20 @@ class PaymentsTest: SignalBaseTest {
     func test_paymentAddressSigning() {
         let identityKeyPair = ECKeyPair.generateKeyPair()
         let publicAddressData = Randomness.generateRandomBytes(256)
-        let signatureData = try! TSPaymentAddress.sign(identityKeyPair: identityKeyPair,
-                                                       publicAddressData: publicAddressData)
-        XCTAssertTrue(TSPaymentAddress.verifySignature(identityKey: identityKeyPair.keyPair.identityKey,
-                                                       publicAddressData: publicAddressData,
-                                                       signatureData: signatureData))
+        let signatureData = try! TSPaymentAddress.sign(
+            identityKeyPair: identityKeyPair,
+            publicAddressData: publicAddressData,
+        )
+        XCTAssertTrue(TSPaymentAddress.verifySignature(
+            identityKey: identityKeyPair.keyPair.identityKey,
+            publicAddressData: publicAddressData,
+            signatureData: signatureData,
+        ))
         let fakeSignatureData = Randomness.generateRandomBytes(UInt(signatureData.count))
-        XCTAssertFalse(TSPaymentAddress.verifySignature(identityKey: identityKeyPair.keyPair.identityKey,
-                                                        publicAddressData: publicAddressData,
-                                                        signatureData: fakeSignatureData))
-    }
-
-    func test_isValidPhoneNumberForPayments_remoteConfigBlocklist() {
-        XCTAssertTrue(PaymentsHelperImpl.isValidPhoneNumberForPayments_remoteConfigBlocklist("+523456",
-                                                                                             paymentsDisabledRegions: ["1", "234"]))
-        XCTAssertFalse(PaymentsHelperImpl.isValidPhoneNumberForPayments_remoteConfigBlocklist("+123456",
-                                                                                              paymentsDisabledRegions: ["1", "234"]))
-        XCTAssertTrue(PaymentsHelperImpl.isValidPhoneNumberForPayments_remoteConfigBlocklist("+233333333",
-                                                                                             paymentsDisabledRegions: ["1", "234"]))
-        XCTAssertFalse(PaymentsHelperImpl.isValidPhoneNumberForPayments_remoteConfigBlocklist("+234333333",
-                                                                                              paymentsDisabledRegions: ["1", "234"]))
+        XCTAssertFalse(TSPaymentAddress.verifySignature(
+            identityKey: identityKeyPair.keyPair.identityKey,
+            publicAddressData: publicAddressData,
+            signatureData: fakeSignatureData,
+        ))
     }
 }

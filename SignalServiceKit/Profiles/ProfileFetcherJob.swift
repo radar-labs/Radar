@@ -24,14 +24,19 @@ public class ProfileFetcherJob {
     private let accountChecker: AccountChecker
     private let db: any DB
     private let disappearingMessagesConfigurationStore: any DisappearingMessagesConfigurationStore
+    private let groupSendEndorsementStore: GroupSendEndorsementStore
     private let identityManager: any OWSIdentityManager
+    private let keyTransparencyStore: KeyTransparencyStore
+    private let localProfileChecker: LocalProfileChecker
     private let paymentsHelper: any PaymentsHelper
     private let profileManager: any ProfileManager
     private let recipientDatabaseTable: RecipientDatabaseTable
-    private let syncManager: any SyncManagerProtocol
+    private let syncManager: any SyncManager
+    private let threadStore: any ThreadStore
     private let tsAccountManager: any TSAccountManager
     private let udManager: any OWSUDManager
     private let versionedProfiles: any VersionedProfiles
+    private let userProfileWriter: UserProfileWriter
     private let profileKeyVersion: String?
     private let profileFullUpdateOnFetch: Bool
 
@@ -43,16 +48,21 @@ public class ProfileFetcherJob {
         accountChecker: AccountChecker,
         db: any DB,
         disappearingMessagesConfigurationStore: any DisappearingMessagesConfigurationStore,
+        groupSendEndorsementStore: GroupSendEndorsementStore,
         identityManager: any OWSIdentityManager,
+        keyTransparencyStore: KeyTransparencyStore,
+        localProfileChecker: LocalProfileChecker,
         paymentsHelper: any PaymentsHelper,
         profileManager: any ProfileManager,
         recipientDatabaseTable: RecipientDatabaseTable,
-        syncManager: any SyncManagerProtocol,
+        syncManager: any SyncManager,
+        threadStore: any ThreadStore,
         tsAccountManager: any TSAccountManager,
         udManager: any OWSUDManager,
         versionedProfiles: any VersionedProfiles,
+        userProfileWriter: UserProfileWriter,
         profileKeyVersion: String?,
-        profileAutoUpdate: Bool
+        profileAutoUpdate: Bool,
     ) {
         self.serviceId = serviceId
         self.groupIdContext = groupIdContext
@@ -61,14 +71,19 @@ public class ProfileFetcherJob {
         self.accountChecker = accountChecker
         self.db = db
         self.disappearingMessagesConfigurationStore = disappearingMessagesConfigurationStore
+        self.groupSendEndorsementStore = groupSendEndorsementStore
         self.identityManager = identityManager
+        self.keyTransparencyStore = keyTransparencyStore
+        self.localProfileChecker = localProfileChecker
         self.paymentsHelper = paymentsHelper
         self.profileManager = profileManager
         self.recipientDatabaseTable = recipientDatabaseTable
         self.syncManager = syncManager
+        self.threadStore = threadStore
         self.tsAccountManager = tsAccountManager
         self.udManager = udManager
         self.versionedProfiles = versionedProfiles
+        self.userProfileWriter = userProfileWriter
         self.profileKeyVersion = profileKeyVersion
         self.profileFullUpdateOnFetch = profileAutoUpdate
     }
@@ -84,14 +99,18 @@ public class ProfileFetcherJob {
         let localIdentifiers = try tsAccountManager.localIdentifiersWithMaybeSneakyTransaction(authedAccount: authedAccount)
         do {
             let fetchedProfile = try await requestProfile(localIdentifiers: localIdentifiers, profileKeyVersion: profileKeyVersion)
-            try await updateProfile(fetchedProfile: fetchedProfile, localIdentifiers: localIdentifiers)
+            try await updateProfile(
+                fetchedProfile: fetchedProfile,
+                localIdentifiers: localIdentifiers,
+                userProfileWriter: userProfileWriter,
+            )
             return fetchedProfile
         } catch ProfileRequestError.notFound {
             let isRegistered = db.read { tx in
                 return recipientDatabaseTable.fetchRecipient(serviceId: serviceId, transaction: tx)?.isRegistered == true
             }
             if isRegistered {
-                try? await accountChecker.checkIfAccountExists(serviceId: serviceId)
+                _ = try? await accountChecker.checkIfAccountExists(serviceId: serviceId)
             }
             throw ProfileRequestError.notFound
         }
@@ -125,7 +144,7 @@ public class ProfileFetcherJob {
                 profileKeyVersion: profileKeyVersion,
                 shouldRequestCredential: versionedFetchParameters.shouldRequestCredential,
                 udAccessKey: versionedFetchParameters.auth?.key,
-                auth: self.authedAccount.chatServiceAuth
+                auth: self.authedAccount.chatServiceAuth,
             )
             do {
                 let response = try await makeRequest(versionedProfileRequest.request)
@@ -171,13 +190,13 @@ public class ProfileFetcherJob {
             accessKey: nil,
             endorsement: endorsement,
             authedAccount: self.authedAccount,
-            options: [.allowIdentifiedFallback, .isProfileFetch]
+            options: [.allowIdentifiedFallback, .isProfileFetch],
         )
 
         let result = try await requestMaker.makeRequest { sealedSenderAuth in
             return OWSRequestFactory.getUnversionedProfileRequest(
                 serviceId: serviceId,
-                auth: sealedSenderAuth.map({ .sealedSender($0) }) ?? .identified(self.authedAccount.chatServiceAuth)
+                auth: sealedSenderAuth.map({ .sealedSender($0) }) ?? .identified(self.authedAccount.chatServiceAuth),
             )
         }
 
@@ -201,7 +220,7 @@ public class ProfileFetcherJob {
 
     private func readVersionedFetchParameters(
         localIdentifiers: LocalIdentifiers,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> VersionedFetchParameters? {
         let _versionedFetchParameters = Self._readVersionedFetchParameters(
             serviceId: self.serviceId,
@@ -218,7 +237,7 @@ public class ProfileFetcherJob {
             profileKey: _versionedFetchParameters.profileKey,
             shouldRequestCredential: try (
                 self.mustFetchNewCredential
-                || self.versionedProfiles.validProfileKeyCredential(for: _versionedFetchParameters.aci, transaction: tx) == nil
+                    || self.versionedProfiles.validProfileKeyCredential(for: _versionedFetchParameters.aci, transaction: tx) == nil
             ),
             auth: _versionedFetchParameters.auth,
         )
@@ -238,12 +257,12 @@ public class ProfileFetcherJob {
         tx: DBReadTransaction,
     ) -> _VersionedFetchParameters? {
         switch serviceId.concreteType {
-        case .pni(_):
+        case .pni:
             return nil
         case .aci(let aci):
             let profileKey = profileManager.userProfile(
                 for: SignalServiceAddress(aci),
-                tx: tx
+                tx: tx,
             )?.profileKey
             guard let profileKey else {
                 return nil
@@ -263,7 +282,7 @@ public class ProfileFetcherJob {
             return _VersionedFetchParameters(
                 aci: aci,
                 profileKey: ProfileKey(profileKey),
-                auth: auth
+                auth: auth,
             )
         }
     }
@@ -288,33 +307,31 @@ public class ProfileFetcherJob {
         guard let aci = serviceId as? Aci else {
             return nil
         }
-        let threadStore = DependenciesBridge.shared.threadStore
-        guard let groupThread = threadStore.fetchGroupThread(groupId: groupId, tx: tx) else {
-            throw OWSAssertionError("Can't find group that should exist.")
+        guard let groupRecord = GroupStore().fetchGroup(forGroupId: groupId, tx: tx) else {
+            throw OWSGenericError("missing group")
         }
-        guard let groupModel = groupThread.groupModel as? TSGroupModelV2 else {
-            throw OWSAssertionError("Can't access v2 model for group with v2 identifier.")
+        guard let secretParams = groupRecord.deriveSecretParams() else {
+            throw OWSGenericError("missing secret params")
         }
-        let endorsementStore = DependenciesBridge.shared.groupSendEndorsementStore
-        let combinedEndorsement = try endorsementStore.fetchCombinedEndorsement(groupThreadId: groupThread.sqliteRowId!, tx: tx)
+        let combinedEndorsement = groupSendEndorsementStore.fetchCombinedEndorsement(groupRowId: groupRecord.rowId, tx: tx)
         guard let combinedEndorsement else {
             // Perhaps we haven't fetched it or it expired.
             return nil
         }
         guard
             let recipient = recipientDatabaseTable.fetchRecipient(serviceId: aci, transaction: tx),
-            let individualEndorsement = try endorsementStore.fetchIndividualEndorsement(
-                groupThreadId: groupThread.sqliteRowId!,
+            let individualEndorsement = groupSendEndorsementStore.fetchIndividualEndorsement(
+                groupRowId: groupRecord.rowId,
                 recipientId: recipient.id,
-                tx: tx
+                tx: tx,
             )
         else {
             throw OWSAssertionError("Can't find GSE for group member that should have one.")
         }
         return GroupSendFullTokenBuilder(
-            secretParams: try groupModel.secretParams(),
+            secretParams: secretParams,
             expiration: combinedEndorsement.expiration,
-            endorsement: try GroupSendEndorsement(contents: individualEndorsement.endorsement)
+            endorsement: try GroupSendEndorsement(contents: individualEndorsement.endorsement),
         )
     }
 
@@ -325,15 +342,19 @@ public class ProfileFetcherJob {
 
     private func updateProfile(
         fetchedProfile: FetchedProfile,
-        localIdentifiers: LocalIdentifiers
+        localIdentifiers: LocalIdentifiers,
+        userProfileWriter: UserProfileWriter,
     ) async throws {
+        let avatarDownloadResult = try await downloadAvatarIfNeeded(
+            fetchedProfile,
+            localIdentifiers: localIdentifiers,
+        )
+
         await updateProfile(
             fetchedProfile: fetchedProfile,
-            avatarDownloadResult: try await downloadAvatarIfNeeded(
-                fetchedProfile,
-                localIdentifiers: localIdentifiers
-            ),
-            localIdentifiers: localIdentifiers
+            avatarDownloadResult: avatarDownloadResult,
+            localIdentifiers: localIdentifiers,
+            userProfileWriter: userProfileWriter,
         )
     }
 
@@ -344,7 +365,7 @@ public class ProfileFetcherJob {
 
     private func downloadAvatarIfNeeded(
         _ fetchedProfile: FetchedProfile,
-        localIdentifiers: LocalIdentifiers
+        localIdentifiers: LocalIdentifiers,
     ) async throws -> AvatarDownloadResult {
         if localIdentifiers.contains(serviceId: fetchedProfile.profile.serviceId) {
             // Profile fetches NEVER touch the local user's avatar.
@@ -375,7 +396,7 @@ public class ProfileFetcherJob {
         let shouldPreventDownload = db.read { tx -> Bool in
             SSKEnvironment.shared.contactManagerImplRef.shouldBlockAvatarDownload(
                 address: profileAddress,
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -387,10 +408,13 @@ public class ProfileFetcherJob {
         do {
             temporaryAvatarUrl = try await profileManager.downloadAndDecryptAvatar(
                 avatarUrlPath: newAvatarUrlPath,
-                profileKey: profileKey
+                profileKey: profileKey,
             )
         } catch {
-            Logger.warn("Error: \(error)")
+            // Log only domain/code; the raw error's userInfo can contain the
+            // avatar CDN URL.
+            Logger.warn("Error: \(error.shortDescription)")
+
             // Reaching this point with anything other than a network failure or
             // timeout should be very rare. It might reflect:
             //
@@ -405,65 +429,56 @@ public class ProfileFetcherJob {
         }
         return AvatarDownloadResult(
             remoteRelativePath: .setTo(newAvatarUrlPath),
-            localFileUrl: .setTo(temporaryAvatarUrl)
+            localFileUrl: .setTo(temporaryAvatarUrl),
         )
     }
 
     private func updateProfile(
         fetchedProfile: FetchedProfile,
         avatarDownloadResult: AvatarDownloadResult,
-        localIdentifiers: LocalIdentifiers
+        localIdentifiers: LocalIdentifiers,
+        userProfileWriter: UserProfileWriter,
     ) async {
         let profile = fetchedProfile.profile
         let serviceId = profile.serviceId
 
         await db.awaitableWrite { transaction in
-            // Update payment address in any case
+            // Radar: always keep the contact's payment-address flag in sync with the
+            // profile we fetched, including the Lightning-address profile version
+            // (fetched with profileFullUpdateOnFetch == false). Upstream moved this flag
+            // from the "arePaymentsEnabledForUserStore" store to OWSUserProfile.
             defer {
-                let paymentAddress = fetchedProfile.decryptedProfile?.paymentAddress(identityKey: fetchedProfile.identityKey)
-                self.paymentsHelper.setArePaymentsEnabled(
-                    for: serviceId,
-                    hasPaymentsEnabled: paymentAddress != nil,
-                    transaction: transaction
+                let hasPaymentAddress = (try? fetchedProfile.decryptedProfile?.paymentAddress()) != nil
+                let userProfile = OWSUserProfile.getOrBuildUserProfile(
+                    for: OWSUserProfile.insertableAddress(serviceId: serviceId, localIdentifiers: localIdentifiers),
+                    userProfileWriter: userProfileWriter,
+                    tx: transaction,
+                )
+                userProfile.update(
+                    hasPaymentAddress: .setTo(hasPaymentAddress),
+                    userProfileWriter: userProfileWriter,
+                    transaction: transaction,
                 )
             }
-            
+
             guard profileFullUpdateOnFetch else {
                 return
             }
-            
+
             if let aci = serviceId as? Aci {
                 self.updateUnidentifiedAccess(
                     aci: aci,
                     verifier: profile.unidentifiedAccessVerifier,
                     hasUnrestrictedAccess: profile.hasUnrestrictedUnidentifiedAccess,
-                    tx: transaction
+                    tx: transaction,
                 )
             }
-
-            // First, we add ensure we have a copy of any new badge in our badge store
-            let badgeModels = fetchedProfile.profile.badges.map { $0.1 }
-            let persistedBadgeIds: [String] = badgeModels.compactMap {
-                do {
-                    try self.profileManager.badgeStore.createOrUpdateBadge($0, transaction: transaction)
-                    return $0.id
-                } catch {
-                    owsFailDebug("Failed to save badgeId: \($0.id). \(error)")
-                    return nil
-                }
-            }
-
-            // Then, we update the profile. `profileBadges` will contain the badgeId of
-            // badges in the badge store
-            let profileBadgeMetadata = fetchedProfile.profile.badges
-                .map { $0.0 }
-                .filter { persistedBadgeIds.contains($0.badgeId) }
 
             let avatarFilename: OptionalChange<String?>
             do {
                 avatarFilename = try OWSUserProfile.consumeTemporaryAvatarFileUrl(
                     avatarDownloadResult.localFileUrl,
-                    tx: transaction
+                    tx: transaction,
                 )
             } catch {
                 Logger.warn("Couldn't move downloaded avatar: \(error)")
@@ -476,10 +491,10 @@ public class ProfileFetcherJob {
                     decryptedProfile: fetchedProfile.decryptedProfile,
                     avatarUrlPath: avatarDownloadResult.remoteRelativePath,
                     avatarFileName: avatarFilename,
-                    profileBadges: profileBadgeMetadata,
+                    profileBadgeUserInfos: profile.profileBadgeUserInfos,
                     lastFetchDate: Date(),
-                    userProfileWriter: .profileFetch,
-                    tx: transaction
+                    userProfileWriter: userProfileWriter,
+                    tx: transaction,
                 )
             }
 
@@ -487,15 +502,14 @@ public class ProfileFetcherJob {
                 serviceId: serviceId,
                 fetchedCapabilities: fetchedProfile.profile.capabilities,
                 localIdentifiers: localIdentifiers,
-                tx: transaction
+                tx: transaction,
             )
 
             if localIdentifiers.aci == serviceId {
                 self.reconcileLocalProfileIfNeeded(fetchedProfile: fetchedProfile)
             }
 
-            let identityManager = DependenciesBridge.shared.identityManager
-            identityManager.saveIdentityKey(profile.identityKey, for: serviceId, tx: transaction)
+            self.identityManager.saveIdentityKey(profile.identityKey, for: serviceId, shouldUpdateStorageService: true, tx: transaction)
         }
     }
 
@@ -503,7 +517,7 @@ public class ProfileFetcherJob {
         aci: Aci,
         verifier: Data?,
         hasUnrestrictedAccess: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         let unidentifiedAccessMode: UnidentifiedAccessMode = {
             guard let verifier else {
@@ -535,22 +549,32 @@ public class ProfileFetcherJob {
         serviceId: ServiceId,
         fetchedCapabilities: SignalServiceProfile.Capabilities,
         localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         let registrationState = tsAccountManager.registrationState(tx: tx)
 
         var shouldSendProfileSync = false
 
-        if
-            localIdentifiers.aci == serviceId,
-            fetchedCapabilities.dummyCapability
-        {
+        if localIdentifiers.aci == serviceId {
             // Space to detect changes to our own capabilities, and run code
             // such as migrations in response.
             //
             // See comment on `dummyCapability`: it's always false, but lets us
             // keep this code around without the compiler complaining.
-            shouldSendProfileSync = true
+            if fetchedCapabilities.dummyCapability {
+                shouldSendProfileSync = true
+            }
+
+            // If's important that we check isUsernameChangeSyncMessageCapable
+            // before entering this block, lest we end up sending profile syncs
+            // between our devices in a loop as they re-fetch the local profile.
+            if
+                fetchedCapabilities.usernameChangeSyncMessage,
+                !keyTransparencyStore.isUsernameChangeSyncMessageCapable(tx: tx)
+            {
+                keyTransparencyStore.setIsUsernameChangeSyncMessageCapable(tx: tx)
+                shouldSendProfileSync = true
+            }
         }
 
         if
@@ -571,9 +595,9 @@ public class ProfileFetcherJob {
         guard tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegisteredPrimaryDevice else {
             return
         }
-        DependenciesBridge.shared.localProfileChecker.didFetchLocalProfile(LocalProfileChecker.RemoteProfile(
+        self.localProfileChecker.didFetchLocalProfile(LocalProfileChecker.RemoteProfile(
             avatarUrlPath: fetchedProfile.profile.avatarUrlPath,
-            decryptedProfile: fetchedProfile.decryptedProfile
+            decryptedProfile: fetchedProfile.decryptedProfile,
         ))
     }
 
@@ -599,6 +623,7 @@ public struct DecryptedProfile {
     public let bio: Result<String?, Error>
     public let bioEmoji: Result<String?, Error>
     public let paymentAddressData: Result<Data?, Error>
+    public let identityKey: IdentityKey
     public let phoneNumberSharing: Result<Bool?, Error>
 }
 
@@ -623,10 +648,10 @@ public struct FetchedProfile {
         }
         let hasAnyField: Bool = (
             profile.profileNameEncrypted != nil
-            || profile.bioEncrypted != nil
-            || profile.bioEmojiEncrypted != nil
-            || profile.paymentAddressEncrypted != nil
-            || profile.phoneNumberSharingEncrypted != nil
+                || profile.bioEncrypted != nil
+                || profile.bioEmojiEncrypted != nil
+                || profile.paymentAddressEncrypted != nil
+                || profile.phoneNumberSharingEncrypted != nil,
         )
         guard hasAnyField else {
             return nil
@@ -641,7 +666,8 @@ public struct FetchedProfile {
             try OWSUserProfile.decrypt(profileStringData: $0, profileKey: profileKey)
         }}
         let paymentAddressData = Result { try profile.paymentAddressEncrypted.map {
-            try OWSUserProfile.decrypt(profileData: $0, profileKey: profileKey)
+            owsAssertDebug(!$0.isEmpty, "encrypted payment address shouldn't be empty")
+            return try OWSUserProfile.decrypt(profileData: $0, profileKey: profileKey)
         }}
         let phoneNumberSharing = Result { try profile.phoneNumberSharingEncrypted.map {
             try OWSUserProfile.decrypt(profileBooleanData: $0, profileKey: profileKey)
@@ -651,34 +677,28 @@ public struct FetchedProfile {
             bio: bio,
             bioEmoji: bioEmoji,
             paymentAddressData: paymentAddressData,
-            phoneNumberSharing: phoneNumberSharing
+            identityKey: profile.identityKey,
+            phoneNumberSharing: phoneNumberSharing,
         )
     }
 }
 
 // MARK: -
 
-public extension DecryptedProfile {
-    func paymentAddress(identityKey: IdentityKey) -> TSPaymentAddress? {
-        do {
-            guard var paymentAddressData = try paymentAddressData.get() else {
-                return nil
-            }
-            guard let (dataLength, dataLengthCount) = UInt32.from(littleEndianData: paymentAddressData) else {
-                owsFailDebug("couldn't find paymentAddressData's length")
-                return nil
-            }
-            paymentAddressData = paymentAddressData.dropFirst(dataLengthCount)
-            paymentAddressData = paymentAddressData.prefix(Int(dataLength))
-            guard paymentAddressData.count == dataLength else {
-                owsFailDebug("paymentAddressData is too short")
-                return nil
-            }
-            let proto = try SSKProtoPaymentAddress(serializedData: paymentAddressData)
-            return try TSPaymentAddress.fromProto(proto, identityKey: identityKey)
-        } catch {
-            owsFailDebug("Error: \(error)")
+extension DecryptedProfile {
+    public func paymentAddress() throws -> TSPaymentAddress? {
+        guard var paymentAddressData = try paymentAddressData.get() else {
             return nil
         }
+        guard let (dataLength, dataLengthCount) = UInt32.from(littleEndianData: paymentAddressData) else {
+            throw OWSGenericError("paymentAddressData doesn't specify a length")
+        }
+        paymentAddressData = paymentAddressData.dropFirst(dataLengthCount)
+        paymentAddressData = paymentAddressData.prefix(Int(dataLength))
+        guard paymentAddressData.count == dataLength else {
+            throw OWSGenericError("paymentAddressData is too short")
+        }
+        let proto = try SSKProtoPaymentAddress(serializedData: paymentAddressData)
+        return try TSPaymentAddress.fromProto(proto, identityKey: identityKey)
     }
 }

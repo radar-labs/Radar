@@ -3,108 +3,100 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
 import CoreTelephony
+import Foundation
 
 public class RegistrationSessionManagerImpl: RegistrationSessionManager {
 
     private let dateProvider: DateProvider
     private let db: any DB
-    private let kvStore: KeyValueStore
-    private let signalService: OWSSignalServiceProtocol
+    private let kvStore: NewKeyValueStore
+    private let networkManager: any NetworkManagerProtocol
 
     public init(
         dateProvider: @escaping DateProvider = Date.provider,
         db: any DB,
-        signalService: OWSSignalServiceProtocol
+        networkManager: any NetworkManagerProtocol,
     ) {
         self.dateProvider = dateProvider
         self.db = db
-        self.kvStore = KeyValueStore(collection: KvStore.collectionName)
-        self.signalService = signalService
+        self.kvStore = NewKeyValueStore(collection: KvStore.collectionName)
+        self.networkManager = networkManager
     }
 
     // TODO: make this and other methods resilient to transient network failures by adding
     // basic retrying logic.
-    public func restoreSession() async -> RegistrationSession? {
+    public func restoreSession(logger: PrefixedLogger) async -> RegistrationSession? {
         // Just get the most recent one, don't validate against any e164.
-        return await restoreSession(forE164: nil)
+        return await restoreSession(forE164: nil, logger: logger)
     }
 
-    public func beginOrRestoreSession(e164: E164, apnsToken: String?) async -> Registration.BeginSessionResponse {
-        // Verify the session is still valid.
-        let restoredSession = await restoreSession(forE164: e164)
-        guard let restoredSession, restoredSession.e164 == e164 else {
-            // We only keep one session at a time, wipe any if we change the e164.
-            await db.awaitableWrite { self.clearPersistedSession($0) }
-
-            let (mcc, mnc) = Self.getMccMnc()
-
-            let response = await makeBeginSessionRequest(
-                e164: e164,
-                apnsToken: apnsToken,
-                mcc: mcc,
-                mnc: mnc
-            )
-            return await persistSessionFromResponse(response)
+    public func beginOrRestoreSession(e164: E164, apnsToken: String?, logger: PrefixedLogger) async throws -> RegistrationSession {
+        let restoredSession = await restoreSession(forE164: e164, logger: logger)
+        if let restoredSession {
+            return restoredSession
         }
-        return .success(restoredSession)
+
+        let (mcc, mnc) = Self.getMccMnc()
+
+        let session = try await makeBeginSessionRequest(
+            e164: e164,
+            apnsToken: apnsToken,
+            mcc: mcc,
+            mnc: mnc,
+            logger: logger,
+        )
+        await db.awaitableWrite { tx in self.persist(session: session, tx) }
+        return session
     }
 
     public func fulfillChallenge(
-        for session: RegistrationSession,
-        fulfillment: Registration.ChallengeFulfillment
-    ) async -> Registration.UpdateSessionResponse {
-        let response = await makeFulfillChallengeRequest(session, fulfillment)
+        for session: inout RegistrationSession,
+        fulfillment: Registration.ChallengeFulfillment,
+        logger: PrefixedLogger,
+    ) async throws {
+        try await updatingSession(&session) { session, updatedSession in
+            try await makeFulfillChallengeRequest(
+                forSession: session,
+                updatedSession: &updatedSession,
+                fulfillment: fulfillment,
+                logger: logger,
+            )
+        }
+    }
+
+    public func requestVerificationCode(for session: RegistrationSession, transport: Registration.CodeTransport, logger: PrefixedLogger) async -> Registration.UpdateSessionResponse {
+        let response = await makeRequestVerificationCodeRequest(session, transport, logger: logger)
         return await persistSessionFromResponse(response)
     }
 
-    public func requestVerificationCode(for session: RegistrationSession, transport: Registration.CodeTransport) async -> Registration.UpdateSessionResponse {
-        let response = await makeRequestVerificationCodeRequest(session, transport)
-        return await persistSessionFromResponse(response)
-    }
-
-    public func submitVerificationCode(for session: RegistrationSession, code: String) async -> Registration.UpdateSessionResponse {
-        let response = await makeSubmitVerificationCodeRequest(session, code: code)
+    public func submitVerificationCode(for session: RegistrationSession, code: String, logger: PrefixedLogger) async -> Registration.UpdateSessionResponse {
+        let response = await makeSubmitVerificationCodeRequest(session, code: code, logger: logger)
         return await persistSessionFromResponse(response)
     }
 
     public func clearPersistedSession(_ transaction: DBWriteTransaction) {
-        kvStore.removeValue(forKey: KvStore.sessionKey, transaction: transaction)
+        kvStore.removeValue(forKey: KvStore.sessionKey, tx: transaction)
     }
 
     // MARK: - Session persistence
 
-    internal enum KvStore {
+    enum KvStore {
         static let collectionName = "RegistrationSession"
         static let sessionKey = "session"
     }
 
     private func persist(session: RegistrationSession, _ transaction: DBWriteTransaction) {
-        do {
-            try kvStore.setCodable(session, key: KvStore.sessionKey, transaction: transaction)
-        } catch {
-            owsFailDebug("Unable to encode session; will not be recoverable after app relaunch.")
-        }
+        kvStore.writeValueAsJSON(session, forKey: KvStore.sessionKey, tx: transaction)
     }
 
     private func getPersistedSession(_ transaction: DBReadTransaction) -> RegistrationSession? {
         do {
-            return try kvStore.getCodableValue(forKey: KvStore.sessionKey, transaction: transaction)
+            return try kvStore.fetchJSONAsValue(RegistrationSession.self, forKey: KvStore.sessionKey, tx: transaction)
         } catch {
             owsFailDebug("Unable to decode session; will not be recoverable after app relaunch.")
             return nil
         }
-    }
-
-    private func persistSessionFromResponse(_ response: Registration.BeginSessionResponse) async -> Registration.BeginSessionResponse {
-        switch response {
-        case .success(let session):
-            await db.awaitableWrite { self.persist(session: session, $0) }
-        case .invalidArgument, .retryAfter, .networkFailure, .genericError:
-            break
-        }
-        return response
     }
 
     private func persistSessionFromResponse(_ response: Registration.UpdateSessionResponse) async -> Registration.UpdateSessionResponse {
@@ -113,7 +105,7 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
             let .success(session),
             let .disallowed(session),
             let .rejectedArgument(session),
-            let .retryAfterTimeout(session),
+            let .retryAfterTimeout(session, retryAfterHeader: _),
             let .transportError(session):
             await db.awaitableWrite { self.persist(session: session, $0) }
         case .invalidSession:
@@ -137,6 +129,19 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
         return response
     }
 
+    private func updatingSession(
+        _ session: inout RegistrationSession,
+        block: (_ session: RegistrationSession, _ updatedSession: inout RegistrationSession?) async throws -> Void,
+    ) async throws {
+        var updatedSession: RegistrationSession?
+        let result = await Result(catching: { try await block(session, &updatedSession) })
+        if let updatedSession {
+            session = updatedSession
+            await db.awaitableWrite { tx in self.persist(session: session, tx) }
+        }
+        try result.get()
+    }
+
     // MARK: - MCC/MNC
 
     private static func getMccMnc() -> (mcc: String?, mnc: String?) {
@@ -157,7 +162,7 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
 
     // TODO: make this and other methods resilient to transient network failures by adding
     // basic retrying logic.
-    private func restoreSession(forE164 e164: E164?) async -> RegistrationSession? {
+    private func restoreSession(forE164 e164: E164?, logger: PrefixedLogger) async -> RegistrationSession? {
         guard let existingSession = db.read(block: { self.getPersistedSession($0) }) else {
             return nil
         }
@@ -167,7 +172,7 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
             return nil
         }
         // Verify the session is still valid.
-        let fetchSessionResponse = await makeFetchSessionRequest(existingSession)
+        let fetchSessionResponse = await makeFetchSessionRequest(existingSession, logger: logger)
         _ = await self.persistSessionFromResponse(fetchSessionResponse)
         switch fetchSessionResponse {
         case .success(let session):
@@ -183,60 +188,28 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
         e164: E164,
         apnsToken: String?,
         mcc: String?,
-        mnc: String?
-    ) async -> Registration.BeginSessionResponse {
+        mnc: String?,
+        logger: PrefixedLogger,
+    ) async throws -> RegistrationSession {
         let request = RegistrationRequestFactory.beginSessionRequest(
             e164: e164,
             pushToken: apnsToken,
             mcc: mcc,
-            mnc: mnc
+            mnc: mnc,
+            logger: logger,
         )
-        return await makeRequest(
-            request,
-            e164: e164,
-            handler: self.handleBeginSessionResponse(forE164:statusCode:retryAfterHeader:bodyData:),
-            fallbackError: .genericError,
-            networkFailureError: .networkFailure
-        )
-    }
-
-    private func handleBeginSessionResponse(
-        forE164 e164: E164,
-        statusCode: Int,
-        retryAfterHeader: String?,
-        bodyData: Data?
-    ) -> Registration.BeginSessionResponse {
-        let statusCode = RegistrationServiceResponses.BeginSessionResponseCodes(rawValue: statusCode)
-        switch statusCode {
-        case .success:
-            return registrationSession(
-                fromResponseBody: bodyData,
-                e164: e164
-            ).map { .success($0) } ?? .genericError
-        case .invalidArgument, .missingArgument:
-            return .invalidArgument
-        case .retry:
-            let retryAfter: TimeInterval
-            if
-                let retryAfterHeader,
-                let retryAfterTime = TimeInterval(retryAfterHeader)
-            {
-                retryAfter = retryAfterTime
-            } else {
-                retryAfter = Constants.defaultRetryTime
-            }
-            return .retryAfter(retryAfter)
-        case .unexpectedError, .none:
-            return .genericError
-        }
+        let response = try await networkManager.asyncRequest(request)
+        return try registrationSession(fromResponseBody: response.responseBodyData, e164: e164)
     }
 
     // MARK: Fulfill Challenge
 
     private func makeFulfillChallengeRequest(
-        _ session: RegistrationSession,
-        _ fulfillment: Registration.ChallengeFulfillment
-    ) async -> Registration.UpdateSessionResponse {
+        forSession session: RegistrationSession,
+        updatedSession: inout RegistrationSession?,
+        fulfillment: Registration.ChallengeFulfillment,
+        logger: PrefixedLogger,
+    ) async throws {
         let captchaToken: String?
         let pushChallengeToken: String?
         switch fulfillment {
@@ -250,40 +223,18 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
         let request = RegistrationRequestFactory.fulfillChallengeRequest(
             sessionId: session.id,
             captchaToken: captchaToken,
-            pushChallengeToken: pushChallengeToken
+            pushChallengeToken: pushChallengeToken,
+            logger: logger,
         )
-        return await makeUpdateRequest(
-            request,
-            session: session,
-            handler: self.handleFulfillChallengeResponse(sessionAtSendTime:statusCode:bodyData:)
-        )
-    }
-
-    private func handleFulfillChallengeResponse(
-        sessionAtSendTime: RegistrationSession,
-        statusCode: Int,
-        bodyData: Data?
-    ) -> Registration.UpdateSessionResponse {
-        let e164 = sessionAtSendTime.e164
-        let statusCode = RegistrationServiceResponses.FulfillChallengeResponseCodes(rawValue: statusCode)
-        switch statusCode {
-        case .success:
-            return registrationSession(
-                fromResponseBody: bodyData,
-                e164: e164
-            ).map { .success($0) } ?? .genericError
-        case .notAccepted:
-            return registrationSession(
-                fromResponseBody: bodyData,
-                e164: e164
-            ).map { .rejectedArgument($0) } ?? .genericError
-        case .missingSession:
-            return .invalidSession
-        case .malformedRequest:
-            Logger.error("Malformed fulfill challenge request")
-            return .genericError
-        case .unexpectedError, .none:
-            return .genericError
+        do {
+            let response = try await networkManager.asyncRequest(request)
+            updatedSession = try registrationSession(fromResponseBody: response.responseBodyData, e164: session.e164)
+        } catch where error.httpStatusCode == Registration.challengeRejectedErrorCode {
+            // the challenge token provided did not match
+            updatedSession = try registrationSession(fromResponseBody: error.httpResponseData, e164: session.e164)
+            throw error
+        } catch where error.httpStatusCode == 404 {
+            throw Registration.MissingSessionError()
         }
     }
 
@@ -291,7 +242,8 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
 
     private func makeRequestVerificationCodeRequest(
         _ session: RegistrationSession,
-        _ transport: Registration.CodeTransport
+        _ transport: Registration.CodeTransport,
+        logger: PrefixedLogger,
     ) async -> Registration.UpdateSessionResponse {
         let wireTransport: RegistrationRequestFactory.VerificationCodeTransport
         switch transport {
@@ -319,47 +271,49 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
             sessionId: session.id,
             languageCode: languageCode,
             countryCode: countryCode,
-            transport: wireTransport
+            transport: wireTransport,
+            logger: logger,
         )
         return await makeUpdateRequest(
             request,
             session: session,
-            handler: self.handleRequestVerificationCodeResponse(sessionAtSendTime:statusCode:bodyData:)
+            handler: self.handleRequestVerificationCodeResponse(sessionAtSendTime:statusCode:retryAfterHeader:bodyData:),
         )
     }
 
     private func handleRequestVerificationCodeResponse(
         sessionAtSendTime: RegistrationSession,
         statusCode: Int,
-        bodyData: Data?
+        retryAfterHeader: TimeInterval?,
+        bodyData: Data?,
     ) -> Registration.UpdateSessionResponse {
         let e164 = sessionAtSendTime.e164
         let statusCode = RegistrationServiceResponses.RequestVerificationCodeResponseCodes(rawValue: statusCode)
         switch statusCode {
         case .success:
-            return registrationSession(
+            return (try? registrationSession(
                 fromResponseBody: bodyData,
-                e164: e164
-            ).map { .success($0) } ?? .genericError
+                e164: e164,
+            )).map { .success($0) } ?? .genericError
         case .disallowed:
-            return registrationSession(
+            return (try? registrationSession(
                 fromResponseBody: bodyData,
-                e164: e164
-            ).map { .disallowed($0) } ?? .genericError
+                e164: e164,
+            )).map { .disallowed($0) } ?? .genericError
         case .retry:
-            return registrationSession(
+            return (try? registrationSession(
                 fromResponseBody: bodyData,
-                e164: e164
-            ).map { .retryAfterTimeout($0) } ?? .genericError
+                e164: e164,
+            )).map { .retryAfterTimeout($0, retryAfterHeader: retryAfterHeader) } ?? .genericError
         case .providerFailure:
             return serverFailureResponse(fromResponseBody: bodyData, sessionAtSendTime: sessionAtSendTime).map { .serverFailure($0) } ?? .genericError
         case .missingSession:
             return .invalidSession
         case .transportError:
-            return registrationSession(
+            return (try? registrationSession(
                 fromResponseBody: bodyData,
-                e164: e164
-            ).map { .transportError($0) } ?? .genericError
+                e164: e164,
+            )).map { .transportError($0) } ?? .genericError
         case .malformedRequest, .unexpectedError, .none:
             return .genericError
         }
@@ -369,31 +323,35 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
 
     private func makeSubmitVerificationCodeRequest(
         _ session: RegistrationSession,
-        code: String
+        code: String,
+        logger: PrefixedLogger,
     ) async -> Registration.UpdateSessionResponse {
         let request = RegistrationRequestFactory.submitVerificationCodeRequest(
             sessionId: session.id,
-            code: code
+            code: code,
+            logger: logger,
         )
         return await makeUpdateRequest(
             request,
             session: session,
-            handler: self.handleSubmitVerificationCodeResponse(sessionAtSendTime:statusCode:bodyData:)
+            handler: self.handleSubmitVerificationCodeResponse(sessionAtSendTime:statusCode:retryAfterHeader:bodyData:),
         )
     }
 
     private func handleSubmitVerificationCodeResponse(
         sessionAtSendTime: RegistrationSession,
         statusCode: Int,
-        bodyData: Data?
+        retryAfterHeader: TimeInterval?,
+        bodyData: Data?,
     ) -> Registration.UpdateSessionResponse {
         let e164 = sessionAtSendTime.e164
         let statusCode = RegistrationServiceResponses.SubmitVerificationCodeResponseCodes(rawValue: statusCode)
         switch statusCode {
         case .success:
-            guard let session = registrationSession(
+            guard
+                let session = try? registrationSession(
                     fromResponseBody: bodyData,
-                    e164: e164
+                    e164: e164,
                 )
             else {
                 return .genericError
@@ -407,16 +365,17 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
             Logger.error("Verification code was invalidly formatted (not just incorrect).")
             return .genericError
         case .retry:
-            return registrationSession(
+            return (try? registrationSession(
                 fromResponseBody: bodyData,
-                e164: e164
-            ).map { .retryAfterTimeout($0) } ?? .genericError
+                e164: e164,
+            )).map { .retryAfterTimeout($0, retryAfterHeader: retryAfterHeader) } ?? .genericError
         case .missingSession:
             return .invalidSession
         case .newCodeRequired:
-            guard let session = registrationSession(
+            guard
+                let session = try? registrationSession(
                     fromResponseBody: bodyData,
-                    e164: e164
+                    e164: e164,
                 )
             else {
                 return .genericError
@@ -428,7 +387,7 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
                 return .success(session)
             } else if session.nextVerificationAttempt != nil {
                 // We can submit a code, but not yet.
-                return .retryAfterTimeout(session)
+                return .retryAfterTimeout(session, retryAfterHeader: retryAfterHeader)
             } else {
                 // There is no code to submit.
                 return .disallowed(session)
@@ -451,15 +410,16 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
     }
 
     private func makeFetchSessionRequest(
-        _ session: RegistrationSession
+        _ session: RegistrationSession,
+        logger: PrefixedLogger,
     ) async -> FetchSessionResponse {
-        let request = RegistrationRequestFactory.fetchSessionRequest(sessionId: session.id)
+        let request = RegistrationRequestFactory.fetchSessionRequest(sessionId: session.id, logger: logger)
         do {
-            let response = try await signalService.urlSessionForMainSignalService().performRequest(request)
+            let response = try await networkManager.asyncRequest(request)
             return handleFetchSessionResponse(
                 sessionAtSendTime: session,
                 statusCode: response.responseStatusCode,
-                bodyData: response.responseBodyData
+                bodyData: response.responseBodyData,
             )
         } catch {
             guard let error = error as? OWSHTTPError else {
@@ -468,7 +428,7 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
             let response = handleFetchSessionResponse(
                 sessionAtSendTime: session,
                 statusCode: error.responseStatusCode,
-                bodyData: error.httpResponseData
+                bodyData: error.httpResponseData,
             )
             return response
         }
@@ -477,16 +437,16 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
     private func handleFetchSessionResponse(
         sessionAtSendTime: RegistrationSession,
         statusCode: Int,
-        bodyData: Data?
+        bodyData: Data?,
     ) -> FetchSessionResponse {
         let e164 = sessionAtSendTime.e164
         let statusCode = RegistrationServiceResponses.FetchSessionResponseCodes(rawValue: statusCode)
         switch statusCode {
         case .success:
-            return registrationSession(
+            return (try? registrationSession(
                 fromResponseBody: bodyData,
-                e164: e164
-            ).map { .success($0) } ?? .genericError
+                e164: e164,
+            )).map { .success($0) } ?? .genericError
         case .missingSession:
             return .sessionInvalid
         case .unexpectedError, .none:
@@ -496,30 +456,17 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
 
     // MARK: - Generic Request Helpers
 
-    enum Constants {
-        static let defaultRetryTime: TimeInterval = 3
-
-        static let retryAfterHeader = "retry-after"
-    }
-
     private func registrationSession(
         fromResponseBody bodyData: Data?,
-        e164: E164
-    ) -> RegistrationSession? {
-        guard let bodyData else {
-            Logger.warn("Got empty registration session response")
-            return nil
-        }
-        guard let session = try? JSONDecoder().decode(RegistrationServiceResponses.RegistrationSession.self, from: bodyData) else {
-            Logger.warn("Unable to parse registration session from response")
-            return nil
-        }
+        e164: E164,
+    ) throws -> RegistrationSession {
+        let session = try JSONDecoder().decode(RegistrationServiceResponses.RegistrationSession.self, from: bodyData ?? Data())
         return session.toLocalSession(forE164: e164, receivedAt: dateProvider())
     }
 
     private func serverFailureResponse(
         fromResponseBody bodyData: Data?,
-        sessionAtSendTime: RegistrationSession
+        sessionAtSendTime: RegistrationSession,
     ) -> Registration.ServerFailureResponse? {
         guard let bodyData else {
             Logger.warn("Got empty provider failure response")
@@ -556,24 +503,24 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
         return Registration.ServerFailureResponse(
             session: sessionAtSendTime,
             isPermanent: failure.permanentFailure,
-            reason: localReason
+            reason: localReason,
         )
     }
 
     private func makeRequest<ResponseType>(
         _ request: TSRequest,
         e164: E164,
-        handler: @escaping (_ e164: E164, _ statusCode: Int, _ retryAfterHeader: String?, _ bodyData: Data?) -> ResponseType,
+        handler: @escaping (_ e164: E164, _ statusCode: Int, _ retryAfterHeader: TimeInterval?, _ bodyData: Data?) -> ResponseType,
         fallbackError: ResponseType,
-        networkFailureError: ResponseType
+        networkFailureError: ResponseType,
     ) async -> ResponseType {
         do {
-            let response = try await signalService.urlSessionForMainSignalService().performRequest(request)
+            let response = try await networkManager.asyncRequest(request)
             return handler(
                 e164,
                 response.responseStatusCode,
-                response.headers[Constants.retryAfterHeader],
-                response.responseBodyData
+                response.headers.retryAfterTimeInterval,
+                response.responseBodyData,
             )
         } catch {
             if error.isNetworkFailureOrTimeout {
@@ -585,8 +532,8 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
             return handler(
                 e164,
                 error.responseStatusCode,
-                error.responseHeaders?.value(forHeader: Constants.retryAfterHeader),
-                error.httpResponseData
+                error.responseHeaders?.retryAfterTimeInterval,
+                error.httpResponseData,
             )
         }
     }
@@ -594,25 +541,25 @@ public class RegistrationSessionManagerImpl: RegistrationSessionManager {
     private func makeUpdateRequest(
         _ request: TSRequest,
         session: RegistrationSession,
-        handler: @escaping (_ priorSession: RegistrationSession, _ statusCode: Int, _ bodyData: Data?) -> Registration.UpdateSessionResponse
+        handler: @escaping (_ priorSession: RegistrationSession, _ statusCode: Int, _ retryAfterHeader: TimeInterval?, _ bodyData: Data?) -> Registration.UpdateSessionResponse,
     ) async -> Registration.UpdateSessionResponse {
         return await makeRequest(
             request,
             e164: session.e164,
-            handler: { _, statusCode, _, bodyData in
-                return handler(session, statusCode, bodyData)
+            handler: { _, statusCode, retryAfterHeader, bodyData in
+                return handler(session, statusCode, retryAfterHeader, bodyData)
             },
             fallbackError: .genericError,
-            networkFailureError: .networkFailure
+            networkFailureError: .networkFailure,
         )
     }
 }
 
-fileprivate extension RegistrationServiceResponses.RegistrationSession {
+private extension RegistrationServiceResponses.RegistrationSession {
 
     func toLocalSession(
         forE164 e164: E164,
-        receivedAt: Date
+        receivedAt: Date,
     ) -> RegistrationSession {
         let mappedChallenges = requestedInformation.compactMap(\.asLocalChallenge)
         let hasUnknownChallengeRequiringAppUpdate = mappedChallenges.count != requestedInformation.count
@@ -626,12 +573,12 @@ fileprivate extension RegistrationServiceResponses.RegistrationSession {
             allowedToRequestCode: allowedToRequestCode,
             requestedInformation: mappedChallenges,
             hasUnknownChallengeRequiringAppUpdate: hasUnknownChallengeRequiringAppUpdate,
-            verified: verified
+            verified: verified,
         )
     }
 }
 
-fileprivate extension RegistrationServiceResponses.RegistrationSession.Challenge {
+private extension RegistrationServiceResponses.RegistrationSession.Challenge {
 
     var asLocalChallenge: RegistrationSession.Challenge? {
         switch self {

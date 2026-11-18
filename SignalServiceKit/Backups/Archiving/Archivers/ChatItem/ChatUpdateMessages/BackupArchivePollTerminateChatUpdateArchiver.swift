@@ -10,8 +10,8 @@ final class BackupArchivePollTerminateChatUpdateArchiver {
     typealias ArchiveChatUpdateMessageResult = BackupArchive.ArchiveInteractionResult<Details>
     typealias RestoreChatUpdateMessageResult = BackupArchive.RestoreInteractionResult<Void>
 
-    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError<BackupArchive.InteractionUniqueId>
-    private typealias RestoreFrameError = BackupArchive.RestoreFrameError<BackupArchive.ChatItemId>
+    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError
+    private typealias RestoreFrameError = BackupArchive.RestoreFrameError
 
     private let interactionStore: BackupArchiveInteractionStore
 
@@ -24,17 +24,13 @@ final class BackupArchivePollTerminateChatUpdateArchiver {
     func archivePollTerminateChatUpdate(
         infoMessage: TSInfoMessage,
         threadInfo: BackupArchive.ChatArchivingContext.CachedThreadInfo,
-        context: BackupArchive.ChatArchivingContext
+        context: BackupArchive.ChatArchivingContext,
     ) -> ArchiveChatUpdateMessageResult {
         func messageFailure(
             _ errorType: ArchiveFrameError.ErrorType,
-            line: UInt = #line
+            line: UInt = #line,
         ) -> ArchiveChatUpdateMessageResult {
-            return .messageFailure([.archiveFrameError(
-                errorType,
-                infoMessage.uniqueInteractionId,
-                line: line
-            )])
+            return .messageFailure([.archiveFrameError(errorType, line: line)])
         }
 
         guard let endPollItem: PersistableEndPollItem = infoMessage.infoMessageValue(forKey: .endPoll) else {
@@ -50,9 +46,9 @@ final class BackupArchivePollTerminateChatUpdateArchiver {
             chatUpdateAuthorAddress = BackupArchive.InteractionArchiveDetails.AuthorAddress.contact(
                 BackupArchive.ContactAddress(
                     aci: try Aci.parseFrom(
-                        serviceIdBinary: endPollItem.authorServiceIdBinary
-                    )
-                )
+                        serviceIdBinary: endPollItem.authorServiceIdBinary,
+                    ),
+                ),
             )
         } catch {
             return messageFailure(.endPollUpdateInvalidAuthorAci)
@@ -70,13 +66,12 @@ final class BackupArchivePollTerminateChatUpdateArchiver {
             author: chatUpdateAuthorAddress,
             directionalDetails: .directionless(BackupProto_ChatItem.DirectionlessMessageDetails()),
             dateCreated: infoMessage.timestamp,
-            expireStartDate: nil,
-            expiresInMs: nil,
             isSealedSender: false,
             chatItemType: .updateMessage(chatUpdateMessage),
             isSmsPreviouslyRestoredFromBackup: false,
             threadInfo: threadInfo,
-            context: context.recipientContext
+            pinMessageDetails: nil,
+            context: context.recipientContext,
         )
     }
 
@@ -86,25 +81,17 @@ final class BackupArchivePollTerminateChatUpdateArchiver {
         _ pollTerminateUpdateProto: BackupProto_PollTerminateUpdate,
         chatItem: BackupProto_ChatItem,
         chatThread: BackupArchive.ChatThread,
-        context: BackupArchive.ChatItemRestoringContext
+        context: BackupArchive.ChatItemRestoringContext,
     ) -> RestoreChatUpdateMessageResult {
         func invalidProtoData(
             _ error: RestoreFrameError.ErrorType.InvalidProtoDataError,
-            line: UInt = #line
+            line: UInt = #line,
         ) -> RestoreChatUpdateMessageResult {
-            return .messageFailure([.restoreFrameError(
-                .invalidProtoData(error),
-                chatItem.id,
-                line: line
-            )])
-        }
-
-        guard case .groupV2(let groupThread) = chatThread.threadType else {
-            return invalidProtoData(.pollTerminateNotFromGroupChat)
+            return .messageFailure([.restoreFrameError(.invalidProtoData(error), line: line)])
         }
 
         let recipientId = BackupArchive.RecipientId(value: chatItem.authorID)
-        let authorAddress: BackupArchive.InteropAddress
+        let authorAddress: SignalServiceAddress
         switch context.recipientContext[recipientId] {
         case .localAddress:
             authorAddress = context.recipientContext.localIdentifiers.aciAddress
@@ -115,7 +102,7 @@ final class BackupArchivePollTerminateChatUpdateArchiver {
             guard contactAddress.aci != nil || contactAddress.e164 != nil else {
                 return invalidProtoData(.incomingMessageNotFromAciOrE164)
             }
-            authorAddress = contactAddress.asInteropAddress()
+            authorAddress = contactAddress.asSignalServiceAddress()
         }
         guard let aci = authorAddress.aci else {
             return invalidProtoData(.recipientIdNotFound(recipientId))
@@ -125,14 +112,30 @@ final class BackupArchivePollTerminateChatUpdateArchiver {
         userInfoForNewMessage[.endPoll] = PersistableEndPollItem(
             question: pollTerminateUpdateProto.question,
             authorServiceIdBinary: aci.serviceIdBinary,
-            timestamp: Int64(pollTerminateUpdateProto.targetSentTimestamp)
+            timestamp: Int64(pollTerminateUpdateProto.targetSentTimestamp),
         )
 
+        let expirationDetails = BackupArchive.ChatItemExpirationDetails(
+            chatItem: chatItem,
+            editState: .none,
+            // Info messages start their expire timer as soon as they're
+            // inserted.
+            shouldStartUnstartedTimer: true,
+            restoreStartTimestamp: context.startDate.ows_millisecondsSince1970,
+        )
+        guard let expirationDetails else {
+            return .messageFailure([.restoreFrameError(.invalidProtoData(.expirationTimerOverflowedLocalType))])
+        }
+
         let infoMessage = TSInfoMessage(
-            thread: groupThread,
+            thread: chatThread.tsThread,
             messageType: .typeEndPoll,
             timestamp: chatItem.dateSent,
-            infoMessageUserInfo: userInfoForNewMessage
+            // Backed up messages don't set the chat timer; version is irrelevant.
+            expireTimerVersion: nil,
+            expiresInSeconds: expirationDetails.expiresInSeconds,
+            expireStartedAt: expirationDetails.expireStartedAt,
+            infoMessageUserInfo: userInfoForNewMessage,
         )
 
         do {
@@ -140,10 +143,10 @@ final class BackupArchivePollTerminateChatUpdateArchiver {
                 infoMessage,
                 in: chatThread,
                 chatId: chatItem.typedChatId,
-                context: context
+                context: context,
             )
         } catch let error {
-            return .messageFailure([.restoreFrameError(.databaseInsertionFailed(error), chatItem.id)])
+            return .messageFailure([.restoreFrameError(.databaseInsertionFailed(error))])
         }
 
         return .success(())

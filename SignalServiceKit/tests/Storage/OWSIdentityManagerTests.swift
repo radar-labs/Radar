@@ -16,7 +16,7 @@ class OWSIdentityManagerTests: SSKBaseTest {
         SSKEnvironment.shared.databaseStorageRef.write { tx in
             (DependenciesBridge.shared.registrationStateChangeManager as! RegistrationStateChangeManagerImpl).registerForTests(
                 localIdentifiers: .forUnitTests,
-                tx: tx
+                tx: tx,
             )
         }
     }
@@ -30,13 +30,13 @@ class OWSIdentityManagerTests: SSKBaseTest {
                 newKey,
                 serviceId: aci,
                 direction: .outgoing,
-                tx: transaction
+                tx: transaction,
             ))
             XCTAssert(try identityManager.isTrustedIdentityKey(
                 newKey,
                 serviceId: aci,
                 direction: .incoming,
-                tx: transaction
+                tx: transaction,
             ))
         }
     }
@@ -45,18 +45,18 @@ class OWSIdentityManagerTests: SSKBaseTest {
         let newKey = IdentityKeyPair.generate().identityKey
         let aci = Aci.randomForTesting()
         try write { transaction in
-            identityManager.saveIdentityKey(newKey, for: aci, tx: transaction)
+            identityManager.saveIdentityKey(newKey, for: aci, shouldUpdateStorageService: false, tx: transaction)
             XCTAssert(try identityManager.isTrustedIdentityKey(
                 newKey,
                 serviceId: aci,
                 direction: .outgoing,
-                tx: transaction
+                tx: transaction,
             ))
             XCTAssert(try identityManager.isTrustedIdentityKey(
                 newKey,
                 serviceId: aci,
                 direction: .incoming,
-                tx: transaction
+                tx: transaction,
             ))
         }
     }
@@ -65,19 +65,19 @@ class OWSIdentityManagerTests: SSKBaseTest {
         let originalKey = IdentityKeyPair.generate().identityKey
         let aci = Aci.randomForTesting()
         try write { transaction in
-            identityManager.saveIdentityKey(originalKey, for: aci, tx: transaction)
+            identityManager.saveIdentityKey(originalKey, for: aci, shouldUpdateStorageService: false, tx: transaction)
 
             XCTAssert(try identityManager.isTrustedIdentityKey(
                 originalKey,
                 serviceId: aci,
                 direction: .outgoing,
-                tx: transaction
+                tx: transaction,
             ))
             XCTAssert(try identityManager.isTrustedIdentityKey(
                 originalKey,
                 serviceId: aci,
                 direction: .incoming,
-                tx: transaction
+                tx: transaction,
             ))
 
             let otherKey = IdentityKeyPair.generate().identityKey
@@ -86,7 +86,7 @@ class OWSIdentityManagerTests: SSKBaseTest {
                 otherKey,
                 serviceId: aci,
                 direction: .outgoing,
-                tx: transaction
+                tx: transaction,
             ), "", { error in
                 switch error {
                 case IdentityManagerError.identityKeyMismatchForOutgoingMessage:
@@ -100,7 +100,7 @@ class OWSIdentityManagerTests: SSKBaseTest {
                 otherKey,
                 serviceId: aci,
                 direction: .incoming,
-                tx: transaction
+                tx: transaction,
             ))
         }
     }

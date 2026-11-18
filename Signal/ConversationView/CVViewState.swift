@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import SignalServiceKit
-public import SignalUI
+import SignalServiceKit
+import SignalUI
 
-public protocol CVViewStateDelegate: AnyObject {
+protocol CVViewStateDelegate: AnyObject {
     func viewStateUIModeDidChange(oldValue: ConversationUIMode)
 }
 
@@ -15,53 +15,54 @@ public protocol CVViewStateDelegate: AnyObject {
 // This can be a simple place to hang CVC's mutable view state.
 //
 // These properties should only be accessed on the main thread.
-public class CVViewState: NSObject {
-    public weak var delegate: CVViewStateDelegate?
+class CVViewState {
+    weak var delegate: CVViewStateDelegate?
 
-    public let threadUniqueId: String
-    public var conversationStyle: ConversationStyle
-    public var inputToolbar: ConversationInputToolbar?
-    public let headerView = ConversationHeaderView()
+    let threadUniqueId: String
+    var conversationStyle: ConversationStyle
+    var inputToolbar: ConversationInputToolbar?
+    let headerView = ConversationHeaderView()
 
-    public var bottomBarContainer = UIView.container()
-    public var requestView: UIView?
-    public var bannerStackView: UIView?
-    public var groupNameCollisionFinder: GroupMembershipNameCollisionFinder?
+    var bottomBarContainer = UIView.container()
+    var requestView: UIView?
+    var bannerStackView: UIStackView?
+    var groupNameCollisionFinder: GroupMembershipNameCollisionFinder?
 
-    public var isDismissingInteractively = false
+    var isDismissingInteractively = false
 
-    public var isViewCompletelyAppeared = false
-    public var isViewVisible = false
-    public var shouldAnimateKeyboardChanges = false
-    public var isInPreviewPlatter = false
-    public let viewCreationDate = Date()
-    public var hasAppliedFirstLoad = false
+    var isViewCompletelyAppeared = false
+    var isViewVisible = false
+    var shouldAnimateKeyboardChanges = false
+    var isInPreviewPlatter = false
+    let viewCreationDate = Date()
+    var hasAppliedFirstLoad = false
 
-    public var isUserScrolling = false
-    public var scrollingAnimationCompletionTimer: Timer?
-    public var hasScrollingAnimation: Bool {
+    var isUserScrolling = false
+    var scrollingAnimationCompletionTimer: Timer?
+    var hasScrollingAnimation: Bool {
         AssertIsOnMainThread()
 
         return scrollingAnimationCompletionTimer != nil
     }
-    public var scrollActionForSizeTransition: CVScrollAction?
-    public var scrollActionForUpdate: CVScrollAction?
-    public var lastKnownDistanceFromBottom: CGFloat?
-    public var lastSearchedText: String?
 
-    public var activeCellAnimations = Set<UUID>()
+    var scrollActionForSizeTransition: CVScrollAction?
+    var scrollActionForUpdate: CVScrollAction?
+    var lastKnownDistanceFromBottom: CGFloat?
+    var lastSearchedText: String?
 
-    public func beginCellAnimation(identifier: UUID) {
+    var activeCellAnimations = Set<UUID>()
+
+    func beginCellAnimation(identifier: UUID) {
         activeCellAnimations.insert(identifier)
     }
 
-    public func endCellAnimation(identifier: UUID) {
+    func endCellAnimation(identifier: UUID) {
         activeCellAnimations.remove(identifier)
     }
 
     var bottomViewType: CVCBottomViewType = .none
 
-    public var uiMode: ConversationUIMode = .normal {
+    var uiMode: ConversationUIMode = .normal {
         didSet {
             AssertIsOnMainThread()
             let didChange = uiMode != oldValue
@@ -75,67 +76,68 @@ public class CVViewState: NSObject {
     enum SelectionAnimationState { case idle, willAnimate, animating }
     var selectionAnimationState: SelectionAnimationState = .idle
 
-    public let selectionState = CVSelectionState()
-    public let textExpansion = CVTextExpansion()
-    public let spoilerState = SpoilerRenderState()
-    public let messageSwipeActionState = CVMessageSwipeActionState()
+    let selectionState = CVSelectionState()
+    let textExpansion = CVTextExpansion()
+    let spoilerState = SpoilerRenderState()
+    let messageSwipeActionState = CVMessageSwipeActionState()
 
-    public var isDarkThemeEnabled: Bool = Theme.isDarkThemeEnabled
+    var isDarkThemeEnabled: Bool = Theme.isDarkThemeEnabled
 
-    public var sendMessageController: SendMessageController?
+    var sendMessageController: SendMessageController?
 
-    public let mediaCache = CVMediaCache()
+    let mediaCache = CVMediaCache()
 
     let contactShareViewHelper = ContactShareViewHelper()
 
-    public var userHasScrolled = false
+    var userHasScrolled = false
 
-    public var groupCallBarButtonItem: UIBarButtonItem?
+    var groupCallBarButtonItem: UIBarButtonItem?
 
-    public var lastMessageSentDate: Date?
+    var lastMessageSentDate: Date?
 
-    public let scrollDownButton = ConversationScrollButton(iconName: "chevron-down")
-    public var isHidingScrollDownButton = false
-    public let scrollToNextMentionButton = ConversationScrollButton(iconName: "at")
-    public var isHidingScrollToNextMentionButton = false
-    public var scrollUpdateTimer: Timer?
-    public var isWaitingForDeceleration = false
-    public var highlightedMessageId: String?
+    let scrollDownButton = ConversationScrollButton(iconName: "chevron-down")
+    var isHidingScrollDownButton = false
+    let scrollToNextMentionButton = ConversationScrollButton(iconName: "at")
+    var isHidingScrollToNextMentionButton = false
+    var scrollUpdateTimer: Timer?
+    var isWaitingForDeceleration = false
+    var highlightedMessageId: String?
+    var focusedMessageId: String?
 
-    public var actionOnOpen: ConversationViewAction = .none
+    var actionOnOpen: ConversationViewAction = .none
 
-    public var readTimer: Timer?
-    public var reloadTimer: Timer?
+    var readTimer: Timer?
+    var reloadTimer: Timer?
 
-    public var lastSortIdMarkedRead: UInt64 = 0
-    public var isMarkingAsRead = false
+    var lastSortIdMarkedRead: UInt64 = 0
+    var isMarkingAsRead = false
 
     // MARK: - Gestures
 
-    public var collectionViewGestureRecongnizersConfigured = false
-    public let collectionViewTapGestureRecognizer = SingleOrDoubleTapGestureRecognizer()
-    public let collectionViewLongPressGestureRecognizer = UILongPressGestureRecognizer()
-    public let collectionViewContextMenuGestureRecognizer = UILongPressGestureRecognizer()
-    public var collectionViewContextMenuSecondaryClickRecognizer = UITapGestureRecognizer()
-    public let collectionViewPanGestureRecognizer = UIPanGestureRecognizer()
+    var collectionViewGestureRecongnizersConfigured = false
+    let collectionViewTapGestureRecognizer = SingleOrDoubleTapGestureRecognizer()
+    let collectionViewLongPressGestureRecognizer = UILongPressGestureRecognizer()
+    let collectionViewContextMenuGestureRecognizer = UILongPressGestureRecognizer()
+    var collectionViewContextMenuSecondaryClickRecognizer = UITapGestureRecognizer()
+    let collectionViewPanGestureRecognizer = UIPanGestureRecognizer()
 
-    public var collectionViewActiveContextMenuInteraction: ChatHistoryContextMenuInteraction?
-    public var longPressHandler: CVLongPressHandler?
-    public var panHandler: CVPanHandler?
+    var collectionViewActiveContextMenuInteraction: ChatHistoryContextMenuInteraction?
+    var longPressHandler: CVLongPressHandler?
+    var panHandler: CVPanHandler?
 
     // MARK: -
 
     var initialScrollState: CVInitialScrollState?
 
-    public var presentationStatus: CVPresentationStatus = .notYetPresented
+    var presentationStatus: CVPresentationStatus = .notYetPresented
 
-    public let backgroundContainer = CVBackgroundContainer()
-    public var wallpaperViewBuilder: WallpaperViewBuilder?
+    let backgroundContainer = CVBackgroundContainer()
+    var wallpaperViewBuilder: WallpaperViewBuilder?
     var chatColor: ColorOrGradientSetting
 
     weak var reactionsDetailSheet: ReactionsDetailSheet?
 
-    public var lastKeyboardAnimationDate: Date?
+    var lastKeyboardAnimationDate: Date?
 
     // MARK: - Voice Messages
 
@@ -147,17 +149,23 @@ public class CVViewState: NSObject {
 
     var unwrappedGiftMessageIds = Set<String>()
 
+    // MARK: - Collapse Sets
+
+    /// The set of collapse set IDs that have been expanded by the user.
+    /// Resets to empty when leaving the conversation.
+    var expandedCollapseSets = Set<String>()
+
     // MARK: - Attachment downloads
 
     var manuallyCanceledDownloadsMessageIds = Set<String>()
 
-    // MARK: - 
+    // MARK: -
 
-    public init(
+    init(
         threadUniqueId: String,
         conversationStyle: ConversationStyle,
         chatColor: ColorOrGradientSetting,
-        wallpaperViewBuilder: WallpaperViewBuilder?
+        wallpaperViewBuilder: WallpaperViewBuilder?,
     ) {
         self.threadUniqueId = threadUniqueId
         self.conversationStyle = conversationStyle
@@ -176,11 +184,18 @@ extension ConversationViewController {
 
     var thread: TSThread { threadViewModel.threadRecord }
 
-    var disappearingMessagesConfiguration: OWSDisappearingMessagesConfiguration { threadViewModel.disappearingMessagesConfiguration }
+    var disappearingMessagesConfiguration: DisappearingMessagesConfigurationRecord { threadViewModel.disappearingMessagesConfiguration }
 
     var conversationStyle: ConversationStyle {
         get { viewState.conversationStyle }
-        set { viewState.conversationStyle = newValue }
+        set {
+            viewState.conversationStyle = newValue
+            if #available(iOS 26, *) {
+                let tintColor = newValue.chatColorValue.asChatUIElementTintColor()
+                viewState.scrollDownButton.badgeTintColor = tintColor
+                viewState.scrollToNextMentionButton.badgeTintColor = tintColor
+            }
+        }
     }
 
     var headerView: ConversationHeaderView { viewState.headerView }
@@ -199,7 +214,7 @@ extension ConversationViewController {
         set { viewState.requestView = newValue }
     }
 
-    var bannerStackView: UIView? {
+    var bannerStackView: UIStackView? {
         get { viewState.bannerStackView }
         set { viewState.bannerStackView = newValue }
     }
@@ -282,15 +297,19 @@ extension ConversationViewController {
     var collectionViewTapGestureRecognizer: SingleOrDoubleTapGestureRecognizer {
         viewState.collectionViewTapGestureRecognizer
     }
+
     var collectionViewLongPressGestureRecognizer: UILongPressGestureRecognizer {
         viewState.collectionViewLongPressGestureRecognizer
     }
+
     var collectionViewContextMenuGestureRecognizer: UILongPressGestureRecognizer {
         viewState.collectionViewContextMenuGestureRecognizer
     }
+
     var collectionViewContextMenuSecondaryClickRecognizer: UITapGestureRecognizer {
         viewState.collectionViewContextMenuSecondaryClickRecognizer
     }
+
     var collectionViewPanGestureRecognizer: UIPanGestureRecognizer {
         viewState.collectionViewPanGestureRecognizer
     }
@@ -301,10 +320,11 @@ extension ConversationViewController {
     }
 
     var backgroundContainer: CVBackgroundContainer { viewState.backgroundContainer }
-    internal var reactionsDetailSheet: ReactionsDetailSheet? {
+    var reactionsDetailSheet: ReactionsDetailSheet? {
         get { viewState.reactionsDetailSheet }
         set { viewState.reactionsDetailSheet = newValue }
     }
+
     var contactShareViewHelper: ContactShareViewHelper { viewState.contactShareViewHelper }
 }
 
@@ -332,7 +352,7 @@ extension ConversationViewController {
         set { viewState.panHandler = newValue }
     }
 
-    public var selectionState: CVSelectionState { viewState.selectionState }
+    var selectionState: CVSelectionState { viewState.selectionState }
 
     func isTextExpanded(interactionId: String) -> Bool {
         viewState.textExpansion.isTextExpanded(interactionId: interactionId)
@@ -358,8 +378,6 @@ extension ConversationViewController {
     }
 }
 
-// MARK: -
-
 // This struct facilitates passing around a few key
 // pieces of CVC state during async loads.
 struct CVCoreState {
@@ -367,22 +385,20 @@ struct CVCoreState {
     let mediaCache: CVMediaCache
 }
 
-// MARK: -
-
-public class CVTextExpansion {
+class CVTextExpansion {
     private var expandedTextInteractionsIds = Set<String>()
 
     init(expandedTextInteractionsIds: Set<String>? = nil) {
-        if let expandedTextInteractionsIds = expandedTextInteractionsIds {
+        if let expandedTextInteractionsIds {
             self.expandedTextInteractionsIds = expandedTextInteractionsIds
         }
     }
 
-    public func isTextExpanded(interactionId: String) -> Bool {
+    func isTextExpanded(interactionId: String) -> Bool {
         expandedTextInteractionsIds.contains(interactionId)
     }
 
-    public func setTextExpanded(interactionId: String) {
+    func setTextExpanded(interactionId: String) {
         expandedTextInteractionsIds.insert(interactionId)
     }
 
@@ -394,31 +410,29 @@ public class CVTextExpansion {
     //    let collapseCutoffDate = Date()
 }
 
-// MARK: -
-
-public class CVMessageSwipeActionState {
-    public struct Progress {
+class CVMessageSwipeActionState {
+    struct Progress {
         let xOffset: CGFloat
     }
 
-    public typealias ProgressMap = [String: Progress]
+    typealias ProgressMap = [String: Progress]
     private var progressMap = ProgressMap()
 
     init(progressMap: ProgressMap? = nil) {
-        if let progressMap = progressMap {
+        if let progressMap {
             self.progressMap = progressMap
         }
     }
 
-    public func getProgress(interactionId: String) -> Progress? {
+    func getProgress(interactionId: String) -> Progress? {
         progressMap[interactionId]
     }
 
-    public func setProgress(interactionId: String, progress: Progress) {
+    func setProgress(interactionId: String, progress: Progress) {
         progressMap[interactionId] = progress
     }
 
-    public func resetProgress(interactionId: String) {
+    func resetProgress(interactionId: String) {
         progressMap[interactionId] = nil
     }
 
@@ -426,8 +440,6 @@ public class CVMessageSwipeActionState {
         CVMessageSwipeActionState(progressMap: progressMap)
     }
 }
-
-// MARK: -
 
 // Describes the initial scroll state when we present CVC.
 //
@@ -437,18 +449,16 @@ struct CVInitialScrollState {
     let focusMessageId: String?
 }
 
-// MARK: -
-
 // Records whether or not the conversation view
 // has ever reached these milestones of its lifecycle.
-public enum CVPresentationStatus: UInt, CustomStringConvertible {
+enum CVPresentationStatus: UInt, CustomStringConvertible {
     case notYetPresented = 0
     case firstViewWillAppearHasBegun
     case firstViewWillAppearHasCompleted
     case firstViewDidAppearHasBegun
     case firstViewDidAppearHasCompleted
 
-    public var description: String {
+    var description: String {
         switch self {
         case .notYetPresented:
             return ".notYetPresented"
@@ -464,9 +474,7 @@ public enum CVPresentationStatus: UInt, CustomStringConvertible {
     }
 }
 
-// MARK: -
-
-public extension ConversationViewController {
+extension ConversationViewController {
 
     var presentationStatus: CVPresentationStatus { viewState.presentationStatus }
 

@@ -3,10 +3,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import BonMot
 import Foundation
 import SafariServices
-import SignalUI
 import SignalServiceKit
+import SignalUI
 
 public enum RegistrationPinCharacterSet {
     case digitsOnly
@@ -16,26 +17,26 @@ public enum RegistrationPinCharacterSet {
 /// A blob provided when confirming the PIN, which should be passed
 /// back in to the confirm step controller.
 /// Fields should not be inspected outside of this class.
-public struct RegistrationPinConfirmationBlob: Equatable {
+public struct RegistrationPinConfirmationBlob {
     fileprivate let characterSet: RegistrationPinCharacterSet
-    fileprivate let pinToConfirm: String
+    let pinToConfirm: String
 
-    #if TESTABLE_BUILD
+#if TESTABLE_BUILD
     public static func stub() -> Self {
         return RegistrationPinConfirmationBlob(characterSet: .digitsOnly, pinToConfirm: "1234")
     }
-    #endif
+#endif
 }
 
-public enum RegistrationPinValidationError: Equatable {
+public enum RegistrationPinValidationError {
     case wrongPin(wrongPin: String)
     case serverError
 }
 
 // MARK: - RegistrationPinState
 
-public struct RegistrationPinState: Equatable {
-    public enum Skippability: Equatable {
+public struct RegistrationPinState {
+    public enum Skippability {
         /// The user cannot skip PIN entry due to reglock.
         case unskippable
         /// The user can skip PIN entry for now but may require the PIN
@@ -52,21 +53,31 @@ public struct RegistrationPinState: Equatable {
         }
     }
 
-    public enum RegistrationPinOperation: Equatable {
+    public enum RegistrationPinOperation {
         case creatingNewPin
         case confirmingNewPin(RegistrationPinConfirmationBlob)
         case enteringExistingPin(
             skippability: Skippability,
             /// The number of PIN attempts that the user has. If `nil`, the count is unknown.
-            remainingAttempts: UInt?
+            remainingAttempts: UInt?,
         )
+
+        public var logSafeString: String {
+            switch self {
+            case .creatingNewPin: return "creatingNewPin"
+            case .confirmingNewPin: return "confirmingNewPin"
+            case .enteringExistingPin(let skippability, let remainingAttempts):
+                let attemptsString = remainingAttempts.map { "\($0)" } ?? "unknown"
+                return "enteringExistingPin(\(skippability), remainingAttempts: \(attemptsString))"
+            }
+        }
     }
 
     let operation: RegistrationPinOperation
     let error: RegistrationPinValidationError?
     let contactSupportMode: ContactSupportActionSheet.EmailFilter.RegistrationPINMode
 
-    public enum ExitConfiguration: Equatable {
+    public enum ExitConfiguration {
         case noExitAllowed
         case exitReRegistration
         case exitChangeNumber
@@ -88,16 +99,14 @@ protocol RegistrationPinPresenter: AnyObject {
     func submitWithCreateNewPinInstead()
 
     func exitRegistration()
-
-    func enterRecoveryKey()
 }
 
 // MARK: - RegistrationPinViewController
 
 class RegistrationPinViewController: OWSViewController {
-    public init(
+    init(
         state: RegistrationPinState,
-        presenter: RegistrationPinPresenter
+        presenter: RegistrationPinPresenter,
     ) {
         self.state = state
         self.presenter = presenter
@@ -117,13 +126,13 @@ class RegistrationPinViewController: OWSViewController {
     }
 
     @available(*, unavailable)
-    public override init() {
+    override init() {
         owsFail("This should not be called")
     }
 
     // MARK: Internal state
 
-    public private(set) var state: RegistrationPinState {
+    private(set) var state: RegistrationPinState {
         didSet { configureUI() }
     }
 
@@ -139,42 +148,27 @@ class RegistrationPinViewController: OWSViewController {
 
     private var previouslyWarnedAboutAttemptCount: UInt?
 
-    public func updateState(_ state: RegistrationPinState) {
+    func updateState(_ state: RegistrationPinState) {
         self.state = state
     }
 
     // MARK: Rendering
 
-    private lazy var moreButton: ContextMenuButton = {
-        let result = ContextMenuButton(empty: ())
-        result.setImage(Theme.iconImage(.buttonMore), for: .normal)
-        if #unavailable(iOS 26) {
-            result.tintColor = .Signal.accent
-        }
-        result.autoSetDimensions(to: .square(40))
-        return result
-    }()
-
-    private lazy var moreBarButton = UIBarButtonItem(
-        customView: moreButton,
-        accessibilityIdentifier: "registration.pin.disablePinButton"
-    )
-
     private lazy var backButton: UIButton = {
         let result = UIButton()
         result.setTemplateImage(
             UIImage(imageLiteralResourceName: "NavBarBack"),
-            tintColor: Theme.accentBlueColor
+            tintColor: .Signal.accent,
         )
         result.autoSetDimensions(to: CGSize(square: 40))
-        result.addTarget(self, action: #selector(didTapBack), for: .touchUpInside)
+        result.addAction(
+            UIAction { [weak self] _ in self?.didTapBack() },
+            for: .primaryActionTriggered,
+        )
         return result
     }()
 
-    private lazy var backBarButton = UIBarButtonItem(
-        customView: backButton,
-        accessibilityIdentifier: "registration.pin.backButton"
-    )
+    private lazy var backBarButton = UIBarButtonItem(customView: backButton)
 
     private var stackView: UIStackView!
 
@@ -184,17 +178,17 @@ class RegistrationPinViewController: OWSViewController {
             case .creatingNewPin:
                 return OWSLocalizedString(
                     "REGISTRATION_PIN_CREATE_TITLE",
-                    comment: "During registration, users are asked to create a PIN code. This is the title on the screen where this happens."
+                    comment: "During registration, users are asked to create a PIN code. This is the title on the screen where this happens.",
                 )
             case .confirmingNewPin:
                 return OWSLocalizedString(
                     "REGISTRATION_PIN_CONFIRM_TITLE",
-                    comment: "During registration, users are asked to create a PIN code. They'll be taken to a screen to confirm their PIN, much like confirming a password. This is the title on the screen where this happens."
+                    comment: "During registration, users are asked to create a PIN code. They'll be taken to a screen to confirm their PIN, much like confirming a password. This is the title on the screen where this happens.",
                 )
             case .enteringExistingPin:
                 return OWSLocalizedString(
                     "REGISTRATION_PIN_ENTER_EXISTING_TITLE",
-                    comment: "During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens."
+                    comment: "During re-registration, users may be asked to re-enter their PIN code. This is the title on the screen where this happens.",
                 )
             }
         }())
@@ -211,25 +205,25 @@ class RegistrationPinViewController: OWSViewController {
                     return [
                         OWSLocalizedString(
                             "REGISTRATION_PIN_CREATE_SUBTITLE",
-                            comment: "During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string."
+                            comment: "During registration, users are asked to create a PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string.",
                         ),
                         CommonStrings.learnMore.styled(
-                            with: StringStyle.Part.link(URL.Support.pin)
-                        )
+                            with: StringStyle.Part.link(URL.Support.pin),
+                        ),
                     ]
                 case .confirmingNewPin:
                     return [OWSLocalizedString(
                         "REGISTRATION_PIN_CONFIRM_SUBTITLE",
-                        comment: "During registration, users are asked to create a PIN code. They'll be taken to a screen to confirm their PIN, much like confirming a password. This is the title on the screen where this happens."
+                        comment: "During registration, users are asked to create a PIN code. They'll be taken to a screen to confirm their PIN, much like confirming a password. This is the title on the screen where this happens.",
                     )]
                 case .enteringExistingPin:
                     return [OWSLocalizedString(
                         "REGISTRATION_PIN_ENTER_EXISTING_SUBTITLE",
-                        comment: "During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string."
+                        comment: "During re-registration, users may be asked to re-enter their PIN code. This is the subtitle on the screen where this happens. A \"learn more\" link will be added to the end of this string.",
                     )]
                 }
             }(),
-            separator: " "
+            separator: " ",
         )
         result.font = .dynamicTypeBody
         result.textColor = .Signal.secondaryLabel
@@ -240,7 +234,7 @@ class RegistrationPinViewController: OWSViewController {
     }()
 
     private lazy var pinTextField: UITextField = {
-        let result = UITextField()
+        let result = NoAutofillSecureEntryTextField()
 
         let font = UIFont.systemFont(ofSize: 22)
         result.font = font
@@ -248,22 +242,15 @@ class RegistrationPinViewController: OWSViewController {
         result.textAlignment = .center
         result.textColor = .Signal.label
         result.tintColor = .Signal.label // caret color
-        result.textContentType = .password
-        result.isSecureTextEntry = true
         result.backgroundColor = .Signal.secondaryBackground
         result.defaultTextAttributes.updateValue(5, forKey: .kern)
         result.accessibilityIdentifier = "registration.pin.pinTextField"
         result.delegate = self
-#if compiler(>=6.2)
         if #available(iOS 26, *) {
             result.cornerConfiguration = .capsule()
         } else {
             result.layer.cornerRadius = 10
         }
-#else
-        result.layer.cornerRadius = 10
-#endif
-
         return result
     }()
 
@@ -278,11 +265,11 @@ class RegistrationPinViewController: OWSViewController {
         let button = UIButton(
             configuration: .mediumBorderless(title: OWSLocalizedString(
                 "ONBOARDING_2FA_FORGOT_PIN_LINK",
-                comment: "Label for the 'forgot 2FA PIN' link in the 'onboarding 2FA' view."
+                comment: "Label for the 'forgot 2FA PIN' link in the 'onboarding 2FA' view.",
             )),
             primaryAction: UIAction { [weak self] _ in
                 self?.showExistingPinEntryHelpUI()
-            }
+            },
         )
         button.enableMultilineLabel()
         button.accessibilityIdentifier = "registration.pin.needHelpButton"
@@ -293,11 +280,11 @@ class RegistrationPinViewController: OWSViewController {
         let button = UIButton(
             configuration: .mediumBorderless(title: OWSLocalizedString(
                 "ONBOARDING_2FA_FORGOT_PIN_LINK",
-                comment: "Label for the 'forgot 2FA PIN' link in the 'onboarding 2FA' view."
+                comment: "Label for the 'forgot 2FA PIN' link in the 'onboarding 2FA' view.",
             )),
             primaryAction: UIAction { [weak self] _ in
                 self?.togglePinCharacterSet()
-            }
+            },
         )
         button.enableMultilineLabel()
         button.accessibilityIdentifier = "registration.pin.togglePinCharacterSetButton"
@@ -314,68 +301,49 @@ class RegistrationPinViewController: OWSViewController {
         case .exitReRegistration:
             exitTitle = OWSLocalizedString(
                 "EXIT_REREGISTRATION",
-                comment: "Button to exit re-registration, shown in context menu."
+                comment: "Button to exit re-registration, shown in context menu.",
             )
         case .exitChangeNumber:
             exitTitle = OWSLocalizedString(
                 "EXIT_CHANGE_NUMBER",
-                comment: "Button to exit change number, shown in context menu."
+                comment: "Button to exit change number, shown in context menu.",
             )
         }
         return UIAction(
             title: exitTitle,
             handler: { [weak self] _ in
                 self?.presenter?.exitRegistration()
-            }
+            },
         )
     }
 
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
 
         view.backgroundColor = .Signal.background
-        navigationItem.rightBarButtonItem = {
-            let barButtonItem = UIBarButtonItem(
-                title: CommonStrings.nextButton,
-                style: .done,
-                target: self,
-                action: #selector(didTapNext),
-                accessibilityIdentifier: "registration.pin.nextButton"
-            )
-            barButtonItem.tintColor = .Signal.accent
-            return barButtonItem
-        }()
+        navigationItem.rightBarButtonItem = .nextButton { [weak self] in
+            self?.didTapNext()
+        }
 
-        self.stackView = addStaticContentStackView(
+        stackView = addStaticContentStackView(
             arrangedSubviews: [titleLabel, explanationView, pinTextField],
             isScrollable: true,
-            shouldAvoidKeyboard: true
+            shouldAvoidKeyboard: true,
         )
         stackView.setCustomSpacing(24, after: explanationView)
 
-        pinTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        pinTextField.addAction(
+            UIAction { [weak self] _ in self?.textFieldDidChange() },
+            for: .editingChanged,
+        )
 
         configureUI()
     }
 
-    private var isViewAppeared = false
-
-    public override func viewDidAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        if !UIDevice.current.isIPhone5OrShorter {
-            // Small devices may obscure parts of the UI behind the keyboard, especially with larger
-            // font sizes.
-            pinTextField.becomeFirstResponder()
-        }
-
-        isViewAppeared = true
-    }
-
-    public override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-
-        isViewAppeared = false
+        pinTextField.becomeFirstResponder()
     }
 
     private func configureUI() {
@@ -403,55 +371,53 @@ class RegistrationPinViewController: OWSViewController {
     }
 
     private func configureUIForCreatingNewPin() {
-        navigationItem.leftBarButtonItem = moreBarButton
-
-        moreButton.setActions(actions: [
+        navigationItem.leftBarButtonItem = .contextMenuButton(actions: [
             UIAction(
                 title: OWSLocalizedString(
                     "PIN_CREATION_LEARN_MORE",
-                    comment: "Learn more action on the pin creation view"
+                    comment: "Learn more action on the pin creation view",
                 ),
                 handler: { [weak self] _ in
                     self?.showCreatingNewPinLearnMoreUI()
-                }
+                },
             ),
             UIAction(
                 title: OWSLocalizedString(
                     "PIN_CREATION_SKIP",
-                    comment: "Skip action on the pin creation view"
+                    comment: "Skip action on the pin creation view",
                 ),
                 handler: { [weak self] _ in
                     self?.showSkipCreatingNewPinUI()
-                }
+                },
             ),
-            exitAction()
+            exitAction(),
         ].compacted())
 
         switch pinCharacterSet {
         case .digitsOnly:
             pinValidationLabel.text = OWSLocalizedString(
                 "PIN_CREATION_NUMERIC_HINT",
-                comment: "Label indicating the user must use at least 4 digits"
+                comment: "Label indicating the user must use at least 4 digits",
             )
             togglePinCharacterSetButton.configuration?.title = OWSLocalizedString(
                 "PIN_CREATION_CREATE_ALPHANUMERIC",
-                comment: "Button asking if the user would like to create an alphanumeric PIN"
+                comment: "Button asking if the user would like to create an alphanumeric PIN",
             )
         case .alphanumeric:
             pinValidationLabel.text = OWSLocalizedString(
                 "PIN_CREATION_ALPHANUMERIC_HINT",
-                comment: "Label indicating the user must use at least 4 characters"
+                comment: "Label indicating the user must use at least 4 characters",
             )
             togglePinCharacterSetButton.configuration?.title = OWSLocalizedString(
                 "PIN_CREATION_CREATE_NUMERIC",
-                comment: "Button asking if the user would like to create an numeric PIN"
+                comment: "Button asking if the user would like to create an numeric PIN",
             )
         }
         pinValidationLabel.textColor = .Signal.secondaryLabel
 
         replaceViewsAfterTextField(with: [
             pinValidationLabel,
-            UIView.vStretchingSpacer(minHeight: 24),
+            UIView.vStretchingSpacer(),
             togglePinCharacterSetButtonContainer,
         ])
     }
@@ -464,45 +430,31 @@ class RegistrationPinViewController: OWSViewController {
 
     private func configureUIForEnteringExistingPin(
         skippability: RegistrationPinState.Skippability,
-        remainingAttempts: UInt?
+        remainingAttempts: UInt?,
     ) {
-        navigationItem.leftBarButtonItem = moreBarButton
-        var actions = [UIMenuElement]()
-
+        var actions = [UIAction]()
         if skippability.canSkip {
             actions.append(UIAction(
                 title: OWSLocalizedString(
                     "PIN_ENTER_EXISTING_SKIP",
-                    comment: "If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this."
+                    comment: "If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this.",
                 ),
                 handler: { [weak self] _ in
                     self?.didRequestToSkipEnteringExistingPin()
-                }
+                },
             ))
         }
-
-        actions.append(
-            UIAction(
-                title: OWSLocalizedString(
-                    "PIN_ENTER_EXISTING_USE_RECOVERY_KEY",
-                    comment: "If the user is re-registering, they need to enter their PIN to restore all their data. If they don't remember their PIN, they may remember their Recovery Key which can be used instead of a PIN."
-                ),
-                handler: { [weak self] _ in
-                    self?.presenter?.enterRecoveryKey()
-                }
-            )
-        )
 
         if let exitAction = exitAction() {
             actions.append(exitAction)
         }
 
-        moreButton.setActions(actions: actions)
+        navigationItem.leftBarButtonItem = .contextMenuButton(actions: actions)
 
         showAttemptWarningIfNecessary(
             remainingAttempts: remainingAttempts,
             warnAt: skippability.canSkip ? [3, 1] : [5, 3, 1],
-            canSkip: skippability.canSkip
+            canSkip: skippability.canSkip,
         )
 
         var newViewsAtTheBottom: [UIView] = []
@@ -515,34 +467,34 @@ class RegistrationPinViewController: OWSViewController {
             case 1:
                 pinValidationLabel.text = OWSLocalizedString(
                     "ONBOARDING_2FA_INVALID_PIN_LAST_ATTEMPT",
-                    comment: "Label indicating that the 2fa pin is invalid in the 'onboarding 2fa' view, and you only have one more attempt"
+                    comment: "Label indicating that the 2fa pin is invalid in the 'onboarding 2fa' view, and you only have one more attempt",
                 )
             default:
                 pinValidationLabel.text = OWSLocalizedString(
                     "ONBOARDING_2FA_INVALID_PIN",
-                    comment: "Label indicating that the 2fa pin is invalid in the 'onboarding 2fa' view."
+                    comment: "Label indicating that the 2fa pin is invalid in the 'onboarding 2fa' view.",
                 )
             }
             newViewsAtTheBottom.append(pinValidationLabel)
         case .serverError:
             pinValidationLabel.text = OWSLocalizedString(
                 "SOMETHING_WENT_WRONG_TRY_AGAIN_LATER_ERROR",
-                comment: "An error message generically indicating that something went wrong, and that the user should try again later."
+                comment: "An error message generically indicating that something went wrong, and that the user should try again later.",
             )
             newViewsAtTheBottom.append(pinValidationLabel)
         }
-        pinValidationLabel.textColor = .ows_accentRed
+        pinValidationLabel.textColor = .Signal.red
 
         switch pinCharacterSet {
         case .digitsOnly:
             togglePinCharacterSetButton.configuration?.title = OWSLocalizedString(
                 "ONBOARDING_2FA_ENTER_ALPHANUMERIC",
-                comment: "Button asking if the user would like to enter an alphanumeric PIN"
+                comment: "Button asking if the user would like to enter an alphanumeric PIN",
             )
         case .alphanumeric:
             togglePinCharacterSetButton.configuration?.title = OWSLocalizedString(
                 "ONBOARDING_2FA_ENTER_NUMERIC",
-                comment: "Button asking if the user would like to enter an numeric PIN"
+                comment: "Button asking if the user would like to enter an numeric PIN",
             )
         }
 
@@ -557,10 +509,10 @@ class RegistrationPinViewController: OWSViewController {
     private func showAttemptWarningIfNecessary(
         remainingAttempts: UInt?,
         warnAt: Set<UInt>,
-        canSkip: Bool
+        canSkip: Bool,
     ) {
         guard
-            isViewAppeared,
+            lifecycle == .appeared,
             let remainingAttempts,
             warnAt.contains(remainingAttempts),
             remainingAttempts < (previouslyWarnedAboutAttemptCount ?? UInt.max)
@@ -580,7 +532,7 @@ class RegistrationPinViewController: OWSViewController {
         } else {
             title = OWSLocalizedString(
                 "REGISTER_2FA_INVALID_PIN_ALERT_TITLE",
-                comment: "Alert title explaining what happens if you forget your 'two-factor auth pin'."
+                comment: "Alert title explaining what happens if you forget your 'two-factor auth pin'.",
             )
         }
 
@@ -588,23 +540,23 @@ class RegistrationPinViewController: OWSViewController {
             let attemptRemainingFormat = OWSLocalizedString(
                 "REREGISTER_INVALID_PIN_ATTEMPT_COUNT_%d",
                 tableName: "PluralAware",
-                comment: "If the user is re-registering, they may need to enter their PIN to restore all their data. If they enter the incorrect PIN, they may be warned that they only have a certain number of attempts remaining. That warning will tell the user how many attempts they have in bold text. This is that bold text, which is inserted into the larger string."
+                comment: "If the user is re-registering, they may need to enter their PIN to restore all their data. If they enter the incorrect PIN, they may be warned that they only have a certain number of attempts remaining. That warning will tell the user how many attempts they have in bold text. This is that bold text, which is inserted into the larger string.",
             )
             let attemptRemainingString = String.localizedStringWithFormat(
                 attemptRemainingFormat,
-                remainingAttempts
+                remainingAttempts,
             )
 
             let format: String
             if canSkip {
                 format = OWSLocalizedString(
                     "REREGISTER_INVALID_PIN_WARNING_SKIPPABLE_FORMAT",
-                    comment: "If the user is re-registering, they may need to enter their PIN to restore all their data. If they enter the incorrect PIN, they will be shown a warning. In some cases (such as for this string), the user has the option to skip PIN entry and will lose some data. Embeds {{ number of attempts }}, such as \"3 attempts\"."
+                    comment: "If the user is re-registering, they may need to enter their PIN to restore all their data. If they enter the incorrect PIN, they will be shown a warning. In some cases (such as for this string), the user has the option to skip PIN entry and will lose some data. Embeds {{ number of attempts }}, such as \"3 attempts\".",
                 )
             } else {
                 format = OWSLocalizedString(
                     "REREGISTER_INVALID_PIN_WARNING_UNSKIPPABLE_FORMAT",
-                    comment: "If the user is re-registering, they may need to enter their PIN to restore all their data. If they enter the incorrect PIN, they will be shown a warning. Embeds {{ number of attempts }}, such as \"3 attempts\"."
+                    comment: "If the user is re-registering, they may need to enter their PIN to restore all their data. If they enter the incorrect PIN, they will be shown a warning. Embeds {{ number of attempts }}, such as \"3 attempts\".",
                 )
             }
 
@@ -612,9 +564,9 @@ class RegistrationPinViewController: OWSViewController {
                 fromFormat: format,
                 attributedFormatArgs: [.string(
                     attemptRemainingString,
-                    attributes: [.font: ActionSheetController.messageLabelFont.semibold()]
+                    attributes: [.font: UIFont.dynamicTypeSubheadlineClamped.semibold()],
                 )],
-                defaultAttributes: [.font: ActionSheetController.messageLabelFont]
+                defaultAttributes: [.font: UIFont.dynamicTypeSubheadlineClamped],
             )
         }()
 
@@ -632,12 +584,12 @@ class RegistrationPinViewController: OWSViewController {
         let actionSheet = ActionSheetController(
             title: OWSLocalizedString(
                 "PIN_CREATION_LEARN_MORE_TITLE",
-                comment: "Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet."
+                comment: "Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the title on that sheet.",
             ),
             message: OWSLocalizedString(
                 "PIN_CREATION_LEARN_MORE_TEXT",
-                comment: "Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the text on that sheet."
-            )
+                comment: "Users can create PINs to restore their account data later. They can learn more about this on a sheet. This is the text on that sheet.",
+            ),
         )
 
         actionSheet.addAction(.init(title: CommonStrings.learnMore) { [weak self] _ in
@@ -660,17 +612,17 @@ class RegistrationPinViewController: OWSViewController {
             case .unskippable:
                 message = OWSLocalizedString(
                     "REGISTER_2FA_FORGOT_SVR_PIN_ALERT_MESSAGE",
-                    comment: "Alert body for a forgotten SVR (V2) PIN"
+                    comment: "Alert body for a forgotten SVR (V2) PIN",
                 )
             case .canSkip:
                 message = OWSLocalizedString(
                     "REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_ALERT_MESSAGE",
-                    comment: "Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they cannot necessarily create a new PIN"
+                    comment: "Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they cannot necessarily create a new PIN",
                 )
             case .canSkipAndCreateNew:
                 message = OWSLocalizedString(
                     "REGISTER_2FA_FORGOT_SVR_PIN_WITHOUT_REGLOCK_AND_CAN_CREATE_NEW_PIN_ALERT_MESSAGE",
-                    comment: "Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they can create a new PIN"
+                    comment: "Alert body for a forgotten SVR (V2) PIN when the user doesn't have reglock and they can create a new PIN",
                 )
             }
         }
@@ -678,9 +630,9 @@ class RegistrationPinViewController: OWSViewController {
         let actionSheet = ActionSheetController(
             title: OWSLocalizedString(
                 "REGISTER_2FA_FORGOT_PIN_ALERT_TITLE",
-                comment: "Alert title explaining what happens if you forget your 'two-factor auth pin'."
+                comment: "Alert title explaining what happens if you forget your 'two-factor auth pin'.",
             ),
-            message: message
+            message: message,
         )
 
         switch state.operation {
@@ -693,7 +645,7 @@ class RegistrationPinViewController: OWSViewController {
             case .canSkip:
                 let skipButtonTitle = OWSLocalizedString(
                     "PIN_ENTER_EXISTING_SKIP",
-                    comment: "If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this."
+                    comment: "If the user is re-registering, they need to enter their PIN to restore all their data. In some cases, they can skip this entry and lose some data. This text is shown on a button that lets them begin to do this.",
                 )
                 actionSheet.addAction(.init(title: skipButtonTitle, style: .destructive) { [weak self] _ in
                     self?.presenter?.submitWithSkippedPin()
@@ -701,22 +653,13 @@ class RegistrationPinViewController: OWSViewController {
             case .canSkipAndCreateNew:
                 let skipButtonTitle = OWSLocalizedString(
                     "ONBOARDING_2FA_SKIP_AND_CREATE_NEW_PIN",
-                    comment: "Label for the 'skip and create new pin' button when reglock is disabled during onboarding."
+                    comment: "Label for the 'skip and create new pin' button when reglock is disabled during onboarding.",
                 )
                 actionSheet.addAction(.init(title: skipButtonTitle, style: .destructive) { [weak self] _ in
                     self?.presenter?.submitWithCreateNewPinInstead()
                 })
             }
         }
-
-        actionSheet.addAction(.init(
-            title: OWSLocalizedString(
-                "ONBOARDING_2FA_SKIP_AND_USE_RECOVERY_KEY",
-                comment: "Label for action to use Recovery Key instead of PIN for registration."
-            )
-        ) { [weak self] _ in
-            self?.presenter?.enterRecoveryKey()
-        })
 
         actionSheet.addAction(.init(title: CommonStrings.contactSupport) { [weak self] _ in
             guard let self else { return }
@@ -736,20 +679,20 @@ class RegistrationPinViewController: OWSViewController {
         let actionSheet = ActionSheetController(
             title: OWSLocalizedString(
                 "PIN_CREATION_DISABLE_CONFIRMATION_TITLE",
-                comment: "Title of the 'pin disable' action sheet."
+                comment: "Title of the 'pin disable' action sheet.",
             ),
             message: OWSLocalizedString(
                 "PIN_CREATION_DISABLE_CONFIRMATION_MESSAGE",
-                comment: "Message of the 'pin disable' action sheet."
-            )
+                comment: "Message of the 'pin disable' action sheet.",
+            ),
         )
 
         actionSheet.addAction(.init(
             title: OWSLocalizedString(
                 "PIN_CREATION_DISABLE_CONFIRMATION_ACTION",
-                comment: "Action of the 'pin disable' action sheet."
+                comment: "Action of the 'pin disable' action sheet.",
             ),
-            style: .destructive
+            style: .destructive,
         ) { [weak self] _ in
             self?.presenter?.submitWithSkippedPin()
         })
@@ -761,14 +704,12 @@ class RegistrationPinViewController: OWSViewController {
 
     // MARK: Events
 
-    @objc
     private func didTapBack() {
         Logger.info("")
 
         presenter?.cancelPinConfirmation()
     }
 
-    @objc
     private func didTapNext() {
         Logger.info("")
 
@@ -794,30 +735,50 @@ class RegistrationPinViewController: OWSViewController {
         let actionSheet = ActionSheetController(
             title: OWSLocalizedString(
                 "ONBOARDING_2FA_SKIP_PIN_ENTRY_TITLE",
-                comment: "Title for the skip pin entry action sheet during onboarding."
+                comment: "Title for the skip pin entry action sheet during onboarding.",
             ),
             message: NSAttributedString.composed(
                 of: [
                     OWSLocalizedString(
                         "ONBOARDING_2FA_SKIP_PIN_ENTRY_MESSAGE",
-                        comment: "Explanation for the skip pin entry action sheet during onboarding."
+                        comment: "Explanation for the skip pin entry action sheet during onboarding.",
                     ),
-                    CommonStrings.learnMore.styled(with: .link(URL.Support.pin))
+                    CommonStrings.learnMore.styled(with: .link(URL.Support.pin)),
                 ],
-                baseStyle: ActionSheetController.messageBaseStyle,
-                separator: " "
-            )
+                baseStyle: BonMot.StringStyle(.font(.dynamicTypeSubheadlineClamped), .alignment(.center)),
+                separator: " ",
+            ),
         )
 
-        actionSheet.addAction(.init(
-            title: OWSLocalizedString(
-                "ONBOARDING_2FA_SKIP_AND_CREATE_NEW_PIN",
-                comment: "Label for the 'skip and create new pin' button when reglock is disabled during onboarding."
-            ),
-            style: .destructive
-        ) { [weak self] _ in
-            self?.presenter?.submitWithCreateNewPinInstead()
-        })
+        switch state.operation {
+        case .creatingNewPin, .confirmingNewPin:
+            owsFail("Invalid state. This method should not be called")
+        case let .enteringExistingPin(skippability, _):
+            switch skippability {
+            case .unskippable:
+                owsFail("Invalid state. Shouldn't get to this UI with unskippable PIN")
+            case .canSkip:
+                actionSheet.addAction(.init(
+                    title: OWSLocalizedString(
+                        "ONBOARDING_2FA_SKIP_PIN",
+                        comment: "Label for the 'skip pin' button when reglock is disabled during onboarding.",
+                    ),
+                    style: .destructive,
+                ) { [weak self] _ in
+                    self?.presenter?.submitWithSkippedPin()
+                })
+            case .canSkipAndCreateNew:
+                actionSheet.addAction(.init(
+                    title: OWSLocalizedString(
+                        "ONBOARDING_2FA_SKIP_AND_CREATE_NEW_PIN",
+                        comment: "Label for the 'skip and create new pin' button when reglock is disabled during onboarding.",
+                    ),
+                    style: .destructive,
+                ) { [weak self] _ in
+                    self?.presenter?.submitWithCreateNewPinInstead()
+                })
+            }
+        }
 
         actionSheet.addAction(OWSActionSheets.cancelAction)
 
@@ -834,7 +795,7 @@ class RegistrationPinViewController: OWSViewController {
             } else {
                 presenter?.askUserToConfirmPin(RegistrationPinConfirmationBlob(
                     characterSet: pinCharacterSet,
-                    pinToConfirm: pin
+                    pinToConfirm: pin,
                 ))
             }
         case let .confirmingNewPin(blob):
@@ -852,12 +813,12 @@ class RegistrationPinViewController: OWSViewController {
         let actionSheet = ActionSheetController(
             title: OWSLocalizedString(
                 "PIN_CREATION_WEAK_ERROR",
-                comment: "Label indicating that the attempted PIN is too weak"
+                comment: "Label indicating that the attempted PIN is too weak",
             ),
             message: OWSLocalizedString(
                 "PIN_CREATION_WEAK_ERROR_MESSAGE",
-                comment: "If your attempted PIN is too weak, you'll see an error message. This is the text on the error dialog."
-            )
+                comment: "If your attempted PIN is too weak, you'll see an error message. This is the text on the error dialog.",
+            ),
         )
 
         actionSheet.addAction(.init(title: CommonStrings.okayButton))
@@ -869,8 +830,8 @@ class RegistrationPinViewController: OWSViewController {
         let actionSheet = ActionSheetController(
             message: OWSLocalizedString(
                 "PIN_CREATION_MISMATCH_ERROR",
-                comment: "Label indicating that the attempted PIN does not match the first PIN"
-            )
+                comment: "Label indicating that the attempted PIN does not match the first PIN",
+            ),
         )
 
         actionSheet.addAction(.init(title: CommonStrings.okayButton))
@@ -878,8 +839,7 @@ class RegistrationPinViewController: OWSViewController {
         presentActionSheet(actionSheet)
     }
 
-    @objc
-    private func textFieldDidChange(_ textField: UITextField) {
+    private func textFieldDidChange() {
         configureUI()
     }
 }
@@ -891,7 +851,7 @@ extension RegistrationPinViewController: UITextViewDelegate {
         _ textView: UITextView,
         shouldInteractWith URL: URL,
         in characterRange: NSRange,
-        interaction: UITextItemInteraction
+        interaction: UITextItemInteraction,
     ) -> Bool {
         if textView == explanationView {
             switch state.operation {
@@ -911,7 +871,7 @@ extension RegistrationPinViewController: UITextFieldDelegate {
     func textField(
         _ textField: UITextField,
         shouldChangeCharactersIn range: NSRange,
-        replacementString: String
+        replacementString: String,
     ) -> Bool {
         let result: Bool
         switch pinCharacterSet {
@@ -919,7 +879,7 @@ extension RegistrationPinViewController: UITextFieldDelegate {
             TextFieldFormatting.ows2FAPINTextField(
                 textField,
                 changeCharactersIn: range,
-                replacementString: replacementString
+                replacementString: replacementString,
             )
             result = false
             configureUI()

@@ -8,14 +8,14 @@ import SignalServiceKit
 
 /// Refreshes call links that need to be updated.
 actor CallLinkFetchJobRunner: DatabaseChangeDelegate {
-    private let callLinkStore: any CallLinkRecordStore
+    private let callLinkStore: CallLinkRecordStore
     private let callLinkStateUpdater: CallLinkStateUpdater
     private let db: any DB
 
     init(
-        callLinkStore: any CallLinkRecordStore,
+        callLinkStore: CallLinkRecordStore,
         callLinkStateUpdater: CallLinkStateUpdater,
-        db: any DB
+        db: any DB,
     ) {
         self.callLinkStore = callLinkStore
         self.callLinkStateUpdater = callLinkStateUpdater
@@ -52,13 +52,8 @@ actor CallLinkFetchJobRunner: DatabaseChangeDelegate {
 
         var sequentialFailureCount = 0
         while true {
-            let callLinkToFetch: CallLinkRecord?
-            do {
-                callLinkToFetch = try db.read(block: callLinkStore.fetchAnyPendingRecord(tx:))
-            } catch {
-                owsFailDebug("Can't fetch pending record: \(error)")
-                mightHavePendingFetch = false
-                return
+            let callLinkToFetch = db.read { tx in
+                callLinkStore.fetchAnyPendingRecord(tx: tx)
             }
             guard let callLinkToFetch else {
                 // Nothing to fetch.
@@ -73,7 +68,7 @@ actor CallLinkFetchJobRunner: DatabaseChangeDelegate {
                 sequentialFailureCount += 1
                 let retryDelayNs = OWSOperation.retryIntervalForExponentialBackoff(
                     failureCount: sequentialFailureCount,
-                    maxAverageBackoff: 6 * .hour
+                    maxAverageBackoff: 6 * .hour,
                 ).clampedNanoseconds
                 Logger.warn("Retrying persistent call link fetch after ≈\(OWSOperation.formattedNs(retryDelayNs))s; \(error)")
                 try? await Task.sleep(nanoseconds: retryDelayNs)
@@ -97,7 +92,7 @@ actor CallLinkFetchJobRunner: DatabaseChangeDelegate {
     }
 
     @MainActor
-    func databaseChangesDidUpdate(databaseChanges: any DatabaseChanges) {
+    func databaseChangesDidUpdate(databaseChanges: DatabaseChanges) {
         guard databaseChanges.didUpdate(tableName: CallLinkRecord.databaseTableName) else {
             return
         }

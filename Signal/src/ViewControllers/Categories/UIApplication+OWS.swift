@@ -14,7 +14,6 @@ extension UIApplication {
         return window.findFrontmostViewController(ignoringAlerts: true)
     }
 
-    @objc
     var frontmostViewController: UIViewController? {
         guard let window = CurrentAppContext().mainWindow else {
             return nil
@@ -22,6 +21,7 @@ extension UIApplication {
         return window.findFrontmostViewController(ignoringAlerts: false)
     }
 
+    /// Opens the iOS Settings page for Signal.
     func openSystemSettings() {
         open(URL(string: UIApplication.openSettingsURLString)!, options: [:])
     }

@@ -4,32 +4,21 @@
 //
 
 import Foundation
-import LibSignalClient
+public import LibSignalClient
 
 public enum OWSRequestFactory {
 
-    static let textSecureAccountsAPI  = "v1/accounts"
-    static let textSecureAttributesAPI  = "v1/accounts/attributes/"
-    static let textSecureMessagesAPI  = "v1/messages/"
-    static let textSecureMultiRecipientMessageAPI  = "v1/messages/multi_recipient"
-    static let textSecureKeysAPI  = "v2/keys"
-    static let textSecureSignedKeysAPI  = "v2/keys/signed"
-    static let textSecureDirectoryAPI  = "v1/directory"
-    static let textSecure2FAAPI  = "v1/accounts/pin"
-    static let textSecureRegistrationLockV2API  = "v1/accounts/registration_lock"
+    static let textSecureAccountsAPI = "v1/accounts"
+    static let textSecureAttributesAPI = "v1/accounts/attributes/"
+    static let textSecureKeysAPI = "v2/keys"
+    static let textSecureSignedKeysAPI = "v2/keys/signed"
+    static let textSecureDirectoryAPI = "v1/directory"
+    static let textSecure2FAAPI = "v1/accounts/pin"
     static let textSecureGiftBadgePricesAPI = "v1/subscription/boost/amounts/gift"
 
     public static let textSecureHTTPTimeOut: TimeInterval = 10
 
     // MARK: - Other
-
-    /// - parameter encryptedByteLength: length in bytes of the encrypted file we will upload.
-    /// The server requires it (since 2026-11-04) and caps the returned form at that size.
-    static func allocAttachmentRequestV4(encryptedByteLength: UInt32) -> TSRequest {
-        var urlComps = URLComponents(string: "v4/attachments/form/upload")!
-        urlComps.queryItems = [URLQueryItem(name: "uploadLength", value: "\(encryptedByteLength)")]
-        return TSRequest(url: urlComps.url!, method: "GET", parameters: [:])
-    }
 
     static func currencyConversionRequest() -> TSRequest {
         return TSRequest(url: URL(string: "v1/payments/conversions")!, method: "GET", parameters: [:])
@@ -53,7 +42,7 @@ public enum OWSRequestFactory {
         owsAssertDebug(fromRedemptionSeconds > 0)
         owsAssertDebug(toRedemptionSeconds > 0)
 
-        let path = "v1/certificate/auth/group?redemptionStartSeconds=\(fromRedemptionSeconds)&redemptionEndSeconds=\(toRedemptionSeconds)"
+        let path = "v1/certificate/auth/group?redemptionStartSeconds=\(fromRedemptionSeconds)&redemptionEndSeconds=\(toRedemptionSeconds)&v101=true"
         return TSRequest(url: URL(string: path)!, method: "GET", parameters: [:])
     }
 
@@ -105,101 +94,32 @@ public enum OWSRequestFactory {
         return request
     }
 
-    static func submitMessageRequest(
-        serviceId: ServiceId,
-        messages: [DeviceMessage],
-        timestamp: UInt64,
-        isOnline: Bool,
-        isUrgent: Bool,
-        auth: TSRequest.SealedSenderAuth?
-    ) -> TSRequest {
-        // NOTE: messages may be empty; See comments in OWSDeviceManager.
-        owsAssertDebug(timestamp > 0)
-
-        let path = "\(self.textSecureMessagesAPI)\(serviceId.serviceIdString)?story=\(auth?.isStory == true ? "true" : "false")"
-
-        // Returns the per-account-message parameters used when submitting a message to
-        // the Signal Web Service.
-        // See
-        // <https://github.com/signalapp/Signal-Server/blob/65da844d70369cb8b44966cfb2d2eb9b925a6ba4/service/src/main/java/org/whispersystems/textsecuregcm/entities/IncomingMessageList.java>.
-        let parameters: [String: Any] = [
-            "messages": messages.map { $0.requestParameters() },
-            "timestamp": timestamp,
-            "online": isOnline,
-            "urgent": isUrgent
-        ]
-
-        var request = TSRequest(url: URL(string: path)!, method: "PUT", parameters: parameters)
-        request.timeoutInterval = sendMessageTimeout(estimatedRequestSize: messages.reduce(into: 0, { $0 += $1.content.count + 50 }) + 100)
-        if let auth {
-            request.auth = .sealedSender(auth)
-        }
-        return request
-    }
-
-    static func submitMultiRecipientMessageRequest(
-        ciphertext: Data,
-        timestamp: UInt64,
-        isOnline: Bool,
-        isUrgent: Bool,
-        auth: TSRequest.SealedSenderAuth
-    ) -> TSRequest {
-        owsAssertDebug(timestamp > 0)
-
-        // We build the URL by hand instead of passing the query parameters into the query parameters
-        // AFNetworking won't handle both query parameters and an httpBody (which we need here)
-        var components = URLComponents(string: self.textSecureMultiRecipientMessageAPI)!
-        components.queryItems = [
-            URLQueryItem(name: "ts", value: "\(timestamp)"),
-            URLQueryItem(name: "online", value: isOnline ? "true" : "false"),
-            URLQueryItem(name: "urgent", value: isUrgent ? "true" : "false"),
-            URLQueryItem(name: "story", value: auth.isStory ? "true" : "false"),
-        ]
-
-        var request = TSRequest(url: components.url!, method: "PUT", parameters: nil)
-        request.timeoutInterval = sendMessageTimeout(estimatedRequestSize: ciphertext.count + 200)
-        request.headers["Content-Type"] = "application/vnd.signal-messenger.mrm"
-        request.auth = .sealedSender(auth)
-        request.body = .data(ciphertext)
-        return request
-    }
-
-    private static func sendMessageTimeout(estimatedRequestSize: Int) -> TimeInterval {
-        let bandwidthEstimate: Double = 40_000 // kbit/s
-        let transferEstimate = Double(estimatedRequestSize) / (bandwidthEstimate / 8)
-        let latencyEstimate: Double = Self.textSecureHTTPTimeOut
-        let overallEstimate = latencyEstimate + transferEstimate
-        // Limit to 45 seconds (the maximum time allowed by the pinging logic) to
-        // support larger messages.
-        return min(overallEstimate, 45)
-    }
-
     // MARK: - Registration
 
-    public static func enableRegistrationLockV2Request(token: String) -> TSRequest {
-        owsAssertDebug(nil != token.nilIfEmpty)
+    struct RegistrationRecoveryPassword: Encodable {
+        let wrappedValue: SignalServiceKit.RegistrationRecoveryPassword
 
-        let url = URL(string: textSecureRegistrationLockV2API)!
-        return TSRequest(url: url,
-                         method: HTTPMethod.put.methodName,
-                         parameters: [
-                "registrationLock": token
-            ])
+        init(_ wrappedValue: SignalServiceKit.RegistrationRecoveryPassword) {
+            self.wrappedValue = wrappedValue
+        }
+
+        func encode(to encoder: any Encoder) throws {
+            var container = encoder.singleValueContainer()
+            try container.encode(self.wrappedValue.canonicalStringRepresentation)
+        }
     }
 
-    static func disableRegistrationLockV2Request() -> TSRequest {
-        let url = URL(string: textSecureRegistrationLockV2API)!
-        return TSRequest(url: url,
-                         method: HTTPMethod.delete.methodName,
-                         parameters: [:])
-    }
+    struct RegistrationLock: Encodable {
+        let wrappedValue: SignalServiceKit.RegistrationLock
 
-    public static func registerForPushRequest(apnsToken: String) -> TSRequest {
-        owsAssertDebug(!apnsToken.isEmpty)
+        init(_ wrappedValue: SignalServiceKit.RegistrationLock) {
+            self.wrappedValue = wrappedValue
+        }
 
-        let path = "\(self.textSecureAccountsAPI)/apn"
-
-        return TSRequest(url: URL(string: path)!, method: "PUT", parameters: ["apnRegistrationId": apnsToken])
+        func encode(to encoder: any Encoder) throws {
+            var container = encoder.singleValueContainer()
+            try container.encode(self.wrappedValue.canonicalStringRepresentation)
+        }
     }
 
     static func unregisterAccountRequest() -> TSRequest {
@@ -225,7 +145,7 @@ public enum OWSRequestFactory {
         return TSRequest(
             url: URL(string: "v1/devices/provisioning/code")!,
             method: "GET",
-            parameters: nil
+            parameters: nil,
         )
     }
 
@@ -234,115 +154,112 @@ public enum OWSRequestFactory {
         owsAssertDebug(!ephemeralDeviceId.isEmpty)
 
         return .init(
-            url: .init(pathComponents: ["v1", "provisioning", ephemeralDeviceId])!,
+            url: URL(string: "v1/provisioning/\(ephemeralDeviceId)")!,
             method: "PUT",
-            parameters: ["body": messageBody.base64EncodedString()]
+            parameters: ["body": messageBody.base64EncodedString()],
         )
     }
 
     // MARK: - Donations
 
-    static func setSubscriberID(_ subscriberID: Data) -> TSRequest {
+    /// Creates a new suscriberID record on the server. If the subscriberID
+    /// already exists, extends its TTL.
+    ///
+    /// - Parameter donationPermit
+    /// Required to create a new subscriberID; optional for an existing one.
+    static func setSubscriberID(
+        _ subscriberID: Data,
+        donationPermit: DonationPermit?,
+    ) -> TSRequest {
         var result = TSRequest(
-            url: .init(pathComponents: ["v1", "subscription", subscriberID.asBase64Url])!,
+            url: URL(string: "v1/subscription/\(subscriberID.asBase64Url)")!,
             method: "PUT",
-            parameters: nil
+            parameters: nil,
         )
+        if let donationPermit {
+            result.headers["Donation-Permit"] = donationPermit.serializedPermit.base64EncodedString()
+        }
         result.auth = .anonymous
-        result.applyRedactionStrategy(.redactURL())
+        result.applyRedactionStrategy(.redactURL(sensitiveValues: [subscriberID.asBase64Url]))
         return result
     }
 
     static func deleteSubscriberID(_ subscriberID: Data) -> TSRequest {
         var result = TSRequest(
-            url: .init(pathComponents: ["v1", "subscription", subscriberID.asBase64Url])!,
+            url: URL(string: "v1/subscription/\(subscriberID.asBase64Url)")!,
             method: "DELETE",
-            parameters: nil
+            parameters: nil,
         )
         result.auth = .anonymous
-        result.applyRedactionStrategy(.redactURL())
+        result.applyRedactionStrategy(.redactURL(sensitiveValues: [subscriberID.asBase64Url]))
         return result
     }
 
     static func subscriptionSetDefaultPaymentMethod(
         subscriberId: Data,
         processor: String,
-        paymentMethodId: String
+        paymentMethodId: String,
     ) -> TSRequest {
         var result = TSRequest(
-            url: .init(pathComponents: [
-                "v1",
-                "subscription",
-                subscriberId.asBase64Url,
-                "default_payment_method",
-                processor,
-                paymentMethodId
-            ])!,
+            url: URL(string: "v1/subscription/\(subscriberId.asBase64Url)/default_payment_method/\(processor)/\(paymentMethodId)")!,
             method: "POST",
-            parameters: nil
+            parameters: nil,
         )
         result.auth = .anonymous
-        result.applyRedactionStrategy(.redactURL())
+        result.applyRedactionStrategy(.redactURL(sensitiveValues: [
+            subscriberId.asBase64Url,
+            paymentMethodId,
+        ]))
         return result
     }
 
     static func subscriptionSetDefaultIDEALPaymentMethod(
         subscriberId: Data,
-        setupIntentId: String
+        setupIntentId: String,
     ) -> TSRequest {
         var result = TSRequest(
-            url: .init(pathComponents: [
-                "v1",
-                "subscription",
-                subscriberId.asBase64Url,
-                "default_payment_method_for_ideal",
-                setupIntentId
-            ])!,
+            url: URL(string: "v1/subscription/\(subscriberId.asBase64Url)/default_payment_method_for_ideal/\(setupIntentId)")!,
             method: "POST",
-            parameters: nil
+            parameters: nil,
         )
         result.auth = .anonymous
-        result.applyRedactionStrategy(.redactURL())
+        result.applyRedactionStrategy(.redactURL(sensitiveValues: [
+            subscriberId.asBase64Url,
+            setupIntentId,
+        ]))
         return result
     }
 
-    static func subscriptionCreateStripePaymentMethodRequest(subscriberID: Data) -> TSRequest {
+    static func subscriptionCreateStripePaymentMethodRequest(
+        subscriberID: Data,
+        donationPermit: DonationPermit,
+    ) -> TSRequest {
         var result = TSRequest(
-            url: .init(pathComponents: [
-                "v1",
-                "subscription",
-                subscriberID.asBase64Url,
-                "create_payment_method",
-            ])!,
+            url: URL(string: "v1/subscription/\(subscriberID.asBase64Url)/create_payment_method")!,
             method: "POST",
-            parameters: nil
+            parameters: nil,
         )
+        result.headers["Donation-Permit"] = donationPermit.serializedPermit.base64EncodedString()
         result.auth = .anonymous
-        result.applyRedactionStrategy(.redactURL())
+        result.applyRedactionStrategy(.redactURL(sensitiveValues: [subscriberID.asBase64Url]))
         return result
     }
 
     static func subscriptionCreatePaypalPaymentMethodRequest(
         subscriberID: Data,
         returnURL: URL,
-        cancelURL: URL
+        cancelURL: URL,
     ) -> TSRequest {
         var result = TSRequest(
-            url: .init(pathComponents: [
-                "v1",
-                "subscription",
-                subscriberID.asBase64Url,
-                "create_payment_method",
-                "paypal",
-            ])!,
+            url: URL(string: "v1/subscription/\(subscriberID.asBase64Url)/create_payment_method/paypal")!,
             method: "POST",
             parameters: [
                 "returnUrl": returnURL.absoluteString,
                 "cancelUrl": cancelURL.absoluteString,
-            ]
+            ],
         )
         result.auth = .anonymous
-        result.applyRedactionStrategy(.redactURL())
+        result.applyRedactionStrategy(.redactURL(sensitiveValues: [subscriberID.asBase64Url]))
         return result
     }
 
@@ -350,23 +267,18 @@ public enum OWSRequestFactory {
         subscriberID: Data,
         level: UInt,
         currency: String,
-        idempotencyKey: String
+        idempotencyKey: String,
     ) -> TSRequest {
         var result = TSRequest(
-            url: .init(pathComponents: [
-                "v1",
-                "subscription",
-                subscriberID.asBase64Url,
-                "level",
-                String(level),
-                currency,
-                idempotencyKey,
-            ])!,
+            url: URL(string: "v1/subscription/\(subscriberID.asBase64Url)/level/\(level)/\(currency)/\(idempotencyKey)")!,
             method: "PUT",
-            parameters: nil
+            parameters: nil,
         )
         result.auth = .anonymous
-        result.applyRedactionStrategy(.redactURL())
+        result.applyRedactionStrategy(.redactURL(sensitiveValues: [
+            subscriberID.asBase64Url,
+            idempotencyKey,
+        ]))
         return result
     }
 
@@ -375,19 +287,14 @@ public enum OWSRequestFactory {
         receiptCredentialRequest: ReceiptCredentialRequest,
     ) -> TSRequest {
         var result = TSRequest(
-            url: .init(pathComponents: [
-                "v1",
-                "subscription",
-                subscriberID.asBase64Url,
-                "receipt_credentials",
-            ])!,
+            url: URL(string: "v1/subscription/\(subscriberID.asBase64Url)/receipt_credentials")!,
             method: "POST",
             parameters: [
                 "receiptCredentialRequest": receiptCredentialRequest.serialize().base64EncodedString(),
-            ]
+            ],
         )
         result.auth = .anonymous
-        result.applyRedactionStrategy(.redactURL())
+        result.applyRedactionStrategy(.redactURL(sensitiveValues: [subscriberID.asBase64Url]))
         return result
     }
 
@@ -396,17 +303,13 @@ public enum OWSRequestFactory {
         displayBadgesOnProfile: Bool,
     ) -> TSRequest {
         return TSRequest(
-            url: .init(pathComponents: [
-                "v1",
-                "donation",
-                "redeem-receipt",
-            ])!,
+            url: URL(string: "v1/donation/redeem-receipt")!,
             method: "POST",
             parameters: [
                 "receiptCredentialPresentation": receiptCredentialPresentation.base64EncodedString(),
                 "visible": displayBadgesOnProfile,
                 "primary": false,
-            ]
+            ],
         )
     }
 
@@ -416,18 +319,13 @@ public enum OWSRequestFactory {
         receiptCredentialRequest: ReceiptCredentialRequest,
     ) -> TSRequest {
         var result = TSRequest(
-            url: .init(pathComponents: [
-                "v1",
-                "subscription",
-                "boost",
-                "receipt_credentials",
-            ])!,
+            url: URL(string: "v1/subscription/boost/receipt_credentials")!,
             method: "POST",
             parameters: [
                 "paymentIntentId": paymentIntentID,
                 "receiptCredentialRequest": receiptCredentialRequest.serialize().base64EncodedString(),
                 "processor": paymentProcessor.rawValue,
-            ]
+            ],
         )
         result.auth = .anonymous
         return result
@@ -435,14 +333,9 @@ public enum OWSRequestFactory {
 
     public static func bankMandateRequest(bankTransferType: StripePaymentMethod.BankTransfer) -> TSRequest {
         var result = TSRequest(
-            url: .init(pathComponents: [
-                "v1",
-                "subscription",
-                "bank_mandate",
-                bankTransferType.rawValue,
-            ])!,
+            url: URL(string: "v1/subscription/bank_mandate/\(bankTransferType.rawValue)")!,
             method: "GET",
-            parameters: nil
+            parameters: nil,
         )
         result.headers[HttpHeaders.acceptLanguageHeaderKey] = HttpHeaders.acceptLanguageHeaderValue
         result.auth = .anonymous
@@ -451,27 +344,78 @@ public enum OWSRequestFactory {
 
     // MARK: - Keys
 
-    static func preKeyRequestParameters(_ preKeyRecord: LibSignalClient.PreKeyRecord) -> [String: Any] {
-        [
-            "keyId": preKeyRecord.id,
-            "publicKey": try! preKeyRecord.publicKey().serialize().base64EncodedStringWithoutPadding()
-        ]
+    struct IdentityKey: Encodable {
+        let wrappedValue: LibSignalClient.IdentityKey
+
+        init(_ wrappedValue: LibSignalClient.IdentityKey) {
+            self.wrappedValue = wrappedValue
+        }
+
+        func encode(to encoder: any Encoder) throws {
+            var container = encoder.singleValueContainer()
+            try container.encode(self.wrappedValue.publicKey.serialize().base64EncodedString())
+        }
     }
 
-    static func signedPreKeyRequestParameters(_ signedPreKeyRecord: LibSignalClient.SignedPreKeyRecord) -> [String: Any] {
-        [
-            "keyId": signedPreKeyRecord.id,
-            "publicKey": try! signedPreKeyRecord.publicKey().serialize().base64EncodedStringWithoutPadding(),
-            "signature": signedPreKeyRecord.signature.base64EncodedStringWithoutPadding()
-        ]
+    struct PreKey: Encodable {
+        let wrappedValue: LibSignalClient.PreKeyRecord
+
+        init(_ wrappedValue: LibSignalClient.PreKeyRecord) {
+            self.wrappedValue = wrappedValue
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case keyId
+            case publicKey
+        }
+
+        func encode(to encoder: any Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(self.wrappedValue.id, forKey: .keyId)
+            try container.encode(self.wrappedValue.publicKey().serialize().base64EncodedStringWithoutPadding(), forKey: .publicKey)
+        }
     }
 
-    static func pqPreKeyRequestParameters(_ pqPreKeyRecord: LibSignalClient.KyberPreKeyRecord) -> [String: Any] {
-        [
-            "keyId": pqPreKeyRecord.id,
-            "publicKey": try! pqPreKeyRecord.publicKey().serialize().base64EncodedStringWithoutPadding(),
-            "signature": pqPreKeyRecord.signature.base64EncodedStringWithoutPadding()
-        ]
+    public struct SignedPreKey: Encodable {
+        let wrappedValue: LibSignalClient.SignedPreKeyRecord
+
+        public init(_ wrappedValue: LibSignalClient.SignedPreKeyRecord) {
+            self.wrappedValue = wrappedValue
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case keyId
+            case publicKey
+            case signature
+        }
+
+        public func encode(to encoder: any Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(self.wrappedValue.id, forKey: .keyId)
+            try container.encode(self.wrappedValue.publicKey().serialize().base64EncodedStringWithoutPadding(), forKey: .publicKey)
+            try container.encode(self.wrappedValue.signature.base64EncodedStringWithoutPadding(), forKey: .signature)
+        }
+    }
+
+    public struct KyberPreKey: Encodable {
+        let wrappedValue: LibSignalClient.KyberPreKeyRecord
+
+        public init(_ wrappedValue: LibSignalClient.KyberPreKeyRecord) {
+            self.wrappedValue = wrappedValue
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case keyId
+            case publicKey
+            case signature
+        }
+
+        public func encode(to encoder: any Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(self.wrappedValue.id, forKey: .keyId)
+            try container.encode(self.wrappedValue.publicKey().serialize().base64EncodedStringWithoutPadding(), forKey: .publicKey)
+            try container.encode(self.wrappedValue.signature.base64EncodedStringWithoutPadding(), forKey: .signature)
+        }
     }
 
     static func availablePreKeysCountRequest(for identity: OWSIdentity) -> TSRequest {
@@ -501,35 +445,42 @@ public enum OWSRequestFactory {
         prekeyRecords: [LibSignalClient.PreKeyRecord]?,
         pqLastResortPreKeyRecord: LibSignalClient.KyberPreKeyRecord?,
         pqPreKeyRecords: [LibSignalClient.KyberPreKeyRecord]?,
-        auth: ChatServiceAuth
+        auth: ChatServiceAuth,
     ) -> TSRequest {
         var path = textSecureKeysAPI
         if let queryParam = queryParam(for: identity) {
             path = path.appending("?\(queryParam)")
         }
 
-        var parameters = [String: Any]()
-
+        var request = SetKeysRequest()
         if let signedPreKeyRecord {
-            parameters["signedPreKey"] = signedPreKeyRequestParameters(signedPreKeyRecord)
+            request.signedPreKey = OWSRequestFactory.SignedPreKey(signedPreKeyRecord)
         }
         if let prekeyRecords {
-            parameters["preKeys"] = prekeyRecords.map { self.preKeyRequestParameters($0) }
+            request.preKeys = prekeyRecords.map { OWSRequestFactory.PreKey($0) }
         }
         if let pqLastResortPreKeyRecord {
-            parameters["pqLastResortPreKey"] = pqPreKeyRequestParameters(pqLastResortPreKeyRecord)
+            request.pqLastResortPreKey = OWSRequestFactory.KyberPreKey(pqLastResortPreKeyRecord)
         }
         if let pqPreKeyRecords {
-            parameters["pqPreKeys"] = pqPreKeyRecords.map { self.pqPreKeyRequestParameters($0) }
+            request.pqPreKeys = pqPreKeyRecords.map { OWSRequestFactory.KyberPreKey($0) }
         }
 
-        var request = TSRequest(
+        var result = TSRequest(
             url: URL(string: path)!,
             method: "PUT",
-            parameters: parameters
+            body: .encodable(request),
         )
-        request.auth = .identified(auth)
-        return request
+        result.auth = .identified(auth)
+        result.timeoutInterval = 45
+        return result
+    }
+
+    private struct SetKeysRequest: Encodable {
+        var signedPreKey: OWSRequestFactory.SignedPreKey?
+        var preKeys: [OWSRequestFactory.PreKey]?
+        var pqLastResortPreKey: OWSRequestFactory.KyberPreKey?
+        var pqPreKeys: [OWSRequestFactory.KyberPreKey]?
     }
 
     static func queryParam(for identity: OWSIdentity) -> String? {
@@ -554,7 +505,7 @@ public enum OWSRequestFactory {
         aci: Aci,
         profileKeyVersion: String,
         credentialRequest: Data?,
-        auth: TSRequest.Auth
+        auth: TSRequest.Auth,
     ) -> TSRequest {
         var components = [String]()
         components.append(aci.serviceIdString)
@@ -581,7 +532,7 @@ public enum OWSRequestFactory {
         visibleBadgeIds: [String],
         version: String,
         commitment: Data,
-        auth: ChatServiceAuth
+        auth: ChatServiceAuth,
     ) -> TSRequest {
         var parameters: [String: Any] = [
             "avatar": hasAvatar,
@@ -606,21 +557,5 @@ public enum OWSRequestFactory {
         var request = TSRequest(url: URL(string: "v1/profile/")!, method: "PUT", parameters: parameters)
         request.auth = .identified(auth)
         return request
-    }
-}
-
-// MARK: -
-
-extension DeviceMessage {
-    /// Returns the per-device-message parameters when sending a message.
-    ///
-    /// See <https://github.com/signalapp/Signal-Server/blob/ab26a65/service/src/main/java/org/whispersystems/textsecuregcm/entities/IncomingMessage.java>.
-    func requestParameters() -> NSDictionary {
-        return [
-            "type": type.rawValue,
-            "destinationDeviceId": destinationDeviceId.uint32Value,
-            "destinationRegistrationId": Int32(bitPattern: destinationRegistrationId),
-            "content": content.base64EncodedString()
-        ]
     }
 }

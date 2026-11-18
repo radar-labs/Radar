@@ -4,19 +4,10 @@
 //
 
 import Foundation
+public import LibSignalClient
 import ObjectiveC
 
 extension Error {
-    public var hasIsRetryable: Bool {
-        if self is IsRetryableProvider {
-            return true
-        }
-        if self.isNetworkFailureOrTimeout {
-            return true
-        }
-        return false
-    }
-
     public var isRetryable: Bool {
         // Error and NSError have a special relationship.
         // They can be "cast" back and forth, but are separate objects.
@@ -33,11 +24,11 @@ extension Error {
         //
         // When trying to cast an error to IsRetryableProvider,
         // we need to try casting both the Error and NSError form.
-        if let error = self as? IsRetryableProvider {
-            return error.isRetryableProvider
+        if let error = self as? IsRetryableProvider, error.isRetryableProvider {
+            return true
         }
-        if let error = (self as NSError) as? IsRetryableProvider {
-            return error.isRetryableProvider
+        if let error = (self as NSError) as? IsRetryableProvider, error.isRetryableProvider {
+            return true
         }
 
         if self.isNetworkFailureOrTimeout {
@@ -45,14 +36,7 @@ extension Error {
             return true
         }
 
-        // This value should always be set for all errors by this
-        // var is consulted.  If not, default to retrying in production.
-        if CurrentAppContext().isRunningTests {
-            Logger.warn("Error without retry behavior specified: \(self)")
-        } else {
-            owsFailDebug("Error without retry behavior specified: \(self)")
-        }
-        return true
+        return false
     }
 }
 
@@ -64,24 +48,13 @@ public protocol IsRetryableProvider {
 
 // MARK: -
 
-extension OWSAssertionError: IsRetryableProvider {
-    public var isRetryableProvider: Bool { false }
-}
-
-extension OWSGenericError: IsRetryableProvider {
-    public var isRetryableProvider: Bool { false }
-}
-
-extension CancellationError: IsRetryableProvider {
-    public var isRetryableProvider: Bool { false }
-}
-
-// MARK: -
-
 // NOTE: We typically prefer to use a more specific error.
 public class OWSRetryableError: CustomNSError, IsRetryableProvider {
     public static var asNSError: NSError {
         OWSRetryableError() as Error as NSError
+    }
+
+    public init() {
     }
 
     // MARK: - IsRetryableProvider
@@ -89,30 +62,13 @@ public class OWSRetryableError: CustomNSError, IsRetryableProvider {
     public var isRetryableProvider: Bool { true }
 }
 
-// MARK: -
+// MARK: - SignalError
 
-// NOTE: We typically prefer to use a more specific error.
-public class OWSUnretryableError: CustomNSError, IsRetryableProvider {
-    public static var asNSError: NSError {
-        OWSUnretryableError() as Error as NSError
+extension SignalError: IsRetryableProvider {
+    public var isRetryableProvider: Bool {
+        switch self {
+        case .mismatchedDevices: return true
+        default: return false
+        }
     }
-
-    public init() {}
-
-    // MARK: - IsRetryableProvider
-
-    public var isRetryableProvider: Bool { false }
-}
-
-// MARK: -
-
-public enum SSKUnretryableError: Error, IsRetryableProvider {
-    case stickerDecryptionFailure
-    case downloadCouldNotMoveFile
-    case downloadCouldNotDeleteFile
-    case messageProcessingFailed
-
-    // MARK: - IsRetryableProvider
-
-    public var isRetryableProvider: Bool { false }
 }

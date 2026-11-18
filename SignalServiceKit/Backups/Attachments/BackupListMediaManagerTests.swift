@@ -11,50 +11,62 @@ import Testing
 
 public class BackupListMediaManagerTests {
 
-    let accountKeyStore: AccountKeyStore
-    let attachmentStore = AttachmentStoreImpl()
-    let backupAttachmentDownloadStore = BackupAttachmentDownloadStore()
-    let backupAttachmentUploadScheduler = BackupAttachmentUploadSchedulerMock()
-    let backupAttachmentUploadStore = BackupAttachmentUploadStore()
-    fileprivate let backupRequestManager = BackupRequestManagerMock()
-    let backupSettingsStore = BackupSettingsStore()
-    let db = InMemoryDB()
-    let orphanedBackupAttachmentStore = OrphanedBackupAttachmentStoreImpl()
-    let remoteConfigManager = StubbableRemoteConfigManager()
-    let tsAccountManager = MockTSAccountManager()
+    private lazy var accountKeyStore = AccountKeyStore(backupSettingsStore: backupSettingsStore)
+    private let attachmentStore = AttachmentStore()
+    private let attachmentUploadStore = AttachmentUploadStore()
+    private let backupAttachmentDownloadProgress = BackupAttachmentDownloadProgressMock()
+    private let backupAttachmentDownloadStore = BackupAttachmentDownloadStore()
+    private let backupAttachmentUploadProgress = BackupAttachmentUploadProgressMock(initialCompleted: 0, total: 100)
+    private let backupAttachmentUploadStore = BackupAttachmentUploadStore()
+    private let backupAttachmentUploadEraStore = BackupAttachmentUploadEraStore()
+    private let backupListMediaStore = BackupListMediaStore()
+    private lazy var backupMediaErrorNotificationPresenter = BackupMediaErrorNotificationPresenter(
+        dateProvider: dateProvider,
+        db: db,
+        notificationPresenter: notificationPresenter,
+    )
+    private let backupRequestManager = BackupRequestManagerMock()
+    private let backupSettingsStore = BackupSettingsStore()
+    private let dateProvider: DateProvider = { Date() }
+    private let db = InMemoryDB()
+    private let interactionStore = InteractionStoreImpl()
+    private let notificationPresenter = NoopNotificationPresenterImpl()
+    private let orphanedBackupAttachmentStore = OrphanedBackupAttachmentStore()
+    private let remoteConfigManager = StubbableRemoteConfigManager()
+    private let tsAccountManager = MockTSAccountManager()
+    private lazy var backupAttachmentUploadScheduler = BackupAttachmentUploadScheduler(
+        attachmentStore: attachmentStore,
+        backupAttachmentUploadStore: backupAttachmentUploadStore,
+        backupAttachmentUploadEraStore: backupAttachmentUploadEraStore,
+        dateProvider: dateProvider,
+        interactionStore: interactionStore,
+        remoteConfigProvider: remoteConfigManager,
+        tsAccountManager: tsAccountManager,
+    )
 
-    let listMediaManager: BackupListMediaManager
-
-    init() {
-        let dateProvider: DateProvider = {
-            Date()
-        }
-        self.accountKeyStore = AccountKeyStore(
-            backupSettingsStore: backupSettingsStore
-        )
-        self.listMediaManager = BackupListMediaManagerImpl(
-            accountKeyStore: accountKeyStore,
-            attachmentStore: attachmentStore,
-            attachmentUploadStore: AttachmentUploadStoreImpl(
-                attachmentStore: attachmentStore
-            ),
-            backupAttachmentDownloadProgress: BackupAttachmentDownloadProgressMock(),
-            backupAttachmentDownloadStore: backupAttachmentDownloadStore,
-            backupAttachmentUploadProgress: BackupAttachmentUploadProgressMock(),
-            backupAttachmentUploadScheduler: backupAttachmentUploadScheduler,
-            backupAttachmentUploadStore: backupAttachmentUploadStore,
-            backupAttachmentUploadEraStore: BackupAttachmentUploadEraStore(),
-            backupListMediaStore: BackupListMediaStore(),
-            backupRequestManager: backupRequestManager,
-            backupSettingsStore: backupSettingsStore,
-            dateProvider: dateProvider,
-            db: db,
-            notificationPresenter: NoopNotificationPresenterImpl(),
-            orphanedBackupAttachmentStore: orphanedBackupAttachmentStore,
-            remoteConfigManager: remoteConfigManager,
-            tsAccountManager: tsAccountManager
-        )
-    }
+    private lazy var listMediaManager = BackupListMediaManagerImpl(
+        accountKeyStore: accountKeyStore,
+        attachmentStore: attachmentStore,
+        attachmentUploadStore: attachmentUploadStore,
+        backupAttachmentDownloadProgress: backupAttachmentDownloadProgress,
+        backupAttachmentDownloadStore: backupAttachmentDownloadStore,
+        backupAttachmentUploadProgress: backupAttachmentUploadProgress,
+        backupAttachmentUploadScheduler: backupAttachmentUploadScheduler,
+        backupAttachmentUploadStore: backupAttachmentUploadStore,
+        backupAttachmentUploadEraStore: backupAttachmentUploadEraStore,
+        backupListMediaStore: backupListMediaStore,
+        backupMediaErrorNotificationPresenter: backupMediaErrorNotificationPresenter,
+        backupRequestManager: backupRequestManager,
+        backupSettingsStore: backupSettingsStore,
+        dateProvider: dateProvider,
+        db: db,
+        localFileBackupAttachmentMetadataStore: LocalFileBackupAttachmentMetadataStore(),
+        notificationPresenter: notificationPresenter,
+        orphanedBackupAttachmentStore: orphanedBackupAttachmentStore,
+        remoteConfigManager: remoteConfigManager,
+        tsAccountManager: tsAccountManager,
+        localFileBackupStore: LocalFileBackupStore(),
+    )
 
     @Test
     func testListMedia() async throws {
@@ -81,18 +93,19 @@ public class BackupListMediaManagerTests {
         // Case 1: Attachment exists locally but not on CDN
         let localOnlyIds = await db.awaitableWrite { tx in
             return (0..<numAttachmentsPerCase).map { _ in
+                let plaintextHash = Randomness.generateRandomBytes(32)
                 return insertAttachment(
-                    mediaName: UUID().uuidString,
+                    plaintextHash: plaintextHash,
+                    encryptionKey: .generate(),
                     mediaTierInfo: .init(
                         cdnNumber: 1,
                         unencryptedByteCount: 100,
-                        sha256ContentHash: UUID().data,
+                        plaintextHash: plaintextHash,
                         incrementalMacInfo: nil,
                         uploadEra: localUploadEra,
-                        lastDownloadAttemptTimestamp: nil
+                        lastDownloadAttemptTimestamp: nil,
                     ),
-                    scheduleDownload: true,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
@@ -102,8 +115,8 @@ public class BackupListMediaManagerTests {
         let remoteOnlyCdnNumberMedia = (0..<numAttachmentsPerCase).map { _ in
             return BackupArchive.Response.StoredMedia(
                 cdn: orphanCdnNumber,
-                mediaId: UUID().uuidString,
-                objectLength: 100
+                mediaId: Randomness.generateRandomBytes(15).hexadecimalString,
+                objectLength: 100,
             )
         }
         // For other cases, we'll add duplicate entries on cdn at different
@@ -113,20 +126,28 @@ public class BackupListMediaManagerTests {
         // Case 3: exists on both, local didn't have cdn info
         let discoveredCdnNumber: UInt32 = 5
         var discoveredCdnNumberMedia = [BackupArchive.Response.StoredMedia]()
-        let discoveredCdnNumberIds = try await db.awaitableWrite { tx in
-            return try (0..<numAttachmentsPerCase).map { _ in
-                let mediaName = UUID().uuidString
-                let mediaId = try mediaRootBackupKey.deriveMediaId(mediaName)
-                discoveredCdnNumberMedia.append(.init(
-                    cdn: discoveredCdnNumber,
-                    mediaId: mediaId.asBase64Url,
-                    objectLength: 100
-                ))
+        let discoveredCdnNumberIds = await db.awaitableWrite { tx in
+            return (0..<numAttachmentsPerCase).map { _ in
+                let plaintextHash = Randomness.generateRandomBytes(32)
+                let encryptionKey = AttachmentKey.generate()
+                let mediaName = Attachment.mediaName(
+                    plaintextHash: plaintextHash,
+                    encryptionKey: encryptionKey.combinedKey,
+                )
+                let fullsizeMediaId = mediaRootBackupKey.deriveMediaId(mediaName)
+                let thumbnailMediaId = mediaRootBackupKey.deriveMediaId(AttachmentBackupThumbnail.thumbnailMediaName(fullsizeMediaName: mediaName))
+                for mediaId in [fullsizeMediaId, thumbnailMediaId] {
+                    discoveredCdnNumberMedia.append(.init(
+                        cdn: discoveredCdnNumber,
+                        mediaId: mediaId.asBase64Url,
+                        objectLength: 100,
+                    ))
+                }
                 return insertAttachment(
-                    mediaName: mediaName,
+                    plaintextHash: plaintextHash,
+                    encryptionKey: encryptionKey,
                     mediaTierInfo: nil,
-                    scheduleUpload: true,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
@@ -134,64 +155,82 @@ public class BackupListMediaManagerTests {
         // Case 4: exists on both, cdn number matches.
         let matchingCdnNumber: UInt32 = 3
         var matchingCdnNumberMedia = [BackupArchive.Response.StoredMedia]()
-        let matchingCdnNumberIds = try await db.awaitableWrite { tx in
-            return try (0..<numAttachmentsPerCase).map { _ in
-                let mediaName = UUID().uuidString
-                let mediaId = try mediaRootBackupKey.deriveMediaId(mediaName)
-                matchingCdnNumberMedia.append(.init(
-                    cdn: matchingCdnNumber,
-                    mediaId: mediaId.asBase64Url,
-                    objectLength: 100
-                ))
-                orphanCdnNumberMedia.append(.init(
-                    cdn: orphanCdnNumber,
-                    mediaId: mediaId.asBase64Url,
-                    objectLength: 100
-                ))
+        let matchingCdnNumberIds = await db.awaitableWrite { tx in
+            return (0..<numAttachmentsPerCase).map { _ in
+                let plaintextHash = Randomness.generateRandomBytes(32)
+                let encryptionKey = AttachmentKey.generate()
+                let mediaName = Attachment.mediaName(
+                    plaintextHash: plaintextHash,
+                    encryptionKey: encryptionKey.combinedKey,
+                )
+                let fullsizeMediaId = mediaRootBackupKey.deriveMediaId(mediaName)
+                let thumbnailMediaId = mediaRootBackupKey.deriveMediaId(AttachmentBackupThumbnail.thumbnailMediaName(fullsizeMediaName: mediaName))
+                for mediaId in [fullsizeMediaId, thumbnailMediaId] {
+                    matchingCdnNumberMedia.append(.init(
+                        cdn: matchingCdnNumber,
+                        mediaId: mediaId.asBase64Url,
+                        objectLength: 100,
+                    ))
+                    orphanCdnNumberMedia.append(.init(
+                        cdn: orphanCdnNumber,
+                        mediaId: mediaId.asBase64Url,
+                        objectLength: 100,
+                    ))
+                }
                 return insertAttachment(
-                    mediaName: mediaName,
+                    plaintextHash: plaintextHash,
+                    encryptionKey: encryptionKey,
                     mediaTierInfo: .init(
                         cdnNumber: matchingCdnNumber,
                         unencryptedByteCount: 100,
-                        sha256ContentHash: UUID().data,
+                        plaintextHash: plaintextHash,
                         incrementalMacInfo: nil,
                         uploadEra: localUploadEra,
-                        lastDownloadAttemptTimestamp: nil
+                        lastDownloadAttemptTimestamp: nil,
                     ),
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
 
         // Case 5: exists on both, cdn number doesn't match.
         var nonMatchingCdnNumberMedia = [BackupArchive.Response.StoredMedia]()
-        let nonMatchingCdnNumberIds = try await db.awaitableWrite { tx in
-            return try (0..<numAttachmentsPerCase).map { _ in
-                let mediaName = UUID().uuidString
-                let mediaId = try mediaRootBackupKey.deriveMediaId(mediaName)
-                nonMatchingCdnNumberMedia.append(.init(
-                    // Prefer a cdn number matching remote config,
-                    // instead of the other orphaned one below
-                    cdn: remoteConfigCdnNumber,
-                    mediaId: mediaId.asBase64Url,
-                    objectLength: 100
-                ))
-                orphanCdnNumberMedia.append(.init(
-                    cdn: remoteConfigCdnNumber,
-                    mediaId: mediaId.asBase64Url,
-                    objectLength: 100
-                ))
+        let nonMatchingCdnNumberIds = await db.awaitableWrite { tx in
+            return (0..<numAttachmentsPerCase).map { _ in
+                let plaintextHash = Randomness.generateRandomBytes(32)
+                let encryptionKey = AttachmentKey.generate()
+                let mediaName = Attachment.mediaName(
+                    plaintextHash: plaintextHash,
+                    encryptionKey: encryptionKey.combinedKey,
+                )
+                let fullsizeMediaId = mediaRootBackupKey.deriveMediaId(mediaName)
+                let thumbnailMediaId = mediaRootBackupKey.deriveMediaId(AttachmentBackupThumbnail.thumbnailMediaName(fullsizeMediaName: mediaName))
+                for mediaId in [fullsizeMediaId, thumbnailMediaId] {
+                    nonMatchingCdnNumberMedia.append(.init(
+                        // Prefer a cdn number matching remote config,
+                        // instead of the other orphaned one below
+                        cdn: remoteConfigCdnNumber,
+                        mediaId: mediaId.asBase64Url,
+                        objectLength: 100,
+                    ))
+                    orphanCdnNumberMedia.append(.init(
+                        cdn: remoteConfigCdnNumber,
+                        mediaId: mediaId.asBase64Url,
+                        objectLength: 100,
+                    ))
+                }
                 return insertAttachment(
-                    mediaName: mediaName,
+                    plaintextHash: plaintextHash,
+                    encryptionKey: encryptionKey,
                     mediaTierInfo: .init(
                         cdnNumber: matchingCdnNumber,
                         unencryptedByteCount: 100,
-                        sha256ContentHash: UUID().data,
+                        plaintextHash: plaintextHash,
                         incrementalMacInfo: nil,
                         uploadEra: localUploadEra,
-                        lastDownloadAttemptTimestamp: nil
+                        lastDownloadAttemptTimestamp: nil,
                     ),
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
@@ -202,50 +241,60 @@ public class BackupListMediaManagerTests {
                 storedMediaObjects: remoteOnlyCdnNumberMedia,
                 backupDir: "",
                 mediaDir: "",
-                cursor: "someCursor"
+                cursor: "someCursor",
             ),
             BackupArchive.Response.ListMediaResult(
                 storedMediaObjects: discoveredCdnNumberMedia,
                 backupDir: "",
                 mediaDir: "",
-                cursor: "someCursor"
+                cursor: "someCursor",
             ),
             BackupArchive.Response.ListMediaResult(
                 storedMediaObjects: matchingCdnNumberMedia,
                 backupDir: "",
                 mediaDir: "",
-                cursor: "someCursor"
+                cursor: "someCursor",
             ),
             BackupArchive.Response.ListMediaResult(
                 storedMediaObjects: nonMatchingCdnNumberMedia,
                 backupDir: "",
                 mediaDir: "",
-                cursor: "someCursor"
+                cursor: "someCursor",
             ),
             BackupArchive.Response.ListMediaResult(
                 storedMediaObjects: orphanCdnNumberMedia,
                 backupDir: "",
                 mediaDir: "",
-                cursor: nil
-            )
+                cursor: nil,
+            ),
         ]
 
         try await listMediaManager.queryListMediaIfNeeded()
 
         // Case 1 should've been marked as not uploaded to media tier,
-        // removed from download queue and added to upload queue.
+        // removed from download queue and added to upload queue for both
+        // fullsize and thumbnail.
         db.read { tx in
             for attachmentId in localOnlyIds {
                 let attachment = attachmentStore.fetch(id: attachmentId, tx: tx)!
                 #expect(attachment.mediaTierInfo == nil)
+                #expect(attachment.thumbnailMediaTierInfo == nil)
 
-                #expect(try! backupAttachmentDownloadStore.getEnqueuedDownload(
-                    attachmentRowId: attachmentId,
-                    thumbnail: false,
-                    tx: tx
-                ) == nil)
+                for thumbnail in [true, false] {
+                    let enqueuedDownload = backupAttachmentDownloadStore.getEnqueuedDownload(
+                        attachmentRowId: attachmentId,
+                        thumbnail: thumbnail,
+                        tx: tx,
+                    )
+                    let enqueuedUpload = backupAttachmentUploadStore.getEnqueuedUpload(
+                        for: attachmentId,
+                        fullsize: !thumbnail,
+                        tx: tx,
+                    )
 
-                #expect(self.backupAttachmentUploadScheduler.enqueuedAttachmentIds.contains(attachmentId))
+                    #expect(enqueuedDownload == nil)
+                    #expect(enqueuedUpload != nil)
+                }
             }
         }
 
@@ -253,26 +302,28 @@ public class BackupListMediaManagerTests {
         db.read { tx in
             for orphanMedia in remoteOnlyCdnNumberMedia + orphanCdnNumberMedia {
                 let mediaId = try! Data.data(fromBase64Url: orphanMedia.mediaId)
-                #expect(try! OrphanedBackupAttachment
-                    .filter(Column(OrphanedBackupAttachment.CodingKeys.mediaId) == mediaId)
-                    .filter(Column(OrphanedBackupAttachment.CodingKeys.cdnNumber) == orphanMedia.cdn)
-                    .fetchCount(tx.database)
-                    == 1
+                #expect(
+                    try! OrphanedBackupAttachment
+                        .filter(Column(OrphanedBackupAttachment.CodingKeys.mediaId) == mediaId)
+                        .filter(Column(OrphanedBackupAttachment.CodingKeys.cdnNumber) == orphanMedia.cdn)
+                        .fetchCount(tx.database)
+                        == 1,
                 )
             }
         }
 
-        // Case 3 should be updated with cdn info, with uploads dequeued.
+        // Case 3 should be updated with cdn info, with no uploads enqueued (for
+        // either fullsize or thumbnail).
         db.read { tx in
             for attachmentId in discoveredCdnNumberIds {
                 let attachment = attachmentStore.fetch(id: attachmentId, tx: tx)!
-                #expect(attachment.mediaTierInfo?.cdnNumber == discoveredCdnNumber)
-
-                #expect(try! QueuedBackupAttachmentUpload
+                let queuedUploadCount = try! QueuedBackupAttachmentUpload
                     .filter(Column(QueuedBackupAttachmentUpload.CodingKeys.attachmentRowId) == attachmentId)
                     .fetchCount(tx.database)
-                    == 0
-                )
+
+                #expect(attachment.mediaTierInfo?.cdnNumber == discoveredCdnNumber)
+                #expect(attachment.thumbnailMediaTierInfo?.cdnNumber == discoveredCdnNumber)
+                #expect(queuedUploadCount == 0)
             }
         }
 
@@ -281,6 +332,7 @@ public class BackupListMediaManagerTests {
             for attachmentId in matchingCdnNumberIds {
                 let attachment = attachmentStore.fetch(id: attachmentId, tx: tx)!
                 #expect(attachment.mediaTierInfo?.cdnNumber == matchingCdnNumber)
+                #expect(attachment.thumbnailMediaTierInfo?.cdnNumber == matchingCdnNumber)
             }
         }
 
@@ -289,6 +341,7 @@ public class BackupListMediaManagerTests {
             for attachmentId in nonMatchingCdnNumberIds {
                 let attachment = attachmentStore.fetch(id: attachmentId, tx: tx)!
                 #expect(attachment.mediaTierInfo?.cdnNumber == remoteConfigCdnNumber)
+                #expect(attachment.thumbnailMediaTierInfo?.cdnNumber == remoteConfigCdnNumber)
             }
         }
     }
@@ -298,79 +351,44 @@ public class BackupListMediaManagerTests {
     typealias Attachment = SignalServiceKit.Attachment
 
     private func insertAttachment(
-        mediaName: String,
+        plaintextHash: Data,
+        encryptionKey: AttachmentKey,
         mediaTierInfo: Attachment.MediaTierInfo?,
-        scheduleDownload: Bool = false,
-        scheduleUpload: Bool = false,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> Attachment.IDType {
+        owsPrecondition(mediaTierInfo == nil || mediaTierInfo!.plaintextHash == plaintextHash)
+
         let thread = TSThread(uniqueId: UUID().uuidString)
-        try! thread.asRecord().insert(tx.database)
-        let attachmentParams: Attachment.ConstructionParams
-        if scheduleDownload {
-            attachmentParams = Attachment.ConstructionParams.fromBackup(
-                blurHash: nil,
-                mimeType: "image/jpeg",
-                encryptionKey: UUID().data,
-                latestTransitTierInfo: nil,
-                sha256ContentHash: UUID().data,
-                mediaName: mediaName,
-                mediaTierInfo: mediaTierInfo,
-                thumbnailMediaTierInfo: nil
-            )
-        } else {
-            attachmentParams = Attachment.ConstructionParams.mockStream(
-                mediaName: mediaName
-            )
-        }
-        var attachmentRecord = Attachment.Record(params: attachmentParams)
+        try! thread.insert(tx.database)
+
+        var attachmentRecord = Attachment.Record.mockStream(
+            encryptionKey: encryptionKey,
+            plaintextHash: plaintextHash,
+        )
         try! attachmentRecord.insert(tx.database)
+
         if let mediaTierInfo {
-            let updateParams = Attachment.ConstructionParams.forUpdatingAsUploadedToMediaTier(
-                attachment: try! Attachment(record: attachmentRecord),
-                mediaTierInfo: mediaTierInfo,
-                mediaName: mediaName
-            )
-            var updateRecord = Attachment.Record(params: updateParams)
-            updateRecord.sqliteId = attachmentRecord.sqliteId
-            try! updateRecord.update(tx.database)
+            let attachment = Attachment(record: attachmentRecord)
+            attachment.mediaTierInfo = mediaTierInfo
+
+            attachmentRecord = Attachment.Record(attachment: attachment)
+            try! attachmentRecord.update(tx.database)
         }
+
         // We make all the attachments just thread wallpapers for ease of setup;
         // for list media purposes it doesn't matter if its a message attachment
         // or thread wallpaper attachment.
         let referenceParams = AttachmentReference.ConstructionParams.mock(
             owner: .thread(.threadWallpaperImage(.init(
                 threadRowId: thread.sqliteRowId!,
-                creationTimestamp: 0
-            )))
+                creationTimestamp: 0,
+            ))),
         )
-        let referenceRecord = try! referenceParams.buildRecord(
-            attachmentRowId: attachmentRecord.sqliteId!
+        _ = attachmentStore.addReference(
+            referenceParams,
+            attachmentRowId: attachmentRecord.sqliteId!,
+            tx: tx,
         )
-        try! referenceRecord.insert(tx.database)
-
-        if scheduleDownload {
-            try! backupAttachmentDownloadStore.enqueue(
-                ReferencedAttachment(
-                    reference: AttachmentReference(record: referenceRecord as! AttachmentReference.ThreadAttachmentReferenceRecord),
-                    attachment: Attachment(record: attachmentRecord)
-                ),
-                thumbnail: false,
-                canDownloadFromMediaTier: true,
-                state: .ready,
-                currentTimestamp: 0,
-                tx: tx
-            )
-        }
-
-        if scheduleUpload {
-            try! backupAttachmentUploadStore.enqueue(
-                Attachment(record: attachmentRecord).asStream()!,
-                owner: .threadWallpaper,
-                fullsize: true,
-                tx: tx
-            )
-        }
 
         return attachmentRecord.sqliteId!
     }

@@ -32,7 +32,7 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
         threadUniqueId: String,
         audioAttachment: AudioAttachment,
         playbackRate: AudioPlaybackRate,
-        isIncoming: Bool
+        isIncoming: Bool,
     ) {
         self.threadUniqueId = threadUniqueId
         self.audioAttachment = audioAttachment
@@ -52,11 +52,11 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
         // start invisible
         self.alpha = 0
         self.backgroundColor = _backgroundColor
-        self.layer.cornerRadius = Constants.cornerRadius
+        addPillBlock()
 
         Self.playbackRateLabelConfig(
             playbackRate: playbackRate,
-            color: textColor
+            color: textColor,
         ).applyForRendering(label: label)
         self.imageView.image = Constants.image?.withTintColor(textColor, renderingMode: .alwaysOriginal)
     }
@@ -68,12 +68,13 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
             self.alpha = isVisible ? 1 : 0
         }
     }
+
     private var isAnimatingVisibility: Bool?
 
-    public func setVisibility(
+    func setVisibility(
         _ visible: Bool,
         animated: Bool = true,
-        completion: (() -> Void)? = nil
+        completion: (() -> Void)? = nil,
     ) {
         // NOTE: can't use `isHidden` state because ManualStackView gets
         // unhappy if one of its subviews hides. Use alpha instead.
@@ -86,13 +87,13 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
             CATransform3DIdentity,
             visible ? 0 : 1,
             visible ? 0 : 1,
-            1
+            1,
         )
         let toScale = CATransform3DScale(
             CATransform3DIdentity,
             visible ? 1 : 0,
             visible ? 1 : 0,
-            1
+            1,
         )
         layer.transform = toScale
 
@@ -124,10 +125,10 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
         CATransaction.commit()
     }
 
-    public func setPlaybackRate(
+    func setPlaybackRate(
         _ playbackRate: AudioPlaybackRate,
         animated: Bool = true,
-        completion: (() -> Void)? = nil
+        completion: (() -> Void)? = nil,
     ) {
         guard self.playbackRate != playbackRate else {
             completion?()
@@ -142,7 +143,7 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
             strongSelf.setSubviewFrames()
             Self.playbackRateLabelConfig(
                 playbackRate: strongSelf.playbackRate,
-                color: strongSelf.textColor
+                color: strongSelf.textColor,
             ).applyForRendering(label: strongSelf.label)
         }
 
@@ -161,14 +162,14 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
             CATransform3DIdentity,
             1,
             1,
-            1
+            1,
         )
         animation.fromValue = fromScale
         let toScale = CATransform3DScale(
             CATransform3DIdentity,
             Constants.changeAnimationScale,
             Constants.changeAnimationScale,
-            1
+            1,
         )
         animation.toValue = toScale
         animation.autoreverses = true
@@ -183,7 +184,7 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
         // right at the reversal point.
         DispatchQueue.main.asyncAfter(
             deadline: .now() + Constants.animationDuration,
-            execute: setContent
+            execute: setContent,
         )
         return
     }
@@ -200,15 +201,14 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
 
     // MARK: - Tapping
 
-    public func handleTap(
+    func handleTap(
         sender: UIGestureRecognizer,
         itemModel: CVItemModel,
-        audioMessageViewDelegate: AudioMessageViewDelegate?
+        audioMessageViewDelegate: AudioMessageViewDelegate?,
     ) -> Bool {
-        guard
-            let attachmentId = audioAttachment.attachmentStream?.attachmentStream.id,
-            AppEnvironment.shared.cvAudioPlayerRef.audioPlaybackState(forAttachmentId: attachmentId) == .playing
-        else {
+        let cvAudioPlayer = AppEnvironment.shared.cvAudioPlayerRef
+        let playbackID = CVAudioPlaybackID(audioAttachment: audioAttachment)
+        guard cvAudioPlayer.audioPlaybackState(playbackID: playbackID) == .playing else {
             return false
         }
         // Check that the tap is within the bounding box, but
@@ -216,7 +216,7 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
         let location = sender.location(in: self)
         let tapTargetBounds = bounds.insetBy(
             dx: -0.5 * max(0, Constants.minTapTargetSize - bounds.width),
-            dy: -0.5 * max(0, Constants.minTapTargetSize - bounds.height)
+            dy: -0.5 * max(0, Constants.minTapTargetSize - bounds.height),
         )
         guard tapTargetBounds.contains(location) else {
             return false
@@ -226,7 +226,7 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
 
         // Hold off updates until we animate the change.
         let animationCompletion = audioMessageViewDelegate?.beginCellAnimation(
-            maximumDuration: Constants.maxAnimationDuration
+            maximumDuration: Constants.maxAnimationDuration,
         )
 
         let reloadGroup = DispatchGroup()
@@ -236,15 +236,16 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
         reloadGroup.enter()
         SSKEnvironment.shared.databaseStorageRef.asyncWrite(
             block: {
-                itemModel.threadAssociatedData.updateWith(
+                itemModel.thread.updateWith(
                     audioPlaybackRate: newPlaybackRate.rawValue,
                     updateStorageService: true,
-                    transaction: $0
+                    transaction: $0,
                 )
             },
             completion: {
                 reloadGroup.leave()
-            })
+            },
+        )
 
         // Trigger the animation which also updates the playback rate value.
         reloadGroup.enter()
@@ -267,11 +268,11 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
 
     // MARK: - Sizing
 
-    public static func measure(maxWidth: CGFloat) -> CGSize {
+    static func measure(maxWidth: CGFloat) -> CGSize {
         // Always size this view for the max playback rate size.
         let labelConfig = Self.playbackRateLabelConfig(
             playbackRate: AudioPlaybackRate.rateForLargestDisplayText,
-            color: .white // Color doesn't matter for sizing.
+            color: .white, // Color doesn't matter for sizing.
         )
         let nonLabelWidth = Constants.imageSize + Constants.margins.totalWidth
         let labelSize = CVText.measureLabel(config: labelConfig, maxWidth: maxWidth - nonLabelWidth)
@@ -280,7 +281,7 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
 
         return CGSize(
             width: labelSize.width + nonLabelWidth,
-            height: height
+            height: height,
         )
     }
 
@@ -289,11 +290,11 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
     private func setSubviewFrames() {
         let labelConfig = Self.playbackRateLabelConfig(
             playbackRate: playbackRate,
-            color: .white // Color doesn't matter for sizing.
+            color: .white, // Color doesn't matter for sizing.
         )
         let labelSize = CVText.measureLabel(
             config: labelConfig,
-            maxWidth: bounds.width
+            maxWidth: bounds.width,
         )
         let labelWidth = labelSize.width
         let imageSize = Constants.imageSize
@@ -307,30 +308,26 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
             x: sidePadding,
             y: (bounds.height - labelSize.height) / 2,
             width: labelWidth,
-            height: labelSize.height
+            height: labelSize.height,
         )
         imageView.frame = CGRect(
             x: sidePadding + labelWidth,
             y: (bounds.height - imageSize) / 2,
             width: imageSize,
-            height: imageSize
+            height: imageSize,
         )
     }
 
     // MARK: - Colors
 
     open func makeBackgroundColor() -> UIColor {
-        isIncoming
-            ? (Theme.isDarkThemeEnabled ? UIColor.ows_white : .ows_black).withAlphaComponent(0.08)
-            : UIColor.ows_whiteAlpha20
+        isIncoming ? .Signal.MaterialBase.button : .Signal.ColorBase.button
     }
 
     private lazy var _backgroundColor = { makeBackgroundColor() }()
 
     open func makeTextColor() -> UIColor {
-        return isIncoming
-        ? (Theme.isDarkThemeEnabled ? .ows_gray15 : .ows_gray60)
-        : .ows_white
+        isIncoming ? .Signal.label : .Signal.ColorBase.labelPrimary
     }
 
     private lazy var textColor: UIColor = { makeTextColor() }()
@@ -339,7 +336,7 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
 
     private static func playbackRateLabelConfig(
         playbackRate: AudioPlaybackRate,
-        color: UIColor
+        color: UIColor,
     ) -> CVLabelConfig {
         let text = playbackRate.displayText
         // Limit the max font size to avoid overlap.
@@ -352,12 +349,11 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
             text,
             font: font,
             textColor: color,
-            textAlignment: .right
+            textAlignment: .right,
         )
     }
 
     fileprivate enum Constants {
-        static let cornerRadius: CGFloat = 6
         static var font: UIFont { UIFont.dynamicTypeFootnote }
         static let maxFontSize: CGFloat = 20
 
@@ -369,6 +365,7 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
                 return 16
             }
         }
+
         static var image: UIImage? {
             switch UIApplication.shared.preferredContentSizeCategory {
             case .extraSmall, .small, .medium, .large, .extraLarge:
@@ -377,6 +374,7 @@ class AudioMessagePlaybackRateView: ManualLayoutViewWithLayer {
                 return UIImage(named: "x-compact")
             }
         }
+
         static let margins = UIEdgeInsets(hMargin: 8, vMargin: 2)
 
         static let animationName = "scale"

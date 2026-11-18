@@ -4,7 +4,7 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
 // Compare with ColorOrGradientSwatchView:
 //
@@ -17,37 +17,29 @@ public import SignalUI
 //
 // Although we could combine these two views, these two scenarios are
 // just different enough that its convenient to have two separate views.
-public class CVColorOrGradientView: ManualLayoutViewWithLayer {
+class CVColorOrGradientView: ManualLayoutViewWithLayer, CVDimmableView, OWSBubbleViewHost {
 
     private weak var referenceView: UIView?
     private var value: ColorOrGradientValue?
 
-    public struct StrokeConfig {
-        let color: UIColor
-        let width: CGFloat
-    }
-    public struct BubbleConfig {
-        let sharpCorners: OWSDirectionalRectCorner
-        let sharpCornerRadius: CGFloat
-        let wideCornerRadius: CGFloat
-        let strokeConfig: StrokeConfig?
-    }
-    private var bubbleConfig: BubbleConfig?
-    private var hasPillRounding = false
+    private var bubbleConfig: BubbleConfiguration?
 
+    private var backgroundBlurView: UIVisualEffectView?
     private let gradientLayer = CAGradientLayer()
-    private let shapeLayer = CAShapeLayer()
+    private let strokeLayer = CAShapeLayer()
     private let maskLayer = CAShapeLayer()
     private var dimmerLayer: CALayer?
 
-    public var ensureSubviewsFillBounds = false
-    public var animationsEnabled = false
+    var ensureSubviewsFillBounds = false
+    var animationsEnabled = false
 
-    public init() {
+    init() {
         super.init(name: "CVColorOrGradientView")
 
+        strokeLayer.fillColor = nil
+
         gradientLayer.disableAnimationsWithDelegate()
-        shapeLayer.disableAnimationsWithDelegate()
+        strokeLayer.disableAnimationsWithDelegate()
         maskLayer.disableAnimationsWithDelegate()
     }
 
@@ -65,35 +57,25 @@ public class CVColorOrGradientView: ManualLayoutViewWithLayer {
         }
     }
 
-    public func configure(value: ColorOrGradientValue,
-                          referenceView: UIView,
-                          bubbleConfig: BubbleConfig? = nil,
-                          hasPillRounding: Bool = false) {
-        // At most one of these parameters should be set.
-        owsAssertDebug(!hasPillRounding || bubbleConfig == nil)
-
+    func configure(
+        value: ColorOrGradientValue,
+        referenceView: UIView,
+        bubbleConfig: BubbleConfiguration? = nil,
+    ) {
         self.value = value
         self.referenceView = referenceView
         self.bubbleConfig = bubbleConfig
-        self.hasPillRounding = hasPillRounding
 
         addDefaultLayoutBlock()
 
         updateAppearance()
     }
 
-    public static func build(conversationStyle: ConversationStyle, referenceView: UIView) -> CVColorOrGradientView {
-        let view = CVColorOrGradientView()
-        view.configure(value: conversationStyle.bubbleChatColorOutgoing,
-                       referenceView: referenceView)
-        return view
-    }
+    func updateAppearance() {
 
-    public func updateAppearance() {
-
-        guard let value = self.value,
-              let referenceView = self.referenceView else {
-            self.backgroundColor = nil
+        guard let value, let referenceView else {
+            backgroundColor = nil
+            backgroundBlurView?.removeFromSuperview()
             gradientLayer.removeFromSuperlayer()
             dimmerLayer?.removeFromSuperlayer()
             return
@@ -102,12 +84,33 @@ public class CVColorOrGradientView: ManualLayoutViewWithLayer {
         switch value {
         case .transparent:
             backgroundColor = nil
+            backgroundBlurView?.removeFromSuperview()
             gradientLayer.removeFromSuperlayer()
             dimmerLayer?.removeFromSuperlayer()
+
+        case .blur(let blurEffect):
+            backgroundColor = nil
+            if let backgroundBlurView {
+                backgroundBlurView.effect = blurEffect
+                // `backgroundBlurView` will be removed as a subview if `reset()` was called.
+                // But not every call of `updateAppearance()` is preceded by `reset()`.
+                if backgroundBlurView.superview != self {
+                    addSubviewToFillSuperviewEdges(backgroundBlurView)
+                }
+            } else {
+                let backgroundBlurView = UIVisualEffectView(effect: blurEffect)
+                addSubviewToFillSuperviewEdges(backgroundBlurView)
+                self.backgroundBlurView = backgroundBlurView
+            }
+            gradientLayer.removeFromSuperlayer()
+
         case .solidColor(let color):
             backgroundColor = color
+            backgroundBlurView?.removeFromSuperview()
             gradientLayer.removeFromSuperlayer()
+
         case .gradient(let color1, let color2, let angleRadians):
+            backgroundBlurView?.removeFromSuperview()
 
             if gradientLayer.superlayer != self.layer {
                 gradientLayer.removeFromSuperlayer()
@@ -118,7 +121,7 @@ public class CVColorOrGradientView: ManualLayoutViewWithLayer {
 
             gradientLayer.colors = [
                 color1.cgColor,
-                color2.cgColor
+                color2.cgColor,
             ]
 
             /* The start and end points of the gradient when drawn into the layer's
@@ -164,13 +167,17 @@ public class CVColorOrGradientView: ManualLayoutViewWithLayer {
             let referenceFrameLocalPoints = self.convert(referenceView.bounds, from: referenceView)
             // The reference frame (bounding box of the entire gradient)
             // in local unit coordinates.
-            let referenceFrameLocalUnits = CGRect(x: referenceFrameLocalPoints.x.inverseLerp(bounds.minX, bounds.maxX),
-                                                  y: referenceFrameLocalPoints.y.inverseLerp(bounds.minY, bounds.maxY),
-                                                  width: referenceFrameLocalPoints.width / bounds.width,
-                                                  height: referenceFrameLocalPoints.height / bounds.height)
+            let referenceFrameLocalUnits = CGRect(
+                x: referenceFrameLocalPoints.x.inverseLerp(bounds.minX, bounds.maxX),
+                y: referenceFrameLocalPoints.y.inverseLerp(bounds.minY, bounds.maxY),
+                width: referenceFrameLocalPoints.width / bounds.width,
+                height: referenceFrameLocalPoints.height / bounds.height,
+            )
             func convertFromGradientToLocal(_ point: CGPoint) -> CGPoint {
-                CGPoint(x: point.x.lerp(referenceFrameLocalUnits.minX, referenceFrameLocalUnits.maxX),
-                        y: point.y.lerp(referenceFrameLocalUnits.minY, referenceFrameLocalUnits.maxY))
+                CGPoint(
+                    x: point.x.lerp(referenceFrameLocalUnits.minX, referenceFrameLocalUnits.maxX),
+                    y: point.y.lerp(referenceFrameLocalUnits.minY, referenceFrameLocalUnits.maxY),
+                )
             }
             // Control points within the local UIView viewport.
             // Expressed as unit values with upper-left origin.
@@ -217,73 +224,48 @@ public class CVColorOrGradientView: ManualLayoutViewWithLayer {
             gradientLayer.endPoint = endPointLayerUnitsLL
         }
 
-        if let bubbleConfig = self.bubbleConfig {
-            let sharpCorners = UIView.uiRectCorner(forOWSDirectionalRectCorner: bubbleConfig.sharpCorners)
-            let bubblePath = UIBezierPath.roundedRect(self.bounds,
-                                                      sharpCorners: sharpCorners,
-                                                      sharpCornerRadius: bubbleConfig.sharpCornerRadius,
-                                                      wideCornerRadius: bubbleConfig.wideCornerRadius)
+        // Bubble shape.
+        if let bubbleConfig {
+            // Corners.
+            maskLayer.path = bubbleConfig.bubblePath(for: bounds).cgPath
+            layer.mask = maskLayer
 
-            if sharpCorners == .allCorners || sharpCorners == [] {
-                // If all of the corners have the same radius, don't
-                // bother using a mask layer.
-                layer.cornerRadius = (sharpCorners == []
-                                        ? bubbleConfig.wideCornerRadius
-                                        : bubbleConfig.sharpCornerRadius)
-                layer.mask = nil
-                layer.masksToBounds = true
+            // Stroke.
+            if
+                let stroke = bubbleConfig.stroke,
+                let strokePath = bubbleConfig.strokePath(for: bounds)
+            {
+                strokeLayer.lineWidth = stroke.width
+                strokeLayer.strokeColor = stroke.color.cgColor
+                strokeLayer.path = strokePath.cgPath
+                layer.addSublayer(strokeLayer)
             } else {
-                maskLayer.path = bubblePath.cgPath
-                layer.mask = maskLayer
-                layer.masksToBounds = false
-                layer.cornerRadius = 0
-            }
-
-            if let strokeConfig = bubbleConfig.strokeConfig {
-                shapeLayer.lineWidth = strokeConfig.width
-                shapeLayer.strokeColor = strokeConfig.color.cgColor
-                shapeLayer.fillColor = nil
-                shapeLayer.path = bubblePath.cgPath
-                layer.addSublayer(shapeLayer)
-            } else if shapeLayer.superlayer != nil {
-                shapeLayer.removeFromSuperlayer()
+                strokeLayer.removeFromSuperlayer()
             }
         } else {
-            // If this view isn't being used as a CVC message bubble,
-            // don't bother masking or using shapeLayer to render the stroke.
             layer.mask = nil
 
-            if hasPillRounding {
-                layer.masksToBounds = true
-                layer.cornerRadius = bounds.size.smallerAxis / 2
-            } else {
-                layer.masksToBounds = false
-                layer.cornerRadius = 0
-            }
-            if shapeLayer.superlayer != nil {
-                shapeLayer.removeFromSuperlayer()
-            }
+            strokeLayer.removeFromSuperlayer()
         }
 
         ensureSubviewLayout()
     }
 
-    public override func reset() {
+    override func reset() {
         super.reset()
 
-        self.referenceView = nil
-        self.value = nil
-        self.backgroundColor = nil
-        self.bubbleConfig = nil
-        self.hasPillRounding = false
-        shapeLayer.removeFromSuperlayer()
+        referenceView = nil
+        value = nil
+        backgroundColor = nil
+        bubbleConfig = nil
+        strokeLayer.removeFromSuperlayer()
         gradientLayer.removeFromSuperlayer()
         dimmerLayer?.removeFromSuperlayer()
     }
 
     // MARK: - CALayerDelegate
 
-    public override func action(for layer: CALayer, forKey event: String) -> CAAction? {
+    override func action(for layer: CALayer, forKey event: String) -> CAAction? {
         // Disable all implicit CALayer animations if needed
         if animationsEnabled {
             return super.action(for: layer, forKey: event)
@@ -293,87 +275,22 @@ public class CVColorOrGradientView: ManualLayoutViewWithLayer {
 
     }
 
-    // MARK: - DimmableView
+    // MARK: - CVDimmableView
 
-    // Layer is not created until it's needed so storing color in a variable is necessary.
-    var dimmingColor: UIColor? {
-        didSet {
-            dimmerLayer?.backgroundColor = dimmingColor?.cgColor
+    var dimmerColor: UIColor = .clear
+
+    var dimsContent = false
+
+    var backgroundLayer: CALayer? { gradientLayer }
+
+    // MARK: - OWSBubbleViewHost
+
+    var maskPath: UIBezierPath {
+        guard let bubbleConfig else {
+            return UIBezierPath(rect: bounds)
         }
+        return bubbleConfig.bubblePath(for: bounds)
     }
 
-    var dimmerDimsBackgroundOnly = true
-
-    private var sublayerIndexForDimmerLayer: UInt32 {
-        if dimmerDimsBackgroundOnly {
-            // As deep as possible but above the gradient layer.
-            if gradientLayer.superlayer == self.layer {
-                return 1
-            } else {
-                return 0
-            }
-        } else {
-            return UInt32(layer.sublayers?.count ?? 0)
-        }
-    }
-
-    func performDimmingAnimation(stepDuration: TimeInterval) {
-        guard let dimmingColor else { return }
-
-        var dimmerLayer: CALayer
-        if let existingDimmerLayer = self.dimmerLayer {
-            dimmerLayer = existingDimmerLayer
-        } else {
-            dimmerLayer = CALayer()
-            dimmerLayer.opacity = 0
-            dimmerLayer.backgroundColor = dimmingColor.cgColor
-            self.dimmerLayer = dimmerLayer
-        }
-
-        // Move dimmer layer to a correct z-index.
-        dimmerLayer.removeFromSuperlayer()
-        dimmerLayer.frame = layer.bounds
-        layer.insertSublayer(dimmerLayer, at: sublayerIndexForDimmerLayer)
-
-        dimmerLayer.removeAllAnimations()
-
-        // Animate fade-in.
-        let fadeIn = CABasicAnimation(keyPath: #keyPath(CALayer.opacity))
-        fadeIn.fromValue = 0
-        fadeIn.toValue = 1
-        fadeIn.duration = stepDuration
-        fadeIn.fillMode = .forwards
-        fadeIn.isRemovedOnCompletion = false
-        dimmerLayer.add(fadeIn, forKey: "fadeIn")
-
-        // Schedule fade-out after delay.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2 * stepDuration) {
-            let fadeOut = CABasicAnimation(keyPath: #keyPath(CALayer.opacity))
-            fadeOut.fromValue = 1
-            fadeOut.toValue = 0
-            fadeOut.duration = stepDuration
-            fadeOut.fillMode = .forwards
-            fadeOut.isRemovedOnCompletion = false
-            dimmerLayer.add(fadeOut, forKey: "fadeOut")
-        }
-    }
-}
-
-// MARK: -
-
-extension CVColorOrGradientView: OWSBubbleViewHost {
-    public var maskPath: UIBezierPath {
-        guard let bubbleConfig = self.bubbleConfig else {
-            owsFailDebug("Missing bubbleConfig.")
-            return UIBezierPath()
-        }
-        let sharpCorners = UIView.uiRectCorner(forOWSDirectionalRectCorner: bubbleConfig.sharpCorners)
-        let bubblePath = UIBezierPath.roundedRect(self.bounds,
-                                                  sharpCorners: sharpCorners,
-                                                  sharpCornerRadius: bubbleConfig.sharpCornerRadius,
-                                                  wideCornerRadius: bubbleConfig.wideCornerRadius)
-        return bubblePath
-    }
-
-    public var bubbleReferenceView: UIView { self }
+    var bubbleReferenceView: UIView { self }
 }

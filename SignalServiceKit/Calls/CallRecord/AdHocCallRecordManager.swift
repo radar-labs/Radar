@@ -13,25 +13,25 @@ public protocol AdHocCallRecordManager {
         status: CallRecord.CallStatus.CallLinkCallStatus,
         timestamp: UInt64,
         shouldSendSyncMessge: Bool,
-        tx: DBWriteTransaction
-    ) throws
+        tx: DBWriteTransaction,
+    )
 
     func handlePeekResult(
         eraId: String?,
         rootKey: CallLinkRootKey,
-        tx: DBWriteTransaction
-    ) throws
+        tx: DBWriteTransaction,
+    )
 }
 
 final class AdHocCallRecordManagerImpl: AdHocCallRecordManager {
     private let callRecordStore: any CallRecordStore
-    private let callLinkStore: any CallLinkRecordStore
+    private let callLinkStore: CallLinkRecordStore
     private let outgoingSyncMessageManager: any OutgoingCallEventSyncMessageManager
 
     init(
         callRecordStore: any CallRecordStore,
-        callLinkStore: any CallLinkRecordStore,
-        outgoingSyncMessageManager: any OutgoingCallEventSyncMessageManager
+        callLinkStore: CallLinkRecordStore,
+        outgoingSyncMessageManager: any OutgoingCallEventSyncMessageManager,
     ) {
         self.callRecordStore = callRecordStore
         self.callLinkStore = callLinkStore
@@ -44,8 +44,8 @@ final class AdHocCallRecordManagerImpl: AdHocCallRecordManager {
         status: CallRecord.CallStatus.CallLinkCallStatus,
         timestamp: UInt64,
         shouldSendSyncMessge: Bool,
-        tx: DBWriteTransaction
-    ) throws {
+        tx: DBWriteTransaction,
+    ) {
         // This shouldn't happen (we block joining earlier), but race conditions
         // theoretically allow it, and this is the final point at which we can
         // enforce the invariant that deleted links can't have call records.
@@ -57,27 +57,24 @@ final class AdHocCallRecordManagerImpl: AdHocCallRecordManager {
         let callRecordResult = callRecordStore.fetch(
             callId: callId,
             conversationId: .callLink(callLinkRowId: callLink.id),
-            tx: tx
+            tx: tx,
         )
         let callRecord: CallRecord
         switch callRecordResult {
         case .matchDeleted:
             return
+
         case .matchNotFound:
             callRecord = CallRecord(
                 callId: callId,
                 callLinkRowId: callLink.id,
                 callStatus: status,
-                callBeganTimestamp: timestamp
+                callBeganTimestamp: timestamp,
             )
-            do {
-                try callRecordStore.insert(callRecord: callRecord, tx: tx)
-            } catch let error {
-                owsFailBeta("Failed to insert call record: \(error)")
-            }
+            callRecordStore.insert(callRecord: callRecord, tx: tx)
             var callLink = callLink
             callLink.didInsertCallRecord()
-            try callLinkStore.update(callLink, tx: tx)
+            callLinkStore.update(callLink, tx: tx)
 
         case .matchFound(let callRecord2):
             callRecord = callRecord2
@@ -87,7 +84,7 @@ final class AdHocCallRecordManagerImpl: AdHocCallRecordManager {
             callRecordStore.updateCallAndUnreadStatus(
                 callRecord: callRecord,
                 newCallStatus: .callLink(status),
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -96,7 +93,7 @@ final class AdHocCallRecordManagerImpl: AdHocCallRecordManager {
                 callRecord: callRecord,
                 callEvent: .callUpdated,
                 callEventTimestamp: timestamp,
-                tx: tx
+                tx: tx,
             )
         }
     }
@@ -104,39 +101,39 @@ final class AdHocCallRecordManagerImpl: AdHocCallRecordManager {
     func handlePeekResult(
         eraId: String?,
         rootKey: CallLinkRootKey,
-        tx: DBWriteTransaction
-    ) throws {
-        guard var callLinkRecord = try self.callLinkStore.fetch(roomId: rootKey.deriveRoomId(), tx: tx) else {
+        tx: DBWriteTransaction,
+    ) {
+        guard var callLinkRecord = self.callLinkStore.fetch(roomId: rootKey.deriveRoomId(), tx: tx) else {
             return
         }
         let callId = eraId.map(callIdFromEra(_:))
         if callLinkRecord.activeCallId != callId {
             callLinkRecord.activeCallId = callId
-            try self.callLinkStore.update(callLinkRecord, tx: tx)
+            self.callLinkStore.update(callLinkRecord, tx: tx)
         }
         if let callId {
             // Things that are already in the calls tab get updated timestamps (and
             // move to the top) whenever we notice that they're active. "Already in the
             // calls tab" means "isUpcoming or hasCallRecord".
-            let shouldObserveResult = try { () -> Bool in
+            let shouldObserveResult = { () -> Bool in
                 if callLinkRecord.isUpcoming == true {
                     return true
                 }
-                let callRecords = try self.callRecordStore.fetchExisting(
+                let callRecords = self.callRecordStore.fetchExisting(
                     conversationId: .callLink(callLinkRowId: callLinkRecord.id),
                     limit: 1,
-                    tx: tx
+                    tx: tx,
                 )
                 return !callRecords.isEmpty
             }()
             if shouldObserveResult {
-                try self.createOrUpdateRecord(
+                self.createOrUpdateRecord(
                     callId: callId,
                     callLink: callLinkRecord,
                     status: .generic,
                     timestamp: Date.ows_millisecondTimestamp(),
                     shouldSendSyncMessge: true,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
@@ -146,11 +143,11 @@ final class AdHocCallRecordManagerImpl: AdHocCallRecordManager {
 #if TESTABLE_BUILD
 
 final class MockAdHocCallRecordManager: AdHocCallRecordManager {
-    func createOrUpdateRecord(callId: UInt64, callLink: CallLinkRecord, status: CallRecord.CallStatus.CallLinkCallStatus, timestamp: UInt64, shouldSendSyncMessge: Bool, tx: DBWriteTransaction) throws {
+    func createOrUpdateRecord(callId: UInt64, callLink: CallLinkRecord, status: CallRecord.CallStatus.CallLinkCallStatus, timestamp: UInt64, shouldSendSyncMessge: Bool, tx: DBWriteTransaction) {
         fatalError()
     }
 
-    func handlePeekResult(eraId: String?, rootKey: CallLinkRootKey, tx: DBWriteTransaction) throws {
+    func handlePeekResult(eraId: String?, rootKey: CallLinkRootKey, tx: DBWriteTransaction) {
         fatalError()
     }
 }

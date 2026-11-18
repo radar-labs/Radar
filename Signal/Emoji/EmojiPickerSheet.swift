@@ -12,10 +12,7 @@ class EmojiPickerSheet: OWSViewController {
     let completionHandler: (EmojiWithSkinTones?) -> Void
 
     let collectionView: EmojiPickerCollectionView
-    lazy var sectionToolbar = EmojiPickerSectionToolbar(
-        delegate: self,
-        forceDarkTheme: self.forceDarkTheme
-    )
+    lazy var sectionToolbar = EmojiPickerSectionToolbar(delegate: self)
 
     let allowReactionConfiguration: Bool
 
@@ -29,27 +26,24 @@ class EmojiPickerSheet: OWSViewController {
 
     lazy var configureButton: UIButton = {
         let button = UIButton()
-
         button.setImage(Theme.iconImage(.emojiSettings), for: .normal)
-        button.tintColor = self.forceDarkTheme ? Theme.darkThemeNavbarIconColor : Theme.primaryIconColor
-
-        button.addTarget(self, action: #selector(didSelectConfigureButton), for: .touchUpInside)
+        button.tintColor = UIColor.Signal.label
+        button.addAction(
+            UIAction { [weak self] _ in self?.didSelectConfigureButton() },
+            for: .primaryActionTriggered,
+        )
         return button
     }()
-
-    private let forceDarkTheme: Bool
 
     private let reactionPickerConfigurationListener: ReactionPickerConfigurationListener?
 
     init(
         message: TSMessage?,
         allowReactionConfiguration: Bool = true,
-        forceDarkTheme: Bool = false,
         reactionPickerConfigurationListener: ReactionPickerConfigurationListener? = nil,
-        completionHandler: @escaping (EmojiWithSkinTones?) -> Void
+        completionHandler: @escaping (EmojiWithSkinTones?) -> Void,
     ) {
         self.allowReactionConfiguration = allowReactionConfiguration
-        self.forceDarkTheme = forceDarkTheme
         self.reactionPickerConfigurationListener = reactionPickerConfigurationListener
         self.completionHandler = completionHandler
         self.collectionView = EmojiPickerCollectionView(message: message)
@@ -58,13 +52,6 @@ class EmojiPickerSheet: OWSViewController {
         sheetPresentationController?.detents = [.medium(), .large()]
         sheetPresentationController?.prefersGrabberVisible = true
         sheetPresentationController?.delegate = self
-
-        if forceDarkTheme {
-            self.overrideUserInterfaceStyle = .dark
-            if #available(iOS 17.0, *) {
-                sheetPresentationController?.traitOverrides.userInterfaceStyle = .dark
-            }
-        }
     }
 
     // MARK: -
@@ -72,7 +59,11 @@ class EmojiPickerSheet: OWSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable {
+        if #available(iOS 17.0, *), self.overrideUserInterfaceStyle == .dark {
+            sheetPresentationController?.traitOverrides.userInterfaceStyle = .dark
+        }
+
+        if #available(iOS 26, *) {
             view.backgroundColor = nil
         } else {
             view.backgroundColor = .tertiarySystemBackground
@@ -116,7 +107,6 @@ class EmojiPickerSheet: OWSViewController {
             sectionToolbar.bottomAnchor.constraint(equalTo: keyboardLayoutGuide.topAnchor, constant: -8),
         ])
 
-#if compiler(>=6.2)
         // Obscures content underneath the emoji section toolbar to improve legibility.
         if #available(iOS 26, *) {
             let scrollInteraction = UIScrollEdgeElementContainerInteraction()
@@ -124,10 +114,9 @@ class EmojiPickerSheet: OWSViewController {
             scrollInteraction.edge = .bottom
             sectionToolbar.addInteraction(scrollInteraction)
         }
-#endif
     }
 
-    public override func viewDidLayoutSubviews() {
+    override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
         // Ensure the scrollView's layout has completed
@@ -143,13 +132,14 @@ class EmojiPickerSheet: OWSViewController {
         collectionView.scrollIndicatorInsets = contentInset
     }
 
-    @objc
-    private func didSelectConfigureButton(sender: UIButton) {
+    private func didSelectConfigureButton() {
         let configVC = EmojiReactionPickerConfigViewController(
-            forceDarkTheme: self.forceDarkTheme,
-            reactionPickerConfigurationListener: self.reactionPickerConfigurationListener
+            reactionPickerConfigurationListener: self.reactionPickerConfigurationListener,
         )
         let navController = UINavigationController(rootViewController: configVC)
+        if overrideUserInterfaceStyle == .dark {
+            navController.overrideUserInterfaceStyle = .dark
+        }
         self.present(navController, animated: true)
     }
 

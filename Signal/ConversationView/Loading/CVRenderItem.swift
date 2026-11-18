@@ -3,36 +3,38 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import SignalServiceKit
-public import SignalUI
+import SignalServiceKit
+import SignalUI
 
-public class CVRenderItem: NSObject {
-    public let itemModel: CVItemModel
+class CVRenderItem: ConversationViewLayoutItem, Equatable, CustomDebugStringConvertible {
+    let itemModel: CVItemModel
 
-    public var componentState: CVComponentState { itemModel.componentState }
-    public var itemViewState: CVItemViewState { itemModel.itemViewState }
+    var componentState: CVComponentState { itemModel.componentState }
+    var itemViewState: CVItemViewState { itemModel.itemViewState }
 
-    public let rootComponent: CVRootComponent
+    let rootComponent: CVRootComponent
 
-    public let cellMeasurement: CVCellMeasurement
-    public var cellSize: CGSize { cellMeasurement.cellSize }
+    let cellMeasurement: CVCellMeasurement
+    var cellSize: CGSize { cellMeasurement.cellSize }
 
     private let incomingMessageAuthorAddress: SignalServiceAddress?
 
-    public var cellReuseIdentifier: String {
+    var cellReuseIdentifier: String {
         rootComponent.cellReuseIdentifier.rawValue
     }
 
-    public var interaction: TSInteraction {
+    var interaction: TSInteraction {
         itemModel.interaction
     }
 
-    public var interactionUniqueId: String { interaction.uniqueId }
-    public var interactionType: OWSInteractionType { interaction.interactionType }
+    var interactionUniqueId: String { interaction.uniqueId }
+    var interactionType: OWSInteractionType { interaction.interactionType }
 
-    init(itemModel: CVItemModel,
-         rootComponent: CVRootComponent,
-         cellMeasurement: CVCellMeasurement) {
+    init(
+        itemModel: CVItemModel,
+        rootComponent: CVRootComponent,
+        cellMeasurement: CVCellMeasurement,
+    ) {
         self.itemModel = itemModel
         self.rootComponent = rootComponent
         self.cellMeasurement = cellMeasurement
@@ -86,20 +88,23 @@ public class CVRenderItem: NSObject {
         NSStringFromOWSInteractionType(interaction.interactionType)
     }
 
-    public override var debugDescription: String {
+    var debugDescription: String {
         "\(interactionUniqueId) \(interactionTypeName)"
     }
 
-    public var reactionState: InteractionReactionState? {
+    var reactionState: InteractionReactionState? {
         componentState.reactions?.reactionState
     }
-}
 
-// MARK: -
+    // MARK: - Equatable
 
-extension CVRenderItem: ConversationViewLayoutItem {
+    static func ==(lhs: CVRenderItem, rhs: CVRenderItem) -> Bool {
+        lhs.interactionUniqueId == rhs.interactionUniqueId
+    }
 
-    public func vSpacing(previousLayoutItem: ConversationViewLayoutItem) -> CGFloat {
+    // MARK: - ConversationViewLayoutItem
+
+    func vSpacing(previousLayoutItem: ConversationViewLayoutItem) -> CGFloat {
         guard let previousLayoutItem = previousLayoutItem as? CVRenderItem else {
             owsFailDebug("Invalid previousLayoutItem.")
             return 0
@@ -116,10 +121,12 @@ extension CVRenderItem: ConversationViewLayoutItem {
             case .incomingMessage:
                 // Only use compact spacing within a cluster
                 // of messages from the same author.
-                if !itemViewState.isFirstInCluster,
-                   let selfAuthorAddress = self.incomingMessageAuthorAddress,
-                   let prevAuthorAddress = previousLayoutItem.incomingMessageAuthorAddress,
-                   selfAuthorAddress == prevAuthorAddress {
+                if
+                    !itemViewState.isFirstInCluster,
+                    let selfAuthorAddress = self.incomingMessageAuthorAddress,
+                    let prevAuthorAddress = previousLayoutItem.incomingMessageAuthorAddress,
+                    selfAuthorAddress == prevAuthorAddress
+                {
                     return ConversationStyle.compactMessageSpacing
                 }
                 return ConversationStyle.defaultMessageSpacing
@@ -146,18 +153,22 @@ extension CVRenderItem: ConversationViewLayoutItem {
             if previousInteraction.interactionType == interaction.interactionType {
                 switch previousInteraction.interactionType {
                 case .error:
-                    if let errorMessage = interaction as? TSErrorMessage,
-                       let previousErrorMessage = previousInteraction as? TSErrorMessage,
-                       (errorMessage.errorType == .nonBlockingIdentityChange
-                            || previousErrorMessage.errorType != errorMessage.errorType) {
+                    if
+                        let errorMessage = interaction as? TSErrorMessage,
+                        let previousErrorMessage = previousInteraction as? TSErrorMessage,
+                        errorMessage.errorType == .nonBlockingIdentityChange
+                        || previousErrorMessage.errorType != errorMessage.errorType
+                    {
                         return ConversationStyle.defaultMessageSpacing
                     }
                     return 0
                 case .info:
-                    if let infoMessage = interaction as? TSInfoMessage,
-                       let previousInfoMessage = previousInteraction as? TSInfoMessage,
-                       (infoMessage.messageType == .verificationStateChange
-                            || previousInfoMessage.messageType != infoMessage.messageType) {
+                    if
+                        let infoMessage = interaction as? TSInfoMessage,
+                        let previousInfoMessage = previousInteraction as? TSInfoMessage,
+                        infoMessage.messageType == .verificationStateChange
+                        || previousInfoMessage.messageType != infoMessage.messageType
+                    {
                         return ConversationStyle.defaultMessageSpacing
                     }
                     return 0
@@ -166,8 +177,10 @@ extension CVRenderItem: ConversationViewLayoutItem {
                 default:
                     return ConversationStyle.defaultMessageSpacing
                 }
-            } else if previousInteraction.interactionType == .outgoingMessage
-                        || previousInteraction.interactionType == .incomingMessage {
+            } else if
+                previousInteraction.interactionType == .outgoingMessage
+                || previousInteraction.interactionType == .incomingMessage
+            {
                 return ConversationStyle.systemMessageSpacing
             } else {
                 return ConversationStyle.defaultMessageSpacing
@@ -177,11 +190,11 @@ extension CVRenderItem: ConversationViewLayoutItem {
         }
     }
 
-    public var canBeUsedForContinuity: Bool {
+    var canBeUsedForContinuity: Bool {
         ConversationViewLayout.canInteractionBeUsedForScrollContinuity(itemModel.interaction)
     }
 
-    public var isDateHeader: Bool {
+    var isDateHeader: Bool {
         itemModel.interaction.interactionType == .dateHeader
     }
 }

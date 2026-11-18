@@ -4,6 +4,7 @@
 //
 
 import Foundation
+public import UIKit
 
 /// Like MessageBody but with styles only, no mentions.
 public class StyleOnlyMessageBody: Codable, Equatable {
@@ -20,7 +21,7 @@ public class StyleOnlyMessageBody: Codable, Equatable {
     public var length: Int { (text as NSString).length }
 
     public var hasStyles: Bool {
-        return collapsedStyles.isEmpty.negated
+        return !collapsedStyles.isEmpty
     }
 
     public convenience init(messageBody: MessageBody) {
@@ -69,10 +70,8 @@ public class StyleOnlyMessageBody: Codable, Equatable {
         return MessageBody(
             text: text,
             ranges: MessageBodyRanges(
-                mentions: [:],
-                orderedMentions: [],
-                collapsedStyles: collapsedStyles
-            )
+                collapsedStyles: collapsedStyles,
+            ),
         )
     }
 
@@ -83,7 +82,7 @@ public class StyleOnlyMessageBody: Codable, Equatable {
             mentionAttributes: [],
             styleAttributes: collapsedStyles.map {
                 return .init(.fromCollapsedStyle($0.value), range: $0.range)
-            }
+            },
         )
     }
 
@@ -92,14 +91,14 @@ public class StyleOnlyMessageBody: Codable, Equatable {
         baseFont: UIFont? = nil,
         baseTextColor: UIColor? = nil,
         textAlignment: NSTextAlignment? = nil,
-        isDarkThemeEnabled: Bool
+        isDarkThemeEnabled: Bool,
     ) -> NSAttributedString {
         let baseFont = baseFont ?? config.baseFont
         let baseTextColor = baseTextColor ?? config.textColor.color(isDarkThemeEnabled: isDarkThemeEnabled)
 
         var baseAttributes: [NSAttributedString.Key: Any] = [
             .font: baseFont,
-            .foregroundColor: baseTextColor
+            .foregroundColor: baseTextColor,
         ]
         if let textAlignment {
             let paragraphStyle = NSMutableParagraphStyle()
@@ -108,7 +107,7 @@ public class StyleOnlyMessageBody: Codable, Equatable {
         }
         let string = NSMutableAttributedString(
             string: text,
-            attributes: baseAttributes
+            attributes: baseAttributes,
         )
         return HydratedMessageBody.applyAttributes(
             on: string,
@@ -123,21 +122,19 @@ public class StyleOnlyMessageBody: Codable, Equatable {
                 mention: MentionDisplayConfiguration(
                     font: config.baseFont,
                     foregroundColor: config.textColor,
-                    backgroundColor: nil
+                    backgroundColor: nil,
                 ),
                 style: config,
-                searchRanges: nil
+                searchRanges: nil,
             ),
-            isDarkThemeEnabled: isDarkThemeEnabled
+            isDarkThemeEnabled: isDarkThemeEnabled,
         )
     }
 
     public func toProtoBodyRanges() -> [SSKProtoBodyRange] {
         // No need to validate length; all instances of this class are validated.
         return MessageBodyRanges(
-            mentions: [:],
-            orderedMentions: [],
-            collapsedStyles: collapsedStyles
+            collapsedStyles: collapsedStyles,
         ).toProtoBodyRanges()
     }
 
@@ -158,7 +155,7 @@ public class StyleOnlyMessageBody: Codable, Equatable {
 
     private func stripAndPerformDrop(
         _ operation: (__owned String) -> (Int) -> Substring,
-        _ count: Int
+        _ count: Int,
     ) -> StyleOnlyMessageBody {
         let originalStripped = text.stripped
         let finalText = String(operation(originalStripped)(count)).stripped
@@ -178,14 +175,14 @@ public class StyleOnlyMessageBody: Codable, Equatable {
                 style.value,
                 range: NSRange(
                     location: intersection.location - finalSubrange.location,
-                    length: intersection.length
-                )
+                    length: intersection.length,
+                ),
             )
         }
         return .init(text: finalText, collapsedStyles: finalStyles)
     }
 
-    public static func == (lhs: StyleOnlyMessageBody, rhs: StyleOnlyMessageBody) -> Bool {
+    public static func ==(lhs: StyleOnlyMessageBody, rhs: StyleOnlyMessageBody) -> Bool {
         guard lhs.text == rhs.text else {
             return false
         }
@@ -221,7 +218,7 @@ public class StyleOnlyMessageBody: Codable, Equatable {
                     return NSRangedValue($0, range: style.range)
                 }
             }
-            let messageBodyRanges = MessageBodyRanges(mentions: [:], styles: singleStyles)
+            let messageBodyRanges = MessageBodyRanges(mentions: [], styles: singleStyles)
             self.collapsedStyles = messageBodyRanges.collapsedStyles
         } else {
             self.collapsedStyles = try container.decode([NSRangedValue<CollapsedStyle>].self, forKey: .collapsedStyles)

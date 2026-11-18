@@ -15,6 +15,7 @@ protocol UsernameLinkScanDelegate: AnyObject {
 
 class UsernameLinkScanQRCodeViewController: OWSViewController, OWSNavigationChildController {
     var preferredNavigationBarStyle: OWSNavigationBarStyle { .blur }
+    var navbarBackgroundColorOverride: UIColor? { OWSTableViewController2.tableBackgroundColor }
 
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         .portrait
@@ -35,7 +36,7 @@ class UsernameLinkScanQRCodeViewController: OWSViewController, OWSNavigationChil
     private lazy var scanViewController = {
         let scanViewController = QRCodeScanViewController(
             appearance: .framed,
-            showUploadPhotoButton: true
+            showUploadPhotoButton: true,
         )
 
         scanViewController.delegate = self
@@ -45,28 +46,21 @@ class UsernameLinkScanQRCodeViewController: OWSViewController, OWSNavigationChil
 
     private lazy var instructionsLabel: UILabel = {
         let label = UILabel()
-
+        label.font = .dynamicTypeSubheadline
         label.numberOfLines = 0
         label.textAlignment = .center
         label.lineBreakMode = .byWordWrapping
         label.text = OWSLocalizedString(
             "USERNAME_LINK_SCAN_QR_CODE_INSTRUCTIONS_LABEL",
-            comment: "Text providing instructions on how to use the username link QR code scanning."
+            comment: "Text providing instructions on how to use the username link QR code scanning.",
         )
-
+        label.adjustsFontForContentSizeCategory = true
         // Always use dark theme since it sits over the scan mask.
-        label.textColor = .ows_white
-
+        label.textColor = .white
         return label
     }()
 
     // MARK: - Lifecycle
-
-    var navbarBackgroundColorOverride: UIColor? {
-        return OWSTableViewController2.tableBackgroundColor(
-            isUsingPresentedStyle: true
-        )
-    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -88,16 +82,7 @@ class UsernameLinkScanQRCodeViewController: OWSViewController, OWSNavigationChil
 
         scanViewController.view.autoPinEdgesToSuperviewEdges()
         instructionsWrapperView.autoPinEdges(toSuperviewSafeAreaExcludingEdge: .bottom)
-
-        themeDidChange()
-        contentSizeCategoryDidChange()
     }
-
-    override func contentSizeCategoryDidChange() {
-        instructionsLabel.font = .dynamicTypeSubheadline
-    }
-
-    // MARK: Actions
 }
 
 // MARK: - Scan delegate
@@ -115,7 +100,7 @@ extension UsernameLinkScanQRCodeViewController: QRCodeScanDelegate {
 
     func qrCodeScanViewScanned(
         qrCodeData: Data?,
-        qrCodeString: String?
+        qrCodeString: String?,
     ) -> QRCodeScanOutcome {
         guard let qrCodeString else {
             UsernameLogger.shared.error("Unexpectedly missing QR code string!")
@@ -124,10 +109,10 @@ extension UsernameLinkScanQRCodeViewController: QRCodeScanDelegate {
 
         guard
             let scannedUrl = URL(string: qrCodeString),
-            let scannedUsernameLink = Usernames.UsernameLink(usernameLinkUrl: scannedUrl)
+            let scannedUsernameLink = try? Usernames.UsernameLink(usernameLinkUrl: scannedUrl)
         else {
             UsernameLogger.shared.error(
-                "Failed to create username link from scanned QR code!"
+                "Failed to create username link from scanned QR code!",
             )
             return .continueScanning
         }
@@ -142,7 +127,7 @@ extension UsernameLinkScanQRCodeViewController: QRCodeScanDelegate {
     }
 
     func qrCodeScanViewDismiss(
-        _ qrCodeScanViewController: QRCodeScanViewController
+        _ qrCodeScanViewController: QRCodeScanViewController,
     ) {
         dismiss(animated: true)
     }
@@ -161,6 +146,8 @@ extension UsernameLinkScanQRCodeViewController: PHPickerViewControllerDelegate {
             return
         }
 
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
+
         Task { @MainActor in
             async let dismiss: Void = { @MainActor () async -> Void in
                 await withCheckedContinuation { continuation in
@@ -171,20 +158,24 @@ extension UsernameLinkScanQRCodeViewController: PHPickerViewControllerDelegate {
             }()
 
             do {
-                let typedItemProvider = try TypedItemProvider.make(for: selectedItem.itemProvider)
-                let attachment = try await typedItemProvider.buildAttachment()
+                let attachment = try await TypedItemProvider.buildVisualMediaAttachment(
+                    forItemProvider: selectedItem.itemProvider,
+                    attachmentLimits: attachmentLimits,
+                )
                 guard
-                    let image = attachment.image(),
+                    let image = attachment.rawValue.image(),
                     let ciImage = CIImage(image: image)
                 else {
                     throw QRCodeImagePickerError.noAttachmentImage
                 }
 
-                guard let qrCodeDetector = CIDetector(
-                    ofType: CIDetectorTypeQRCode,
-                    context: nil,
-                    options: [CIDetectorAccuracy: CIDetectorAccuracyHigh]
-                ) else {
+                guard
+                    let qrCodeDetector = CIDetector(
+                        ofType: CIDetectorTypeQRCode,
+                        context: nil,
+                        options: [CIDetectorAccuracy: CIDetectorAccuracyHigh],
+                    )
+                else {
                     throw QRCodeImagePickerError.ciDetectorError
                 }
 
@@ -202,14 +193,14 @@ extension UsernameLinkScanQRCodeViewController: PHPickerViewControllerDelegate {
 
                 _ = self.qrCodeScanViewScanned(
                     qrCodeData: nil,
-                    qrCodeString: qrCodeMessageString
+                    qrCodeString: qrCodeMessageString,
                 )
             } catch {
                 UsernameLogger.shared.error("Error building attachment for QC code scan: \(error)")
                 _ = await dismiss
                 OWSActionSheets.showErrorAlert(
                     message: CommonStrings.somethingWentWrongError,
-                    fromViewController: self
+                    fromViewController: self,
                 )
             }
         }

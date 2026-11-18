@@ -19,19 +19,17 @@ public class SSKEnvironment: NSObject {
         _shared = env
     }
 
-    #if TESTABLE_BUILD
-    private(set) public var contactManagerRef: any ContactManager
-    private(set) public var messageSenderRef: MessageSender
-    private(set) public var networkManagerRef: NetworkManager
-    private(set) public var paymentsHelperRef: PaymentsHelperSwift
-    private(set) public var groupsV2Ref: GroupsV2
-    #else
+#if TESTABLE_BUILD
+    public private(set) var contactManagerRef: any ContactManager
+    public private(set) var networkManagerRef: NetworkManager
+    public private(set) var paymentsHelperRef: PaymentsHelperSwift
+    public private(set) var groupsV2Ref: GroupsV2
+#else
     public let contactManagerRef: any ContactManager
-    public let messageSenderRef: MessageSender
     public let networkManagerRef: NetworkManager
     public let paymentsHelperRef: PaymentsHelperSwift
     public let groupsV2Ref: GroupsV2
-    #endif
+#endif
     /// This should be deprecated.
     public var contactManagerImplRef: OWSContactsManager { contactManagerRef as! OWSContactsManager }
     @objc
@@ -45,19 +43,16 @@ public class SSKEnvironment: NSObject {
     public let blockingManagerRef: BlockingManager
     public let remoteConfigManagerRef: RemoteConfigManager
     public let udManagerRef: OWSUDManager
-    public let messageDecrypterRef: OWSMessageDecrypter
+    let messageDecrypterRef: OWSMessageDecrypter
     public let groupMessageProcessorManagerRef: GroupMessageProcessorManager
     public let ows2FAManagerRef: OWS2FAManager
-    @objc
-    public let disappearingMessagesJobRef: OWSDisappearingMessagesJob
     @objc
     public let receiptManagerRef: OWSReceiptManager
     @objc
     public let receiptSenderRef: ReceiptSender
     public let reachabilityManagerRef: SSKReachabilityManager
-    public let syncManagerRef: SyncManagerProtocol
+    public let syncManagerRef: SyncManager
     public let typingIndicatorsRef: TypingIndicators
-    public let stickerManagerRef: StickerManager
     @objc
     public let databaseStorageRef: SDSDatabaseStorage
     public let signalServiceAddressCacheRef: SignalServiceAddressCache
@@ -78,7 +73,6 @@ public class SSKEnvironment: NSObject {
     public let owsPaymentsLockRef: OWSPaymentsLock
     public let mobileCoinHelperRef: MobileCoinHelper
     public let spamChallengeResolverRef: SpamChallengeResolver
-    public let senderKeyStoreRef: SenderKeyStore
     public let phoneNumberUtilRef: PhoneNumberUtil
     public let webSocketFactoryRef: WebSocketFactory
     public let systemStoryManagerRef: SystemStoryManagerProtocol
@@ -117,13 +111,11 @@ public class SSKEnvironment: NSObject {
         messageDecrypter: OWSMessageDecrypter,
         groupMessageProcessorManager: GroupMessageProcessorManager,
         ows2FAManager: OWS2FAManager,
-        disappearingMessagesJob: OWSDisappearingMessagesJob,
         receiptManager: OWSReceiptManager,
         receiptSender: ReceiptSender,
         reachabilityManager: SSKReachabilityManager,
-        syncManager: SyncManagerProtocol,
+        syncManager: SyncManager,
         typingIndicators: TypingIndicators,
-        stickerManager: StickerManager,
         databaseStorage: SDSDatabaseStorage,
         signalServiceAddressCache: SignalServiceAddressCache,
         signalService: OWSSignalServiceProtocol,
@@ -144,7 +136,6 @@ public class SSKEnvironment: NSObject {
         paymentsLock: OWSPaymentsLock,
         mobileCoinHelper: MobileCoinHelper,
         spamChallengeResolver: SpamChallengeResolver,
-        senderKeyStore: SenderKeyStore,
         phoneNumberUtil: PhoneNumberUtil,
         webSocketFactory: WebSocketFactory,
         systemStoryManager: SystemStoryManagerProtocol,
@@ -161,10 +152,9 @@ public class SSKEnvironment: NSObject {
         avatarBuilder: AvatarBuilder,
         smJobQueues: SignalMessagingJobQueues,
         groupCallManager: GroupCallManager,
-        profileFetcher: any ProfileFetcher
+        profileFetcher: any ProfileFetcher,
     ) {
         self.contactManagerRef = contactManager
-        self.messageSenderRef = messageSender
         self.pendingReceiptRecorderRef = pendingReceiptRecorder
         self.profileManagerRef = profileManager
         self.networkManagerRef = networkManager
@@ -177,13 +167,11 @@ public class SSKEnvironment: NSObject {
         self.messageDecrypterRef = messageDecrypter
         self.groupMessageProcessorManagerRef = groupMessageProcessorManager
         self.ows2FAManagerRef = ows2FAManager
-        self.disappearingMessagesJobRef = disappearingMessagesJob
         self.receiptManagerRef = receiptManager
         self.receiptSenderRef = receiptSender
         self.syncManagerRef = syncManager
         self.reachabilityManagerRef = reachabilityManager
         self.typingIndicatorsRef = typingIndicators
-        self.stickerManagerRef = stickerManager
         self.databaseStorageRef = databaseStorage
         self.signalServiceAddressCacheRef = signalServiceAddressCache
         self.signalServiceRef = signalService
@@ -204,7 +192,6 @@ public class SSKEnvironment: NSObject {
         self.owsPaymentsLockRef = paymentsLock
         self.mobileCoinHelperRef = mobileCoinHelper
         self.spamChallengeResolverRef = spamChallengeResolver
-        self.senderKeyStoreRef = senderKeyStore
         self.phoneNumberUtilRef = phoneNumberUtil
         self.webSocketFactoryRef = webSocketFactory
         self.systemStoryManagerRef = systemStoryManager
@@ -247,8 +234,6 @@ public class SSKEnvironment: NSObject {
         SignalProxy.warmCaches(appReadiness: appReadiness)
         self.signalServiceRef.warmCaches()
         self.profileManagerRef.warmCaches()
-        self.receiptManagerRef.prepareCachedValues()
-        dependenciesBridge.svr.warmCaches()
         self.typingIndicatorsRef.warmCaches()
         self.paymentsHelperRef.warmCaches()
         self.paymentsCurrenciesRef.warmCaches()
@@ -261,34 +246,27 @@ public class SSKEnvironment: NSObject {
         let databaseStorage = self.databaseStorageRef
         let tsAccountManager = dependenciesBridge.tsAccountManager
 
-        let mustHavePni: Bool
-        let mustHavePniIdentityKey: Bool
-        switch tsAccountManager.registrationStateWithMaybeSneakyTransaction {
-        case .provisioned:
-            mustHavePni = true
-            mustHavePniIdentityKey = true
-        case .registered:
-            mustHavePni = true
-            mustHavePniIdentityKey = true
-        default:
-            mustHavePni = false
-            mustHavePniIdentityKey = false
-        }
-
-        guard mustHavePni || mustHavePniIdentityKey else {
+        guard
+            let registeredState = try? tsAccountManager.registeredStateWithMaybeSneakyTransaction(),
+            registeredState.localIdentifiers.hasPhoneNumber
+        else {
+            // We must be a registered account with a phone number for this check.
             return
         }
 
-        let (hasPni, hasPniIdentityKey) = databaseStorage.read { tx -> (Bool, Bool) in
-            let hasPni = tsAccountManager.localIdentifiers(tx: tx)!.pni != nil
-            let hasPniIdentityKey = dependenciesBridge.identityManager.identityKeyPair(for: .pni, tx: tx) != nil
-            return (hasPni, hasPniIdentityKey)
+        let hasPni = registeredState.localIdentifiers.pni != nil
+        let hasPniIdentityKey = databaseStorage.read { tx in
+            return dependenciesBridge.identityManager.identityKeyPair(for: .pni, tx: tx) != nil
         }
 
-        if (!hasPni && mustHavePni) || (!hasPniIdentityKey && mustHavePniIdentityKey) {
+        if !hasPni || !hasPniIdentityKey {
             Logger.warn("Deregistering because PNI state is missing (hasPni: \(hasPni); hasPniIdentityKey: \(hasPniIdentityKey))")
             databaseStorage.write { tx in
-                dependenciesBridge.registrationStateChangeManager.setIsDeregisteredOrDelinked(true, tx: tx)
+                dependenciesBridge.registrationStateChangeManager.setIsDeregisteredOrDelinked(
+                    true,
+                    notify: true,
+                    tx: tx,
+                )
             }
         }
     }
@@ -299,31 +277,43 @@ public class SSKEnvironment: NSObject {
     /// Pni (a one-time migration), but it also helps ensure that the value is
     /// always consistent with TSAccountManager's values.
     private func fixLocalRecipientIfNeeded(dependenciesBridge: DependenciesBridge) {
-        self.databaseStorageRef.write { tx in
-            guard let localIdentifiers = dependenciesBridge.tsAccountManager.localIdentifiers(tx: tx) else {
-                return  // Not registered yet.
+        let databaseStorage = self.databaseStorageRef
+        let recipientMerger = dependenciesBridge.recipientMerger
+        let recipientStore = dependenciesBridge.recipientDatabaseTable
+        let tsAccountManager = dependenciesBridge.tsAccountManager
+
+        databaseStorage.write { tx in
+            guard let localIdentifiers = tsAccountManager.localIdentifiers(tx: tx) else {
+                return // Not registered yet.
             }
-            guard let phoneNumber = E164(localIdentifiers.phoneNumber) else {
-                return  // Registered with an invalid phone number.
+            let phoneNumberObj: E164?
+            if let phoneNumber = localIdentifiers.phoneNumber {
+                guard let _phoneNumberObj = E164(phoneNumber) else {
+                    return // Registered with an invalid phone number.
+                }
+                phoneNumberObj = _phoneNumberObj
+            } else {
+                phoneNumberObj = nil
             }
-            let recipientMerger = dependenciesBridge.recipientMerger
-            _ = recipientMerger.applyMergeForLocalAccount(
+            var localRecipient = recipientMerger.applyMergeForLocalAccount(
                 aci: localIdentifiers.aci,
-                phoneNumber: phoneNumber,
+                phoneNumber: phoneNumberObj,
                 pni: localIdentifiers.pni,
-                tx: tx
+                shouldUpdateStorageService: true,
+                tx: tx,
             )
+            if localRecipient.isBlocked {
+                localRecipient.status = .unspecified
+                localRecipient.blockedAt = .unspecified
+                recipientStore.updateRecipient(localRecipient, transaction: tx)
+            }
         }
     }
 
-    #if TESTABLE_BUILD
+#if TESTABLE_BUILD
 
     public func setContactManagerForUnitTests(_ contactManager: any ContactManager) {
         self.contactManagerRef = contactManager
-    }
-
-    public func setMessageSenderForUnitTests(_ messageSender: MessageSender) {
-        self.messageSenderRef = messageSender
     }
 
     public func setNetworkManagerForUnitTests(_ networkManager: NetworkManager) {
@@ -338,5 +328,5 @@ public class SSKEnvironment: NSObject {
         self.groupsV2Ref = groupsV2
     }
 
-    #endif
+#endif
 }

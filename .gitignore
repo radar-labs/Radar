@@ -3,6 +3,7 @@ Config/User*.xcconfig
 
 # Exclude the build directory
 build/*
+.build/
 # Exclude temp nibs and swap files
 *~.nib
 *.swp
@@ -35,6 +36,9 @@ Index/
 *.pyc
 *.sdsjson
 Scripts/sds_codegen/sds-includes/*
+
+# Logs
+debuglogs/
 
 /.idea
 /.vscode

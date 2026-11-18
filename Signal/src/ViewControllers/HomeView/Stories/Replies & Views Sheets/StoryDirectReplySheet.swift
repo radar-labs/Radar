@@ -4,9 +4,9 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
-public class StoryDirectReplySheet: OWSViewController, StoryReplySheet {
+class StoryDirectReplySheet: OWSViewController, StoryReplySheet {
 
     var dismissHandler: (() -> Void)?
 
@@ -20,6 +20,7 @@ public class StoryDirectReplySheet: OWSViewController, StoryReplySheet {
         toolbar.translatesAutoresizingMaskIntoConstraints = false
         return toolbar
     }()
+
     let storyMessage: StoryMessage
     lazy var thread: TSThread? = SSKEnvironment.shared.databaseStorageRef.read { storyMessage.context.thread(transaction: $0) }
 
@@ -32,19 +33,20 @@ public class StoryDirectReplySheet: OWSViewController, StoryReplySheet {
         self.spoilerState = spoilerState
         super.init()
         modalPresentationStyle = .custom
+        overrideUserInterfaceStyle = .dark
     }
 
-    public override func viewWillAppear(_ animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         inputToolbar.becomeFirstResponder()
     }
 
-    public override func viewWillDisappear(_ animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         inputToolbar.resignFirstResponder()
     }
 
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
 
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
@@ -67,14 +69,16 @@ public class StoryDirectReplySheet: OWSViewController, StoryReplySheet {
         dismiss(animated: true)
     }
 
-    public override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+    override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
         // We don't want `inputToolbar` to stay attached to the keyboard's layout guide during dismiss animation
         // as this creates unpleasant animations where the bar flies across the screen.
         // To workaround that we freeze vertical position of the `inputToolbar`
         // just before the animation stars to that the bar is animated with the whole view.
         if let inputToolbarBottomConstraint {
             let fixedPositionConstraint = inputToolbar.topAnchor.constraint(
-                equalTo: view.topAnchor, constant: inputToolbar.frame.y)
+                equalTo: view.topAnchor,
+                constant: inputToolbar.frame.y,
+            )
 
             NSLayoutConstraint.deactivate([inputToolbarBottomConstraint])
             NSLayoutConstraint.activate([fixedPositionConstraint])

@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import SignalServiceKit
-public import SignalUI
+import SignalServiceKit
+import SignalUI
 
-public enum CVMessageCellType: Int, CustomStringConvertible, Equatable {
+enum CVMessageCellType: Int, CustomStringConvertible, Equatable {
     case unknown
 
     // These message cell types all use the default root component.
@@ -23,6 +23,7 @@ public enum CVMessageCellType: Int, CustomStringConvertible, Equatable {
     case quoteOnlyMessage
     case giftBadge
     case poll
+    case releaseNotesMessage
 
     // Most of these other message cell types use a special root view.
     case dateHeader
@@ -32,10 +33,11 @@ public enum CVMessageCellType: Int, CustomStringConvertible, Equatable {
     case systemMessage
     case unknownThreadWarning
     case defaultDisappearingMessageTimer
+    case collapseSet
 
     // MARK: - CustomStringConvertible
 
-    public var description: String {
+    var description: String {
         switch self {
         case .unknown: return "unknown"
         case .textOnlyMessage: return "textOnlyMessage"
@@ -58,6 +60,8 @@ public enum CVMessageCellType: Int, CustomStringConvertible, Equatable {
         case .unknownThreadWarning: return "unknownThreadWarning"
         case .defaultDisappearingMessageTimer: return "defaultDisappearingMessageTimer"
         case .poll: return "poll"
+        case .collapseSet: return "collapseSet"
+        case .releaseNotesMessage: return "releaseNotesMessage"
         }
     }
 }
@@ -66,7 +70,7 @@ public enum CVMessageCellType: Int, CustomStringConvertible, Equatable {
 
 // Represents some _renderable_ portion of an Conversation View item.
 // It could be the entire item or some part thereof.
-public protocol CVNode {
+protocol CVNode {
     var thread: TSThread { get }
     var interaction: TSInteraction { get }
     var messageCellType: CVMessageCellType { get }
@@ -89,8 +93,8 @@ extension CVNode {
         interaction is TSOutgoingMessage
     }
 
-    var wasNotCreatedLocally: Bool {
-        (interaction as? TSOutgoingMessage)?.wasNotCreatedLocally == true
+    var isReleaseNotesMessage: Bool {
+        interaction is TSReleaseNotesMessage
     }
 
     var wasRemotelyDeleted: Bool {
@@ -101,8 +105,10 @@ extension CVNode {
     }
 
     var hasPerConversationExpiration: Bool {
-        guard interaction.interactionType == .incomingMessage ||
-                interaction.interactionType == .outgoingMessage else {
+        guard
+            interaction.interactionType == .incomingMessage ||
+            interaction.interactionType == .outgoingMessage
+        else {
             return false
         }
         guard let message = interaction as? TSMessage else {

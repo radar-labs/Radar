@@ -3,8 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import SignalServiceKit
+public import Foundation
 public import LibSignalClient
+import SignalServiceKit
 
 public class DeviceProvisioningURL {
 
@@ -14,6 +15,8 @@ public class DeviceProvisioningURL {
     /// and secondary device.
     public enum Capability: String {
         case linknsync = "backup5"
+        case wifiaware = "wifiaware"
+        case nopni = "nopni2"
     }
 
     public let linkType: LinkType
@@ -40,7 +43,7 @@ public class DeviceProvisioningURL {
         type: LinkType,
         ephemeralDeviceId: String,
         publicKey: PublicKey,
-        capabilities: [Capability] = []
+        capabilities: [Capability] = [],
     ) {
         self.linkType = type
         self.ephemeralDeviceId = ephemeralDeviceId
@@ -93,7 +96,7 @@ public class DeviceProvisioningURL {
                         }
                         return capability
                     })
-                ?? []
+                    ?? []
             default:
                 Logger.warn("unknown query item in provisioning string: \(queryItem.name)")
             }

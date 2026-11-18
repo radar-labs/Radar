@@ -4,6 +4,7 @@
 //
 
 import Foundation
+public import LibSignalClient
 
 public enum RegistrationRequestFactory {
 
@@ -14,17 +15,18 @@ public enum RegistrationRequestFactory {
         e164: E164,
         pushToken: String?,
         mcc: String?,
-        mnc: String?
+        mnc: String?,
+        logger: PrefixedLogger,
     ) -> TSRequest {
         let urlPathComponents = URLPathComponents(
-            ["v1", "verification", "session"]
+            ["v1", "verification", "session"],
         )
         var urlComponents = URLComponents()
         urlComponents.percentEncodedPath = urlPathComponents.percentEncoded
         let url = urlComponents.url!
 
         var parameters: [String: Any] = [
-            "number": e164.stringValue
+            "number": e164.stringValue,
         ]
         if let pushToken {
             owsAssertDebug(!pushToken.isEmpty)
@@ -38,25 +40,26 @@ public enum RegistrationRequestFactory {
             parameters["mnc"] = mnc
         }
 
-        var result = TSRequest(url: url, method: "POST", parameters: parameters)
+        var result = TSRequest(url: url, method: "POST", parameters: parameters, logger: logger)
         result.auth = .registration(nil)
         return result
     }
 
     /// See `RegistrationServiceResponses.FetchSessionResponseCodes` for possible responses.
     public static func fetchSessionRequest(
-        sessionId: String
+        sessionId: String,
+        logger: PrefixedLogger,
     ) -> TSRequest {
-        owsAssertDebug(sessionId.isEmpty.negated)
+        owsAssertDebug(!sessionId.isEmpty)
 
         let urlPathComponents = URLPathComponents(
-            ["v1", "verification", "session", sessionId]
+            ["v1", "verification", "session", sessionId],
         )
         var urlComponents = URLComponents()
         urlComponents.percentEncodedPath = urlPathComponents.percentEncoded
         let url = urlComponents.url!
 
-        var result = TSRequest(url: url, method: "GET", parameters: nil)
+        var result = TSRequest(url: url, method: "GET", parameters: nil, logger: logger)
         result.auth = .registration(nil)
         redactSessionIdFromLogs(sessionId, in: &result)
         return result
@@ -68,13 +71,14 @@ public enum RegistrationRequestFactory {
     public static func fulfillChallengeRequest(
         sessionId: String,
         captchaToken: String?,
-        pushChallengeToken: String?
+        pushChallengeToken: String?,
+        logger: PrefixedLogger,
     ) -> TSRequest {
-        owsAssertDebug(sessionId.isEmpty.negated)
+        owsAssertDebug(!sessionId.isEmpty)
         owsAssertDebug(!captchaToken.isEmptyOrNil || !pushChallengeToken.isEmptyOrNil)
 
         let urlPathComponents = URLPathComponents(
-            ["v1", "verification", "session", sessionId]
+            ["v1", "verification", "session", sessionId],
         )
         var urlComponents = URLComponents()
         urlComponents.percentEncodedPath = urlPathComponents.percentEncoded
@@ -88,7 +92,7 @@ public enum RegistrationRequestFactory {
             parameters["pushChallenge"] = pushChallengeToken
         }
 
-        var result = TSRequest(url: url, method: "PATCH", parameters: parameters)
+        var result = TSRequest(url: url, method: "PATCH", parameters: parameters, logger: logger)
         result.auth = .registration(nil)
         redactSessionIdFromLogs(sessionId, in: &result)
         return result
@@ -108,12 +112,13 @@ public enum RegistrationRequestFactory {
         sessionId: String,
         languageCode: String?,
         countryCode: String?,
-        transport: VerificationCodeTransport
+        transport: VerificationCodeTransport,
+        logger: PrefixedLogger,
     ) -> TSRequest {
-        owsAssertDebug(sessionId.isEmpty.negated)
+        owsAssertDebug(!sessionId.isEmpty)
 
         let urlPathComponents = URLPathComponents(
-            ["v1", "verification", "session", sessionId, "code"]
+            ["v1", "verification", "session", sessionId, "code"],
         )
         var urlComponents = URLComponents()
         urlComponents.percentEncodedPath = urlPathComponents.percentEncoded
@@ -121,7 +126,7 @@ public enum RegistrationRequestFactory {
 
         let parameters: [String: Any] = [
             "transport": transport.rawValue,
-            "client": "ios"
+            "client": "ios",
         ]
 
         var languageCodes = [String]()
@@ -131,13 +136,13 @@ public enum RegistrationRequestFactory {
             }
             languageCodes.append(languageCode)
         }
-        if languageCodes.contains("en").negated {
+        if !languageCodes.contains("en") {
             languageCodes.append("en")
         }
 
         let languageHeader: String = HttpHeaders.formatAcceptLanguageHeader(languageCodes)
 
-        var result = TSRequest(url: url, method: "POST", parameters: parameters)
+        var result = TSRequest(url: url, method: "POST", parameters: parameters, logger: logger)
         result.auth = .registration(nil)
         result.headers[HttpHeaders.acceptLanguageHeaderKey] = languageHeader
         redactSessionIdFromLogs(sessionId, in: &result)
@@ -147,23 +152,24 @@ public enum RegistrationRequestFactory {
     /// See `RegistrationServiceResponses.SubmitVerificationCodeResponseCodes` for possible responses.
     public static func submitVerificationCodeRequest(
         sessionId: String,
-        code: String
+        code: String,
+        logger: PrefixedLogger,
     ) -> TSRequest {
-        owsAssertDebug(sessionId.isEmpty.negated)
-        owsAssertDebug(code.isEmpty.negated)
+        owsAssertDebug(!sessionId.isEmpty)
+        owsAssertDebug(!code.isEmpty)
 
         let urlPathComponents = URLPathComponents(
-            ["v1", "verification", "session", sessionId, "code"]
+            ["v1", "verification", "session", sessionId, "code"],
         )
         var urlComponents = URLComponents()
         urlComponents.percentEncodedPath = urlPathComponents.percentEncoded
         let url = urlComponents.url!
 
         let parameters: [String: Any] = [
-            "code": code
+            "code": code,
         ]
 
-        var result = TSRequest(url: url, method: "PUT", parameters: parameters)
+        var result = TSRequest(url: url, method: "PUT", parameters: parameters, logger: logger)
         result.auth = .registration(nil)
         redactSessionIdFromLogs(sessionId, in: &result)
         return result
@@ -173,12 +179,13 @@ public enum RegistrationRequestFactory {
 
     public static func svr2AuthCredentialCheckRequest(
         e164: E164,
-        credentials: [SVR2AuthCredential]
+        credentials: [SVR2AuthCredential],
+        logger: PrefixedLogger,
     ) -> TSRequest {
         owsAssertDebug(!credentials.isEmpty)
 
         let urlPathComponents = URLPathComponents(
-            ["v2", "svr", "auth", "check"]
+            ["v2", "svr", "auth", "check"],
         )
         var urlComponents = URLComponents()
         urlComponents.percentEncodedPath = urlPathComponents.percentEncoded
@@ -188,10 +195,10 @@ public enum RegistrationRequestFactory {
             "number": e164.stringValue,
             "passwords": credentials.map {
                 "\($0.credential.username):\($0.credential.password)"
-            }
+            },
         ]
 
-        var result = TSRequest(url: url, method: "POST", parameters: parameters)
+        var result = TSRequest(url: url, method: "POST", parameters: parameters, logger: logger)
         result.auth = .registration(nil)
         return result
     }
@@ -200,9 +207,18 @@ public enum RegistrationRequestFactory {
 
     public enum VerificationMethod {
         /// The ID of an existing, validated RegistrationSession.
-        case sessionId(String)
-        /// Base64 encoded registration recovery password (derived from KBS master secret).
-        case recoveryPassword(String)
+        case sessionId(E164, String)
+        case recoveryPassword(RegistrationIdentifier, RegistrationRecoveryPassword)
+        case receiptCredential(ReceiptCredentialPresentation)
+
+        public var shouldIncludePniMaterial: Bool {
+            switch self {
+            case .receiptCredential:
+                return false
+            case .sessionId, .recoveryPassword:
+                return true
+            }
+        }
     }
 
     public struct ApnRegistrationId: Codable {
@@ -234,55 +250,71 @@ public enum RegistrationRequestFactory {
     /// - parameter prekeyBundles: Prekey information to include in the request; mirrors the requests to `v2/keys`.
     public static func createAccountRequest(
         verificationMethod: VerificationMethod,
-        e164: E164,
         authPassword: String,
         accountAttributes: AccountAttributes,
         skipDeviceTransfer: Bool,
         apnRegistrationId: ApnRegistrationId?,
-        prekeyBundles: RegistrationPreKeyUploadBundles
+        aciPreKeyBundle: RegistrationPreKeyUploadBundle,
+        pniPreKeyBundle: RegistrationPreKeyUploadBundle?,
+        logger: PrefixedLogger,
     ) -> TSRequest {
         owsAssertDebug((apnRegistrationId != nil) != accountAttributes.isManualMessageFetchEnabled)
 
         let urlPathComponents = URLPathComponents(
-            ["v1", "registration"]
+            ["v1", "registration"],
         )
         var urlComponents = URLComponents()
         urlComponents.percentEncodedPath = urlPathComponents.percentEncoded
         let url = urlComponents.url!
 
-        let jsonEncoder = JSONEncoder()
-        let accountAttributesData = try! jsonEncoder.encode(accountAttributes)
-        let accountAttributesDict = try! JSONSerialization.jsonObject(with: accountAttributesData, options: .fragmentsAllowed) as! [String: Any]
+        var request = RegistrationRequest(
+            accountAttributes: accountAttributes,
+            skipDeviceTransfer: skipDeviceTransfer,
+            aciIdentityKey: OWSRequestFactory.IdentityKey(aciPreKeyBundle.identityKeyPair.identityKey),
+            aciSignedPreKey: OWSRequestFactory.SignedPreKey(aciPreKeyBundle.signedPreKey),
+            aciPqLastResortPreKey: OWSRequestFactory.KyberPreKey(aciPreKeyBundle.lastResortPreKey),
+            pniIdentityKey: pniPreKeyBundle.map { OWSRequestFactory.IdentityKey($0.identityKeyPair.identityKey) },
+            pniSignedPreKey: pniPreKeyBundle.map { OWSRequestFactory.SignedPreKey($0.signedPreKey) },
+            pniPqLastResortPreKey: pniPreKeyBundle.map { OWSRequestFactory.KyberPreKey($0.lastResortPreKey) },
+            apnToken: apnRegistrationId,
+        )
 
-        var parameters: [String: Any] = [
-            "accountAttributes": accountAttributesDict,
-            "skipDeviceTransfer": skipDeviceTransfer,
-            "aciIdentityKey": prekeyBundles.aci.identityKeyPair.keyPair.publicKey.serialize().base64EncodedStringWithoutPadding(),
-            "pniIdentityKey": prekeyBundles.pni.identityKeyPair.keyPair.publicKey.serialize().base64EncodedStringWithoutPadding(),
-            "aciSignedPreKey": OWSRequestFactory.signedPreKeyRequestParameters(prekeyBundles.aci.signedPreKey),
-            "pniSignedPreKey": OWSRequestFactory.signedPreKeyRequestParameters(prekeyBundles.pni.signedPreKey),
-            "aciPqLastResortPreKey": OWSRequestFactory.pqPreKeyRequestParameters(prekeyBundles.aci.lastResortPreKey),
-            "pniPqLastResortPreKey": OWSRequestFactory.pqPreKeyRequestParameters(prekeyBundles.pni.lastResortPreKey),
-            "requireAtomic": true
-        ]
+        let username: String
         switch verificationMethod {
-        case .sessionId(let sessionId):
-            parameters["sessionId"] = sessionId
-        case .recoveryPassword(let recoveryPassword):
-            parameters["recoveryPassword"] = recoveryPassword
+        case .sessionId(let phoneNumber, let sessionId):
+            username = phoneNumber.stringValue
+            request.sessionId = sessionId
+        case .recoveryPassword(let identifier, let recoveryPassword):
+            switch identifier {
+            case .phoneNumber(let phoneNumber):
+                username = phoneNumber.stringValue
+            }
+            request.recoveryPassword = OWSRequestFactory.RegistrationRecoveryPassword(recoveryPassword)
+        case .receiptCredential(let receiptCredentialPresentation):
+            username = "no_number"
+            request.receiptCredentialPresentation = ByteArrayCodable(receiptCredentialPresentation)
         }
 
-        if let apnRegistrationId {
-            let apnRegistrationIdData = try! jsonEncoder.encode(apnRegistrationId)
-            let apnRegistrationIdDict = try! JSONSerialization.jsonObject(with: apnRegistrationIdData, options: .fragmentsAllowed) as! [String: Any]
-            parameters["apnToken"] = apnRegistrationIdDict
-        }
-
-        var result = TSRequest(url: url, method: "POST", parameters: parameters)
+        var result = TSRequest(url: url, method: "POST", body: .encodable(request), logger: logger)
         // As odd as this is, it is to spec.
-        result.auth = .registration((username: e164.stringValue, password: authPassword))
+        result.auth = .registration((username: username, password: authPassword))
         result.headers["X-Signal-Agent"] = "OWI"
         return result
+    }
+
+    struct RegistrationRequest: Encodable {
+        var sessionId: String?
+        var recoveryPassword: OWSRequestFactory.RegistrationRecoveryPassword?
+        var receiptCredentialPresentation: ByteArrayCodable<ReceiptCredentialPresentation>?
+        var accountAttributes: AccountAttributes
+        var skipDeviceTransfer: Bool
+        var aciIdentityKey: OWSRequestFactory.IdentityKey
+        var aciSignedPreKey: OWSRequestFactory.SignedPreKey
+        var aciPqLastResortPreKey: OWSRequestFactory.KyberPreKey
+        var pniIdentityKey: OWSRequestFactory.IdentityKey?
+        var pniSignedPreKey: OWSRequestFactory.SignedPreKey?
+        var pniPqLastResortPreKey: OWSRequestFactory.KyberPreKey?
+        var apnToken: ApnRegistrationId?
     }
 
     /// Update the phone number on an account.
@@ -295,66 +327,68 @@ public enum RegistrationRequestFactory {
     ///   linked device of the change number and rotated pni keys.
     public static func changeNumberRequest(
         verificationMethod: VerificationMethod,
-        e164: E164,
-        reglockToken: String?,
-        pniChangeNumberParameters: PniDistribution.Parameters
+        reglockToken: RegistrationLock?,
+        pniChangeNumberParameters: PniDistribution.Parameters,
+        logger: PrefixedLogger,
     ) -> TSRequest {
         let urlPathComponents = URLPathComponents(
-            ["v2", "accounts", "number"]
+            ["v2", "accounts", "number"],
         )
         var urlComponents = URLComponents()
         urlComponents.percentEncodedPath = urlPathComponents.percentEncoded
         let url = urlComponents.url!
 
-        var parameters: [String: Any] = [
-            "number": e164.stringValue
-        ]
+        let newPhoneNumber: E164
         switch verificationMethod {
-        case .sessionId(let sessionId):
-            parameters["sessionId"] = sessionId
-        case .recoveryPassword(let recoveryPassword):
-            parameters["recoveryPassword"] = recoveryPassword
-        }
-        if let reglockToken {
-            parameters["reglock"] = reglockToken
+        case .sessionId(let _newPhoneNumber, _):
+            newPhoneNumber = _newPhoneNumber
+        case .recoveryPassword(.phoneNumber(let _newPhoneNumber), _):
+            newPhoneNumber = _newPhoneNumber
+        case .receiptCredential:
+            owsFail("not supported")
         }
 
-        parameters.merge(
-            pniChangeNumberParameters.requestParameters(),
-            uniquingKeysWith: { _, _ in
-                owsFail("Unexpectedly encountered duplicate keys!")
-            }
+        var request = ChangeNumberRequest(
+            number: newPhoneNumber,
+            reglock: reglockToken.map { OWSRequestFactory.RegistrationLock($0) },
+            pniIdentityKey: OWSRequestFactory.IdentityKey(pniChangeNumberParameters.pniIdentityKey),
+            devicePniSignedPrekeys: pniChangeNumberParameters.devicePniSignedPreKeys.mapKeys(injectiveTransform: { "\($0)" }).mapValues {
+                return OWSRequestFactory.SignedPreKey($0)
+            },
+            devicePniPqLastResortPrekeys: pniChangeNumberParameters.devicePniPqLastResortPreKeys.mapKeys(injectiveTransform: { "\($0)" }).mapValues {
+                return OWSRequestFactory.KyberPreKey($0)
+            },
+            deviceMessages: pniChangeNumberParameters.deviceMessages,
+            pniRegistrationIds: pniChangeNumberParameters.pniRegistrationIds.mapKeys(injectiveTransform: { "\($0)" }),
         )
 
-        return TSRequest(url: url, method: "PUT", parameters: parameters)
+        switch verificationMethod {
+        case .sessionId(_, let sessionId):
+            request.sessionId = sessionId
+        case .recoveryPassword(_, let recoveryPassword):
+            request.recoveryPassword = OWSRequestFactory.RegistrationRecoveryPassword(recoveryPassword)
+        case .receiptCredential:
+            owsFail("not supported")
+        }
+
+        return TSRequest(url: url, method: "PUT", body: .encodable(request), logger: logger)
     }
 
-    public static func updatePrimaryDeviceAccountAttributesRequest(
-        _ accountAttributes: AccountAttributes,
-        auth: ChatServiceAuth
-    ) -> TSRequest {
-        let urlPathComponents = URLPathComponents(
-            ["v1", "accounts", "attributes"]
-        )
-        var urlComponents = URLComponents()
-        urlComponents.percentEncodedPath = urlPathComponents.percentEncoded
-        let url = urlComponents.url!
-
-        // The request expects the AccountAttributes to be the root object.
-        // Serialize it to JSON then get the key value dict to do that.
-        let data = try! JSONEncoder().encode(accountAttributes)
-        let parameters = try! JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as! [String: Any]
-
-        var result = TSRequest(url: url, method: "PUT", parameters: parameters)
-        result.auth = .identified(auth)
-        return result
+    private struct ChangeNumberRequest: Encodable {
+        var number: E164
+        var sessionId: String?
+        var recoveryPassword: OWSRequestFactory.RegistrationRecoveryPassword?
+        var reglock: OWSRequestFactory.RegistrationLock?
+        var pniIdentityKey: OWSRequestFactory.IdentityKey
+        var devicePniSignedPrekeys: [String: OWSRequestFactory.SignedPreKey]
+        var devicePniPqLastResortPrekeys: [String: OWSRequestFactory.KyberPreKey]
+        var deviceMessages: [DeviceMessage]
+        var pniRegistrationIds: [String: UInt32]
     }
 
     // MARK: - Helpers
 
     private static func redactSessionIdFromLogs(_ sessionId: String, in request: inout TSRequest) {
-        request.applyRedactionStrategy(.redactURL(
-            replacement: request.url.absoluteString.replacingOccurrences(of: sessionId, with: "[REDACTED]")
-        ))
+        request.applyRedactionStrategy(.redactURL(sensitiveValues: [sessionId]))
     }
 }

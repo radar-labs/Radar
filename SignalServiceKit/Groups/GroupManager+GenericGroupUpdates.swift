@@ -4,7 +4,7 @@
 //
 
 import Foundation
-import LibSignalClient
+public import LibSignalClient
 
 extension GroupManager {
     // Serialize group updates by group ID
@@ -15,7 +15,7 @@ extension GroupManager {
             secretParams: GroupSecretParams,
             updateDescription: String,
             isDeletingAccount: Bool,
-            changesBlock: @escaping (GroupsV2OutgoingChanges) -> Void
+            changesBlock: @escaping (GroupsV2OutgoingChanges) -> Void,
         ) async throws -> [Promise<Void>] {
             do {
                 return try await Promise.wrapAsync {
@@ -36,14 +36,14 @@ extension GroupManager {
         private static func _run(
             secretParams: GroupSecretParams,
             isDeletingAccount: Bool,
-            changesBlock: (GroupsV2OutgoingChanges) -> Void
+            changesBlock: (GroupsV2OutgoingChanges) -> Void,
         ) async throws -> [Promise<Void>] {
             try await GroupManager.ensureLocalProfileHasCommitmentIfNecessary()
 
             return try await SSKEnvironment.shared.groupsV2Ref.updateGroupV2(
                 secretParams: secretParams,
                 isDeletingAccount: isDeletingAccount,
-                changesBlock: changesBlock
+                changesBlock: changesBlock,
             )
         }
     }
@@ -52,19 +52,18 @@ extension GroupManager {
     /// Each Promise represents sending a message to one or more recipients.
     @discardableResult
     public static func updateGroupV2(
-        groupModel: TSGroupModelV2,
+        secretParams: GroupSecretParams,
         description: String,
         isDeletingAccount: Bool = false,
-        changesBlock: @escaping (GroupsV2OutgoingChanges) -> Void
+        changesBlock: @escaping (GroupsV2OutgoingChanges) -> Void,
     ) async throws -> [Promise<Void>] {
-        let secretParams = try groupModel.secretParams()
         let groupId = try secretParams.getPublicParams().getGroupIdentifier()
-        return try await groupUpdateQueues.run(forKey: groupId) {
+        return try await groupUpdateQueues.runWithThrowingTask(forKey: groupId) {
             return try await GenericGroupUpdateOperation.run(
                 secretParams: secretParams,
                 updateDescription: description,
                 isDeletingAccount: isDeletingAccount,
-                changesBlock: changesBlock
+                changesBlock: changesBlock,
             )
         }
     }

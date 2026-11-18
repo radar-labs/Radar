@@ -11,15 +11,15 @@ final class BackupArchiveGroupUpdateMessageArchiver {
     typealias ArchiveChatUpdateMessageResult = BackupArchive.ArchiveInteractionResult<Details>
     typealias RestoreChatUpdateMessageResult = BackupArchive.RestoreInteractionResult<Void>
 
-    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError<BackupArchive.InteractionUniqueId>
+    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError
     private typealias PersistableGroupUpdateItem = TSInfoMessage.PersistableGroupUpdateItem
 
     private let groupUpdateBuilder: GroupUpdateItemBuilder
     private let interactionStore: BackupArchiveInteractionStore
 
-    public init(
+    init(
         groupUpdateBuilder: GroupUpdateItemBuilder,
-        interactionStore: BackupArchiveInteractionStore
+        interactionStore: BackupArchiveInteractionStore,
     ) {
         self.groupUpdateBuilder = groupUpdateBuilder
         self.interactionStore = interactionStore
@@ -28,16 +28,16 @@ final class BackupArchiveGroupUpdateMessageArchiver {
     func archiveGroupUpdate(
         infoMessage: TSInfoMessage,
         threadInfo: BackupArchive.ChatArchivingContext.CachedThreadInfo,
-        context: BackupArchive.ChatArchivingContext
+        context: BackupArchive.ChatArchivingContext,
     ) -> ArchiveChatUpdateMessageResult {
         let groupUpdateItems: [TSInfoMessage.PersistableGroupUpdateItem]
         switch infoMessage.groupUpdateMetadata(
-            localIdentifiers: context.recipientContext.localIdentifiers
+            localIdentifiers: context.recipientContext.localIdentifiers,
         ) {
         case .nonGroupUpdate:
             // Should be impossible.
             return .completeFailure(.fatalArchiveError(.developerError(
-                OWSAssertionError("Invalid interaction type")
+                message: "Invalid interaction type",
             )))
         case .legacyRawString:
             return .skippableInteraction(.skippableGroupUpdate(.legacyRawString))
@@ -47,7 +47,7 @@ final class BackupArchiveGroupUpdateMessageArchiver {
                 newDisappearingMessageToken: groupModel.dmToken,
                 localIdentifiers: context.recipientContext.localIdentifiers,
                 groupUpdateSource: source,
-                tx: context.tx
+                tx: context.tx,
             )
         case .modelDiff(let old, let new, let source):
             groupUpdateItems = groupUpdateBuilder.precomputedUpdateItemsByDiffingModels(
@@ -57,7 +57,7 @@ final class BackupArchiveGroupUpdateMessageArchiver {
                 newDisappearingMessageToken: new.dmToken,
                 localIdentifiers: context.recipientContext.localIdentifiers,
                 groupUpdateSource: source,
-                tx: context.tx
+                tx: context.tx,
             )
         case .precomputed(let persistableGroupUpdateItemsWrapper):
             groupUpdateItems = persistableGroupUpdateItemsWrapper.updateItems
@@ -66,7 +66,7 @@ final class BackupArchiveGroupUpdateMessageArchiver {
             groupUpdateItems,
             for: infoMessage,
             threadInfo: threadInfo,
-            context: context
+            context: context,
         )
     }
 
@@ -74,7 +74,7 @@ final class BackupArchiveGroupUpdateMessageArchiver {
         _ groupUpdateItems: [TSInfoMessage.PersistableGroupUpdateItem],
         for interaction: TSInteraction,
         threadInfo: BackupArchive.ChatArchivingContext.CachedThreadInfo,
-        context: BackupArchive.ChatArchivingContext
+        context: BackupArchive.ChatArchivingContext,
     ) -> ArchiveChatUpdateMessageResult {
         var partialErrors = [ArchiveFrameError]()
 
@@ -82,7 +82,7 @@ final class BackupArchiveGroupUpdateMessageArchiver {
             groupUpdates: groupUpdateItems,
             interactionId: interaction.uniqueInteractionId,
             localIdentifiers: context.recipientContext.localIdentifiers,
-            partialErrors: &partialErrors
+            partialErrors: &partialErrors,
         )
         let groupChange: BackupProto_GroupChangeChatUpdate
         switch contentsResult.bubbleUp(Details.self, partialErrors: &partialErrors) {
@@ -102,13 +102,12 @@ final class BackupArchiveGroupUpdateMessageArchiver {
             author: .localUser,
             directionalDetails: .directionless(directionlessDetails),
             dateCreated: interaction.timestamp,
-            expireStartDate: nil,
-            expiresInMs: nil,
             isSealedSender: false,
             chatItemType: .updateMessage(chatUpdate),
             isSmsPreviouslyRestoredFromBackup: false,
             threadInfo: threadInfo,
-            context: context.recipientContext
+            pinMessageDetails: nil,
+            context: context.recipientContext,
         )
 
         let details: Details
@@ -130,7 +129,7 @@ final class BackupArchiveGroupUpdateMessageArchiver {
         groupUpdates: [TSInfoMessage.PersistableGroupUpdateItem],
         interactionId: BackupArchive.InteractionUniqueId,
         localIdentifiers: LocalIdentifiers,
-        partialErrors: inout [ArchiveFrameError]
+        partialErrors: inout [ArchiveFrameError],
     ) -> BackupArchive.ArchiveInteractionResult<BackupProto_GroupChangeChatUpdate> {
         var updates = [BackupProto_GroupChangeChatUpdate.Update]()
 
@@ -141,11 +140,11 @@ final class BackupArchiveGroupUpdateMessageArchiver {
                 .archiveGroupUpdate(
                     groupUpdate: groupUpdate,
                     localUserAci: localIdentifiers.aci,
-                    interactionId: interactionId
+                    interactionId: interactionId,
                 )
             switch result.bubbleUp(
                 BackupProto_GroupChangeChatUpdate.self,
-                partialErrors: &partialErrors
+                partialErrors: &partialErrors,
             ) {
             case .continue(let update):
                 updates.append(update)
@@ -161,12 +160,12 @@ final class BackupArchiveGroupUpdateMessageArchiver {
             }
         }
 
-        guard updates.isEmpty.negated else {
+        guard !updates.isEmpty else {
             if groupUpdates.count == skipCount, let latestSkipError {
                 // Its ok; we just skipped everything.
                 return .skippableInteraction(.skippableGroupUpdate(latestSkipError))
             }
-            return .messageFailure(partialErrors + [.archiveFrameError(.emptyGroupUpdate, interactionId)])
+            return .messageFailure(partialErrors + [.archiveFrameError(.emptyGroupUpdate)])
         }
 
         var groupChangeChatUpdate = BackupProto_GroupChangeChatUpdate()
@@ -183,27 +182,23 @@ final class BackupArchiveGroupUpdateMessageArchiver {
         _ groupUpdate: BackupProto_GroupChangeChatUpdate,
         chatItem: BackupProto_ChatItem,
         chatThread: BackupArchive.ChatThread,
-        context: BackupArchive.ChatItemRestoringContext
+        context: BackupArchive.ChatItemRestoringContext,
     ) -> RestoreChatUpdateMessageResult {
         let groupThread: TSGroupThread
         switch chatThread.threadType {
         case .contact:
-            return .messageFailure([.restoreFrameError(
-                .invalidProtoData(.groupUpdateMessageInNonGroupChat),
-                chatItem.id
-            )])
+            return .messageFailure([.restoreFrameError(.invalidProtoData(.groupUpdateMessageInNonGroupChat))])
         case .groupV2(let _groupThread):
             groupThread = _groupThread
         }
 
-        var partialErrors = [BackupArchive.RestoreFrameError<BackupArchive.ChatItemId>]()
+        var partialErrors = [BackupArchive.RestoreFrameError]()
 
         let result = BackupArchiveGroupUpdateProtoToSwiftConverter
             .restoreGroupUpdates(
                 groupUpdates: groupUpdate.updates,
                 localUserAci: context.recipientContext.localIdentifiers.aci,
                 partialErrors: &partialErrors,
-                chatItemId: chatItem.id
             )
         var persistableUpdates: [PersistableGroupUpdateItem]
         switch result.bubbleUp(Void.self, partialErrors: &partialErrors) {
@@ -213,15 +208,12 @@ final class BackupArchiveGroupUpdateMessageArchiver {
             return error
         }
 
-        guard persistableUpdates.isEmpty.negated else {
+        guard !persistableUpdates.isEmpty else {
             // We can't have an empty array of updates!
-            return .messageFailure(partialErrors + [.restoreFrameError(
-                .invalidProtoData(.emptyGroupUpdates),
-                chatItem.id
-            )])
+            return .messageFailure(partialErrors + [.restoreFrameError(.invalidProtoData(.emptyGroupUpdates))])
         }
 
-        guard persistableUpdates.isEmpty.negated else {
+        guard !persistableUpdates.isEmpty else {
             // If we got an empty array, that means it got collapsed!
             // Ok to skip, as any updates should be applied to the
             // previous db entry.
@@ -235,7 +227,7 @@ final class BackupArchiveGroupUpdateMessageArchiver {
             timestamp: chatItem.dateSent,
             spamReportingMetadata: .unreportable,
             groupThread: groupThread,
-            updateItems: persistableUpdates
+            updateItems: persistableUpdates,
         )
 
         do {
@@ -243,10 +235,10 @@ final class BackupArchiveGroupUpdateMessageArchiver {
                 infoMessage,
                 in: chatThread,
                 chatId: chatItem.typedChatId,
-                context: context
+                context: context,
             )
         } catch let error {
-            return .messageFailure(partialErrors + [.restoreFrameError(.databaseInsertionFailed(error), chatItem.id)])
+            return .messageFailure(partialErrors + [.restoreFrameError(.databaseInsertionFailed(error))])
         }
 
         if partialErrors.isEmpty {

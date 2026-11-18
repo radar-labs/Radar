@@ -25,6 +25,9 @@ class CLVViewState {
     let containerView: ChatListContainerView
     let reminderViews: CLVReminderViews
     let backupDownloadProgressView: CLVBackupDownloadProgressView
+    let backupExportProgressView: CLVBackupExportProgressView
+    let localFileBackupRestoreProgressView: CLVLocalFileBackupRestoreProgressView
+    let localFileBackupExportProgressView: CLVLocalFileBackupExportProgressView
     let settingsButtonCreator: ChatListSettingsButtonState
     let proxyButtonCreator: ChatListProxyButtonCreator
 
@@ -50,10 +53,11 @@ class CLVViewState {
     var unreadPaymentNotificationsCount: UInt = 0 {
         didSet { settingsButtonCreator.updateState(hasUnreadPaymentNotification: unreadPaymentNotificationsCount > 0) }
     }
+
     var firstUnreadPaymentModel: TSPaymentModel?
     var lastKnownTableViewContentOffset: CGPoint?
 
-    public enum BackupFailureAlertType: CaseIterable {
+    enum BackupFailureAlertType: CaseIterable {
         case avatarBadge
         case menuItemBadge
         case menuItem
@@ -66,6 +70,7 @@ class CLVViewState {
             }
         }
     }
+
     var backupFailureAlerts: Set<BackupFailureAlertType> = [] {
         didSet {
             settingsButtonCreator.updateState(
@@ -76,23 +81,25 @@ class CLVViewState {
         }
     }
 
-    public enum BackupSubscriptionFailedToRedeemAlertType: CaseIterable {
+    enum BackupSubscriptionAlreadyRedeemedAlertType: CaseIterable {
         case avatarBadge
         case menuItem
     }
-    var backupSubscriptionFailedToRedeemAlerts: Set<BackupSubscriptionFailedToRedeemAlertType> = [] {
+
+    var backupSubscriptionAlreadyRedeemedAlerts: Set<BackupSubscriptionAlreadyRedeemedAlertType> = [] {
         didSet {
             settingsButtonCreator.updateState(
-                showBackupsSubscriptionAlreadyRedeemedAvatarBadge: backupSubscriptionFailedToRedeemAlerts.contains(.avatarBadge),
-                showBackupsSubscriptionAlreadyRedeemedMenuItem: backupSubscriptionFailedToRedeemAlerts.contains(.menuItem),
+                showBackupsSubscriptionAlreadyRedeemedAvatarBadge: backupSubscriptionAlreadyRedeemedAlerts.contains(.avatarBadge),
+                showBackupsSubscriptionAlreadyRedeemedMenuItem: backupSubscriptionAlreadyRedeemedAlerts.contains(.menuItem),
             )
         }
     }
 
-    public enum BackupIAPNotFoundLocallyAlertType: CaseIterable {
+    enum BackupIAPNotFoundLocallyAlertType: CaseIterable {
         case avatarBadge
         case menuItem
     }
+
     var backupIAPNotFoundLocallyAlerts: Set<BackupIAPNotFoundLocallyAlertType> = [] {
         didSet {
             settingsButtonCreator.updateState(
@@ -107,8 +114,6 @@ class CLVViewState {
             settingsButtonCreator.updateState(hasConsumedMediaTierCapacity: hasConsumedMediaTierCapacity)
         }
     }
-
-    let backupDownloadProgressViewState = CLVBackupDownloadProgressView.State()
 
     // MARK: - Initializer
 
@@ -129,6 +134,9 @@ class CLVViewState {
         self.containerView = ChatListContainerView(tableView: tableDataSource.tableView, searchBar: searchController.searchBar)
         self.reminderViews = CLVReminderViews()
         self.backupDownloadProgressView = CLVBackupDownloadProgressView()
+        self.backupExportProgressView = CLVBackupExportProgressView()
+        self.localFileBackupRestoreProgressView = CLVLocalFileBackupRestoreProgressView()
+        self.localFileBackupExportProgressView = CLVLocalFileBackupExportProgressView()
         self.settingsButtonCreator = ChatListSettingsButtonState()
         self.proxyButtonCreator = ChatListProxyButtonCreator(chatConnectionManager: DependenciesBridge.shared.chatConnectionManager)
     }
@@ -141,7 +149,7 @@ class CLVViewState {
         inboxFilter = viewInfo.inboxFilter
         settingsButtonCreator.updateState(
             hasInboxChats: viewInfo.inboxCount > 0,
-            hasArchivedChats: viewInfo.archiveCount > 0
+            hasArchivedChats: viewInfo.archiveCount > 0,
         )
     }
 }

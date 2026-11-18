@@ -3,19 +3,20 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import LibSignalClient
 import SignalServiceKit
 import SignalUI
 
 class UsernameSelectionCoordinator {
     struct Context {
-        let databaseStorage: SDSDatabaseStorage
+        let databaseStorage: DB
         let networkManager: NetworkManager
         let storageServiceManager: StorageServiceManager
         let usernameEducationManager: UsernameEducationManager
         let localUsernameManager: LocalUsernameManager
     }
 
-    private let currentUsername: String?
+    private let currentUsername: LibSignalClient.Username?
     private let isAttemptingRecovery: Bool
 
     private weak var usernameChangeDelegate: UsernameChangeDelegate?
@@ -24,11 +25,11 @@ class UsernameSelectionCoordinator {
     private let context: Context
 
     init(
-        currentUsername: String?,
+        currentUsername: LibSignalClient.Username?,
         isAttemptingRecovery: Bool = false,
         usernameChangeDelegate: UsernameChangeDelegate? = nil,
         usernameSelectionDelegate: (any UsernameSelectionDelegate)? = nil,
-        context: Context
+        context: Context,
     ) {
         self.currentUsername = currentUsername
         self.isAttemptingRecovery = isAttemptingRecovery
@@ -59,7 +60,7 @@ class UsernameSelectionCoordinator {
             self.context.databaseStorage.write { tx in
                 self.context.usernameEducationManager.setShouldShowUsernameEducation(
                     false,
-                    tx: tx
+                    tx: tx,
                 )
             }
 
@@ -73,14 +74,14 @@ class UsernameSelectionCoordinator {
 
     private func presentUsernameSelection(fromViewController: UIViewController) {
         let vc = UsernameSelectionViewController(
-            existingUsername: .init(rawUsername: currentUsername),
+            existingUsername: currentUsername,
             isAttemptingRecovery: isAttemptingRecovery,
             context: .init(
                 networkManager: context.networkManager,
                 databaseStorage: context.databaseStorage,
                 localUsernameManager: context.localUsernameManager,
-                storageServiceManager: context.storageServiceManager
-            )
+                storageServiceManager: context.storageServiceManager,
+            ),
         )
 
         vc.usernameChangeDelegate = usernameChangeDelegate
@@ -88,7 +89,7 @@ class UsernameSelectionCoordinator {
 
         fromViewController.presentFormSheet(
             OWSNavigationController(rootViewController: vc),
-            animated: true
+            animated: true,
         )
     }
 }

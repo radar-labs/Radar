@@ -95,9 +95,11 @@ public enum RadarPushRelay {
         guard !alreadyAsked else { return }
 
         let settings = await UNUserNotificationCenter.current().notificationSettings()
-        guard settings.authorizationStatus == .authorized
-                || settings.authorizationStatus == .provisional
-                || settings.authorizationStatus == .ephemeral else {
+        guard
+            settings.authorizationStatus == .authorized
+            || settings.authorizationStatus == .provisional
+            || settings.authorizationStatus == .ephemeral
+        else {
             return
         }
 
@@ -108,31 +110,31 @@ public enum RadarPushRelay {
             let alert = UIAlertController(
                 title: OWSLocalizedString(
                     "RELAY_PERMISSION_ALERT_TITLE",
-                    comment: "Title of the alert asking the user whether to enable the Radar notification relay."
+                    comment: "Title of the alert asking the user whether to enable the Radar notification relay.",
                 ),
                 message: OWSLocalizedString(
                     "RELAY_PERMISSION_ALERT_MESSAGE",
-                    comment: "Body of the alert asking the user whether to enable the Radar notification relay."
+                    comment: "Body of the alert asking the user whether to enable the Radar notification relay.",
                 ),
-                preferredStyle: .alert
+                preferredStyle: .alert,
             )
             // Match iOS system permission alerts: "Don't Allow"-equivalent on the
             // left (cancel), preferred "Allow"-equivalent on the right (bold).
             alert.addAction(UIAlertAction(
                 title: OWSLocalizedString(
                     "RELAY_PERMISSION_ALERT_DISABLE",
-                    comment: "Button title to disable the Radar notification relay."
+                    comment: "Button title to disable the Radar notification relay.",
                 ),
-                style: .cancel
+                style: .cancel,
             ) { _ in
                 continuation.resume(returning: false)
             })
             let allowAction = UIAlertAction(
                 title: OWSLocalizedString(
                     "RELAY_PERMISSION_ALERT_ALLOW",
-                    comment: "Button title to allow / enable the Radar notification relay."
+                    comment: "Button title to allow / enable the Radar notification relay.",
                 ),
-                style: .default
+                style: .default,
             ) { _ in
                 continuation.resume(returning: true)
             }
@@ -369,7 +371,7 @@ public enum RadarPushRelay {
             (
                 dependencies.tsAccountManager.localIdentifiers(tx: tx),
                 dependencies.tsAccountManager.storedDeviceId(tx: tx).ifValid,
-                dependencies.identityManager.identityKeyPair(for: .aci, tx: tx)
+                dependencies.identityManager.identityKeyPair(for: .aci, tx: tx),
             )
         }
         guard let aci = localIdentifiers?.aci else {
@@ -387,14 +389,14 @@ public enum RadarPushRelay {
             aci: aci,
             deviceId: deviceId.uint32Value,
             relayToken: relayToken,
-            timestampMs: timestampMs
+            timestampMs: timestampMs,
         )
         let signature = identityKeyPair.identityKeyPair.privateKey.generateSignature(message: message)
         return API.AttachRequest(
             signalAci: aci.rawUUID.uuidString.lowercased(),
             signalDeviceId: deviceId.uint32Value,
             timestampMs: timestampMs,
-            signature: signature.base64EncodedString()
+            signature: signature.base64EncodedString(),
         )
     }
 
@@ -421,8 +423,10 @@ public enum RadarPushRelay {
             }
         }
 
-        if unlinkPhantomFromSignal, let phantomDeviceId,
-           let deviceId = DeviceId(validating: phantomDeviceId) {
+        if
+            unlinkPhantomFromSignal, let phantomDeviceId,
+            let deviceId = DeviceId(validating: phantomDeviceId)
+        {
             do {
                 try await DependenciesBridge.shared.deviceService.unlinkDevice(deviceId: deviceId)
                 Logger.info("RadarPushRelay: unlinked phantom Signal device id=\(phantomDeviceId)")
@@ -469,7 +473,7 @@ public enum RadarPushRelay {
             do {
                 return try await block()
             } catch let error as RelayError {
-                if case .http(let status, _) = error, status < 500 && status != 429 {
+                if case .http(let status, _) = error, status < 500, status != 429 {
                     // Logical 4xx error — retrying won't help.
                     throw error
                 }
@@ -502,7 +506,7 @@ public enum RadarPushRelay {
                 method: "POST",
                 path: "/api/v1/devices",
                 body: body,
-                relayToken: nil
+                relayToken: nil,
             )
             return response.relayToken
         }
@@ -520,13 +524,13 @@ public enum RadarPushRelay {
             let body = try encoder.encode(Body(
                 signalAci: credentials.aci,
                 signalDeviceId: credentials.deviceId,
-                signalPassword: credentials.password
+                signalPassword: credentials.password,
             ))
             let response: LinkResponse = try await send(
                 method: "POST",
                 path: "/api/v1/link",
                 body: body,
-                relayToken: relayToken
+                relayToken: relayToken,
             )
             guard response.linked else {
                 throw RelayError.linkRejected
@@ -550,7 +554,7 @@ public enum RadarPushRelay {
                 method: "POST",
                 path: "/api/v1/attach",
                 body: body,
-                relayToken: relayToken
+                relayToken: relayToken,
             )
             guard response.attached else {
                 throw RelayError.linkRejected
@@ -567,7 +571,7 @@ public enum RadarPushRelay {
                 method: "PUT",
                 path: "/api/v1/devices/token",
                 body: body,
-                relayToken: relayToken
+                relayToken: relayToken,
             )
         }
 
@@ -590,7 +594,7 @@ public enum RadarPushRelay {
                 method: "GET",
                 path: "/api/v1/devices/\(relayToken)/status",
                 body: nil,
-                relayToken: relayToken
+                relayToken: relayToken,
             )
         }
 
@@ -599,7 +603,7 @@ public enum RadarPushRelay {
                 method: "DELETE",
                 path: "/api/v1/devices",
                 body: nil,
-                relayToken: relayToken
+                relayToken: relayToken,
             )
         }
 
@@ -609,7 +613,7 @@ public enum RadarPushRelay {
             method: String,
             path: String,
             body: Data?,
-            relayToken: String?
+            relayToken: String?,
         ) async throws -> T {
             guard let url = URL(string: "\(baseURLString)\(path)") else {
                 throw RelayError.malformedResponse
@@ -629,7 +633,7 @@ public enum RadarPushRelay {
             guard (200..<300).contains(http.statusCode) else {
                 throw RelayError.http(
                     status: http.statusCode,
-                    body: String(data: data, encoding: .utf8) ?? ""
+                    body: String(data: data, encoding: .utf8) ?? "",
                 )
             }
             if T.self == EmptyResponse.self {
@@ -650,11 +654,8 @@ public enum RadarPushRelay {
 
         struct PrimaryState {
             let aci: Aci
-            let pni: Pni
-            let phoneNumber: String
             let aciIdentityKeyPair: ECKeyPair
             let pniIdentityKeyPair: ECKeyPair
-            let profileKey: Aes256Key
         }
 
         static func readPrimaryState(_ dependencies: Dependencies) throws -> PrimaryState {
@@ -662,7 +663,7 @@ public enum RadarPushRelay {
                 guard let localIdentifiers = dependencies.tsAccountManager.localIdentifiers(tx: tx) else {
                     throw RelayError.missingPrimaryState("no local identifiers")
                 }
-                guard let pni = localIdentifiers.pni else {
+                guard localIdentifiers.pni != nil else {
                     throw RelayError.missingPrimaryState("no pni")
                 }
                 guard let aciIdentityKeyPair = dependencies.identityManager.identityKeyPair(for: .aci, tx: tx) else {
@@ -671,16 +672,10 @@ public enum RadarPushRelay {
                 guard let pniIdentityKeyPair = dependencies.identityManager.identityKeyPair(for: .pni, tx: tx) else {
                     throw RelayError.missingPrimaryState("no pni identity")
                 }
-                guard let profileKey = SSKEnvironment.shared.profileManagerRef.localUserProfile(tx: tx)?.profileKey else {
-                    throw RelayError.missingPrimaryState("no profile key")
-                }
                 return PrimaryState(
                     aci: localIdentifiers.aci,
-                    pni: pni,
-                    phoneNumber: localIdentifiers.phoneNumber,
                     aciIdentityKeyPair: aciIdentityKeyPair,
                     pniIdentityKeyPair: pniIdentityKeyPair,
-                    profileKey: profileKey
                 )
             }
         }
@@ -691,12 +686,18 @@ public enum RadarPushRelay {
             let provisioningCode = try await dependencies.deviceProvisioningService
                 .requestDeviceProvisioningCode()
 
-            let prekeyBundles = try await dependencies.preKeyManager
-                .createPreKeysForProvisioning(
-                    aciIdentityKeyPair: primary.aciIdentityKeyPair,
-                    pniIdentityKeyPair: primary.pniIdentityKeyPair
-                )
-                .value
+            // The phantom device's pre-keys only need to exist on the server.
+            // Generate them in memory: upstream's createPreKeysForProvisioning
+            // writes them into the local (here: the primary's) protocol stores,
+            // and the API that used to wipe them again is gone.
+            let aciPreKeyBundle = try makePhantomPreKeyBundle(
+                identity: .aci,
+                keyPair: primary.aciIdentityKeyPair.identityKeyPair,
+            )
+            let pniPreKeyBundle = try makePhantomPreKeyBundle(
+                identity: .pni,
+                keyPair: primary.pniIdentityKeyPair.identityKeyPair,
+            )
 
             let aciRegistrationId = RegistrationIdGenerator.generate()
             let pniRegistrationId = RegistrationIdGenerator.generate()
@@ -704,39 +705,37 @@ public enum RadarPushRelay {
 
             let encryptedDeviceName = try OWSDeviceNames.encryptDeviceName(
                 plaintext: "Radar Push Relay",
-                identityKeyPair: primary.aciIdentityKeyPair.identityKeyPair
+                identityKeyPair: primary.aciIdentityKeyPair.identityKeyPair,
             )
 
-            let attributes = buildAccountAttributes(
-                dependencies: dependencies,
-                primary: primary,
-                encryptedDeviceName: encryptedDeviceName,
-                aciRegistrationId: aciRegistrationId,
-                pniRegistrationId: pniRegistrationId
+            // Same attributes upstream's ProvisioningCoordinatorImpl sends for a
+            // linked device without APNs (it fetches its own messages).
+            let deviceAttributes = DeviceAttributes(
+                fetchesMessages: true,
+                registrationId: aciRegistrationId,
+                pniRegistrationId: pniRegistrationId,
+                name: encryptedDeviceName,
+                // Linked devices don't have SVR backups.
+                capabilities: AccountAttributes.Capabilities(hasSVRBackups: false),
             )
 
             let response = await ProvisioningCoordinatorImpl.Service.makeVerifySecondaryDeviceRequest(
                 verificationCode: provisioningCode.verificationCode,
-                phoneNumber: primary.phoneNumber,
+                aci: primary.aci,
+                aciPreKeyBundle: aciPreKeyBundle,
+                pniPreKeyBundle: pniPreKeyBundle,
                 authPassword: authPassword,
-                accountAttributes: attributes,
+                deviceAttributes: deviceAttributes,
                 apnRegistrationId: nil,
-                prekeyBundles: prekeyBundles,
-                signalService: SSKEnvironment.shared.signalServiceRef
+                networkManager: SSKEnvironment.shared.networkManagerRef,
             )
-
-            // Discard the scratchpad prekeys regardless of outcome. We don't
-            // want the phantom's prekeys leaking into the primary's stores.
-            _ = try? await dependencies.preKeyManager
-                .finalizeRegistrationPreKeys(prekeyBundles, uploadDidSucceed: false)
-                .value
 
             switch response {
             case .success(let resp):
                 return Credentials(
                     aci: primary.aci.serviceIdString,
                     deviceId: resp.deviceId.uint32Value,
-                    password: authPassword
+                    password: authPassword,
                 )
             case .obsoleteLinkedDevice:
                 throw RelayError.provisioning("obsolete linked device")
@@ -747,38 +746,43 @@ public enum RadarPushRelay {
             }
         }
 
-        private static func buildAccountAttributes(
-            dependencies: Dependencies,
-            primary: PrimaryState,
-            encryptedDeviceName: Data,
-            aciRegistrationId: UInt32,
-            pniRegistrationId: UInt32
-        ) -> AccountAttributes {
-            return dependencies.db.read { tx in
-                let udAccessKey = SMKUDAccessKey(profileKey: primary.profileKey).keyData.base64EncodedString()
-                let allowUnrestrictedUD = SSKEnvironment.shared.udManagerRef
-                    .shouldAllowUnrestrictedAccessLocal(transaction: tx)
-                let registrationRecoveryPassword = dependencies.accountKeyStore
-                    .getMasterKey(tx: tx)?
-                    .data(for: .registrationRecoveryPassword)
-                    .canonicalStringRepresentation
-                let phoneNumberDiscoverability = dependencies.tsAccountManager
-                    .phoneNumberDiscoverability(tx: tx)
-                let hasSVRBackups = dependencies.svr.hasBackedUpMasterKey(transaction: tx)
+        /// A signed pre-key and a last-resort Kyber pre-key for the phantom
+        /// device, generated like SignedPreKeyStoreImpl.generateSignedPreKey and
+        /// KyberPreKeyStoreImpl.generatePreKeyRecord but never stored locally.
+        private static func makePhantomPreKeyBundle(
+            identity: OWSIdentity,
+            keyPair: IdentityKeyPair,
+        ) throws -> RegistrationPreKeyUploadBundle {
+            let identityKey = keyPair.privateKey
+            let timestamp = Date().ows_millisecondsSince1970
 
-                return AccountAttributes(
-                    isManualMessageFetchEnabled: true,
-                    registrationId: aciRegistrationId,
-                    pniRegistrationId: pniRegistrationId,
-                    unidentifiedAccessKey: udAccessKey,
-                    unrestrictedUnidentifiedAccess: allowUnrestrictedUD,
-                    reglockToken: nil,
-                    registrationRecoveryPassword: registrationRecoveryPassword,
-                    encryptedDeviceName: encryptedDeviceName.base64EncodedString(),
-                    discoverableByPhoneNumber: phoneNumberDiscoverability,
-                    hasSVRBackups: hasSVRBackups
-                )
-            }
+            let signedPreKeyPrivateKey = PrivateKey.generate()
+            let signedPreKey = try SignedPreKeyRecord(
+                id: randomPreKeyId(),
+                timestamp: timestamp,
+                privateKey: signedPreKeyPrivateKey,
+                signature: identityKey.generateSignature(message: signedPreKeyPrivateKey.publicKey.serialize()),
+            )
+
+            let kemKeyPair = KEMKeyPair.generate()
+            let lastResortPreKey = try KyberPreKeyRecord(
+                id: randomPreKeyId(),
+                timestamp: timestamp,
+                keyPair: kemKeyPair,
+                signature: identityKey.generateSignature(message: kemKeyPair.publicKey.serialize()),
+            )
+
+            return RegistrationPreKeyUploadBundle(
+                identity: identity,
+                identityKeyPair: keyPair,
+                signedPreKey: signedPreKey,
+                lastResortPreKey: lastResortPreKey,
+            )
+        }
+
+        /// Same range as SignalServiceKit's PreKeyId.random().
+        private static func randomPreKeyId() -> UInt32 {
+            return UInt32.random(in: 1..<0x1000000)
         }
     }
 
@@ -788,17 +792,14 @@ public enum RadarPushRelay {
         let db: any DB
         let tsAccountManager: TSAccountManager
         let identityManager: OWSIdentityManager
-        let preKeyManager: PreKeyManager
         let deviceProvisioningService: DeviceProvisioningService
-        let accountKeyStore: AccountKeyStore
-        let svr: SecureValueRecovery
     }
 
     /// Built once and reused — the underlying service is stateless wrapper
     /// around the existing networkManager.
     private static let sharedDeviceProvisioningService: DeviceProvisioningService = {
         DeviceProvisioningServiceImpl(
-            networkManager: SSKEnvironment.shared.networkManagerRef
+            networkManager: SSKEnvironment.shared.networkManagerRef,
         )
     }()
 
@@ -814,10 +815,7 @@ public enum RadarPushRelay {
             db: bridge.db,
             tsAccountManager: bridge.tsAccountManager,
             identityManager: bridge.identityManager,
-            preKeyManager: bridge.preKeyManager,
             deviceProvisioningService: sharedDeviceProvisioningService,
-            accountKeyStore: bridge.accountKeyStore,
-            svr: bridge.svr
         )
     }
 

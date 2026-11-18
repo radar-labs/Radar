@@ -10,23 +10,29 @@ open class PrefixedLogger {
     let suffix: String
 
     public static func empty() -> PrefixedLogger {
-        return PrefixedLogger(rawPrefix: "")
+        return PrefixedLogger(prefix: nil)
     }
 
-    public init(prefix: String, suffix: String? = nil) {
-        self.prefix = "\(prefix) "
+    /// - Parameter prefix
+    /// If non-nil, prepended to all log lines emitted by this logger.
+    /// - Parameter suffix
+    /// If non-nil, appended to all log lines emitted by this logger.
+    public init(prefix: String?, suffix: String? = nil) {
+        self.prefix = prefix.map { "\($0) " } ?? ""
         self.suffix = suffix.map { " \($0)" } ?? ""
     }
 
-    private init(rawPrefix: String, rawSuffix: String? = nil) {
-        self.prefix = rawPrefix
-        self.suffix = rawSuffix ?? ""
+    public func prefixedWith(with extraPrefix: String) -> PrefixedLogger {
+        return PrefixedLogger(
+            prefix: prefix + "\(extraPrefix)",
+            suffix: suffix,
+        )
     }
 
     public func suffixed(with extraSuffix: String) -> PrefixedLogger {
         return PrefixedLogger(
             prefix: prefix,
-            suffix: suffix + " \(extraSuffix)"
+            suffix: suffix + " \(extraSuffix)",
         )
     }
 
@@ -34,13 +40,13 @@ open class PrefixedLogger {
         _ logString: @autoclosure () -> String,
         file: String = #fileID,
         function: String = #function,
-        line: Int = #line
+        line: Int = #line,
     ) {
         Logger.verbose(
             buildLogString(logString()),
             file: file,
             function: function,
-            line: line
+            line: line,
         )
     }
 
@@ -48,13 +54,13 @@ open class PrefixedLogger {
         _ logString: @autoclosure () -> String,
         file: String = #fileID,
         function: String = #function,
-        line: Int = #line
+        line: Int = #line,
     ) {
         Logger.debug(
             buildLogString(logString()),
             file: file,
             function: function,
-            line: line
+            line: line,
         )
     }
 
@@ -62,13 +68,13 @@ open class PrefixedLogger {
         _ logString: @autoclosure () -> String,
         file: String = #fileID,
         function: String = #function,
-        line: Int = #line
+        line: Int = #line,
     ) {
         Logger.info(
             buildLogString(logString()),
             file: file,
             function: function,
-            line: line
+            line: line,
         )
     }
 
@@ -76,13 +82,13 @@ open class PrefixedLogger {
         _ logString: @autoclosure () -> String,
         file: String = #fileID,
         function: String = #function,
-        line: Int = #line
+        line: Int = #line,
     ) {
         Logger.warn(
             buildLogString(logString()),
             file: file,
             function: function,
-            line: line
+            line: line,
         )
     }
 
@@ -90,13 +96,13 @@ open class PrefixedLogger {
         _ logString: @autoclosure () -> String,
         file: String = #fileID,
         function: String = #function,
-        line: Int = #line
+        line: Int = #line,
     ) {
         Logger.error(
             buildLogString(logString()),
             file: file,
             function: function,
-            line: line
+            line: line,
         )
     }
 

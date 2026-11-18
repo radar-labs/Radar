@@ -63,13 +63,13 @@ struct InfoMessageGroupUpdateMigrator {
 
         logger.info("Starting...")
 
-        _ = try await TimeGatedBatch.processAllAsync(
+        try await TimeGatedBatch.processAll(
             db: db,
-            buildTxContext: { tx throws(CancellationError) -> TxContext in
+            buildTxContext: { tx -> TxContext in
                 let lastMigratedInfoMessageRowID = kvStore.fetchValue(
                     Int64.self,
                     forKey: StoreKeys.lastMigratedInfoMessageRowID,
-                    tx: tx
+                    tx: tx,
                 )
 
                 return TxContext(
@@ -100,28 +100,24 @@ struct InfoMessageGroupUpdateMigrator {
                     guard let _infoMessage = try InfoMessage.fetchOne(tx.database, sql: infoMessageQuery) else {
                         // No more info messages: we're done!
                         context.hasFinishedMigrating = true
-                        return 0
+                        return .done(())
                     }
 
                     infoMessage = _infoMessage
                 } catch {
                     logger.error("Failed to read InfoMessage from cursor: aborting migration.")
                     context.hasFinishedMigrating = true
-                    return 0
+                    return .done(())
                 }
 
                 guard
                     let infoMessageUserInfoBlob = infoMessage.infoMessageUserInfoBlob,
-                    let infoMessageUserInfo = try? NSKeyedUnarchiver.unarchivedObject(
-                        ofClass: NSDictionary.self,
-                        from: infoMessageUserInfoBlob,
-                        requiringSecureCoding: false,
-                    ) as? [InfoMessageUserInfoKey: Any]
+                    let infoMessageUserInfo = try? SDSDeserialization.unarchivedInfoDictionary(from: infoMessageUserInfoBlob)
                 else {
                     // Missing or failed-to-unarchive infoMessageUserInfo: skip
                     // this interaction.
                     context.lastMigratedInfoMessageRowID = infoMessage.rowID
-                    return 1
+                    return .more
                 }
 
                 guard
@@ -129,13 +125,13 @@ struct InfoMessageGroupUpdateMigrator {
                         infoMessageUserInfo: infoMessageUserInfo,
                         customMessage: nil,
                         localIdentifiers: localIdentifiers,
-                        tx: tx
+                        tx: tx,
                     )
                 else {
                     // No precomputed group update items. This may not be a
                     // group update, or a malformed one: skip it.
                     context.lastMigratedInfoMessageRowID = infoMessage.rowID
-                    return 1
+                    return .more
                 }
 
                 // This is the only key in infoMessageUserInfo that we're now
@@ -149,7 +145,7 @@ struct InfoMessageGroupUpdateMigrator {
                 ]
                 let newInfoMessageUserInfoBlob = try! NSKeyedArchiver.archivedData(
                     withRootObject: newInfoMessageUserInfo,
-                    requiringSecureCoding: false,
+                    requiringSecureCoding: true,
                 )
 
                 try? tx.database.execute(
@@ -158,13 +154,13 @@ struct InfoMessageGroupUpdateMigrator {
                         SET \(InfoMessage.infoMessageUserInfoColumn) = ?
                         WHERE \(InfoMessage.idColumn) = ?
                     """,
-                    arguments: [newInfoMessageUserInfoBlob, infoMessage.rowID]
+                    arguments: [newInfoMessageUserInfoBlob, infoMessage.rowID],
                 )
 
                 context.lastMigratedInfoMessageRowID = infoMessage.rowID
-                return 1
+                return .more
             },
-            concludeTx: { tx, context throws(CancellationError) in
+            concludeTx: { tx, context in
                 // We've directly modified TSInteractions that may be cached, so
                 // clear said caches.
                 modelReadCaches().evacuateAllCaches()

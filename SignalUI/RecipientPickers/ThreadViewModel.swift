@@ -6,7 +6,7 @@
 import Foundation
 public import SignalServiceKit
 
-public class ThreadViewModel: NSObject {
+public class ThreadViewModel: Equatable {
     public let hasUnreadMessages: Bool
     public let isGroupThread: Bool
     public let threadRecord: TSThread
@@ -14,19 +14,18 @@ public class ThreadViewModel: NSObject {
     public let contactAddress: SignalServiceAddress?
     public let name: String
     public let shortName: String?
-    public let associatedData: ThreadAssociatedData
     public let hasPendingMessageRequest: Bool
-    public let disappearingMessagesConfiguration: OWSDisappearingMessagesConfiguration
+    public let disappearingMessagesConfiguration: DisappearingMessagesConfigurationRecord
     public let isBlocked: Bool
     public let isPinned: Bool
 
-    public var isArchived: Bool { associatedData.isArchived }
-    public var isMuted: Bool { associatedData.isMuted }
-    public var mutedUntilTimestamp: UInt64 { associatedData.mutedUntilTimestamp }
-    public var mutedUntilDate: Date? { associatedData.mutedUntilDate }
-    public var isMarkedUnread: Bool { associatedData.isMarkedUnread }
+    public var isArchived: Bool { threadRecord.isArchived }
+    public var isMuted: Bool { threadRecord.isMuted }
+    public var mutedUntilTimestamp: UInt64 { threadRecord.mutedUntilTimestamp }
+    public var mutedUntilDate: Date? { threadRecord.mutedUntilDate }
+    public var isMarkedUnread: Bool { threadRecord.isMarkedUnread }
 
-    public let pinnedMessageIds: [Int64]
+    public let pinnedMessages: [TSMessage]
 
     public var threadUniqueId: String {
         return threadRecord.uniqueId
@@ -49,10 +48,12 @@ public class ThreadViewModel: NSObject {
     /// - Important
     /// Crashes if the corresponding thread does not exist.
     public convenience init(threadUniqueId: String, forChatList: Bool, transaction tx: DBReadTransaction) {
-        guard let thread = DependenciesBridge.shared.threadStore.fetchThread(
-            uniqueId: threadUniqueId,
-            tx: tx
-        ) else {
+        guard
+            let thread = DependenciesBridge.shared.threadStore.fetchThread(
+                uniqueId: threadUniqueId,
+                tx: tx,
+            )
+        else {
             owsFail("Unexpectedly missing thread for unique ID!")
         }
 
@@ -76,9 +77,6 @@ public class ThreadViewModel: NSObject {
             self.shortName = nil
         }
 
-        let associatedData = ThreadAssociatedData.fetchOrDefault(for: thread, transaction: transaction)
-        self.associatedData = associatedData
-
         if let contactThread = thread as? TSContactThread {
             self.contactAddress = contactThread.contactAddress
         } else {
@@ -87,39 +85,36 @@ public class ThreadViewModel: NSObject {
 
         let unreadCount = InteractionFinder(threadUniqueId: thread.uniqueId).unreadCount(transaction: transaction)
         self.unreadCount = unreadCount
-        self.hasUnreadMessages = associatedData.isMarkedUnread || unreadCount > 0
+        self.hasUnreadMessages = thread.isMarkedUnread || unreadCount > 0
         self.hasPendingMessageRequest = thread.hasPendingMessageRequest(transaction: transaction)
 
-        self.lastMessageForInbox = thread.lastInteractionForInbox(transaction: transaction)
+        self.lastMessageForInbox = thread.lastInteractionForInbox(forChatListSorting: false, transaction: transaction)
 
         if forChatList {
             chatListInfo = ChatListInfo(
                 thread: thread,
                 lastMessageForInbox: lastMessageForInbox,
                 hasPendingMessageRequest: hasPendingMessageRequest,
-                transaction: transaction
+                transaction: transaction,
             )
         } else {
             chatListInfo = nil
         }
 
         isBlocked = SSKEnvironment.shared.blockingManagerRef.isThreadBlocked(thread, transaction: transaction)
-        isPinned = DependenciesBridge.shared.pinnedThreadStore.isThreadPinned(thread, tx: transaction)
+        let pinnedThreadManager = DependenciesBridge.shared.pinnedThreadManager
+        isPinned = pinnedThreadManager.pinnedThreadOrder(forThread: thread, tx: transaction) != nil
 
         if let threadId = thread.grdbId?.int64Value {
-            pinnedMessageIds = DependenciesBridge.shared.pinnedMessageManager.fetchPinnedMessagesForThread(threadId: threadId, tx: transaction)
+            pinnedMessages = DependenciesBridge.shared.pinnedMessageManager.fetchPinnedMessagesForThread(threadId: threadId, tx: transaction)
         } else {
-            owsFailDebug("missing thread Id")
-            pinnedMessageIds = []
+            owsAssertDebug(thread.uniqueId == "MockThread" || thread.uniqueId == "MockGroupThread", "missing thread Id")
+            pinnedMessages = []
         }
     }
 
-    override public func isEqual(_ object: Any?) -> Bool {
-        guard let otherThread = object as? ThreadViewModel else {
-            return super.isEqual(object)
-        }
-
-        return threadRecord.isEqual(otherThread.threadRecord)
+    public static func ==(lhs: ThreadViewModel, rhs: ThreadViewModel) -> Bool {
+        lhs.threadRecord.isEqual(rhs.threadRecord)
     }
 }
 
@@ -135,7 +130,7 @@ public class ChatListInfo {
         thread: TSThread,
         lastMessageForInbox: TSInteraction?,
         hasPendingMessageRequest: Bool,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) {
 
         self.lastMessageDate = lastMessageForInbox?.timestampDate
@@ -148,17 +143,17 @@ public class ChatListInfo {
                 let receiptData = paymentMessage.paymentNotification?.mcReceiptData,
                 let paymentModel = PaymentFinder.paymentModels(
                     forMcReceiptData: receiptData,
-                    transaction: transaction
+                    transaction: transaction,
                 ).first
             {
                 return MessageRecipientStatusUtils.recipientStatus(
                     outgoingMessage: outgoingMessage,
-                    paymentModel: paymentModel
+                    paymentModel: paymentModel,
                 )
             } else {
                 return MessageRecipientStatusUtils.recipientStatus(
                     outgoingMessage: outgoingMessage,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             }
         }()
@@ -167,7 +162,7 @@ public class ChatListInfo {
             thread: thread,
             hasPendingMessageRequest: hasPendingMessageRequest,
             lastMessageForInbox: lastMessageForInbox,
-            transaction: transaction
+            transaction: transaction,
         )
     }
 
@@ -175,19 +170,23 @@ public class ChatListInfo {
         thread: TSThread,
         hasPendingMessageRequest: Bool,
         lastMessageForInbox: TSInteraction?,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> CLVSnippet {
 
         let isBlocked = SSKEnvironment.shared.blockingManagerRef.isThreadBlocked(thread, transaction: transaction)
 
         func loadDraftText() -> HydratedMessageBody? {
-            guard let draftMessageBody = thread.currentDraft(shouldFetchLatest: false,
-                                                             transaction: transaction) else {
+            guard
+                let draftMessageBody = thread.currentDraft(
+                    shouldFetchLatest: false,
+                    transaction: transaction,
+                )
+            else {
                 return nil
             }
             return draftMessageBody
                 .hydrating(
-                    mentionHydrator: ContactsMentionHydrator.mentionHydrator(transaction: transaction)
+                    mentionHydrator: ContactsMentionHydrator.mentionHydrator(transaction: transaction),
                 )
         }
         func hasVoiceMemoDraft() -> Bool {
@@ -196,7 +195,7 @@ public class ChatListInfo {
         func loadLastMessageText() -> HydratedMessageBody? {
             if let previewable = lastMessageForInbox as? OWSPreviewText {
                 return HydratedMessageBody.fromPlaintextWithoutRanges(
-                    previewable.previewText(transaction: transaction).filterStringForDisplay()
+                    previewable.previewText(transaction: transaction).filterStringForDisplay(),
                 )
             } else if let tsMessage = lastMessageForInbox as? TSMessage {
                 return tsMessage.conversationListPreviewText(transaction)
@@ -212,7 +211,7 @@ public class ChatListInfo {
                 return SSKEnvironment.shared.contactManagerImplRef.shortestDisplayName(
                     forGroupMember: incomingMessage.authorAddress,
                     inGroup: groupThread.groupModel,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             } else if lastMessageForInbox is TSOutgoingMessage {
                 return CommonStrings.you
@@ -230,16 +229,20 @@ public class ChatListInfo {
             return SSKEnvironment.shared.contactManagerRef.displayName(for: addedByAddress, tx: transaction).resolvedValue(useShortNameIfAvailable: true)
         }
 
+        let draftIsLatest = thread.lastDraftInteractionRowId >= lastMessageForInbox?.sqliteRowId ?? 0
+
         if isBlocked {
             return .blocked
         } else if hasPendingMessageRequest {
             return .pendingMessageRequest(addedToGroupByName: loadAddedToGroupByName())
-        } else if let draftText = loadDraftText()?.nilIfEmpty {
+        } else if let draftText = loadDraftText()?.nilIfEmpty, draftIsLatest {
             return .draft(draftText: draftText)
         } else if hasVoiceMemoDraft() {
             return .voiceMemoDraft
-        } else if let lastMsg = lastMessageForInbox,
-                  (lastMsg is OWSPaymentMessage || lastMsg is OWSArchivedPaymentMessage) {
+        } else if
+            let lastMsg = lastMessageForInbox,
+            (lastMsg is OWSPaymentMessage || lastMsg is OWSArchivedPaymentMessage)
+        {
             let isIncoming = lastMsg is TSIncomingMessage
             let amountText = buildPaymentAmountText(for: lastMsg, transaction: transaction)
             return .paymentSnippet(amountText: amountText, isIncoming: isIncoming)
@@ -259,16 +262,20 @@ public class ChatListInfo {
         if PaymentsDisplayPreferences.shared.isBalanceHidden {
             return PaymentsFormat.hiddenBalanceString
         }
-        if let paymentMsg = message as? OWSPaymentMessage,
-           let receiptData = paymentMsg.paymentNotification?.mcReceiptData,
-           let paymentModel = PaymentFinder.paymentModels(forMcReceiptData: receiptData, transaction: transaction).first,
-           let amount = paymentModel.paymentAmount {
+        if
+            let paymentMsg = message as? OWSPaymentMessage,
+            let receiptData = paymentMsg.paymentNotification?.mcReceiptData,
+            let paymentModel = PaymentFinder.paymentModels(forMcReceiptData: receiptData, transaction: transaction).first,
+            let amount = paymentModel.paymentAmount
+        {
             let number: String = PaymentsDisplayPreferences.shared.isSatoshiEnabled
                 ? "\(amount.picoMob)"
                 : (PaymentsFormat.format(picoMob: amount.picoMob, isShortForm: true) ?? "\(amount.picoMob)")
             return "\(number) \(unit)"
-        } else if let archivedMsg = message as? OWSArchivedPaymentMessage,
-                  let rawAmount = archivedMsg.archivedPaymentInfo.amount {
+        } else if
+            let archivedMsg = message as? OWSArchivedPaymentMessage,
+            let rawAmount = archivedMsg.archivedPaymentInfo.amount
+        {
             return "\(rawAmount) \(unit)"
         }
         return ""

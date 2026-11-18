@@ -20,23 +20,29 @@ class ForwardMessageViewController: OWSNavigationController {
     private typealias Content = ForwardMessageContent
 
     private var content: Content
+    private let attachmentLimits: OutgoingAttachmentLimits
 
     private var textMessage: String?
 
     private let selection = ConversationPickerSelection()
     var selectedConversations: [ConversationItem] { selection.conversations }
 
-    private init(content: Content) {
+    private init(
+        content: Content,
+        attachmentLimits: OutgoingAttachmentLimits,
+    ) {
         self.content = content
+        self.attachmentLimits = attachmentLimits
+
         self.pickerVC = ConversationPickerViewController(
             selection: selection,
             overrideTitle: OWSLocalizedString(
                 "FORWARD_MESSAGE_TITLE",
-                comment: "Title for the 'forward message(s)' view."
-            )
+                comment: "Title for the 'forward message(s)' view.",
+            ),
         )
 
-        if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable {
+        if #available(iOS 26, *) {
             self.pickerVC.backgroundStyle = .none
         }
 
@@ -71,11 +77,12 @@ class ForwardMessageViewController: OWSNavigationController {
         from fromViewController: UIViewController,
         delegate: ForwardMessageDelegate,
     ) {
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
         do {
             let content: Content = try SSKEnvironment.shared.databaseStorageRef.read { tx in
-                return try Content.build(itemViewModel: itemViewModel, tx: tx)
+                return try Content.build(itemViewModel: itemViewModel, attachmentLimits: attachmentLimits, tx: tx)
             }
-            present(content: content, from: fromViewController, delegate: delegate)
+            present(content: content, from: fromViewController, attachmentLimits: attachmentLimits, delegate: delegate)
         } catch {
             ForwardMessageViewController.showAlertForForwardError(error: error, forwardedInteractionCount: 1)
         }
@@ -86,11 +93,12 @@ class ForwardMessageViewController: OWSNavigationController {
         from fromViewController: UIViewController,
         delegate: ForwardMessageDelegate,
     ) {
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
         do {
             let content: Content = try SSKEnvironment.shared.databaseStorageRef.read { tx in
-                try Content.build(selectionItems: selectionItems, tx: tx)
+                try Content.build(selectionItems: selectionItems, attachmentLimits: attachmentLimits, tx: tx)
             }
-            present(content: content, from: fromViewController, delegate: delegate)
+            present(content: content, from: fromViewController, attachmentLimits: attachmentLimits, delegate: delegate)
         } catch {
             ForwardMessageViewController.showAlertForForwardError(error: error, forwardedInteractionCount: selectionItems.count)
         }
@@ -100,21 +108,23 @@ class ForwardMessageViewController: OWSNavigationController {
         forAttachmentStreams attachmentStreams: [ReferencedAttachmentStream],
         fromMessage message: TSMessage,
         from fromViewController: UIViewController,
-        delegate: ForwardMessageDelegate
+        delegate: ForwardMessageDelegate,
     ) {
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
         do {
             let attachments = try attachmentStreams.map { attachmentStream in
-                try SignalAttachmentCloner.cloneAsSignalAttachment(attachment: attachmentStream)
+                try SignalAttachmentCloner.cloneAsSignalAttachment(attachment: attachmentStream, attachmentLimits: attachmentLimits)
             }
             present(
                 content: ForwardMessageContent(allItems: [ForwardMessageItem(interaction: message, attachments: attachments)]),
                 from: fromViewController,
-                delegate: delegate
+                attachmentLimits: attachmentLimits,
+                delegate: delegate,
             )
         } catch let error {
             ForwardMessageViewController.showAlertForForwardError(
                 error: error,
-                forwardedInteractionCount: 1
+                forwardedInteractionCount: 1,
             )
         }
     }
@@ -122,18 +132,19 @@ class ForwardMessageViewController: OWSNavigationController {
     class func present(
         forStoryMessage storyMessage: StoryMessage,
         from fromViewController: UIViewController,
-        delegate: ForwardMessageDelegate
+        delegate: ForwardMessageDelegate,
     ) {
-        var attachments: [SignalAttachment] = []
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
+        var attachments: [PreviewableAttachment] = []
         var textAttachment: TextAttachment?
         switch storyMessage.attachment {
         case .media:
             let attachment: ReferencedAttachmentStream? = SSKEnvironment.shared.databaseStorageRef.read { tx in
                 guard
                     let rowId = storyMessage.id,
-                    let referencedStream = DependenciesBridge.shared.attachmentStore.fetchFirstReferencedAttachment(
+                    let referencedStream = DependenciesBridge.shared.attachmentStore.fetchAnyReferencedAttachment(
                         for: .storyMessageMedia(storyMessageRowId: rowId),
-                        tx: tx
+                        tx: tx,
                     )?.asReferencedStream
                 else {
                     return nil
@@ -144,12 +155,12 @@ class ForwardMessageViewController: OWSNavigationController {
                 guard let attachment else {
                     throw OWSAssertionError("Missing attachment stream for forwarded story message")
                 }
-                let signalAttachment = try SignalAttachmentCloner.cloneAsSignalAttachment(attachment: attachment)
+                let signalAttachment = try SignalAttachmentCloner.cloneAsSignalAttachment(attachment: attachment, attachmentLimits: attachmentLimits)
                 attachments = [signalAttachment]
             } catch let error {
                 ForwardMessageViewController.showAlertForForwardError(
                     error: error,
-                    forwardedInteractionCount: 1
+                    forwardedInteractionCount: 1,
                 )
                 return
             }
@@ -159,6 +170,7 @@ class ForwardMessageViewController: OWSNavigationController {
         present(
             content: ForwardMessageContent(allItems: [ForwardMessageItem(attachments: attachments, textAttachment: textAttachment)]),
             from: fromViewController,
+            attachmentLimits: attachmentLimits,
             delegate: delegate,
         )
     }
@@ -166,21 +178,23 @@ class ForwardMessageViewController: OWSNavigationController {
     class func present(
         forMessageBody messageBody: MessageBody,
         from fromViewController: UIViewController,
-        delegate: ForwardMessageDelegate
+        delegate: ForwardMessageDelegate,
     ) {
         present(
             content: ForwardMessageContent(allItems: [ForwardMessageItem(messageBody: messageBody)]),
             from: fromViewController,
-            delegate: delegate
+            attachmentLimits: .currentLimits(),
+            delegate: delegate,
         )
     }
 
     private class func present(
         content: Content,
         from fromViewController: UIViewController,
+        attachmentLimits: OutgoingAttachmentLimits,
         delegate: ForwardMessageDelegate,
     ) {
-        let sheet = ForwardMessageViewController(content: content)
+        let sheet = ForwardMessageViewController(content: content, attachmentLimits: attachmentLimits)
         sheet.forwardMessageDelegate = delegate
         fromViewController.present(sheet, animated: true) {
             UIApplication.shared.hideKeyboard()
@@ -205,12 +219,10 @@ class ForwardMessageViewController: OWSNavigationController {
         } else {
             let placeholderText = OWSLocalizedString(
                 "FORWARD_MESSAGE_TEXT_PLACEHOLDER",
-                comment: "Indicates that the user can add a text message to forwarded messages."
+                comment: "Indicates that the user can add a text message to forwarded messages.",
             )
             pickerVC.approvalTextMode = .active(placeholderText: placeholderText)
         }
-
-        pickerVC.shouldHideBottomFooter = selectedConversations.isEmpty
     }
 
     private func maximizeHeight() {
@@ -230,8 +242,8 @@ extension ForwardMessageViewController: UISheetPresentationControllerDelegate {
         // wrong after swiping between detents.
         DispatchQueue.main.async {
             sheetPresentationController.animateChanges {
-                self.pickerVC.bottomFooter?.setNeedsLayout()
-                self.pickerVC.bottomFooter?.layoutIfNeeded()
+                self.pickerVC.view.setNeedsLayout()
+                self.pickerVC.view.layoutIfNeeded()
             }
         }
     }
@@ -261,7 +273,7 @@ extension ForwardMessageViewController {
                     ThreadUtil.addThreadToProfileWhitelistIfEmptyOrPendingRequest(
                         recipientThread,
                         setDefaultTimerIfNecessary: true,
-                        tx: transaction
+                        tx: transaction,
                     )
                 }
 
@@ -280,7 +292,6 @@ extension ForwardMessageViewController {
                         let latestInteraction = TSInteraction.anyFetch(
                             uniqueId: interactionId,
                             transaction: transaction,
-                            ignoreCache: true
                         ),
                         hasRenderableContent(interaction: latestInteraction, tx: transaction)
                     else {
@@ -310,7 +321,7 @@ extension ForwardMessageViewController {
 
             self.forwardMessageDelegate?.forwardMessageFlowDidComplete(
                 items: content.allItems,
-                recipientThreads: outgoingMessageRecipientThreads
+                recipientThreads: outgoingMessageRecipientThreads,
             )
         } catch {
             owsFailDebug("Error: \(error)")
@@ -320,9 +331,16 @@ extension ForwardMessageViewController {
     }
 
     private func send(item: ForwardMessageItem, toOutgoingMessageRecipientThreads outgoingMessageRecipientThreads: [TSThread]) async throws {
+        let stickerManager = DependenciesBridge.shared.stickerManager
+        let db = DependenciesBridge.shared.db
+
         if let stickerMetadata = item.stickerMetadata {
             let stickerInfo = stickerMetadata.stickerInfo
-            if StickerManager.isStickerInstalled(stickerInfo: stickerInfo) {
+            let isStickerInstalled = db.read { tx in
+                stickerManager.isStickerInstalled(stickerInfo: stickerInfo, transaction: tx)
+            }
+
+            if isStickerInstalled {
                 await enqueueMessageViaThreadUtil(toRecipientThreads: outgoingMessageRecipientThreads) { recipientThread in
                     self.send(installedSticker: stickerInfo, thread: recipientThread)
                 }
@@ -342,28 +360,28 @@ extension ForwardMessageViewController {
         } else if !item.attachments.isEmpty {
             // TODO: What about link previews in this case?
             let conversations = selectedConversations
-            _ = try await AttachmentMultisend.sendApprovedMedia(
+            _ = try await AttachmentMultisend.enqueueApprovedMedia(
                 conversations: conversations,
                 approvedMessageBody: item.messageBody,
-                approvedAttachments: item.attachments,
-            ).enqueuedPromise.awaitable()
+                approvedAttachments: ApprovedAttachments(nonViewOnceAttachments: item.attachments, imageQuality: .high),
+                attachmentLimits: attachmentLimits,
+            )
         } else if let textAttachment = item.textAttachment {
             // TODO: we want to reuse the uploaded link preview image attachment instead of re-uploading
             // if the original was sent recently (if not the image could be stale)
-            _ = try await AttachmentMultisend.sendTextAttachment(
-                textAttachment.asUnsentAttachment(), to: selectedConversations
-            ).enqueuedPromise.awaitable()
+            _ = try await AttachmentMultisend.enqueueTextAttachment(
+                textAttachment.asUnsentAttachment(),
+                to: selectedConversations,
+            )
         } else if let messageBody = item.messageBody {
             let linkPreviewDraft = item.linkPreviewDraft
             await enqueueMessageViaThreadUtil(toRecipientThreads: outgoingMessageRecipientThreads) { recipientThread in
                 self.send(body: messageBody, linkPreviewDraft: linkPreviewDraft, recipientThread: recipientThread)
             }
 
-            // Send the text message to any selected story recipients
-            // as a text story with default styling.
-            let storyConversations = selectedConversations.filter { $0.outgoingMessageType == .storyMessage }
-            let storySendResult = StorySharing.sendTextStory(with: messageBody, linkPreviewDraft: linkPreviewDraft, to: storyConversations)
-            _ = try await storySendResult?.enqueuedPromise.awaitable()
+            // Send the text message to any selected story recipients as a text story
+            // with default styling.
+            _ = try await StorySharing.enqueueTextStory(with: messageBody, linkPreviewDraft: linkPreviewDraft, to: selectedConversations)
         } else {
             throw ForwardError.invalidInteraction
         }
@@ -376,7 +394,7 @@ extension ForwardMessageViewController {
         ThreadUtil.enqueueMessage(
             body: body,
             thread: recipientThread,
-            linkPreviewDraft: linkPreviewDraft
+            linkPreviewDraft: linkPreviewDraft,
         )
     }
 
@@ -385,7 +403,7 @@ extension ForwardMessageViewController {
     }
 
     private func send(installedSticker stickerInfo: StickerInfo, thread: TSThread) {
-        ThreadUtil.enqueueMessage(withInstalledSticker: stickerInfo, thread: thread)
+        ThreadUtil.enqueueMessage(withInstalledSticker: stickerInfo, quotedReplyDraft: nil, thread: thread)
     }
 
     private func send(uninstalledSticker stickerMetadata: any StickerMetadata, stickerData: Data, thread: TSThread) {
@@ -394,7 +412,7 @@ extension ForwardMessageViewController {
 
     private func enqueueMessageViaThreadUtil(
         toRecipientThreads recipientThreads: [TSThread],
-        enqueueBlock: (TSThread) -> Void
+        enqueueBlock: (TSThread) -> Void,
     ) async {
         for recipientThread in recipientThreads {
             enqueueBlock(recipientThread)
@@ -467,13 +485,21 @@ extension ForwardMessageViewController {
     ) {
         let toast: String
         if items.count > 1 {
-            toast = OWSLocalizedString("FORWARD_MESSAGE_MESSAGES_SENT_N",
-                                      comment: "Indicates that multiple messages were forwarded.")
+            toast = OWSLocalizedString(
+                "FORWARD_MESSAGE_MESSAGES_SENT_N",
+                comment: "Indicates that multiple messages were forwarded.",
+            )
         } else {
-            toast = OWSLocalizedString("FORWARD_MESSAGE_MESSAGES_SENT_1",
-                                      comment: "Indicates that a single message was forwarded.")
+            toast = OWSLocalizedString(
+                "FORWARD_MESSAGE_MESSAGES_SENT_1",
+                comment: "Indicates that a single message was forwarded.",
+            )
         }
-        fromViewController.presentToast(text: toast)
+        if let cvc = fromViewController as? ConversationViewController {
+            cvc.presentToastCVC(toast, image: .check)
+        } else {
+            fromViewController.presentToast(text: toast, image: .check)
+        }
     }
 }
 
@@ -493,11 +519,17 @@ extension ForwardMessageViewController {
         error: Error,
         forwardedInteractionCount: Int,
     ) {
-        let genericErrorMessage = (forwardedInteractionCount > 1
-                                    ? OWSLocalizedString("ERROR_COULD_NOT_FORWARD_MESSAGES_N",
-                                                        comment: "Error indicating that messages could not be forwarded.")
-                                    : OWSLocalizedString("ERROR_COULD_NOT_FORWARD_MESSAGES_1",
-                                                        comment: "Error indicating that a message could not be forwarded."))
+        let genericErrorMessage = (
+            forwardedInteractionCount > 1
+                ? OWSLocalizedString(
+                    "ERROR_COULD_NOT_FORWARD_MESSAGES_N",
+                    comment: "Error indicating that messages could not be forwarded.",
+                )
+                : OWSLocalizedString(
+                    "ERROR_COULD_NOT_FORWARD_MESSAGES_1",
+                    comment: "Error indicating that a message could not be forwarded.",
+                ),
+        )
 
         guard let forwardError = error as? ForwardError else {
             owsFailDebug("Error: \(error).")
@@ -507,11 +539,17 @@ extension ForwardMessageViewController {
 
         switch forwardError {
         case .missingInteraction:
-            let message = (forwardedInteractionCount > 1
-                            ? OWSLocalizedString("ERROR_COULD_NOT_FORWARD_MESSAGES_MISSING_N",
-                                                comment: "Error indicating that messages could not be forwarded.")
-                            : OWSLocalizedString("ERROR_COULD_NOT_FORWARD_MESSAGES_MISSING_1",
-                                                comment: "Error indicating that a message could not be forwarded."))
+            let message = (
+                forwardedInteractionCount > 1
+                    ? OWSLocalizedString(
+                        "ERROR_COULD_NOT_FORWARD_MESSAGES_MISSING_N",
+                        comment: "Error indicating that messages could not be forwarded.",
+                    )
+                    : OWSLocalizedString(
+                        "ERROR_COULD_NOT_FORWARD_MESSAGES_MISSING_1",
+                        comment: "Error indicating that a message could not be forwarded.",
+                    ),
+            )
             OWSActionSheets.showErrorAlert(message: message)
         case .missingThread, .invalidInteraction:
             owsFailDebug("Error: \(error).")
@@ -526,7 +564,7 @@ extension ForwardMessageViewController {
 struct ForwardMessageItem {
     let interaction: TSInteraction?
 
-    let attachments: [SignalAttachment]
+    let attachments: [PreviewableAttachment]
     let contactShare: ContactShareViewModel?
     let messageBody: MessageBody?
     let linkPreviewDraft: OWSLinkPreviewDraft?
@@ -536,7 +574,7 @@ struct ForwardMessageItem {
 
     fileprivate init(
         interaction: TSInteraction? = nil,
-        attachments: [SignalAttachment] = [],
+        attachments: [PreviewableAttachment] = [],
         contactShare: ContactShareViewModel? = nil,
         messageBody: MessageBody? = nil,
         linkPreviewDraft: OWSLinkPreviewDraft? = nil,
@@ -558,7 +596,8 @@ struct ForwardMessageItem {
         interaction: TSInteraction,
         componentState: CVComponentState,
         selectionType: CVSelectionType,
-        transaction: DBReadTransaction
+        attachmentLimits: OutgoingAttachmentLimits,
+        transaction: DBReadTransaction,
     ) throws -> Self {
         let shouldHaveText = (selectionType == .allContent || selectionType == .secondaryContent)
         let shouldHaveAttachments = (selectionType == .allContent || selectionType == .primaryContent)
@@ -587,12 +626,12 @@ struct ForwardMessageItem {
                 linkPreviewDraft = Self.tryToCloneLinkPreview(
                     linkPreview: linkPreview,
                     parentMessage: message,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             }
         }
 
-        var attachments: [SignalAttachment] = []
+        var attachments: [PreviewableAttachment] = []
         var contactShare: ContactShareViewModel?
         var stickerMetadata: (any StickerMetadata)?
         var stickerAttachment: AttachmentStream?
@@ -611,7 +650,7 @@ struct ForwardMessageItem {
             }
 
             attachments = try attachmentStreams.map { attachmentStream in
-                try SignalAttachmentCloner.cloneAsSignalAttachment(attachment: attachmentStream)
+                try SignalAttachmentCloner.cloneAsSignalAttachment(attachment: attachmentStream, attachmentLimits: attachmentLimits)
             }
 
             stickerMetadata = componentState.stickerMetadata
@@ -620,9 +659,9 @@ struct ForwardMessageItem {
 
         let isEmpty: Bool = (
             attachments.isEmpty
-            && contactShare == nil
-            && messageBody == nil
-            && stickerMetadata == nil
+                && contactShare == nil
+                && messageBody == nil
+                && stickerMetadata == nil,
         )
         guard !isEmpty else {
             throw ForwardError.invalidInteraction
@@ -642,10 +681,12 @@ struct ForwardMessageItem {
     private static func tryToCloneLinkPreview(
         linkPreview: OWSLinkPreview,
         parentMessage: TSMessage,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> OWSLinkPreviewDraft? {
-        guard let urlString = linkPreview.urlString,
-              let url = URL(string: urlString) else {
+        guard
+            let urlString = linkPreview.urlString,
+            let url = URL(string: urlString)
+        else {
             owsFailDebug("Missing or invalid urlString.")
             return nil
         }
@@ -655,7 +696,7 @@ struct ForwardMessageItem {
 
             static func load(
                 attachmentId: Attachment.IDType,
-                transaction: DBReadTransaction
+                transaction: DBReadTransaction,
             ) -> LinkPreviewImage? {
                 guard
                     let attachment = DependenciesBridge.shared.attachmentStore
@@ -681,13 +722,13 @@ struct ForwardMessageItem {
         var linkPreviewImage: LinkPreviewImage?
         if
             let parentMessageRowId = parentMessage.sqliteRowId,
-            let imageAttachmentId = DependenciesBridge.shared.attachmentStore.fetchFirstReference(
+            let imageAttachmentId = DependenciesBridge.shared.attachmentStore.fetchAnyReference(
                 owner: .messageLinkPreview(messageRowId: parentMessageRowId),
-                tx: transaction
+                tx: transaction,
             )?.attachmentRowId,
             let image = LinkPreviewImage.load(
                 attachmentId: imageAttachmentId,
-                transaction: transaction
+                transaction: transaction,
             )
         {
             linkPreviewImage = image
@@ -712,7 +753,7 @@ private struct ForwardMessageContent {
     var canSendToStories: Bool {
         return allItems.allSatisfy { item in
             if !item.attachments.isEmpty {
-                return item.attachments.allSatisfy({ $0.dataSource.isValidImage || $0.dataSource.isValidVideo })
+                return item.attachments.allSatisfy({ $0.isImage || $0.isVideo })
             } else if item.textAttachment != nil {
                 return true
             } else if item.messageBody != nil {
@@ -729,23 +770,26 @@ private struct ForwardMessageContent {
 
     static func build(
         itemViewModel: CVItemViewModelImpl,
-        tx: DBReadTransaction
+        attachmentLimits: OutgoingAttachmentLimits,
+        tx: DBReadTransaction,
     ) throws -> Self {
         return Self(allItems: [try ForwardMessageItem.build(
             interaction: itemViewModel.interaction,
             componentState: itemViewModel.renderItem.componentState,
             selectionType: .allContent,
+            attachmentLimits: attachmentLimits,
             transaction: tx,
         )])
     }
 
     static func build(
         selectionItems: [CVSelectionItem],
-        tx: DBReadTransaction
+        attachmentLimits: OutgoingAttachmentLimits,
+        tx: DBReadTransaction,
     ) throws -> Self {
-        let items = try selectionItems.map { (selectionItem) throws -> ForwardMessageItem in
+        let items = try selectionItems.map { selectionItem throws -> ForwardMessageItem in
             let interactionId = selectionItem.interactionId
-            guard let interaction = TSInteraction.anyFetch(uniqueId: interactionId, transaction: tx) else {
+            guard let interaction = TSInteraction.fetchViaCache(uniqueId: interactionId, transaction: tx) else {
                 throw ForwardError.missingInteraction
             }
             let componentState = try buildComponentState(interaction: interaction, tx: tx)
@@ -753,6 +797,7 @@ private struct ForwardMessageContent {
                 interaction: interaction,
                 componentState: componentState,
                 selectionType: selectionItem.selectionType,
+                attachmentLimits: attachmentLimits,
                 transaction: tx,
             )
         }
@@ -763,11 +808,13 @@ private struct ForwardMessageContent {
         interaction: TSInteraction,
         tx: DBReadTransaction,
     ) throws(ForwardError) -> CVComponentState {
-        guard let componentState = CVLoader.buildStandaloneComponentState(
-            interaction: interaction,
-            spoilerState: SpoilerRenderState(), // Nothing revealed, doesn't matter.
-            transaction: tx,
-        ) else {
+        guard
+            let componentState = CVLoader.buildStandaloneComponentState(
+                interaction: interaction,
+                spoilerState: SpoilerRenderState(), // Nothing revealed, doesn't matter.
+                transaction: tx,
+            )
+        else {
             throw .invalidInteraction
         }
         return componentState

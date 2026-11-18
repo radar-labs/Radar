@@ -11,7 +11,7 @@ import SignalServiceKit
 // are immutable, these operations simply take a
 // snapshot of the current contents which can be used
 // (multiple times) to preserve/restore editor state.
-private class ImageEditorOperation: NSObject {
+private struct ImageEditorOperation {
 
     let operationId: String
 
@@ -28,8 +28,10 @@ private class ImageEditorOperation: NSObject {
 protocol ImageEditorModelObserver: AnyObject {
     // Used for large changes to the model, when the entire
     // model should be reloaded.
-    func imageEditorModelDidChange(before: ImageEditorContents,
-                                   after: ImageEditorContents)
+    func imageEditorModelDidChange(
+        before: ImageEditorContents,
+        after: ImageEditorContents,
+    )
 
     // Used for small narrow changes to the model, usually
     // to a single item.
@@ -38,10 +40,10 @@ protocol ImageEditorModelObserver: AnyObject {
 
 // MARK: -
 
-// Should be @MainActor.
-class ImageEditorModel: NSObject {
+@MainActor
+class ImageEditorModel {
 
-    let srcImagePath: String
+    let srcImage: NormalizedImage
     let srcImageSizePixels: CGSize
     let srcImageMetadata: ImageMetadata
 
@@ -57,96 +59,70 @@ class ImageEditorModel: NSObject {
 
     var blurredSourceImage: CGImage?
 
-    var color = ColorPickerBarColor.defaultColor()
+    var color = ColorPickerBarColor.defaultColor
 
-    // We don't want to allow editing of images if:
-    //
-    // * They are invalid.
-    // * We can't determine their size / aspect-ratio.
-    init(srcImagePath: String) throws {
-        self.srcImagePath = srcImagePath
-
-        let srcFileName = (srcImagePath as NSString).lastPathComponent
-        let srcFileExtension = (srcFileName as NSString).pathExtension
-        guard let mimeType = MimeTypeUtil.mimeTypeForFileExtension(srcFileExtension) else {
-            Logger.error("Couldn't determine MIME type for file.")
-            throw ImageEditorError.invalidInput
-        }
-        guard MimeTypeUtil.isSupportedImageMimeType(mimeType),
-              !MimeTypeUtil.isSupportedDefinitelyAnimatedMimeType(mimeType) else {
-            Logger.error("Invalid MIME type: \(mimeType).")
-            throw ImageEditorError.invalidInput
-        }
-
-        let srcImageMetadata = try? DataImageSource.forPath(srcImagePath).imageMetadata()
+    init(normalizedImage: NormalizedImage) throws {
+        self.srcImage = normalizedImage
+        let srcImageMetadata = try normalizedImage.dataSource.imageSource().imageMetadata()
         guard let srcImageMetadata else {
-            Logger.error("Invalid image")
             throw ImageEditorError.invalidInput
         }
         self.srcImageMetadata = srcImageMetadata
-
         let srcImageSizePixels = srcImageMetadata.pixelSize
         guard srcImageSizePixels.width > 0, srcImageSizePixels.height > 0 else {
-            Logger.error("Couldn't determine image size.")
             throw ImageEditorError.invalidInput
         }
         self.srcImageSizePixels = srcImageSizePixels
 
         self.contents = ImageEditorContents()
         self.transform = ImageEditorTransform.defaultTransform(srcImageSizePixels: srcImageSizePixels)
-
-        super.init()
     }
 
-    @MainActor
     func renderOutput() -> UIImage? {
-        return ImageEditorCanvasView.renderForOutput(model: self, transform: currentTransform())
+        ImageEditorCanvasView.renderForOutput(model: self, transform: currentTransform())
     }
 
     func currentTransform() -> ImageEditorTransform {
-        return transform
+        transform
     }
 
-    func isDirty() -> Bool {
-        if itemCount() > 0 {
+    var isDirty: Bool {
+        if itemCount > 0 {
             return true
         }
         return transform != ImageEditorTransform.defaultTransform(srcImageSizePixels: srcImageSizePixels)
     }
 
-    func itemCount() -> Int {
-        return contents.itemCount()
+    var itemCount: Int {
+        contents.itemCount
     }
 
-    func items() -> [ImageEditorItem] {
-        return contents.items()
+    var items: [ImageEditorItem] {
+        contents.items
     }
 
-    func itemIds() -> [String] {
-        return contents.itemIds()
+    var itemIds: [String] {
+        contents.itemIds
     }
 
     func has(itemForId itemId: String) -> Bool {
-        return item(forId: itemId) != nil
+        item(forId: itemId) != nil
     }
 
     func item(forId itemId: String) -> ImageEditorItem? {
-        return contents.item(forId: itemId)
+        contents.item(forId: itemId)
     }
 
-    func canUndo() -> Bool {
-        return !undoStack.isEmpty
+    var canUndo: Bool {
+        !undoStack.isEmpty
     }
 
-    func canRedo() -> Bool {
-        return !redoStack.isEmpty
+    var canRedo: Bool {
+        !redoStack.isEmpty
     }
 
-    func currentUndoOperationId() -> String? {
-        guard let operation = undoStack.last else {
-            return nil
-        }
-        return operation.operationId
+    var currentUndoOperationId: String? {
+        undoStack.last?.operationId
     }
 
     // MARK: - Observers
@@ -157,15 +133,19 @@ class ImageEditorModel: NSObject {
         observers.append(Weak(value: observer))
     }
 
-    private func fireModelDidChange(before: ImageEditorContents,
-                                    after: ImageEditorContents) {
+    private func fireModelDidChange(
+        before: ImageEditorContents,
+        after: ImageEditorContents,
+    ) {
         // We could diff here and yield a more narrow change event.
         for weakObserver in observers {
             guard let observer = weakObserver.value else {
                 continue
             }
-            observer.imageEditorModelDidChange(before: before,
-                                               after: after)
+            observer.imageEditorModelDidChange(
+                before: before,
+                after: after,
+            )
         }
     }
 
@@ -190,11 +170,11 @@ class ImageEditorModel: NSObject {
         let redoOperation = ImageEditorOperation(contents: contents)
         redoStack.append(redoOperation)
 
-        let oldContents = self.contents
-        self.contents = undoOperation.contents
+        let oldContents = contents
+        contents = undoOperation.contents
 
         // We could diff here and yield a more narrow change event.
-        fireModelDidChange(before: oldContents, after: self.contents)
+        fireModelDidChange(before: oldContents, after: contents)
     }
 
     func redo() {
@@ -206,37 +186,45 @@ class ImageEditorModel: NSObject {
         let undoOperation = ImageEditorOperation(contents: contents)
         undoStack.append(undoOperation)
 
-        let oldContents = self.contents
-        self.contents = redoOperation.contents
+        let oldContents = contents
+        contents = redoOperation.contents
 
         // We could diff here and yield a more narrow change event.
-        fireModelDidChange(before: oldContents, after: self.contents)
+        fireModelDidChange(before: oldContents, after: contents)
     }
 
     func append(item: ImageEditorItem) {
-        performAction({ (oldContents) in
-            let newContents = oldContents.clone()
-            newContents.append(item: item)
-            return newContents
-        }, changedItemIds: [item.itemId])
+        performAction(
+            { oldContents in
+                var newContents = oldContents
+                newContents.append(item: item)
+                return newContents
+            },
+            changedItemIds: [item.itemId],
+        )
     }
 
-    func replace(item: ImageEditorItem,
-                 suppressUndo: Bool = false) {
-        performAction({ (oldContents) in
-            let newContents = oldContents.clone()
-            newContents.replace(item: item)
-            return newContents
-        }, changedItemIds: [item.itemId],
-                      suppressUndo: suppressUndo)
+    func replace(item: ImageEditorItem, suppressUndo: Bool = false) {
+        performAction(
+            { oldContents in
+                var newContents = oldContents
+                newContents.replace(item: item)
+                return newContents
+            },
+            changedItemIds: [item.itemId],
+            suppressUndo: suppressUndo,
+        )
     }
 
     func remove(item: ImageEditorItem) {
-        performAction({ (oldContents) in
-            let newContents = oldContents.clone()
-            newContents.remove(item: item)
-            return newContents
-        }, changedItemIds: [item.itemId])
+        performAction(
+            { oldContents in
+                var newContents = oldContents
+                newContents.remove(item: item)
+                return newContents
+            },
+            changedItemIds: [item.itemId],
+        )
     }
 
     func replace(transform: ImageEditorTransform) {
@@ -245,7 +233,7 @@ class ImageEditorModel: NSObject {
         // The contents haven't changed, but this event prods the
         // observers to reload everything, which is necessary if
         // the transform changes.
-        fireModelDidChange(before: self.contents, after: self.contents)
+        fireModelDidChange(before: contents, after: contents)
     }
 
     // MARK: - Temp Files
@@ -255,7 +243,10 @@ class ImageEditorModel: NSObject {
     func temporaryFilePath(fileExtension: String) -> String {
         AssertIsOnMainThread()
 
-        let filePath = OWSFileSystem.temporaryFilePath(fileExtension: fileExtension)
+        let filePath = OWSFileSystem.temporaryFilePath(
+            fileExtension: fileExtension,
+            isAvailableWhileDeviceLocked: false,
+        )
         temporaryFilePaths.append(filePath)
         return filePath
     }
@@ -275,24 +266,28 @@ class ImageEditorModel: NSObject {
         }
     }
 
-    private func performAction(_ action: (ImageEditorContents) -> ImageEditorContents,
-                               changedItemIds: [String]?,
-                               suppressUndo: Bool = false) {
+    private func performAction(
+        _ action: (ImageEditorContents) -> ImageEditorContents,
+        changedItemIds: [String]?,
+        suppressUndo: Bool = false,
+    ) {
         if !suppressUndo {
             let undoOperation = ImageEditorOperation(contents: contents)
             undoStack.append(undoOperation)
             redoStack.removeAll()
         }
 
-        let oldContents = self.contents
+        let oldContents = contents
         let newContents = action(oldContents)
         contents = newContents
 
-        if let changedItemIds = changedItemIds {
+        if let changedItemIds {
             fireModelDidChange(changedItemIds: changedItemIds)
         } else {
-            fireModelDidChange(before: oldContents,
-                               after: self.contents)
+            fireModelDidChange(
+                before: oldContents,
+                after: contents,
+            )
         }
     }
 }

@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import GRDB
 public import LibSignalClient
 
 public struct RecipientDatabaseTable {
@@ -11,19 +12,19 @@ public struct RecipientDatabaseTable {
 
     func fetchRecipient(contactThread: TSContactThread, tx: DBReadTransaction) -> SignalRecipient? {
         return fetchServiceIdAndRecipient(contactThread: contactThread, tx: tx)
-            .flatMap { (_, recipient) in recipient }
+            .flatMap { _, recipient in recipient }
     }
 
     func fetchServiceId(contactThread: TSContactThread, tx: DBReadTransaction) -> ServiceId? {
         return fetchServiceIdAndRecipient(contactThread: contactThread, tx: tx)
-            .map { (serviceId, _) in serviceId }
+            .map { serviceId, _ in serviceId }
     }
 
     /// Fetch the `ServiceId` for the owner of this contact thread, and its
     /// corresponding `SignalRecipient` if one exists.
     private func fetchServiceIdAndRecipient(
         contactThread: TSContactThread,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> (ServiceId, SignalRecipient?)? {
         let threadServiceId = contactThread.contactUUID.flatMap { try? ServiceId.parseFrom(serviceIdString: $0) }
 
@@ -63,10 +64,10 @@ public struct RecipientDatabaseTable {
     // MARK: -
 
     public func fetchRecipient(address: SignalServiceAddress, tx: DBReadTransaction) -> SignalRecipient? {
-        return (
+        return
             address.serviceId.flatMap({ fetchRecipient(serviceId: $0, transaction: tx) })
-            ?? address.phoneNumber.flatMap({ fetchRecipient(phoneNumber: $0, transaction: tx) })
-        )
+                ?? address.phoneNumber.flatMap({ fetchRecipient(phoneNumber: $0, transaction: tx) })
+
     }
 
     public func fetchAuthorRecipient(incomingMessage: TSIncomingMessage, tx: DBReadTransaction) -> SignalRecipient? {
@@ -74,25 +75,15 @@ public struct RecipientDatabaseTable {
     }
 
     public func fetchRecipient(rowId: Int64, tx: DBReadTransaction) -> SignalRecipient? {
-        do {
+        return failIfThrows {
             return try SignalRecipient.fetchOne(tx.database, key: rowId)
-        } catch {
-            let grdbError = error.grdbErrorForLogging
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(error: grdbError)
-            owsFailDebug("\(grdbError)")
-            return nil
         }
     }
 
     public func fetchRecipient(uniqueId: String, tx: DBReadTransaction) -> SignalRecipient? {
         let sql = "SELECT * FROM \(SignalRecipient.databaseTableName) WHERE \(signalRecipientColumn: .uniqueId) = ?"
-        do {
+        return failIfThrows {
             return try SignalRecipient.fetchOne(tx.database, sql: sql, arguments: [uniqueId])
-        } catch {
-            let grdbError = error.grdbErrorForLogging
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(error: grdbError)
-            owsFailDebug("\(grdbError)")
-            return nil
         }
     }
 
@@ -104,30 +95,20 @@ public struct RecipientDatabaseTable {
             }
         }()
         let sql = "SELECT * FROM \(SignalRecipient.databaseTableName) WHERE \(signalRecipientColumn: serviceIdColumn) = ?"
-        do {
+        return failIfThrows {
             return try SignalRecipient.fetchOne(tx.database, sql: sql, arguments: [serviceId.serviceIdUppercaseString])
-        } catch {
-            let grdbError = error.grdbErrorForLogging
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(error: grdbError)
-            owsFailDebug("\(grdbError)")
-            return nil
         }
     }
 
     public func fetchRecipient(phoneNumber: String, transaction tx: DBReadTransaction) -> SignalRecipient? {
         let sql = "SELECT * FROM \(SignalRecipient.databaseTableName) WHERE \(signalRecipientColumn: .phoneNumber) = ?"
-        do {
+        return failIfThrows {
             return try SignalRecipient.fetchOne(tx.database, sql: sql, arguments: [phoneNumber])
-        } catch {
-            let grdbError = error.grdbErrorForLogging
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(error: grdbError)
-            owsFailDebug("\(grdbError)")
-            return nil
         }
     }
 
     public func enumerateAll(tx: DBReadTransaction, block: (SignalRecipient) -> Void) {
-        do {
+        failIfThrows {
             let cursor = try SignalRecipient.fetchCursor(tx.database)
             var hasMore = true
             while hasMore {
@@ -139,11 +120,20 @@ public struct RecipientDatabaseTable {
                     block(recipient)
                 }
             }
-        } catch {
-            let grdbError = error.grdbErrorForLogging
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(error: grdbError)
-            owsFailDebug("\(grdbError)")
         }
+    }
+
+    public func fetchWhitelistedRecipients(tx: DBReadTransaction) -> [SignalRecipient] {
+        let fetchRequest = SignalRecipient.filter(
+            Column(SignalRecipient.CodingKeys.status.rawValue) == SignalRecipient.Status.whitelisted.rawValue,
+        )
+        return failIfThrows { try fetchRequest.fetchAll(tx.database) }
+    }
+
+    public func fetchBlockedRecipients(tx: DBReadTransaction) -> [SignalRecipient] {
+        let fetchRequest = SignalRecipient
+            .filter(Column(SignalRecipient.CodingKeys.status.rawValue) == SignalRecipient.Status.blocked.rawValue)
+        return failIfThrows { try fetchRequest.fetchAll(tx.database) }
     }
 
     public func fetchAllPhoneNumbers(tx: DBReadTransaction) -> [String: Bool] {
@@ -159,21 +149,13 @@ public struct RecipientDatabaseTable {
 
     public func updateRecipient(_ signalRecipient: SignalRecipient, transaction: DBWriteTransaction) {
         failIfThrows {
-            do {
-                try signalRecipient.update(transaction.database)
-            } catch {
-                throw error.grdbErrorForLogging
-            }
+            try signalRecipient.update(transaction.database)
         }
     }
 
     public func removeRecipient(_ signalRecipient: SignalRecipient, transaction: DBWriteTransaction) {
         failIfThrows {
-            do {
-                try signalRecipient.delete(transaction.database)
-            } catch {
-                throw error.grdbErrorForLogging
-            }
+            try signalRecipient.delete(transaction.database)
         }
     }
 }

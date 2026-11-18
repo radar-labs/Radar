@@ -5,12 +5,12 @@
 
 import LibSignalClient
 
-@objc
-public extension TSGroupThread {
+extension TSGroupThread {
 
-    var groupId: Data { groupModel.groupId }
+    public var groupId: Data { groupModel.groupId }
 
-    var groupMembership: GroupMembership {
+    @objc
+    public var groupMembership: GroupMembership {
         groupModel.groupMembership
     }
 
@@ -18,104 +18,29 @@ public extension TSGroupThread {
 
     static let groupThreadUniqueIdPrefix = "g"
 
-    @nonobjc
-    private static let uniqueIdMappingStore = KeyValueStore(collection: "TSGroupThread.uniqueIdMappingStore")
+    /// Returns the uniqueId for the ``TSGroupThread`` with the given group ID.
+    public static func threadUniqueId(forGroupIdData groupIdData: Data, tx: DBReadTransaction) -> String? {
+        owsAssertDebug(!groupIdData.isEmpty)
 
-    private static func mappingKey(forGroupId groupId: Data) -> String {
-        groupId.hexadecimalString
-    }
-
-    private static func existingThreadId(forGroupId groupId: Data,
-                                         transaction: DBReadTransaction) -> String? {
-        owsAssertDebug(!groupId.isEmpty)
-
-        let mappingKey = self.mappingKey(forGroupId: groupId)
-        return uniqueIdMappingStore.getString(mappingKey, transaction: transaction)
-    }
-
-    /// Returns the uniqueId for the ``TSGroupThread`` with the given group ID,
-    /// if one exists.
-    ///
-    /// We've historically stored a mapping of `[GroupId: ThreadUniqueId]`,
-    /// which facilitated things like V1 -> V2 migration. We'll still check the
-    /// mapping to find the correct unique ID for old threads who had an entry
-    /// there, but for new threads going forward we'll deterministically derive
-    /// a unique ID from the group ID.
-    ///
-    /// We've actually been doing a deterministic unique ID derivation for new
-    /// threads for some time; we'd then also store that mapping, which is not
-    /// necessary.
-    static func threadId(
-        forGroupId groupId: Data,
-        transaction tx: DBReadTransaction
-    ) -> String {
-        owsAssertDebug(!groupId.isEmpty)
-
-        if let threadUniqueId = existingThreadId(
-            forGroupId: groupId, transaction: tx
-        ) {
-            return threadUniqueId
+        let threadId = GroupStore().fetchThreadId(forGroupIdData: groupIdData, tx: tx)
+        guard let threadId else {
+            return nil
         }
 
-        return defaultThreadId(forGroupId: groupId)
+        return threadUniqueId(forThreadId: threadId, tx: tx)
     }
 
-    static func defaultThreadId(forGroupId groupId: Data) -> String {
-        owsAssertDebug(!groupId.isEmpty)
+    public static func threadUniqueId(forThreadId threadId: TSThread.RowId, tx: DBReadTransaction) -> String? {
+        let fetchQuery = TSGroupThread
+            .filter(key: threadId)
+            .select(TSThread.Columns.uniqueId, as: TSThread.UniqueId.self)
 
-        return groupThreadUniqueIdPrefix + groupId.base64EncodedString()
+        return failIfThrows { try fetchQuery.fetchOne(tx.database) }
     }
 
-    /// Sets a `[GroupId: ThreadUniqueId]` mapping for a legacy thread.
-    ///
-    /// All newly-created threads use a deterministic mapping from group ID to
-    /// thread unique ID, so this is unnecessary except for legacy threads for
-    /// whom the mapping does not exist.
-    ///
-    /// - SeeAlso ``threadId(forGroupId:transaction:)``
-    static func setGroupIdMappingForLegacyThread(
-        threadUniqueId: String,
-        groupId: Data,
-        tx: DBWriteTransaction
-    ) {
-        setGroupIdMapping(threadUniqueId: threadUniqueId, groupId: groupId, tx: tx)
-
-        if GroupManager.isV1GroupId(groupId) {
-            do {
-                let v2GroupId = try self.v2GroupId(forV1GroupId: groupId)
-                setGroupIdMapping(threadUniqueId: threadUniqueId, groupId: v2GroupId, tx: tx)
-            } catch {
-                Logger.warn("Couldn't set GV2 mapping for legacy thread")
-            }
-        }
-    }
-
-    private static func v2GroupId(forV1GroupId v1GroupId: Data) throws -> Data {
-        owsPrecondition(GroupManager.isV1GroupId(v1GroupId))
-
-        let infoString = "GV2 Migration"
-        guard let keyBytes = try infoString.utf8.withContiguousStorageIfAvailable({ ptr in
-            try hkdf(
-                outputLength: GroupMasterKey.SIZE,
-                inputKeyMaterial: v1GroupId,
-                salt: [],
-                info: ptr
-            )
-        }) else {
-            owsFail("Failed to compute key bytes!")
-        }
-
-        let contextInfo = try GroupV2ContextInfo.deriveFrom(masterKeyData: keyBytes)
-        return contextInfo.groupId.serialize()
-    }
-
-    private static func setGroupIdMapping(
-        threadUniqueId: String,
-        groupId: Data,
-        tx: DBWriteTransaction
-    ) {
-        let mappingKey = mappingKey(forGroupId: groupId)
-        uniqueIdMappingStore.setString(threadUniqueId, key: mappingKey, transaction: tx)
+    static func defaultThreadUniqueId(forGroupIdData groupIdData: Data) -> String {
+        owsAssertDebug(!groupIdData.isEmpty)
+        return groupThreadUniqueIdPrefix + groupIdData.base64EncodedString()
     }
 
     // MARK: -
@@ -125,23 +50,35 @@ public extension TSGroupThread {
     /// The object is the group's unique ID as a string. Note that NotificationCenter dispatches by
     /// object identity rather than equality, so any observer should register for *all* membership
     /// changes and then filter the notifications they receive as needed.
-    static let membershipDidChange = Notification.Name("TSGroupThread.membershipDidChange")
+    public static let membershipDidChange = Notification.Name("TSGroupThread.membershipDidChange")
 
-    func updateGroupMemberRecords(transaction: DBWriteTransaction) {
+    public func updateGroupMemberRecords(transaction: DBWriteTransaction) {
         let groupMemberUpdater = DependenciesBridge.shared.groupMemberUpdater
-        groupMemberUpdater.updateRecords(groupThread: self, transaction: transaction)
+        groupMemberUpdater.updateRecords(
+            groupThreadUniqueId: self.uniqueId,
+            groupMembership: self.groupMembership,
+            transaction: transaction,
+        )
     }
-
 }
 
 // MARK: -
 
-@objc
-public extension TSThread {
-    var isLocalUserFullMemberOfThread: Bool {
+extension TSThread {
+    public var isLocalUserFullMemberOfThread: Bool {
         guard let groupThread = self as? TSGroupThread else {
             return true
         }
         return groupThread.groupModel.groupMembership.isLocalUserFullMember
+    }
+
+    public var isTerminatedGroup: Bool {
+        guard
+            let groupThread = self as? TSGroupThread,
+            let groupModelV2 = groupThread.groupModel as? TSGroupModelV2
+        else {
+            return false
+        }
+        return groupModelV2.isTerminated
     }
 }

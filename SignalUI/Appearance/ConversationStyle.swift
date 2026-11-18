@@ -8,6 +8,11 @@ public import SignalServiceKit
 // An immutable snapshot of the core styling
 // state used by CVC for a given load/render cycle.
 public struct ConversationStyle {
+    public enum MessageDirection {
+        case incoming
+        case outgoing
+        case releaseNotes
+    }
 
     public enum `Type`: UInt {
         // The style used from initialization until presentation begins.
@@ -35,14 +40,16 @@ public struct ConversationStyle {
     public let isDarkThemeEnabled: Bool
 
     public let hasWallpaper: Bool
+    // Determines blur effect for incoming message bubbles.
+    public let shouldDimWallpaperInDarkMode: Bool
 
-    public let isWallpaperPhoto: Bool
+    public let isStandaloneRenderItem: Bool
 
     private let dynamicBodyTypePointSize: CGFloat
     private let primaryTextColor: UIColor
 
     public let contentMarginTop: CGFloat = 24
-    public let contentMarginBottom: CGFloat = if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable { 8 } else { 24 }
+    public let contentMarginBottom: CGFloat = if #available(iOS 26, *) { 8 } else { 24 }
 
     public let gutterLeading: CGFloat
     public let gutterTrailing: CGFloat
@@ -55,12 +62,12 @@ public struct ConversationStyle {
     public let fullWidthGutterLeading: CGFloat
     public let fullWidthGutterTrailing: CGFloat
 
-    static public let groupMessageAvatarSizeClass = ConversationAvatarView.Configuration.SizeClass.twentyEight
-    static public let selectionViewWidth: CGFloat = 24
-    static public let messageStackSpacing: CGFloat = 8
-    static public let defaultMessageSpacing: CGFloat = 12
-    static public let compactMessageSpacing: CGFloat = 2
-    static public let systemMessageSpacing: CGFloat = 20
+    public static let groupMessageAvatarSizeClass = ConversationAvatarView.Configuration.SizeClass.twentyEight
+    public static let selectionViewWidth: CGFloat = 24
+    public static let messageStackSpacing: CGFloat = 8
+    public static let defaultMessageSpacing: CGFloat = 12
+    public static let compactMessageSpacing: CGFloat = 2
+    public static let systemMessageSpacing: CGFloat = 20
 
     public let contentWidth: CGFloat
 
@@ -74,12 +81,17 @@ public struct ConversationStyle {
 
     public let textInsetTop: CGFloat
     public let textInsetBottom: CGFloat
+    // The bottom inset to use when body text is the last component of the
+    // message bubble.
+    public let textInsetBottomBelowBodyText: CGFloat
     public let textInsetHorizontal: CGFloat
     public var textInsets: UIEdgeInsets {
-        UIEdgeInsets(top: textInsetTop,
-                     leading: textInsetHorizontal,
-                     bottom: textInsetBottom,
-                     trailing: textInsetHorizontal)
+        UIEdgeInsets(
+            top: textInsetTop,
+            leading: textInsetHorizontal,
+            bottom: textInsetBottom,
+            trailing: textInsetHorizontal,
+        )
     }
 
     // We want to align "group sender" avatars with the v-center of the
@@ -108,15 +120,16 @@ public struct ConversationStyle {
         thread: TSThread,
         viewWidth: CGFloat,
         hasWallpaper: Bool,
-        isWallpaperPhoto: Bool,
-        chatColor: ColorOrGradientSetting
+        shouldDimWallpaperInDarkMode: Bool,
+        chatColor: ColorOrGradientSetting,
+        isStandaloneRenderItem: Bool = false,
     ) {
         self.type = type
         self.viewWidth = viewWidth
         self.isDarkThemeEnabled = Theme.isDarkThemeEnabled
         self.primaryTextColor = Theme.primaryTextColor
         self.hasWallpaper = hasWallpaper
-        self.isWallpaperPhoto = isWallpaperPhoto
+        self.shouldDimWallpaperInDarkMode = shouldDimWallpaperInDarkMode
         self.chatColorSetting = chatColor
         self.chatColorValue = chatColor.asValue
 
@@ -146,6 +159,10 @@ public struct ConversationStyle {
         // (e.g. the descender) in the top margin. Note that UIFont.descender is a
         // negative value.
         textInsetBottom = max(0, round(baseFontOffset - abs(messageTextFont.descender)))
+        // The body text label also extends below the descender by the font's
+        // leading, which TextKit adds to each line fragment. Don't include that
+        // in the bottom margin either.
+        textInsetBottomBelowBodyText = max(0, round(baseFontOffset - abs(messageTextFont.descender) - messageTextFont.leading))
 
         textInsetHorizontal = 12
 
@@ -169,107 +186,239 @@ public struct ConversationStyle {
 
         let kMaxAudioMessageWidth: CGFloat = 244
         maxAudioMessageWidth = floor(min(maxMessageWidth, kMaxAudioMessageWidth))
+
+        self.isStandaloneRenderItem = isStandaloneRenderItem
     }
 
     // MARK: Colors
 
-    public static func bubbleColorIncoming(hasWallpaper: Bool,
-                                           isDarkThemeEnabled: Bool) -> UIColor {
-        if hasWallpaper {
-            return isDarkThemeEnabled ? .ows_gray95 : .white
-        } else {
-            return isDarkThemeEnabled ? UIColor.ows_gray80 : UIColor.ows_gray05
-        }
-    }
-    public var bubbleColorIncoming: UIColor {
-        Self.bubbleColorIncoming(hasWallpaper: hasWallpaper,
-                                 isDarkThemeEnabled: isDarkThemeEnabled)
-    }
-
-    public let dateBreakTextColor = UIColor.ows_gray60
-
-    public func bubbleChatColor(isIncoming: Bool) -> ColorOrGradientValue {
-        if isIncoming {
-            return .solidColor(color: bubbleColorIncoming)
-        } else {
+    /// - Returns: Bubble background color to be used for regular text messages and such.
+    public func bubbleChatColor(messageDirection: MessageDirection) -> ColorOrGradientValue {
+        switch messageDirection {
+        case .incoming:
+            return bubbleChatColorIncoming
+        case .outgoing:
             return bubbleChatColorOutgoing
+        case .releaseNotes:
+            return bubbleChatColorReleaseNotes
         }
     }
 
+    private static func bubbleBackgroundBlurEffect(
+        hasWallpaper: Bool,
+        isDarkThemeEnabled: Bool,
+        shouldDimWallpaperInDarkMode: Bool,
+    ) -> UIVisualEffect? {
+        guard hasWallpaper else { return nil }
+        guard UIAccessibility.isReduceTransparencyEnabled == false else { return nil }
+        if isDarkThemeEnabled, shouldDimWallpaperInDarkMode {
+            return UIBlurEffect(style: .systemUltraThinMaterial)
+        }
+        return UIBlurEffect(style: .systemThinMaterial)
+    }
+
+    /// - Returns: Background effect to be used for bubbles in chat if current chat environment requires one.
+    /// If current chat does not require a blur effect `nil` will be returned.
+    ///
+    /// Defines the visual effect to be used in current theme and with the current chat wallpaper.
+    /// Messages that could use this effect include, but are not limited to, incoming messages and system events.
+    public var bubbleBackgroundBlurEffect: UIVisualEffect? {
+        return Self.bubbleBackgroundBlurEffect(
+            hasWallpaper: hasWallpaper,
+            isDarkThemeEnabled: isDarkThemeEnabled,
+            shouldDimWallpaperInDarkMode: shouldDimWallpaperInDarkMode,
+        )
+    }
+
+    /// Contains logic for choosing background style to be used for incoming message bubbles.
+    ///
+    /// - Returns: Background style for incoming message bubbles when chat has provided parameters.
+    /// - Parameter hasWallpaper: Pass `true` if chat has a wallpaper. Otherwise, pass `false`.
+    /// - Parameter shouldDimWallpaperInDarkMode: Is only relevant if `hasWallpaper` is `true`.
+    /// - Parameter isDarkThemeEnabled: Pass `true` to return style to be used in dark theme.
+    public static func bubbleChatColorIncoming(
+        hasWallpaper: Bool,
+        shouldDimWallpaperInDarkMode: Bool,
+        isDarkThemeEnabled: Bool,
+    ) -> ColorOrGradientValue {
+        if UIAccessibility.isReduceTransparencyEnabled, hasWallpaper {
+            return .solidColor(color: UIColor.Signal.background)
+        }
+        if
+            let blurEffect = bubbleBackgroundBlurEffect(
+                hasWallpaper: hasWallpaper,
+                isDarkThemeEnabled: isDarkThemeEnabled,
+                shouldDimWallpaperInDarkMode: shouldDimWallpaperInDarkMode,
+            )
+        {
+            return .blur(blurEffect: blurEffect)
+        }
+        let color = UIColor { traitCollection in
+            switch (traitCollection.userInterfaceStyle, traitCollection.userInterfaceLevel) {
+            case (.dark, .elevated):
+                UIColor(rgbHex: 0x3D3D3F)
+            case (.dark, _):
+                UIColor(rgbHex: 0x2C2C2E)
+            case (_, .elevated):
+                UIColor(rgbHex: 0xEBEBEB)
+            case (_, _):
+                UIColor(rgbHex: 0xE9E9E9)
+            }
+        }
+        return .solidColor(color: color)
+    }
+
+    /// - Returns: Background style for incoming message bubble in the current chat.
+    public var bubbleChatColorIncoming: ColorOrGradientValue {
+        Self.bubbleChatColorIncoming(
+            hasWallpaper: hasWallpaper,
+            shouldDimWallpaperInDarkMode: shouldDimWallpaperInDarkMode,
+            isDarkThemeEnabled: isDarkThemeEnabled,
+        )
+    }
+
+    /// - Returns: Background style for outgoing message bubble in the current chat.
     public var bubbleChatColorOutgoing: ColorOrGradientValue {
         chatColorValue
     }
 
-    public static var bubbleTextColorIncoming: UIColor {
-        return bubbleTextColorIncomingThemed.forCurrentTheme
+    public var bubbleChatColorReleaseNotes: ColorOrGradientValue {
+        if Theme.isDarkThemeEnabled {
+            return .solidColor(color: UIColor(rgbHex: 0x444664, alpha: 1))
+        } else {
+            return .solidColor(color: UIColor(rgbHex: 0x8889B4, alpha: 1))
+        }
     }
+
+    // MARK: - Primary text color
 
     public static var bubbleTextColorIncomingThemed: ThemedColor {
-        ThemedColor(light: UIColor.ows_gray90, dark: UIColor.ows_gray05)
-    }
-
-    public static var bubbleTextColorOutgoing: UIColor {
-        return bubbleTextColorOutgoingThemed.forCurrentTheme
+        ThemedColor(light: Theme.lightThemePrimaryColor, dark: Theme.darkThemePrimaryColor)
     }
 
     public static var bubbleTextColorOutgoingThemed: ThemedColor {
-        ThemedColor(light: UIColor.ows_white, dark: UIColor.ows_gray05)
+        ThemedColor(light: UIColor.white, dark: UIColor.ows_gray05)
+    }
+
+    public static var bubbleTextColorIncoming: UIColor {
+        bubbleTextColorIncomingThemed.forCurrentTheme
+    }
+
+    public static var bubbleTextColorOutgoing: UIColor {
+        bubbleTextColorOutgoingThemed.forCurrentTheme
+    }
+
+    public static func bubbleTextColor(isIncoming: Bool) -> UIColor {
+        isIncoming ? bubbleTextColorIncoming : bubbleTextColorOutgoing
     }
 
     public var bubbleTextColorIncoming: UIColor {
         Self.bubbleTextColorIncomingThemed.color(isDarkThemeEnabled: isDarkThemeEnabled)
     }
 
-    public var bubbleSecondaryTextColorIncoming: UIColor {
-        isDarkThemeEnabled ? .ows_gray25 : .ows_gray60
-    }
-
     public var bubbleTextColorOutgoing: UIColor {
         Self.bubbleTextColorOutgoingThemed.color(isDarkThemeEnabled: isDarkThemeEnabled)
     }
 
-    public var bubbleSecondaryTextColorOutgoing: UIColor {
-        isDarkThemeEnabled ? .ows_whiteAlpha60 : .ows_whiteAlpha80
+    public var bubbleTextColorReleaseNotes: UIColor {
+        return .white
+    }
+
+    public func bubbleTextColor(isIncoming: Bool) -> UIColor {
+        isIncoming ? bubbleTextColorIncoming : bubbleTextColorOutgoing
     }
 
     public func bubbleTextColor(message: TSMessage) -> UIColor {
-        if message.wasRemotelyDeleted && !hasWallpaper {
+        if message.wasRemotelyDeleted, !hasWallpaper {
             return primaryTextColor
         } else if message is TSIncomingMessage {
             return bubbleTextColorIncoming
         } else if message is TSOutgoingMessage {
             return bubbleTextColorOutgoing
+        } else if message is TSReleaseNotesMessage {
+            return bubbleTextColorReleaseNotes
         } else {
             owsFailDebug("Unexpected message type: \(message)")
             return bubbleTextColorOutgoing
         }
     }
 
-    public func bubbleTextColor(isIncoming: Bool) -> UIColor {
-        if isIncoming {
-            return bubbleTextColorIncoming
-        } else {
-            return bubbleTextColorOutgoing
-        }
+    // MARK: - Secondary text color
+
+    private static var bubbleSecondaryTextColorIncomingThemed: ThemedColor {
+        ThemedColor(
+            light: Theme.lightThemeSecondaryTextAndIconColor,
+            dark: Theme.darkThemeSecondaryTextAndIconColor,
+        )
+    }
+
+    private static var bubbleSecondaryTextColorOutgoingThemed: ThemedColor {
+        ThemedColor(
+            light: UIColor.ows_whiteAlpha80,
+            dark: UIColor.ows_whiteAlpha60,
+        )
+    }
+
+    public static var bubbleSecondaryTextColorIncoming: UIColor {
+        bubbleSecondaryTextColorIncomingThemed.forCurrentTheme
+    }
+
+    public static var bubbleSecondaryTextColorOutgoing: UIColor {
+        bubbleSecondaryTextColorOutgoingThemed.forCurrentTheme
+    }
+
+    public static func bubbleSecondaryTextColor(isIncoming: Bool) -> UIColor {
+        isIncoming ? bubbleSecondaryTextColorIncoming : bubbleSecondaryTextColorOutgoing
+    }
+
+    public var bubbleSecondaryTextColorIncoming: UIColor {
+        Self.bubbleSecondaryTextColorIncomingThemed.color(isDarkThemeEnabled: isDarkThemeEnabled)
+    }
+
+    public var bubbleSecondaryTextColorOutgoing: UIColor {
+        Self.bubbleSecondaryTextColorOutgoingThemed.color(isDarkThemeEnabled: isDarkThemeEnabled)
+    }
+
+    public func bubbleSecondaryTextColor(isIncoming: Bool) -> UIColor {
+        isIncoming ? bubbleSecondaryTextColorIncoming : bubbleSecondaryTextColorOutgoing
+    }
+
+    // MARK: - Misc colors
+
+    public var systemMessageTextColor: UIColor {
+        hasWallpaper ? Theme.primaryTextColor : Theme.secondaryTextAndIconColor
     }
 
     public func bubbleReadMoreTextColor(message: TSMessage) -> UIColor {
         if message is TSIncomingMessage {
-            return isDarkThemeEnabled ? .ows_whiteAlpha90 : .ows_accentBlue
+            return isDarkThemeEnabled ? .ows_whiteAlpha90 : .Signal.accent
         } else if message is TSOutgoingMessage {
             return isDarkThemeEnabled ? .ows_whiteAlpha90 : .white
+        } else if message is TSReleaseNotesMessage {
+            return .ows_whiteAlpha90
         } else {
             owsFailDebug("Unexpected message type: \(message)")
             return bubbleTextColorOutgoing
         }
     }
 
-    public func bubbleSecondaryTextColor(isIncoming: Bool) -> UIColor {
-        if isIncoming {
-            return bubbleSecondaryTextColorIncoming
-        } else {
-            return bubbleSecondaryTextColorOutgoing
-        }
+    /// - Returns: Stroke configuration to use on regular bubbles in chat for the theme provided.
+    ///
+    /// The purpose of this method is to provide stroke configuration to be used with non-message bubbles (eg date headers).
+    public static func bubbleStroke(isDarkThemeEnabled: Bool) -> BubbleConfiguration.Stroke {
+        let strokeColor = isDarkThemeEnabled ? UIColor(white: 1, alpha: 0.25) : UIColor(white: 0, alpha: 0.35)
+        let strokeWidth = UITraitCollection.current.hairlineWidthFraction(2)
+        return BubbleConfiguration.Stroke(color: strokeColor, width: strokeWidth)
+    }
+
+    /// - Returns: Stroke configuration to use for incoming or outgoing message bubbles in chat.
+    ///
+    /// Unlike static method above this function will only return stroke configuration if bubbles must have one.
+    public func bubbleStroke(isIncoming: Bool) -> BubbleConfiguration.Stroke? {
+        // Only use stroke for incoming messages and if there's a wallpaper.
+        guard hasWallpaper, isIncoming else { return nil }
+
+        return ConversationStyle.bubbleStroke(isDarkThemeEnabled: isDarkThemeEnabled)
     }
 
     // Same across all themes
@@ -279,25 +428,26 @@ public struct ConversationStyle {
 }
 
 extension ConversationStyle: Equatable {
-    public static func == (lhs: ConversationStyle, rhs: ConversationStyle) -> Bool {
+    public static func ==(lhs: ConversationStyle, rhs: ConversationStyle) -> Bool {
         // We need to compare any state that could affect
         // how we render view appearance.
-        (lhs.type.isValid == rhs.type.isValid &&
-         lhs.viewWidth == rhs.viewWidth &&
-         lhs.dynamicBodyTypePointSize == rhs.dynamicBodyTypePointSize &&
-         lhs.isDarkThemeEnabled == rhs.isDarkThemeEnabled &&
-         lhs.hasWallpaper == rhs.hasWallpaper &&
-         lhs.isWallpaperPhoto == rhs.isWallpaperPhoto &&
-         lhs.maxMessageWidth == rhs.maxMessageWidth &&
-         lhs.maxMediaMessageWidth == rhs.maxMediaMessageWidth &&
-         lhs.textInsets == rhs.textInsets &&
-         lhs.gutterLeading == rhs.gutterLeading &&
-         lhs.gutterTrailing == rhs.gutterTrailing &&
-         lhs.fullWidthGutterLeading == rhs.fullWidthGutterLeading &&
-         lhs.fullWidthGutterTrailing == rhs.fullWidthGutterTrailing &&
-         lhs.textInsets == rhs.textInsets &&
-         lhs.lastTextLineAxis == rhs.lastTextLineAxis &&
-         lhs.chatColorSetting == rhs.chatColorSetting)
+        lhs.type.isValid == rhs.type.isValid &&
+            lhs.viewWidth == rhs.viewWidth &&
+            lhs.dynamicBodyTypePointSize == rhs.dynamicBodyTypePointSize &&
+            lhs.isDarkThemeEnabled == rhs.isDarkThemeEnabled &&
+            lhs.hasWallpaper == rhs.hasWallpaper &&
+            lhs.shouldDimWallpaperInDarkMode == rhs.shouldDimWallpaperInDarkMode &&
+            lhs.maxMessageWidth == rhs.maxMessageWidth &&
+            lhs.maxMediaMessageWidth == rhs.maxMediaMessageWidth &&
+            lhs.textInsets == rhs.textInsets &&
+            lhs.gutterLeading == rhs.gutterLeading &&
+            lhs.gutterTrailing == rhs.gutterTrailing &&
+            lhs.fullWidthGutterLeading == rhs.fullWidthGutterLeading &&
+            lhs.fullWidthGutterTrailing == rhs.fullWidthGutterTrailing &&
+            lhs.textInsets == rhs.textInsets &&
+            lhs.textInsetBottomBelowBodyText == rhs.textInsetBottomBelowBodyText &&
+            lhs.lastTextLineAxis == rhs.lastTextLineAxis &&
+            lhs.chatColorSetting == rhs.chatColorSetting
     }
 }
 
@@ -309,7 +459,6 @@ extension ConversationStyle: CustomDebugStringConvertible {
             "dynamicBodyTypePointSize: \(dynamicBodyTypePointSize), " +
             "isDarkThemeEnabled: \(isDarkThemeEnabled), " +
             "hasWallpaper: \(hasWallpaper), " +
-            "isWallpaperPhoto: \(isWallpaperPhoto), " +
             "maxMessageWidth: \(maxMessageWidth), " +
             "maxMediaMessageWidth: \(maxMediaMessageWidth), " +
             "textInsets: \(textInsets), " +
@@ -318,26 +467,9 @@ extension ConversationStyle: CustomDebugStringConvertible {
             "fullWidthGutterLeading: \(fullWidthGutterLeading), " +
             "fullWidthGutterTrailing: \(fullWidthGutterTrailing), " +
             "textInsets: \(textInsets), " +
+            "textInsetBottomBelowBodyText: \(textInsetBottomBelowBodyText), " +
             "lastTextLineAxis: \(lastTextLineAxis), " +
             "chatColor: \(chatColorSetting), " +
             "]"
-    }
-}
-
-extension ConversationStyle {
-    public func quotedReplyHighlightColor() -> UIColor {
-        UIColor.init(rgbHex: 0xB5B5B5)
-    }
-
-    public func quotedReplyAuthorColor() -> UIColor {
-        quotedReplyTextColor()
-    }
-
-    public func quotedReplyTextColor() -> UIColor {
-        isDarkThemeEnabled ? .ows_gray05 : .ows_gray90
-    }
-
-    public func quotedReplyAttachmentColor() -> UIColor {
-        isDarkThemeEnabled ? .ows_gray05 : UIColor.ows_gray90
     }
 }

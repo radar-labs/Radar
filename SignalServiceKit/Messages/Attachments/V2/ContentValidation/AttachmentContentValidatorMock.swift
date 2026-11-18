@@ -11,21 +11,20 @@ open class AttachmentContentValidatorMock: AttachmentContentValidator {
 
     init() {}
 
-    open func validateContents(
-        dataSource: DataSource,
-        shouldConsume: Bool,
+    open func validateDataSourceContents(
+        _ dataSource: DataSourcePath,
         mimeType: String,
         renderingFlag: AttachmentReference.RenderingFlag,
-        sourceFilename: String?
+        sourceFilename: String?,
     ) async throws -> PendingAttachment {
         throw OWSAssertionError("Unimplemented")
     }
 
-    open func validateContents(
-        data: Data,
+    open func validateDataContents(
+        _ data: Data,
         mimeType: String,
         renderingFlag: AttachmentReference.RenderingFlag,
-        sourceFilename: String?
+        sourceFilename: String?,
     ) async throws -> PendingAttachment {
         throw OWSAssertionError("Unimplemented")
     }
@@ -33,11 +32,11 @@ open class AttachmentContentValidatorMock: AttachmentContentValidator {
     open func validateDownloadedContents(
         ofEncryptedFileAt fileUrl: URL,
         attachmentKey: AttachmentKey,
-        plaintextLength: UInt32?,
-        integrityCheck: AttachmentIntegrityCheck,
+        plaintextLength: UInt32,
+        integrityCheck: AttachmentIntegrityCheck?,
         mimeType: String,
         renderingFlag: AttachmentReference.RenderingFlag,
-        sourceFilename: String?
+        sourceFilename: String?,
     ) async throws -> PendingAttachment {
         throw OWSAssertionError("Unimplemented")
     }
@@ -46,25 +45,25 @@ open class AttachmentContentValidatorMock: AttachmentContentValidator {
         ofEncryptedFileAt fileUrl: URL,
         attachmentKey: AttachmentKey,
         plaintextLength: UInt32,
-        mimeType: String
+        mimeType: String,
     ) async throws -> RevalidatedAttachment {
         throw OWSAssertionError("Unimplemented")
     }
 
-    open func validateContents(
-        ofBackupMediaFileAt fileUrl: URL,
-        outerDecryptionData: DecryptionMetadata,
-        innerDecryptionData: DecryptionMetadata,
+    open func validateBackupMediaFileContents(
+        fileUrl: URL,
+        outerAttachmentKey: AttachmentKey,
+        innerDecryptionMetadata: DecryptionMetadata,
         finalAttachmentKey: AttachmentKey,
         mimeType: String,
         renderingFlag: AttachmentReference.RenderingFlag,
-        sourceFilename: String?
-    ) async throws -> any PendingAttachment {
+        sourceFilename: String?,
+    ) async throws -> PendingAttachment {
         throw OWSAssertionError("Unimplemented")
     }
 
     struct MockValidatedMessageBody: ValidatedMessageBody {
-        var oversizeText: (any PendingAttachment)? { nil }
+        var oversizeText: PendingAttachment? { nil }
         let inlinedBody: MessageBody
 
         fileprivate init(inlinedBody: MessageBody) {
@@ -78,7 +77,7 @@ open class AttachmentContentValidatorMock: AttachmentContentValidator {
 
     open func truncatedMessageBodyForInlining(
         _ body: MessageBody,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> ValidatedInlineMessageBody {
         return MockValidatedMessageBody(inlinedBody: body)
     }
@@ -87,18 +86,19 @@ open class AttachmentContentValidatorMock: AttachmentContentValidator {
         from texts: [Key: MessageBody],
         attachmentKeys: [Key: AttachmentKey],
     ) async throws -> [Key: ValidatedMessageBody] {
-        throw OWSAssertionError("Unimplemented")
+        // Incomplete functionality.
+        return [texts.keys.first!: MockValidatedMessageBody(inlinedBody: texts.values.first!)]
     }
 
     open func prepareQuotedReplyThumbnail(
         fromOriginalAttachment: AttachmentStream,
-        originalReference: AttachmentReference
+        originalReference: AttachmentReference,
     ) async throws -> QuotedReplyAttachmentDataSource {
         throw OWSAssertionError("Unimplemented")
     }
 
     open func prepareQuotedReplyThumbnail(
-        fromOriginalAttachmentStream: AttachmentStream
+        fromOriginalAttachmentStream: AttachmentStream,
     ) async throws -> PendingAttachment {
         throw OWSAssertionError("Unimplemented")
     }

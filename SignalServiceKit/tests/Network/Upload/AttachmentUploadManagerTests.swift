@@ -6,9 +6,9 @@
 import Testing
 @testable import SignalServiceKit
 
-class AttachmentUploadManagerTests {
-    var uploadManager: AttachmentUploadManager!
-    var helper: AttachmentUploadManagerMockHelper!
+struct AttachmentUploadManagerTests {
+    let uploadManager: AttachmentUploadManager
+    let helper: AttachmentUploadManagerMockHelper
 
     init() {
         helper = AttachmentUploadManagerMockHelper()
@@ -23,11 +23,11 @@ class AttachmentUploadManagerTests {
             db: helper.mockDB,
             fileSystem: helper.mockFileSystem,
             interactionStore: helper.mockInteractionStore,
-            networkManager: helper.mockNetworkManager,
             remoteConfigProvider: helper.mockRemoteConfigProvider,
+            serviceProvider: MockServiceProvider(mockServices: [helper.mockAuthMessagesService]),
             signalService: helper.mockServiceManager,
             sleepTimer: helper.mockSleepTimer,
-            storyStore: helper.mockStoryStore
+            storyStore: helper.mockStoryStore,
         )
     }
 
@@ -35,17 +35,17 @@ class AttachmentUploadManagerTests {
     func testBasicUpload(cdn: CDNEndpoint) async throws {
         let encryptedSize: UInt32 = 20
         let unencryptedSize: UInt32 = 32
-        helper.setup(encryptedSize: encryptedSize, unencryptedSize: unencryptedSize)
+        let attachmentID = helper.setup(encryptedSize: encryptedSize, unencryptedSize: unencryptedSize)
 
         // Indexed to line up with helper.capturedRequests.
         // 0. Mock the form request
         // 1. Mock UploadLocation request
-        let attempt = helper.addUploadFormAndLocationRequestMock(cdn: cdn) { (auth, uploadLocation, resumeLocation) in
+        let attempt = helper.addUploadFormAndLocationRequestMock(cdn: cdn) { auth, uploadLocation, resumeLocation in
             // 2. Successful upload
-            helper.addUploadRequestMock(auth: auth, location: resumeLocation, type: .success)
+            helper.addUploadRequestMock(auth: auth, location: resumeLocation, type: .success(200))
         }
 
-        _ = try await uploadManager.uploadTransitTierAttachment(attachmentId: 1)
+        _ = try await uploadManager.uploadTransitTierAttachment(attachmentId: attachmentID)
 
         switch cdn {
         case .cdn2:
@@ -72,21 +72,21 @@ class AttachmentUploadManagerTests {
         let encryptedSize: UInt32 = 20
         let unencryptedSize: UInt32 = 32
         let firstUpload = 10
-        helper.setup(encryptedSize: encryptedSize, unencryptedSize: unencryptedSize)
+        let attachmentID = helper.setup(encryptedSize: encryptedSize, unencryptedSize: unencryptedSize)
 
         // Indexed to line up with helper.capturedRequests.
         // 0. Mock the form request
         // 1. Upload location request
-        let attempt = helper.addUploadFormAndLocationRequestMock(cdn: cdn) { (auth, _, location) in
+        let attempt = helper.addUploadFormAndLocationRequestMock(cdn: cdn) { auth, _, location in
             // 2. Fail the upload with a network error
             helper.addUploadRequestMock(auth: auth, location: location, type: .networkError)
             // 3. Fetch the progress (10 of 20 bytes)
             helper.addResumeProgressMock(cdn: cdn, auth: auth, location: location, type: .progress(count: firstUpload))
             // 4. Complete the upload
-            helper.addUploadRequestMock(auth: auth, location: location, type: .success)
+            helper.addUploadRequestMock(auth: auth, location: location, type: .success(200))
         }
 
-        try await uploadManager.uploadTransitTierAttachment(attachmentId: 1)
+        try await uploadManager.uploadTransitTierAttachment(attachmentId: attachmentID)
 
         if case let .uploadTask(request) = helper.capturedUploadRequests.last {
             #expect(request.httpMethod == attempt.resumeUploadHttpMethod)
@@ -109,7 +109,7 @@ class AttachmentUploadManagerTests {
                 #expect(request.allHTTPHeaderFields!["Upload-Length"] == nil)
             }
         } else { Issue.record("Unexpected request encountered.") }
-        #expect(helper.mockAttachmentUploadStore.uploadedAttachments.first!.unencryptedByteCount == unencryptedSize)
+        #expect(helper.getUploadedAttachment(id: attachmentID).unencryptedByteCount == unencryptedSize)
     }
 
     @Test(arguments: CDNEndpoint.allCases)
@@ -118,15 +118,18 @@ class AttachmentUploadManagerTests {
         let encryptedSize: Int = chunkSize + 1
         let unencryptedSize = encryptedSize
 
-        helper.setup(encryptedSize: UInt32(encryptedSize), unencryptedSize: UInt32(unencryptedSize))
+        let attachmentID = helper.setup(encryptedSize: UInt32(encryptedSize), unencryptedSize: UInt32(unencryptedSize))
 
-        let attempt2 = helper.addUploadFormAndLocationRequestMock(cdn: cdn) { (auth, _, location) in
-            helper.addUploadRequestMock(auth: auth, location: location, type: .success)
-            helper.addResumeProgressMock(cdn: cdn, auth: auth, location: location, type: .progress(count: Int(chunkSize)))
-            helper.addUploadRequestMock(auth: auth, location: location, type: .success)
+        let initialResponseCode = switch cdn {
+        case .cdn2: 308
+        case .cdn3: 200
+        }
+        let attempt2 = helper.addUploadFormAndLocationRequestMock(cdn: cdn) { auth, _, location in
+            helper.addUploadRequestMock(auth: auth, location: location, type: .success(initialResponseCode))
+            helper.addUploadRequestMock(auth: auth, location: location, type: .success(200))
         }
 
-        try await uploadManager.uploadTransitTierAttachment(attachmentId: 1)
+        try await uploadManager.uploadTransitTierAttachment(attachmentId: attachmentID)
 
         if case let .uploadTask(request) = helper.capturedUploadRequests[0] {
             #expect(request.httpMethod == attempt2.uploadHttpMethod)
@@ -134,7 +137,7 @@ class AttachmentUploadManagerTests {
             case .cdn2:
                 #expect(request.url!.absoluteString == attempt2.fetchedUploadLocation)
                 #expect(request.allHTTPHeaderFields!["Content-Length"] == "\(chunkSize)")
-                #expect(request.allHTTPHeaderFields!["content-range"] == nil)
+                #expect(request.allHTTPHeaderFields!["content-range"] == "bytes 0-\(chunkSize - 1)/\(encryptedSize)")
             case .cdn3:
                 #expect(request.allHTTPHeaderFields!["Content-Length"] == "\(chunkSize)")
                 #expect(request.allHTTPHeaderFields!["Upload-Offset"] == "0")
@@ -165,7 +168,7 @@ class AttachmentUploadManagerTests {
                 #expect(request.allHTTPHeaderFields!["upload-length"] == nil)
             }
         } else { Issue.record("Unexpected request encountered.") }
-        #expect(helper.mockAttachmentUploadStore.uploadedAttachments.first!.unencryptedByteCount == unencryptedSize)
+        #expect(helper.getUploadedAttachment(id: attachmentID).unencryptedByteCount == unencryptedSize)
     }
 
     @Test(arguments: CDNEndpoint.allCases)
@@ -174,17 +177,19 @@ class AttachmentUploadManagerTests {
         let encryptedSize: Int = (chunkSize * 2) + 10
         let unencryptedSize: Int = encryptedSize + 1 // Just to make it different than encrypted size
 
-        helper.setup(encryptedSize: UInt32(encryptedSize), unencryptedSize: UInt32(unencryptedSize))
+        let attachmentID = helper.setup(encryptedSize: UInt32(encryptedSize), unencryptedSize: UInt32(unencryptedSize))
 
-        let attempt2 = helper.addUploadFormAndLocationRequestMock(cdn: cdn) { (auth, _, location) in
-            helper.addUploadRequestMock(auth: auth, location: location, type: .success)
-            helper.addResumeProgressMock(cdn: cdn, auth: auth, location: location, type: .progress(count: Int(chunkSize)))
-            helper.addUploadRequestMock(auth: auth, location: location, type: .success)
-            helper.addResumeProgressMock(cdn: cdn, auth: auth, location: location, type: .progress(count: Int(chunkSize * 2)))
-            helper.addUploadRequestMock(auth: auth, location: location, type: .success)
+        let initialResponseCode = switch cdn {
+        case .cdn2: 308
+        case .cdn3: 200
+        }
+        let attempt2 = helper.addUploadFormAndLocationRequestMock(cdn: cdn) { auth, _, location in
+            helper.addUploadRequestMock(auth: auth, location: location, type: .success(initialResponseCode))
+            helper.addUploadRequestMock(auth: auth, location: location, type: .success(initialResponseCode))
+            helper.addUploadRequestMock(auth: auth, location: location, type: .success(200))
         }
 
-        try await uploadManager.uploadTransitTierAttachment(attachmentId: 1)
+        try await uploadManager.uploadTransitTierAttachment(attachmentId: attachmentID)
 
         if case let .uploadTask(request) = helper.capturedUploadRequests[0] {
             #expect(request.httpMethod == attempt2.uploadHttpMethod)
@@ -192,7 +197,7 @@ class AttachmentUploadManagerTests {
             case .cdn2:
                 #expect(request.url!.absoluteString == attempt2.fetchedUploadLocation)
                 #expect(request.allHTTPHeaderFields!["Content-Length"] == "\(chunkSize)")
-                #expect(request.allHTTPHeaderFields!["content-range"] == nil)
+                #expect(request.allHTTPHeaderFields!["content-range"] == "bytes 0-\(chunkSize - 1)/\(encryptedSize)")
             case .cdn3:
                 #expect(request.allHTTPHeaderFields!["Content-Length"] == "\(chunkSize)")
                 #expect(request.allHTTPHeaderFields!["Upload-Offset"] == "0")
@@ -243,14 +248,14 @@ class AttachmentUploadManagerTests {
                 #expect(request.allHTTPHeaderFields!["upload-length"] == nil)
             }
         } else { Issue.record("Unexpected request encountered.") }
-        #expect(helper.mockAttachmentUploadStore.uploadedAttachments.first!.unencryptedByteCount == unencryptedSize)
+        #expect(helper.getUploadedAttachment(id: attachmentID).unencryptedByteCount == unencryptedSize)
     }
 
     @Test(arguments: CDNEndpoint.allCases)
     func testBadRangePrefixRestartUpload(cdn: CDNEndpoint) async throws {
         let encryptedSize: UInt32 = 20
         let unencryptedSize: UInt32 = 32
-        helper.setup(encryptedSize: encryptedSize, unencryptedSize: unencryptedSize)
+        let attachmentID = helper.setup(encryptedSize: encryptedSize, unencryptedSize: unencryptedSize)
 
         // Indexed to line up with helper.capturedRequests.
         // 0. Mock the form request
@@ -261,10 +266,10 @@ class AttachmentUploadManagerTests {
             // 3. Fetch the progress (10 of 20 bytes)
             helper.addResumeProgressMock(cdn: cdn, auth: auth, location: location, type: .missingRange)
 
-            helper.addUploadRequestMock(auth: auth, location: location, type: .success)
+            helper.addUploadRequestMock(auth: auth, location: location, type: .success(200))
         }
 
-        try await uploadManager.uploadTransitTierAttachment(attachmentId: 1)
+        try await uploadManager.uploadTransitTierAttachment(attachmentId: attachmentID)
 
         if case let .uploadTask(request) = helper.capturedUploadRequests.last {
             #expect(request.url!.absoluteString == attempt.fetchedUploadLocation)
@@ -272,14 +277,14 @@ class AttachmentUploadManagerTests {
             #expect(request.allHTTPHeaderFields!["Content-Length"] == "\(encryptedSize)")
             #expect(request.allHTTPHeaderFields!["Content-Range"] == nil)
         } else { Issue.record("Unexpected request encountered.") }
-        #expect(helper.mockAttachmentUploadStore.uploadedAttachments.first!.unencryptedByteCount == unencryptedSize)
+        #expect(helper.getUploadedAttachment(id: attachmentID).unencryptedByteCount == unencryptedSize)
     }
 
     @Test(arguments: CDNEndpoint.allCases)
     func testFullRestartUpload(cdn: CDNEndpoint) async throws {
         let encryptedSize: UInt32 = 20
         let unencryptedSize: UInt32 = 32
-        helper.setup(encryptedSize: encryptedSize, unencryptedSize: unencryptedSize)
+        let attachmentID = helper.setup(encryptedSize: encryptedSize, unencryptedSize: unencryptedSize)
 
         // Indexed to line up with helper.capturedRequests.
         // 0. Mock the form request
@@ -295,10 +300,10 @@ class AttachmentUploadManagerTests {
         // 5. Upload location request
         let attempt2 = helper.addUploadFormAndLocationRequestMock(cdn: cdn) { auth, _, location in
             // 6. Complete the upload
-            helper.addUploadRequestMock(auth: auth, location: location, type: .success)
+            helper.addUploadRequestMock(auth: auth, location: location, type: .success(200))
         }
 
-        try await uploadManager.uploadTransitTierAttachment(attachmentId: 1)
+        try await uploadManager.uploadTransitTierAttachment(attachmentId: attachmentID)
 
         if case let .uploadTask(request) = helper.capturedUploadRequests.last {
             #expect(request.url!.absoluteString == attempt2.fetchedUploadLocation)
@@ -306,14 +311,14 @@ class AttachmentUploadManagerTests {
             #expect(request.allHTTPHeaderFields!["Content-Length"] == "\(encryptedSize)")
             #expect(request.allHTTPHeaderFields!["Content-Range"] == nil)
         } else { Issue.record("Unexpected request encountered.") }
-        #expect(helper.mockAttachmentUploadStore.uploadedAttachments.first!.unencryptedByteCount == unencryptedSize)
+        #expect(helper.getUploadedAttachment(id: attachmentID).unencryptedByteCount == unencryptedSize)
     }
 
     @Test(arguments: CDNEndpoint.allCases)
     func testFullRestartSwitchingCDNUpload(cdn: CDNEndpoint) async throws {
         let encryptedSize: UInt32 = 20
         let unencryptedSize: UInt32 = 32
-        helper.setup(encryptedSize: encryptedSize, unencryptedSize: unencryptedSize)
+        let attachmentID = helper.setup(encryptedSize: encryptedSize, unencryptedSize: unencryptedSize)
 
         let startCDN = cdn
         let finishCDN: CDNEndpoint = {
@@ -338,10 +343,10 @@ class AttachmentUploadManagerTests {
         // 5. Upload location request
         let attempt2 = helper.addUploadFormAndLocationRequestMock(cdn: finishCDN) { auth, _, location in
             // 6. Complete the upload
-            helper.addUploadRequestMock(auth: auth, location: location, type: .success)
+            helper.addUploadRequestMock(auth: auth, location: location, type: .success(200))
         }
 
-        try await uploadManager.uploadTransitTierAttachment(attachmentId: 1)
+        try await uploadManager.uploadTransitTierAttachment(attachmentId: attachmentID)
 
         if case let .uploadTask(request) = helper.capturedUploadRequests.last {
             #expect(request.url!.absoluteString == attempt2.fetchedUploadLocation)
@@ -349,7 +354,7 @@ class AttachmentUploadManagerTests {
             #expect(request.allHTTPHeaderFields!["Content-Length"] == "\(encryptedSize)")
             #expect(request.allHTTPHeaderFields!["Content-Range"] == nil)
         } else { Issue.record("Unexpected request encountered.") }
-        #expect(helper.mockAttachmentUploadStore.uploadedAttachments.first!.unencryptedByteCount == unencryptedSize)
+        #expect(helper.getUploadedAttachment(id: attachmentID).unencryptedByteCount == unencryptedSize)
     }
 
     /// Test getting a 500 back, and reporting local progress. Each failure should result in an increasing backoff
@@ -357,35 +362,35 @@ class AttachmentUploadManagerTests {
     func testFullRestartUploadAfter500ReportingLocalProgress(cdn: CDNEndpoint) async throws {
         let encryptedSize: UInt32 = 20
         let unencryptedSize: UInt32 = 32
-        helper.setup(encryptedSize: encryptedSize, unencryptedSize: unencryptedSize)
+        let attachmentID = helper.setup(encryptedSize: encryptedSize, unencryptedSize: unencryptedSize)
 
         // Indexed to line up with helper.capturedRequests.
         // 0. Mock the form request
         // 1. Upload location request
         let attempt = helper.addUploadFormAndLocationRequestMock(cdn: cdn) { auth, _, location in
             // 2. Fail the upload with a server error
-            helper.addUploadRequestMock(auth: auth, location: location, type: .failure(code: 500), completedCount: 20)
+            helper.addUploadRequestMock(auth: auth, location: location, type: .failure(code: 500), completedCount: (20, 20))
 
             // 3. Fetch the remote progress, but find none
             helper.addResumeProgressMock(cdn: cdn, auth: auth, location: location, type: .missingRange)
 
             // 4. Fail the upload with a server error
-            helper.addUploadRequestMock(auth: auth, location: location, type: .failure(code: 500), completedCount: 20)
+            helper.addUploadRequestMock(auth: auth, location: location, type: .failure(code: 500), completedCount: (20, 20))
 
             // 5. Fetch the remote progress, but find none
             helper.addResumeProgressMock(cdn: cdn, auth: auth, location: location, type: .missingRange)
 
             // 6. Fail the upload with a server error
-            helper.addUploadRequestMock(auth: auth, location: location, type: .failure(code: 500), completedCount: 20)
+            helper.addUploadRequestMock(auth: auth, location: location, type: .failure(code: 500), completedCount: (20, 20))
 
             // 7. Fetch the remote progress, but find none
             helper.addResumeProgressMock(cdn: cdn, auth: auth, location: location, type: .missingRange)
 
             // 8. Succeed the upload
-            helper.addUploadRequestMock(auth: auth, location: location, type: .success, completedCount: 20)
+            helper.addUploadRequestMock(auth: auth, location: location, type: .success(200), completedCount: (20, 20))
         }
 
-        try await uploadManager.uploadTransitTierAttachment(attachmentId: 1)
+        try await uploadManager.uploadTransitTierAttachment(attachmentId: attachmentID)
 
         #expect(helper.mockSleepTimer.requestedDelays.count == 3)
 
@@ -395,14 +400,14 @@ class AttachmentUploadManagerTests {
             #expect(request.allHTTPHeaderFields!["Content-Length"] == "\(encryptedSize)")
             #expect(request.allHTTPHeaderFields!["Content-Range"] == nil)
         } else { Issue.record("Unexpected request encountered.") }
-        #expect(helper.mockAttachmentUploadStore.uploadedAttachments.first!.unencryptedByteCount == unencryptedSize)
+        #expect(helper.getUploadedAttachment(id: attachmentID).unencryptedByteCount == unencryptedSize)
     }
 
     @Test(arguments: CDNEndpoint.allCases)
     func testNetworkTimeoutResumeUpload(cdn: CDNEndpoint) async throws {
         let encryptedSize: UInt32 = 20
         let unencryptedSize: UInt32 = 32
-        helper.setup(encryptedSize: encryptedSize, unencryptedSize: unencryptedSize)
+        let attachmentID = helper.setup(encryptedSize: encryptedSize, unencryptedSize: unencryptedSize)
 
         // Indexed to line up with helper.capturedRequests.
         // 0. Mock the form request
@@ -427,10 +432,10 @@ class AttachmentUploadManagerTests {
             helper.addResumeProgressMock(cdn: cdn, auth: auth, location: location, type: .progress(count: 15))
 
             // 8. Succeed the upload
-            helper.addUploadRequestMock(auth: auth, location: location, type: .success, completedCount: 20)
+            helper.addUploadRequestMock(auth: auth, location: location, type: .success(200), completedCount: (20, 20))
         }
 
-        try await uploadManager.uploadTransitTierAttachment(attachmentId: 1)
+        try await uploadManager.uploadTransitTierAttachment(attachmentId: attachmentID)
 
         // Since these are network timeouts, and the remote endpoint is showing progress being made
         // there shouldn't be any backoff timers fired.
@@ -441,7 +446,7 @@ class AttachmentUploadManagerTests {
             #expect(request.httpMethod == attempt.resumeUploadHttpMethod)
             #expect(request.allHTTPHeaderFields!["Content-Range"] == nil)
         } else { Issue.record("Unexpected request encountered.") }
-        #expect(helper.mockAttachmentUploadStore.uploadedAttachments.first!.unencryptedByteCount == unencryptedSize)
+        #expect(helper.getUploadedAttachment(id: attachmentID).unencryptedByteCount == unencryptedSize)
     }
 
     // MARK: Testing reupload strategies
@@ -452,17 +457,16 @@ class AttachmentUploadManagerTests {
         helper.mockDate = uploadTimestamp.addingTimeInterval(Upload.Constants.uploadReuseWindow / 2)
 
         // Set up an attachment that isn't a stream.
-        helper.mockAttachmentStore.mockFetcher = { _ in
-            return MockAttachment.mock(
-                streamInfo: nil,
+        let attachmentID = helper.insertMockAttachment(
+            Attachment.mock(
                 transitTierInfo: .mock(
-                    uploadTimestamp: uploadTimestamp.ows_millisecondsSince1970
-                )
-            )
-        }
+                    uploadTimestamp: uploadTimestamp.ows_millisecondsSince1970,
+                ),
+            ),
+        )
 
         do {
-            try await uploadManager.uploadTransitTierAttachment(attachmentId: 1)
+            try await uploadManager.uploadTransitTierAttachment(attachmentId: attachmentID)
             Issue.record("Should fail to upload!")
         } catch {
             // Success
@@ -474,15 +478,15 @@ class AttachmentUploadManagerTests {
         // Set up an already uploaded attachment that is still in the time window.
         let uploadTimestamp = Date(timeIntervalSinceNow: -10000)
         helper.mockDate = uploadTimestamp.addingTimeInterval(Upload.Constants.uploadReuseWindow / 2)
-        helper.mockAttachmentStore.mockFetcher = { _ in
-            return MockAttachmentStream.mock(
+        let attachmentID = helper.insertMockAttachment(
+            AttachmentStream.mock(
                 transitTierInfo: .mock(
-                    uploadTimestamp: uploadTimestamp.ows_millisecondsSince1970
-                )
-            ).attachment
-        }
+                    uploadTimestamp: uploadTimestamp.ows_millisecondsSince1970,
+                ),
+            ).attachment,
+        )
 
-        try await uploadManager.uploadTransitTierAttachment(attachmentId: 1)
+        try await uploadManager.uploadTransitTierAttachment(attachmentId: attachmentID)
 
         #expect(helper.capturedRequests.isEmpty)
     }
@@ -491,13 +495,13 @@ class AttachmentUploadManagerTests {
     func testUseLocalEncryptionInfo(cdn: CDNEndpoint) async throws {
         // Set up an attachment we've never uploaded so we reuse the local stream info.
         let encryptedSize: UInt32 = 27
-        helper.setup(
+        let attachmentID = helper.setup(
             encryptedUploadSize: encryptedSize,
-            mockAttachment: MockAttachmentStream.mock(
+            mockAttachment: AttachmentStream.mock(
                 streamInfo: .mock(encryptedByteCount: encryptedSize),
                 transitTierInfo: nil,
-                mediaTierInfo: nil
-            ).attachment
+                mediaTierInfo: nil,
+            ).attachment,
         )
 
         // Indexed to line up with helper.capturedRequests.
@@ -505,10 +509,10 @@ class AttachmentUploadManagerTests {
         // 1. Mock UploadLocation request
         let attempt = helper.addUploadFormAndLocationRequestMock(cdn: cdn) { auth, uploadLocation, location in
             // 2. Successful upload
-            helper.addUploadRequestMock(auth: auth, location: location, type: .success)
+            helper.addUploadRequestMock(auth: auth, location: location, type: .success(200))
         }
 
-        _ = try await uploadManager.uploadTransitTierAttachment(attachmentId: 1)
+        _ = try await uploadManager.uploadTransitTierAttachment(attachmentId: attachmentID)
 
         switch cdn {
         case .cdn2:
@@ -541,17 +545,17 @@ class AttachmentUploadManagerTests {
             uploadTimestamp: helper.mockDate
                 .addingTimeInterval(Upload.Constants.uploadReuseWindow * -2)
                 .ows_millisecondsSince1970,
-            unencryptedByteCount: encryptedSize + 2
+            unencryptedByteCount: encryptedSize + 2,
         )
 
-        let attachment = MockAttachmentStream.mock(
+        let attachment = AttachmentStream.mock(
             streamInfo: streamInfo,
             transitTierInfo: transitTierInfo,
-            mediaTierInfo: nil
+            mediaTierInfo: nil,
         ).attachment
-        helper.setup(
+        let attachmentID = helper.setup(
             encryptedUploadSize: encryptedSize,
-            mockAttachment: attachment
+            mockAttachment: attachment,
         )
 
         var didDecrypt = false
@@ -575,10 +579,10 @@ class AttachmentUploadManagerTests {
         // 1. Mock UploadLocation request
         let attempt = helper.addUploadFormAndLocationRequestMock(cdn: cdn) { auth, uploadLocation, location in
             // 2. Successful upload
-            helper.addUploadRequestMock(auth: auth, location: location, type: .success)
+            helper.addUploadRequestMock(auth: auth, location: location, type: .success(200))
         }
 
-        _ = try await uploadManager.uploadTransitTierAttachment(attachmentId: 1)
+        _ = try await uploadManager.uploadTransitTierAttachment(attachmentId: attachmentID)
 
         switch cdn {
         case .cdn2:
@@ -610,14 +614,14 @@ class AttachmentUploadManagerTests {
         // We should use fresh encryption, so set these to intentionally
         // non matching sizes.
         let streamInfo = Attachment.StreamInfo.mock(encryptedByteCount: encryptedSize + 1)
-        let attachment = MockAttachmentStream.mock(
+        let attachment = AttachmentStream.mock(
             streamInfo: streamInfo,
             transitTierInfo: nil,
-            mediaTierInfo: .mock()
+            mediaTierInfo: .mock(),
         ).attachment
-        helper.setup(
+        let attachmentID = helper.setup(
             encryptedUploadSize: encryptedSize,
-            mockAttachment: attachment
+            mockAttachment: attachment,
         )
 
         var didDecrypt = false
@@ -641,10 +645,10 @@ class AttachmentUploadManagerTests {
         // 1. Mock UploadLocation request
         let attempt = helper.addUploadFormAndLocationRequestMock(cdn: cdn) { auth, uploadLocation, location in
             // 2. Successful upload
-            helper.addUploadRequestMock(auth: auth, location: location, type: .success)
+            helper.addUploadRequestMock(auth: auth, location: location, type: .success(200))
         }
 
-        _ = try await uploadManager.uploadTransitTierAttachment(attachmentId: 1)
+        _ = try await uploadManager.uploadTransitTierAttachment(attachmentId: attachmentID)
 
         switch cdn {
         case .cdn2:

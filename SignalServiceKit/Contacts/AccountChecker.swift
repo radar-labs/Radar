@@ -9,11 +9,12 @@ import LibSignalClient
 public class AccountChecker {
     private let db: any DB
     private let networkManager: NetworkManager
-    private let recipientFetcher: any RecipientFetcher
+    private let recipientFetcher: RecipientFetcher
     private let recipientManager: any SignalRecipientManager
     private let recipientMerger: any RecipientMerger
     private let recipientStore: RecipientDatabaseTable
     private let tsAccountManager: any TSAccountManager
+    private let chatConnectionManager: ChatConnectionManager
 
     struct RateLimitError: Error, IsRetryableProvider {
         var retryAfter: TimeInterval
@@ -25,11 +26,12 @@ public class AccountChecker {
     init(
         db: any DB,
         networkManager: NetworkManager,
-        recipientFetcher: any RecipientFetcher,
+        recipientFetcher: RecipientFetcher,
         recipientManager: any SignalRecipientManager,
         recipientMerger: any RecipientMerger,
         recipientStore: RecipientDatabaseTable,
-        tsAccountManager: any TSAccountManager
+        tsAccountManager: any TSAccountManager,
+        chatConnectionManager: ChatConnectionManager,
     ) {
         self.db = db
         self.networkManager = networkManager
@@ -38,37 +40,39 @@ public class AccountChecker {
         self.recipientMerger = recipientMerger
         self.recipientStore = recipientStore
         self.tsAccountManager = tsAccountManager
+        self.chatConnectionManager = chatConnectionManager
     }
 
     /// Checks if an account exists for `serviceId`.
     ///
     /// If it exists, the `SignalRecipient` is marked as "registered". If it
     /// doesn't exist, the `SignalRecipient` is marked as "unregistered".
-    func checkIfAccountExists(serviceId: ServiceId) async throws {
-        let accountRequest = OWSRequestFactory.accountRequest(serviceId: serviceId)
+    func checkIfAccountExists(serviceId: ServiceId) async throws -> Bool {
+        var exists = true
         do {
-            let response = try await networkManager.asyncRequest(accountRequest)
-            guard response.responseStatusCode == 200 else {
-                throw OWSGenericError("Unexpected server response.")
+            try await chatConnectionManager.withUnauthService(.profiles) {
+                exists = try await $0.accountExists(serviceId)
             }
+        } catch let SignalError.rateLimitedError(retryAfter: retryAfter, message: _) {
+            throw RateLimitError(retryAfter: retryAfter)
+        }
+        if exists {
             await db.awaitableWrite { tx in
                 var recipient = recipientFetcher.fetchOrCreate(serviceId: serviceId, tx: tx)
                 recipientManager.markAsRegisteredAndSave(&recipient, shouldUpdateStorageService: true, tx: tx)
             }
-        } catch where error.httpStatusCode == 429 {
-            throw RateLimitError(retryAfter: error.httpResponseHeaders?.retryAfterTimeInterval ?? 0)
-        } catch where error.httpStatusCode == 404 {
+        } else {
             await db.awaitableWrite { tx in
                 self.markAsUnregisteredAndSplitRecipientIfNeeded(serviceId: serviceId, shouldUpdateStorageService: true, tx: tx)
             }
-            throw error
         }
+        return exists
     }
 
     func markAsUnregisteredAndSplitRecipientIfNeeded(
         serviceId: ServiceId,
         shouldUpdateStorageService: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         AssertNotOnMainThread()
 
@@ -80,7 +84,7 @@ public class AccountChecker {
             &recipient,
             unregisteredAt: .now,
             shouldUpdateStorageService: shouldUpdateStorageService,
-            tx: tx
+            tx: tx,
         )
 
         guard let localIdentifiers = tsAccountManager.localIdentifiers(tx: tx) else {
@@ -91,7 +95,8 @@ public class AccountChecker {
         recipientMerger.splitUnregisteredRecipientIfNeeded(
             localIdentifiers: localIdentifiers,
             unregisteredRecipient: &recipient,
-            tx: tx
+            shouldUpdateStorageService: true,
+            tx: tx,
         )
     }
 }

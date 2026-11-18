@@ -10,6 +10,7 @@ public import LibSignalClient
 public enum OWSDeviceNameError: Error {
     case assertionFailure
     case invalidInput
+    case emptyName
     case cryptError(_ description: String)
 }
 
@@ -39,7 +40,7 @@ public enum OWSDeviceNames {
         let protoBuilder = SignalIOSProtoDeviceName.builder(
             ephemeralPublic: ephemeralKeyPair.publicKey.serialize(),
             syntheticIv: syntheticIV,
-            ciphertext: ciphertext
+            ciphertext: ciphertext,
         )
         return try protoBuilder.buildSerializedData()
     }
@@ -98,8 +99,7 @@ public enum OWSDeviceNames {
             throw OWSDeviceNameError.assertionFailure
         }
         guard ciphertext.count > 0 else {
-            owsFailDebug("Invalid cipher text.")
-            throw OWSDeviceNameError.assertionFailure
+            throw OWSDeviceNameError.emptyName
         }
 
         // master_secret = ECDH(identity_private, ephemeral_public)

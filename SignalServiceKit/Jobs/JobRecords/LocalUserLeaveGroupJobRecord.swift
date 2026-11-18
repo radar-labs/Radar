@@ -7,8 +7,8 @@ import Foundation
 import GRDB
 import LibSignalClient
 
-public final class LocalUserLeaveGroupJobRecord: JobRecord, FactoryInitializableFromRecordType {
-    override class var jobRecordType: JobRecordType { .localUserLeaveGroup }
+public final class LocalUserLeaveGroupJobRecord: JobRecord {
+    override public class var jobRecordType: JobRecordType { .localUserLeaveGroup }
 
     let threadId: String
     let replacementAdminAciString: String?
@@ -19,7 +19,7 @@ public final class LocalUserLeaveGroupJobRecord: JobRecord, FactoryInitializable
         replacementAdminAci: Aci?,
         waitForMessageProcessing: Bool,
         failureCount: UInt = 0,
-        status: Status = .ready
+        status: Status = .ready,
     ) {
         self.threadId = threadId
         self.replacementAdminAciString = replacementAdminAci?.serviceIdUppercaseString
@@ -27,25 +27,23 @@ public final class LocalUserLeaveGroupJobRecord: JobRecord, FactoryInitializable
 
         super.init(
             failureCount: failureCount,
-            status: status
+            status: status,
         )
     }
 
-    required init(forRecordTypeFactoryInitializationFrom decoder: Decoder) throws {
+    required init(inheritableDecoder decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         threadId = try container.decode(String.self, forKey: .threadId)
         replacementAdminAciString = try container.decodeIfPresent(String.self, forKey: .replacementAdminAciString)
         waitForMessageProcessing = try container.decode(Bool.self, forKey: .waitForMessageProcessing)
 
-        try super.init(baseClassDuringFactoryInitializationFrom: container.superDecoder())
+        try super.init(inheritableDecoder: decoder)
     }
 
     override public func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
-
-        try super.encode(to: container.superEncoder())
-
         try container.encode(threadId, forKey: .threadId)
         try container.encodeIfPresent(replacementAdminAciString, forKey: .replacementAdminAciString)
         try container.encode(waitForMessageProcessing, forKey: .waitForMessageProcessing)

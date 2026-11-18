@@ -6,7 +6,39 @@
 public import Contacts
 
 @objc(OWSContactPhoneNumber)
-public class OWSContactPhoneNumber: MTLModel, OWSContactField {
+public final class OWSContactPhoneNumber: NSObject, NSSecureCoding, OWSContactField {
+    public static var supportsSecureCoding: Bool { true }
+
+    public init?(coder: NSCoder) {
+        self.label = coder.decodeObject(of: NSString.self, forKey: "label") as String?
+        self.phoneNumber = coder.decodeObject(of: NSString.self, forKey: "phoneNumber") as String? ?? ""
+        self.type = (coder.decodeObject(of: NSNumber.self, forKey: "phoneType")?.intValue).flatMap(`Type`.init(rawValue:)) ?? .home
+    }
+
+    public func encode(with coder: NSCoder) {
+        if let label {
+            coder.encode(label, forKey: "label")
+        }
+        coder.encode(self.phoneNumber, forKey: "phoneNumber")
+        coder.encode(NSNumber(value: self.type.rawValue), forKey: "phoneType")
+    }
+
+    override public var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(label)
+        hasher.combine(phoneNumber)
+        hasher.combine(type)
+        return hasher.finalize()
+    }
+
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard Swift.type(of: self) == Swift.type(of: object) else { return false }
+        guard self.label == object.label else { return false }
+        guard self.phoneNumber == object.phoneNumber else { return false }
+        guard self.type == object.type else { return false }
+        return true
+    }
 
     @objc(OWSContactPhoneType)
     public enum `Type`: Int, CustomStringConvertible {
@@ -25,33 +57,17 @@ public class OWSContactPhoneNumber: MTLModel, OWSContactField {
         }
     }
 
-    @objc(phoneType)
-    public private(set) var type: `Type` = .home
+    public let type: `Type`
 
     // Applies in the Type.custom case.
-    @objc
-    public private(set) var label: String?
-
-    @objc
-    public private(set) var phoneNumber: String = ""
-
-    public override init() {
-        super.init()
-    }
+    public let label: String?
+    public let phoneNumber: String
 
     public init(type: Type, label: String? = nil, phoneNumber: String) {
         self.type = type
         self.label = label
         self.phoneNumber = phoneNumber
         super.init()
-    }
-
-    required init!(coder: NSCoder!) {
-        super.init(coder: coder)
-    }
-
-    required init(dictionary dictionaryValue: [String: Any]!) throws {
-        try super.init(dictionary: dictionaryValue)
     }
 
     public var e164: String? {
@@ -116,7 +132,7 @@ extension OWSContactPhoneNumber {
             type = .custom
             customLabel = SystemContact.localizedString(
                 forCNLabel: cnLabeledValue.label,
-                labeledValueType: CNLabeledValue<CNPhoneNumber>.self
+                labeledValueType: CNLabeledValue<CNPhoneNumber>.self,
             )
         }
 

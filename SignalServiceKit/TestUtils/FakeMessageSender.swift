@@ -7,16 +7,15 @@ import Foundation
 
 #if TESTABLE_BUILD
 
-class FakeMessageSender: MessageSender {
-    public var stubbedFailingErrors = [Error?]()
-    public var sentMessages = [TSOutgoingMessage]()
-    public var sendMessageWasCalledBlock: ((TSOutgoingMessage) -> Void)?
+public class FakeMessageSender: MessageSender {
+    var stubbedFailingErrors = [Error?]()
+    var sentMessages = [TSOutgoingMessage]()
+    var sendMessageWasCalledBlock: ((TSOutgoingMessage) -> Void)?
 
-    init(accountChecker: AccountChecker) {
-        super.init(accountChecker: accountChecker, groupSendEndorsementStore: GroupSendEndorsementStoreImpl())
+    public init() {
     }
 
-    override func sendMessage(_ preparedMessage: PreparedOutgoingMessage) async -> MessageSender.SendResult {
+    public func sendMessage(_ preparedMessage: PreparedOutgoingMessage) async -> SendMessageResult {
         do {
             try await preparedMessage.send { message in
                 sentMessages.append(message)

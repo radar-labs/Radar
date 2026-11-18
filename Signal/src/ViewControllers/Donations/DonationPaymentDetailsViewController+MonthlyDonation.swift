@@ -14,10 +14,15 @@ extension DonationPaymentDetailsViewController {
         with validForm: FormState.ValidForm,
         newSubscriptionLevel: DonationSubscriptionLevel,
         priorSubscriptionLevel: DonationSubscriptionLevel?,
-        subscriberID existingSubscriberId: Data?
+        subscriberID existingSubscriberId: Data?,
     ) {
+        let db = DependenciesBridge.shared.db
+        let donationPermitFetcher = DependenciesBridge.shared.donationPermitFetcher
+        let donationSubscriptionManager = DependenciesBridge.shared.donationSubscriptionManager
+        let idealStore = DependenciesBridge.shared.pendingIDEALDonationStore
+        let networkManager = SSKEnvironment.shared.networkManagerRef
+
         let currencyCode = self.donationAmount.currencyCode
-        let donationStore = DependenciesBridge.shared.externalPendingIDEALDonationStore
 
         Logger.info("[Donations] Starting monthly donation")
 
@@ -28,22 +33,32 @@ extension DonationPaymentDetailsViewController {
                     operation: {
                         if let existingSubscriberId {
                             Logger.info("[Donations] Cancelling existing subscription")
-                            try await DonationSubscriptionManager.cancelSubscription(for: existingSubscriberId)
+                            try await donationSubscriptionManager.cancelSubscription(for: existingSubscriberId)
                         } else {
                             Logger.info("[Donations] No existing subscription to cancel")
                         }
 
                         Logger.info("[Donations] Preparing new monthly subscription")
-                        let subscriberId = try await DonationSubscriptionManager.prepareNewSubscription(currencyCode: currencyCode)
+                        let subscriberId = try await donationSubscriptionManager.prepareNewSubscription(currencyCode: currencyCode)
 
                         Logger.info("[Donations] Creating Signal payment method for new monthly subscription")
-                        let clientSecret = try await Stripe.createSignalPaymentMethodForSubscription(subscriberId: subscriberId)
+                        let clientSecret = try await Retry.performWithBackoff(maxAttempts: 3) {
+                            let donationPermit = try await donationPermitFetcher.fetchDonationPermit()
+
+                            return try await Stripe.createSignalPaymentMethodForSubscription(
+                                subscriberId: subscriberId,
+                                donationPermit: donationPermit,
+                                networkManager: networkManager,
+                            )
+                        }
 
                         Logger.info("[Donations] Authorizing payment for new monthly subscription")
-                        let confirmedIntent = try await Stripe.setupNewSubscription(
-                            clientSecret: clientSecret,
-                            paymentMethod: validForm.stripePaymentMethod
-                        )
+                        let confirmedIntent = try await Retry.performWithBackoff(maxAttempts: 3) {
+                            try await Stripe.setupNewSubscription(
+                                clientSecret: clientSecret,
+                                paymentMethod: validForm.stripePaymentMethod,
+                            )
+                        }
 
                         if let redirectToUrl = confirmedIntent.redirectToUrl {
                             if case .ideal = validForm.donationPaymentMethod {
@@ -52,16 +67,21 @@ extension DonationPaymentDetailsViewController {
                                     subscriberId: subscriberId,
                                     clientSecret: clientSecret,
                                     setupIntentId: confirmedIntent.setupIntentId,
-                                    newSubscriptionLevel: newSubscriptionLevel,
-                                    oldSubscriptionLevel: priorSubscriptionLevel,
-                                    amount: self.donationAmount
+                                    newSubscriptionLevel: newSubscriptionLevel.level,
+                                    oldSubscriptionLevel: priorSubscriptionLevel?.level,
+                                    amount: self.donationAmount,
                                 )
-                                await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
-                                    do {
-                                        try donationStore.setPendingSubscription(donation: confirmedDonation, tx: tx)
-                                    } catch {
-                                        owsFailDebug("[Donations] Failed to persist pending iDEAL subscription.")
-                                    }
+                                await db.awaitableWrite { tx in
+                                    // Set the unclaimed iDEAL paymentID
+                                    idealStore.setDonationNeedsHandling(
+                                        isOneTime: false,
+                                        intentId: confirmedIntent.setupIntentId,
+                                        tx: tx,
+                                    )
+                                    idealStore.setPendingSubscription(
+                                        donation: confirmedDonation,
+                                        tx: tx,
+                                    )
                                 }
                             } else {
                                 Logger.info("[Donations] Subscription requires 3DS authentication. Presenting...")
@@ -79,15 +99,32 @@ extension DonationPaymentDetailsViewController {
                             paymentType = .ideal(setupIntentId: confirmedIntent.setupIntentId)
                         }
 
-                        try await DonationViewsUtil.completeMonthlyDonations(
+                        if case .ideal(let intentId) = paymentType {
+                            let hasDonationToClaim = await db.awaitableWrite { tx in
+                                idealStore.claimDonationHandling(
+                                    isOneTime: false,
+                                    intentId: intentId,
+                                    tx: tx,
+                                )
+                            }
+
+                            if !hasDonationToClaim {
+                                Logger.info("[Donations] Monthly iDEAL donation already handled. Continuing")
+                                return
+                            }
+                        }
+
+                        try await DonationViewsUtil.finalizeAndRedeemMonthlyDonation(
                             subscriberId: subscriberId,
                             paymentType: paymentType,
-                            newSubscriptionLevel: newSubscriptionLevel,
-                            priorSubscriptionLevel: priorSubscriptionLevel,
+                            newSubscriptionLevel: newSubscriptionLevel.level,
+                            priorSubscriptionLevel: priorSubscriptionLevel?.level,
                             currencyCode: currencyCode,
-                            databaseStorage: SSKEnvironment.shared.databaseStorageRef
+                            db: db,
+                            donationSubscriptionManager: donationSubscriptionManager,
+                            idealStore: idealStore,
                         )
-                    }
+                    },
                 )
                 Logger.info("[Donations] Monthly donation finished")
                 self.onFinished(nil)

@@ -13,16 +13,16 @@ class EmojiMoodPickerView: UIView {
 
     var selectedMood: Mood? {
         didSet {
-            moodButtons.forEach { (mood, button) in
+            moodButtons.forEach { mood, button in
                 button.isSelected = (mood == selectedMood)
             }
         }
     }
 
-    private let moodButtons: [Mood: UIButton] = Mood.allCases.dictionaryMappingToValues { (mood) in
+    private let moodButtons: [Mood: UIButton] = Mood.allCases.dictionaryMappingToValues { mood in
         let button = UIButton(type: .custom)
         let title = NSAttributedString(string: "\(mood.emojiRepresentation)", attributes: [
-            .font: UIFont.boldSystemFont(ofSize: 24)
+            .font: UIFont.boldSystemFont(ofSize: 24),
         ])
         button.clipsToBounds = true
         button.setAttributedTitle(title, for: .normal)
@@ -42,7 +42,13 @@ class EmojiMoodPickerView: UIView {
 
         let orderedButtons = Mood.allCases.compactMap { moodButtons[$0] }
         for button in orderedButtons {
-            button.addTarget(self, action: #selector(buttonWasTapped(_:)), for: .touchUpInside)
+            button.addAction(
+                UIAction { [weak self] action in
+                    guard let self, let button = action.sender as? UIButton else { return }
+                    self.buttonWasTapped(button)
+                },
+                for: .primaryActionTriggered,
+            )
             buttonStack.addArrangedSubview(button)
         }
 
@@ -78,7 +84,6 @@ class EmojiMoodPickerView: UIView {
 
     // MARK: - Button responder
 
-    @objc
     private func buttonWasTapped(_ button: UIButton) {
         // When this action is invoked, our selection state hasn't been updated yet
         // If we were not selected, we're being selected
@@ -94,9 +99,9 @@ class EmojiMoodPickerView: UIView {
     @objc
     private func applyTheme() {
         let defaultButtonBackground = Theme.isDarkThemeEnabled ? UIColor.ows_gray80 : UIColor.ows_gray05
-        let selectedButtonBackground = Theme.accentBlueColor
+        let selectedButtonBackground = UIColor.Signal.accent
 
-        moodButtons.values.forEach { (button) in
+        moodButtons.values.forEach { button in
             button.setBackgroundImage(UIImage.image(color: defaultButtonBackground), for: .normal)
             button.setBackgroundImage(UIImage.image(color: selectedButtonBackground), for: .selected)
         }

@@ -5,8 +5,7 @@
 
 import LibSignalClient
 
-public class BackupArchivePostFrameRestoreActionManager {
-    typealias SharedMap = BackupArchive.SharedMap
+class BackupArchivePostFrameRestoreActionManager {
     typealias RecipientId = BackupArchive.RecipientId
     typealias RecipientActions = BackupArchive.RecipientRestoringContext.PostFrameRestoreActions
     typealias ChatId = BackupArchive.ChatId
@@ -16,6 +15,7 @@ public class BackupArchivePostFrameRestoreActionManager {
     private let dateProvider: DateProvider
     private let interactionStore: BackupArchiveInteractionStore
     private let lastVisibleInteractionStore: LastVisibleInteractionStore
+    private let pinnedThreadManager: any PinnedThreadManager
     private let preferences: BackupArchive.Shims.Preferences
     private let recipientDatabaseTable: RecipientDatabaseTable
     private let sskPreferences: BackupArchive.Shims.SSKPreferences
@@ -26,15 +26,17 @@ public class BackupArchivePostFrameRestoreActionManager {
         dateProvider: @escaping DateProvider,
         interactionStore: BackupArchiveInteractionStore,
         lastVisibleInteractionStore: LastVisibleInteractionStore,
+        pinnedThreadManager: any PinnedThreadManager,
         preferences: BackupArchive.Shims.Preferences,
         recipientDatabaseTable: RecipientDatabaseTable,
         sskPreferences: BackupArchive.Shims.SSKPreferences,
-        threadStore: BackupArchiveThreadStore
+        threadStore: BackupArchiveThreadStore,
     ) {
         self.avatarFetcher = avatarFetcher
         self.dateProvider = dateProvider
         self.interactionStore = interactionStore
         self.lastVisibleInteractionStore = lastVisibleInteractionStore
+        self.pinnedThreadManager = pinnedThreadManager
         self.preferences = preferences
         self.recipientDatabaseTable = recipientDatabaseTable
         self.sskPreferences = sskPreferences
@@ -44,10 +46,10 @@ public class BackupArchivePostFrameRestoreActionManager {
     // MARK: -
 
     func performPostFrameRestoreActions(
-        recipientActions: SharedMap<RecipientId, RecipientActions>,
-        chatActions: SharedMap<ChatId, ChatActions>,
+        recipientActions: [RecipientId: RecipientActions],
+        chatActions: [ChatId: ChatActions],
         bencher: BackupArchive.RestoreBencher,
-        chatItemContext: BackupArchive.ChatItemRestoringContext
+        chatItemContext: BackupArchive.ChatItemRestoringContext,
     ) throws {
         for (recipientId, actions) in recipientActions {
             if actions.insertContactHiddenInfoMessage {
@@ -76,7 +78,7 @@ public class BackupArchivePostFrameRestoreActionManager {
                     try threadStore.markVisible(
                         thread: thread,
                         lastInteractionRowId: actions.lastVisibleInteractionRowId,
-                        context: chatItemContext.chatContext
+                        context: chatItemContext.chatContext,
                     )
                 }
                 if
@@ -90,10 +92,10 @@ public class BackupArchivePostFrameRestoreActionManager {
                     lastVisibleInteractionStore.setLastVisibleInteraction(
                         TSThread.LastVisibleInteraction(
                             sortId: lastVisibleInteractionRowId,
-                            onScreenPercentage: 1
+                            onScreenPercentage: 1,
                         ),
                         for: thread.tsThread,
-                        tx: chatItemContext.tx
+                        tx: chatItemContext.tx,
                     )
                 }
                 switch thread.threadType {
@@ -103,7 +105,7 @@ public class BackupArchivePostFrameRestoreActionManager {
                     try updateLastInteractionTimestamps(
                         for: groupThread,
                         actions: actions,
-                        context: chatItemContext.chatContext
+                        context: chatItemContext.chatContext,
                     )
                 }
             }
@@ -111,6 +113,18 @@ public class BackupArchivePostFrameRestoreActionManager {
         if wasAnyThreadVisible {
             sskPreferences.setHasSavedThread(true, tx: chatItemContext.tx)
         }
+
+        let pinnedThreads = chatActions
+            .compactMapValues(\.pinnedOrder)
+            .sorted(by: { $0.value < $1.value })
+            .compactMap({ (chatId, _) -> TSThread? in
+                guard let item = chatItemContext.chatContext[chatId] else {
+                    owsFailDebug("can't restore pinned item missing its context")
+                    return nil
+                }
+                return item.tsThread
+            })
+        pinnedThreadManager.setPinnedThreads(pinnedThreads, updateStorageService: false, tx: chatItemContext.tx)
 
         let avatarFetchTimestamp = dateProvider().ows_millisecondsSince1970
         for recipientId in chatItemContext.recipientContext.allRecipientIds() {
@@ -138,7 +152,7 @@ public class BackupArchivePostFrameRestoreActionManager {
                         currentTimestamp: avatarFetchTimestamp,
                         lastVisibleInteractionRowIdInContactThread: getLastVisibleInteractionRowId(),
                         localIdentifiers: chatItemContext.recipientContext.localIdentifiers,
-                        tx: chatItemContext.tx
+                        tx: chatItemContext.tx,
                     )
                 case .contact(let contactAddress):
                     guard let serviceId: ServiceId = contactAddress.aci ?? contactAddress.pni else {
@@ -149,7 +163,7 @@ public class BackupArchivePostFrameRestoreActionManager {
                         currentTimestamp: avatarFetchTimestamp,
                         lastVisibleInteractionRowIdInContactThread: getLastVisibleInteractionRowId(),
                         localIdentifiers: chatItemContext.recipientContext.localIdentifiers,
-                        tx: chatItemContext.tx
+                        tx: chatItemContext.tx,
                     )
                 case .group(let groupId):
                     guard let groupThread = chatItemContext.recipientContext[groupId] else {
@@ -160,7 +174,7 @@ public class BackupArchivePostFrameRestoreActionManager {
                         currentTimestamp: avatarFetchTimestamp,
                         lastVisibleInteractionRowIdInGroupThread: getLastVisibleInteractionRowId(),
                         localIdentifiers: chatItemContext.recipientContext.localIdentifiers,
-                        tx: chatItemContext.tx
+                        tx: chatItemContext.tx,
                     )
                 }
             }
@@ -171,7 +185,7 @@ public class BackupArchivePostFrameRestoreActionManager {
     /// `SignalRecipient` SQLite row ID.
     private func insertContactHiddenInfoMessage(
         recipientId: BackupArchive.RecipientId,
-        chatItemContext: BackupArchive.ChatItemRestoringContext
+        chatItemContext: BackupArchive.ChatItemRestoringContext,
     ) throws {
         guard
             let chatId = chatItemContext.chatContext[recipientId],
@@ -190,7 +204,7 @@ public class BackupArchivePostFrameRestoreActionManager {
             infoMessage,
             in: chatThread,
             chatId: chatId,
-            context: chatItemContext
+            context: chatItemContext,
         )
     }
 
@@ -208,7 +222,7 @@ public class BackupArchivePostFrameRestoreActionManager {
     private func updateLastInteractionTimestamps(
         for groupThread: TSGroupThread,
         actions: ChatActions,
-        context: BackupArchive.ChatRestoringContext
+        context: BackupArchive.ChatRestoringContext,
     ) throws {
         for memberAddress in groupThread.groupMembership.fullMembers {
             guard let memberAci = memberAddress.aci else {
@@ -222,12 +236,12 @@ public class BackupArchivePostFrameRestoreActionManager {
             let groupMember = try TSGroupMember.groupMember(
                 for: memberAci,
                 in: groupThread,
-                tx: context.tx
+                tx: context.tx,
             )
 
             try groupMember?.updateWith(
                 lastInteractionTimestamp: latestTimestamp,
-                tx: context.tx
+                tx: context.tx,
             )
         }
     }

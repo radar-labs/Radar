@@ -15,6 +15,11 @@ public enum AttachmentDownloads {
     /// attachmentDownloadProgressNotification in this case.
     public static let attachmentDownloadProgressNotification = Notification.Name("AttachmentDownloadProgressNotification")
 
+    /// Notification that the current attempt to download has stopped.  This could be due to ineligibility, cancellation, or other errors.
+    /// The download may  restart based on the type of error, or user interaction, which would result
+    /// in `attachmentDownloadProgressNotification` notifications being sent once download progress begins again.
+    public static let attachmentDownloadStoppedNotification = Notification.Name("attachmentDownloadStoppedNotification")
+
     /// Key for a CGFloat progress value from 0 to 1
     public static var attachmentDownloadProgressKey: String { "attachmentDownloadProgressKey" }
 
@@ -25,88 +30,40 @@ public enum AttachmentDownloads {
     public static var attachmentDownloadAttachmentIDKey: String { "attachmentDownloadAttachmentIDKey" }
 
     public struct DownloadMetadata {
-        public let mimeType: String
         public let cdnNumber: UInt32
-        public let encryptionKey: Data
         public let source: Source
 
         public enum Source {
-            case transitTier(cdnKey: String, integrityCheck: AttachmentIntegrityCheck, plaintextLength: UInt32?)
-            case mediaTierFullsize(
-                cdnReadCredential: MediaTierReadCredential,
-                outerEncryptionMetadata: MediaTierEncryptionMetadata,
-                integrityCheck: AttachmentIntegrityCheck,
-                plaintextLength: UInt32?
-            )
-            case mediaTierThumbnail(
-                cdnReadCredential: MediaTierReadCredential,
-                outerEncyptionMetadata: MediaTierEncryptionMetadata,
-                innerEncryptionMetadata: MediaTierEncryptionMetadata
-            )
-            case linkNSyncBackup(cdnKey: String)
+            case transitTier(cdnKey: String)
+            case mediaTier(type: MediaTierType, cdnReadCredential: MediaTierReadCredential, mediaId: Data)
+
+            public enum MediaTierType {
+                case fullsize
+                case thumbnail
+            }
 
             var asQueuedDownloadSource: QueuedAttachmentDownloadRecord.SourceType {
                 switch self {
                 case .transitTier:
                     return .transitTier
-                case .mediaTierFullsize:
+                case .mediaTier(type: .fullsize, _, _):
                     return .mediaTierFullsize
-                case .mediaTierThumbnail:
+                case .mediaTier(type: .thumbnail, _, _):
                     return .mediaTierThumbnail
-                case .linkNSyncBackup:
-                    return .transitTier
                 }
             }
         }
 
-        public var integrityCheck: AttachmentIntegrityCheck? {
-            switch source {
-            case .transitTier(_, let integrityCheck, _):
-                return integrityCheck
-            case .mediaTierFullsize(_, _, let integrityCheck, _):
-                return integrityCheck
-            case .mediaTierThumbnail:
-                // No integrityCheck for media tier thumbnails; they come from the local user.
-                return nil
-            case .linkNSyncBackup:
-                // No integrityCheck for link'n'sync backups; they come from the local user.
-                return nil
-            }
-        }
-
-        public var plaintextLength: UInt32? {
-            switch source {
-            case .transitTier(_, _, let plaintextLength):
-                return plaintextLength
-            case .mediaTierFullsize(_, _, _, let plaintextLength):
-                return plaintextLength
-            case .mediaTierThumbnail:
-                // Thumbnails don't include a length out of band.
-                // They may be padded with 0s to hit bucket sizes, but
-                // we take advantage of the fact that jpegs support
-                // no-op trailing 0s (and all thumbnails are jpegs).
-                return nil
-            case .linkNSyncBackup:
-                // Link'n'sync backups don't include a length out
-                // of band because gzip ignores padding.
-                return nil
-            }
-        }
-
         public init(
-            mimeType: String,
             cdnNumber: UInt32,
-            encryptionKey: Data,
-            source: Source
+            source: Source,
         ) {
-            self.mimeType = mimeType
             self.cdnNumber = cdnNumber
-            self.encryptionKey = encryptionKey
             self.source = source
         }
     }
 
-    public enum Error: Swift.Error, Equatable {
+    public enum Error: Swift.Error {
         case expiredCredentials
         case blockedByActiveCall
         case blockedByPendingMessageRequest
@@ -115,44 +72,83 @@ public enum AttachmentDownloads {
     }
 
     public struct CdnInfo {
-        public let contentLength: UInt
+        public let contentLength: UInt64
         public let lastModified: Date
+
+        public init(contentLength: UInt64, lastModified: Date) {
+            self.contentLength = contentLength
+            self.lastModified = lastModified
+        }
+
+        init(_ headers: HttpHeaders) throws {
+            guard
+                let contentLengthRaw = headers["Content-Length"],
+                let contentLengthBytes = UInt64(contentLengthRaw)
+            else {
+                throw OWSGenericError("Missing content length from cdn")
+            }
+            self.contentLength = contentLengthBytes
+
+            guard
+                let lastModifiedRaw = headers["Last-Modified"],
+                let lastModifiedDate = Date.ows_parseFromHTTPDateString(lastModifiedRaw)
+            else {
+                throw OWSGenericError("Missing last modified from cdn")
+            }
+            self.lastModified = lastModifiedDate
+        }
     }
 }
 
 public protocol AttachmentDownloadManager {
 
     func backupCdnInfo(
-        metadata: BackupReadCredential
+        metadata: BackupReadCredential,
     ) async throws -> BackupCdnInfo
 
     func downloadBackup(
         metadata: BackupReadCredential,
-        progress: OWSProgressSink?
-    ) -> Promise<URL>
+        progressBlock: OWSURLSession.ProgressBlock,
+    ) async throws -> URL
+
+    func downloadEncryptedTransientAttachment(
+        downloadMetadata: AttachmentDownloads.DownloadMetadata,
+        progressBlock: OWSURLSession.ProgressBlock,
+    ) async throws -> URL
 
     func downloadTransientAttachment(
-        metadata: AttachmentDownloads.DownloadMetadata,
-        progress: OWSProgressSink?
-    ) -> Promise<URL>
+        downloadMetadata: AttachmentDownloads.DownloadMetadata,
+        decryptionMetadata: DecryptionMetadata,
+        progressBlock: OWSURLSession.ProgressBlock,
+    ) async throws -> URL
 
     func enqueueDownloadOfAttachmentsForMessage(
         _ message: TSMessage,
         priority: AttachmentDownloadPriority,
-        tx: DBWriteTransaction
+        useThumbnails: Bool,
+        tx: DBWriteTransaction,
     )
 
     func enqueueDownloadOfAttachmentsForStoryMessage(
         _ message: StoryMessage,
         priority: AttachmentDownloadPriority,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 
-    func enqueueDownloadOfAttachment(
-        id: Attachment.IDType,
+    func enqueueDownloadOfReferencedAttachment(
+        referencedAttachment: ReferencedAttachment,
         priority: AttachmentDownloadPriority,
-        source: QueuedAttachmentDownloadRecord.SourceType,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
+    ) throws(AttachmentDownloads.Error)
+
+    func downloadReferencedAttachment(
+        referencedAttachment: ReferencedAttachment,
+        priority: AttachmentDownloadPriority,
+    ) async throws
+
+    func enqueueCopyOfLocalAttachment(
+        id: Attachment.IDType,
+        tx: DBWriteTransaction,
     )
 
     /// There's two sources of truth for calculating download progress,
@@ -165,7 +161,7 @@ public protocol AttachmentDownloadManager {
         id: Attachment.IDType,
         priority: AttachmentDownloadPriority,
         source: QueuedAttachmentDownloadRecord.SourceType,
-        progress: OWSProgressSink?
+        progress: OWSProgressSink?,
     ) async throws
 
     /// Starts downloading off the persisted queue, if there's anything to download
@@ -173,43 +169,30 @@ public protocol AttachmentDownloadManager {
     func beginDownloadingIfNecessary()
 
     func cancelDownload(for attachmentId: Attachment.IDType, tx: DBWriteTransaction)
+
+    @MainActor
+    func currentProgress(forAttachmentId attachmentId: Attachment.IDType) -> Float?
 }
 
 extension AttachmentDownloadManager {
 
-    public func downloadTransientAttachment(
-        metadata: AttachmentDownloads.DownloadMetadata
-    ) -> Promise<URL> {
-        return downloadTransientAttachment(
-            metadata: metadata,
-            progress: nil
-        )
-    }
-
     public func enqueueDownloadOfAttachmentsForMessage(
         _ message: TSMessage,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
-        enqueueDownloadOfAttachmentsForMessage(message, priority: .default, tx: tx)
+        enqueueDownloadOfAttachmentsForMessage(
+            message,
+            priority: .default,
+            useThumbnails: false,
+            tx: tx,
+        )
     }
 
     public func enqueueDownloadOfAttachmentsForStoryMessage(
         _ message: StoryMessage,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         enqueueDownloadOfAttachmentsForStoryMessage(message, priority: .default, tx: tx)
     }
 
-    public func downloadAttachment(
-        id: Attachment.IDType,
-        priority: AttachmentDownloadPriority,
-        source: QueuedAttachmentDownloadRecord.SourceType
-    ) async throws {
-        try await downloadAttachment(
-            id: id,
-            priority: priority,
-            source: source,
-            progress: nil
-        )
-    }
 }

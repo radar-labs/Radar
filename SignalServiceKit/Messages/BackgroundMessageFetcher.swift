@@ -6,56 +6,70 @@
 import Foundation
 
 public struct BackgroundMessageFetcherFactory {
+    private let attachmentBackfillManager: AttachmentBackfillManager
     private let chatConnectionManager: any ChatConnectionManager
     private let groupMessageProcessorManager: GroupMessageProcessorManager
     private let messageProcessor: MessageProcessor
     private let messageSenderJobQueue: MessageSenderJobQueue
     private let receiptSender: ReceiptSender
+    private let storageServiceManager: any StorageServiceManager
 
     public init(
+        attachmentBackfillManager: AttachmentBackfillManager,
         chatConnectionManager: any ChatConnectionManager,
         groupMessageProcessorManager: GroupMessageProcessorManager,
         messageProcessor: MessageProcessor,
         messageSenderJobQueue: MessageSenderJobQueue,
         receiptSender: ReceiptSender,
+        storageServiceManager: any StorageServiceManager,
     ) {
+        self.attachmentBackfillManager = attachmentBackfillManager
         self.chatConnectionManager = chatConnectionManager
         self.groupMessageProcessorManager = groupMessageProcessorManager
         self.messageProcessor = messageProcessor
         self.messageSenderJobQueue = messageSenderJobQueue
         self.receiptSender = receiptSender
+        self.storageServiceManager = storageServiceManager
     }
 
     public func buildFetcher() -> BackgroundMessageFetcher {
         return BackgroundMessageFetcher(
+            attachmentBackfillManager: self.attachmentBackfillManager,
             chatConnectionManager: self.chatConnectionManager,
             groupMessageProcessorManager: self.groupMessageProcessorManager,
             messageProcessor: self.messageProcessor,
             messageSenderJobQueue: self.messageSenderJobQueue,
             receiptSender: self.receiptSender,
+            storageServiceManager: self.storageServiceManager,
         )
     }
 }
 
 public actor BackgroundMessageFetcher {
+    private let attachmentBackfillManager: AttachmentBackfillManager
     private let chatConnectionManager: any ChatConnectionManager
     private let groupMessageProcessorManager: GroupMessageProcessorManager
     private let messageProcessor: MessageProcessor
     private let messageSenderJobQueue: MessageSenderJobQueue
     private let receiptSender: ReceiptSender
+    private let storageServiceManager: any StorageServiceManager
 
     fileprivate init(
+        attachmentBackfillManager: AttachmentBackfillManager,
         chatConnectionManager: any ChatConnectionManager,
         groupMessageProcessorManager: GroupMessageProcessorManager,
         messageProcessor: MessageProcessor,
         messageSenderJobQueue: MessageSenderJobQueue,
         receiptSender: ReceiptSender,
+        storageServiceManager: any StorageServiceManager,
     ) {
+        self.attachmentBackfillManager = attachmentBackfillManager
         self.chatConnectionManager = chatConnectionManager
         self.groupMessageProcessorManager = groupMessageProcessorManager
         self.messageProcessor = messageProcessor
         self.messageSenderJobQueue = messageSenderJobQueue
         self.receiptSender = receiptSender
+        self.storageServiceManager = storageServiceManager
     }
 
     private var connectionTokens = [OWSChatConnection.ConnectionToken]()
@@ -112,10 +126,16 @@ public actor BackgroundMessageFetcher {
             async let pendingMessages: Void = self.messageSenderJobQueue.waitUntilDone()
             // Wait until all sync requests are fulfilled.
             async let pendingOps: Void = MessageReceiver.waitForPendingTasks()
+            // Wait until Storage Service has settled.
+            async let pendingStorageService: Void = self.storageServiceManager.waitForSteadyState()
+            // Wait until attachment backfills are done.
+            async let pendingAttachmentBackfills: Void = self.attachmentBackfillManager.awaitProcessingEnqueuedInboundRequests()
 
             try await pendingReceipts
             try await pendingMessages
             try await pendingOps
+            try await pendingStorageService
+            try await pendingAttachmentBackfills
         }
 
         // Finally, wait for any notifications to finish posting

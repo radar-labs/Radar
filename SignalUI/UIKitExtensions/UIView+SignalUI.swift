@@ -15,7 +15,7 @@ public class SpacerView: UIView {
         CATransformLayer.self
     }
 
-    convenience public init(preferredWidth: CGFloat = UIView.noIntrinsicMetric, preferredHeight: CGFloat = UIView.noIntrinsicMetric) {
+    public convenience init(preferredWidth: CGFloat = UIView.noIntrinsicMetric, preferredHeight: CGFloat = UIView.noIntrinsicMetric) {
         self.init(preferredSize: CGSize(width: preferredWidth, height: preferredHeight))
     }
 
@@ -68,10 +68,10 @@ public extension UIView {
         view.setContentHuggingVerticalLow()
         view.setCompressionResistanceVerticalLow()
 
-        if let minHeight = minHeight {
+        if let minHeight {
             view.autoSetDimension(.height, toSize: minHeight, relation: .greaterThanOrEqual)
         }
-        if let maxHeight = maxHeight {
+        if let maxHeight {
             NSLayoutConstraint.autoSetPriority(.defaultLow) {
                 view.autoSetDimension(.height, toSize: maxHeight)
             }
@@ -119,8 +119,10 @@ public extension UIView {
     }
 
     var sizeThatFitsMaxSize: CGSize {
-        sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude,
-                            height: CGFloat.greatestFiniteMagnitude))
+        sizeThatFits(CGSize(
+            width: CGFloat.greatestFiniteMagnitude,
+            height: CGFloat.greatestFiniteMagnitude,
+        ))
     }
 
     static func container() -> UIView {
@@ -148,12 +150,28 @@ public extension UIView {
         return self
     }
 
-    func addCircleBadge(color: UIColor) {
-        let badge = OWSLayerView.circleView(size: 12)
+    func addCircleBadge(
+        color: UIColor,
+        onCircleView circleView: UIView,
+        circleDiameter: CGFloat,
+        badgeDiameter: CGFloat = 12,
+        overlap: CGFloat = 4,
+    ) {
+        let badge = OWSLayerView.circleView(size: badgeDiameter)
         badge.backgroundColor = color
         self.addSubview(badge)
-        badge.autoPinEdge(toSuperviewEdge: .top, withInset: -3)
-        badge.autoPinEdge(toSuperviewEdge: .trailing, withInset: -3)
+
+        // Overlap the two circles, on a 45deg diagonal, by the given amount.
+
+        let circleRadius = circleDiameter / 2
+        let badgeRadius = badgeDiameter / 2
+
+        let centerDiagonalOffset = circleRadius + badgeRadius - overlap
+        let centerSquareOffset = centerDiagonalOffset / CGFloat(2).squareRoot()
+        let edgeInset = circleRadius - badgeRadius - centerSquareOffset
+
+        badge.autoPinEdge(.top, to: .top, of: circleView, withOffset: edgeInset)
+        badge.autoPinEdge(.trailing, to: .trailing, of: circleView, withOffset: -edgeInset)
     }
 }
 
@@ -276,8 +294,10 @@ public extension UIView {
     ///   location. **Use negative inset values to increase tappable area.**
     /// - Returns: true if `gestureRecognizer` is inside the receiver’s bounds
     /// inset by `hotAreaInsets`; otherwise, false.
-    func containsGestureLocation(_ gestureRecognizer: UIGestureRecognizer,
-                                 hotAreaInsets: UIEdgeInsets? = nil) -> Bool {
+    func containsGestureLocation(
+        _ gestureRecognizer: UIGestureRecognizer,
+        hotAreaInsets: UIEdgeInsets? = nil,
+    ) -> Bool {
         let location = gestureRecognizer.location(in: self)
         var hotArea = bounds
         if let hotAreaInsets {
@@ -289,15 +309,16 @@ public extension UIView {
     }
 }
 
-// MARK: - Bottom Stroke
+// MARK: -
 
 public extension UIView {
-    func addBottomStroke() -> UIView {
-        return addBottomStroke(color: .ows_middleGray, strokeWidth: .hairlineWidth)
+    var hairlineWidth: CGFloat {
+        traitCollection.hairlineWidth
     }
 
     @discardableResult
-    func addBottomStroke(color: UIColor, strokeWidth: CGFloat) -> UIView {
+    func addBottomStroke(color: UIColor, strokeWidth: CGFloat? = nil) -> UIView {
+        let strokeWidth = strokeWidth ?? hairlineWidth
         let strokeView = UIView()
         strokeView.backgroundColor = color
         addSubview(strokeView)
@@ -313,5 +334,31 @@ public extension UIView {
 public extension UIApplication {
     func hideKeyboard() {
         sendAction(#selector(UIView.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+}
+
+// MARK: -
+
+public extension UITraitCollection {
+    var hairlineWidth: CGFloat {
+        1 / displayScale
+    }
+
+    func hairlineWidthFraction(_ fraction: CGFloat) -> CGFloat {
+        fraction * hairlineWidth
+    }
+}
+
+// MARK: -
+
+public extension UIWindow {
+
+    /// Designed for view controllers to consult if app is running on a legacy device
+    /// where there is no dedicated area for the status bar.
+    ///
+    /// - returns `true` if app is running in a `phone` environment and status bar should to be hidden for better user experience.
+    var shouldHideStatusBarForFullScreenPresentation: Bool {
+        guard traitCollection.userInterfaceIdiom == .phone else { return false }
+        return safeAreaInsets.top <= 20
     }
 }

@@ -4,11 +4,10 @@
 //
 
 import Combine
-import SwiftUI
-import SignalUI
-import SignalServiceKit
 import LibSignalClient
-import LocalAuthentication
+import SignalServiceKit
+import SignalUI
+import SwiftUI
 
 // This has a long and awful name so that if the condition is ever changed,
 // the text shown to internal users about it can be changed too.
@@ -50,10 +49,10 @@ class LinkedDevicesViewModel: ObservableObject {
             shouldShowFinishLinkingSheet = newDeviceExpectation != nil
         }
     }
+
     private var deviceIdToIgnore: DeviceId?
     fileprivate var shouldShowFinishLinkingSheet = false
 
-    private let backupArchiveErrorPresenter: BackupArchiveErrorPresenter
     private let databaseChangeObserver: DatabaseChangeObserver
     private let db: any DB
     private let deviceService: OWSDeviceService
@@ -68,7 +67,6 @@ class LinkedDevicesViewModel: ObservableObject {
 #if DEBUG
         self.isPreview = isPreview
 #endif
-        backupArchiveErrorPresenter = DependenciesBridge.shared.backupArchiveErrorPresenter
         databaseChangeObserver = DependenciesBridge.shared.databaseChangeObserver
         db = DependenciesBridge.shared.db
         deviceService = DependenciesBridge.shared.deviceService
@@ -88,8 +86,8 @@ class LinkedDevicesViewModel: ObservableObject {
             try? await Task.sleep(nanoseconds: NSEC_PER_SEC)
             withAnimation {
                 self.displayableDevices = [
-                    .init(device: .previewItem(id: 1, name: "iPad")),
-                    .init(device: .previewItem(id: 2, name: "macOS")),
+                    .init(device: .previewItem(id: DeviceId(validating: 1)!, name: "iPad")),
+                    .init(device: .previewItem(id: DeviceId(validating: 2)!, name: "macOS")),
                 ]
             }
             self.isLoading = false
@@ -118,21 +116,17 @@ class LinkedDevicesViewModel: ObservableObject {
     private func updateDeviceList() {
         var displayableDevices = db.read { transaction -> [DisplayableDevice] in
             return deviceStore.fetchAll(tx: transaction)
-                .filter { $0.isLinkedDevice }
+                .filter { !$0.deviceId.isPrimary }
                 .map { DisplayableDevice(device: $0) }
         }
 
         if let deviceIdToIgnore {
             displayableDevices.removeAll { device in
-                let shouldRemove = device.id == Int(deviceIdToIgnore.rawValue)
-                if shouldRemove {
-                    Logger.debug("Ignoring device \(device.id)")
-                }
-                return shouldRemove
+                return device.id == deviceIdToIgnore
             }
         }
 
-        displayableDevices.sort { (lhs, rhs) in
+        displayableDevices.sort { lhs, rhs in
             lhs.device.createdAt < rhs.device.createdAt
         }
 
@@ -144,7 +138,7 @@ class LinkedDevicesViewModel: ObservableObject {
             {
                 present.send(.newDeviceToast(
                     deviceName: newDevice.displayName,
-                    didSync: newDeviceExpectation == .linkAndSync
+                    didSync: newDeviceExpectation == .linkAndSync,
                 ))
                 self.newDeviceExpectation = nil
                 withAnimation {
@@ -198,8 +192,8 @@ class LinkedDevicesViewModel: ObservableObject {
 
     func renameDevice(
         _ displayableDevice: DisplayableDevice,
-        to newName: String
-    ) async throws(OWSDeviceRenameError) {
+        to newName: String,
+    ) async throws {
         try await deviceService.renameDevice(
             device: displayableDevice.device,
             newName: newName,
@@ -211,14 +205,14 @@ class LinkedDevicesViewModel: ObservableObject {
     struct DisplayableDevice: Hashable, Identifiable {
         let device: OWSDevice
 
-        var id: Int { device.deviceId }
+        var id: DeviceId { device.deviceId }
         var displayName: String { device.displayName }
         var createdAt: Date { device.createdAt }
 
-        static func == (lhs: DisplayableDevice, rhs: DisplayableDevice) -> Bool {
+        static func ==(lhs: DisplayableDevice, rhs: DisplayableDevice) -> Bool {
             lhs.id == rhs.id
-            && lhs.displayName == rhs.displayName
-            && lhs.createdAt == rhs.createdAt
+                && lhs.displayName == rhs.displayName
+                && lhs.createdAt == rhs.createdAt
         }
 
         func hash(into hasher: inout Hasher) {
@@ -254,7 +248,7 @@ extension LinkedDevicesViewModel: DatabaseChangeDelegate {
 extension LinkedDevicesViewModel: LinkDeviceViewControllerDelegate {
     func didFinishLinking(
         _ linkNSyncData: LinkNSyncData?,
-        from linkDeviceViewController: LinkDeviceViewController
+        from linkDeviceViewController: LinkDeviceViewController,
     ) {
         self.deviceIdToIgnore = nil
         self.scheduleNewLinkedDeviceNotification()
@@ -267,13 +261,13 @@ extension LinkedDevicesViewModel: LinkDeviceViewControllerDelegate {
         }
 
         // Don't wait for the view pop to start the linking process
-        let linkAndSyncProgressModal = BackupProgressModal(style: .linkAndSync)
+        let linkAndSyncProgressModal = BackupRestoreProgressModal(style: .linkAndSync)
         linkDeviceViewController.popToLinkedDeviceList { [weak self] in
             self?.present.send(.activityIndicator(linkAndSyncProgressModal))
         }
 
         let linkNSyncTask = Task { @MainActor in
-            let progress = await OWSSequentialProgress<PrimaryLinkNSyncProgressPhase>.createSink { progress in
+            let progress = OWSSequentialProgress<PrimaryLinkNSyncProgressPhase>.createSink { progress in
                 await MainActor.run {
                     linkAndSyncProgressModal.viewModel.updatePrimaryLinkingProgress(progress: progress)
                 }
@@ -282,7 +276,7 @@ extension LinkedDevicesViewModel: LinkDeviceViewControllerDelegate {
                 try await DependenciesBridge.shared.linkAndSyncManager.waitForLinkingAndUploadBackup(
                     ephemeralBackupKey: linkNSyncData.ephemeralBackupKey,
                     tokenId: linkNSyncData.tokenId,
-                    progress: progress
+                    progress: progress,
                 )
                 Task { @MainActor in
                     await linkAndSyncProgressModal.completeAndDismiss()
@@ -299,10 +293,10 @@ extension LinkedDevicesViewModel: LinkDeviceViewControllerDelegate {
                         self.deviceIdToIgnore = linkedDeviceId
                         return
                     case
-                            .errorWaitingForLinkedDevice,
-                            .errorUploadingBackup,
-                            .errorMarkingBackupUploaded,
-                            .errorGeneratingBackup:
+                        .errorWaitingForLinkedDevice,
+                        .errorUploadingBackup,
+                        .errorMarkingBackupUploaded,
+                        .errorGeneratingBackup:
                         self.present.send(.linkAndSyncFailureAlert(error))
                     }
                 }
@@ -341,7 +335,7 @@ extension LinkedDevicesViewModel: LinkDeviceViewControllerDelegate {
             deviceStore.setMostRecentlyLinkedDeviceDetails(
                 linkedTime: deviceLinkTimestamp,
                 notificationDelay: notificationDelay,
-                tx: tx
+                tx: tx,
             )
         }
         SSKEnvironment.shared.notificationPresenterRef.scheduleNotifyForNewLinkedDevice(deviceLinkTimestamp: deviceLinkTimestamp)
@@ -358,11 +352,9 @@ extension LinkedDevicesViewModel: LinkDeviceViewControllerDelegate {
         if let details, Date() > details.shouldRemindUserAfter {
             db.write { tx in
                 deviceStore.clearMostRecentlyLinkedDeviceDetails(tx: tx)
-                ExperienceUpgradeManager.clearExperienceUpgrade(
-                    .newLinkedDeviceNotification,
-                    transaction: tx
-                )
             }
+
+            NotificationCenter.default.post(name: .megaphoneStateDidChange, object: nil)
         }
 
         SSKEnvironment.shared.notificationPresenterRef.clearDeliveredNewLinkedDevicesNotifications()
@@ -432,7 +424,7 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
 
         self.title = OWSLocalizedString(
             "LINKED_DEVICES_TITLE",
-            comment: "Menu item and navbar title for the device manager"
+            comment: "Menu item and navbar title for the device manager",
         )
     }
 
@@ -442,7 +434,7 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
         let editMode = editMode ?? viewModel.editMode
 
         navigationItem.rightBarButtonItem = .systemItem(
-            editMode.isEditing ? .done : .edit
+            editMode.isEditing ? .done : .edit,
         ) { [weak viewModel] in
             withAnimation {
                 viewModel?.editMode = editMode.isEditing ? .inactive : .active
@@ -462,13 +454,13 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
                 hero: .image(UIImage(named: "linked-devices")!),
                 title: OWSLocalizedString(
                     "LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_TITLE",
-                    comment: "Title for a sheet when a user has started linking a device informing them to finish the process on that other device"
+                    comment: "Title for a sheet when a user has started linking a device informing them to finish the process on that other device",
                 ),
                 body: OWSLocalizedString(
                     "LINK_NEW_DEVICE_FINISH_ON_OTHER_DEVICE_SHEET_BODY",
-                    comment: "Body text for a sheet when a user has started linking a device informing them to finish the process on that other device"
+                    comment: "Body text for a sheet when a user has started linking a device informing them to finish the process on that other device",
                 ),
-                primaryButton: .dismissing(title: CommonStrings.continueButton)
+                primaryButton: .dismissing(title: CommonStrings.continueButton),
             )
             self.finishLinkingSheet = sheet
 
@@ -485,16 +477,16 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
         let title: String = if didSync {
             OWSLocalizedString(
                 "DEVICE_LIST_UPDATE_NEW_DEVICE_SYNCED_TOAST",
-                comment: "Message appearing on a toast indicating a new device was successfully linked and synced."
+                comment: "Message appearing on a toast indicating a new device was successfully linked and synced.",
             )
         } else {
             OWSLocalizedString(
                 "DEVICE_LIST_UPDATE_NEW_DEVICE_TOAST",
-                comment: "Message appearing on a toast indicating a new device was successfully linked. Embeds {{ device name }}"
+                comment: "Message appearing on a toast indicating a new device was successfully linked. Embeds {{ device name }}",
             )
         }
 
-        presentToast(text: String(format: title, deviceName))
+        presentToast(text: String.nonPluralLocalizedStringWithFormat(title, deviceName))
     }
 
     private func showUpdateFailureAlert(error: Error) {
@@ -502,17 +494,21 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
 
         let alertTitle = OWSLocalizedString(
             "DEVICE_LIST_UPDATE_FAILED_TITLE",
-            comment: "Alert title that can occur when viewing device manager."
+            comment: "Alert title that can occur when viewing device manager.",
         )
-        let alert = ActionSheetController(title: alertTitle,
-                                          message: error.userErrorDescription)
-        alert.addAction(ActionSheetAction(
-            title: CommonStrings.retryButton,
-            style: .default) { [weak self] _ in
+        let alert = ActionSheetController(
+            title: alertTitle,
+            message: error.userErrorDescription,
+        )
+        alert.addAction(
+            ActionSheetAction(
+                title: CommonStrings.retryButton,
+                style: .default,
+            ) { [weak self] _ in
                 Task {
                     await self?.viewModel.refreshDevices()
                 }
-            }
+            },
         )
         alert.addAction(OWSActionSheets.dismissAction)
 
@@ -533,25 +529,25 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
             }
 
             presentLinkView(LinkDeviceViewController(
-                skipEducationSheet: skipEducationSheet
+                skipEducationSheet: skipEducationSheet,
             ))
         }
     }
 
     private func didTapLinkDeviceButton() {
-        let localDeviceAuth = LocalDeviceAuthentication()
+        let localDeviceAuth = LocalDeviceAuthentication(useCase: .linkNewDevice)
         let localDeviceAuthAttemptToken: LocalDeviceAuthentication.AttemptToken
 
         switch localDeviceAuth.checkCanAttempt() {
         case .success(let attemptToken):
             localDeviceAuthAttemptToken = attemptToken
-        case .failure(.notRequired):
+        case .failure(.notConfigured):
             showLinkNewDeviceView()
             return
         case .failure(.canceled):
             return
-        case .failure(.genericError(let localizedErrorMessage)):
-            showError(message: localizedErrorMessage)
+        case .failure(.failed(let failureReason)):
+            showError(message: failureReason.localizedErrorMessage)
             return
         }
 
@@ -559,14 +555,14 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
             hero: .image(UIImage(named: "phone-lock")!),
             title: OWSLocalizedString(
                 "LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_TITLE",
-                comment: "Title for a sheet when a user tries to link a device informing them that they will need to authenticate their device"
+                comment: "Title for a sheet when a user tries to link a device informing them that they will need to authenticate their device",
             ),
             body: OWSLocalizedString(
                 "LINK_NEW_DEVICE_AUTHENTICATION_INFO_SHEET_BODY",
-                comment: "Body text for a sheet when a user tries to link a device informing them that they will need to authenticate their device"
+                comment: "Body text for a sheet when a user tries to link a device informing them that they will need to authenticate their device",
             ),
             primaryButton: .init(
-                title: CommonStrings.continueButton
+                title: CommonStrings.continueButton,
             ) { [weak self] _ in
                 self?.dismiss(animated: true)
                 Task {
@@ -575,7 +571,7 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
                         localDeviceAuthAttemptToken: localDeviceAuthAttemptToken,
                     )
                 }
-            }
+            },
         )
 
         self.present(sheet, animated: true)
@@ -585,17 +581,17 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
         let actionSheet = ActionSheetController(
             title: OWSLocalizedString(
                 "LINK_NEW_DEVICE_SYNC_FAILED_TITLE",
-                comment: "Title for a sheet indicating that a newly linked device failed to sync messages."
+                comment: "Title for a sheet indicating that a newly linked device failed to sync messages.",
             ),
             message: OWSLocalizedString(
                 "LINK_NEW_DEVICE_SYNC_FAILED_RETRYABLE_MESSAGE",
-                comment: "Message for a sheet indicating that a newly linked device failed to sync messages with a retryable error."
-            )
+                comment: "Message for a sheet indicating that a newly linked device failed to sync messages with a retryable error.",
+            ),
         )
         actionSheet.addAction(
             .init(
                 title: CommonStrings.retryButton,
-                style: .cancel
+                style: .cancel,
             ) { [weak self] _ in
                 Task {
                     await errorRetryHandler.tryToResetLinkedDevice()
@@ -603,19 +599,19 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
                         self?.showLinkNewDeviceView(skipEducationSheet: true)
                     }
                 }
-            }
+            },
         )
         actionSheet.addAction(
             .init(
                 title: OWSLocalizedString(
                     "LINK_NEW_DEVICE_SYNC_FAILED_CONTINUE_BUTTON",
-                    comment: "Button for a sheet indicating that a newly linked device failed to sync messages, to link without transferring."
-                )
+                    comment: "Button for a sheet indicating that a newly linked device failed to sync messages, to link without transferring.",
+                ),
             ) { _ in
                 Task {
                     await errorRetryHandler.tryToContinueWithoutSyncing()
                 }
-            }
+            },
         )
         actionSheet.onDismiss = { [weak self] in
             self?.viewModel.expectMoreDevices()
@@ -624,17 +620,17 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
     }
 
     private func showLinkAndSyncUnretryableFailureAlert(
-        contactSupportEmailFilter: ContactSupportActionSheet.EmailFilter?
+        contactSupportEmailFilter: ContactSupportActionSheet.EmailFilter?,
     ) {
         let actionSheet = ActionSheetController(
             title: OWSLocalizedString(
                 "LINK_NEW_DEVICE_SYNC_FAILED_TITLE",
-                comment: "Title for a sheet indicating that a newly linked device failed to sync messages."
+                comment: "Title for a sheet indicating that a newly linked device failed to sync messages.",
             ),
             message: OWSLocalizedString(
                 "LINK_NEW_DEVICE_SYNC_FAILED_MESSAGE",
-                comment: "Message for a sheet indicating that a newly linked device failed to sync messages."
-            )
+                comment: "Message for a sheet indicating that a newly linked device failed to sync messages.",
+            ),
         )
         if let contactSupportEmailFilter {
             actionSheet.addAction(ActionSheetAction(title: CommonStrings.contactSupport) { [weak self] _ in
@@ -643,7 +639,7 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
                 ContactSupportActionSheet.present(
                     emailFilter: contactSupportEmailFilter,
                     logDumper: .fromGlobals(),
-                    fromViewController: self
+                    fromViewController: self,
                 )
             })
         }
@@ -654,7 +650,6 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
 
         actionSheet.onDismiss = { [weak self] in
             self?.viewModel.expectMoreDevices()
-            DependenciesBridge.shared.backupArchiveErrorPresenter.presentOverTopmostViewController(completion: {})
         }
         presentActionSheet(actionSheet)
     }
@@ -666,12 +661,12 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
         localDeviceAuthAttemptToken: LocalDeviceAuthentication.AttemptToken,
     ) async {
         switch await localDeviceAuth.attempt(token: localDeviceAuthAttemptToken) {
-        case .success, .failure(.notRequired):
+        case .success, .failure(.notConfigured):
             showLinkNewDeviceView()
         case .failure(.canceled):
             break
-        case .failure(.genericError(let localizedErrorMessage)):
-            showError(message: localizedErrorMessage)
+        case .failure(.failed(let failureReason)):
+            showError(message: failureReason.localizedErrorMessage)
         }
     }
 
@@ -680,7 +675,7 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
         OWSActionSheets.showActionSheet(
             title: DeviceAuthenticationErrorMessage.errorSheetTitle,
             message: message,
-            fromViewController: self
+            fromViewController: self,
         )
     }
 
@@ -688,13 +683,13 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
 
     private func showRenameDeviceView(device: LinkedDevicesViewModel.DisplayableDevice) {
         let viewController = EditDeviceNameViewController(
-            oldName: device.displayName
+            oldName: device.displayName,
         ) { [weak viewModel] newName in
             try await viewModel?.renameDevice(device, to: newName)
             self.presentToast(text: OWSLocalizedString(
                 "LINKED_DEVICES_RENAME_SUCCESS_MESSAGE",
                 value: "Device name updated",
-                comment: "Message on a toast indicating the device was renamed."
+                comment: "Message on a toast indicating the device was renamed.",
             ))
         }
         self.navigationController?.pushViewController(viewController, animated: true)
@@ -705,23 +700,27 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
     private func showUnlinkDeviceConfirmAlert(displayableDevice: LinkedDevicesViewModel.DisplayableDevice) {
         AssertIsOnMainThread()
 
-        let titleFormat = OWSLocalizedString("UNLINK_CONFIRMATION_ALERT_TITLE",
-                                                        comment: "Alert title for confirming device deletion")
-        let title = String(format: titleFormat, displayableDevice.displayName)
-        let message = OWSLocalizedString("UNLINK_CONFIRMATION_ALERT_BODY",
-                                                    comment: "Alert message to confirm unlinking a device")
+        let titleFormat = OWSLocalizedString(
+            "UNLINK_CONFIRMATION_ALERT_TITLE",
+            comment: "Alert title for confirming device deletion",
+        )
+        let title = String.nonPluralLocalizedStringWithFormat(titleFormat, displayableDevice.displayName)
+        let message = OWSLocalizedString(
+            "UNLINK_CONFIRMATION_ALERT_BODY",
+            comment: "Alert message to confirm unlinking a device",
+        )
         let alert = ActionSheetController(title: title, message: message)
         alert.addAction(
             ActionSheetAction(
                 title: OWSLocalizedString(
                     "UNLINK_ACTION",
-                    comment: "button title for unlinking a device"
+                    comment: "button title for unlinking a device",
                 ),
                 style: .destructive,
                 handler: { [weak viewModel] _ in
                     viewModel?.unlinkDevice(displayableDevice.device)
-                }
-            )
+                },
+            ),
         )
         alert.addAction(OWSActionSheets.cancelAction)
         presentActionSheet(alert)
@@ -732,16 +731,16 @@ class LinkedDevicesHostingController: HostingContainer<LinkedDevicesView> {
 
         let title = OWSLocalizedString(
             "UNLINKING_FAILED_ALERT_TITLE",
-            comment: "Alert title when unlinking device fails"
+            comment: "Alert title when unlinking device fails",
         )
         let alert = ActionSheetController(title: title, message: error.userErrorDescription)
         alert.addAction(
             ActionSheetAction(
                 title: CommonStrings.retryButton,
-                style: .default
+                style: .default,
             ) { [weak self] _ in
                 self?.viewModel.unlinkDevice(device)
-            }
+            },
         )
         alert.addAction(OWSActionSheets.cancelAction)
         presentActionSheet(alert)
@@ -765,21 +764,21 @@ struct LinkedDevicesView: View {
 
                     Text(OWSLocalizedString(
                         "LINKED_DEVICES_HEADER_DESCRIPTION",
-                        comment: "Description for header of the linked devices list"
+                        comment: "Description for header of the linked devices list",
                     ))
-                        .appendLink(CommonStrings.learnMore) {
-                            viewModel.present.send(.linkedDeviceEducation)
-                        }
-                        .foregroundStyle(Color.Signal.secondaryLabel)
-                        .font(.subheadline)
-                        .multilineTextAlignment(.center)
+                    .appendLink(CommonStrings.learnMore) {
+                        viewModel.present.send(.linkedDeviceEducation)
+                    }
+                    .foregroundStyle(Color.Signal.secondaryLabel)
+                    .font(.subheadline)
+                    .multilineTextAlignment(.center)
 
                     Button {
                         viewModel.present.send(.linkDeviceAuthentication)
                     } label: {
                         Text(OWSLocalizedString(
                             "LINK_NEW_DEVICE_TITLE",
-                            comment: "Navigation title when scanning QR code to add new device."
+                            comment: "Navigation title when scanning QR code to add new device.",
                         ))
                     }
                     .buttonStyle(Registration.UI.LargePrimaryButtonStyle())
@@ -802,7 +801,7 @@ struct LinkedDevicesView: View {
                         } else {
                             Text(OWSLocalizedString(
                                 "LINKED_DEVICES_EMPTY_STATE",
-                                comment: "Text that appears where the linked device list would be indicating that there are no linked devices."
+                                comment: "Text that appears where the linked device list would be indicating that there are no linked devices.",
                             ))
                             .foregroundStyle(.secondary)
                             .font(.subheadline)
@@ -827,16 +826,16 @@ struct LinkedDevicesView: View {
             } header: {
                 Text(OWSLocalizedString(
                     "LINKED_DEVICES_LIST_TITLE",
-                    comment: "Title above the list of currently-linked devices"
+                    comment: "Title above the list of currently-linked devices",
                 ))
             } footer: {
                 (
                     SignalSymbol.lock.text(dynamicTypeBaseSize: 16).baselineOffset(-1) +
-                    Text(" ") +
-                    Text(OWSLocalizedString(
-                        "LINKED_DEVICES_LIST_FOOTER",
-                        comment: "Footer text below the list of currently-linked devices"
-                    ))
+                        Text(" ") +
+                        Text(OWSLocalizedString(
+                            "LINKED_DEVICES_LIST_FOOTER",
+                            comment: "Footer text below the list of currently-linked devices",
+                        )),
                 )
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color.Signal.secondaryLabel)
@@ -847,7 +846,7 @@ struct LinkedDevicesView: View {
             if shouldShowDeviceIdsBecauseUserIsInternal {
                 SignalSection { } footer: {
                     Text(LocalizationNotNeeded(
-                        "Device IDs (and this message) are only shown to internal users."
+                        "Device IDs (and this message) are only shown to internal users.",
                     ))
                     .foregroundStyle(Color.Signal.tertiaryLabel)
                 }
@@ -874,7 +873,7 @@ struct LinkedDevicesView: View {
             if let device {
                 if shouldShowDeviceIdsBecauseUserIsInternal {
                     LocalizationNotNeeded(
-                        "#\(device.device.deviceId): \(device.displayName)"
+                        "#\(device.device.deviceId): \(device.displayName)",
                     )
                 } else {
                     device.displayName
@@ -885,9 +884,9 @@ struct LinkedDevicesView: View {
         }
 
         private func dateFormattedString(format: String, date: Date) -> String {
-            String(
-                format: format,
-                DateUtil.dateFormatter.string(from: date)
+            String.nonPluralLocalizedStringWithFormat(
+                format,
+                DateUtil.dateFormatter.string(from: date),
             )
         }
 
@@ -896,27 +895,55 @@ struct LinkedDevicesView: View {
             return dateFormattedString(
                 format: OWSLocalizedString(
                     "DEVICE_LINKED_AT_LABEL",
-                    comment: "{{Short Date}} when device was linked."
+                    comment: "{{Short Date}} when device was linked.",
                 ),
-                date: device.device.createdAt
+                date: device.device.createdAt,
             )
         }
 
         private var lastSeenDateString: String {
             guard let device else { return " " }
-            return dateFormattedString(
-                format: OWSLocalizedString(
-                    "DEVICE_LAST_ACTIVE_AT_LABEL",
-                    comment: "{{Short Date}} when device last communicated with Signal Server."
-                ),
-                // lastSeenAt is stored at day granularity. At midnight UTC.
-                // Making it likely that when you first link a device it will
-                // be "last seen" the day before it was created, which looks broken.
-                date: max(
-                    device.device.createdAt,
-                    device.device.lastSeenAt
-                )
+
+            // lastSeenAt is stored with day granularity (midnight UTC), which
+            // means a recently-linked device could have a lastSeenAt that's
+            // before its createdAt, for some time zones. Avoid that by taking
+            // whichever is more recent.
+            let lastSeenDate = max(
+                device.device.createdAt,
+                device.device.lastSeenAt,
             )
+            let now = Date()
+
+            // Since lastSeenAt is truncated to midnight UTC, avoid time-zone-aware
+            // comparisons (such as using Calendar). There's fuzziness in these
+            // comparisons, but at least its only fuzziness coming from the
+            // truncation.
+            let timeIntervalSinceLastSeen = now.timeIntervalSince(lastSeenDate)
+            switch timeIntervalSinceLastSeen {
+            case ..<(2 * .day):
+                return OWSLocalizedString(
+                    "DEVICE_LAST_ACTIVE_PAST_DAY",
+                    comment: "Label indicating a linked device was last active within the past day.",
+                )
+            case (2 * .day)..<(3 * .day):
+                return OWSLocalizedString(
+                    "DEVICE_LAST_ACTIVE_PAST_TWO_DAYS",
+                    comment: "Label indicating a linked device was last active within the past two days.",
+                )
+            case (3 * .day)..<(4 * .day):
+                return OWSLocalizedString(
+                    "DEVICE_LAST_ACTIVE_ABOUT_THREE_DAYS_AGO",
+                    comment: "Label indicating a linked device was last active about three days ago.",
+                )
+            default:
+                return dateFormattedString(
+                    format: OWSLocalizedString(
+                        "DEVICE_LAST_ACTIVE_AT_LABEL",
+                        comment: "{{Short Date}} when device last communicated with Signal Server.",
+                    ),
+                    date: lastSeenDate,
+                )
+            }
         }
 
         var body: some View {
@@ -941,25 +968,25 @@ struct LinkedDevicesView: View {
                     Button {
                         guard let device else { return }
                         viewModel.present.send(
-                            .unlinkDeviceConfirmation(displayableDevice: device)
-                        )
-                    } label: {
-                        Label(LinkedDevicesView.unlinkString, image: "link-slash")
-                    }
-
-                    Button {
-                        guard let device else { return }
-                        viewModel.present.send(
-                            .renameDevice(displayableDevice: device)
+                            .renameDevice(displayableDevice: device),
                         )
                     } label: {
                         Label(
                             OWSLocalizedString(
                                 "LINKED_DEVICES_RENAME_BUTTON",
-                                comment: "Button title for renaming a linked device"
+                                comment: "Button title for renaming a linked device",
                             ),
-                            image: "edit"
+                            image: "edit",
                         )
+                    }
+
+                    Button(role: .destructive) {
+                        guard let device else { return }
+                        viewModel.present.send(
+                            .unlinkDeviceConfirmation(displayableDevice: device),
+                        )
+                    } label: {
+                        Label(LinkedDevicesView.unlinkString, image: "link-slash")
                     }
                 } label: {
                     VStack(spacing: 0) {
@@ -976,7 +1003,7 @@ struct LinkedDevicesView: View {
 
     private static let unlinkString = OWSLocalizedString(
         "UNLINK_ACTION",
-        comment: "button title for unlinking a device"
+        comment: "button title for unlinking a device",
     )
 }
 
@@ -986,10 +1013,11 @@ class EditDeviceNameViewController: NameEditorViewController {
     override class var nameByteLimit: Int { 225 }
     override class var nameGlyphLimit: Int { 50 }
 
+    override var allowEmptyName: Bool { false }
     override var placeholderText: String? {
         OWSLocalizedString(
             "SECONDARY_ONBOARDING_CHOOSE_DEVICE_NAME_PLACEHOLDER",
-            comment: "text field placeholder"
+            comment: "text field placeholder",
         )
     }
 
@@ -998,7 +1026,7 @@ class EditDeviceNameViewController: NameEditorViewController {
 
         self.title = OWSLocalizedString(
             "LINKED_DEVICES_RENAME_TITLE",
-            comment: "Title for the screen for renaming a linked device"
+            comment: "Title for the screen for renaming a linked device",
         )
     }
 
@@ -1006,8 +1034,8 @@ class EditDeviceNameViewController: NameEditorViewController {
         OWSActionSheets.showErrorAlert(
             message: OWSLocalizedString(
                 "LINKED_DEVICES_RENAME_FAILURE_MESSAGE",
-                comment: "Message on a sheet indicating the device rename attempt received an error."
-            )
+                comment: "Message on a sheet indicating the device rename attempt received an error.",
+            ),
         )
     }
 }

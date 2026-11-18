@@ -1,1 +1,5 @@
 *.strings diff=localizablestrings
+
+# Load these diffs by default. Otherwise GitHub will automatically collapse them.
+Signal.xcworkspace/contents.xcworkspacedata -linguist-generated
+Signal.xcworkspace/xcshareddata/swiftpm/Package.resolved -linguist-generated

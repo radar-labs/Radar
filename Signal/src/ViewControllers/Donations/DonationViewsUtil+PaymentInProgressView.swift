@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import SignalServiceKit
-import SignalUI
+import SignalServiceKit
+public import SignalUI
 
 extension DonationViewsUtil {
     @MainActor
@@ -26,7 +26,7 @@ extension DonationViewsUtil {
 
         let progressView = AnimatedProgressView(loadingText: OWSLocalizedString(
             "SUSTAINER_VIEW_PROCESSING_PAYMENT",
-            comment: "Loading indicator on the sustainer view"
+            comment: "Loading indicator on the sustainer view",
         ))
         viewController.view.addSubview(progressView)
         progressView.autoCenterInSuperview()

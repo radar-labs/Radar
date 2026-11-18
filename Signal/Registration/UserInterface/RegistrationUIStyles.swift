@@ -4,35 +4,27 @@
 //
 
 import Foundation
-import SwiftUI
 import SignalServiceKit
+import SwiftUI
 
 extension Registration {
 
     enum UI {
 
         private static func primaryButtonStyle() -> some PrimitiveButtonStyle {
-#if compiler(>=6.2)
             if #available(iOS 26, *) {
                 return GlassProminentButtonStyle.glassProminent
             } else {
                 return BorderedProminentButtonStyle.borderedProminent
             }
-#else
-            return BorderedProminentButtonStyle.borderedProminent
-#endif
         }
 
         private static func secondaryButtonStyle() -> some PrimitiveButtonStyle {
-#if compiler(>=6.2)
             if #available(iOS 26, *) {
                 return GlassProminentButtonStyle.glassProminent
             } else {
                 return PlainButtonStyle.plain
             }
-#else
-            return PlainButtonStyle.plain
-#endif
         }
 
         private static var largeButtonContentPadding: EdgeInsets {
@@ -55,10 +47,6 @@ extension Registration {
             }
         }
 
-        private static func primaryButtonForegroundColor() -> Color {
-            return .white
-        }
-
         private static func secondaryButtonForegroundColor() -> Color {
             if #available(iOS 26, *) {
                 return .Signal.label
@@ -68,6 +56,8 @@ extension Registration {
         }
 
         struct LargePrimaryButtonStyle: PrimitiveButtonStyle {
+            @Environment(\.isEnabled) private var isEnabled
+
             @ViewBuilder
             func makeBody(configuration: Configuration) -> some View {
                 Button(action: configuration.trigger) {
@@ -75,7 +65,7 @@ extension Registration {
                         Spacer()
                         configuration.label
                             .font(.headline)
-                            .foregroundColor(UI.primaryButtonForegroundColor())
+                            .foregroundColor(isEnabled ? .white : .black)
                         Spacer()
                     }
                     .padding(UI.largeButtonContentPadding)
@@ -86,22 +76,40 @@ extension Registration {
             }
         }
 
+        private static func baseLargeSecondaryButtonStyleBody(
+            configuration: PrimitiveButtonStyle.Configuration,
+        ) -> some View {
+            Button(action: configuration.trigger) {
+                HStack {
+                    Spacer()
+                    configuration.label
+                        .font(.headline)
+                        .foregroundColor(UI.secondaryButtonForegroundColor())
+                    Spacer()
+                }
+                .padding(UI.largeButtonContentPadding)
+            }
+            .buttonStyle(UI.secondaryButtonStyle())
+            .buttonBorderShape(UI.buttonBorderShape())
+        }
+
         struct LargeSecondaryButtonStyle: PrimitiveButtonStyle {
             @ViewBuilder
             func makeBody(configuration: Configuration) -> some View {
-                Button(action: configuration.trigger) {
-                    HStack {
-                        Spacer()
-                        configuration.label
-                            .font(.headline)
-                            .foregroundColor(UI.secondaryButtonForegroundColor())
-                        Spacer()
-                    }
-                    .padding(UI.largeButtonContentPadding)
-                }
-                .buttonStyle(UI.secondaryButtonStyle())
-                .buttonBorderShape(UI.buttonBorderShape())
+                Registration.UI.baseLargeSecondaryButtonStyleBody(
+                    configuration: configuration,
+                )
                 .tint(.clear)
+            }
+        }
+
+        struct LargeSecondaryHeroButtonStyle: PrimitiveButtonStyle {
+            @ViewBuilder
+            func makeBody(configuration: Configuration) -> some View {
+                Registration.UI.baseLargeSecondaryButtonStyleBody(
+                    configuration: configuration,
+                )
+                .tint(.Signal.secondaryFill)
             }
         }
 
@@ -121,3 +129,31 @@ extension Registration {
         }
     }
 }
+
+// MARK: -
+
+#if DEBUG
+
+#Preview("Button Styles") {
+    VStack(spacing: 16) {
+        Button("Large Primary") {}
+            .buttonStyle(Registration.UI.LargePrimaryButtonStyle())
+        Button("Large Secondary") {}
+            .buttonStyle(Registration.UI.LargeSecondaryButtonStyle())
+        Button("Medium Secondary") {}
+            .buttonStyle(Registration.UI.MediumSecondaryButtonStyle())
+
+        Button("Large Primary Disabled") {}
+            .buttonStyle(Registration.UI.LargePrimaryButtonStyle())
+            .disabled(true)
+        Button("Large Secondary Disabled") {}
+            .buttonStyle(Registration.UI.LargeSecondaryButtonStyle())
+            .disabled(true)
+        Button("Medium Secondary Disabled") {}
+            .buttonStyle(Registration.UI.MediumSecondaryButtonStyle())
+            .disabled(true)
+    }
+    .padding()
+}
+
+#endif

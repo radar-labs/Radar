@@ -4,7 +4,6 @@
 //
 
 import Foundation
-import Reachability
 public import LibSignalClient
 
 public protocol NetworkManagerProtocol {
@@ -39,13 +38,9 @@ public class NetworkManager: NetworkManagerProtocol {
         self.libsignalNet = libsignalNet
         if let libsignalNet {
             self.reachabilityDidChangeObserver = Task {
-                for await notification in NotificationCenter.default.notifications(named: .reachabilityChanged) {
-                    let reachability = notification.object as! Reachability
-                    Logger.info("New preferred network: \(reachability.currentReachabilityString()!)")
+                for await _ in NotificationCenter.default.notifications(named: SSKReachability.owsReachabilityDidChange) {
                     do {
-                        if !SignalProxy.isEnabled {
-                            Self.resetLibsignalNetProxySettings(libsignalNet, appReadiness: appReadiness)
-                        }
+                        Self.resetLibsignalNetProxySettings(libsignalNet, appReadiness: appReadiness)
                         try libsignalNet.networkDidChange()
                     } catch {
                         owsFailDebug("error notify libsignal of network change: \(error)")
@@ -54,6 +49,7 @@ public class NetworkManager: NetworkManagerProtocol {
             }
 
             self.resetLibsignalNetProxySettings()
+            Logger.info("Initialized libsignal Net and reset proxy settings (signalProxyEnabled: \(SignalProxy.isEnabled)).")
             appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
                 // We did this once already, but doing it properly depends on RemoteConfig.
                 self.resetLibsignalNetProxySettings()
@@ -62,7 +58,6 @@ public class NetworkManager: NetworkManagerProtocol {
             self.reachabilityDidChangeObserver = nil
         }
 
-        SwiftSingletons.register(self)
     }
 
     deinit {
@@ -82,6 +77,11 @@ public class NetworkManager: NetworkManagerProtocol {
     }
 
     private static func resetLibsignalNetProxySettings(_ libsignalNet: Net, appReadiness: AppReadiness) {
+        guard !SignalProxy.isEnabled else {
+            // Don't stomp on in-app proxy settings, which are managed by SignalProxy.
+            return
+        }
+
         if let systemProxy = ProxyConfig.fromCFNetwork() {
             Logger.info("System '\(systemProxy.scheme)' proxy detected")
             do {
@@ -118,7 +118,7 @@ public class NetworkManager: NetworkManagerProtocol {
 
         public init(
             retryOn: [RetryOn],
-            maxAttempts: Int
+            maxAttempts: Int,
         ) {
             self.retryOn = retryOn
             self.maxAttempts = maxAttempts
@@ -156,7 +156,7 @@ public class NetworkManager: NetworkManagerProtocol {
 
                 return false
             },
-            block: { try await _asyncRequest(request) }
+            block: { try await _asyncRequest(request) },
         )
     }
 
@@ -182,7 +182,7 @@ private struct ProxyConfig {
     var password: String?
 
     static func fromCFNetwork() -> Self? {
-        let chatURL = URL(string: TSConstants.mainServiceIdentifiedURL)!
+        let chatURL = URL(string: TSConstants.mainServiceURL)!
         guard let settings = CFNetworkCopySystemProxySettings()?.takeRetainedValue() else {
             return nil
         }
@@ -202,7 +202,8 @@ private struct ProxyConfig {
                     host: proxyConfig[kCFProxyHostNameKey] as! String,
                     port: proxyConfig[kCFProxyPortNumberKey] as! UInt16?,
                     username: proxyConfig[kCFProxyUsernameKey] as! String?,
-                    password: proxyConfig[kCFProxyPasswordKey] as! String?)
+                    password: proxyConfig[kCFProxyPasswordKey] as! String?,
+                )
             case kCFProxyTypeHTTPS:
                 // This seems to mean "HTTP proxy for HTTPS connections" rather than "proxy that itself uses TLS".
                 // Leave room for the latter interpretation if the port number is traditionally HTTPS.
@@ -212,7 +213,8 @@ private struct ProxyConfig {
                     host: proxyConfig[kCFProxyHostNameKey] as! String,
                     port: port,
                     username: proxyConfig[kCFProxyUsernameKey] as! String?,
-                    password: proxyConfig[kCFProxyPasswordKey] as! String?)
+                    password: proxyConfig[kCFProxyPasswordKey] as! String?,
+                )
             case kCFProxyTypeSOCKS:
                 // iOS doesn't distinguish between SOCKS4 and SOCKS5. Defer to libsignal's default.
                 return ProxyConfig(
@@ -220,7 +222,8 @@ private struct ProxyConfig {
                     host: proxyConfig[kCFProxyHostNameKey] as! String,
                     port: proxyConfig[kCFProxyPortNumberKey] as! UInt16?,
                     username: proxyConfig[kCFProxyUsernameKey] as! String?,
-                    password: proxyConfig[kCFProxyPasswordKey] as! String?)
+                    password: proxyConfig[kCFProxyPasswordKey] as! String?,
+                )
             case kCFProxyTypeAutoConfigurationJavaScript, kCFProxyTypeAutoConfigurationURL:
                 // CFNetwork provides ways to execute these, but they're not something that can be done synchronously.
                 // PAC files are rare, though; we can come back to this if it turns out to be used in practice.
@@ -248,7 +251,7 @@ private struct ProxyConfig {
 
 public class OWSFakeNetworkManager: NetworkManager {
 
-    public override func asyncRequestImpl(
+    override public func asyncRequestImpl(
         _ request: TSRequest,
         retryPolicy: RetryPolicy,
     ) async throws -> HTTPResponse {
@@ -265,6 +268,28 @@ class MockNetworkManager: NetworkManagerProtocol {
         retryPolicy: NetworkManager.RetryPolicy,
     ) async throws -> HTTPResponse {
         return try await asyncRequestHandlers.removeFirst()(request, retryPolicy)
+    }
+
+    static func mockResponse(
+        matchingRequest: @escaping (TSRequest) -> Bool,
+        statusCode: Int = 200,
+        headers: HttpHeaders = HttpHeaders(),
+        bodyData: Data? = nil,
+        bodyJson: (any Encodable)? = nil,
+    ) -> ((TSRequest, NetworkManager.RetryPolicy) async throws -> HTTPResponse) {
+        return { request, _ in
+            owsPrecondition(matchingRequest(request))
+            let response = HTTPResponse(
+                requestUrl: request.url,
+                status: statusCode,
+                headers: headers,
+                bodyData: bodyData ?? bodyJson.map({ try! JSONEncoder().encode($0) }),
+            )
+            guard 200 <= statusCode, statusCode <= 399 else {
+                throw response.asError()
+            }
+            return response
+        }
     }
 }
 

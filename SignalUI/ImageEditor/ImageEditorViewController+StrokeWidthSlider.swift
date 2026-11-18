@@ -15,9 +15,12 @@ extension ImageEditorViewController {
     private func setupStrokeWidthPreviewIfNecessary() {
         guard strokeWidthSliderIsTrackingObservation == nil else { return }
 
+        strokeWidthPreviewDot.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(strokeWidthPreviewDot)
-        strokeWidthPreviewDot.autoHCenterInSuperview()
-        strokeWidthPreviewDot.autoVCenterInSuperview()
+        NSLayoutConstraint.activate([
+            strokeWidthPreviewDot.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            strokeWidthPreviewDot.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+        ])
 
         strokeWidthSliderIsTrackingObservation = strokeWidthSlider.observe(\.isTracking, options: [.new]) { [weak self] _, _ in
             self?.updateStrokeWidthPreviewVisibility()
@@ -30,12 +33,14 @@ extension ImageEditorViewController {
     }
 
     func updateStrokeWidthPreviewSize() {
-        guard let strokeWidthPreviewDotSize = strokeWidthPreviewDotSize else { return }
+        guard let strokeWidthPreviewDotSize else { return }
 
         let unitStrokeWidth = currentStrokeUnitWidth()
         let viewSize = imageEditorView.gestureReferenceView.bounds.size
-        let strokeWidth = ImageEditorStrokeItem.strokeWidth(forUnitStrokeWidth: unitStrokeWidth,
-                                                            dstSize: viewSize)
+        let strokeWidth = ImageEditorStrokeItem.strokeWidth(
+            forUnitStrokeWidth: unitStrokeWidth,
+            dstSize: viewSize,
+        )
         var dotSize = max(strokeWidth, 1)
         if currentStrokeType != .blur {
             dotSize += 2 * strokeWidthPreviewDot.layer.borderWidth
@@ -51,11 +56,10 @@ extension ImageEditorViewController {
         }
     }
 
-    @objc
-    func strokeTypeButtonTapped(sender: UIButton) {
+    func didTapStrokeTypeButton() {
         owsAssertDebug(currentStroke == nil)
-        drawToolbar.strokeTypeButton.isSelected = !drawToolbar.strokeTypeButton.isSelected
-        currentStrokeType = drawToolbar.strokeTypeButton.isSelected ? .highlighter : .pen
+        drawToolbar.toggleStrokeType()
+        currentStrokeType = drawToolbar.strokeType
     }
 
     @objc
@@ -67,23 +71,21 @@ extension ImageEditorViewController {
             owsAssertDebug(hideStrokeWidthSliderTimer == nil)
 
             hideStrokeWidthSliderTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { [weak self] _ in
-                guard let self = self else { return }
+                guard let self else { return }
 
                 self.setStrokeWidthSlider(revealed: false)
             }
         }
     }
 
-    @objc
-    func handleSliderTouchEvents(slider: UISlider) {
+    func handleSliderTouchEvents(_ slider: UISlider) {
         guard slider.isTracking != strokeWidthSliderRevealed else { return }
 
         setStrokeWidthSlider(revealed: slider.isTracking)
     }
 
-    @objc
-    func handleSliderValueChanged(slider: UISlider) {
-        strokeWidthValues[currentStrokeType] = slider.value
+    func handleSliderValueChanged(value: Float) {
+        strokeWidthValues[currentStrokeType] = value
         updateStrokeWidthPreviewSize()
     }
 
@@ -105,8 +107,8 @@ extension ImageEditorViewController {
 
     private func updateStrokeWidthSliderPosition() {
         strokeWidthSliderPosition?.constant = strokeWidthSliderRevealed
-        ? strokeWidthSliderContainer.bounds.height/2 - 12
-        : 0
+            ? strokeWidthSliderContainer.bounds.height / 2 - 12
+            : 0
         UIView.animate(withDuration: 0.2) {
             if !self.strokeWidthSliderRevealed {
                 self.strokeWidthPreviewDot.alpha = 0

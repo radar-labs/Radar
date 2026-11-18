@@ -4,7 +4,7 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
 enum ViewOnceState: Equatable {
     case unknown
@@ -19,7 +19,7 @@ enum ViewOnceState: Equatable {
     case outgoingFailed
     case outgoingSentExpired
 
-    static func == (lhs: ViewOnceState, rhs: ViewOnceState) -> Bool {
+    static func ==(lhs: ViewOnceState, rhs: ViewOnceState) -> Bool {
         switch (lhs, rhs) {
         case
             (.unknown, .unknown),
@@ -57,9 +57,9 @@ enum ViewOnceState: Equatable {
 
 // MARK: -
 
-public class CVComponentViewOnce: CVComponentBase, CVComponent {
+class CVComponentViewOnce: CVComponentBase, CVComponent, CVAccessibilityComponent {
 
-    public var componentKey: CVComponentKey { .viewOnce }
+    var componentKey: CVComponentKey { .viewOnce }
 
     private enum ViewOnceMessageType: Equatable {
         case unknown
@@ -73,6 +73,7 @@ public class CVComponentViewOnce: CVComponentBase, CVComponent {
     private var viewOnceState: ViewOnceState {
         viewOnce.viewOnceState
     }
+
     private var isExpired: Bool {
         switch viewOnce.viewOnceState {
         case .incomingExpired, .outgoingSentExpired:
@@ -81,13 +82,15 @@ public class CVComponentViewOnce: CVComponentBase, CVComponent {
             return false
         }
     }
+
     private var attachmentStream: AttachmentStream? {
         if case .incomingAvailable(let attachmentStream, _) = viewOnceState {
             return attachmentStream
         }
         return nil
     }
-    private var shouldShowIcon: Bool {
+
+    private var shouldShowStateIcon: Bool {
         switch viewOnceState {
         case .incomingInvalidContent, .incomingDownloading:
             return false
@@ -95,7 +98,8 @@ public class CVComponentViewOnce: CVComponentBase, CVComponent {
             return true
         }
     }
-    private var shouldShowProgress: Bool {
+
+    private var shouldShowProgressView: Bool {
         switch viewOnceState {
         case .incomingDownloading:
             return true
@@ -110,13 +114,15 @@ public class CVComponentViewOnce: CVComponentBase, CVComponent {
         super.init(itemModel: itemModel)
     }
 
-    public func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
+    func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
         CVComponentViewViewOnce()
     }
 
-    public func configureForRendering(componentView componentViewParam: CVComponentView,
-                                      cellMeasurement: CVCellMeasurement,
-                                      componentDelegate: CVComponentDelegate) {
+    func configureForRendering(
+        componentView componentViewParam: CVComponentView,
+        cellMeasurement: CVCellMeasurement,
+        componentDelegate: CVComponentDelegate,
+    ) {
         guard let componentView = componentViewParam as? CVComponentViewViewOnce else {
             owsFailDebug("Unexpected componentView.")
             componentViewParam.reset()
@@ -125,23 +131,32 @@ public class CVComponentViewOnce: CVComponentBase, CVComponent {
 
         var subviews = [UIView]()
 
+        let configuration = CVAttachmentProgressView.Configuration(
+            conversationStyle: conversationStyle,
+            isIncoming: isIncoming,
+            margin: 3,
+        )
+
         switch viewOnceState {
         case .incomingDownloading(let attachmentPointer, _):
             let progressView = CVAttachmentProgressView(
                 direction: .download(
-                    attachmentPointer: attachmentPointer,
-                    downloadState: .enqueuedOrDownloading
+                    attachmentID: attachmentPointer.id,
+                    downloadState: .enqueuedOrDownloading,
                 ),
-                diameter: iconSize,
-                isDarkThemeEnabled: conversationStyle.isDarkThemeEnabled,
-                mediaCache: mediaCache
+                configuration: configuration,
             )
             subviews.append(progressView)
         default:
-            if shouldShowIcon, let iconName = self.iconName {
+            if shouldShowStateIcon, let iconName {
+                let backgroundCirleView = CVAttachmentProgressView.circularBackgroundView(
+                    configuration: configuration,
+                )
                 let iconView = componentView.iconView
-                iconView.setTemplateImageName(iconName, tintColor: iconColor)
-                subviews.append(iconView)
+                iconView.contentMode = .center
+                iconView.setTemplateImageName(iconName, tintColor: configuration.foregroundColor)
+                backgroundCirleView.addSubviewToFillSuperviewEdges(iconView)
+                subviews.append(backgroundCirleView)
             }
         }
 
@@ -151,48 +166,49 @@ public class CVComponentViewOnce: CVComponentBase, CVComponent {
 
         let stackView = componentView.stackView
         stackView.reset()
-        stackView.configure(config: stackViewConfig,
-                            cellMeasurement: cellMeasurement,
-                            measurementKey: Self.measurementKey_stackView,
-                            subviews: subviews)
+        stackView.configure(
+            config: stackViewConfig,
+            cellMeasurement: cellMeasurement,
+            measurementKey: Self.measurementKey_stackView,
+            subviews: subviews,
+        )
     }
 
-    private let iconSize: CGFloat = 24
-
-    private var downloadProgressRadius: CGFloat {
-        iconSize * 0.5
-    }
+    private let stateViewSize = CGSize(square: 40)
 
     private var stackViewConfig: CVStackViewConfig {
-        CVStackViewConfig(axis: .horizontal,
-                          alignment: .center,
-                          spacing: 8,
-                          layoutMargins: .zero)
+        CVStackViewConfig(
+            axis: .horizontal,
+            alignment: .center,
+            spacing: 8,
+            layoutMargins: .zero,
+        )
     }
 
     private static let measurementKey_stackView = "CVComponentViewOnce.measurementKey_stackView"
 
-    public func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
+    func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
         owsAssertDebug(maxWidth > 0)
 
         var subviewInfos = [ManualStackSubviewInfo]()
 
-        let hasIcon = shouldShowIcon && iconName != nil
-        let hasIconOrProgress = hasIcon || shouldShowProgress
+        let showStateIcon = shouldShowStateIcon && iconName != nil
 
         var availableWidth = maxWidth
-        if hasIconOrProgress {
-            availableWidth = max(0, availableWidth - (iconSize + stackViewConfig.spacing))
-            subviewInfos.append(CGSize.square(iconSize).asManualSubviewInfo(hasFixedSize: true))
+        if showStateIcon || shouldShowProgressView {
+            availableWidth = max(0, availableWidth - (stateViewSize.width + stackViewConfig.spacing))
+            subviewInfos.append(stateViewSize.asManualSubviewInfo(hasFixedSize: true))
         }
         let textSize = CVText.measureLabel(config: labelConfig, maxWidth: availableWidth)
         subviewInfos.append(textSize.asManualSubviewInfo)
 
-        let stackMeasurement = ManualStackView.measure(config: stackViewConfig,
-                                                       measurementBuilder: measurementBuilder,
-                                                       measurementKey: Self.measurementKey_stackView,
-                                                       subviewInfos: subviewInfos,
-                                                       maxWidth: maxWidth)
+        let stackMeasurement = ManualStackView.measure(
+            config: stackViewConfig,
+            measurementBuilder: measurementBuilder,
+            measurementKey: Self.measurementKey_stackView,
+            subviewInfos: subviewInfos,
+            maxWidth: maxWidth,
+        )
         var result = stackMeasurement.measuredSize
         // We use this "min width" to reduce/avoid "flutter"
         // in the bubble's size as the message changes states.
@@ -203,10 +219,12 @@ public class CVComponentViewOnce: CVComponentBase, CVComponent {
 
     // MARK: - Events
 
-    public override func handleTap(sender: UIGestureRecognizer,
-                                   componentDelegate: CVComponentDelegate,
-                                   componentView: CVComponentView,
-                                   renderItem: CVRenderItem) -> Bool {
+    override func handleTap(
+        sender: UIGestureRecognizer,
+        componentDelegate: CVComponentDelegate,
+        componentView: CVComponentView,
+        renderItem: CVRenderItem,
+    ) -> Bool {
         AssertIsOnMainThread()
 
         guard let message = interaction as? TSMessage else {
@@ -221,7 +239,7 @@ public class CVComponentViewOnce: CVComponentBase, CVComponent {
              .incomingInvalidContent:
             break
         case .incomingFailed, .incomingPending:
-            componentDelegate.didTapFailedOrPendingDownloads(message)
+            componentDelegate.didTapSkippedDownloads(message)
         case .incomingAvailable:
             componentDelegate.didTapViewOnceAttachment(message)
         case .incomingExpired, .outgoingSentExpired:
@@ -239,33 +257,31 @@ public class CVComponentViewOnce: CVComponentBase, CVComponent {
 
     // Used for rendering some portion of an Conversation View item.
     // It could be the entire item or some part thereof.
-    public class CVComponentViewViewOnce: NSObject, CVComponentView {
+    class CVComponentViewViewOnce: CVComponentView {
 
         fileprivate let stackView = ManualStackView(name: "viewOnce")
         fileprivate let iconView = CVImageView()
         fileprivate let label = CVLabel()
 
-        public var isDedicatedCellView = false
+        var isDedicatedCellView = false
 
-        public var rootView: UIView {
+        var rootView: UIView {
             stackView
         }
 
-        public func setIsCellVisible(_ isCellVisible: Bool) {}
+        func setIsCellVisible(_ isCellVisible: Bool) {}
 
-        public func reset() {
+        func reset() {
             stackView.reset()
             iconView.image = nil
             label.text = nil
         }
 
     }
-}
 
-// MARK: -
+    // MARK: -
 
-fileprivate extension CVComponentViewOnce {
-    var iconName: String? {
+    private var iconName: String? {
         switch viewOnceState {
         case .unknown:
             owsFailDebug("Invalid value.")
@@ -276,7 +292,7 @@ fileprivate extension CVComponentViewOnce {
             owsFailDebug("Unexpected state.")
             return nil
         case .incomingFailed, .incomingPending:
-            return "arrow-circle-down"
+            return Theme.iconName(.arrowDown)
         case .incomingAvailable:
             return "view_once"
         case .outgoingFailed:
@@ -290,7 +306,7 @@ fileprivate extension CVComponentViewOnce {
         }
     }
 
-    var textColor: UIColor {
+    private var textColor: UIColor {
         switch viewOnceState {
         case .unknown:
             owsFailDebug("Invalid value.")
@@ -311,39 +327,14 @@ fileprivate extension CVComponentViewOnce {
         }
     }
 
-    var iconColor: UIColor {
-        let pendingColor: UIColor = (Theme.isDarkThemeEnabled ? .ows_gray15 : .ows_gray75)
-
-        switch viewOnceState {
-        case .unknown:
-            owsFailDebug("Invalid value.")
-            return conversationStyle.bubbleTextColorIncoming
-        case .incomingExpired, .incomingUndownloadable:
-            return conversationStyle.bubbleTextColorIncoming
-        case .incomingDownloading,
-             .incomingFailed,
-             .incomingPending:
-            return pendingColor
-        case .incomingAvailable:
-            return conversationStyle.bubbleTextColorIncoming
-        case .outgoingFailed:
-            return pendingColor
-        case .outgoingSending,
-             .outgoingSentExpired:
-            return conversationStyle.bubbleTextColorOutgoing
-        case .incomingInvalidContent:
-            return Theme.secondaryTextAndIconColor
-        }
-    }
-
-    var labelConfig: CVLabelConfig {
+    private var labelConfig: CVLabelConfig {
         func buildDefaultConfig(text: String) -> CVLabelConfig {
             return CVLabelConfig.unstyledText(
                 text,
                 font: UIFont.dynamicTypeSubheadline.semibold(),
                 textColor: textColor,
                 numberOfLines: 1,
-                lineBreakMode: .byTruncatingTail
+                lineBreakMode: .byTruncatingTail,
             )
         }
 
@@ -352,13 +343,15 @@ fileprivate extension CVComponentViewOnce {
             owsFailDebug("Invalid value.")
             return buildDefaultConfig(text: CommonStrings.genericError)
         case .incomingExpired:
-            let text = OWSLocalizedString("PER_MESSAGE_EXPIRATION_VIEWED",
-                                         comment: "Label for view-once messages indicating that the local user has viewed the message's contents.")
+            let text = OWSLocalizedString(
+                "PER_MESSAGE_EXPIRATION_VIEWED",
+                comment: "Label for view-once messages indicating that the local user has viewed the message's contents.",
+            )
             return buildDefaultConfig(text: text)
         case .incomingUndownloadable:
             let text = OWSLocalizedString(
                 "PER_MESSAGE_EXPIRATION_EXPIRED",
-                comment: "Label for view-once messages indicating that the message's contents are expired and unavailable to download."
+                comment: "Label for view-once messages indicating that the message's contents are expired and unavailable to download.",
             )
             return buildDefaultConfig(text: text)
         case .incomingDownloading:
@@ -388,18 +381,22 @@ fileprivate extension CVComponentViewOnce {
         case .outgoingSending,
              .outgoingSentExpired:
             let text = OWSLocalizedString(
-                "PER_MESSAGE_EXPIRATION_OUTGOING_MESSAGE", comment: "Label for outgoing view-once messages.")
+                "PER_MESSAGE_EXPIRATION_OUTGOING_MESSAGE",
+                comment: "Label for outgoing view-once messages.",
+            )
             return buildDefaultConfig(text: text)
         case .incomingInvalidContent:
             let text = OWSLocalizedString(
-                "PER_MESSAGE_EXPIRATION_INVALID_CONTENT", comment: "Label for view-once messages that have invalid content.")
+                "PER_MESSAGE_EXPIRATION_INVALID_CONTENT",
+                comment: "Label for view-once messages that have invalid content.",
+            )
             // Reconfigure label for this state only.
             return CVLabelConfig.unstyledText(
                 text,
                 font: UIFont.dynamicTypeSubheadline,
                 textColor: Theme.secondaryTextAndIconColor,
                 numberOfLines: 0,
-                lineBreakMode: .byWordWrapping
+                lineBreakMode: .byWordWrapping,
             )
         }
     }
@@ -408,15 +405,13 @@ fileprivate extension CVComponentViewOnce {
         switch viewOnceState {
         case let .incomingAvailable(attachmentStream, _):
             switch attachmentStream.contentType {
-            case .file, .invalid, .audio:
+            case .file, .audio:
                 owsFailDebug("Invalid view once type")
                 return .unknown
             case .image:
                 return .photo
             case .video:
                 return .video
-            case .animatedImage:
-                return .photo
             }
         case .unknown,
              .incomingExpired,
@@ -438,12 +433,10 @@ fileprivate extension CVComponentViewOnce {
             return .unknown
         }
     }
-}
 
-// MARK: -
+    // MARK: - CVAccessibilityComponent
 
-extension CVComponentViewOnce: CVAccessibilityComponent {
-    public var accessibilityDescription: String {
+    var accessibilityDescription: String {
         // TODO: We could include the media type (video, image, animated image).
         labelConfig.text.accessibilityDescription
     }

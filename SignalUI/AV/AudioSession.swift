@@ -14,7 +14,7 @@ public class AudioActivity: NSObject {
 
     public var requiresRecordingPermissions: Bool {
         switch behavior {
-        case .playAndRecord, .call:
+        case .recordAudio, .call:
             return true
         case .playback, .playbackMixWithOthers, .audioMessagePlayback, .unknown:
             return false
@@ -26,7 +26,7 @@ public class AudioActivity: NSObject {
         switch behavior {
         case .audioMessagePlayback, .call:
             return true
-        case .playback, .playbackMixWithOthers, .playAndRecord, .unknown:
+        case .playback, .playbackMixWithOthers, .recordAudio, .unknown:
             return false
         }
     }
@@ -34,8 +34,11 @@ public class AudioActivity: NSObject {
     public var backgroundPlaybackName: String? {
         switch behavior {
         case .audioMessagePlayback:
-            return OWSLocalizedString("AUDIO_ACTIVITY_PLAYBACK_NAME_AUDIO_MESSAGE",
-                                     comment: "A string indicating that an audio message is playing.")
+            return OWSLocalizedString(
+                "AUDIO_ACTIVITY_PLAYBACK_NAME_AUDIO_MESSAGE",
+                comment: "A string indicating that an audio message is playing.",
+            )
+
         case .call:
             return nil
 
@@ -65,7 +68,7 @@ public class AudioSession: NSObject {
 
     private let device = UIDevice.current
 
-    public override init() {
+    override public init() {
         super.init()
     }
 
@@ -82,7 +85,8 @@ public class AudioSession: NSObject {
             self,
             selector: #selector(proximitySensorStateDidChange(notification:)),
             name: UIDevice.proximityStateDidChangeNotification,
-            object: nil)
+            object: nil,
+        )
 
         ensureAudioState()
     }
@@ -107,6 +111,14 @@ public class AudioSession: NSObject {
     public func startAudioActivity(_ audioActivity: AudioActivity) -> Bool {
         unfairLock.lock()
         defer { unfairLock.unlock() }
+
+        if
+            audioActivity.behavior == .recordAudio,
+            aggregateBehaviors.contains(.call)
+        {
+            Logger.warn("Can't start recording while a call audio activity is active.")
+            return false
+        }
 
         if
             audioActivity.requiresRecordingPermissions,
@@ -155,6 +167,11 @@ public class AudioSession: NSObject {
     }
 
     private func reconcileAudioCategory() throws {
+
+        // Pre-emptively call this before checking the behaviors. This helps clean
+        // any bad/stale audo state that may have linger from errors (e.g. CallKit failures)
+        cullStaleAudioActivities()
+
         if aggregateBehaviors.contains(.audioMessagePlayback) {
             SSKEnvironment.shared.proximityMonitoringManagerRef.add(lifetime: self)
         } else {
@@ -166,7 +183,7 @@ public class AudioSession: NSObject {
             // WebRTC/CallAudioService manages call audio
             // Eventually it would be nice to consolidate more of the audio
             // session handling.
-        } else if aggregateBehaviors.contains(.playAndRecord) {
+        } else if aggregateBehaviors.contains(.recordAudio) {
             assert(avAudioSession.recordPermission == .granted)
             try setCategory(
                 .playAndRecord,
@@ -174,8 +191,7 @@ public class AudioSession: NSObject {
                 options: [
                     .defaultToSpeaker,
                     .allowBluetoothHFP,
-                    .allowBluetoothA2DP
-                ]
+                ],
             )
             try avAudioSession.setAllowHapticsAndSystemSoundsDuringRecording(true)
         } else if aggregateBehaviors.contains(.audioMessagePlayback) {
@@ -201,7 +217,7 @@ public class AudioSession: NSObject {
     private func setCategory(
         _ category: AVAudioSession.Category,
         mode: AVAudioSession.Mode? = nil,
-        options: AVAudioSession.CategoryOptions = []
+        options: AVAudioSession.CategoryOptions = [],
     ) throws {
         guard
             avAudioSession.category != category
@@ -210,9 +226,9 @@ public class AudioSession: NSObject {
         else {
             return
         }
-        if let mode = mode, !options.isEmpty {
+        if let mode, !options.isEmpty {
             try avAudioSession.setCategory(category, mode: mode, options: options)
-        } else if let mode = mode {
+        } else if let mode {
             try avAudioSession.setCategory(category, mode: mode)
         } else if !options.isEmpty {
             try avAudioSession.setCategory(category, options: options)
@@ -221,12 +237,7 @@ public class AudioSession: NSObject {
         }
     }
 
-    private func ensureAudioSessionActivationState(remainingRetries: UInt = 3) {
-        guard remainingRetries > 0 else {
-            owsFailDebug("ensureAudioSessionActivationState has no remaining retries")
-            return
-        }
-
+    private func cullStaleAudioActivities() {
         // Cull any stale activities
         currentActivities = currentActivities.compactMap { oldActivity in
             guard oldActivity.value != nil else {
@@ -240,6 +251,15 @@ public class AudioSession: NSObject {
             // return any still-active activities
             return oldActivity
         }
+    }
+
+    private func ensureAudioSessionActivationState(remainingRetries: UInt = 3) {
+        guard remainingRetries > 0 else {
+            owsFailDebug("ensureAudioSessionActivationState has no remaining retries")
+            return
+        }
+
+        cullStaleAudioActivities()
 
         guard currentActivities.isEmpty else {
             return
@@ -271,9 +291,9 @@ public class AudioSession: NSObject {
 }
 
 extension AVAudioSession.CategoryOptions {
-    #if !canImport(AVFoundation, _version: 2360.61.4.11)
+#if !canImport(AVFoundation, _version: 2360.61.4.11)
     public static let allowBluetoothHFP = Self.allowBluetooth
-    #endif
+#endif
 }
 
 extension AudioBehavior: CustomStringConvertible {
@@ -287,8 +307,8 @@ extension AudioBehavior: CustomStringConvertible {
             return "OWSAudioBehavior.playbackMixWithOthers"
         case .audioMessagePlayback:
             return "OWSAudioBehavior.audioMessagePlayback"
-        case .playAndRecord:
-            return "OWSAudioBehavior.playAndRecord"
+        case .recordAudio:
+            return "OWSAudioBehavior.recordAudioMessage"
         case .call:
             return "OWSAudioBehavior.call"
         }

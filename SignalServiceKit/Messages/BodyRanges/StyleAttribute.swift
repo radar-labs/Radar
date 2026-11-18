@@ -4,6 +4,7 @@
 //
 
 import Foundation
+public import UIKit
 
 // Note that this struct gets put into NSAttributedString,
 // so we want it to mostly contain simple types and not
@@ -17,7 +18,7 @@ public struct StyleDisplayConfiguration: Equatable {
     public let revealedSpoilerBgColor: ThemedColor?
 
     public let revealAllIds: Bool
-    public let revealedIds: Set<StyleIdType>
+    public let revealedIds: Set<StyleId>
 
     /// If true, unrevealed spoiler text will be invisible (clear).
     /// If false, unrevealed spoiler text will use `textColor` as its background color.
@@ -37,8 +38,8 @@ public struct StyleDisplayConfiguration: Equatable {
         spoilerAnimationColorOverride: ThemedColor? = nil,
         revealedSpoilerBgColor: ThemedColor? = nil,
         revealAllIds: Bool,
-        revealedIds: Set<StyleIdType>,
-        useAnimatedSpoilers: Bool
+        revealedIds: Set<StyleId>,
+        useAnimatedSpoilers: Bool,
     ) {
         self.baseFont = baseFont
         self.textColor = textColor
@@ -57,7 +58,7 @@ public struct StyleDisplayConfiguration: Equatable {
     }
 }
 
-internal struct StyleAttribute: Equatable, Hashable {
+struct StyleAttribute: Equatable, Hashable {
     typealias Style = MessageBodyRanges.Style
     typealias SingleStyle = MessageBodyRanges.SingleStyle
     typealias CollapsedStyle = MessageBodyRanges.CollapsedStyle
@@ -65,27 +66,19 @@ internal struct StyleAttribute: Equatable, Hashable {
     /// Externally: identifies a single style range, even if the actual attribute has been
     /// split when applied, as happens when a parallel attribute is applied to the middle
     /// of a style range.
-    ///
-    /// Really this is just the original full range of the style, hashed. But that detail is
-    /// irrelevant to everthing outside of this class.
-    internal let ids: [SingleStyle: StyleIdType]
-    internal let style: Style
+    let ids: [SingleStyle: StyleId]
+    let style: Style
 
-    internal static func fromCollapsedStyle(_ style: CollapsedStyle) -> Self {
+    static func fromCollapsedStyle(_ style: CollapsedStyle) -> Self {
         return .init(ids: style.originals.mapValues(\.id), style: style.style)
     }
 
-    private init(ids: [SingleStyle: StyleIdType], style: Style) {
-        self.ids = ids
-        self.style = style
-    }
-
-    internal func applyAttributes(
+    func applyAttributes(
         to string: NSMutableAttributedString,
         at range: NSRange,
         config: StyleDisplayConfiguration,
         searchRanges: HydratedMessageBody.DisplayConfiguration.SearchRanges?,
-        isDarkThemeEnabled: Bool
+        isDarkThemeEnabled: Bool,
     ) {
         var fontTraits: UIFontDescriptor.SymbolicTraits = []
         var attributes: [NSAttributedString.Key: Any] = [:]
@@ -115,7 +108,7 @@ internal struct StyleAttribute: Equatable, Hashable {
             }
         }
 
-        if style.contains(.strikethrough) && (isSpoilerRevealed ?? true) {
+        if style.contains(.strikethrough), isSpoilerRevealed ?? true {
             attributes[.strikethroughStyle] = NSUnderlineStyle.single.rawValue
             attributes[.strikethroughColor] = config.textColor.color(isDarkThemeEnabled: isDarkThemeEnabled)
         }
@@ -145,9 +138,9 @@ internal struct StyleAttribute: Equatable, Hashable {
                 string.addAttributes(
                     [
                         .backgroundColor: backgroundColor,
-                        .foregroundColor: UIColor.clear
+                        .foregroundColor: UIColor.clear,
                     ],
-                    range: intersection
+                    range: intersection,
                 )
             }
         }
@@ -156,16 +149,16 @@ internal struct StyleAttribute: Equatable, Hashable {
     private static let plaintextSpoilerCharacter = "■"
     private static let maxPlaintextSpoilerLength = 4
 
-    internal func applyPlaintextSpoiler(
+    func applyPlaintextSpoiler(
         to string: NSMutableString,
-        at range: NSRange
+        at range: NSRange,
     ) {
         string.replaceCharacters(
             in: range,
             with: String(
                 repeating: Self.plaintextSpoilerCharacter,
-                count: min(range.length, Self.maxPlaintextSpoilerLength)
-            )
+                count: min(range.length, Self.maxPlaintextSpoilerLength),
+            ),
         )
     }
 }

@@ -5,11 +5,9 @@
 
 import SignalServiceKit
 import SignalUI
-import SDWebImage
 
 class GifPickerCell: UICollectionViewCell {
 
-    private let imageView = SDAnimatedImageView()
     private let mp4View = LoopingVideoView()
     private let activityIndicator: UIActivityIndicatorView = {
         let view = UIActivityIndicatorView(style: .medium)
@@ -35,13 +33,11 @@ class GifPickerCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        [imageView, mp4View, activityIndicator].forEach {
+        [mp4View, activityIndicator].forEach {
             contentView.addSubview($0)
         }
-        imageView.isHidden = true
         mp4View.isHidden = true
 
-        imageView.autoPinEdgesToSuperviewEdges()
         mp4View.autoPinEdgesToSuperviewEdges()
         activityIndicator.autoCenterInSuperview()
 
@@ -49,7 +45,8 @@ class GifPickerCell: UICollectionViewCell {
             self,
             selector: #selector(applyTheme),
             name: .themeDidChange,
-            object: nil)
+            object: nil,
+        )
 
         applyTheme()
     }
@@ -64,7 +61,7 @@ class GifPickerCell: UICollectionViewCell {
 
     // MARK: Public
 
-    public func ensureCellState() {
+    func ensureCellState() {
         ensureLoadState()
         ensureViewState()
     }
@@ -72,10 +69,6 @@ class GifPickerCell: UICollectionViewCell {
     var imageInfo: GiphyImageInfo? {
         didSet {
             AssertIsOnMainThread()
-            if imageInfo?.isValidImage == false {
-                owsFailDebug("Invalid image info set on cell")
-                imageInfo = nil
-            }
             ensureCellState()
         }
     }
@@ -96,21 +89,20 @@ class GifPickerCell: UICollectionViewCell {
         }
     }
 
-    public var isDisplayingPreview: Bool {
-        (previewAsset != nil) && (mp4View.video != nil || imageView.image != nil)
+    var isDisplayingPreview: Bool {
+        previewAsset != nil && mp4View.video != nil
     }
 
-    public func requestRenditionForSending() async throws(GiphyError) -> ProxiedContentAsset {
-        guard let imageInfo = imageInfo,
-              let fullSizeAsset = imageInfo.fullSizeAsset else {
-            owsFailDebug("fullSizeAsset was unexpectedly nil")
-            throw GiphyError.assertionError(description: "fullSizeAsset was unexpectedly nil")
+    func requestRenditionForSending() async throws(GiphyError) -> ProxiedContentAsset {
+        guard let imageInfo else {
+            owsFailDebug("imageInfo was unexpectedly nil")
+            throw GiphyError.assertionError(description: "imageInfo was unexpectedly nil")
         }
 
         // We don't retain a handle on the asset request, since there will only ever
         // be one selected asset, and we never want to cancel it.
         do {
-            return try await GiphyDownloader.giphyDownloader.requestAsset(assetDescription: fullSizeAsset, priority: .high)
+            return try await GiphyDownloader.giphyDownloader.requestAsset(assetDescription: imageInfo.fullSize, priority: .high)
         } catch {
             // TODO GiphyDownloader API should pass through a useful failing error
             // so we can pass it through here
@@ -139,7 +131,7 @@ class GifPickerCell: UICollectionViewCell {
     }
 
     private func ensureLoadState() {
-        guard isCellVisible, let imageInfo = imageInfo else {
+        guard isCellVisible, let imageInfo else {
             // Nothing to load. We don't load non-visible cell content
             previewAssetRequest = nil
             return
@@ -148,17 +140,13 @@ class GifPickerCell: UICollectionViewCell {
             // We already have a load in progress, or we've already loaded the asset
             return
         }
-        guard let previewAssetDescription = imageInfo.animatedPreviewAsset else {
-            Logger.warn("could not pick gif rendition: \(imageInfo.giphyId)")
-            return
-        }
 
         previewAssetRequest = GiphyDownloader.giphyDownloader.requestAsset(
-            assetDescription: previewAssetDescription,
+            assetDescription: imageInfo.preview,
             priority: .low,
             success: { [weak self] assetRequest, asset in
                 AssertIsOnMainThread()
-                guard let self = self else { return }
+                guard let self else { return }
                 guard assetRequest == self.previewAssetRequest else {
                     owsFailDebug("Obsolete request callback.")
                     return
@@ -169,13 +157,13 @@ class GifPickerCell: UICollectionViewCell {
             },
             failure: { [weak self] assetRequest in
                 AssertIsOnMainThread()
-                guard let self = self else { return }
+                guard let self else { return }
                 guard assetRequest == self.previewAssetRequest else {
                     owsFailDebug("Obsolete request callback.")
                     return
                 }
                 self.previewAssetRequest = nil
-            }
+            },
         )
     }
 
@@ -193,27 +181,14 @@ class GifPickerCell: UICollectionViewCell {
             activityIndicator.stopAnimating()
         }
 
-        if asset.assetDescription.fileExtension == "mp4", let video = LoopingVideo(decryptedLocalFileUrl: URL(fileURLWithPath: asset.filePath)) {
-            mp4View.video = video
-            mp4View.isHidden = false
-        } else if (try? DataImageSource.forPath(asset.filePath))?.ows_isValidImage ?? false, let image = SDAnimatedImage(contentsOfFile: asset.filePath) {
-            imageView.image = image
-            imageView.isHidden = false
-        } else if (try? DataImageSource.forPath(asset.filePath))?.ows_isValidImage ?? false, let image = UIImage(contentsOfFile: asset.filePath) {
-            imageView.image = image
-            imageView.isHidden = false
-        } else {
-            owsFailDebug("could not load asset.")
-            clearViewState()
-            return
-        }
+        let video = LoopingVideo(decryptedLocalFileUrl: URL(fileURLWithPath: asset.filePath))
+        mp4View.video = video
+        mp4View.isHidden = false
     }
 
     private func clearViewState() {
         AssertIsOnMainThread()
 
-        imageView.image = nil
-        imageView.isHidden = true
         mp4View.video = nil
         mp4View.isHidden = true
         activityIndicator.stopAnimating()

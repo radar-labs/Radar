@@ -12,7 +12,7 @@ extension ConversationViewController {
             self,
             selector: #selector(wallpaperDidChange),
             name: WallpaperStore.wallpaperDidChangeNotification,
-            object: nil
+            object: nil,
         )
         updateWallpaperView()
     }
@@ -24,7 +24,7 @@ extension ConversationViewController {
         chatColorDidChange() // Changing the wallpaper might change the ChatColor.
     }
 
-    func updateWallpaperViewBuilder() {
+    private func updateWallpaperViewBuilder() {
         viewState.wallpaperViewBuilder = SSKEnvironment.shared.databaseStorageRef.read { tx in Self.loadWallpaperViewBuilder(for: thread, tx: tx) }
         updateWallpaperView()
     }

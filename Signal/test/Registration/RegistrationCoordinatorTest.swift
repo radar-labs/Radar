@@ -26,27 +26,27 @@ public class RegistrationCoordinatorTest {
     private var experienceManager: RegistrationCoordinatorImpl.TestMocks.ExperienceManager!
     private var accountKeyStore: AccountKeyStore!
     private var localUsernameManagerMock: MockLocalUsernameManager!
+    private var mockIdentityManager: OWSIdentityManager!
     private var mockMessagePipelineSupervisor: RegistrationCoordinatorImpl.TestMocks.MessagePipelineSupervisor!
     private var mockMessageProcessor: RegistrationCoordinatorImpl.TestMocks.MessageProcessor!
-    private var mockURLSession: TSRequestOWSURLSessionMock!
+    private var mockUsernamesService: MockUsernamesService!
     private var networkManagerMock: MockNetworkManager!
     private var ows2FAManagerMock: RegistrationCoordinatorImpl.TestMocks.OWS2FAManager!
     private var phoneNumberDiscoverabilityManagerMock: MockPhoneNumberDiscoverabilityManager!
     private var preKeyManagerMock: RegistrationCoordinatorImpl.TestMocks.PreKeyManager!
     private var profileManagerMock: RegistrationCoordinatorImpl.TestMocks.ProfileManager!
     private var pushRegistrationManagerMock: RegistrationCoordinatorImpl.TestMocks.PushRegistrationManager!
+    private var quickRestoreManager: QuickRestoreManager!
     private var receiptManagerMock: RegistrationCoordinatorImpl.TestMocks.ReceiptManager!
     private var registrationCoordinatorLoader: RegistrationCoordinatorLoaderImpl!
     private var registrationStateChangeManagerMock: MockRegistrationStateChangeManager!
     private var sessionManager: RegistrationSessionManagerMock!
     private var storageServiceManagerMock: RegistrationCoordinatorImpl.TestMocks.StorageServiceManager!
     private var svr: SecureValueRecoveryMock!
-    private var svrLocalStorageMock: SVRLocalStorageMock!
-    private var svrAuthCredentialStore: SVRAuthCredentialStorageMock!
+    private var svrAuthCredentialManager: SVRAuthCredentialManager!
     private var timeoutProviderMock: RegistrationCoordinatorImpl.TestMocks.TimeoutProvider!
     private var tsAccountManagerMock: MockTSAccountManager!
-    private var usernameApiClientMock: RegistrationCoordinatorImpl.TestMocks.UsernameApiClient!
-    private var usernameLinkManagerMock: MockUsernameLinkManager!
+    private var localFileBackupManager: LocalFileBackupManager!
 
     class RegistrationTestRun {
         private(set) var recordedSteps = [TestStep]()
@@ -54,6 +54,7 @@ public class RegistrationCoordinatorTest {
             recordedSteps.append(step)
         }
     }
+
     private var testRun = RegistrationTestRun()
 
     init() {
@@ -64,7 +65,7 @@ public class RegistrationCoordinatorTest {
         accountKeyStore = AccountKeyStore(backupSettingsStore: BackupSettingsStore())
         let preKeyStore = PreKeyStore()
         changeNumberPniManager = ChangePhoneNumberPniManagerMock(
-            mockKyberStore: KyberPreKeyStoreImpl(for: .pni, dateProvider: dateProvider, preKeyStore: preKeyStore)
+            mockKyberStore: KyberPreKeyStoreImpl(for: .pni, dateProvider: dateProvider, preKeyStore: preKeyStore),
         )
         contactsStore = RegistrationCoordinatorImpl.TestMocks.ContactsStore()
         experienceManager = RegistrationCoordinatorImpl.TestMocks.ExperienceManager()
@@ -76,9 +77,10 @@ public class RegistrationCoordinatorTest {
             return mock
         }()
         svr = SecureValueRecoveryMock()
-        svrAuthCredentialStore = SVRAuthCredentialStorageMock()
+        svrAuthCredentialManager = SVRAuthCredentialManager.mock()
         mockMessagePipelineSupervisor = RegistrationCoordinatorImpl.TestMocks.MessagePipelineSupervisor()
         mockMessageProcessor = RegistrationCoordinatorImpl.TestMocks.MessageProcessor()
+        mockUsernamesService = MockUsernamesService()
         networkManagerMock = MockNetworkManager()
         ows2FAManagerMock = RegistrationCoordinatorImpl.TestMocks.OWS2FAManager()
         phoneNumberDiscoverabilityManagerMock = MockPhoneNumberDiscoverabilityManager()
@@ -88,19 +90,44 @@ public class RegistrationCoordinatorTest {
         receiptManagerMock = RegistrationCoordinatorImpl.TestMocks.ReceiptManager()
         registrationStateChangeManagerMock = MockRegistrationStateChangeManager()
         sessionManager = RegistrationSessionManagerMock()
-        svrLocalStorageMock = SVRLocalStorageMock()
         storageServiceManagerMock = RegistrationCoordinatorImpl.TestMocks.StorageServiceManager(run: testRun)
         timeoutProviderMock = RegistrationCoordinatorImpl.TestMocks.TimeoutProvider()
         tsAccountManagerMock = MockTSAccountManager()
-        usernameApiClientMock = RegistrationCoordinatorImpl.TestMocks.UsernameApiClient()
-        usernameLinkManagerMock = MockUsernameLinkManager()
 
-        let mockURLSession = TSRequestOWSURLSessionMock()
-        self.mockURLSession = mockURLSession
-        let mockSignalService = OWSSignalServiceMock()
-        mockSignalService.mockUrlSessionBuilder = { _, _, _ in
-            return mockURLSession
-        }
+        let recipientDbTable = RecipientDatabaseTable()
+        let recipientFetcher = RecipientFetcher(
+            recipientDatabaseTable: recipientDbTable,
+            searchableNameIndexer: MockSearchableNameIndexer(),
+        )
+        let recipientIdFinder = RecipientIdFinder(
+            recipientDatabaseTable: recipientDbTable,
+            recipientFetcher: recipientFetcher,
+        )
+        mockIdentityManager = MockIdentityManager(recipientIdFinder: recipientIdFinder)
+
+        quickRestoreManager = QuickRestoreManager(
+            accountKeyStore: accountKeyStore,
+            backupNonceStore: BackupNonceMetadataStore(),
+            backupSettingsStore: BackupSettingsStore(),
+            db: db,
+            deviceProvisioningService: DeviceProvisioningServiceImpl(networkManager: networkManagerMock),
+            identityManager: mockIdentityManager,
+            networkManager: networkManagerMock,
+            tsAccountManager: tsAccountManagerMock,
+        )
+
+        let localFileBackupManager = LocalFileBackupManager(
+            appReadiness: AppReadinessMock(),
+            db: db,
+            dateProvider: { Date() },
+            attachmentStore: AttachmentStore(),
+            attachmentValidator: AttachmentContentValidatorMock(),
+            orphanedAttachmentCleaner: OrphanedAttachmentCleanerImpl(dateProvider: { Date() }, db: db),
+            localFileBackupAttachmentMetadataStore: LocalFileBackupAttachmentMetadataStore(),
+            localFileBackupStore: LocalFileBackupStore(),
+            securityScopedBookmarkAccess: SecurityScopedBookmarkAccessMock(hasAccess: true, url: nil),
+            restoreProgress: LocalFileBackupAttachmentRestoreProgress(),
+        )
 
         let dependencies = RegistrationCoordinatorDependencies(
             appExpiry: appExpiry,
@@ -115,9 +142,11 @@ public class RegistrationCoordinatorTest {
             contactsStore: contactsStore,
             dateProvider: { self.dateProvider() },
             db: db,
-            deviceTransferService: RegistrationCoordinatorImpl.TestMocks.DeviceTransferService(),
+            deviceSleepManager: DeviceSleepManagerMock(),
+            deviceTransferRestore: DeviceTransferRestoreMock(),
             experienceManager: experienceManager,
             identityManager: RegistrationCoordinatorImpl.TestMocks.IdentityManager(),
+            localFileBackupManager: localFileBackupManager,
             localUsernameManager: localUsernameManagerMock,
             messagePipelineSupervisor: mockMessagePipelineSupervisor,
             messageProcessor: mockMessageProcessor,
@@ -127,56 +156,40 @@ public class RegistrationCoordinatorTest {
             preKeyManager: preKeyManagerMock,
             profileManager: profileManagerMock,
             pushRegistrationManager: pushRegistrationManagerMock,
-            quickRestoreManager: RegistrationCoordinatorImpl.TestMocks.QuickRestoreManager(),
+            quickRestoreManager: quickRestoreManager,
             receiptManager: receiptManagerMock,
             registrationBackupErrorPresenter: RegistrationCoordinatorBackupErrorPresenterMock(),
             registrationStateChangeManager: registrationStateChangeManagerMock,
             registrationWebSocketManager: MockRegistrationWebSocketManager(),
             remoteConfigManager: StubbableRemoteConfigManager(),
+            securityScopedBookmarkAccess: SecurityScopedBookmarkAccessMock(hasAccess: true, url: nil),
+            serviceProvider: MockServiceProvider(mockServices: [mockUsernamesService!]),
             sessionManager: sessionManager,
-            signalService: mockSignalService,
+            signalService: OWSSignalServiceMock(),
             storageServiceManager: storageServiceManagerMock,
             svr: svr,
-            svrAuthCredentialStore: svrAuthCredentialStore,
+            svrLocalStorage: SVRLocalStorage(),
+            svrAuthCredentialManager: svrAuthCredentialManager,
             timeoutProvider: timeoutProviderMock,
             tsAccountManager: tsAccountManagerMock,
             udManager: RegistrationCoordinatorImpl.TestMocks.UDManager(),
-            usernameApiClient: usernameApiClientMock,
-            usernameLinkManager: usernameLinkManagerMock
         )
         registrationCoordinatorLoader = RegistrationCoordinatorLoaderImpl(dependencies: dependencies)
     }
 
-    enum KeyType: CustomDebugStringConvertible {
-        case none
-        case masterKey
-        case accountEntropyPool
-
-        var debugDescription: String {
-            switch self {
-            case .none: return "none"
-            case .masterKey: return "masterKey"
-            case .accountEntropyPool: return "AEP"
-            }
-        }
-
-        static var testCases: [(old: Self, new: Self)] {
-            return [
-                (.masterKey, .accountEntropyPool),
-                (.accountEntropyPool, .accountEntropyPool)
-            ]
-        }
-    }
-
     static let testModes: [RegistrationMode] = [
         RegistrationMode.registering,
-        RegistrationMode.reRegistering(.init(e164: Stubs.e164, aci: Stubs.aci))
+        RegistrationMode.reRegistering(.phoneNumberfull(phoneNumber: Stubs.e164.stringValue, aci: Stubs.aci)),
     ]
 
-    typealias TestCase = (mode: RegistrationMode, oldKey: KeyType, newKey: KeyType)
+    struct TestCase {
+        var mode: RegistrationMode
+    }
 
     static func onlyReRegisteringTestCases() -> [TestCase] {
-        return buildTestCases(for: [RegistrationMode.reRegistering(.init(e164: Stubs.e164, aci: Stubs.aci))])
+        return buildTestCases(for: [
+            RegistrationMode.reRegistering(.phoneNumberfull(phoneNumber: Stubs.e164.stringValue, aci: Stubs.aci)),
+        ])
     }
 
     static func testCases() -> [TestCase] {
@@ -184,20 +197,23 @@ public class RegistrationCoordinatorTest {
     }
 
     static func buildTestCases(for modes: [RegistrationMode]) -> [TestCase] {
-        var results = [(mode: RegistrationMode, oldKey: KeyType, newKey: KeyType)]()
+        var results = [TestCase]()
         for mode in modes {
-            for keys in KeyType.testCases {
-                results.append((mode, keys.old, keys.new))
-            }
+            results.append(TestCase(mode: mode))
         }
         return results
     }
 
     func setupTest(_ testCase: TestCase) -> RegistrationCoordinatorImpl {
+        return setUpTest(forMode: testCase.mode)
+    }
+
+    private func setUpTest(forMode mode: RegistrationMode) -> RegistrationCoordinatorImpl {
         return db.write {
             return registrationCoordinatorLoader.coordinator(
-                forDesiredMode: testCase.mode,
-                transaction: $0
+                forDesiredMode: mode,
+                transaction: $0,
+                logger: .empty(),
             ) as! RegistrationCoordinatorImpl
         }
     }
@@ -206,11 +222,11 @@ public class RegistrationCoordinatorTest {
         case restoreKeys
         case requestPushToken
         case createPreKeys
+        case resetOneTimePreKeyTimestamp
         case createAccount
         case finalizePreKeys
-        case rotateOneTimePreKeys
         case restoreStorageService
-        case backupMasterKey
+        case markPinEnabled
         case confirmReservedUsername
         case rotateManifest
         case updateAccountAttribute
@@ -221,11 +237,11 @@ public class RegistrationCoordinatorTest {
             case .restoreKeys: return "restoreKeys"
             case .requestPushToken: return "requestPushToken"
             case .createPreKeys: return "createPreKeys"
+            case .resetOneTimePreKeyTimestamp: return "resetOneTimePreKeyTimestamp"
             case .createAccount: return "createAccount"
             case .finalizePreKeys: return "finalizePreKeys"
-            case .rotateOneTimePreKeys: return "rotateOneTimePreKeys"
             case .restoreStorageService: return "restoreStorageService"
-            case .backupMasterKey: return "backupMasterKey"
+            case .markPinEnabled: return "markPinEnabled"
             case .confirmReservedUsername: return "confirmReservedUsername"
             case .rotateManifest: return "rotateManifest"
             case .updateAccountAttribute: return "updateAccountAttribute"
@@ -246,11 +262,12 @@ public class RegistrationCoordinatorTest {
         switch mode {
         case .registering:
             // With no state set up, should show the splash.
-            #expect(await coordinator.nextStep() == .registrationSplash)
+            #expect(await coordinator.nextStep().isRegistrationSplash)
             // Once we show it, don't show it again.
-            #expect(await coordinator.continueFromSplash().awaitable() != .registrationSplash)
+            coordinator.continueFromSplash()
+            #expect(await !coordinator.nextStep().isRegistrationSplash)
         case .reRegistering, .changingNumber:
-            #expect(await coordinator.nextStep() != .registrationSplash)
+            #expect(await !coordinator.nextStep().isRegistrationSplash)
         }
     }
 
@@ -263,7 +280,7 @@ public class RegistrationCoordinatorTest {
         setupDefaultAccountAttributes()
 
         // We should start with the banner.
-        #expect(await coordinator.nextStep() == .appUpdateBanner)
+        #expect(await coordinator.nextStep().isAppUpdateBanner)
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -280,22 +297,23 @@ public class RegistrationCoordinatorTest {
         switch mode {
         case .registering:
             // Gotta get the splash out of the way.
-            #expect(await coordinator.nextStep() == .registrationSplash)
-            nextStep = await coordinator.continueFromSplash().awaitable()
+            #expect(await coordinator.nextStep().isRegistrationSplash)
+            coordinator.continueFromSplash()
+            nextStep = await coordinator.nextStep()
         case .reRegistering, .changingNumber:
             // No splash for these.
             nextStep = await coordinator.nextStep()
         }
 
         // Now we should show the permissions.
-        #expect(nextStep == .permissions)
+        #expect(nextStep.isPermissions)
         // Doesn't change even if we try and proceed.
-        #expect(await coordinator.nextStep() == .permissions)
+        #expect(await coordinator.nextStep().isPermissions)
 
         // Once the state is updated we can proceed.
         nextStep = await coordinator.requestPermissions().awaitable()
-        #expect(nextStep != .registrationSplash)
-        #expect(nextStep != .permissions)
+        #expect(!nextStep.isRegistrationSplash)
+        #expect(!nextStep.isPermissions)
     }
 
     // MARK: - Reg Recovery Password Path
@@ -303,7 +321,6 @@ public class RegistrationCoordinatorTest {
     @MainActor @Test(arguments: Self.testCases(), [true, false])
     func runRegRecoverPwPathTestHappyPath(testCase: TestCase, wasReglockEnabled: Bool) async throws {
         let coordinator = setupTest(testCase)
-        let mode = testCase.mode
 
         // Set profile info so we skip those steps.
         setupDefaultAccountAttributes()
@@ -312,26 +329,27 @@ public class RegistrationCoordinatorTest {
 
         // Set a PIN on disk.
         ows2FAManagerMock.pinCodeMock = { Stubs.pinCode }
+        ows2FAManagerMock.shouldMasterKeyBeBackedUpMock = { true }
 
-        let (initialMasterKey, finalMasterKey) = buildKeyDataMocks(testCase)
+        let aep = buildKeyDataMocks(testCase)
+        let initialMasterKey = aep.getMasterKey()
 
         // Give it the pin code, which should make it try and register.
 
         // It needs an apns token to register.
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
         // It needs prekeys as well.
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
         // And will finalize prekeys after success.
-        preKeyManagerMock.addFinalizePreKeyMock { didSucceed in
-            #expect(didSucceed)
-            return Task {}
-        }
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
 
         let identityResponse = Stubs.accountIdentityResponse()
         var authPassword: String!
-        let expectedRequest = createAccountWithRecoveryPw(initialMasterKey)
-        mockURLSession.addResponse(TSRequestOWSURLSessionMock.Response(
-            matcher: { request in
+        let expectedRequest = createAccountWithRecoveryPw(initialMasterKey.deriveRegistrationRecoveryPassword())
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { request in
                 // The password is generated internally by RegistrationCoordinator.
                 // Extract it so we can check that the same password sent to the server
                 // to register is used later for other requests.
@@ -348,57 +366,36 @@ public class RegistrationCoordinatorTest {
                 return request.url == expectedRequest.url
             },
             statusCode: 200,
-            bodyData: try JSONEncoder().encode(identityResponse)
+            bodyJson: identityResponse,
         ))
 
-        func expectedAuthedAccount() -> AuthedAccount {
-            return .explicit(
-                aci: identityResponse.aci,
-                pni: identityResponse.pni,
-                e164: Stubs.e164,
+        func expectedAuth() -> ChatServiceAuth {
+            return ChatServiceAuth.explicit(
+                aci: identityResponse.localIdentifiers.aci,
                 deviceId: .primary,
-                authPassword: authPassword
+                password: authPassword,
             )
         }
 
-        // When registered, we should create pre-keys.
-        preKeyManagerMock.addRotateOneTimePreKeyMock({ auth in
-            #expect(auth == expectedAuthedAccount().chatServiceAuth)
-            return Task {}
-        })
+        var didMarkReglockEnabled = false
+        ows2FAManagerMock.didMarkRegistrationLockEnabled = { didMarkReglockEnabled = true }
 
-        if wasReglockEnabled {
-            // If we had reglock before registration, it should be re-enabled.
-            let expectedReglockRequest = OWSRequestFactory.enableRegistrationLockV2Request(token: finalMasterKey.reglockToken)
-            networkManagerMock.asyncRequestHandlers.append({ request, _ in
-                if request.url == expectedReglockRequest.url {
-                    #expect(finalMasterKey.reglockToken == request.parameters["registrationLock"] as! String)
-                    return HTTPResponse(requestUrl: request.url, status: 200, headers: HttpHeaders(), bodyData: nil)
-                }
-                throw OWSAssertionError("")
-            })
-        }
-
-        // We haven't done a SVR backup; that should happen now.
-        svr.backupMasterKeyMock = { pin, masterKey, authMethod in
+        // We haven't marked the PIN enabled; that should happen now.
+        var didMarkPinEnabled = false
+        ows2FAManagerMock.didMarkPinEnabled = { pin in
             #expect(pin == Stubs.pinCode)
-            // We don't have a SVR auth credential, it should use chat server creds.
-            #expect(masterKey.rawData == finalMasterKey.rawData)
-            #expect(authMethod == .chatServerAuth(expectedAuthedAccount()))
-            self.svr.hasMasterKey = true
-            return .value(masterKey)
+            didMarkPinEnabled = true
         }
 
         // Once we sync push tokens, we should restore from storage service.
         storageServiceManagerMock.addRestoreOrCreateManifestIfNecessaryMock({ auth, masterKeySource in
-            #expect(auth.authedAccount == expectedAuthedAccount())
+            #expect(auth.chatServiceAuth == expectedAuth())
             switch masterKeySource {
             case .explicit(let explicitMasterKey):
                 #expect(initialMasterKey.rawData == explicitMasterKey.rawData)
             default:
                 Issue.record("Unexpected master key used in storage service operation.")
             }
-            return .value(())
         })
 
         storageServiceManagerMock.addRotateManifestMock({ _, _ in return .value(()) })
@@ -407,54 +404,49 @@ public class RegistrationCoordinatorTest {
         // our username.
         let mockUsernameLink: Usernames.UsernameLink = .mocked
         localUsernameManagerMock.startingUsernameState = .available(username: "boba.42", usernameLink: mockUsernameLink)
-        usernameApiClientMock.confirmReservedUsernameMocks = [{ _, _, chatServiceAuth in
-            #expect(chatServiceAuth == .explicit(
-                aci: identityResponse.aci,
-                deviceId: .primary,
-                password: authPassword
-            ))
-            return .success(usernameLinkHandle: mockUsernameLink.handle)
-        }]
+        mockUsernamesService.confirmUsernameMocks.set([{ _, _ in
+            return mockUsernameLink.handle
+        }])
 
         // Once we do the username reclamation,
-        // we will sync account attributes and then we are finished!
-        let expectedAttributesRequest = RegistrationRequestFactory.updatePrimaryDeviceAccountAttributesRequest(
-            Stubs.accountAttributes(finalMasterKey),
-            auth: .implicit() // doesn't matter for url matching
-        )
-        networkManagerMock.asyncRequestHandlers.append({ request, _ in
-            if request.url == expectedAttributesRequest.url {
-                return HTTPResponse(requestUrl: request.url, status: 200, headers: HttpHeaders(), bodyData: nil)
-            }
-            throw OWSAssertionError("")
-        })
+        // then we are finished!
 
         // NOTE: We expect to skip opening path steps because
         // if we have a SVR master key locally, this _must_ be
         // a previously registered device, and we can skip intros.
 
         // We haven't set a phone number so it should ask for that.
-        #expect(
-            await coordinator.nextStep() ==
-                .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        guard case .phoneNumberEntry = await coordinator.nextStep() else {
+            Issue.record("must be phoneNumberEntry")
+            return
+        }
 
         // Give it a phone number, which should show the PIN entry step.
+        coordinator.submitE164(Stubs.e164)
         // Now it should ask for the PIN to confirm the user knows it.
-        #expect(
-            await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .pinEntry(Stubs.pinEntryStateForRegRecoveryPath(mode: mode)))
+        guard case .pinEntry(let pinState) = await coordinator.nextStep() else {
+            Issue.record("must be pinEntry")
+            return
+        }
+        guard case .enteringExistingPin(skippability: .canSkip, remainingAttempts: _) = pinState.operation else {
+            Issue.record("must be enteringExistingPin with skippability")
+            return
+        }
 
-        #expect(await coordinator.submitPINCode(Stubs.pinCode).awaitable() == .done)
+        #expect(await coordinator.submitPINCode(Stubs.pinCode).awaitable().isDone)
 
         // Since we set profile info, we should have scheduled a reupload.
         #expect(profileManagerMock.didScheduleReuploadLocalProfile)
+
+        // If we had reglock before registration, it should be re-enabled.
+        #expect(wasReglockEnabled == didMarkReglockEnabled)
+
+        #expect(didMarkPinEnabled)
     }
 
     @MainActor @Test(arguments: Self.testCases())
     func testRegRecoveryPwPath_wrongPIN(testCase: TestCase) async throws {
         let coordinator = setupTest(testCase)
-        let mode = testCase.mode
 
         // Set profile info so we skip those steps.
         setupDefaultAccountAttributes()
@@ -463,8 +455,11 @@ public class RegistrationCoordinatorTest {
 
         // Set a different PIN on disk.
         ows2FAManagerMock.pinCodeMock = { Stubs.pinCode }
+        ows2FAManagerMock.shouldMasterKeyBeBackedUpMock = { true }
 
-        let (initialMasterKey, finalMasterKey) = buildKeyDataMocks(testCase)
+        let aep = buildKeyDataMocks(testCase)
+        let initialMasterKey = aep.getMasterKey()
+
         // NOTE: We expect to skip opening path steps because
         // if we have a SVR master key locally, this _must_ be
         // a previously registered device, and we can skip intros.
@@ -474,18 +469,17 @@ public class RegistrationCoordinatorTest {
         // It needs an apns token to register.
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
         // Every time we register we also ask for prekeys.
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
         // And we finalize them after.
-        preKeyManagerMock.addFinalizePreKeyMock { didSucceed in
-            #expect(didSucceed)
-            return Task {}
-        }
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
 
         let identityResponse = Stubs.accountIdentityResponse()
         var authPassword: String!
-        let expectedRequest = createAccountWithRecoveryPw(initialMasterKey)
-        mockURLSession.addResponse(TSRequestOWSURLSessionMock.Response(
-            matcher: { request in
+        let expectedRequest = createAccountWithRecoveryPw(initialMasterKey.deriveRegistrationRecoveryPassword())
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { request in
                 authPassword = request.authPassword
                 let requestAttributes = Self.attributesFromCreateAccountRequest(request)
                 let recoveryPw = initialMasterKey.regRecoveryPw
@@ -495,45 +489,33 @@ public class RegistrationCoordinatorTest {
                 return request.url == expectedRequest.url
             },
             statusCode: 200,
-            bodyData: try JSONEncoder().encode(identityResponse)
+            bodyJson: identityResponse,
         ))
 
-        func expectedAuthedAccount() -> AuthedAccount {
-            return .explicit(
-                aci: identityResponse.aci,
-                pni: identityResponse.pni,
-                e164: Stubs.e164,
+        func expectedAuth() -> ChatServiceAuth {
+            return ChatServiceAuth.explicit(
+                aci: identityResponse.localIdentifiers.aci,
                 deviceId: .primary,
-                authPassword: authPassword
+                password: authPassword,
             )
         }
 
-        // When registered, we should create pre-keys.
-        preKeyManagerMock.addRotateOneTimePreKeyMock({ auth in
-            #expect(auth == expectedAuthedAccount().chatServiceAuth)
-            return Task {}
-        })
-
-        // We haven't done a SVR backup; that should happen now.
-        svr.backupMasterKeyMock = { pin, masterKey, authMethod in
+        // We haven't marked the PIN enabled; that should happen now.
+        var didMarkPinEnabled = false
+        ows2FAManagerMock.didMarkPinEnabled = { pin in
             #expect(pin == Stubs.pinCode)
-            #expect(masterKey.rawData == finalMasterKey.rawData)
-            // We don't have a SVR auth credential, it should use chat server creds.
-            #expect(authMethod == .chatServerAuth(expectedAuthedAccount()))
-            self.svr.hasMasterKey = true
-            return .value(masterKey)
+            didMarkPinEnabled = true
         }
 
         // Once we sync push tokens, we should restore from storage service.
         storageServiceManagerMock.addRestoreOrCreateManifestIfNecessaryMock({ auth, masterKeySource in
-            #expect(auth.authedAccount == expectedAuthedAccount())
+            #expect(auth.chatServiceAuth == expectedAuth())
             switch masterKeySource {
             case .explicit(let explicitMasterKey):
                 #expect(initialMasterKey.rawData == explicitMasterKey.rawData)
             default:
                 Issue.record("Unexpected master key used in storage service operation.")
             }
-            return .value(())
         })
 
         storageServiceManagerMock.addRotateManifestMock({ _, _ in return .value(()) })
@@ -545,68 +527,70 @@ public class RegistrationCoordinatorTest {
         localUsernameManagerMock.startingUsernameState = .usernameAndLinkCorrupted
 
         // Once we do the storage service restore,
-        // we will sync account attributes and then we are finished!
-        let expectedAttributesRequest = RegistrationRequestFactory.updatePrimaryDeviceAccountAttributesRequest(
-            Stubs.accountAttributes(finalMasterKey),
-            auth: .implicit() // // doesn't matter for url matching
-        )
-        networkManagerMock.asyncRequestHandlers.append({ request, _ in
-            if request.url == expectedAttributesRequest.url {
-                #expect(finalMasterKey.regRecoveryPw == (request.parameters["recoveryPassword"] as? String) ?? "")
-                return HTTPResponse(requestUrl: request.url, status: 200, headers: HttpHeaders(), bodyData: nil)
-            }
-            throw OWSAssertionError("")
-        })
+        // then we are finished!
+
+        var nextStep = await coordinator.nextStep()
 
         // We haven't set a phone number so it should ask for that.
-        #expect(
-            await coordinator.nextStep() ==
-                .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        guard case .phoneNumberEntry = nextStep else {
+            Issue.record("must be phoneNumberEntry")
+            return
+        }
 
         // Give it a phone number, which should show the PIN entry step.
-
+        coordinator.submitE164(Stubs.e164)
         // Now it should ask for the PIN to confirm the user knows it.
-        #expect(
-            await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .pinEntry(Stubs.pinEntryStateForRegRecoveryPath(mode: mode))
-        )
+        nextStep = await coordinator.nextStep()
+        do {
+            guard case .pinEntry(let pinState) = nextStep else {
+                Issue.record("must be pinEntry")
+                return
+            }
+            guard case .enteringExistingPin(skippability: .canSkip, remainingAttempts: _) = pinState.operation else {
+                Issue.record("must be enteringExistingPin with skippability")
+                return
+            }
+        }
 
         // Give it the wrong PIN, it should reject and give us the same step again.
-        #expect(
-            await coordinator.submitPINCode(wrongPinCode).awaitable() ==
-                .pinEntry(Stubs.pinEntryStateForRegRecoveryPath(
-                    mode: mode,
-                    error: .wrongPin(wrongPin: wrongPinCode),
-                    remainingAttempts: 9
-                ))
-        )
+        nextStep = await coordinator.submitPINCode(wrongPinCode).awaitable()
+        do {
+            guard case .pinEntry(let pinState) = nextStep else {
+                Issue.record("must be pinEntry")
+                return
+            }
+            guard case .enteringExistingPin(skippability: .canSkip, remainingAttempts: 9) = pinState.operation else {
+                Issue.record("must be enteringExistingPin with skippability")
+                return
+            }
+        }
 
-        #expect(await coordinator.submitPINCode(Stubs.pinCode).awaitable() == .done)
+        #expect(await coordinator.submitPINCode(Stubs.pinCode).awaitable().isDone)
 
         // Since we set profile info, we should have scheduled a reupload.
         #expect(profileManagerMock.didScheduleReuploadLocalProfile)
+
+        #expect(didMarkPinEnabled)
     }
 
-    @MainActor @Test(arguments: Self.testCases())
+    @MainActor @Test(arguments: Self.onlyReRegisteringTestCases())
     func testRegRecoveryPwPath_wrongPassword(testCase: TestCase) async {
         let coordinator = setupTest(testCase)
-        let mode = testCase.mode
 
         // Set profile info so we skip those steps.
         setupDefaultAccountAttributes()
 
         // Set a PIN on disk.
         ows2FAManagerMock.pinCodeMock = { Stubs.pinCode }
+        ows2FAManagerMock.shouldMasterKeyBeBackedUpMock = { true }
+        var didClearPinCode = false
+        ows2FAManagerMock.clearLocalPinCodeMock = { didClearPinCode = true }
 
         // Make SVR give us back a reg recovery password.
-        let masterKey = AccountEntropyPool().getMasterKey()
-        await db.awaitableWrite { accountKeyStore.setMasterKey(masterKey, tx: $0) }
-        svr.hasMasterKey = true
+        let aep = buildKeyDataMocks(testCase)
 
-        // NOTE: We expect to skip opening path steps because
-        // if we have a SVR master key locally, this _must_ be
-        // a previously registered device, and we can skip intros.
+        // NOTE: We expect to skip opening path steps. If we have an AEP locally,
+        // this must be a previously registered device.
 
         // Before registering, it should ask for push tokens to give the registration.
         // It will also ask again later when account creation fails and it needs
@@ -615,30 +599,26 @@ public class RegistrationCoordinatorTest {
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
 
         // Every time we register we also ask for prekeys.
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
 
         // And we finalize them after.
         // Set up a list of mocks that should be returned in order
-        preKeyManagerMock.addFinalizePreKeyMock { didSucceed in
-            #expect(didSucceed.negated)
-            return Task {}
-        }
-        preKeyManagerMock.addFinalizePreKeyMock { didSucceed in
-            #expect(didSucceed)
-            return Task {}
-        }
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
 
         // Fail the request; the reg recovery pw is invalid.
-        let expectedRecoveryPwRequest = createAccountWithRecoveryPw(masterKey)
-        let failResponse = TSRequestOWSURLSessionMock.Response(
-            urlSuffix: expectedRecoveryPwRequest.url.absoluteString,
-            statusCode: RegistrationServiceResponses.AccountCreationResponseCodes.unauthorized.rawValue
-        )
-        mockURLSession.addResponse(failResponse)
+        let expectedRecoveryPwRequest = createAccountWithRecoveryPw(aep.getMasterKey().deriveRegistrationRecoveryPassword())
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { $0.url == expectedRecoveryPwRequest.url },
+            statusCode: 401,
+        ))
 
         // Once the first request fails, it should try an start a session. Resolve with a session.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session()))
+        let expectedSession = stubs.session()
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Before requesting a session, it should ask for push tokens to give the session.
         // This was set up above.
@@ -651,57 +631,65 @@ public class RegistrationCoordinatorTest {
         // Resolve with an updated session.
         sessionManager.addRequestCodeResponseMock(.success(stubs.session(nextVerificationAttempt: 0)))
 
+        var nextStep = await coordinator.nextStep()
+
         // We haven't set a phone number so it should ask for that.
-        #expect(
-            await coordinator.nextStep() ==
-                .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        guard case .phoneNumberEntry = nextStep else {
+            Issue.record("must be phoneNumberEntry")
+            return
+        }
 
         // Give it a phone number, which should show the PIN entry step.
+        coordinator.submitE164(Stubs.e164)
         // Now it should ask for the PIN to confirm the user knows it.
-        #expect(
-            await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .pinEntry(Stubs.pinEntryStateForRegRecoveryPath(mode: mode))
-        )
+        nextStep = await coordinator.nextStep()
+        guard case .pinEntry(let pinState) = nextStep else {
+            Issue.record("must be pinEntry")
+            return
+        }
+        guard case .enteringExistingPin(skippability: .canSkip, remainingAttempts: _) = pinState.operation else {
+            Issue.record("must be enteringExistingPin with skippability")
+            return
+        }
 
         // Check we have the master key now, to be safe.
-        #expect(svr.hasMasterKey)
+        #expect(!didClearPinCode)
 
         // Give it the pin code, which should make it try and register.
+        nextStep = await coordinator.submitPINCode(Stubs.pinCode).awaitable()
         // Now we should expect to be at verification code entry since we already set the phone number.
+        guard case .verificationCodeEntry(let codeState) = nextStep else {
+            Issue.record("must be verificationCodeEntry")
+            return
+        }
         // No exit allowed since we've already started trying to create the account.
-        #expect(
-            await coordinator.submitPINCode(Stubs.pinCode).awaitable() ==
-                .verificationCodeEntry(
-                    stubs.verificationCodeEntryState(mode: mode, exitConfigOverride: .noExitAllowed)
-                )
-        )
+        #expect(codeState.exitConfiguration == .noExitAllowed)
+        #expect(codeState.validationError == nil)
 
         // We want to have kept the master key; we failed the reg recovery pw check
         // but that could happen even if the key is valid. Once we finish session based
         // re-registration we want to be able to recover the key.
-        #expect(svr.hasMasterKey)
+        #expect(!didClearPinCode)
     }
 
-    @MainActor @Test(arguments: Self.testCases())
+    @MainActor @Test(arguments: Self.onlyReRegisteringTestCases())
     func testRegRecoveryPwPath_failedReglock(testCase: TestCase) async {
         let coordinator = setupTest(testCase)
-        let mode = testCase.mode
 
         // Set profile info so we skip those steps.
         setupDefaultAccountAttributes()
 
         // Set a PIN on disk.
         ows2FAManagerMock.pinCodeMock = { Stubs.pinCode }
+        ows2FAManagerMock.shouldMasterKeyBeBackedUpMock = { true }
+        var didClearPinCode = false
+        ows2FAManagerMock.clearLocalPinCodeMock = { didClearPinCode = true }
 
         // Make SVR give us back a reg recovery password.
-        let masterKey = AccountEntropyPool().getMasterKey()
-        db.write { accountKeyStore.setMasterKey(masterKey, tx: $0) }
-        svr.hasMasterKey = true
+        let aep = buildKeyDataMocks(testCase)
 
-        // NOTE: We expect to skip opening path steps because
-        // if we have a SVR master key locally, this _must_ be
-        // a previously registered device, and we can skip intros.
+        // NOTE: We expect to skip opening path steps. If we have an AEP locally,
+        // this must be a previously registered device.
 
         // First we try and create an account with reg recovery
         // password; we will fail with reglock error.
@@ -720,34 +708,28 @@ public class RegistrationCoordinatorTest {
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
 
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
-
-        preKeyManagerMock.addFinalizePreKeyMock { didSucceed in
-            #expect(didSucceed.negated)
-            return Task {}
-        }
-        preKeyManagerMock.addFinalizePreKeyMock { didSucceed in
-            #expect(didSucceed.negated)
-            return Task {}
-        }
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
 
         // Fail the first request; the reglock is invalid.
-        let expectedRecoveryPwRequest = createAccountWithRecoveryPw(masterKey)
-        let failResponse = TSRequestOWSURLSessionMock.Response(
-            urlSuffix: expectedRecoveryPwRequest.url.absoluteString,
-            statusCode: RegistrationServiceResponses.AccountCreationResponseCodes.reglockFailed.rawValue,
+        let expectedRecoveryPwRequest = createAccountWithRecoveryPw(aep.getMasterKey().deriveRegistrationRecoveryPassword())
+        let failResponse = MockNetworkManager.mockResponse(
+            matchingRequest: { $0.url == expectedRecoveryPwRequest.url },
+            statusCode: 423,
             bodyJson: EncodableRegistrationLockFailureResponse(
                 timeRemainingMs: 10,
-                svr2AuthCredential: Stubs.svr2AuthCredential
-            )
+                svr2AuthCredential: Stubs.svr2AuthCredential,
+            ),
         )
-        mockURLSession.addResponse(failResponse)
+        networkManagerMock.asyncRequestHandlers.append(failResponse)
 
         // Once the request fails, we should try again with the reglock
         // token, this time.
-        mockURLSession.addResponse(failResponse)
+        networkManagerMock.asyncRequestHandlers.append(failResponse)
 
         // Once the second request fails, it should try an start a session.
 
@@ -758,7 +740,8 @@ public class RegistrationCoordinatorTest {
         })
 
         // Resolve with a session.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session()))
+        let expectedSession = stubs.session()
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Then when it gets back the session, it should immediately ask for
         // a verification code to be sent.
@@ -766,52 +749,55 @@ public class RegistrationCoordinatorTest {
         // Resolve with an updated session.
         sessionManager.addRequestCodeResponseMock(.success(stubs.session(nextVerificationAttempt: 0)))
 
+        var nextStep = await coordinator.nextStep()
+
         // We haven't set a phone number so it should ask for that.
-        #expect(
-            await coordinator.nextStep() ==
-                .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        guard case .phoneNumberEntry = nextStep else {
+            Issue.record("must be phoneNumberEntry")
+            return
+        }
 
         // Give it a phone number, which should show the PIN entry step.
+        coordinator.submitE164(Stubs.e164)
         // Now it should ask for the PIN to confirm the user knows it.
-        #expect(
-            await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .pinEntry(Stubs.pinEntryStateForRegRecoveryPath(mode: mode))
-        )
-
-        #expect(svr.hasMasterKey)
+        nextStep = await coordinator.nextStep()
+        guard case .pinEntry(let pinState) = nextStep else {
+            Issue.record("must be pinEntry")
+            return
+        }
+        guard case .enteringExistingPin(skippability: .canSkip, remainingAttempts: _) = pinState.operation else {
+            Issue.record("must be enteringExistingPin with skippability")
+            return
+        }
+        #expect(!didClearPinCode)
 
         // Give it the pin code, which should make it try and register.
-        // Now we should expect to be at verification code entry since we already set the phone number.
+        nextStep = await coordinator.submitPINCode(Stubs.pinCode).awaitable()
+        guard case .verificationCodeEntry(let codeState) = nextStep else {
+            Issue.record("must be verificationCodeEntry")
+            return
+        }
         // No exit allowed since we've already started trying to create the account.
+        #expect(codeState.exitConfiguration == .noExitAllowed)
+        #expect(codeState.validationError == nil)
         // We want to have wiped our master key; we failed reglock, which means the key itself is wrong
-        #expect(
-            await coordinator.submitPINCode(Stubs.pinCode).awaitable() ==
-                .verificationCodeEntry(
-                    stubs.verificationCodeEntryState(mode: mode, exitConfigOverride: .noExitAllowed)
-                )
-        )
-
-        #expect(svr.hasMasterKey.negated)
+        #expect(didClearPinCode)
     }
 
     @MainActor @Test(arguments: Self.testCases())
     func testRegRecoveryPwPath_retryNetworkError(testCase: TestCase) async throws {
         let coordinator = setupTest(testCase)
-        let mode = testCase.mode
 
         // Set profile info so we skip those steps.
         setupDefaultAccountAttributes()
 
         // Set a PIN on disk.
         ows2FAManagerMock.pinCodeMock = { Stubs.pinCode }
+        ows2FAManagerMock.shouldMasterKeyBeBackedUpMock = { true }
 
-        let (initialMasterKey, finalMasterKey) = buildKeyDataMocks(testCase)
-        svr.hasMasterKey = true
-
-        // NOTE: We expect to skip opening path steps because
-        // if we have a SVR master key locally, this _must_ be
-        // a previously registered device, and we can skip intros.
+        let aep = buildKeyDataMocks(testCase)
+        let initialMasterKey = aep.getMasterKey()
+        let finalMasterKey = aep.getMasterKey()
 
         // Before registering, it should ask for push tokens to give the registration.
         // When it retries, it will ask again.
@@ -819,101 +805,75 @@ public class RegistrationCoordinatorTest {
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
 
         // Every time we register we also ask for prekeys.
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
 
         // And we finalize them after.
-        preKeyManagerMock.addFinalizePreKeyMock { didSucceed in
-            #expect(didSucceed.negated)
-            return Task {}
-        }
-        preKeyManagerMock.addFinalizePreKeyMock { didSucceed in
-            #expect(didSucceed)
-            return Task {}
-        }
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
 
         // Fail the request with a network error.
-        let expectedRecoveryPwRequest = createAccountWithRecoveryPw(initialMasterKey)
-        let failResponse = TSRequestOWSURLSessionMock.Response.networkError(
-            matcher: { _ in
-                self.testRun.addObservedStep(.failedRequest)
-                return true
-            },
-            url: expectedRecoveryPwRequest.url
-        )
-        mockURLSession.addResponse(failResponse)
+        networkManagerMock.asyncRequestHandlers.append({ _, _ in
+            self.testRun.addObservedStep(.failedRequest)
+            throw OWSHTTPError.networkFailure(.unknownNetworkFailure)
+        })
 
         let identityResponse = Stubs.accountIdentityResponse()
         var authPassword: String!
 
         // Once the first request fails, it should retry. Resolve with success
-        let expectedRequest = createAccountWithRecoveryPw(initialMasterKey)
-        mockURLSession.addResponse(
-            TSRequestOWSURLSessionMock.Response(
-                matcher: { request in
-                    if request.url == expectedRequest.url {
-                        self.testRun.addObservedStep(.createAccount)
-                        // The password is generated internally by RegistrationCoordinator.
-                        // Extract it so we can check that the same password sent to the server
-                        // to register is used later for other requests.
-                        authPassword = request.authPassword
-                        return true
-                    }
-                    return false
-                },
-                statusCode: 200,
-                bodyData: try! JSONEncoder().encode(identityResponse)
-            )
-        )
+        let expectedRequest = createAccountWithRecoveryPw(initialMasterKey.deriveRegistrationRecoveryPassword())
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { request in
+                if request.url == expectedRequest.url {
+                    self.testRun.addObservedStep(.createAccount)
+                    // The password is generated internally by RegistrationCoordinator.
+                    // Extract it so we can check that the same password sent to the server
+                    // to register is used later for other requests.
+                    authPassword = request.authPassword
+                    return true
+                }
+                return false
+            },
+            statusCode: 200,
+            bodyJson: identityResponse,
+        ))
 
-        func expectedAuthedAccount() -> AuthedAccount {
-            return .explicit(
-                aci: identityResponse.aci,
-                pni: identityResponse.pni,
-                e164: Stubs.e164,
+        func expectedAuth() -> ChatServiceAuth {
+            return ChatServiceAuth.explicit(
+                aci: identityResponse.localIdentifiers.aci,
                 deviceId: .primary,
-                authPassword: authPassword
+                password: authPassword,
             )
         }
 
-        // When registered, it should try and sync pre-keys.
-        preKeyManagerMock.addRotateOneTimePreKeyMock({ auth in
-            #expect(auth == expectedAuthedAccount().chatServiceAuth)
-            return Task {}
-        })
-
-        // We haven't done a SVR backup; that should happen.
-        svr.backupMasterKeyMock = { pin, masterKey, authMethod in
-            self.testRun.addObservedStep(.backupMasterKey)
+        // We haven't marked the PIN enabled; that should happen.
+        ows2FAManagerMock.didMarkPinEnabled = { pin in
+            self.testRun.addObservedStep(.markPinEnabled)
             #expect(pin == Stubs.pinCode)
-            #expect(masterKey.rawData == finalMasterKey.rawData)
-            // We don't have a SVR auth credential, it should use chat server creds.
-            #expect(authMethod == .chatServerAuth(expectedAuthedAccount()))
-            self.svr.hasMasterKey = true
-            return .value(masterKey)
         }
 
         // Once we back up to svr, we should restore from storage service.
         storageServiceManagerMock.addRestoreOrCreateManifestIfNecessaryMock({ auth, masterKeySource in
-            #expect(auth.authedAccount == expectedAuthedAccount())
+            #expect(auth.chatServiceAuth == expectedAuth())
             switch masterKeySource {
             case .explicit(let explicitMasterKey):
                 #expect(initialMasterKey.rawData == explicitMasterKey.rawData)
             default:
                 Issue.record("Unexpected master key used in storage service operation.")
             }
-            return .value(())
         })
 
         storageServiceManagerMock.addRestoreOrCreateManifestIfNecessaryMock({ auth, masterKeySource in
-            #expect(auth.authedAccount == expectedAuthedAccount())
+            #expect(auth.chatServiceAuth == expectedAuth())
             switch masterKeySource {
             case .explicit(let explicitMasterKey):
                 #expect(finalMasterKey.rawData == explicitMasterKey.rawData)
             default:
                 Issue.record("Unexpected master key used in storage service operation.")
             }
-            return .value(())
         })
 
         storageServiceManagerMock.addRotateManifestMock({ _, _ in return .value(()) })
@@ -921,69 +881,57 @@ public class RegistrationCoordinatorTest {
         // Once we restore from storage service, we should attempt to reclaim our username.
         let mockUsernameLink: Usernames.UsernameLink = .mocked
         localUsernameManagerMock.startingUsernameState = .available(username: "boba.42", usernameLink: mockUsernameLink)
-        usernameApiClientMock.confirmReservedUsernameMocks = [{ _, _, chatServiceAuth in
+        mockUsernamesService.confirmUsernameMocks.set([{ _, _ in
             self.testRun.addObservedStep(.confirmReservedUsername)
-            #expect(chatServiceAuth == .explicit(
-                aci: identityResponse.aci,
-                deviceId: .primary,
-                password: authPassword
-            ))
-            return .success(usernameLinkHandle: mockUsernameLink.handle)
-        }]
+            return mockUsernameLink.handle
+        }])
 
         // Once we do the storage service restore,
-        // we will sync account attributes and then we are finished!
-        let expectedAttributesRequest = RegistrationRequestFactory.updatePrimaryDeviceAccountAttributesRequest(
-            Stubs.accountAttributes(finalMasterKey),
-            auth: .implicit() // // doesn't matter for url matching
-        )
-        networkManagerMock.asyncRequestHandlers.append({ request, _ in
-            if request.url == expectedAttributesRequest.url {
-                self.testRun.addObservedStep(.updateAccountAttribute)
-                return HTTPResponse(requestUrl: request.url, status: 200, headers: HttpHeaders(), bodyData: nil)
-            }
-            throw OWSAssertionError("")
-        })
+        // then we are finished!
+
+        var nextStep = await coordinator.nextStep()
 
         // We haven't set a phone number so it should ask for that.
-        #expect(
-            await coordinator.nextStep() ==
-                .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        guard case .phoneNumberEntry = nextStep else {
+            Issue.record("must be phoneNumberEntry")
+            return
+        }
 
         // Give it a phone number, which should show the PIN entry step.
+        coordinator.submitE164(Stubs.e164)
         // Now it should ask for the PIN to confirm the user knows it.
-        #expect(
-            await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .pinEntry(Stubs.pinEntryStateForRegRecoveryPath(mode: mode))
-        )
+        nextStep = await coordinator.nextStep()
+        guard case .pinEntry(let pinState) = nextStep else {
+            Issue.record("must be pinEntry")
+            return
+        }
+        guard case .enteringExistingPin(skippability: .canSkip, remainingAttempts: _) = pinState.operation else {
+            Issue.record("must be enteringExistingPin with skippability")
+            return
+        }
 
         // Give it the pin code, which should make it try and register.
-        #expect(await coordinator.submitPINCode(Stubs.pinCode).awaitable() == .done)
+        nextStep = await coordinator.submitPINCode(Stubs.pinCode).awaitable()
+        #expect(nextStep.isDone)
 
-        var expectedSteps: [TestStep] = [
+        let expectedSteps: [TestStep] = [
             .requestPushToken,
             .createPreKeys,
+            .createPreKeys,
             .failedRequest,
-            .finalizePreKeys,
             .requestPushToken,
+            .createPreKeys,
             .createPreKeys,
             .createAccount,
             .finalizePreKeys,
-            .rotateOneTimePreKeys,
-            // .restoreStorageService, // If going from MasterKey -> AEP
-            .backupMasterKey,
-            // .restoreStorageService,
+            .finalizePreKeys,
+            .markPinEnabled,
+            .restoreStorageService,
             .confirmReservedUsername,
+            .resetOneTimePreKeyTimestamp,
             .rotateManifest,
-            .updateAccountAttribute
         ]
 
-        if testCase.newKey == .accountEntropyPool && testCase.oldKey != .accountEntropyPool {
-            expectedSteps.insert(.restoreStorageService, at: 9)
-        } else {
-            expectedSteps.insert(.restoreStorageService, at: 10)
-        }
         #expect(testRun.recordedSteps == expectedSteps)
 
         // Since we set profile info, we should have scheduled a reupload.
@@ -996,26 +944,25 @@ public class RegistrationCoordinatorTest {
     // createAccount attempt, since this is the path that happens in the app.
     // Keeping 'testRegRecoveryPwPath_failedReglock' around since it's still
     // technically a possible path and should still be validated.
-    @MainActor @Test(arguments: Self.testCases())
+    @MainActor @Test(arguments: Self.onlyReRegisteringTestCases())
     func testRegRecoveryPwPath_failedReglock2(testCase: TestCase) async {
         let coordinator = setupTest(testCase)
-        let mode = testCase.mode
 
         // Set profile info so we skip those steps.
         setupDefaultAccountAttributes()
 
         // Set a PIN on disk.
         ows2FAManagerMock.pinCodeMock = { Stubs.pinCode }
+        ows2FAManagerMock.shouldMasterKeyBeBackedUpMock = { true }
+        var didClearPinCode = false
+        ows2FAManagerMock.clearLocalPinCodeMock = { didClearPinCode = true }
         ows2FAManagerMock.isReglockEnabledMock = { true }
 
         // Make SVR give us back a reg recovery password.
-        let masterKey = AccountEntropyPool().getMasterKey()
-        db.write { accountKeyStore.setMasterKey(masterKey, tx: $0) }
-        svr.hasMasterKey = true
+        let aep = buildKeyDataMocks(testCase)
 
-        // NOTE: We expect to skip opening path steps because
-        // if we have a SVR master key locally, this _must_ be
-        // a previously registered device, and we can skip intros.
+        // NOTE: We expect to skip opening path steps. If we have an AEP locally,
+        // this must be a previously registered device.
 
         // First we try and create an account with reg recovery
         // password; we will fail with reglock error.
@@ -1034,21 +981,16 @@ public class RegistrationCoordinatorTest {
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
 
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
-
-        preKeyManagerMock.addFinalizePreKeyMock({ _ in Task {} })
-        preKeyManagerMock.addFinalizePreKeyMock({ _ in Task {} })
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
 
         // Fail the first request;
-        let expectedRecoveryPwRequest = createAccountWithRecoveryPw(masterKey)
-        mockURLSession.addResponse(TSRequestOWSURLSessionMock.Response(
-            urlSuffix: expectedRecoveryPwRequest.url.absoluteString,
-            statusCode: RegistrationServiceResponses.AccountCreationResponseCodes.regRecoveryPasswordRejected.rawValue,
-            bodyJson: EncodableRegistrationLockFailureResponse(
-                timeRemainingMs: 10,
-                svr2AuthCredential: Stubs.svr2AuthCredential
-            )
+        let expectedRecoveryPwRequest = createAccountWithRecoveryPw(aep.getMasterKey().deriveRegistrationRecoveryPassword())
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { $0.url == expectedRecoveryPwRequest.url },
+            statusCode: 403,
         ))
 
         // Once the first request fails, it should try an start a session.
@@ -1059,7 +1001,8 @@ public class RegistrationCoordinatorTest {
         })
 
         // Resolve with a session.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session()))
+        let expectedSession = stubs.session()
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Then when it gets back the session, it should immediately ask for
         // a verification code to be sent.
@@ -1070,55 +1013,57 @@ public class RegistrationCoordinatorTest {
         // Give back an valid session.
         sessionManager.addSubmitCodeResponseMock(.success(stubs.session(
             receivedDate: date,
-            verified: true
+            verified: true,
         )))
 
         // Once the request fails, we should try again with the reglock
         // token, this time.
-        let expectedRecoveryPwRequest2 = createAccountWithSession(masterKey)
-        mockURLSession.addResponse(TSRequestOWSURLSessionMock.Response(
-            urlSuffix: expectedRecoveryPwRequest2.url.absoluteString,
-            statusCode: RegistrationServiceResponses.AccountCreationResponseCodes.reglockFailed.rawValue,
+        let expectedRecoveryPwRequest2 = createAccountWithSession(recoveryPassword: aep.getMasterKey().deriveRegistrationRecoveryPassword())
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { $0.url == expectedRecoveryPwRequest2.url },
+            statusCode: 423,
             bodyJson: EncodableRegistrationLockFailureResponse(
                 timeRemainingMs: 10000,
-                svr2AuthCredential: Stubs.svr2AuthCredential
-            )
+                svr2AuthCredential: Stubs.svr2AuthCredential,
+            ),
         ))
 
-        #expect(svr.hasMasterKey)
+        #expect(!didClearPinCode)
 
-        let acknowledgeAction: RegistrationReglockTimeoutAcknowledgeAction = switch testCase.mode {
-        case .registering: .resetPhoneNumber
-        case .changingNumber, .reRegistering: .none
-        }
+        var nextStep = await coordinator.nextStep()
 
         // We haven't set a phone number so it should ask for that.
-        #expect(
-            await coordinator.nextStep() ==
-                .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        guard case .phoneNumberEntry = nextStep else {
+            Issue.record("must be phoneNumberEntry")
+            return
+        }
 
         // Give it a phone number, which should show the PIN entry step.
+        coordinator.submitE164(Stubs.e164)
         // Now it should ask for the PIN to confirm the user knows it.
-        #expect(
-            await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .pinEntry(Stubs.pinEntryStateForRegRecoveryPath(mode: mode))
-        )
+        nextStep = await coordinator.nextStep()
+        guard case .pinEntry(let pinState) = nextStep else {
+            Issue.record("must be pinEntry")
+            return
+        }
+        guard case .enteringExistingPin(skippability: .canSkip, remainingAttempts: _) = pinState.operation else {
+            Issue.record("must be enteringExistingPin with skippability")
+            return
+        }
 
         // Give it the pin code, which should make it try and register.
         _ = await coordinator.submitPINCode(Stubs.pinCode).awaitable()
 
-        #expect(await coordinator.submitVerificationCode(Stubs.pinCode).awaitable() ==
-            .reglockTimeout(
-                RegistrationReglockTimeoutState(
-                    reglockExpirationDate: dateProvider().addingTimeInterval(TimeInterval(10)),
-                    acknowledgeAction: acknowledgeAction
-                )
-            )
-        )
+        nextStep = await coordinator.submitVerificationCode(Stubs.pinCode).awaitable()
+        guard case .enterRecoveryKey(let recoveryKeyState) = nextStep else {
+            Issue.record("must be enterRecoveryKey")
+            return
+        }
+        #expect(!recoveryKeyState.canShowBackButton)
+        #expect(!recoveryKeyState.canShowNoKeyHelpButton)
 
         // We want to have wiped our master key; we failed reglock, which means the key itself is wrong.
-        #expect(svr.hasMasterKey)
+        #expect(!didClearPinCode)
     }
 
     // Test the path where a the local masterkey is no longer in sync with the one storedin SVR
@@ -1127,50 +1072,39 @@ public class RegistrationCoordinatorTest {
     @MainActor @Test(arguments: Self.onlyReRegisteringTestCases())
     func testRegRecoveryPwPath_reglock_failedLocalCredentials(testCase: TestCase) async {
         let coordinator = setupTest(testCase)
-        let mode = testCase.mode
 
         // Set profile info so we skip those steps.
         setupDefaultAccountAttributes()
 
         // Set a PIN on disk.
         ows2FAManagerMock.pinCodeMock = { Stubs.pinCode }
+        ows2FAManagerMock.shouldMasterKeyBeBackedUpMock = { true }
+        var didClearPinCode = false
+        ows2FAManagerMock.clearLocalPinCodeMock = { didClearPinCode = true }
         ows2FAManagerMock.isReglockEnabledMock = { true }
 
         // Make SVR give us back a reg recovery password.
-        let (masterKey, newMasterKey) = buildKeyDataMocks(testCase)
+        let aep = buildKeyDataMocks(testCase)
+        let masterKey = aep.getMasterKey()
         let remoteMasterKey = MasterKey()
         // For non-AEP, we will replace the local key with the remote key.
         // For AEP, we'll rotate to a new AEP (or use the existing local AEP if it's present)
-        let finalMasterKey = testCase.newKey == .masterKey ? remoteMasterKey : newMasterKey
-        svr.hasMasterKey = true
 
         // Put some auth credentials in storage.
         let svr2CredentialCandidates: [SVR2AuthCredential] = [
             Stubs.svr2AuthCredential,
         ]
-        svrAuthCredentialStore.svr2Dict = Dictionary(grouping: svr2CredentialCandidates, by: \.credential.username).mapValues { $0.first! }
-
-        // Give it a phone number, which should cause it to check the auth credentials.
-        // Match the main auth credential.
-        let expectedSVR2CheckRequest = RegistrationRequestFactory.svr2AuthCredentialCheckRequest(
-            e164: Stubs.e164,
-            credentials: svr2CredentialCandidates
-        )
-        mockURLSession.addResponse(TSRequestOWSURLSessionMock.Response(
-            urlSuffix: expectedSVR2CheckRequest.url.absoluteString,
-            statusCode: 200,
-            bodyJson: RegistrationServiceResponses.SVR2AuthCheckResponse(matches: [
-                "\(Stubs.svr2AuthCredential.credential.username):\(Stubs.svr2AuthCredential.credential.password)": .match,
-            ])
-        ))
+        storeSvrCredentials(svr2CredentialCandidates)
 
         // NOTE: We expect to skip opening path steps because
         // if we have a SVR master key locally, this _must_ be
         // a previously registered device, and we can skip intros.
         svr.restoreKeysMock = { pin, authMethod in
             #expect(pin == Stubs.pinCode)
-            #expect(authMethod == .svrAuth(Stubs.svr2AuthCredential, backup: nil))
-            self.svr.hasMasterKey = true
+            if case .svrAuth(Stubs.svr2AuthCredential, backup: nil) = authMethod {
+            } else {
+                Issue.record("wrong authMethod: \(authMethod)")
+            }
             return .value(.success(remoteMasterKey))
         }
 
@@ -1186,36 +1120,41 @@ public class RegistrationCoordinatorTest {
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
 
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
 
-        preKeyManagerMock.addFinalizePreKeyMock { didSucceed in
-            #expect(didSucceed.negated)
-            return Task {}
-        }
-        preKeyManagerMock.addFinalizePreKeyMock { didSucceed in
-            #expect(didSucceed)
-            return Task {}
-        }
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
 
         // Fail the first request; the reglock is invalid.
-        let expectedRecoveryPwRequest = createAccountWithRecoveryPw(masterKey)
-        mockURLSession.addResponse(TSRequestOWSURLSessionMock.Response(
-            urlSuffix: expectedRecoveryPwRequest.url.absoluteString,
-            statusCode: RegistrationServiceResponses.AccountCreationResponseCodes.regRecoveryPasswordRejected.rawValue,
-            bodyJson: EncodableRegistrationLockFailureResponse(
-                timeRemainingMs: 10,
-                svr2AuthCredential: Stubs.svr2AuthCredential
-            )
+        let expectedRecoveryPwRequest = createAccountWithRecoveryPw(masterKey.deriveRegistrationRecoveryPassword())
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { $0.url == expectedRecoveryPwRequest.url },
+            statusCode: 403,
+        ))
+
+        let expectedSVR2CheckRequest = RegistrationRequestFactory.svr2AuthCredentialCheckRequest(
+            e164: Stubs.e164,
+            credentials: svr2CredentialCandidates,
+            logger: .empty(),
+        )
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { $0.url.relativeString.hasSuffix(expectedSVR2CheckRequest.url.absoluteString) },
+            statusCode: 200,
+            bodyJson: RegistrationServiceResponses.SVR2AuthCheckResponse(matches: [
+                "\(Stubs.svr2AuthCredential.credential.username):\(Stubs.svr2AuthCredential.credential.password)": .match,
+            ]),
         ))
 
         // Once the request fails, we should try again with the reglock
         // token, this time.
         let accountIdentityResponse = Stubs.accountIdentityResponse()
         var authPassword: String!
-        let expectedRecoveryPwRequest2 = createAccountWithRecoveryPw(remoteMasterKey)
-        mockURLSession.addResponse(TSRequestOWSURLSessionMock.Response(
-            matcher: { request in
+        let expectedRecoveryPwRequest2 = createAccountWithRecoveryPw(remoteMasterKey.deriveRegistrationRecoveryPassword())
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { request in
                 authPassword = request.authPassword
                 let requestAttributes = Self.attributesFromCreateAccountRequest(request)
                 #expect((request.parameters["recoveryPassword"] as? String) == remoteMasterKey.regRecoveryPw)
@@ -1223,109 +1162,85 @@ public class RegistrationCoordinatorTest {
                 return request.url == expectedRecoveryPwRequest2.url
             },
             statusCode: 200,
-            bodyJson: accountIdentityResponse
+            bodyJson: accountIdentityResponse,
         ))
 
-        func expectedAuthedAccount() -> AuthedAccount {
-            return .explicit(
-                aci: accountIdentityResponse.aci,
-                pni: accountIdentityResponse.pni,
-                e164: Stubs.e164,
+        func expectedAuth() -> ChatServiceAuth {
+            return ChatServiceAuth.explicit(
+                aci: accountIdentityResponse.localIdentifiers.aci,
                 deviceId: .primary,
-                authPassword: authPassword
+                password: authPassword,
             )
         }
 
-        // When registered, we should create pre-keys.
-        preKeyManagerMock.addRotateOneTimePreKeyMock({ auth in
-            #expect(auth == expectedAuthedAccount().chatServiceAuth)
-            return Task {}
-        })
+        var didMarkReglockEnabled = false
+        ows2FAManagerMock.didMarkRegistrationLockEnabled = { didMarkReglockEnabled = true }
 
-        // If we had reglock before registration, it should be re-enabled.
-        let expectedReglockRequest = OWSRequestFactory.enableRegistrationLockV2Request(token: finalMasterKey.reglockToken)
-        networkManagerMock.asyncRequestHandlers.append({ request, _ in
-            if request.url == expectedReglockRequest.url {
-                #expect(finalMasterKey.reglockToken == request.parameters["registrationLock"] as! String)
-                return HTTPResponse(requestUrl: request.url, status: 200, headers: HttpHeaders(), bodyData: nil)
-            }
-            throw OWSAssertionError("")
-        })
-
-        // We haven't done a SVR backup; that should happen now.
-        svr.backupMasterKeyMock = { pin, masterKey, authMethod in
+        // We haven't marked the PIN enabled; that should happen now.
+        var didMarkPinEnabled = false
+        ows2FAManagerMock.didMarkPinEnabled = { pin in
             #expect(pin == Stubs.pinCode)
-            // We don't have a SVR auth credential, it should use chat server creds.
-            #expect(masterKey.rawData == finalMasterKey.rawData)
-            #expect(authMethod == .svrAuth(
-                Stubs.svr2AuthCredential,
-                backup: .chatServerAuth(expectedAuthedAccount())
-            ))
-            self.svr.hasMasterKey = true
-            return .value(masterKey)
+            didMarkPinEnabled = true
         }
 
         // Once we sync push tokens, we should restore from storage service.
         storageServiceManagerMock.addRestoreOrCreateManifestIfNecessaryMock({ auth, masterKeySource in
-            #expect(auth.authedAccount == expectedAuthedAccount())
+            #expect(auth.chatServiceAuth == expectedAuth())
             switch masterKeySource {
             case .explicit(let explicitMasterKey):
                 #expect(remoteMasterKey.rawData == explicitMasterKey.rawData)
             default:
                 Issue.record("Unexpected master key used in storage service operation.")
             }
-            return .value(())
         })
 
         // Once we restore from storage service, we should attempt to reclaim
         // our username.
         let mockUsernameLink: Usernames.UsernameLink = .mocked
         localUsernameManagerMock.startingUsernameState = .available(username: "boba.42", usernameLink: mockUsernameLink)
-        usernameApiClientMock.confirmReservedUsernameMocks = [{ _, _, chatServiceAuth in
-            #expect(chatServiceAuth == .explicit(
-                aci: accountIdentityResponse.aci,
-                deviceId: .primary,
-                password: authPassword
-            ))
-            return .success(usernameLinkHandle: mockUsernameLink.handle)
-        }]
+        mockUsernamesService.confirmUsernameMocks.set([{ _, _ in
+            return mockUsernameLink.handle
+        }])
 
         storageServiceManagerMock.addRotateManifestMock({ _, _ in return .value(()) })
 
         // Once we do the username reclamation,
-        // we will sync account attributes and then we are finished!
-        let expectedAttributesRequest = RegistrationRequestFactory.updatePrimaryDeviceAccountAttributesRequest(
-            Stubs.accountAttributes(finalMasterKey),
-            auth: .implicit() // doesn't matter for url matching
-        )
-        networkManagerMock.asyncRequestHandlers.append({ request, _ in
-            if request.url == expectedAttributesRequest.url {
-                return HTTPResponse(requestUrl: request.url, status: 200, headers: HttpHeaders(), bodyData: nil)
-            }
-            throw OWSAssertionError("")
-        })
+        // then we are finished!
+
+        var nextStep = await coordinator.nextStep()
 
         // We haven't set a phone number so it should ask for that.
-        #expect(
-            await coordinator.nextStep() ==
-                .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        guard case .phoneNumberEntry = nextStep else {
+            Issue.record("must be phoneNumberEntry")
+            return
+        }
 
         // Give it a phone number, which should show the PIN entry step.
+        coordinator.submitE164(Stubs.e164)
         // Now it should ask for the PIN to confirm the user knows it.
-        #expect(
-            await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .pinEntry(Stubs.pinEntryStateForRegRecoveryPath(mode: mode))
-        )
+        nextStep = await coordinator.nextStep()
+        guard case .pinEntry(let pinState) = nextStep else {
+            Issue.record("must be pinEntry")
+            return
+        }
+        guard case .enteringExistingPin(skippability: .canSkip, remainingAttempts: _) = pinState.operation else {
+            Issue.record("must be enteringExistingPin with skippability")
+            return
+        }
 
-        #expect(svrAuthCredentialStore.svr2Dict[Stubs.svr2AuthCredential.credential.username] != nil)
+        #expect(getSvrCredentialUsernames() == [Stubs.svr2AuthCredential.credential.username])
 
-        #expect(svr.hasMasterKey)
+        #expect(!didClearPinCode)
 
         // Give it the pin code, which should make it try and register.
-        #expect(await coordinator.submitPINCode(Stubs.pinCode).awaitable() == .done)
+        #expect(await coordinator.submitPINCode(Stubs.pinCode).awaitable().isDone)
 
-        #expect(svr.hasMasterKey)
+        #expect(!didClearPinCode)
+
+        // If we had reglock before registration, it should be re-enabled.
+        #expect(didMarkReglockEnabled)
+
+        #expect(didMarkPinEnabled)
     }
 
     /// Test the path where both local and remote RRP are rejected due to a reglock challenge
@@ -1339,41 +1254,29 @@ public class RegistrationCoordinatorTest {
     @MainActor @Test(arguments: Self.onlyReRegisteringTestCases())
     func testRegRecoveryPwPath_reglock_localAndRemoteKeysRejected(testCase: TestCase) async {
         let coordinator = setupTest(testCase)
-        let mode = testCase.mode
 
         // Set profile info so we skip those steps.
         setupDefaultAccountAttributes()
 
         // Set a PIN on disk.
         ows2FAManagerMock.pinCodeMock = { Stubs.pinCode }
+        ows2FAManagerMock.shouldMasterKeyBeBackedUpMock = { true }
+        var didClearPinCode = false
+        ows2FAManagerMock.clearLocalPinCodeMock = { didClearPinCode = true }
         ows2FAManagerMock.isReglockEnabledMock = { true }
 
         // Make SVR give us back a reg recovery password.
-        let (masterKey, _) = buildKeyDataMocks(testCase)
+        let aep = buildKeyDataMocks(testCase)
+        let masterKey = aep.getMasterKey()
         let remoteMasterKey = MasterKey()
         // For non-AEP, we will replace the local key with the remote key.
         // For AEP, we'll rotate to a new AEP (or use the existing local AEP if it's present)
-        svr.hasMasterKey = true
 
         // Put some auth credentials in storage.
         let svr2CredentialCandidates: [SVR2AuthCredential] = [
             Stubs.svr2AuthCredential,
         ]
-        svrAuthCredentialStore.svr2Dict = Dictionary(grouping: svr2CredentialCandidates, by: \.credential.username).mapValues { $0.first! }
-
-        // Give it a phone number, which should cause it to check the auth credentials.
-        // Match the main auth credential.
-        let expectedSVR2CheckRequest = RegistrationRequestFactory.svr2AuthCredentialCheckRequest(
-            e164: Stubs.e164,
-            credentials: svr2CredentialCandidates
-        )
-        mockURLSession.addResponse(TSRequestOWSURLSessionMock.Response(
-            urlSuffix: expectedSVR2CheckRequest.url.absoluteString,
-            statusCode: 200,
-            bodyJson: RegistrationServiceResponses.SVR2AuthCheckResponse(matches: [
-                "\(Stubs.svr2AuthCredential.credential.username):\(Stubs.svr2AuthCredential.credential.password)": .match,
-            ])
-        ))
+        storeSvrCredentials(svr2CredentialCandidates)
 
         // NOTE: We expect to skip opening path steps because
         // if we have a SVR master key locally, this _must_ be
@@ -1381,8 +1284,10 @@ public class RegistrationCoordinatorTest {
 
         svr.restoreKeysMock = { pin, authMethod in
             #expect(pin == Stubs.pinCode)
-            #expect(authMethod == .svrAuth(Stubs.svr2AuthCredential, backup: nil))
-            self.svr.hasMasterKey = true
+            if case .svrAuth(Stubs.svr2AuthCredential, backup: nil) = authMethod {
+            } else {
+                Issue.record("wrong authMethod: \(authMethod)")
+            }
             return .value(.success(remoteMasterKey))
         }
 
@@ -1396,26 +1301,35 @@ public class RegistrationCoordinatorTest {
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
 
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
-
-        preKeyManagerMock.addFinalizePreKeyMock({ _ in Task {} })
-        preKeyManagerMock.addFinalizePreKeyMock({ _ in Task {} })
-        preKeyManagerMock.addFinalizePreKeyMock({ _ in Task {} })
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
 
         // Fail the first request; the local key is invalid.
-        let expectedRecoveryPwRequest = createAccountWithRecoveryPw(masterKey)
-        let failResponse = TSRequestOWSURLSessionMock.Response(
-            urlSuffix: expectedRecoveryPwRequest.url.absoluteString,
-            statusCode: RegistrationServiceResponses.AccountCreationResponseCodes.regRecoveryPasswordRejected.rawValue,
-            bodyJson: EncodableRegistrationLockFailureResponse(
-                timeRemainingMs: 10000,
-                svr2AuthCredential: Stubs.svr2AuthCredential
-            )
+        let expectedRecoveryPwRequest = createAccountWithRecoveryPw(masterKey.deriveRegistrationRecoveryPassword())
+        let failResponse = MockNetworkManager.mockResponse(
+            matchingRequest: { $0.url == expectedRecoveryPwRequest.url },
+            statusCode: 403,
         )
-        mockURLSession.addResponse(failResponse)
-        mockURLSession.addResponse(failResponse)
+        networkManagerMock.asyncRequestHandlers.append(failResponse)
+
+        let expectedSVR2CheckRequest = RegistrationRequestFactory.svr2AuthCredentialCheckRequest(
+            e164: Stubs.e164,
+            credentials: svr2CredentialCandidates,
+            logger: .empty(),
+        )
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { $0.url.relativeString.hasSuffix(expectedSVR2CheckRequest.url.absoluteString) },
+            statusCode: 200,
+            bodyJson: RegistrationServiceResponses.SVR2AuthCheckResponse(matches: [
+                "\(Stubs.svr2AuthCredential.credential.username):\(Stubs.svr2AuthCredential.credential.password)": .match,
+            ]),
+        ))
+
+        networkManagerMock.asyncRequestHandlers.append(failResponse)
 
         pushRegistrationManagerMock.setReceivePreAuthChallengeTokenMock({
             try! await Task.sleep(nanoseconds: TimeInterval.infinity.clampedNanoseconds)
@@ -1426,67 +1340,73 @@ public class RegistrationCoordinatorTest {
         sessionManager.addRequestCodeResponseMock(.success(stubs.session(nextVerificationAttempt: 0)))
 
         // Resolve with a session.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session()))
+        let expectedSession = stubs.session()
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Once the request fails, we should try again with the reglock
         // token, this time.
         // The third attempt should fall back to session using the remote key(?)
-        let expectedRecoveryPwRequest3 = createAccountWithSession(remoteMasterKey)
-        mockURLSession.addResponse(TSRequestOWSURLSessionMock.Response(
-            urlSuffix: expectedRecoveryPwRequest3.url.absoluteString,
-            statusCode: RegistrationServiceResponses.AccountCreationResponseCodes.reglockFailed.rawValue,
+        let expectedRecoveryPwRequest3 = createAccountWithSession(recoveryPassword: remoteMasterKey.deriveRegistrationRecoveryPassword())
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { $0.url == expectedRecoveryPwRequest3.url },
+            statusCode: 423,
             bodyJson: EncodableRegistrationLockFailureResponse(
                 timeRemainingMs: 10000,
-                svr2AuthCredential: Stubs.svr2AuthCredential
-            )
+                svr2AuthCredential: Stubs.svr2AuthCredential,
+            ),
         ))
 
         // Give back a verified session.
         sessionManager.addSubmitCodeResponseMock(.success(stubs.session(verified: true)))
 
-        let acknowledgeAction: RegistrationReglockTimeoutAcknowledgeAction = switch testCase.mode {
-        case .registering: .resetPhoneNumber
-        case .changingNumber, .reRegistering: .none
-        }
+        var nextStep = await coordinator.nextStep()
 
         // We haven't set a phone number so it should ask for that.
-        #expect(
-            await coordinator.nextStep() ==
-                .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
-
+        guard case .phoneNumberEntry = nextStep else {
+            Issue.record("must be phoneNumberEntry")
+            return
+        }
         // Give it a phone number, which should show the PIN entry step.
+        coordinator.submitE164(Stubs.e164)
         // Now it should ask for the PIN to confirm the user knows it.
-        #expect(
-            await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .pinEntry(Stubs.pinEntryStateForRegRecoveryPath(mode: mode))
-        )
+        nextStep = await coordinator.nextStep()
+        guard case .pinEntry(let pinState) = nextStep else {
+            Issue.record("must be pinEntry")
+            return
+        }
+        guard case .enteringExistingPin(skippability: .canSkip, remainingAttempts: _) = pinState.operation else {
+            Issue.record("must be enteringExistingPin with skippability")
+            return
+        }
 
         // Give it the pin code, which should make it try and register.
-        #expect(
-            await coordinator.submitPINCode(Stubs.pinCode).awaitable() ==
-                .verificationCodeEntry(
-                    stubs.verificationCodeEntryState(
-                        mode: mode,
-                        // TODO: [Refactor]: Is 'noExitAllowed' the correct value to expect here?
-                        exitConfigOverride: .noExitAllowed
-                    ))
-        )
-
-        #expect(svr.hasMasterKey)
+        nextStep = await coordinator.submitPINCode(Stubs.pinCode).awaitable()
+        guard case .verificationCodeEntry(let codeState) = nextStep else {
+            Issue.record("must be verificationCodeEntry")
+            return
+        }
+        // TODO: [Refactor]: Is 'noExitAllowed' the correct value to expect here?
+        #expect(codeState.exitConfiguration == .noExitAllowed)
+        #expect(!didClearPinCode)
 
         // Submit verification code
-        #expect(await coordinator.submitVerificationCode(Stubs.verificationCode).awaitable() ==
-            .reglockTimeout(
-                RegistrationReglockTimeoutState(
-                    reglockExpirationDate: dateProvider().addingTimeInterval(TimeInterval(10)),
-                    acknowledgeAction: acknowledgeAction
-                )
-            )
-        )
+        nextStep = await coordinator.submitVerificationCode(Stubs.verificationCode).awaitable()
+        guard case .reglockTimeout(let reglockState) = nextStep else {
+            Issue.record("must be reglockTimeout")
+            return
+        }
+        let acknowledgeAction: RegistrationReglockTimeoutAcknowledgeAction
+        switch testCase.mode {
+        case .registering:
+            acknowledgeAction = .resetPhoneNumber
+        case .changingNumber, .reRegistering:
+            acknowledgeAction = .none
+        }
+        #expect(reglockState.acknowledgeAction == acknowledgeAction)
+        #expect(reglockState.reglockExpirationDate == dateProvider().addingTimeInterval(10))
 
         // We want to have wiped our master key; we failed reglock, which means the key itself is wrong.
-        #expect(svr.hasMasterKey)
+        #expect(!didClearPinCode)
     }
 
     // MARK: - SVR Auth Credential Path
@@ -1504,20 +1424,20 @@ public class RegistrationCoordinatorTest {
         mockSVRCredentials(isMatch: true)
 
         // Get past the opening.
-        await goThroughOpeningHappyPath(
-            coordinator: coordinator,
-            mode: mode,
-            expectedNextStep: .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        await goThroughOpeningHappyPath(coordinator: coordinator, mode: mode)
 
-        let (initialMasterKey, finalMasterKey) = buildKeyDataMocks(testCase)
+        let aep = buildKeyDataMocks(testCase)
+        let initialMasterKey = aep.getMasterKey()
+        let finalMasterKey = aep.getMasterKey()
 
         // Resolve the key restoration from SVR and have it start returning the key.
         svr.restoreKeysMock = { pin, authMethod in
             self.testRun.addObservedStep(.restoreKeys)
             #expect(pin == Stubs.pinCode)
-            #expect(authMethod == .svrAuth(Stubs.svr2AuthCredential, backup: nil))
-            self.svr.hasMasterKey = true
+            if case .svrAuth(Stubs.svr2AuthCredential, backup: nil) = authMethod {
+            } else {
+                Issue.record("wrong authMethod: \(authMethod)")
+            }
             return .value(.success(initialMasterKey))
         }
 
@@ -1525,68 +1445,50 @@ public class RegistrationCoordinatorTest {
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
 
         // Every time we register we also ask for prekeys.
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
 
         // And we finalize them after.
-        preKeyManagerMock.addFinalizePreKeyMock { didSucceed in
-            #expect(didSucceed)
-            return Task {}
-        }
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
 
         // Now still at it should make a reg recovery pw request
         let accountIdentityResponse = Stubs.accountIdentityResponse()
         var authPassword: String!
-        let expectedRegRecoveryPwRequest = createAccountWithRecoveryPw(initialMasterKey)
-        mockURLSession.addResponse(
-            TSRequestOWSURLSessionMock.Response(
-                matcher: { request in
-                    self.testRun.addObservedStep(.createAccount)
-                    authPassword = request.authPassword
-                    return request.url == expectedRegRecoveryPwRequest.url
-                },
-                statusCode: 200,
-                bodyJson: accountIdentityResponse
-            )
-        )
+        let expectedRegRecoveryPwRequest = createAccountWithRecoveryPw(initialMasterKey.deriveRegistrationRecoveryPassword())
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { request in
+                self.testRun.addObservedStep(.createAccount)
+                authPassword = request.authPassword
+                return request.url == expectedRegRecoveryPwRequest.url
+            },
+            statusCode: 200,
+            bodyJson: accountIdentityResponse,
+        ))
 
-        func expectedAuthedAccount() -> AuthedAccount {
-            return .explicit(
-                aci: accountIdentityResponse.aci,
-                pni: accountIdentityResponse.pni,
-                e164: Stubs.e164,
+        func expectedAuth() -> ChatServiceAuth {
+            return ChatServiceAuth.explicit(
+                aci: accountIdentityResponse.localIdentifiers.aci,
                 deviceId: .primary,
-                authPassword: authPassword
+                password: authPassword,
             )
         }
 
-        // When registered, it should try and create pre-keys.
-        preKeyManagerMock.addRotateOneTimePreKeyMock({ auth in
-            #expect(auth == expectedAuthedAccount().chatServiceAuth)
-            return Task {}
-        })
-
-        // Once we create pre-keys, we should back up to svr.
-        svr.backupMasterKeyMock = { pin, masterKey, authMethod in
-            self.testRun.addObservedStep(.backupMasterKey)
+        // Once we create pre-keys, we mark the PIN enabled.
+        ows2FAManagerMock.didMarkPinEnabled = { pin in
+            self.testRun.addObservedStep(.markPinEnabled)
             #expect(pin == Stubs.pinCode)
-            #expect(masterKey.rawData == finalMasterKey.rawData)
-            #expect(authMethod == .svrAuth(
-                Stubs.svr2AuthCredential,
-                backup: .chatServerAuth(expectedAuthedAccount())
-            ))
-            return .value(masterKey)
         }
 
         // Once we back up to svr, we should restore from storage service.
         storageServiceManagerMock.addRestoreOrCreateManifestIfNecessaryMock({ auth, masterKeySource in
-            #expect(auth.authedAccount == expectedAuthedAccount())
+            #expect(auth.chatServiceAuth == expectedAuth())
             switch masterKeySource {
             case .explicit(let explicitMasterKey):
                 #expect(initialMasterKey.rawData == explicitMasterKey.rawData)
             default:
                 Issue.record("Unexpected master key used in storage service operation.")
             }
-            return .value(())
         })
 
         storageServiceManagerMock.addRestoreOrCreateManifestIfNecessaryMock({ auth, masterKeySource in
@@ -1596,7 +1498,6 @@ public class RegistrationCoordinatorTest {
             default:
                 Issue.record("Unexpected master key used in storage service operation.")
             }
-            return .value(())
         })
 
         storageServiceManagerMock.addRotateManifestMock({ _, _ in return .value(()) })
@@ -1604,69 +1505,48 @@ public class RegistrationCoordinatorTest {
         // Once we restore from storage service, we should attempt to reclaim our username.
         let mockUsernameLink: Usernames.UsernameLink = .mocked
         localUsernameManagerMock.startingUsernameState = .available(username: "boba.42", usernameLink: mockUsernameLink)
-        usernameApiClientMock.confirmReservedUsernameMocks = [{ _, _, chatServiceAuth in
+        mockUsernamesService.confirmUsernameMocks.set([{ _, _ in
             self.testRun.addObservedStep(.confirmReservedUsername)
-            #expect(chatServiceAuth == .explicit(
-                aci: accountIdentityResponse.aci,
-                deviceId: .primary,
-                password: authPassword
-            ))
-            return .success(usernameLinkHandle: mockUsernameLink.handle)
-        }]
+            return mockUsernameLink.handle
+        }])
 
-        // Once we do the storage service restore, we will sync account attributes and then we are finished!
-        let expectedAttributesRequest = RegistrationRequestFactory.updatePrimaryDeviceAccountAttributesRequest(
-            Stubs.accountAttributes(finalMasterKey),
-            auth: .implicit() // doesn't matter for url matching
-        )
-        networkManagerMock.asyncRequestHandlers.append({ request, _ in
-            if request.url == expectedAttributesRequest.url {
-                self.testRun.addObservedStep(.updateAccountAttribute)
-                return HTTPResponse(requestUrl: request.url, status: 200, headers: HttpHeaders(), bodyData: nil)
-            }
-            throw OWSAssertionError("")
-        })
+        // Once we do the storage service restore, then we are finished!
 
         // At this point, we should be asking for PIN entry so we can use the credential
         // to recover the SVR master key.
-        #expect(
-            await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .pinEntry(Stubs.pinEntryStateForSVRAuthCredentialPath(mode: mode))
-        )
+        coordinator.submitE164(Stubs.e164)
+        var nextStep = await coordinator.nextStep()
+        guard case .pinEntry(let pinState) = nextStep else {
+            Issue.record("must be pinEntry")
+            return
+        }
+        guard case .enteringExistingPin(skippability: .canSkip, remainingAttempts: _) = pinState.operation else {
+            Issue.record("must be enteringExistingPin with skippability")
+            return
+        }
 
         // We should have wiped the invalid and unknown credentials.
-        let remainingCredentials = svrAuthCredentialStore.svr2Dict
-        #expect(remainingCredentials[Stubs.svr2AuthCredential.credential.username] != nil)
-        #expect(remainingCredentials["aaaa"] != nil)
-        #expect(remainingCredentials["zzzz"] == nil)
-        #expect(remainingCredentials["0000"] == nil)
-        // SVR should be untouched.
-        #expect(svrAuthCredentialStore.svr2Dict[Stubs.svr2AuthCredential.credential.username] != nil)
+        #expect(getSvrCredentialUsernames() == [Stubs.svr2AuthCredential.credential.username, "aaaa"])
 
         // Enter the PIN, which should try and recover from SVR.
         // Once we do that, it should follow the Reg Recovery Password Path.
-        #expect(await coordinator.submitPINCode(Stubs.pinCode).awaitable() == .done)
+        nextStep = await coordinator.submitPINCode(Stubs.pinCode).awaitable()
+        #expect(nextStep.isDone)
 
-        var expectedSteps: [TestStep] = [
+        let expectedSteps: [TestStep] = [
             .restoreKeys,
             .requestPushToken,
             .createPreKeys,
+            .createPreKeys,
             .createAccount,
             .finalizePreKeys,
-            .rotateOneTimePreKeys,
-            //            "restoreStorageService",
-            .backupMasterKey,
-            //            "restoreStorageService",
+            .finalizePreKeys,
+            .restoreStorageService,
+            .markPinEnabled,
             .confirmReservedUsername,
+            .resetOneTimePreKeyTimestamp,
             .rotateManifest,
-            .updateAccountAttribute
         ]
-
-        if testCase.newKey == .accountEntropyPool {
-            expectedSteps.insert(.restoreStorageService, at: 6)
-        } else {
-            expectedSteps.insert(.restoreStorageService, at: 7)
-        }
 
         #expect(testRun.recordedSteps == expectedSteps)
 
@@ -1686,11 +1566,7 @@ public class RegistrationCoordinatorTest {
         mockSVRCredentials(isMatch: false)
 
         // Get past the opening.
-        await goThroughOpeningHappyPath(
-            coordinator: coordinator,
-            mode: mode,
-            expectedNextStep: .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        await goThroughOpeningHappyPath(coordinator: coordinator, mode: mode)
 
         // Once the first request fails, it should try an start a session.
         // We'll ask for a push challenge, though we don't need to resolve it in this test.
@@ -1700,7 +1576,8 @@ public class RegistrationCoordinatorTest {
         })
 
         // Resolve with a session.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session()))
+        let expectedSession = stubs.session()
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Then when it gets back the session, it should immediately ask for
         // a verification code to be sent.
@@ -1711,17 +1588,15 @@ public class RegistrationCoordinatorTest {
 
         // Give it a phone number, which should cause it to check the auth credentials.
         // Now we should expect to be at verification code entry since we already set the phone number.
-        #expect(
-            await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(mode: mode))
-        )
+        coordinator.submitE164(Stubs.e164)
+        let nextStep = await coordinator.nextStep()
+        guard case .verificationCodeEntry = nextStep else {
+            Issue.record("must be verificationCodeEntry")
+            return
+        }
 
-        // We should have wipted the invalid and unknown credentials.
-        let remainingCredentials = svrAuthCredentialStore.svr2Dict
-        #expect(remainingCredentials[Stubs.svr2AuthCredential.credential.username] != nil)
-        #expect(remainingCredentials["aaaa"] != nil)
-        #expect(remainingCredentials["zzzz"] == nil)
-        #expect(remainingCredentials["0000"] == nil)
+        // We should have wiped the invalid and unknown credentials.
+        #expect(getSvrCredentialUsernames() == [Stubs.svr2AuthCredential.credential.username, "aaaa"])
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -1736,30 +1611,25 @@ public class RegistrationCoordinatorTest {
         setupDefaultAccountAttributes()
 
         // Put some auth credentials in storage.
-        let credentialCandidates: [SVR2AuthCredential] = [ Stubs.svr2AuthCredential ]
-        svrAuthCredentialStore.svr2Dict = Dictionary(grouping: credentialCandidates, by: \.credential.username).mapValues { $0.first! }
+        let credentialCandidates: [SVR2AuthCredential] = [Stubs.svr2AuthCredential]
+        storeSvrCredentials(credentialCandidates)
 
         // Get past the opening.
-        await goThroughOpeningHappyPath(
-            coordinator: coordinator,
-            mode: mode,
-            expectedNextStep: .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        await goThroughOpeningHappyPath(coordinator: coordinator, mode: mode)
 
         // Don't give back any matches, which means we will want to create a session as a fallback.
         var expectedSVRCheckRequest = RegistrationRequestFactory.svr2AuthCredentialCheckRequest(
             e164: originalE164,
-            credentials: credentialCandidates
+            credentials: credentialCandidates,
+            logger: .empty(),
         )
-        mockURLSession.addResponse(
-            TSRequestOWSURLSessionMock.Response(
-                urlSuffix: expectedSVRCheckRequest.url.absoluteString,
-                statusCode: 200,
-                bodyJson: RegistrationServiceResponses.SVR2AuthCheckResponse(matches: [
-                    "\(Stubs.svr2AuthCredential.credential.username):\(Stubs.svr2AuthCredential.credential.password)": .notMatch
-                ])
-            )
-        )
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { $0.url.relativeString.hasSuffix(expectedSVRCheckRequest.url.absoluteString) },
+            statusCode: 200,
+            bodyJson: RegistrationServiceResponses.SVR2AuthCheckResponse(matches: [
+                "\(Stubs.svr2AuthCredential.credential.username):\(Stubs.svr2AuthCredential.credential.password)": .notMatch,
+            ]),
+        ))
 
         // Once the first request fails, it should try an start a session.
         // We'll ask for a push challenge, though we don't need to resolve it in this test.
@@ -1769,7 +1639,8 @@ public class RegistrationCoordinatorTest {
         })
 
         // Resolve with a session.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session(e164: originalE164)))
+        let expectedSession = stubs.session(e164: originalE164)
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Then when it gets back the session, it should immediately ask for a verification code to be sent.
         // Resolve with an updated session.
@@ -1780,39 +1651,48 @@ public class RegistrationCoordinatorTest {
         // Give a match, so it registers via SVR auth credential.
         expectedSVRCheckRequest = RegistrationRequestFactory.svr2AuthCredentialCheckRequest(
             e164: changedE164,
-            credentials: credentialCandidates
+            credentials: credentialCandidates,
+            logger: .empty(),
         )
-        mockURLSession.addResponse(
-            TSRequestOWSURLSessionMock.Response(
-                urlSuffix: expectedSVRCheckRequest.url.absoluteString,
-                statusCode: 200,
-                bodyJson: RegistrationServiceResponses.SVR2AuthCheckResponse(matches: [
-                    "\(Stubs.svr2AuthCredential.credential.username):\(Stubs.svr2AuthCredential.credential.password)": .match
-                ])
-            )
-        )
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { $0.url.relativeString.hasSuffix(expectedSVRCheckRequest.url.absoluteString) },
+            statusCode: 200,
+            bodyJson: RegistrationServiceResponses.SVR2AuthCheckResponse(matches: [
+                "\(Stubs.svr2AuthCredential.credential.username):\(Stubs.svr2AuthCredential.credential.password)": .match,
+            ]),
+        ))
 
         // Give it a phone number, which should cause it to check the auth credentials.
         // Now we should expect to be at verification code entry since we already set the phone number.
-        #expect(
-            await coordinator.submitE164(originalE164).awaitable() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(mode: mode))
-        )
+        coordinator.submitE164(originalE164)
+        var nextStep = await coordinator.nextStep()
+        guard case .verificationCodeEntry = nextStep else {
+            Issue.record("must be verificationCodeEntry")
+            return
+        }
 
         // We should have wiped the invalid and unknown credentials.
-        #expect(svrAuthCredentialStore.svr2Dict[Stubs.svr2AuthCredential.credential.username] != nil)
+        #expect(getSvrCredentialUsernames() == [Stubs.svr2AuthCredential.credential.username])
 
         // Now change the phone number; this should take us back to phone number entry.
-        #expect(
-            await coordinator.requestChangeE164().awaitable() ==
-                .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        coordinator.requestChangeE164()
+        nextStep = await coordinator.nextStep()
+        guard case .phoneNumberEntry = nextStep else {
+            Issue.record("must be phoneNumberEntry")
+            return
+        }
 
         // Now it should ask for PIN entry; we are on the SVR auth credential path.
-        #expect(
-            await coordinator.submitE164(changedE164).awaitable() ==
-                .pinEntry(Stubs.pinEntryStateForSVRAuthCredentialPath(mode: mode))
-        )
+        coordinator.submitE164(changedE164)
+        nextStep = await coordinator.nextStep()
+        guard case .pinEntry(let pinState) = nextStep else {
+            Issue.record("must be pinEntry")
+            return
+        }
+        guard case .enteringExistingPin(skippability: .canSkip, remainingAttempts: _) = pinState.operation else {
+            Issue.record("must be enteringExistingPin with skippability")
+            return
+        }
     }
 
     // MARK: - Session Path
@@ -1836,61 +1716,47 @@ public class RegistrationCoordinatorTest {
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
 
         // It should also fetch the prekeys for account creation
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
 
-        let expectedRequest = createAccountWithSession(newMasterKey)
-        mockURLSession.addResponse(
-            TSRequestOWSURLSessionMock.Response(
-                matcher: { request in
-                    authPassword = request.authPassword
-                    return request.url == expectedRequest.url
-                },
-                statusCode: 200,
-                bodyJson: accountIdentityResponse
-            )
-        )
+        let expectedRequest = createAccountWithSession(recoveryPassword: newMasterKey.deriveRegistrationRecoveryPassword())
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { request in
+                authPassword = request.authPassword
+                return request.url == expectedRequest.url
+            },
+            statusCode: 200,
+            bodyJson: accountIdentityResponse,
+        ))
 
-        func expectedAuthedAccount() -> AuthedAccount {
-            return .explicit(
-                aci: accountIdentityResponse.aci,
-                pni: accountIdentityResponse.pni,
-                e164: Stubs.e164,
+        func expectedAuth() -> ChatServiceAuth {
+            return ChatServiceAuth.explicit(
+                aci: accountIdentityResponse.localIdentifiers.aci,
                 deviceId: .primary,
-                authPassword: authPassword
+                password: authPassword,
             )
         }
 
         // Once we are registered, we should finalize prekeys.
-        preKeyManagerMock.addFinalizePreKeyMock { didSucceed in
-            #expect(didSucceed)
-            return Task {}
-        }
-
-        // Then we should try and create one time pre-keys
-        // with the credentials we got in the identity response.
-        preKeyManagerMock.addRotateOneTimePreKeyMock({ auth in
-            #expect(auth == expectedAuthedAccount().chatServiceAuth)
-            return Task {}
-        })
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
 
         // Finish the validation.
-        svr.backupMasterKeyMock = { pin, masterKey, authMethod in
+        var didMarkPinEnabled = false
+        ows2FAManagerMock.didMarkPinEnabled = { pin in
             #expect(pin == Stubs.pinCode)
-            #expect(masterKey.rawData == newMasterKey.rawData)
-            #expect(authMethod == .chatServerAuth(expectedAuthedAccount()))
-            return .value(masterKey)
+            didMarkPinEnabled = true
         }
 
         // Once we sync push tokens, we should restore from storage service.
         storageServiceManagerMock.addRestoreOrCreateManifestIfNecessaryMock({ auth, masterKeySource in
-            #expect(auth.authedAccount == expectedAuthedAccount())
+            #expect(auth.chatServiceAuth == expectedAuth())
             switch masterKeySource {
             case .explicit(let explicitMasterKey):
                 #expect(newMasterKey.rawData == explicitMasterKey.rawData)
             default:
                 Issue.record("Unexpected master key used in storage service operation.")
             }
-            return .value(())
         })
 
         // Once we restore from storage service, we should attempt to reclaim
@@ -1898,84 +1764,87 @@ public class RegistrationCoordinatorTest {
         // no different impact on the rest of registration.
         let mockUsernameLink: Usernames.UsernameLink = .mocked
         localUsernameManagerMock.startingUsernameState = .available(username: "boba.42", usernameLink: mockUsernameLink)
-        usernameApiClientMock.confirmReservedUsernameMocks = [{ _, _, chatServiceAuth in
-            #expect(chatServiceAuth == .explicit(
-                aci: accountIdentityResponse.aci,
-                deviceId: .primary,
-                password: authPassword
-            ))
+        mockUsernamesService.confirmUsernameMocks.set([{ _, _ in
             throw OWSGenericError("Something went wrong :(")
-        }]
+        }])
 
         // And once we do the storage service restore,
-        // we will sync account attributes and then we are finished!
-        let expectedAttributesRequest = RegistrationRequestFactory.updatePrimaryDeviceAccountAttributesRequest(
-            Stubs.accountAttributes(newMasterKey),
-            auth: .implicit() // doesn't matter for url matching
-        )
-        networkManagerMock.asyncRequestHandlers.append({ request, _ in
-            if request.url == expectedAttributesRequest.url {
-                return HTTPResponse(requestUrl: request.url, status: 200, headers: HttpHeaders(), bodyData: nil)
-            }
-            throw OWSAssertionError("")
-        })
+        // then we are finished!
 
         storageServiceManagerMock.addRotateManifestMock({ _, _ in return .value(()) })
 
         // Submit a code.
-        // Now we should ask to create a PIN.
-        // No exit allowed since we've already started trying to create the account.
-        #expect(
-            await coordinator.submitVerificationCode(Stubs.pinCode).awaitable() ==
-                .pinEntry(Stubs.pinEntryStateForPostRegCreate(mode: mode, exitConfigOverride: .noExitAllowed))
-        )
+        var nextStep = await coordinator.submitVerificationCode(Stubs.pinCode).awaitable()
+        do {
+            // Now we should ask to create a PIN.
+            guard case .pinEntry(let pinState) = nextStep else {
+                Issue.record("must be pinEntry")
+                return
+            }
+            // No exit allowed since we've already started trying to create the account.
+            #expect(pinState.exitConfiguration == .noExitAllowed)
+            guard case .creatingNewPin = pinState.operation else {
+                Issue.record("must be creatingNewPin")
+                return
+            }
+        }
 
         // Confirm the pin first.
-        // No exit allowed since we've already started trying to create the account.
-        #expect(
-            await coordinator.setPINCodeForConfirmation(.stub()).awaitable() ==
-                .pinEntry(Stubs.pinEntryStateForPostRegConfirm(mode: mode, exitConfigOverride: .noExitAllowed))
-        )
+        coordinator.setPINCodeForConfirmation(.stub())
+        nextStep = await coordinator.nextStep()
+        do {
+            guard case .pinEntry(let pinState) = nextStep else {
+                Issue.record("must be pinEntry")
+                return
+            }
+            // No exit allowed since we've already started trying to create the account.
+            #expect(pinState.exitConfiguration == .noExitAllowed)
+            guard case .confirmingNewPin(let confirmState) = pinState.operation else {
+                Issue.record("must be creatingNewPin")
+                return
+            }
+            #expect(confirmState.pinToConfirm == Stubs.pinCode)
+        }
 
         // When we submit the pin, it should backup with SVR.
-        #expect(await coordinator.submitPINCode(Stubs.pinCode).awaitable() == .done)
+        #expect(await coordinator.submitPINCode(Stubs.pinCode).awaitable().isDone)
 
         // Since we set profile info, we should have scheduled a reupload.
         #expect(profileManagerMock.didScheduleReuploadLocalProfile)
+
+        #expect(didMarkPinEnabled)
     }
 
-    @MainActor @Test(arguments: Self.testCases())
-    func testSessionPath_invalidE164(testCase: TestCase) async {
-        let coordinator = setupTest(testCase)
-        let mode = testCase.mode
+    @MainActor @Test
+    func testSessionPath_invalidE164() async {
+        let coordinator = setUpTest(forMode: .registering)
         let badE164 = E164("+15555555555")!
 
-        switch mode {
-        case .registering, .changingNumber:
-            break
-        case .reRegistering:
-            // no changing the number when reregistering
-            return
-        }
-
-        await setUpSessionPath(coordinator: coordinator, mode: mode)
+        await setUpSessionPath(coordinator: coordinator, mode: .registering)
 
         // Reject for invalid argument (the e164).
-        sessionManager.addBeginSessionResponseMock(.invalidArgument)
+        sessionManager.addBeginSessionResponseMock({
+            throw HTTPResponse(
+                requestUrl: URL(string: "v1/verification/session")!,
+                status: 422,
+            ).asError()
+        })
 
         // Give it a phone number, which should cause it to start a session.
         // It should put us on the phone number entry screen again
         // with an error.
-        #expect(
-            await coordinator.submitE164(badE164).awaitable() ==
-                .phoneNumberEntry(
-                    stubs.phoneNumberEntryState(
-                        mode: mode,
-                        previouslyEnteredE164: badE164,
-                        withValidationErrorFor: .invalidArgument
-                    )
-                )
-        )
+        coordinator.submitE164(badE164)
+        let nextStep = await coordinator.nextStep()
+        guard case .phoneNumberEntry(.registration(.initialRegistration(let entryState))) = nextStep else {
+            Issue.record("must be phoneNumberEntry(registration(initialRegistration(...)))")
+            return
+        }
+        guard case .invalidE164(let invalidE164) = entryState.validationError else {
+            Issue.record("must be invalidE164")
+            return
+        }
+        #expect(entryState.previouslyEnteredE164 == badE164)
+        #expect(invalidE164.invalidE164 == badE164)
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -1988,21 +1857,37 @@ public class RegistrationCoordinatorTest {
         let retryTimeInterval: TimeInterval = 5
 
         // Reject with a rate limit.
-        sessionManager.addBeginSessionResponseMock(.retryAfter(retryTimeInterval))
+        sessionManager.addBeginSessionResponseMock({
+            throw HTTPResponse(
+                requestUrl: URL(string: "v1/verification/session")!,
+                status: 429,
+                headers: ["Retry-After": "\(retryTimeInterval)"],
+            ).asError()
+        })
 
         // Give it a phone number, which should cause it to start a session.
         // It should put us on the phone number entry screen again
         // with an error.
-        #expect(
-            await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .phoneNumberEntry(
-                    stubs.phoneNumberEntryState(
-                        mode: mode,
-                        previouslyEnteredE164: Stubs.e164,
-                        withValidationErrorFor: .retryAfter(retryTimeInterval)
-                    )
-                )
-        )
+        coordinator.submitE164(Stubs.e164)
+        let nextStep = await coordinator.nextStep()
+        guard case .phoneNumberEntry(let state) = nextStep else {
+            Issue.record("must be phoneNumberEntry")
+            return
+        }
+        let validationError: RegistrationPhoneNumberViewState.ValidationError?
+        switch state {
+        case .registration(.initialRegistration(let state)):
+            validationError = state.validationError
+        case .registration(.reregistration(let state)):
+            validationError = state.validationError
+        case .changingNumber:
+            validationError = nil
+        }
+        guard case .rateLimited(let rateLimitedState) = validationError else {
+            Issue.record("must be rateLimited")
+            return
+        }
+        #expect(rateLimitedState.expiration == dateProvider().addingTimeInterval(15))
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2013,21 +1898,20 @@ public class RegistrationCoordinatorTest {
         await setUpSessionPath(coordinator: coordinator, mode: mode)
 
         // Give back a session, but with SMS code rate limiting already.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session(
-            nextSMS: 10
-        )))
+        let expectedSession = stubs.session(nextSMS: 10)
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Give it a phone number, which should cause it to start a session.
         // It should put us on the verification code entry screen with an error.
-        #expect(
-            await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(
-                    mode: mode,
-                    nextSMS: 10,
-                    nextVerificationAttempt: nil,
-                    validationError: .smsResendTimeout
-                ))
-        )
+        coordinator.submitE164(Stubs.e164)
+        let nextStep = await coordinator.nextStep()
+        guard case .verificationCodeEntry(let state) = nextStep else {
+            Issue.record("must be verificationCodeEntry")
+            return
+        }
+        #expect(state.validationError == .smsResendTimeout)
+        #expect(state.nextSMSDate == dateProvider().addingTimeInterval(10))
+        #expect(state.nextVerificationAttemptDate == nil)
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2038,16 +1922,17 @@ public class RegistrationCoordinatorTest {
         await setUpSessionPath(coordinator: coordinator, mode: mode)
 
         // Give back a session that's ready to go.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session(
+        let expectedSession = stubs.session(
             nextCall: nil, /* initially calling unavailable */
-        )))
+        )
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Once we get that session, we should try and send a code.
         // Resolve with a transport error
         // and no next verification attempt on the session,
         // so it counts as transport failure with no code sent.
         sessionManager.addRequestCodeResponseMock(.transportError(stubs.session(
-            nextSMS: nil /* now sms unavailable but calling is */
+            nextSMS: nil, /* now sms unavailable but calling is */
         )))
 
         // If we resend via voice, that should put us in a happy path. Resolve with a success.
@@ -2056,20 +1941,29 @@ public class RegistrationCoordinatorTest {
 
         // Give it a phone number, which should cause it to start a session.
         // We should get back the code entry step, with a validation error for the sms transport.
-        #expect(
-            await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(
-                    mode: mode,
-                    nextSMS: nil,
-                    nextVerificationAttempt: nil,
-                    validationError: .failedInitialTransport(failedTransport: .sms)
-                ))
-        )
+        coordinator.submitE164(Stubs.e164)
+        do {
+            let nextStep = await coordinator.nextStep()
+            guard case .verificationCodeEntry(let state) = nextStep else {
+                Issue.record("must be verificationCodeEntry")
+                return
+            }
+            guard case .failedInitialTransport(failedTransport: .sms) = state.validationError else {
+                Issue.record("must be failedInitialTransport(sms)")
+                return
+            }
+        }
 
         // We should get back the code entry step.
-        #expect(
-            await coordinator.requestVoiceCode().awaitable() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(mode: mode)))
+        coordinator.requestVoiceCode()
+        do {
+            let nextStep = await coordinator.nextStep()
+            guard case .verificationCodeEntry(let state) = nextStep else {
+                Issue.record("must be verificationCodeEntry")
+                return
+            }
+            #expect(state.validationError == nil)
+        }
         #expect(sessionManager.didRequestCode)
     }
 
@@ -2081,7 +1975,8 @@ public class RegistrationCoordinatorTest {
         await setUpSessionPath(coordinator: coordinator, mode: mode)
 
         // Give back a session that's ready to go.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session()))
+        let expectedSession = stubs.session()
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Once we get that session, we should try and send a code.
 
@@ -2098,32 +1993,43 @@ public class RegistrationCoordinatorTest {
         // Give it a phone number, which should cause it to start a session.
         // We should get back the code entry step,
         // with a validation error for the sms transport.
-        #expect(await coordinator.submitE164(Stubs.e164).awaitable() ==
-            .verificationCodeEntry(stubs.verificationCodeEntryState(
-                mode: mode,
-                nextVerificationAttempt: nil,
-                validationError: .failedInitialTransport(failedTransport: .sms)
-            ))
-        )
+        coordinator.submitE164(Stubs.e164)
+        do {
+            let nextStep = await coordinator.nextStep()
+            guard case .verificationCodeEntry(let state) = nextStep else {
+                Issue.record("must be verificationCodeEntry")
+                return
+            }
+            guard case .failedInitialTransport(failedTransport: .sms) = state.validationError else {
+                Issue.record("must be failedInitialTransport(sms)")
+                return
+            }
+        }
 
         // The server says no code is available to submit. We know
         // we never sent a code, so show a unique error for that
         // but keep the user on the code entry screen so they can
         // retry sending a code with a transport method of their choice.
 
-        #expect(
-            await coordinator.submitVerificationCode(Stubs.verificationCode).awaitable() ==
-                .showErrorSheet(.submittingVerificationCodeBeforeAnyCodeSent)
-        )
+        do {
+            let nextStep = await coordinator.submitVerificationCode(Stubs.verificationCode).awaitable()
+            guard case .showErrorSheet(.submittingVerificationCodeBeforeAnyCodeSent) = nextStep else {
+                Issue.record("must be showErrorSheet(submittingVerificationCodeBeforeAnyCodeSent)")
+                return
+            }
+        }
 
-        #expect(
-            await coordinator.nextStep() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(
-                    mode: mode,
-                    nextVerificationAttempt: nil,
-                    validationError: .failedInitialTransport(failedTransport: .sms)
-                ))
-        )
+        do {
+            let nextStep = await coordinator.nextStep()
+            guard case .verificationCodeEntry(let state) = nextStep else {
+                Issue.record("must be verificationCodeEntry")
+                return
+            }
+            guard case .failedInitialTransport(failedTransport: .sms) = state.validationError else {
+                Issue.record("must be failedInitialTransport(sms)")
+                return
+            }
+        }
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2140,32 +2046,40 @@ public class RegistrationCoordinatorTest {
         })
 
         // Give back a session that's ready to go.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session(
-            receivedDate: self.date
-        )))
+        let expectedSession = stubs.session(receivedDate: self.date)
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Once we get that session, we should try and send a code.
 
         // Reject with a timeout.
-        sessionManager.addRequestCodeResponseMock(.retryAfterTimeout(stubs.session(
-            receivedDate: self.date,
-            nextSMS: 10
-        )))
+        sessionManager.addRequestCodeResponseMock(.retryAfterTimeout(
+            stubs.session(receivedDate: self.date, nextSMS: 10),
+            retryAfterHeader: nil,
+        ))
 
         // Give it a phone number, which should cause it to start a session.
         // It should put us on the phone number entry screen again
         // with an error.
-        let step = await coordinator.submitE164(Stubs.e164).awaitable()
-        #expect(
-            step ==
-                .phoneNumberEntry(
-                    stubs.phoneNumberEntryState(
-                        mode: mode,
-                        previouslyEnteredE164: Stubs.e164,
-                        withValidationErrorFor: .retryAfter(10)
-                    )
-                )
-        )
+        coordinator.submitE164(Stubs.e164)
+        let nextStep = await coordinator.nextStep()
+        guard case .phoneNumberEntry(let state) = nextStep else {
+            Issue.record("must be phoneNumberEntry")
+            return
+        }
+        let validationError: RegistrationPhoneNumberViewState.ValidationError?
+        switch state {
+        case .registration(.initialRegistration(let state)):
+            validationError = state.validationError
+        case .registration(.reregistration(let state)):
+            validationError = state.validationError
+        case .changingNumber:
+            validationError = nil
+        }
+        guard case .rateLimited(let rateLimitedState) = validationError else {
+            Issue.record("must be rateLimited")
+            return
+        }
+        #expect(rateLimitedState.expiration == dateProvider().addingTimeInterval(15))
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2185,9 +2099,8 @@ public class RegistrationCoordinatorTest {
         })
 
         // Give back a session that's ready to go.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session(
-            e164: originalE164
-        )))
+        let expectedSession = stubs.session(e164: originalE164)
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Once we get that session, we should try and send a code.
         // Give back a session with a sent code.
@@ -2207,41 +2120,50 @@ public class RegistrationCoordinatorTest {
 
         // Give back a session that's ready to go.
         // TODO: allow mocking multiple responses
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session(
-            e164: changedE164
-        )))
+        let expectedSession2 = stubs.session(e164: changedE164)
+        sessionManager.addBeginSessionResponseMock({ expectedSession2 })
 
         // Once we get that session, we should try and send a code.
         // Give back a session with a sent code.
         sessionManager.addRequestCodeResponseMock(.success(stubs.session(
             e164: changedE164,
-            nextVerificationAttempt: 0
+            nextVerificationAttempt: 0,
         )))
 
         // Give it a phone number, which should cause it to start a session.
-        // We should be on the verification code entry screen.
-        #expect(
-            await coordinator.submitE164(originalE164).awaitable() ==
-                .verificationCodeEntry(
-                    stubs.verificationCodeEntryState(mode: mode, e164: originalE164)
-                )
-        )
+        coordinator.submitE164(originalE164)
+        do {
+            let nextStep = await coordinator.nextStep()
+            // We should be on the verification code entry screen.
+            guard case .verificationCodeEntry(let state) = nextStep else {
+                Issue.record("must be verificationCodeEntry")
+                return
+            }
+            #expect(state.e164 == originalE164)
+            #expect(state.validationError == nil)
+        }
 
         // Ask to change the number; this should put us back on phone number entry.
-        #expect(
-            await coordinator.requestChangeE164().awaitable() ==
-                .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        coordinator.requestChangeE164()
+        let nextStep = await coordinator.nextStep()
+        guard case .phoneNumberEntry = nextStep else {
+            Issue.record("must be phoneNumberEntry")
+            return
+        }
 
         // Give it the new phone number, which should cause it to start a session.
-        // We should be on the verification code entry screen.
         // TODO: Missing a 'requestPushToken'?
-        #expect(
-            await coordinator.submitE164(changedE164).awaitable() ==
-                .verificationCodeEntry(
-                    stubs.verificationCodeEntryState(mode: mode, e164: changedE164)
-                )
-        )
+        coordinator.submitE164(changedE164)
+        do {
+            let nextStep = await coordinator.nextStep()
+            // We should be on the verification code entry screen.
+            guard case .verificationCodeEntry(let state) = nextStep else {
+                Issue.record("must be verificationCodeEntry")
+                return
+            }
+            #expect(state.e164 == changedE164)
+            #expect(state.validationError == nil)
+        }
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2252,13 +2174,15 @@ public class RegistrationCoordinatorTest {
         await setUpSessionPath(coordinator: coordinator, mode: mode)
 
         // Give back a session with a captcha challenge.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session(
+        let expectedSession = stubs.session(
             allowedToRequestCode: false,
             requestedInformation: [.captcha],
-        )))
+        )
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Give back a session without the challenge.
-        sessionManager.addFulfillChallengeResponseMock(.success(stubs.session()))
+        let expectedSession2 = stubs.session()
+        sessionManager.addFulfillChallengeResponseMock({ session, _ in session = expectedSession2 })
 
         // That means it should try and send a code;
         // Resolve with a session.
@@ -2271,26 +2195,36 @@ public class RegistrationCoordinatorTest {
         )))
 
         // Give back a session without the challenge.
-        sessionManager.addFulfillChallengeResponseMock(.success(stubs.session(
-            nextVerificationAttempt: 0,
-        )))
+        let expectedSession3 = stubs.session(nextVerificationAttempt: 0)
+        sessionManager.addFulfillChallengeResponseMock({ session, _ in session = expectedSession3 })
 
         // Give it a phone number, which should cause it to start a session.
+        coordinator.submitE164(Stubs.e164)
+        var nextStep = await coordinator.nextStep()
         // Once we get that session, we should get a captcha step back.
-        #expect(await coordinator.submitE164(Stubs.e164).awaitable() == .captchaChallenge)
+        guard case .captchaChallenge = nextStep else {
+            Issue.record("must be captchaChallenge")
+            return
+        }
 
         // We should get back the code entry step. Submit a captcha challenge.
-        #expect(
-            await coordinator.submitCaptcha(Stubs.captchaToken).awaitable() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(mode: mode))
-        )
+        nextStep = await coordinator.submitCaptcha(Stubs.captchaToken).awaitable()
+        guard case .verificationCodeEntry = nextStep else {
+            Issue.record("must be verificationCodeEntry")
+            return
+        }
 
-        // Now try and resend a code, which should hit us with the captcha challenge immediately.
-        #expect(await coordinator.requestSMSCode().awaitable() == .captchaChallenge)
+        // Now try and resend a code, which should hit us with the captcha
+        // challenge immediately.
+        coordinator.requestSMSCode()
+        nextStep = await coordinator.nextStep()
+        guard case .captchaChallenge = nextStep else {
+            Issue.record("must be captchaChallenge")
+            return
+        }
 
-        // This means when we fulfill the challenge, it should
-        // immediately try and send the code that couldn't be sent before because
-        // of the challenge.
+        // This means when we fulfill the challenge, it should immediately try and
+        // send the code that couldn't be sent before because of the challenge.
         stubs.date = date.addingTimeInterval(10)
         let secondCodeDate = date
 
@@ -2304,10 +2238,11 @@ public class RegistrationCoordinatorTest {
         // entry screen.
         // TODO[Registration]: test that the "next SMS code" state is properly set
         // given the new sms code date above.
-        #expect(
-            await coordinator.submitCaptcha(Stubs.captchaToken).awaitable() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(mode: mode))
-        )
+        nextStep = await coordinator.submitCaptcha(Stubs.captchaToken).awaitable()
+        guard case .verificationCodeEntry = nextStep else {
+            Issue.record("must be verificationCodeEntry")
+            return
+        }
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2322,14 +2257,18 @@ public class RegistrationCoordinatorTest {
         pushRegistrationManagerMock.setReceivePreAuthChallengeTokenMock({ "a pre-auth challenge token" })
 
         // Give back a session with a push challenge.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session(
+        let expectedSession = stubs.session(
             allowedToRequestCode: false,
             requestedInformation: [.pushChallenge],
-        )))
+        )
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
-        sessionManager.addFulfillChallengeResponseMock(.success(stubs.session(
-            nextVerificationAttempt: 0,
-        )))
+        let expectedSession2 = stubs.session(nextVerificationAttempt: 0)
+        var latestChallengeFulfillment: Registration.ChallengeFulfillment?
+        sessionManager.addFulfillChallengeResponseMock({ session, fulfillment in
+            session = expectedSession2
+            latestChallengeFulfillment = fulfillment
+        })
 
         sessionManager.addRequestCodeResponseMock(.success(stubs.session(
             nextVerificationAttempt: 0,
@@ -2341,17 +2280,16 @@ public class RegistrationCoordinatorTest {
         // resulting request for another SMS code.
 
         // Give it a phone number, which should cause it to start a session.
-        _ = await coordinator.submitE164(Stubs.e164).awaitable()
+        coordinator.submitE164(Stubs.e164)
+        _ = await coordinator.nextStep()
 
         // We should still be waiting.
-        #expect(
-            await coordinator.nextStep() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(mode: mode))
-        )
-        #expect(
-            sessionManager.latestChallengeFulfillment ==
-                .pushChallenge("a pre-auth challenge token")
-        )
+        let nextStep = await coordinator.nextStep()
+        guard case .verificationCodeEntry = nextStep else {
+            Issue.record("must be verificationCodeEntry")
+            return
+        }
+        #expect(latestChallengeFulfillment == .pushChallenge("a pre-auth challenge token"))
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2363,11 +2301,7 @@ public class RegistrationCoordinatorTest {
         setupDefaultAccountAttributes()
 
         // Get past the opening.
-        await goThroughOpeningHappyPath(
-            coordinator: coordinator,
-            mode: mode,
-            expectedNextStep: .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        await goThroughOpeningHappyPath(coordinator: coordinator, mode: mode)
 
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
 
@@ -2381,18 +2315,23 @@ public class RegistrationCoordinatorTest {
         }
 
         // Give back a session with a push challenge.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session(
+        let expectedSession = stubs.session(
             allowedToRequestCode: false,
             requestedInformation: [.pushChallenge],
-        )))
+        )
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Take too long to resolve with the challenge token.
         timeoutProviderMock.pushTokenMinWaitTime = 0.5
         timeoutProviderMock.pushTokenTimeout = 2
 
         // Give it a phone number, which should cause it to start a session.
-        let nextStep = await coordinator.submitE164(Stubs.e164).awaitable()
-        #expect(nextStep == .showErrorSheet(.sessionInvalidated))
+        coordinator.submitE164(Stubs.e164)
+        let nextStep = await coordinator.nextStep()
+        guard case .showErrorSheet(.sessionInvalidated) = nextStep else {
+            Issue.record("must be showErrorSheet(sessionInvalidated)")
+            return
+        }
 
         // One time to set up, one time for the min wait time, one time
         // for the full timeout.
@@ -2408,11 +2347,7 @@ public class RegistrationCoordinatorTest {
         setupDefaultAccountAttributes()
 
         // Get past the opening.
-        await goThroughOpeningHappyPath(
-            coordinator: coordinator,
-            mode: mode,
-            expectedNextStep: .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        await goThroughOpeningHappyPath(coordinator: coordinator, mode: mode)
 
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
 
@@ -2425,17 +2360,22 @@ public class RegistrationCoordinatorTest {
         })
 
         // Give back a session with a push challenge.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session(
+        let expectedSession = stubs.session(
             allowedToRequestCode: false,
-            requestedInformation: [.pushChallenge]
-        )))
+            requestedInformation: [.pushChallenge],
+        )
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         timeoutProviderMock.pushTokenMinWaitTime = 0.5
         timeoutProviderMock.pushTokenTimeout = 2
 
         // Give it a phone number, which should cause it to start a session.
-        let nextStep = await coordinator.submitE164(Stubs.e164).awaitable()
-        #expect(nextStep == .showErrorSheet(.sessionInvalidated))
+        coordinator.submitE164(Stubs.e164)
+        let nextStep = await coordinator.nextStep()
+        guard case .showErrorSheet(.sessionInvalidated) = nextStep else {
+            Issue.record("must be showErrorSheet(sessionInvalidated)")
+            return
+        }
 
         // One time to set up, one time for the min wait time, one time
         // for the full timeout.
@@ -2450,33 +2390,24 @@ public class RegistrationCoordinatorTest {
         // Set profile info so we skip those steps.
         setupDefaultAccountAttributes()
         pushRegistrationManagerMock.addRequestPushTokenMock({ .pushUnsupported(description: "") })
-        pushRegistrationManagerMock.setReceivePreAuthChallengeTokenMock({
-            try! await Task.sleep(nanoseconds: TimeInterval.infinity.clampedNanoseconds)
-            fatalError()
-        })
 
         // Get past the opening.
-        await goThroughOpeningHappyPath(
-            coordinator: coordinator,
-            mode: mode,
-            expectedNextStep: .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        await goThroughOpeningHappyPath(coordinator: coordinator, mode: mode)
 
         // Require a push challenge, which we won't be able to answer.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session(
+        let expectedSession = stubs.session(
             allowedToRequestCode: false,
             requestedInformation: [.pushChallenge],
-        )))
+        )
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Give it a phone number, which should cause it to start a session.
-        #expect(
-            await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .phoneNumberEntry(stubs.phoneNumberEntryState(
-                    mode: mode,
-                    previouslyEnteredE164: Stubs.e164
-                ))
-        )
-        #expect(sessionManager.latestChallengeFulfillment == nil)
+        coordinator.submitE164(Stubs.e164)
+        let nextStep = await coordinator.nextStep()
+        guard case .phoneNumberEntry = nextStep else {
+            Issue.record("must be phoneNumberEntry")
+            return
+        }
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2492,25 +2423,32 @@ public class RegistrationCoordinatorTest {
         pushRegistrationManagerMock.setReceivePreAuthChallengeTokenMock({ "a pre-auth challenge token" })
 
         // Give back a session with multiple challenges.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session(
+        let expectedSession = stubs.session(
             allowedToRequestCode: false,
             requestedInformation: [.captcha, .pushChallenge],
-        )))
+        )
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Be ready to handle push challenges as soon as we can.
-        sessionManager.addFulfillChallengeResponseMock(.success(stubs.session(
-            nextVerificationAttempt: 0,
-        )))
+        let expectedSession2 = stubs.session(nextVerificationAttempt: 0)
+        var latestChallengeFulfillment: Registration.ChallengeFulfillment?
+        sessionManager.addFulfillChallengeResponseMock({ session, fulfillment in
+            session = expectedSession2
+            latestChallengeFulfillment = fulfillment
+        })
 
         sessionManager.addRequestCodeResponseMock(.success(stubs.session(
             nextVerificationAttempt: 0,
         )))
 
         // Give it a phone number, which should cause it to start a session.
-        let step = await coordinator.submitE164(Stubs.e164).awaitable()
-        #expect(step == .verificationCodeEntry(stubs.verificationCodeEntryState(mode: mode)))
-        let fulfillment = sessionManager.latestChallengeFulfillment
-        #expect(fulfillment == .pushChallenge("a pre-auth challenge token"))
+        coordinator.submitE164(Stubs.e164)
+        let nextStep = await coordinator.nextStep()
+        guard case .verificationCodeEntry = nextStep else {
+            Issue.record("must be verificationCodeEntry")
+            return
+        }
+        #expect(latestChallengeFulfillment == .pushChallenge("a pre-auth challenge token"))
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2529,20 +2467,25 @@ public class RegistrationCoordinatorTest {
         })
 
         // Give back a session with multiple challenges.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session(
+        let expectedSession = stubs.session(
             allowedToRequestCode: false,
             requestedInformation: [.pushChallenge, .captcha],
-        )))
+        )
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         timeoutProviderMock.pushTokenMinWaitTime = 0.5
         timeoutProviderMock.pushTokenTimeout = 2
 
         // Give it a phone number, which should cause it to start a session.
-        let nextStep = await coordinator.submitE164(Stubs.e164).awaitable()
+        coordinator.submitE164(Stubs.e164)
 
         // After that, we should get a captcha step back, because we haven't
         // yet received the push challenge token.
-        #expect(nextStep == .captchaChallenge)
+        let nextStep = await coordinator.nextStep()
+        guard case .captchaChallenge = nextStep else {
+            Issue.record("must be captchaChallenge")
+            return
+        }
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2559,15 +2502,15 @@ public class RegistrationCoordinatorTest {
         pushRegistrationManagerMock.setReceivePreAuthChallengeTokenMock({ await challengeTokenPromise.awaitable() })
 
         // Give back a session with multiple challenges.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session(
+        let expectedSession = stubs.session(
             allowedToRequestCode: false,
             requestedInformation: [.pushChallenge, .captcha],
-        )))
+        )
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Also prep for the token's submission.
-        sessionManager.addFulfillChallengeResponseMock(.success(stubs.session(
-            nextVerificationAttempt: 0,
-        )))
+        let expectedSession2 = stubs.session(nextVerificationAttempt: 0)
+        sessionManager.addFulfillChallengeResponseMock({ session, _ in session = expectedSession2 })
 
         sessionManager.addRequestCodeResponseMock(.success(stubs.session(
             nextVerificationAttempt: 0,
@@ -2585,8 +2528,12 @@ public class RegistrationCoordinatorTest {
         // Give it a phone number, which should cause it to start a session.
         // Once we get that session, we should wait a short time for the
         // push challenge token and fulfill it.
-        let step = await coordinator.submitE164(Stubs.e164).awaitable()
-        #expect(step == .verificationCodeEntry(stubs.verificationCodeEntryState(mode: mode)))
+        coordinator.submitE164(Stubs.e164)
+        let nextStep = await coordinator.nextStep()
+        guard case .verificationCodeEntry = nextStep else {
+            Issue.record("must be verificationCodeEntry")
+            return
+        }
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2598,30 +2545,27 @@ public class RegistrationCoordinatorTest {
         setupDefaultAccountAttributes()
 
         pushRegistrationManagerMock.addRequestPushTokenMock({ .pushUnsupported(description: "") })
-        pushRegistrationManagerMock.setReceivePreAuthChallengeTokenMock({
-            try! await Task.sleep(nanoseconds: TimeInterval.infinity.clampedNanoseconds)
-            fatalError()
-        })
 
         // No other setup; no auth credentials, SVR keys, etc in storage
         // so that we immediately go to the session flow.
 
         // Get past the opening.
-        await goThroughOpeningHappyPath(
-            coordinator: coordinator,
-            mode: mode,
-            expectedNextStep: .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        await goThroughOpeningHappyPath(coordinator: coordinator, mode: mode)
 
         // Give back a session with multiple challenges.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session(
+        let expectedSession = stubs.session(
             allowedToRequestCode: false,
             requestedInformation: [.captcha, .pushChallenge],
-        )))
+        )
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Give it a phone number, which should cause it to start a session.
-        #expect(await coordinator.submitE164(Stubs.e164).awaitable() == .captchaChallenge)
-        #expect(sessionManager.latestChallengeFulfillment == nil)
+        coordinator.submitE164(Stubs.e164)
+        let nextStep = await coordinator.nextStep()
+        guard case .captchaChallenge = nextStep else {
+            Issue.record("must be captchaChallenge")
+            return
+        }
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2632,25 +2576,36 @@ public class RegistrationCoordinatorTest {
         await setUpSessionPath(coordinator: coordinator, mode: mode)
 
         // Give back a session with a captcha challenge and an unknown challenge.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session(
+        let expectedSession = stubs.session(
             allowedToRequestCode: false,
             requestedInformation: [.captcha],
             hasUnknownChallengeRequiringAppUpdate: true,
-        )))
+        )
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Give back a session without the captcha but still with the unknown challenge
-        sessionManager.addFulfillChallengeResponseMock(.success(stubs.session(
+        let expectedSession2 = stubs.session(
             allowedToRequestCode: false,
             hasUnknownChallengeRequiringAppUpdate: true,
-        )))
+        )
+        sessionManager.addFulfillChallengeResponseMock({ session, _ in session = expectedSession2 })
 
         // Once we get that session, we should get a captcha step back.
         // We have an unknown challenge, but we should do known challenges first!
         // Give it a phone number, which should cause it to start a session.
-        #expect(await coordinator.submitE164(Stubs.e164).awaitable() == .captchaChallenge)
+        coordinator.submitE164(Stubs.e164)
+        var nextStep = await coordinator.nextStep()
+        guard case .captchaChallenge = nextStep else {
+            Issue.record("must be captchaChallenge")
+            return
+        }
 
         // This means we should get the app update banner.
-        #expect(await coordinator.submitCaptcha(Stubs.captchaToken).awaitable() == .appUpdateBanner)
+        nextStep = await coordinator.submitCaptcha(Stubs.captchaToken).awaitable()
+        guard case .appUpdateBanner = nextStep else {
+            Issue.record("must be appUpdateBanner")
+            return
+        }
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2662,18 +2617,20 @@ public class RegistrationCoordinatorTest {
 
         // Give back a rejected argument response, its the wrong code.
         sessionManager.addSubmitCodeResponseMock(.rejectedArgument(stubs.session(
-            nextVerificationAttempt: 0
+            nextVerificationAttempt: 0,
         )))
 
         // Now try and send the wrong code.
         let badCode = "garbage"
-        #expect(
-            await coordinator.submitVerificationCode(badCode).awaitable() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(
-                    mode: mode,
-                    validationError: .invalidVerificationCode(invalidCode: badCode)
-                ))
-        )
+        let nextStep = await coordinator.submitVerificationCode(badCode).awaitable()
+        guard case .verificationCodeEntry(let state) = nextStep else {
+            Issue.record("must be verificationCodeEntry")
+            return
+        }
+        guard case .invalidVerificationCode(invalidCode: badCode) = state.validationError else {
+            Issue.record("must be invalidVerificationCode")
+            return
+        }
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2684,62 +2641,77 @@ public class RegistrationCoordinatorTest {
         await createSessionAndRequestFirstCode(coordinator: coordinator, mode: mode)
 
         // Give back a retry response.
-        sessionManager.addSubmitCodeResponseMock(.retryAfterTimeout(stubs.session(
-            nextVerificationAttempt: 10,
-        )))
+        sessionManager.addSubmitCodeResponseMock(.retryAfterTimeout(
+            stubs.session(nextVerificationAttempt: 10),
+            retryAfterHeader: 10,
+        ))
 
         // Resend an sms code, time that out too.
-        sessionManager.addRequestCodeResponseMock(.retryAfterTimeout(stubs.session(
-            nextSMS: 7,
-            nextCall: 0,
-            nextVerificationAttempt: 9,
-        )))
+        sessionManager.addRequestCodeResponseMock(.retryAfterTimeout(
+            stubs.session(nextSMS: 7, nextCall: 0, nextVerificationAttempt: 9),
+            retryAfterHeader: 7,
+        ))
 
         // Resend an voice code, time that out too
         // Make the timeout SO short that it retries
         sessionManager.didRequestCode = false
-        sessionManager.addRequestCodeResponseMock(.retryAfterTimeout(stubs.session(
-            nextSMS: 6,
-            nextCall: 0.1,
-            nextVerificationAttempt: 8,
-        )))
+        sessionManager.addRequestCodeResponseMock(.retryAfterTimeout(
+            stubs.session(nextSMS: 6, nextCall: 0.1, nextVerificationAttempt: 8),
+            retryAfterHeader: 0.1,
+        ))
 
         // Be ready for the retry. Ensure we called it the first time.
-        sessionManager.addRequestCodeResponseMock(.retryAfterTimeout(stubs.session(
-            nextSMS: 5,
-            nextCall: 4,
-            nextVerificationAttempt: 8,
-        )))
+        sessionManager.addRequestCodeResponseMock(.retryAfterTimeout(
+            stubs.session(nextSMS: 5, nextCall: 4, nextVerificationAttempt: 8),
+            retryAfterHeader: 4,
+        ))
 
-        #expect(
-            await coordinator.submitVerificationCode(Stubs.verificationCode).awaitable() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(
-                    mode: mode,
-                    nextVerificationAttempt: 10,
-                    validationError: .submitCodeTimeout
-                ))
-        )
+        var nextStep = await coordinator.submitVerificationCode(Stubs.verificationCode).awaitable()
+        do {
+            guard case .verificationCodeEntry(let state) = nextStep else {
+                Issue.record("must be verificationCodeEntry")
+                return
+            }
+            guard case .submitCodeTimeout = state.validationError else {
+                Issue.record("must be submitCodeTimeout")
+                return
+            }
+            #expect(state.nextCallDate == dateProvider())
+            #expect(state.nextSMSDate == dateProvider())
+            #expect(state.nextVerificationAttemptDate == dateProvider().addingTimeInterval(10))
+        }
 
-        #expect(
-            await coordinator.requestSMSCode().awaitable() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(
-                    mode: mode,
-                    nextSMS: 7,
-                    nextVerificationAttempt: 9,
-                    validationError: .smsResendTimeout
-                ))
-        )
+        coordinator.requestSMSCode()
+        nextStep = await coordinator.nextStep()
+        do {
+            guard case .verificationCodeEntry(let state) = nextStep else {
+                Issue.record("must be verificationCodeEntry")
+                return
+            }
+            guard case .smsResendTimeout = state.validationError else {
+                Issue.record("must be smsResendTimeout")
+                return
+            }
+            #expect(state.nextCallDate == dateProvider())
+            #expect(state.nextSMSDate == dateProvider().addingTimeInterval(7))
+            #expect(state.nextVerificationAttemptDate == dateProvider().addingTimeInterval(9))
+        }
 
-        #expect(
-            await coordinator.requestVoiceCode().awaitable() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(
-                    mode: mode,
-                    nextSMS: 5,
-                    nextCall: 4,
-                    nextVerificationAttempt: 8,
-                    validationError: .voiceResendTimeout
-                ))
-        )
+        coordinator.requestVoiceCode()
+        nextStep = await coordinator.nextStep()
+        do {
+            guard case .verificationCodeEntry(let state) = nextStep else {
+                Issue.record("must be verificationCodeEntry")
+                return
+            }
+            guard case .voiceResendTimeout = state.validationError else {
+                Issue.record("must be voiceResendTimeout")
+                return
+            }
+            #expect(state.nextCallDate == dateProvider().addingTimeInterval(4))
+            #expect(state.nextSMSDate == dateProvider().addingTimeInterval(5))
+            #expect(state.nextVerificationAttemptDate == dateProvider().addingTimeInterval(8))
+        }
 
         #expect(sessionManager.didRequestCode)
     }
@@ -2760,18 +2732,18 @@ public class RegistrationCoordinatorTest {
         // The server says no code is available to submit. But we think we tried
         // sending a code with local state. We want to be on the verification
         // code entry screen, with an error so the user retries sending a code.
-        #expect(
-            await coordinator.submitVerificationCode(Stubs.verificationCode).awaitable() ==
-                .showErrorSheet(.verificationCodeSubmissionUnavailable)
-        )
+        var nextStep = await coordinator.submitVerificationCode(Stubs.verificationCode).awaitable()
+        guard case .showErrorSheet(.verificationCodeSubmissionUnavailable) = nextStep else {
+            Issue.record("must be showErrorSheet(verificationCodeSubmissionUnavailable)")
+            return
+        }
 
-        #expect(
-            await coordinator.nextStep() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(
-                    mode: mode,
-                    nextVerificationAttempt: nil
-                ))
-        )
+        nextStep = await coordinator.nextStep()
+        guard case .verificationCodeEntry(let state) = nextStep else {
+            Issue.record("must be verificationCodeEntry")
+            return
+        }
+        #expect(state.nextVerificationAttemptDate == nil)
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2783,20 +2755,20 @@ public class RegistrationCoordinatorTest {
 
         // Give back a retry response when submitting a code,
         // but with no ability to resubmit.
-        sessionManager.addSubmitCodeResponseMock(.retryAfterTimeout(stubs.session()))
+        sessionManager.addSubmitCodeResponseMock(.retryAfterTimeout(stubs.session(), retryAfterHeader: nil))
 
-        #expect(
-            await coordinator.submitVerificationCode(Stubs.verificationCode).awaitable() ==
-                .showErrorSheet(.verificationCodeSubmissionUnavailable)
-        )
+        var nextStep = await coordinator.submitVerificationCode(Stubs.verificationCode).awaitable()
+        guard case .showErrorSheet(.verificationCodeSubmissionUnavailable) = nextStep else {
+            Issue.record("must be showErrorSheet(verificationCodeSubmissionUnavailable)")
+            return
+        }
 
-        #expect(
-            await coordinator.nextStep() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(
-                    mode: mode,
-                    nextVerificationAttempt: nil
-                ))
-        )
+        nextStep = await coordinator.nextStep()
+        guard case .verificationCodeEntry(let state) = nextStep else {
+            Issue.record("must be verificationCodeEntry")
+            return
+        }
+        #expect(state.nextVerificationAttemptDate == nil)
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2807,7 +2779,8 @@ public class RegistrationCoordinatorTest {
         await setUpSessionPath(coordinator: coordinator, mode: mode)
 
         // Give back a session thats ready to go.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session()))
+        let expectedSession = stubs.session()
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Once we get that session, we should try and send a verification code.
         // Have that ready to go.
@@ -2821,24 +2794,25 @@ public class RegistrationCoordinatorTest {
         sessionManager.addSubmitCodeResponseMock(.invalidSession)
 
         // Give it a phone number, which should cause it to start a session.
+        coordinator.submitE164(Stubs.e164)
+        var nextStep = await coordinator.nextStep()
         // Now we should expect to be at verification code entry since we sent the code.
-        #expect(
-            await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(mode: mode))
-        )
+        guard case .verificationCodeEntry = nextStep else {
+            Issue.record("must be verificationCodeEntry")
+            return
+        }
 
-        #expect(
-            await coordinator.submitVerificationCode(Stubs.pinCode).awaitable() ==
-                .showErrorSheet(.sessionInvalidated)
-        )
+        nextStep = await coordinator.submitVerificationCode(Stubs.pinCode).awaitable()
+        guard case .showErrorSheet(.sessionInvalidated) = nextStep else {
+            Issue.record("must be showErrorSheet(sessionInvalidated)")
+            return
+        }
 
-        #expect(
-            await coordinator.nextStep() ==
-                .phoneNumberEntry(stubs.phoneNumberEntryState(
-                    mode: mode,
-                    previouslyEnteredE164: Stubs.e164
-                ))
-        )
+        nextStep = await coordinator.nextStep()
+        guard case .phoneNumberEntry = nextStep else {
+            Issue.record("must be phoneNumberEntry")
+            return
+        }
     }
 
     @MainActor @Test(arguments: Self.testCases())
@@ -2852,7 +2826,7 @@ public class RegistrationCoordinatorTest {
         // Give back a verified session.
         sessionManager.addSubmitCodeResponseMock(.success(stubs.session(
             receivedDate: date,
-            verified: true
+            verified: true,
         )))
 
         let accountIdentityResponse = Stubs.accountIdentityResponse()
@@ -2865,80 +2839,54 @@ public class RegistrationCoordinatorTest {
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
 
         // It should also fetch the prekeys for account creation
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
 
-        let expectedRequest = createAccountWithSession(newMasterKey)
-        mockURLSession.addResponse(
-            TSRequestOWSURLSessionMock.Response(
-                matcher: { request in
-                    authPassword = request.authPassword
-                    let requestAttributes = Self.attributesFromCreateAccountRequest(request)
-                    // These should be empty if sessionId is sent
-                    #expect((request.parameters["recoveryPassword"] as? String) == nil)
-                    #expect(requestAttributes.registrationRecoveryPassword == nil)
-                    return request.url == expectedRequest.url
-                },
-                statusCode: 200,
-                bodyJson: accountIdentityResponse
-            ),
-        )
+        let expectedRequest = createAccountWithSession(recoveryPassword: newMasterKey.deriveRegistrationRecoveryPassword())
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { request in
+                authPassword = request.authPassword
+                let requestAttributes = Self.attributesFromCreateAccountRequest(request)
+                // These should be empty if sessionId is sent
+                #expect((request.parameters["recoveryPassword"] as? String) == nil)
+                #expect(requestAttributes.registrationRecoveryPassword == nil)
+                return request.url == expectedRequest.url
+            },
+            statusCode: 200,
+            bodyJson: accountIdentityResponse,
+        ))
 
-        func expectedAuthedAccount() -> AuthedAccount {
-            return .explicit(
-                aci: accountIdentityResponse.aci,
-                pni: accountIdentityResponse.pni,
-                e164: Stubs.e164,
+        func expectedAuth() -> ChatServiceAuth {
+            return ChatServiceAuth.explicit(
+                aci: accountIdentityResponse.localIdentifiers.aci,
                 deviceId: .primary,
-                authPassword: authPassword
+                password: authPassword,
             )
         }
 
         // Once we are registered, we should finalize prekeys.
-        preKeyManagerMock.addFinalizePreKeyMock { didSucceed in
-            #expect(didSucceed)
-            return Task {}
-        }
-
-        // Then we should try and create one time pre-keys
-        // with the credentials we got in the identity response.
-        preKeyManagerMock.addRotateOneTimePreKeyMock({ auth in
-            #expect(auth == expectedAuthedAccount().chatServiceAuth)
-            return Task {}
-        })
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
 
         // When we skip the pin, it should skip any SVR backups.
-        svr.backupMasterKeyMock = { _, masterKey, _ in
-            Issue.record("Shouldn't talk to SVR with skipped PIN!")
-            return .value(masterKey)
+        ows2FAManagerMock.didMarkPinEnabled = { _ in
+            Issue.record("Shouldn't mark PIN enabled with skipped PIN!")
         }
 
-        storageServiceManagerMock.addRestoreOrCreateManifestIfNecessaryMock({ _, _ in
-            return .value(())
-        })
+        storageServiceManagerMock.addRestoreOrCreateManifestIfNecessaryMock({ _, _ in })
 
         // Once we skip the storage service restore,
-        // we will sync account attributes and then we are finished!
-        let expectedAttributesRequest = RegistrationRequestFactory.updatePrimaryDeviceAccountAttributesRequest(
-            Stubs.accountAttributes(newMasterKey),
-            auth: .implicit() // doesn't matter for url matching
-        )
-        networkManagerMock.asyncRequestHandlers.append({ request, _ in
-            if request.url == expectedAttributesRequest.url {
-                return HTTPResponse(requestUrl: request.url, status: 200, headers: HttpHeaders(), bodyData: nil)
-            }
-            throw OWSAssertionError("")
-        })
+        // then we are finished!
 
         // Once we sync push tokens, we should restore from storage service.
         storageServiceManagerMock.addRestoreOrCreateManifestIfNecessaryMock({ auth, masterKeySource in
-            #expect(auth.authedAccount == expectedAuthedAccount())
+            #expect(auth.chatServiceAuth == expectedAuth())
             switch masterKeySource {
             case .explicit(let explicitMasterKey):
                 #expect(newMasterKey.rawData == explicitMasterKey.rawData)
             default:
                 Issue.record("Unexpected master key used in storage service operation.")
             }
-            return .value(())
         })
 
         storageServiceManagerMock.addRotateManifestMock({ _, _ in
@@ -2946,20 +2894,26 @@ public class RegistrationCoordinatorTest {
             return .value(())
         })
 
+        var nextStep = await coordinator.submitVerificationCode(Stubs.pinCode).awaitable()
         // Now we should ask to create a PIN.
+        guard case .pinEntry(let pinState) = nextStep else {
+            Issue.record("must be pinEntry")
+            return
+        }
         // No exit allowed since we've already started trying to create the account.
-        #expect(
-            await coordinator.submitVerificationCode(Stubs.pinCode).awaitable() ==
-                .pinEntry(
-                    Stubs.pinEntryStateForPostRegCreate(mode: mode, exitConfigOverride: .noExitAllowed)
-                )
-        )
+        #expect(pinState.exitConfiguration == .noExitAllowed)
+        guard case .creatingNewPin = pinState.operation else {
+            Issue.record("must be creatingNewPin")
+            return
+        }
 
         // At this point we should not have set the AEP.
         #expect(db.read { accountKeyStore.getAccountEntropyPool(tx: $0) == nil })
 
         // Skip the PIN code.
-        #expect(await coordinator.skipPINCode().awaitable() == .done)
+        coordinator.skipPINCode()
+        nextStep = await coordinator.nextStep()
+        #expect(nextStep.isDone)
 
         // We should now have set the AEP.
         #expect(db.read { accountKeyStore.getAccountEntropyPool(tx: $0) != nil })
@@ -2968,26 +2922,17 @@ public class RegistrationCoordinatorTest {
         #expect(profileManagerMock.didScheduleReuploadLocalProfile)
     }
 
-    @MainActor @Test(arguments: Self.testCases())
-    func testSessionPath_skipPINRestore_createNewPIN(testCase: TestCase) async {
-        let coordinator = setupTest(testCase)
-        let mode = testCase.mode
+    @MainActor @Test
+    func testSessionPath_skipPINRestore_createNewPIN() async {
+        let coordinator = setUpTest(forMode: .registering)
         let newMasterKey = Stubs.accountEntropyPoolToGenerate.getMasterKey()
 
-        switch mode {
-        case .registering:
-            break
-        case .reRegistering, .changingNumber:
-            // Test only applies to registering scenarios.
-            return
-        }
-
-        await createSessionAndRequestFirstCode(coordinator: coordinator, mode: mode)
+        await createSessionAndRequestFirstCode(coordinator: coordinator, mode: .registering)
 
         // Give back a verified session.
         sessionManager.addSubmitCodeResponseMock(.success(stubs.session(
             receivedDate: date,
-            verified: true
+            verified: true,
         )))
 
         // Previously used SVR so we first ask to restore.
@@ -2999,98 +2944,86 @@ public class RegistrationCoordinatorTest {
         pushRegistrationManagerMock.addRequestPushTokenMock({ .success(Stubs.apnsRegistrationId) })
 
         // It should also fetch the prekeys for account creation
-        preKeyManagerMock.addCreatePreKeysMock({ Task { Stubs.prekeyBundles() } })
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
+        preKeyManagerMock.addCreatePreKeysMock(Stubs.preKeyBundle(identity:))
 
-        let expectedRequest = createAccountWithSession(newMasterKey)
-        mockURLSession.addResponse(
-            TSRequestOWSURLSessionMock.Response(
-                matcher: { request in
-                    authPassword = request.authPassword
-                    return request.url == expectedRequest.url
-                },
-                statusCode: 200,
-                bodyJson: accountIdentityResponse
-            )
-        )
+        let expectedRequest = createAccountWithSession(recoveryPassword: newMasterKey.deriveRegistrationRecoveryPassword())
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { request in
+                authPassword = request.authPassword
+                return request.url == expectedRequest.url
+            },
+            statusCode: 200,
+            bodyJson: accountIdentityResponse,
+        ))
 
-        func expectedAuthedAccount() -> AuthedAccount {
-            return .explicit(
-                aci: accountIdentityResponse.aci,
-                pni: accountIdentityResponse.pni,
-                e164: Stubs.e164,
+        func expectedAuth() -> ChatServiceAuth {
+            return ChatServiceAuth.explicit(
+                aci: accountIdentityResponse.localIdentifiers.aci,
                 deviceId: .primary,
-                authPassword: authPassword
+                password: authPassword,
             )
         }
 
         // Once we are registered, we should finalize prekeys.
-        preKeyManagerMock.addFinalizePreKeyMock { didSucceed in
-            #expect(didSucceed)
-            return Task {}
-        }
-
-        // Then we should try and create one time pre-keys
-        // with the credentials we got in the identity response.
-        preKeyManagerMock.addRotateOneTimePreKeyMock({ auth in
-            #expect(auth == expectedAuthedAccount().chatServiceAuth)
-            return Task {}
-        })
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
+        preKeyManagerMock.addFinalizePreKeyBundleMock { _ in }
 
         // When we skip the pin, it should skip any SVR backups.
-        svr.backupMasterKeyMock = { _, masterKey, _ in
-            Issue.record("Shouldn't talk to SVR with skipped PIN!")
-            return .value(masterKey)
-
+        ows2FAManagerMock.didMarkPinEnabled = { _ in
+            Issue.record("Shouldn't mark PIN enabled with skipped PIN!")
         }
 
         storageServiceManagerMock.addRestoreOrCreateManifestIfNecessaryMock({ auth, masterKeySource in
-            #expect(auth.authedAccount == expectedAuthedAccount())
+            #expect(auth.chatServiceAuth == expectedAuth())
             switch masterKeySource {
             case .explicit(let explicitMasterKey):
                 #expect(newMasterKey.rawData == explicitMasterKey.rawData)
             default:
                 Issue.record("Unexpected master key used in storage service operation.")
             }
-            return .value(())
         })
 
         storageServiceManagerMock.addRotateManifestMock({ _, _ in return .value(()) })
 
         // Once we skip the storage service restore,
-        // we will sync account attributes and then we are finished!
-        let expectedAttributesRequest = RegistrationRequestFactory.updatePrimaryDeviceAccountAttributesRequest(
-            Stubs.accountAttributes(newMasterKey),
-            auth: .implicit() // doesn't matter for url matching
-        )
-        networkManagerMock.asyncRequestHandlers.append({ request, _ in
-            if request.url == expectedAttributesRequest.url {
-                return HTTPResponse(requestUrl: request.url, status: 200, headers: HttpHeaders(), bodyData: nil)
-            }
-            throw OWSAssertionError("")
-        })
+        // then we are finished!
 
         // Now we should ask to restore the PIN.
-        #expect(
-            await coordinator.submitVerificationCode(Stubs.pinCode).awaitable() ==
-                .pinEntry(
-                    Stubs.pinEntryStateForPostRegRestore(mode: mode)
-                )
-        )
+        var nextStep = await coordinator.submitVerificationCode(Stubs.pinCode).awaitable()
+        do {
+            guard case .pinEntry(let state) = nextStep else {
+                Issue.record("must be pinEntry")
+                return
+            }
+            guard case .enteringExistingPin(skippability: .canSkipAndCreateNew, remainingAttempts: _) = state.operation else {
+                Issue.record("must be enteringExistingPin with skip & create new")
+                return
+            }
+        }
 
         // Skip the PIN code and create a new one instead.
         // When we skip, we should be asked to _create_ the PIN.
-        #expect(
-            await coordinator.skipAndCreateNewPINCode().awaitable() ==
-                .pinEntry(
-                    Stubs.pinEntryStateForPostRegCreate(mode: mode, exitConfigOverride: .noExitAllowed)
-                )
-        )
+        coordinator.skipAndCreateNewPINCode()
+        nextStep = await coordinator.nextStep()
+        do {
+            guard case .pinEntry(let state) = nextStep else {
+                Issue.record("must be pinEntry")
+                return
+            }
+            guard case .creatingNewPin = state.operation else {
+                Issue.record("must be creatingNewPin")
+                return
+            }
+        }
 
         // At this point we should not have set the AEP.
         #expect(db.read { accountKeyStore.getAccountEntropyPool(tx: $0) == nil })
 
         // Skip this PIN code, too.
-        #expect(await coordinator.skipPINCode().awaitable() == .done)
+        coordinator.skipPINCode()
+        nextStep = await coordinator.nextStep()
+        #expect(nextStep.isDone)
 
         // We should now have set the master key (i.e., the AEP).
         #expect(db.read { accountKeyStore.getAccountEntropyPool(tx: $0) != nil })
@@ -3116,7 +3049,7 @@ public class RegistrationCoordinatorTest {
         let reglockStateNoneData = "7b226e6f6e65223a7b7d7d"
         #expect(
             try decoder.decode(ReglockState.self, from: Data.data(fromHex: reglockStateNoneData)!) ==
-            ReglockState.none
+                ReglockState.none,
         )
 
         // Serialized ReglockState.reglocked(
@@ -3126,7 +3059,7 @@ public class RegistrationCoordinatorTest {
         let reglockStateReglockedData = "7b227265676c6f636b6564223a7b2265787069726174696f6e44617465223a2d3937383239373230302c2263726564656e7469616c223a7b2263726564656e7469616c223a7b22757365726e616d65223a2261626364222c2270617373776f7264223a2278797a227d7d7d7d"
         #expect(
             try decoder.decode(ReglockState.self, from: Data.data(fromHex: reglockStateReglockedData)!) ==
-            ReglockState.reglocked(credential: .testOnly(svr2: nil), expirationDate: reglockExpirationDate)
+                ReglockState.reglocked(credential: .testOnly(svr2: nil), expirationDate: reglockExpirationDate),
         )
 
         // Serialized ReglockState.reglocked(
@@ -3139,44 +3072,46 @@ public class RegistrationCoordinatorTest {
         let reglockStateReglockedSVR2Data = "7b227265676c6f636b6564223a7b2265787069726174696f6e44617465223a2d3937383239373230302c2263726564656e7469616c223a7b226b6273223a7b2263726564656e7469616c223a7b22757365726e616d65223a2261626364222c2270617373776f7264223a2278797a227d7d2c2273767232223a7b2263726564656e7469616c223a7b22757365726e616d65223a22787878222c2270617373776f7264223a22797979227d7d7d7d7d"
         #expect(
             try decoder.decode(ReglockState.self, from: Data.data(fromHex: reglockStateReglockedSVR2Data)!) ==
-            ReglockState.reglocked(credential: .init(svr2: Stubs.svr2AuthCredential), expirationDate: reglockExpirationDate)
+                ReglockState.reglocked(credential: .init(svr2: Stubs.svr2AuthCredential), expirationDate: reglockExpirationDate),
         )
 
         // Serialized ReglockState.waitingTimeout(expirationDate: reglockExpirationDate)
         let reglockStateWaitingTimeoutData = "7b2277616974696e6754696d656f7574223a7b2265787069726174696f6e44617465223a2d3937383239373230307d7d"
         #expect(
             try decoder.decode(ReglockState.self, from: Data.data(fromHex: reglockStateWaitingTimeoutData)!) ==
-            ReglockState.waitingTimeout(expirationDate: reglockExpirationDate)
+                ReglockState.waitingTimeout(expirationDate: reglockExpirationDate),
         )
     }
 
     // MARK: Happy Path Setups
 
     private func createAccountWithSession(
-        _ masterKey: MasterKey
+        recoveryPassword: RegistrationRecoveryPassword,
     ) -> TSRequest {
         return RegistrationRequestFactory.createAccountRequest(
-            verificationMethod: .sessionId(Stubs.sessionId),
-            e164: Stubs.e164,
+            verificationMethod: .sessionId(Stubs.e164, Stubs.sessionId),
             authPassword: "", // Doesn't matter for request generation.
-            accountAttributes: Stubs.accountAttributes(masterKey),
+            accountAttributes: Stubs.accountAttributes(registrationRecoveryPassword: recoveryPassword),
             skipDeviceTransfer: true,
             apnRegistrationId: Stubs.apnsRegistrationId,
-            prekeyBundles: Stubs.prekeyBundles()
+            aciPreKeyBundle: Stubs.preKeyBundle(identity: .aci),
+            pniPreKeyBundle: Stubs.preKeyBundle(identity: .pni),
+            logger: .empty(),
         )
     }
 
     private func createAccountWithRecoveryPw(
-        _ masterKey: MasterKey
+        _ recoveryPassword: RegistrationRecoveryPassword,
     ) -> TSRequest {
         return RegistrationRequestFactory.createAccountRequest(
-            verificationMethod: .recoveryPassword(masterKey.regRecoveryPw),
-            e164: Stubs.e164,
+            verificationMethod: .recoveryPassword(.phoneNumber(Stubs.e164), recoveryPassword),
             authPassword: "", // Doesn't matter for request generation.
-            accountAttributes: Stubs.accountAttributes(masterKey),
+            accountAttributes: Stubs.accountAttributes(registrationRecoveryPassword: recoveryPassword),
             skipDeviceTransfer: true,
             apnRegistrationId: Stubs.apnsRegistrationId,
-            prekeyBundles: Stubs.prekeyBundles()
+            aciPreKeyBundle: Stubs.preKeyBundle(identity: .aci),
+            pniPreKeyBundle: Stubs.preKeyBundle(identity: .pni),
+            logger: .empty(),
         )
     }
 
@@ -3184,7 +3119,6 @@ public class RegistrationCoordinatorTest {
     private func goThroughOpeningHappyPath(
         coordinator: any RegistrationCoordinator,
         mode: RegistrationMode,
-        expectedNextStep: RegistrationStep
     ) async {
         contactsStore.doesNeedContactsAuthorization = true
         pushRegistrationManagerMock.doesNeedNotificationAuthorization = true
@@ -3192,16 +3126,21 @@ public class RegistrationCoordinatorTest {
         switch mode {
         case .registering:
             // Gotta get the splash out of the way.
-            #expect(await coordinator.nextStep() == .registrationSplash)
+            #expect(await coordinator.nextStep().isRegistrationSplash)
+            coordinator.continueFromSplash()
         case .reRegistering, .changingNumber:
             break
         }
 
         // Now we should show the permissions.
-        #expect(await coordinator.continueFromSplash().awaitable() == .permissions)
+        #expect(await coordinator.nextStep().isPermissions)
 
         // Once the state is updated we can proceed.
-        #expect(await coordinator.requestPermissions().awaitable() == expectedNextStep)
+        let nextStep = await coordinator.requestPermissions().awaitable()
+        guard case .phoneNumberEntry = nextStep else {
+            Issue.record("must be phoneNumberEntry")
+            return
+        }
     }
 
     @MainActor
@@ -3220,11 +3159,7 @@ public class RegistrationCoordinatorTest {
         // so that we immediately go to the session flow.
 
         // Get past the opening.
-        await goThroughOpeningHappyPath(
-            coordinator: coordinator,
-            mode: mode,
-            expectedNextStep: .phoneNumberEntry(stubs.phoneNumberEntryState(mode: mode))
-        )
+        await goThroughOpeningHappyPath(coordinator: coordinator, mode: mode)
     }
 
     @MainActor
@@ -3240,23 +3175,28 @@ public class RegistrationCoordinatorTest {
         })
 
         // Give back a session that's ready to go.
-        sessionManager.addBeginSessionResponseMock(.success(stubs.session()))
+        let expectedSession = stubs.session()
+        sessionManager.addBeginSessionResponseMock({ expectedSession })
 
         // Once we get that session, we should try and send a code.
         // Resolve with a session thats ready for code submission.
         sessionManager.addRequestCodeResponseMock(.success(stubs.session(nextVerificationAttempt: 0)))
 
         // We should get back the code entry step.
-        #expect(
-            await coordinator.submitE164(Stubs.e164).awaitable() ==
-                .verificationCodeEntry(stubs.verificationCodeEntryState(mode: mode))
-        )
+        coordinator.submitE164(Stubs.e164)
+        let nextStep = await coordinator.nextStep()
+        guard case .verificationCodeEntry(let codeState) = nextStep else {
+            Issue.record("must be verificationCodeEntry")
+            return
+        }
+        #expect(codeState.validationError == nil)
     }
 
     // MARK: - Helpers
 
     private func setupDefaultAccountAttributes() {
         ows2FAManagerMock.pinCodeMock = { nil }
+        ows2FAManagerMock.shouldMasterKeyBeBackedUpMock = { false }
         ows2FAManagerMock.isReglockEnabledMock = { false }
 
         tsAccountManagerMock.isManualMessageFetchEnabledMock = { false }
@@ -3282,80 +3222,76 @@ public class RegistrationCoordinatorTest {
                 badges: [],
                 lastFetchDate: Date(timeIntervalSince1970: 1735689600),
                 lastMessagingDate: nil,
-                isPhoneNumberShared: false
+                isPhoneNumberShared: false,
+                hasPaymentAddress: false,
             )
         }
     }
 
     private static func attributesFromCreateAccountRequest(
-        _ request: TSRequest
+        _ request: TSRequest,
     ) -> AccountAttributes {
         let accountAttributesData = try! JSONSerialization.data(
             withJSONObject: request.parameters["accountAttributes"]!,
-            options: .fragmentsAllowed
+            options: .fragmentsAllowed,
         )
         return try! JSONDecoder().decode(
             AccountAttributes.self,
-            from: accountAttributesData
+            from: accountAttributesData,
         )
     }
 
     // MARK: - Helpers
 
-    func buildKeyDataMocks(_ testCase: TestCase) -> (MasterKey, MasterKey) {
-        let oldAccountEntropyPool = AccountEntropyPool()
-        let oldMasterKey = oldAccountEntropyPool.getMasterKey()
-        let newMasterKey = Stubs.accountEntropyPoolToGenerate.getMasterKey()
+    func buildKeyDataMocks(_ testCase: TestCase) -> AccountEntropyPool {
+        let oldAep = AccountEntropyPool()
+        // on re-registration, make the AEP be present
+        db.write { accountKeyStore.setAccountEntropyPool(oldAep, tx: $0) }
+        return oldAep
+    }
 
-        switch (testCase.oldKey, testCase.newKey) {
-        case (.accountEntropyPool, .accountEntropyPool):
-            // on re-registration, make the AEP be present
-            db.write { accountKeyStore.setAccountEntropyPool(oldAccountEntropyPool, tx: $0) }
-            return (oldMasterKey, oldMasterKey)
-        case (.masterKey, .masterKey):
-            db.write { accountKeyStore.setMasterKey(oldMasterKey, tx: $0) }
-            return (oldMasterKey, oldMasterKey)
-        case (.masterKey, .accountEntropyPool):
-            // If this is a reregistration from an non-AEP client,
-            // AEP is only available after calling getOrGenerateAEP()
-            db.write { accountKeyStore.setMasterKey(oldMasterKey, tx: $0) }
-            return (oldMasterKey, newMasterKey)
-        case (.none, .masterKey):
-            return (newMasterKey, newMasterKey)
-        case (.none, .accountEntropyPool):
-            return (newMasterKey, newMasterKey)
-        case (.accountEntropyPool, .masterKey):
-            fatalError("Migrating to masterkey from AEP not supported")
-        case (_, .none):
-            fatalError("Registration requires a destination key")
+    func storeSvrCredentials(_ svrCredentials: [SVR2AuthCredential]) {
+        let invalidCredential = SVR2AuthCredential(credential: RemoteAttestationAuth(username: UUID().uuidString, password: "abc123"))
+        db.write { tx in
+            for credential in svrCredentials + [invalidCredential] {
+                svrAuthCredentialManager.storeAuthCredentialForCurrentUsername(credential, tx)
+            }
+            svrAuthCredentialManager.deleteInvalidCredentials([invalidCredential], tx)
         }
+    }
+
+    func getSvrCredentialUsernames() -> Set<String> {
+        return Set(db.read { tx in
+            return svrAuthCredentialManager.getAuthCredentials(tx).map(\.credential.username)
+        })
     }
 
     func mockSVRCredentials(isMatch: Bool) {
         // Put some auth credentials in storage.
         let svr2CredentialCandidates: [SVR2AuthCredential] = [
             Stubs.svr2AuthCredential,
-            SVR2AuthCredential(credential: RemoteAttestation.Auth(username: "aaaa", password: "abc")),
-            SVR2AuthCredential(credential: RemoteAttestation.Auth(username: "zzzz", password: "xyz")),
-            SVR2AuthCredential(credential: RemoteAttestation.Auth(username: "0000", password: "123"))
+            SVR2AuthCredential(credential: RemoteAttestationAuth(username: "aaaa", password: "abc")),
+            SVR2AuthCredential(credential: RemoteAttestationAuth(username: "zzzz", password: "xyz")),
+            SVR2AuthCredential(credential: RemoteAttestationAuth(username: "0000", password: "123")),
         ]
-        svrAuthCredentialStore.svr2Dict = Dictionary(grouping: svr2CredentialCandidates, by: \.credential.username).mapValues { $0.first! }
+        storeSvrCredentials(svr2CredentialCandidates)
 
         // Give it a phone number, which should cause it to check the auth credentials.
         // Match the main auth credential.
         let expectedSVR2CheckRequest = RegistrationRequestFactory.svr2AuthCredentialCheckRequest(
             e164: Stubs.e164,
-            credentials: svr2CredentialCandidates
+            credentials: svr2CredentialCandidates,
+            logger: .empty(),
         )
-        mockURLSession.addResponse(TSRequestOWSURLSessionMock.Response(
-            urlSuffix: expectedSVR2CheckRequest.url.absoluteString,
+        networkManagerMock.asyncRequestHandlers.append(MockNetworkManager.mockResponse(
+            matchingRequest: { $0.url.relativeString.hasSuffix(expectedSVR2CheckRequest.url.absoluteString) },
             statusCode: 200,
             bodyJson: RegistrationServiceResponses.SVR2AuthCheckResponse(matches: [
                 "\(Stubs.svr2AuthCredential.credential.username):\(Stubs.svr2AuthCredential.credential.password)": isMatch ? .match : .notMatch,
                 "aaaa:abc": .notMatch,
                 "zzzz:xyz": .invalid,
-                "0000:123": .unknown
-            ])
+                "0000:123": .unknown,
+            ]),
         ))
     }
 
@@ -3368,7 +3304,7 @@ public class RegistrationCoordinatorTest {
         static let aci = Aci.randomForTesting()
         static let pinCode = "1234"
 
-        static let svr2AuthCredential = SVR2AuthCredential(credential: RemoteAttestation.Auth(username: "xxx", password: "yyy"))
+        static let svr2AuthCredential = SVR2AuthCredential(credential: RemoteAttestationAuth(username: "xxx", password: "yyy"))
 
         static let captchaToken = "captchaToken"
         static let apnsToken = "apnsToken"
@@ -3382,7 +3318,7 @@ public class RegistrationCoordinatorTest {
 
         var date: Date = Date()
 
-        static func accountAttributes(_ masterKey: MasterKey? = nil) -> AccountAttributes {
+        static func accountAttributes(registrationRecoveryPassword: RegistrationRecoveryPassword? = nil) -> AccountAttributes {
             return AccountAttributes(
                 isManualMessageFetchEnabled: false,
                 registrationId: 0,
@@ -3390,39 +3326,32 @@ public class RegistrationCoordinatorTest {
                 unidentifiedAccessKey: "",
                 unrestrictedUnidentifiedAccess: false,
                 reglockToken: nil,
-                registrationRecoveryPassword: masterKey?.regRecoveryPw,
+                registrationRecoveryPassword: registrationRecoveryPassword?.rawData.base64EncodedString(),
                 encryptedDeviceName: nil,
                 discoverableByPhoneNumber: .nobody,
-                hasSVRBackups: true
+                capabilities: AccountAttributes.Capabilities(hasSVRBackups: true),
             )
         }
 
         static func accountIdentityResponse(
-            hasPreviouslyUsedSVR: Bool = false
-        ) -> RegistrationServiceResponses.AccountIdentityResponse {
-            return RegistrationServiceResponses.AccountIdentityResponse(
-                aci: Stubs.aci,
-                pni: Pni.randomForTesting(),
-                e164: Stubs.e164,
-                username: nil,
-                hasPreviouslyUsedSVR: hasPreviouslyUsedSVR
-            )
-        }
-
-        static func prekeyBundles() -> RegistrationPreKeyUploadBundles {
-            return RegistrationPreKeyUploadBundles(
-                aci: preKeyBundle(identity: .aci),
-                pni: preKeyBundle(identity: .pni)
+            hasPreviouslyUsedSVR: Bool = false,
+        ) -> AccountIdentityResponse {
+            return AccountIdentityResponse(
+                localIdentifiers: LocalIdentifiers(
+                    aci: Stubs.aci,
+                    accountType: .phoneNumberfull(phoneNumber: Stubs.e164.stringValue, pni: .randomForTesting()),
+                ),
+                storageCapable: hasPreviouslyUsedSVR,
             )
         }
 
         static func preKeyBundle(identity: OWSIdentity) -> RegistrationPreKeyUploadBundle {
-            let identityKeyPair = ECKeyPair.generateKeyPair()
+            let identityKeyPair = IdentityKeyPair.generate()
             return RegistrationPreKeyUploadBundle(
                 identity: identity,
                 identityKeyPair: identityKeyPair,
-                signedPreKey: SignedPreKeyStoreImpl.generateSignedPreKey(keyId: PreKeyId.random(), signedBy: identityKeyPair.keyPair.privateKey),
-                lastResortPreKey: KyberPreKeyStoreImpl.generatePreKeyRecord(keyId: 0, now: Date(), signedBy: identityKeyPair.keyPair.privateKey),
+                signedPreKey: SignedPreKeyStoreImpl.generateSignedPreKey(keyId: PreKeyId.random(), signedBy: identityKeyPair.privateKey),
+                lastResortPreKey: KyberPreKeyStoreImpl.generatePreKeyRecord(keyId: 0, now: Date(), signedBy: identityKeyPair.privateKey),
             )
         }
 
@@ -3435,7 +3364,7 @@ public class RegistrationCoordinatorTest {
             allowedToRequestCode: Bool = true,
             requestedInformation: [RegistrationSession.Challenge] = [],
             hasUnknownChallengeRequiringAppUpdate: Bool = false,
-            verified: Bool = false
+            verified: Bool = false,
         ) -> RegistrationSession {
             let receivedDate = receivedDate ?? date
             return RegistrationSession(
@@ -3448,238 +3377,15 @@ public class RegistrationCoordinatorTest {
                 allowedToRequestCode: allowedToRequestCode,
                 requestedInformation: requestedInformation,
                 hasUnknownChallengeRequiringAppUpdate: hasUnknownChallengeRequiringAppUpdate,
-                verified: verified
+                verified: verified,
             )
-        }
-
-        // MARK: Step States
-
-        static func pinEntryStateForRegRecoveryPath(
-            mode: RegistrationMode,
-            error: RegistrationPinValidationError? = nil,
-            remainingAttempts: UInt? = nil
-        ) -> RegistrationPinState {
-            return RegistrationPinState(
-                operation: .enteringExistingPin(
-                    skippability: .canSkip,
-                    remainingAttempts: remainingAttempts
-                ),
-                error: error,
-                contactSupportMode: .v2WithUnknownReglockState,
-                exitConfiguration: mode.pinExitConfig
-            )
-        }
-
-        static func pinEntryStateForSVRAuthCredentialPath(
-            mode: RegistrationMode,
-            error: RegistrationPinValidationError? = nil
-        ) -> RegistrationPinState {
-            return RegistrationPinState(
-                operation: .enteringExistingPin(skippability: .canSkip, remainingAttempts: nil),
-                error: error,
-                contactSupportMode: .v2WithUnknownReglockState,
-                exitConfiguration: mode.pinExitConfig
-            )
-        }
-
-        func phoneNumberEntryState(
-            mode: RegistrationMode,
-            previouslyEnteredE164: E164? = nil,
-            withValidationErrorFor response: Registration.BeginSessionResponse? = nil
-        ) -> RegistrationPhoneNumberViewState {
-            let response = response ?? .success(session())
-            let validationError: RegistrationPhoneNumberViewState.ValidationError?
-            switch response {
-            case .success:
-                validationError = nil
-            case .invalidArgument:
-                validationError = .invalidE164(.init(invalidE164: previouslyEnteredE164 ?? Stubs.e164))
-            case .retryAfter(let timeInterval):
-                validationError = .rateLimited(.init(
-                    expiration: date.addingTimeInterval(timeInterval),
-                    e164: previouslyEnteredE164 ?? Stubs.e164
-                ))
-            case .networkFailure, .genericError:
-                Issue.record("Should not be generating phone number state for error responses.")
-                validationError = nil
-            }
-
-            switch mode {
-            case .registering:
-                return .registration(.initialRegistration(.init(
-                    previouslyEnteredE164: previouslyEnteredE164,
-                    validationError: validationError,
-                    canExitRegistration: true
-                )))
-            case .reRegistering(let params):
-                return .registration(.reregistration(.init(
-                    e164: params.e164,
-                    validationError: validationError,
-                    canExitRegistration: true
-                )))
-            case .changingNumber(let changeNumberParams):
-                switch validationError {
-                case .none:
-                    if let newE164 = previouslyEnteredE164 {
-                        return .changingNumber(.confirmation(.init(
-                            oldE164: changeNumberParams.oldE164,
-                            newE164: newE164,
-                            rateLimitedError: nil
-                        )))
-                    } else {
-                        return .changingNumber(.initialEntry(.init(
-                            oldE164: changeNumberParams.oldE164,
-                            newE164: nil,
-                            hasConfirmed: false,
-                            invalidE164Error: nil
-                        )))
-                    }
-                case .rateLimited(let error):
-                    return .changingNumber(.confirmation(.init(
-                        oldE164: changeNumberParams.oldE164,
-                        newE164: previouslyEnteredE164!,
-                        rateLimitedError: error
-                    )))
-                case .invalidInput:
-                    owsFail("Can't happen.")
-                case .invalidE164(let error):
-                    return .changingNumber(.initialEntry(.init(
-                        oldE164: changeNumberParams.oldE164,
-                        newE164: previouslyEnteredE164,
-                        hasConfirmed: previouslyEnteredE164 != nil,
-                        invalidE164Error: error
-                    )))
-                }
-            }
-        }
-
-        func verificationCodeEntryState(
-            mode: RegistrationMode,
-            e164: E164 = Stubs.e164,
-            nextSMS: TimeInterval? = 0,
-            nextCall: TimeInterval? = 0,
-            showHelpText: Bool = false,
-            nextVerificationAttempt: TimeInterval? = 0,
-            validationError: RegistrationVerificationValidationError? = nil,
-            exitConfigOverride: RegistrationVerificationState.ExitConfiguration? = nil
-        ) -> RegistrationVerificationState {
-
-            let canChangeE164: Bool
-            switch mode {
-            case .reRegistering:
-                canChangeE164 = false
-            case .registering, .changingNumber:
-                canChangeE164 = true
-            }
-
-            return RegistrationVerificationState(
-                e164: e164,
-                nextSMSDate: nextSMS.map { date.addingTimeInterval($0) },
-                nextCallDate: nextCall.map { date.addingTimeInterval($0) },
-                nextVerificationAttemptDate: nextVerificationAttempt.map { date.addingTimeInterval($0) },
-                canChangeE164: canChangeE164,
-                showHelpText: showHelpText,
-                validationError: validationError,
-                exitConfiguration: exitConfigOverride ?? mode.verificationExitConfig
-            )
-        }
-
-        static func pinEntryStateForSessionPathReglock(
-            mode: RegistrationMode,
-            error: RegistrationPinValidationError? = nil
-        ) -> RegistrationPinState {
-            return RegistrationPinState(
-                operation: .enteringExistingPin(skippability: .unskippable, remainingAttempts: nil),
-                error: error,
-                contactSupportMode: .v2WithReglock,
-                exitConfiguration: mode.pinExitConfig
-            )
-        }
-
-        static func pinEntryStateForPostRegRestore(
-            mode: RegistrationMode,
-            exitConfigOverride: RegistrationPinState.ExitConfiguration? = nil,
-            error: RegistrationPinValidationError? = nil
-        ) -> RegistrationPinState {
-            return RegistrationPinState(
-                operation: .enteringExistingPin(
-                    skippability: .canSkipAndCreateNew,
-                    remainingAttempts: nil
-                ),
-                error: error,
-                contactSupportMode: .v2NoReglock,
-                exitConfiguration: exitConfigOverride ?? mode.pinExitConfig
-            )
-        }
-
-        static func pinEntryStateForPostRegCreate(
-            mode: RegistrationMode,
-            exitConfigOverride: RegistrationPinState.ExitConfiguration? = nil
-        ) -> RegistrationPinState {
-            return RegistrationPinState(
-                operation: .creatingNewPin,
-                error: nil,
-                contactSupportMode: .v2NoReglock,
-                exitConfiguration: exitConfigOverride ?? mode.pinExitConfig
-            )
-        }
-
-        static func pinEntryStateForPostRegConfirm(
-            mode: RegistrationMode,
-            error: RegistrationPinValidationError? = nil,
-            exitConfigOverride: RegistrationPinState.ExitConfiguration? = nil
-        ) -> RegistrationPinState {
-            return RegistrationPinState(
-                operation: .confirmingNewPin(.stub()),
-                error: error,
-                contactSupportMode: .v2NoReglock,
-                exitConfiguration: exitConfigOverride ?? mode.pinExitConfig
-            )
-        }
-    }
-}
-
-extension RegistrationMode {
-
-    var testDescription: String {
-        switch self {
-        case .registering:
-            return "registering"
-        case .reRegistering:
-            return "re-registering"
-        case .changingNumber:
-            return "changing number"
-        }
-    }
-
-    var pinExitConfig: RegistrationPinState.ExitConfiguration {
-        switch self {
-        case .registering:
-            return .noExitAllowed
-        case .reRegistering:
-            return .exitReRegistration
-        case .changingNumber:
-            // TODO[Registration]: test change number properly
-            return .exitChangeNumber
-        }
-    }
-
-    var verificationExitConfig: RegistrationVerificationState.ExitConfiguration {
-        switch self {
-        case .registering:
-            return .noExitAllowed
-        case .reRegistering:
-            return .exitReRegistration
-        case .changingNumber:
-            // TODO[Registration]: test change number properly
-            return .exitChangeNumber
         }
     }
 }
 
 private extension MasterKey {
-    var regRecoveryPw: String { data(for: .registrationRecoveryPassword).rawData.base64EncodedString() }
-    var reglockToken: String { data(for: .registrationLock).rawData.hexadecimalString }
+    var regRecoveryPw: String { deriveRegistrationRecoveryPassword().rawData.base64EncodedString() }
+    var reglockToken: String { deriveRegistrationLock().rawData.hexadecimalString }
 }
 
 struct EncodableRegistrationLockFailureResponse: Codable {
@@ -3703,12 +3409,35 @@ struct EncodableRegistrationLockFailureResponse: Codable {
     }
 }
 
+extension AccountIdentityResponse: @retroactive Encodable {
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.localIdentifiers.aci.rawUUID, forKey: .aci)
+        switch self.localIdentifiers.accountType {
+        case .phoneNumberfull(let phoneNumber, let pni):
+            try container.encode(phoneNumber, forKey: .number)
+            try container.encode(pni?.rawUUID, forKey: .pni)
+        case .phoneNumberless(let authCredentialSalt):
+            try container.encode(authCredentialSalt, forKey: .authCredentialSalt)
+        }
+        try container.encodeIfPresent(self.usernameHash.map({ DataBase64Url($0) }), forKey: .usernameHash)
+        try container.encodeIfPresent(self.usernameLinkHandle, forKey: .usernameLinkHandle)
+        try container.encode(self.storageCapable, forKey: .storageCapable)
+        // Omit entitlements because they're not needed here.
+        struct FakeEntitlements: Encodable {
+            var badges: [Int]
+            var backup: Int?
+        }
+        try container.encode(FakeEntitlements(badges: [], backup: nil), forKey: .entitlements)
+    }
+}
+
 private extension Usernames.UsernameLink {
     static var mocked: Usernames.UsernameLink {
-        return Usernames.UsernameLink(
+        return UsernameLink(
             handle: UUID(),
-            entropy: Data(repeating: 8, count: 32)
-        )!
+            entropy: try! UsernameLink.Entropy(rawValue: Data(repeating: 8, count: 32)),
+        )
     }
 }
 
@@ -3720,5 +3449,35 @@ private extension TSRequest {
         owsPrecondition(authHeader.hasPrefix("Basic "))
         let authValue = String(data: Data(base64Encoded: String(authHeader.dropFirst(6)))!, encoding: .utf8)!
         return String(authValue.split(separator: ":").dropFirst().first!)
+    }
+}
+
+private extension RegistrationStep {
+    var isRegistrationSplash: Bool {
+        if case .registrationSplash = self {
+            return true
+        }
+        return false
+    }
+
+    var isAppUpdateBanner: Bool {
+        if case .appUpdateBanner = self {
+            return true
+        }
+        return false
+    }
+
+    var isPermissions: Bool {
+        if case .permissions = self {
+            return true
+        }
+        return false
+    }
+
+    var isDone: Bool {
+        if case .done = self {
+            return true
+        }
+        return false
     }
 }

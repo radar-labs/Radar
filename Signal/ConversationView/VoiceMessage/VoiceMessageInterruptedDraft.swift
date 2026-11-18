@@ -4,7 +4,6 @@
 //
 
 import AVFoundation
-import Foundation
 import SignalServiceKit
 import SignalUI
 
@@ -24,18 +23,16 @@ final class VoiceMessageInterruptedDraft: VoiceMessageSendableDraft {
 
     private let threadUniqueId: String
     private let audioFileUrl: URL
-    private let waveformFileUrl: URL
 
     init(threadUniqueId: String, directoryUrl: URL) {
         self.threadUniqueId = threadUniqueId
         self.audioFileUrl = URL(fileURLWithPath: Constants.audioFilename, relativeTo: directoryUrl)
-        self.waveformFileUrl = URL(fileURLWithPath: Constants.waveformFilename, relativeTo: directoryUrl)
     }
 
-    public static func currentDraft(for thread: TSThread, transaction: DBReadTransaction) -> VoiceMessageInterruptedDraft? {
+    static func currentDraft(for thread: TSThread, transaction: DBReadTransaction) -> VoiceMessageInterruptedDraft? {
         let directoryUrl = VoiceMessageInterruptedDraftStore.directoryUrl(
             threadUniqueId: thread.uniqueId,
-            transaction: transaction
+            transaction: transaction,
         )
         return directoryUrl.map { VoiceMessageInterruptedDraft(threadUniqueId: thread.uniqueId, directoryUrl: $0) }
     }
@@ -48,30 +45,61 @@ final class VoiceMessageInterruptedDraft: VoiceMessageSendableDraft {
 
     // MARK: -
 
-    public private(set) lazy var audioWaveformTask: Task<AudioWaveform, Error> = {
-        // The file at `waveformPath` is created lazily by accessing this property.
-        // It's used solely for UI and thus isn't created until it's needed.
-        DependenciesBridge.shared.audioWaveformManager.audioWaveform(
-            forAudioPath: audioFileUrl.path,
-            waveformPath: waveformFileUrl.path
-        )
+    /// The waveform is used solely for UI, so it isn't sampled until something
+    /// asks for it. The samples are then cached for the life of the draft.
+    private(set) lazy var audioWaveformTask: Task<AudioWaveform, Error> = {
+        let audioFilePath = self.audioFileUrl.path
+        let threadUniqueId = self.threadUniqueId
+
+        return Task {
+            let audioWaveformManager = DependenciesBridge.shared.audioWaveformManager
+            let db = SSKEnvironment.shared.databaseStorageRef
+
+            let cachedSamples = db.read { tx in
+                VoiceMessageInterruptedDraftStore.waveformSamples(
+                    threadUniqueId: threadUniqueId,
+                    transaction: tx,
+                )
+            }
+            if
+                let cachedSamples,
+                let cachedWaveform = try? AudioWaveform(waveformData: cachedSamples)
+            {
+                return cachedWaveform
+            }
+
+            let waveform = try audioWaveformManager.computeAudioWaveform(audioFilePath: audioFilePath)
+
+            await db.awaitableWrite { tx in
+                VoiceMessageInterruptedDraftStore.setWaveformSamples(
+                    waveform.waveformData,
+                    threadUniqueId: threadUniqueId,
+                    transaction: tx,
+                )
+            }
+
+            return waveform
+        }
     }()
 
-    public private(set) lazy var audioPlayer: AudioPlayer = {
+    private(set) lazy var audioPlayer: AudioPlayer = {
         AudioPlayer(decryptedFileUrl: audioFileUrl, audioBehavior: .audioMessagePlayback)
     }()
 
-    public private(set) lazy var duration: TimeInterval? = {
+    private(set) lazy var duration: TimeInterval? = {
         guard OWSFileSystem.fileOrFolderExists(url: audioFileUrl) else { return nil }
         return try? AVAudioPlayer(
-            contentsOf: audioFileUrl
+            contentsOf: audioFileUrl,
         ).duration
     }()
 
     // MARK: -
 
-    public func prepareForSending() throws -> URL {
-        let temporaryAudioFileUrl = OWSFileSystem.temporaryFileUrl()
+    func prepareForSending() throws -> URL {
+        let temporaryAudioFileUrl = OWSFileSystem.temporaryFileUrl(
+            fileName: audioFileUrl.lastPathComponent,
+            isAvailableWhileDeviceLocked: false,
+        )
         try FileManager.default.copyItem(at: audioFileUrl, to: temporaryAudioFileUrl)
         return temporaryAudioFileUrl
     }

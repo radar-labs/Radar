@@ -13,22 +13,24 @@ public enum Batching {
     //
     // If batchSize == 0, no batching is done and no
     // autoreleasepool is used.
-    public static func loop(batchSize: UInt,
-                            loopBlock: (UnsafeMutablePointer<ObjCBool>) throws -> Void) rethrows {
-        var stop: ObjCBool = false
+    public static func loop(
+        batchSize: UInt,
+        loopBlock: (_ stop: inout Bool) throws -> Void,
+    ) rethrows {
+        var stop = false
         guard batchSize > 0 else {
             // No batching.
-            while !stop.boolValue {
+            while !stop {
                 try loopBlock(&stop)
             }
             return
         }
 
         // With batching.
-        while !stop.boolValue {
+        while !stop {
             try autoreleasepool {
                 for _ in 0..<batchSize {
-                    guard !stop.boolValue else {
+                    guard !stop else {
                         return
                     }
                     try loopBlock(&stop)

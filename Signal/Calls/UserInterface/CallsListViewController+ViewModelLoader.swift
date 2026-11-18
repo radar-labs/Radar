@@ -31,17 +31,17 @@ extension CallsListViewController {
     struct ViewModelLoader {
         typealias CallViewModelForUpcomingCallLink = (
             _ callLinkRowId: Int64,
-            _ tx: DBReadTransaction
+            _ tx: DBReadTransaction,
         ) -> CallViewModel
 
         typealias CallViewModelForCallRecords = (
             _ callRecords: [CallRecord],
-            _ tx: DBReadTransaction
+            _ tx: DBReadTransaction,
         ) -> CallViewModel
 
         typealias FetchCallRecordBlock = (
             _ callRecordId: CallRecord.ID,
-            _ tx: DBReadTransaction
+            _ tx: DBReadTransaction,
         ) -> CallRecord?
 
         enum LoadDirection {
@@ -49,7 +49,7 @@ extension CallsListViewController {
             case newer
         }
 
-        private let callLinkStore: any CallLinkRecordStore
+        private let callLinkStore: CallLinkRecordStore
         private let callRecordLoader: CallRecordLoader
         private let callViewModelForCallRecords: CallViewModelForCallRecords
         private let callViewModelForUpcomingCallLink: CallViewModelForUpcomingCallLink
@@ -59,14 +59,14 @@ extension CallsListViewController {
         private let maxCoalescedCallsInOneViewModel: Int
 
         init(
-            callLinkStore: any CallLinkRecordStore,
+            callLinkStore: CallLinkRecordStore,
             callRecordLoader: CallRecordLoader,
             callViewModelForCallRecords: @escaping CallViewModelForCallRecords,
             callViewModelForUpcomingCallLink: @escaping CallViewModelForUpcomingCallLink,
             fetchCallRecordBlock: @escaping FetchCallRecordBlock,
             shouldFetchUpcomingCallLinks: Bool,
             viewModelPageSize: Int = 50,
-            maxCoalescedCallsInOneViewModel: Int = 50
+            maxCoalescedCallsInOneViewModel: Int = 50,
         ) {
             self.callLinkStore = callLinkStore
             self.callRecordLoader = callRecordLoader
@@ -213,7 +213,7 @@ extension CallsListViewController {
             // Throw away cached view models if we have way too many.
             let adjacentRange = (
                 max(0, pageRange.lowerBound - 2 * viewModelPageSize)
-                ..< min(totalCount, pageRange.upperBound + 2 * viewModelPageSize)
+                    ..< min(totalCount, pageRange.upperBound + 2 * viewModelPageSize),
             )
             for internalIndex in upcomingCallLinkReferences.indices {
                 if adjacentRange.contains(internalIndex) {
@@ -233,13 +233,7 @@ extension CallsListViewController {
             guard shouldFetchUpcomingCallLinks else {
                 return
             }
-            let upcomingCallLinks: [CallLinkRecord]
-            do {
-                upcomingCallLinks = try callLinkStore.fetchUpcoming(earlierThan: nil, limit: 2048, tx: tx)
-            } catch {
-                Logger.warn("Couldn't fetch call links to show on the calls tab: \(error)")
-                return
-            }
+            let upcomingCallLinks = callLinkStore.fetchUpcoming(earlierThan: nil, limit: 2048, tx: tx)
             self.upcomingCallLinkReferences = upcomingCallLinks.map {
                 return UpcomingCallLinkReference(callLinkRowId: $0.id)
             }
@@ -255,7 +249,7 @@ extension CallsListViewController {
         /// call link).
         mutating func loadCallHistoryItemReferences(
             direction loadDirection: LoadDirection,
-            tx: DBReadTransaction
+            tx: DBReadTransaction,
         ) -> (Bool, Set<CallViewModel.Reference>) {
             var fetchResult: [NonEmptyArray<CallRecord>]
             let fetchDirection: LoadDirection
@@ -268,13 +262,13 @@ extension CallsListViewController {
                 fetchResult = loadOlderCallHistoryItemReferences(
                     olderThan: callHistoryItemTimestampRange?.lowerBound,
                     maxCount: viewModelPageSize,
-                    tx: tx
+                    tx: tx,
                 )
             case (.newer, let callHistoryItemTimestampRange?):
                 fetchDirection = .newer
                 fetchResult = loadNewerCallHistoryItemReferences(
                     newerThan: callHistoryItemTimestampRange.upperBound,
-                    tx: tx
+                    tx: tx,
                 ).map { NonEmptyArray(singleElement: $0) }
             }
 
@@ -291,7 +285,7 @@ extension CallsListViewController {
             if let callHistoryItemTimestampRange {
                 self.callHistoryItemTimestampRange = (
                     min(callHistoryItemTimestampRange.lowerBound, oldestFetchedTimestamp)
-                    ... max(callHistoryItemTimestampRange.upperBound, newestFetchedTimestamp)
+                        ... max(callHistoryItemTimestampRange.upperBound, newestFetchedTimestamp),
                 )
             } else {
                 self.callHistoryItemTimestampRange = oldestFetchedTimestamp...newestFetchedTimestamp
@@ -330,7 +324,7 @@ extension CallsListViewController {
                 let combinedGroupOfCallRecords = oldestGroupOfNewCallRecords + newestGroupOfOldCallRecords
                 let reference = CallHistoryItemReference(
                     callRecordIds: combinedGroupOfCallRecords.map(\.id),
-                    callLinkRowId: newestOldReference.callLinkRowId
+                    callLinkRowId: newestOldReference.callLinkRowId,
                 )
                 callHistoryItemReferences[0] = reference
                 modifiedReferences.insert(reference.viewModelReference)
@@ -347,15 +341,13 @@ extension CallsListViewController {
                         case .callLink(let callLinkRowId):
                             return callLinkRowId
                         }
-                    }()
+                    }(),
                 )
             }
 
             switch fetchDirection {
             case .older:
-                // swiftlint:disable shorthand_operator
                 self.callHistoryItemReferences = self.callHistoryItemReferences + fetchedCallHistoryItemReferences
-                // swiftlint:enable shorthand_operator
             case .newer:
                 self.callHistoryItemReferences = fetchedCallHistoryItemReferences + self.callHistoryItemReferences
             }
@@ -434,11 +426,11 @@ extension CallsListViewController {
         private func loadOlderCallHistoryItemReferences(
             olderThan oldestCallTimestamp: UInt64?,
             maxCount: Int,
-            tx: DBReadTransaction
+            tx: DBReadTransaction,
         ) -> [NonEmptyArray<CallRecord>] {
             let newCallRecordsCursor: CallRecordCursor = callRecordLoader.loadCallRecords(
                 loadDirection: .olderThan(oldestCallTimestamp: oldestCallTimestamp),
-                tx: tx
+                tx: tx,
             )
 
             // Group call records that will be shown together in the UI.
@@ -449,7 +441,7 @@ extension CallsListViewController {
                 if let anchorCallRecord = callRecordsForNextGroup.first {
                     let canCoalesce: Bool = (
                         callRecordsForNextGroup.count < maxCoalescedCallsInOneViewModel
-                        && anchorCallRecord.isValidCoalescingAnchor(for: nextCallRecord)
+                            && anchorCallRecord.isValidCoalescingAnchor(for: nextCallRecord),
                     )
                     if !canCoalesce {
                         results.append(NonEmptyArray(callRecordsForNextGroup)!)
@@ -491,11 +483,11 @@ extension CallsListViewController {
         /// next time we load-from-empty. In return, this code is simpler.
         private func loadNewerCallHistoryItemReferences(
             newerThan newestCallTimestamp: UInt64,
-            tx: DBReadTransaction
+            tx: DBReadTransaction,
         ) -> [CallRecord] {
             let newCallRecordsCursor: CallRecordCursor = callRecordLoader.loadCallRecords(
                 loadDirection: .newerThan(newestCallTimestamp: newestCallTimestamp),
-                tx: tx
+                tx: tx,
             )
 
             // The call records we get back from our cursor will be ordered ascending,
@@ -513,7 +505,7 @@ extension CallsListViewController {
         /// ``viewModelReferences()``'s result may change after calling this method.
         mutating func dropCalls(
             matching callRecordIdsToDrop: [CallRecord.ID],
-            tx: DBReadTransaction
+            tx: DBReadTransaction,
         ) {
             let callRecordIdsToDrop = Set(callRecordIdsToDrop)
 
@@ -527,13 +519,19 @@ extension CallsListViewController {
                 if let callRecordIds = NonEmptyArray(reference.callRecordIds.rawValue.filter({ !callRecordIdsToDrop.contains($0) })) {
                     callHistoryItemReferences[internalIndex] = CallHistoryItemReference(
                         callRecordIds: callRecordIds,
-                        callLinkRowId: reference.callLinkRowId
+                        callLinkRowId: reference.callLinkRowId,
                     )
                 } else {
                     callHistoryItemIndicesToRemove.insert(internalIndex)
                 }
             }
             callHistoryItemReferences.remove(atOffsets: callHistoryItemIndicesToRemove)
+        }
+
+        mutating func invalidateCallHistoryViewModels() {
+            for index in callHistoryItemReferences.indices {
+                callHistoryItemReferences[index].viewModel = nil
+            }
         }
 
         /// Invalidates view models containing any of the given IDs.
@@ -589,11 +587,11 @@ private extension CallRecord {
             // Call links are never coalesced.
             return false
         }
-        return (
+        return
             callDirection == otherCallRecord.callDirection
-            && callStatus.isMissedCall == otherCallRecord.callStatus.isMissedCall
-            && callBeganDate.addingTimeInterval(-Constants.coalescingTimeWindow) < otherCallRecord.callBeganDate
-        )
+                && callStatus.isMissedCall == otherCallRecord.callStatus.isMissedCall
+                && callBeganDate.addingTimeInterval(-Constants.coalescingTimeWindow) < otherCallRecord.callBeganDate
+
     }
 }
 
@@ -619,7 +617,7 @@ private struct NonEmptyArray<Element> {
         return NonEmptyArray<T>(try self.rawValue.map(transform))!
     }
 
-    static func + (lhs: Self, rhs: [Element]) -> Self {
+    static func +(lhs: Self, rhs: [Element]) -> Self {
         return Self(lhs.rawValue + rhs)!
     }
 }

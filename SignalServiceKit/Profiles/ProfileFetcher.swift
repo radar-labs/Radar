@@ -16,15 +16,29 @@ public struct ProfileFetchContext {
     /// If true, the fetch must try to fetch a new credential.
     public var mustFetchNewCredential: Bool
 
-    // If set, the fetch must tr y to fetch with special version
+    /// The nature of the user profile fetch.  This determines side-effect behavior
+    /// such as if storage service is updated after the write.
+    public var userProfileWriter: UserProfileWriter
+
+    /// Radar: if set, fetch this specific profile key version (Radar publishes the
+    /// Lightning address under `PaymentsConstants.bitcoinLightningProfileKeyVersion`).
     public var profileKeyVersion: String?
 
+    /// Radar: if false, the fetched profile is not written to the local profile cache.
     public var cache: Bool
 
-    public init(groupId: GroupIdentifier? = nil, isOpportunistic: Bool = false, mustFetchNewCredential: Bool = false, profileKeyVersion: String? = nil, cache: Bool = true) {
+    public init(
+        groupId: GroupIdentifier? = nil,
+        isOpportunistic: Bool = false,
+        mustFetchNewCredential: Bool = false,
+        userProfileWriter: UserProfileWriter = .profileFetch,
+        profileKeyVersion: String? = nil,
+        cache: Bool = true,
+    ) {
         self.groupId = groupId
         self.isOpportunistic = isOpportunistic
         self.mustFetchNewCredential = mustFetchNewCredential
+        self.userProfileWriter = userProfileWriter
         self.profileKeyVersion = profileKeyVersion
         self.cache = cache
     }
@@ -40,7 +54,7 @@ extension ProfileFetcher {
     public func fetchProfile(
         for serviceId: ServiceId,
         context: ProfileFetchContext = ProfileFetchContext(),
-        authedAccount: AuthedAccount = .implicit()
+        authedAccount: AuthedAccount = .implicit,
     ) async throws -> FetchedProfile {
         return try await fetchProfileImpl(for: serviceId, context: context, authedAccount: authedAccount)
     }
@@ -49,9 +63,9 @@ extension ProfileFetcher {
         for serviceId: ServiceId,
         context: ProfileFetchContext = ProfileFetchContext(
             profileKeyVersion: PaymentsConstants.bitcoinLightningProfileKeyVersion,
-            cache: false
+            cache: false,
         ),
-        authedAccount: AuthedAccount = .implicit()
+        authedAccount: AuthedAccount = .implicit,
     ) async throws -> FetchedProfile {
         return try await fetchProfileImpl(for: serviceId, context: context, authedAccount: authedAccount)
     }
@@ -59,26 +73,27 @@ extension ProfileFetcher {
     func fetchProfileSync(
         for serviceId: ServiceId,
         context: ProfileFetchContext = ProfileFetchContext(),
-        authedAccount: AuthedAccount = .implicit()
+        authedAccount: AuthedAccount = .implicit,
     ) -> Task<FetchedProfile, Error> {
         return fetchProfileSyncImpl(for: serviceId, context: context, authedAccount: authedAccount)
     }
 }
 
-public enum ProfileFetcherError: Error, IsRetryableProvider {
+public enum ProfileFetcherError: Error {
     case skippingOpportunisticFetch
     case couldNotFetchCredential
-
-    public var isRetryableProvider: Bool {
-        switch self {
-        case .skippingOpportunisticFetch: false
-        case .couldNotFetchCredential: false
-        }
-    }
 }
 
 public actor ProfileFetcherImpl: ProfileFetcher {
-    private let jobCreator: (ServiceId, GroupIdentifier?, _ mustFetchNewCredential: Bool, AuthedAccount, _ profileKeyVersion: String?, _ profileAutoUpdate: Bool) -> ProfileFetcherJob
+    private let jobCreator: (
+        ServiceId,
+        GroupIdentifier?,
+        _ mustFetchNewCredential: Bool,
+        AuthedAccount,
+        UserProfileWriter,
+        _ profileKeyVersion: String?,
+        _ profileAutoUpdate: Bool,
+    ) -> ProfileFetcherJob
     private let reachabilityManager: any SSKReachabilityManager
     private let tsAccountManager: any TSAccountManager
 
@@ -92,6 +107,7 @@ public actor ProfileFetcherImpl: ProfileFetcher {
             case requestFailure(ProfileRequestError)
             case otherFailure
         }
+
         let completionDate: MonotonicDate
 
         init(outcome: Outcome, completionDate: MonotonicDate) {
@@ -113,19 +129,23 @@ public actor ProfileFetcherImpl: ProfileFetcher {
         accountChecker: AccountChecker,
         db: any DB,
         disappearingMessagesConfigurationStore: any DisappearingMessagesConfigurationStore,
+        groupSendEndorsementStore: GroupSendEndorsementStore,
         identityManager: any OWSIdentityManager,
+        keyTransparencyStore: KeyTransparencyStore,
+        localProfileChecker: LocalProfileChecker,
         paymentsHelper: any PaymentsHelper,
         profileManager: any ProfileManager,
         reachabilityManager: any SSKReachabilityManager,
         recipientDatabaseTable: RecipientDatabaseTable,
-        syncManager: any SyncManagerProtocol,
+        syncManager: any SyncManager,
+        threadStore: any ThreadStore,
         tsAccountManager: any TSAccountManager,
         udManager: any OWSUDManager,
-        versionedProfiles: any VersionedProfiles
+        versionedProfiles: any VersionedProfiles,
     ) {
         self.reachabilityManager = reachabilityManager
         self.tsAccountManager = tsAccountManager
-        self.jobCreator = { serviceId, groupIdContext, mustFetchNewCredential, authedAccount, profileKeyVersion, profileAutoUpdate in
+        self.jobCreator = { serviceId, groupIdContext, mustFetchNewCredential, authedAccount, userProfileWriter, profileKeyVersion, profileAutoUpdate in
             return ProfileFetcherJob(
                 serviceId: serviceId,
                 groupIdContext: groupIdContext,
@@ -134,19 +154,23 @@ public actor ProfileFetcherImpl: ProfileFetcher {
                 accountChecker: accountChecker,
                 db: db,
                 disappearingMessagesConfigurationStore: disappearingMessagesConfigurationStore,
+                groupSendEndorsementStore: groupSendEndorsementStore,
                 identityManager: identityManager,
+                keyTransparencyStore: keyTransparencyStore,
+                localProfileChecker: localProfileChecker,
                 paymentsHelper: paymentsHelper,
                 profileManager: profileManager,
                 recipientDatabaseTable: recipientDatabaseTable,
                 syncManager: syncManager,
+                threadStore: threadStore,
                 tsAccountManager: tsAccountManager,
                 udManager: udManager,
                 versionedProfiles: versionedProfiles,
+                userProfileWriter: userProfileWriter,
                 profileKeyVersion: profileKeyVersion,
                 profileAutoUpdate: profileAutoUpdate,
             )
         }
-        SwiftSingletons.register(self)
     }
 
     private nonisolated func insertFetchState(serviceId: ServiceId) -> FetchState {
@@ -159,7 +183,7 @@ public actor ProfileFetcherImpl: ProfileFetcher {
 
     private nonisolated func finalizeFetchState(
         serviceId: ServiceId,
-        fetchState: FetchState
+        fetchState: FetchState,
     ) {
         self.inProgressFetches.update {
             $0[serviceId, default: []].removeAll(where: { $0 === fetchState })
@@ -172,7 +196,7 @@ public actor ProfileFetcherImpl: ProfileFetcher {
     public nonisolated func fetchProfileSyncImpl(
         for serviceId: ServiceId,
         context: ProfileFetchContext,
-        authedAccount: AuthedAccount
+        authedAccount: AuthedAccount,
     ) -> Task<FetchedProfile, Error> {
         // Insert this before starting the Task to ensure we've denoted the pending
         // fetch before returning control to the caller.
@@ -182,7 +206,7 @@ public actor ProfileFetcherImpl: ProfileFetcher {
                 serviceId: serviceId,
                 fetchState: fetchState,
                 context: context,
-                authedAccount: authedAccount
+                authedAccount: authedAccount,
             )
         }
     }
@@ -190,7 +214,7 @@ public actor ProfileFetcherImpl: ProfileFetcher {
     public func fetchProfileImpl(
         for serviceId: ServiceId,
         context: ProfileFetchContext,
-        authedAccount: AuthedAccount
+        authedAccount: AuthedAccount,
     ) async throws -> FetchedProfile {
         // We're already running concurrently with other code, so no new race
         // conditions are introduced by calling `insertFetchState` inline.
@@ -198,7 +222,7 @@ public actor ProfileFetcherImpl: ProfileFetcher {
             serviceId: serviceId,
             fetchState: insertFetchState(serviceId: serviceId),
             context: context,
-            authedAccount: authedAccount
+            authedAccount: authedAccount,
         )
     }
 
@@ -206,13 +230,13 @@ public actor ProfileFetcherImpl: ProfileFetcher {
         serviceId: ServiceId,
         fetchState: FetchState,
         context: ProfileFetchContext,
-        authedAccount: AuthedAccount
+        authedAccount: AuthedAccount,
     ) async throws -> FetchedProfile {
         let result = await Result {
             try await fetchProfileWithOptions(
                 serviceId: serviceId,
                 context: context,
-                authedAccount: authedAccount
+                authedAccount: authedAccount,
             )
         }
         finalizeFetchState(serviceId: serviceId, fetchState: fetchState)
@@ -222,7 +246,7 @@ public actor ProfileFetcherImpl: ProfileFetcher {
     private func fetchProfileWithOptions(
         serviceId: ServiceId,
         context: ProfileFetchContext,
-        authedAccount: AuthedAccount
+        authedAccount: AuthedAccount,
     ) async throws -> FetchedProfile {
         if context.isOpportunistic {
             if !CurrentAppContext().isMainApp {
@@ -236,15 +260,12 @@ public actor ProfileFetcherImpl: ProfileFetcher {
     private func fetchProfileOpportunistically(
         serviceId: ServiceId,
         context: ProfileFetchContext,
-        authedAccount: AuthedAccount
+        authedAccount: AuthedAccount,
     ) async throws -> FetchedProfile {
         if CurrentAppContext().isRunningTests {
             throw ProfileFetcherError.skippingOpportunisticFetch
         }
         guard shouldOpportunisticallyFetch(serviceId: serviceId) else {
-            throw ProfileFetcherError.skippingOpportunisticFetch
-        }
-        guard isRegisteredOrExplicitlyAuthenticated(authedAccount: authedAccount) else {
             throw ProfileFetcherError.skippingOpportunisticFetch
         }
         // We don't need opportunistic fetches for ourself.
@@ -260,21 +281,20 @@ public actor ProfileFetcherImpl: ProfileFetcher {
         return try await fetchProfileUrgently(serviceId: serviceId, context: context, authedAccount: authedAccount)
     }
 
-    private func isRegisteredOrExplicitlyAuthenticated(authedAccount: AuthedAccount) -> Bool {
-        switch authedAccount.info {
-        case .implicit:
-            return tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered
-        case .explicit:
-            return true
-        }
-    }
-
     private func fetchProfileUrgently(
         serviceId: ServiceId,
         context: ProfileFetchContext,
-        authedAccount: AuthedAccount
+        authedAccount: AuthedAccount,
     ) async throws -> FetchedProfile {
-        let result = await Result { try await jobCreator(serviceId, context.groupId, context.mustFetchNewCredential, authedAccount, context.profileKeyVersion, context.cache).run() }
+        let result = await Result { try await jobCreator(
+            serviceId,
+            context.groupId,
+            context.mustFetchNewCredential,
+            authedAccount,
+            context.userProfileWriter,
+            context.profileKeyVersion,
+            context.cache,
+        ).run() }
         let outcome: FetchResult.Outcome
         do {
             _ = try result.get()

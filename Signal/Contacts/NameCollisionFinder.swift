@@ -18,7 +18,7 @@ public struct NameCollision {
         fileprivate init(
             comparableName: ComparableDisplayName,
             profileNameChange: (oldestProfileName: String, newestProfileName: String)? = nil,
-            latestUpdateTimestamp: UInt64? = nil
+            latestUpdateTimestamp: UInt64? = nil,
         ) {
             self.address = comparableName.address
             self.comparableName = comparableName
@@ -60,11 +60,11 @@ public class ContactThreadNameCollisionFinder: NameCollisionFinder {
     /// Builds a collision finder that will only return collisions if the
     /// target contact thread represents a pending message request.
     public static func makeToCheckMessageRequestNameCollisions(
-        forContactThread contactThread: TSContactThread
+        forContactThread contactThread: TSContactThread,
     ) -> ContactThreadNameCollisionFinder {
         ContactThreadNameCollisionFinder(
             contactThread: contactThread,
-            onlySearchIfMessageRequest: true
+            onlySearchIfMessageRequest: true,
         )
     }
 
@@ -102,7 +102,7 @@ public class ContactThreadNameCollisionFinder: NameCollisionFinder {
         let targetName = ComparableDisplayName(
             address: contactThread.contactAddress,
             displayName: SSKEnvironment.shared.contactManagerRef.displayName(for: contactThread.contactAddress, tx: transaction),
-            config: config
+            config: config,
         )
 
         // If we don't have a name for this person, don't show collisions.
@@ -153,7 +153,7 @@ public class GroupMembershipNameCollisionFinder: NameCollisionFinder {
     }
 
     public func findCollisions(transaction: DBReadTransaction) -> [NameCollision] {
-        guard let updatedThread = TSGroupThread.anyFetchGroupThread(uniqueId: groupThread.uniqueId, transaction: transaction) else {
+        guard let updatedThread = TSGroupThread.fetchGroupThreadViaCache(uniqueId: groupThread.uniqueId, transaction: transaction) else {
             return []
         }
         groupThread = updatedThread
@@ -177,7 +177,7 @@ public class GroupMembershipNameCollisionFinder: NameCollisionFinder {
         // Early-exit to avoid fetching unnecessary profile update messages
         // Move our start search pointer to try and proactively reduce our future interaction search space
         if allCollisions.isEmpty {
-            setRecentProfileUpdateSearchStartIdToMax(transaction: transaction)
+            setRecentProfileUpdateSearchStartIdToMax()
             return []
         }
 
@@ -206,7 +206,7 @@ public class GroupMembershipNameCollisionFinder: NameCollisionFinder {
                     return NameCollision.Element(
                         comparableName: $0,
                         profileNameChange: profileNameChange(profileUpdateMessages: profileUpdateMessages),
-                        latestUpdateTimestamp: newestUpdateMessage?.timestamp
+                        latestUpdateTimestamp: newestUpdateMessage?.timestamp,
                     )
                 })!
             }
@@ -223,7 +223,7 @@ public class GroupMembershipNameCollisionFinder: NameCollisionFinder {
     }
 
     private func profileNameChange(
-        profileUpdateMessages: [TSInfoMessage]?
+        profileUpdateMessages: [TSInfoMessage]?,
     ) -> (oldestProfileName: String, newestProfileName: String)? {
         let oldestUpdateMessage = profileUpdateMessages?.min(by: { $0.sortId < $1.sortId })
         let newestUpdateMessage = profileUpdateMessages?.max(by: { $0.sortId < $1.sortId })
@@ -240,7 +240,10 @@ public class GroupMembershipNameCollisionFinder: NameCollisionFinder {
         lock.withLock {
             if let cachedResults = recentProfileUpdateMessages { return cachedResults }
 
-            let sortId = recentProfileUpdateSearchStartId(transaction: transaction) ?? 0
+            let sortId = GroupMembershipNameCollisionFinderStore().recentProfileUpdateSearchStartId(
+                forThreadUniqueId: groupThread.uniqueId,
+                tx: transaction,
+            ) ?? 0
             let finder = InteractionFinder(threadUniqueId: thread.uniqueId)
 
             // Build a map from (SignalServiceAddress) -> (List of recent profile update messages)
@@ -261,25 +264,18 @@ public class GroupMembershipNameCollisionFinder: NameCollisionFinder {
             let allRecentMessages = recentProfileUpdateMessages?.values.flatMap({ $0 })
             guard let newMaxSortId = allRecentMessages?.max(by: { $0.sortId < $1.sortId })?.sortId else { return }
 
-            setRecentProfileUpdateSearchStartId(newValue: newMaxSortId, transaction: transaction)
+            GroupMembershipNameCollisionFinderStore().setRecentProfileUpdateSearchStartId(
+                newMaxSortId,
+                forThreadUniqueId: groupThread.uniqueId,
+                tx: transaction,
+            )
             recentProfileUpdateMessages?.removeAll()
         }
     }
 
     // MARK: Storage
 
-    private static var keyValueStore = KeyValueStore(collection: "GroupThreadCollisionFinder")
-
-    private func recentProfileUpdateSearchStartId(transaction: DBReadTransaction) -> UInt64? {
-        Self.keyValueStore.getUInt64(groupThread.uniqueId, transaction: transaction)
-    }
-
-    private func setRecentProfileUpdateSearchStartId(newValue: UInt64, transaction: DBWriteTransaction) {
-        let existingValue = recentProfileUpdateSearchStartId(transaction: transaction) ?? 0
-        Self.keyValueStore.setUInt64(max(newValue, existingValue), key: groupThread.uniqueId, transaction: transaction)
-    }
-
-    private func setRecentProfileUpdateSearchStartIdToMax(transaction: DBReadTransaction) {
+    private func setRecentProfileUpdateSearchStartIdToMax() {
         // This is a perf optimization to proactively reduce our search space, so it doesn't need to be exact.
         // `lastInteractionRowId` is the current latest interaction on the thread when we checked for collisions.
         //
@@ -291,9 +287,13 @@ public class GroupMembershipNameCollisionFinder: NameCollisionFinder {
         // on our search space.
         // - In our searchStartId cache, we always set the max(currentValue, newValue). So even if maxInteractionId
         // is unset or invalid, we'll never mistakenly grow our search space by setting the startId to a smaller value.
-        let maxInteractionId = UInt64(thread.lastInteractionRowId)
-        SSKEnvironment.shared.databaseStorageRef.asyncWrite { writeTx in
-            self.setRecentProfileUpdateSearchStartId(newValue: maxInteractionId, transaction: writeTx)
+        let maxInteractionId = thread.lastInteractionRowId
+        SSKEnvironment.shared.databaseStorageRef.asyncWrite { [groupThread] writeTx in
+            GroupMembershipNameCollisionFinderStore().setRecentProfileUpdateSearchStartId(
+                maxInteractionId,
+                forThreadUniqueId: groupThread.uniqueId,
+                tx: writeTx,
+            )
         }
     }
 }
@@ -312,7 +312,7 @@ private extension NameCollision {
                 } else {
                     return (lhs.address.serviceId?.serviceIdString ?? lhs.address.phoneNumber ?? "") < (rhs.address.serviceId?.serviceIdString ?? rhs.address.phoneNumber ?? "")
                 }
-            }
+            },
         )!
     }
 }

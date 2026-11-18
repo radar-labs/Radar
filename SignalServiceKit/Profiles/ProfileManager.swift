@@ -89,15 +89,15 @@ public protocol ProfileManager: ProfileManagerProtocol {
         unsavedRotatedProfileKey: Aes256Key?,
         mustReuploadAvatar: Bool,
         authedAccount: AuthedAccount,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> Promise<Void>
-    
+
     func reuploadLocalProfileWithProfileKeyVersion(
         _ profileKeyVersion: String,
         unsavedRotatedProfileKey: Aes256Key?,
         mustReuploadAvatar: Bool,
         authedAccount: AuthedAccount,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> Promise<Void>
 
     func downloadAndDecryptLocalUserAvatarIfNeeded(authedAccount: AuthedAccount) async throws
@@ -112,7 +112,7 @@ public protocol ProfileManager: ProfileManagerProtocol {
     /// this method will download it twice.
     func downloadAndDecryptAvatar(
         avatarUrlPath: String,
-        profileKey: ProfileKey
+        profileKey: ProfileKey,
     ) async throws -> URL
 
     func updateProfile(
@@ -120,10 +120,17 @@ public protocol ProfileManager: ProfileManagerProtocol {
         decryptedProfile: DecryptedProfile?,
         avatarUrlPath: OptionalChange<String?>,
         avatarFileName: OptionalChange<String?>,
-        profileBadges: [OWSUserProfileBadgeInfo],
+        profileBadgeUserInfos: [OWSUserProfileBadgeInfo],
         lastFetchDate: Date,
         userProfileWriter: UserProfileWriter,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
+    )
+
+    func setHasPaymentAddress(
+        aci: Aci,
+        localIdentifiers: LocalIdentifiers,
+        userProfileWriter: UserProfileWriter,
+        tx: DBWriteTransaction,
     )
 
     func updateLocalProfile(
@@ -137,13 +144,13 @@ public protocol ProfileManager: ProfileManagerProtocol {
         unsavedRotatedProfileKey: Aes256Key?,
         userProfileWriter: UserProfileWriter,
         authedAccount: AuthedAccount,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> Promise<Void>
 
     func didSendOrReceiveMessage(
         serviceId: ServiceId,
         localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 
     func setProfileKeyData(
@@ -154,7 +161,7 @@ public protocol ProfileManager: ProfileManagerProtocol {
         userProfileWriter: UserProfileWriter,
         localIdentifiers: LocalIdentifiers,
         authedAccount: AuthedAccount,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 
     func fillInProfileKeys(
@@ -162,12 +169,11 @@ public protocol ProfileManager: ProfileManagerProtocol {
         authoritativeProfileKeys: [Aci: Data],
         userProfileWriter: UserProfileWriter,
         localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 
     // MARK: -
 
-    func allWhitelistedAddresses(tx: DBReadTransaction) -> [SignalServiceAddress]
     func allWhitelistedRegisteredAddresses(tx: DBReadTransaction) -> [SignalServiceAddress]
 }
 
@@ -175,7 +181,7 @@ extension ProfileManager {
     public func localProfileKey(tx: DBReadTransaction) -> ProfileKey? {
         return localUserProfile(tx: tx)?.profileKey.map(ProfileKey.init(_:))
     }
-    
+
     public func updateLocalProfile(
         profileGivenName: OptionalChange<OWSUserProfile.NameComponent>,
         profileFamilyName: OptionalChange<OWSUserProfile.NameComponent?>,
@@ -186,7 +192,7 @@ extension ProfileManager {
         unsavedRotatedProfileKey: Aes256Key?,
         userProfileWriter: UserProfileWriter,
         authedAccount: AuthedAccount,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> Promise<Void> {
         return updateLocalProfile(
             profileKeyVersion: nil,
@@ -199,7 +205,7 @@ extension ProfileManager {
             unsavedRotatedProfileKey: unsavedRotatedProfileKey,
             userProfileWriter: userProfileWriter,
             authedAccount: authedAccount,
-            tx: tx
+            tx: tx,
         )
     }
 }

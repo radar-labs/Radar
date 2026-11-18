@@ -59,6 +59,7 @@ public class GroupsV2OutgoingChanges {
     private var accessForMembers: GroupV2Access?
     private var accessForAttributes: GroupV2Access?
     private var accessForAddFromInviteLink: GroupV2Access?
+    private var accessForMemberLabels: GroupV2Access?
 
     private enum InviteLinkPasswordMode {
         case ignore
@@ -69,7 +70,7 @@ public class GroupsV2OutgoingChanges {
     private var inviteLinkPasswordMode: InviteLinkPasswordMode?
 
     private var shouldAcceptInvite = false
-    private var shouldLeaveGroupDeclineInvite = false
+    private(set) var shouldLeaveGroupDeclineInvite = false
     private var shouldRevokeInvalidInvites = false
 
     /// Non-nil if the value changed.
@@ -77,10 +78,14 @@ public class GroupsV2OutgoingChanges {
 
     private var shouldUpdateLocalProfileKey = false
 
-    private var newLinkMode: GroupsV2LinkMode?
+    private var newLinkMode: GroupInviteLinkMode?
 
     /// Non-nil if dm state changed.
     private var newDisappearingMessageToken: DisappearingMessageToken?
+
+    private var membersToChangeLabel = [Aci: MemberLabel?]()
+
+    private var shouldTerminateGroup = false
 
     public init(groupSecretParams: GroupSecretParams) {
         self.groupSecretParams = groupSecretParams
@@ -126,6 +131,10 @@ public class GroupsV2OutgoingChanges {
         membersToChangeRole[aci] = role
     }
 
+    public func changeLabelForMember(_ aci: Aci, label: MemberLabel?) {
+        membersToChangeLabel[aci] = label
+    }
+
     public func setLocalShouldAcceptInvite() {
         owsAssertDebug(!shouldAcceptInvite)
         shouldAcceptInvite = true
@@ -146,6 +155,11 @@ public class GroupsV2OutgoingChanges {
         accessForAttributes = value
     }
 
+    public func setAccessForMemberLabels(_ value: GroupV2Access) {
+        owsAssertDebug(accessForMemberLabels == nil)
+        accessForMemberLabels = value
+    }
+
     public func setNewDisappearingMessageToken(_ newDisappearingMessageToken: DisappearingMessageToken) {
         owsAssertDebug(self.newDisappearingMessageToken == nil)
         self.newDisappearingMessageToken = newDisappearingMessageToken
@@ -156,7 +170,7 @@ public class GroupsV2OutgoingChanges {
         shouldRevokeInvalidInvites = true
     }
 
-    public func setLinkMode(_ linkMode: GroupsV2LinkMode) {
+    public func setLinkMode(_ linkMode: GroupInviteLinkMode) {
         owsAssertDebug(accessForAddFromInviteLink == nil)
         owsAssertDebug(inviteLinkPasswordMode == nil)
 
@@ -164,10 +178,8 @@ public class GroupsV2OutgoingChanges {
         case .disabled:
             accessForAddFromInviteLink = .unsatisfiable
             inviteLinkPasswordMode = .ignore
-        case .enabledWithoutApproval, .enabledWithApproval:
-            accessForAddFromInviteLink = (linkMode == .enabledWithoutApproval
-                                            ? .any
-                                            : .administrator)
+        case .enabled(let requireAdminApproval):
+            accessForAddFromInviteLink = requireAdminApproval ? .administrator : .any
             inviteLinkPasswordMode = .ensureValid
         }
     }
@@ -189,6 +201,11 @@ public class GroupsV2OutgoingChanges {
         shouldUpdateLocalProfileKey = true
     }
 
+    public func setShouldTerminateGroup() {
+        owsAssertDebug(!shouldTerminateGroup)
+        shouldTerminateGroup = true
+    }
+
     // MARK: - Change Protos
 
     /// Given the current group state, build a change proto that reflects the
@@ -198,33 +215,32 @@ public class GroupsV2OutgoingChanges {
     public func buildGroupChangeProto(
         currentGroupModel: TSGroupModelV2,
         currentDisappearingMessageToken: DisappearingMessageToken,
-        forceRefreshProfileKeyCredentials: Bool
+        forceRefreshProfileKeyCredentials: Bool,
     ) async throws -> GroupsV2BuiltGroupChange? {
         let groupId = try self.groupSecretParams.getPublicParams().getGroupIdentifier()
         guard groupId.serialize() == currentGroupModel.groupId else {
             throw OWSAssertionError("Mismatched groupId.")
         }
-        guard let localIdentifiers = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction else {
-            throw OWSAssertionError("Missing localIdentifiers.")
-        }
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        let registeredState = try tsAccountManager.registeredStateWithMaybeSneakyTransaction()
 
         // Note that we're calculating the set of users for whom we MIGHT WANT
         // profile key credentials based on the "original intent". We always
         // include our own ACI because non-add operations (e.g., updating our
         // profile key) will require our own profile key credential.
         var newUserAcis: Set<Aci> = Set(membersToAdd.compactMap { $0 as? Aci })
-        newUserAcis.insert(localIdentifiers.aci)
+        newUserAcis.insert(registeredState.localIdentifiers.aci)
 
         let profileKeyCredentials = try await SSKEnvironment.shared.groupsV2Ref.loadProfileKeyCredentials(
             for: Array(newUserAcis),
-            forceRefresh: forceRefreshProfileKeyCredentials
+            forceRefresh: forceRefreshProfileKeyCredentials,
         )
 
         return try self.buildGroupChangeProto(
             currentGroupModel: currentGroupModel,
             currentDisappearingMessageToken: currentDisappearingMessageToken,
-            localIdentifiers: localIdentifiers,
-            profileKeyCredentials: profileKeyCredentials
+            localIdentifiers: registeredState.localIdentifiers,
+            profileKeyCredentials: profileKeyCredentials,
         )
     }
 
@@ -333,19 +349,21 @@ public class GroupsV2OutgoingChanges {
             }
         }
 
-        if let inviteLinkPasswordMode = inviteLinkPasswordMode {
+        if let inviteLinkPasswordMode {
             let newInviteLinkPassword: Data?
             switch inviteLinkPasswordMode {
             case .ignore:
                 newInviteLinkPassword = currentGroupModel.inviteLinkPassword
             case .rotate:
-                newInviteLinkPassword = GroupManager.generateInviteLinkPasswordV2()
+                newInviteLinkPassword = GroupInviteLink.generateInviteLinkPassword()
             case .ensureValid:
-                if let oldInviteLinkPassword = currentGroupModel.inviteLinkPassword,
-                   !oldInviteLinkPassword.isEmpty {
+                if
+                    let oldInviteLinkPassword = currentGroupModel.inviteLinkPassword,
+                    !oldInviteLinkPassword.isEmpty
+                {
                     newInviteLinkPassword = oldInviteLinkPassword
                 } else {
-                    newInviteLinkPassword = GroupManager.generateInviteLinkPasswordV2()
+                    newInviteLinkPassword = GroupInviteLink.generateInviteLinkPassword()
                 }
             }
 
@@ -386,7 +404,7 @@ public class GroupsV2OutgoingChanges {
                     actionBuilder.setAdded(try GroupsV2Protos.buildMemberProto(
                         profileKeyCredential: profileKeyCredential,
                         role: .default,
-                        groupV2Params: groupV2Params
+                        groupV2Params: groupV2Params,
                     ))
                     actionsBuilder.addAddMembers(actionBuilder.buildInfallibly())
                     didChange = true
@@ -401,7 +419,7 @@ public class GroupsV2OutgoingChanges {
                     actionBuilder.setAdded(try GroupsV2Protos.buildPendingMemberProto(
                         serviceId: serviceId,
                         role: .default,
-                        groupV2Params: groupV2Params
+                        groupV2Params: groupV2Params,
                     ))
                     actionsBuilder.addAddPendingMembers(actionBuilder.buildInfallibly())
                     didChange = true
@@ -458,13 +476,13 @@ public class GroupsV2OutgoingChanges {
             // least-recently banned.
             let maxNumBannableIds = RemoteConfig.current.maxGroupSizeBannedMembers
             let netNumIdsToBan = acisToBan.count - acisToUnban.count
-            let nOldMembersToUnban = currentBannedMembers.count + netNumIdsToBan - Int(maxNumBannableIds)
+            let nOldMembersToUnban = currentBannedMembers.count + netNumIdsToBan - Int(clamping: maxNumBannableIds)
 
             if nOldMembersToUnban > 0 {
                 let bannedSortedByAge = currentBannedMembers.sorted { member1, member2 -> Bool in
                     // Lower bannedAt time goes first
                     member1.value < member2.value
-                }.map { (aci, _) -> Aci in aci }
+                }.map { aci, _ -> Aci in aci }
 
                 acisToUnban += bannedSortedByAge.prefix(nOldMembersToUnban)
             }
@@ -518,11 +536,44 @@ public class GroupsV2OutgoingChanges {
                 // We don't treat that as a conflict.
                 continue
             }
-            var actionBuilder = GroupsProtoGroupChangeActionsModifyMemberRoleAction.builder()
+            let userId = try groupV2Params.userId(for: aci)
+            do {
+                var actionBuilder = GroupsProtoGroupChangeActionsModifyMemberRoleAction.builder()
+                actionBuilder.setUserID(userId)
+                actionBuilder.setRole(newRole.asProtoRole)
+                actionsBuilder.addModifyMemberRoles(actionBuilder.buildInfallibly())
+            }
+            if newRole != .administrator, currentGroupModel.access.memberLabels == .administrator {
+                var actionBuilder = GroupsProtoGroupChangeActionsModifyMemberLabelAction.builder()
+                actionBuilder.setUserID(userId)
+                actionsBuilder.addModifyMemberLabel(actionBuilder.buildInfallibly())
+            }
+            didChange = true
+        }
+
+        for (aci, label) in self.membersToChangeLabel {
+            guard currentGroupMembership.isFullMember(aci) else {
+                // User is no longer a member.
+                throw GroupsV2Error.cannotBuildGroupChangeProto_conflictingChange
+            }
+            var actionBuilder = GroupsProtoGroupChangeActionsModifyMemberLabelAction.builder()
             let userId = try groupV2Params.userId(for: aci)
             actionBuilder.setUserID(userId)
-            actionBuilder.setRole(newRole.asProtoRole)
-            actionsBuilder.addModifyMemberRoles(actionBuilder.buildInfallibly())
+
+            if
+                let labelString = label?.label,
+                let encryptedLabelString = try? groupV2Params.encryptMemberLabel(labelString)
+            {
+                actionBuilder.setLabelString(encryptedLabelString)
+            }
+            if
+                let labelEmoji = label?.labelEmoji,
+                let encryptedLabelEmoji = try? groupV2Params.encryptMemberLabelEmoji(labelEmoji)
+            {
+                actionBuilder.setLabelEmoji(encryptedLabelEmoji)
+            }
+
+            actionsBuilder.addModifyMemberLabel(actionBuilder.buildInfallibly())
             didChange = true
         }
 
@@ -547,11 +598,33 @@ public class GroupsV2OutgoingChanges {
                 didChange = true
             }
         }
+        if let access = self.accessForMemberLabels {
+            if currentAccess.memberLabels == access {
+                // Redundant change, not a conflict.
+            } else {
+                var actionBuilder = GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlAction.builder()
+                actionBuilder.setMemberLabelAccess(access.protoAccess)
+                actionsBuilder.setModifyMemberLabelAccess(actionBuilder.buildInfallibly())
+                didChange = true
+
+                if access == .administrator {
+                    for fullMember in currentGroupMembership.fullMembers.compactMap(\.aci) {
+                        if currentGroupMembership.role(for: fullMember) != .administrator {
+                            var actionBuilder = GroupsProtoGroupChangeActionsModifyMemberLabelAction.builder()
+                            actionBuilder.setUserID(try groupV2Params.userId(for: fullMember))
+                            actionsBuilder.addModifyMemberLabel(actionBuilder.buildInfallibly())
+                        }
+                    }
+                }
+            }
+        }
 
         var accessForAddFromInviteLink = self.accessForAddFromInviteLink
-        if currentGroupMembership.allMembersOfAnyKind.count == 1 &&
-            currentGroupMembership.isFullMemberAndAdministrator(localAci) &&
-            self.shouldLeaveGroupDeclineInvite {
+        if
+            currentGroupMembership.allMembersOfAnyKind.count == 1,
+            currentGroupMembership.isFullMemberAndAdministrator(localAci),
+            self.shouldLeaveGroupDeclineInvite
+        {
             // If we're the last admin to leave the group,
             // disable the group invite link.
             accessForAddFromInviteLink = .unsatisfiable
@@ -575,7 +648,7 @@ public class GroupsV2OutgoingChanges {
 
             let profileKeyCredentialPresentationData = try GroupsV2Protos.presentationData(
                 profileKeyCredential: localProfileKeyCredential,
-                groupV2Params: groupV2Params
+                groupV2Params: groupV2Params,
             )
 
             // Accepting an invite to our ACI uses a different change action
@@ -585,7 +658,9 @@ public class GroupsV2OutgoingChanges {
             var promotedLocalAci: Bool
             let isLocalInvitedByAci = currentGroupMembership.isInvitedMember(localAci)
             let isLocalInvitedByPni = {
-                guard let localPni = localIdentifiers.pni else { return false }
+                guard let localPni = localIdentifiers.pni else {
+                    return false
+                }
                 return currentGroupMembership.isInvitedMember(localPni)
             }()
 
@@ -622,9 +697,11 @@ public class GroupsV2OutgoingChanges {
 
         if self.shouldLeaveGroupDeclineInvite {
             // Check that we are still invited or in group.
-            if let invitedAtServiceId = currentGroupMembership.localUserInvitedAtServiceId(
-                localIdentifiers: localIdentifiers
-            ) {
+            if
+                let invitedAtServiceId = currentGroupMembership.localUserInvitedAtServiceId(
+                    localIdentifiers: localIdentifiers,
+                )
+            {
                 if invitedAtServiceId == localIdentifiers.pni {
                     // If we are declining an invite to our PNI, we should not send group
                     // update messages. Messages cannot come from our PNI, so we would be
@@ -678,9 +755,16 @@ public class GroupsV2OutgoingChanges {
                 throw OWSAssertionError("Missing profile key credential: \(localAci)")
             }
             var actionBuilder = GroupsProtoGroupChangeActionsModifyMemberProfileKeyAction.builder()
-            actionBuilder.setPresentation(try GroupsV2Protos.presentationData(profileKeyCredential: profileKeyCredential,
-                                                                              groupV2Params: groupV2Params))
+            actionBuilder.setPresentation(try GroupsV2Protos.presentationData(
+                profileKeyCredential: profileKeyCredential,
+                groupV2Params: groupV2Params,
+            ))
             actionsBuilder.addModifyMemberProfileKeys(actionBuilder.buildInfallibly())
+            didChange = true
+        }
+
+        if shouldTerminateGroup {
+            actionsBuilder.setTerminateGroup(GroupsProtoGroupChangeActionsTerminateGroupAction.builder().buildInfallibly())
             didChange = true
         }
 
@@ -693,7 +777,7 @@ public class GroupsV2OutgoingChanges {
         Logger.info("Updating group.")
         return GroupsV2BuiltGroupChange(
             proto: actionsBuilder.buildInfallibly(),
-            groupUpdateMessageBehavior: groupUpdateMessageBehavior
+            groupUpdateMessageBehavior: groupUpdateMessageBehavior,
         )
     }
 }

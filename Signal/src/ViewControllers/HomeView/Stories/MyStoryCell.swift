@@ -4,9 +4,9 @@
 //
 
 import Foundation
-import UIKit
 import SignalServiceKit
 import SignalUI
+import UIKit
 
 class MyStoryCell: UITableViewCell {
     static let reuseIdentifier = "MyStoryCell"
@@ -17,23 +17,27 @@ class MyStoryCell: UITableViewCell {
         label.textColor = .Signal.label
         return label
     }()
+
     private let titleChevron: UIImageView = {
         let imageView = UIImageView()
         imageView.tintColor = .Signal.label
         return imageView
     }()
+
     private let subtitleLabel: UILabel = {
         let label = UILabel()
         label.font = .dynamicTypeSubheadline
         label.textColor = .Signal.secondaryLabel
         return label
     }()
+
     private let avatarView = ConversationAvatarView(sizeClass: .fiftySix, localUserDisplayMode: .asUser, badged: false, useAutolayout: true)
     private let attachmentThumbnail = UIView()
 
     private let failedIconView = UIImageView(image: Theme.iconImage(.error16))
 
-    private let addStoryButton = OWSButton()
+    private static let addStoryButtonActionIdentifier = UIAction.Identifier("MyStoryCell.AddStory")
+    private let addStoryButton = UIButton(configuration: .plain())
     private let plusIcon = PlusIconView()
 
     private let contentHStackView = UIStackView()
@@ -46,7 +50,7 @@ class MyStoryCell: UITableViewCell {
 
         titleLabel.text = OWSLocalizedString("MY_STORIES_TITLE", comment: "Title for the 'My Stories' view")
 
-        titleChevron.image = UIImage(imageLiteralResourceName: "chevron-right-20")
+        titleChevron.image = UIImage(resource: .chevronRight20)
 
         let titleStack = UIStackView(arrangedSubviews: [titleLabel, titleChevron])
         titleStack.axis = .horizontal
@@ -55,7 +59,7 @@ class MyStoryCell: UITableViewCell {
 
         failedIconView.autoSetDimension(.width, toSize: 16)
         failedIconView.contentMode = .scaleAspectFit
-        failedIconView.tintColor = .ows_accentRed
+        failedIconView.tintColor = .Signal.red
 
         let subtitleStack = UIStackView(arrangedSubviews: [failedIconView, subtitleLabel])
         subtitleStack.axis = .horizontal
@@ -66,14 +70,26 @@ class MyStoryCell: UITableViewCell {
         vStack.axis = .vertical
         vStack.alignment = .leading
 
-        addStoryButton.addSubview(avatarView)
-        avatarView.autoPinEdgesToSuperviewEdges()
+        let addStoryButtonSize = avatarView.intrinsicContentSize
+        let addStoryButtonBackground = UIView.container()
+        avatarView.translatesAutoresizingMaskIntoConstraints = false
+        addStoryButtonBackground.addSubview(avatarView)
+        plusIcon.translatesAutoresizingMaskIntoConstraints = false
+        addStoryButtonBackground.addSubview(plusIcon)
+        NSLayoutConstraint.activate([
+            addStoryButton.widthAnchor.constraint(equalToConstant: addStoryButtonSize.width),
+            addStoryButton.heightAnchor.constraint(equalToConstant: addStoryButtonSize.height),
 
-        plusIcon.isUserInteractionEnabled = false
+            avatarView.topAnchor.constraint(equalTo: addStoryButtonBackground.topAnchor),
+            avatarView.leadingAnchor.constraint(equalTo: addStoryButtonBackground.leadingAnchor),
+            avatarView.trailingAnchor.constraint(equalTo: addStoryButtonBackground.trailingAnchor),
+            avatarView.bottomAnchor.constraint(equalTo: addStoryButtonBackground.bottomAnchor),
 
-        addStoryButton.addSubview(plusIcon)
-        plusIcon.autoPinEdge(toSuperviewEdge: .trailing, withInset: -3)
-        plusIcon.autoPinEdge(toSuperviewEdge: .bottom, withInset: -3)
+            plusIcon.trailingAnchor.constraint(equalTo: addStoryButtonBackground.trailingAnchor, constant: 3),
+            plusIcon.bottomAnchor.constraint(equalTo: addStoryButtonBackground.bottomAnchor, constant: 3),
+        ])
+        addStoryButton.configuration?.background.cornerRadius = 0
+        addStoryButton.configuration?.background.customView = addStoryButtonBackground
 
         contentHStackView.addArrangedSubviews([addStoryButton, vStack, .hStretchingSpacer(), attachmentThumbnail])
         contentHStackView.axis = .horizontal
@@ -93,13 +109,13 @@ class MyStoryCell: UITableViewCell {
     override func updateConfiguration(using state: UICellConfigurationState) {
         var configuration = UIBackgroundConfiguration.clear()
         if state.isSelected || state.isHighlighted {
-            configuration.backgroundColor = Theme.tableCell2SelectedBackgroundColor
+            configuration.backgroundColor = OWSTableViewController2.cellSelectedBackgroundColor
             if useSidebarAppearance {
                 configuration.cornerRadius = 24
             }
         } else {
             configuration.backgroundColor = .Signal.background
-       }
+        }
         backgroundConfiguration = configuration
 
         attachmentThumbnailDividerView?.backgroundColor = configuration.backgroundColor
@@ -108,21 +124,26 @@ class MyStoryCell: UITableViewCell {
 
     private var attachmentThumbnailDividerView: UIView?
 
-    private var latestMessageRevealedSpoilerIds: Set<StyleIdType>?
+    private var latestMessageRevealedSpoilerIds: Set<StyleId>?
     private var latestMessageAttachment: StoryThumbnailView.Attachment?
-    private var secondLatestMessageRevealedSpoilerIds: Set<StyleIdType>?
+    private var secondLatestMessageRevealedSpoilerIds: Set<StyleId>?
     private var secondLatestMessageAttachment: StoryThumbnailView.Attachment?
 
     func configure(
         with model: MyStoryViewModel,
         spoilerState: SpoilerRenderState,
-        addStoryAction: @escaping () -> Void
+        addStoryAction: @escaping () -> Void,
     ) {
         configureSubtitle(with: model)
 
         titleChevron.isHiddenInStackView = model.messages.isEmpty
 
-        addStoryButton.block = addStoryAction
+        addStoryButton.addAction(
+            UIAction(identifier: Self.addStoryButtonActionIdentifier) { _ in
+                addStoryAction()
+            },
+            for: .primaryActionTriggered,
+        )
 
         avatarView.updateWithSneakyTransactionIfNecessary { config in
             config.dataSource = .address(DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction!.aciAddress)
@@ -131,17 +152,19 @@ class MyStoryCell: UITableViewCell {
             config.usePlaceholderImages()
         }
 
-        let latestMessageRevealedSpoilerIds: Set<StyleIdType> = model.latestMessageIdentifier.map(
-            spoilerState.revealState.revealedSpoilerIds(interactionIdentifier:)
+        let latestMessageRevealedSpoilerIds: Set<StyleId> = model.latestMessageIdentifier.map(
+            spoilerState.revealState.revealedSpoilerIds(interactionIdentifier:),
         ) ?? Set()
-        let secondLatestMessageRevealedSpoilerIds: Set<StyleIdType> = model.secondLatestMessageIdentifier.map(
-            spoilerState.revealState.revealedSpoilerIds(interactionIdentifier:)
+        let secondLatestMessageRevealedSpoilerIds: Set<StyleId> = model.secondLatestMessageIdentifier.map(
+            spoilerState.revealState.revealedSpoilerIds(interactionIdentifier:),
         ) ?? Set()
 
-        if self.latestMessageAttachment != model.latestMessageAttachment ||
+        if
+            self.latestMessageAttachment != model.latestMessageAttachment ||
             self.secondLatestMessageAttachment != model.secondLatestMessageAttachment ||
             self.latestMessageRevealedSpoilerIds != latestMessageRevealedSpoilerIds ||
-            self.secondLatestMessageRevealedSpoilerIds != secondLatestMessageRevealedSpoilerIds {
+            self.secondLatestMessageRevealedSpoilerIds != secondLatestMessageRevealedSpoilerIds
+        {
             self.latestMessageAttachment = model.latestMessageAttachment
             self.secondLatestMessageAttachment = model.secondLatestMessageAttachment
             self.latestMessageRevealedSpoilerIds = latestMessageRevealedSpoilerIds
@@ -156,7 +179,7 @@ class MyStoryCell: UITableViewCell {
                 let latestThumbnailView = StoryThumbnailView(
                     attachment: latestMessageAttachment,
                     interactionIdentifier: latestMessageIdentifier,
-                    spoilerState: spoilerState
+                    spoilerState: spoilerState,
                 )
                 attachmentThumbnail.addSubview(latestThumbnailView)
                 latestThumbnailView.autoPinHeightToSuperview()
@@ -170,7 +193,7 @@ class MyStoryCell: UITableViewCell {
                     let secondLatestThumbnailView = StoryThumbnailView(
                         attachment: secondLatestMessageAttachment,
                         interactionIdentifier: secondLatestMessageIdentifier,
-                        spoilerState: spoilerState
+                        spoilerState: spoilerState,
                     )
                     secondLatestThumbnailView.layer.cornerRadius = 6
                     secondLatestThumbnailView.transform = .init(rotationAngle: (CurrentAppContext().isRTL ? 1 : -1) * 0.18168878)
@@ -244,7 +267,7 @@ class MyStoryCell: UITableViewCell {
             iconView.autoSetDimensions(to: .square(20))
             iconView.layer.cornerRadius = 10
             iconView.autoCenterInSuperview()
-            iconView.backgroundColor = .ows_accentBlue
+            iconView.backgroundColor = .Signal.accent
 
             // NOTE: gets written over by the cell's theme application.
             outerCircle.backgroundColor = .Signal.background

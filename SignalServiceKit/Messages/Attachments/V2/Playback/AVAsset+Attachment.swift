@@ -9,13 +9,13 @@ import Foundation
 extension AVAsset {
 
     public static func from(
-        _ attachment: AttachmentStream
+        _ attachmentStream: AttachmentStream,
     ) throws -> AVAsset {
         return try .fromEncryptedFile(
-            at: attachment.fileURL,
-            attachmentKey: AttachmentKey(combinedKey: attachment.attachment.encryptionKey),
-            plaintextLength: attachment.info.unencryptedByteCount,
-            mimeType: attachment.mimeType
+            at: attachmentStream.fileURL,
+            attachmentKey: AttachmentKey(combinedKey: attachmentStream.attachment.encryptionKey),
+            plaintextLength: attachmentStream.unencryptedByteCount,
+            mimeType: attachmentStream.mimeType,
         )
     }
 
@@ -23,14 +23,14 @@ extension AVAsset {
         at fileURL: URL,
         attachmentKey: AttachmentKey,
         plaintextLength: UInt32,
-        mimeType: String
+        mimeType: String,
     ) throws -> AVAsset {
         func createAsset(mimeTypeOverride: String? = nil) throws -> AVAsset {
             return try AVAsset._fromEncryptedFile(
                 at: fileURL,
                 attachmentKey: attachmentKey,
                 plaintextLength: plaintextLength,
-                mimeType: mimeTypeOverride ?? mimeType
+                mimeType: mimeTypeOverride ?? mimeType,
             )
         }
 
@@ -53,7 +53,7 @@ extension AVAsset {
         at fileURL: URL,
         attachmentKey: AttachmentKey,
         plaintextLength: UInt32,
-        mimeType: String
+        mimeType: String,
     ) throws -> AVAsset {
         let fileHandle = try Cryptography.encryptedAttachmentFileHandle(
             at: fileURL,
@@ -67,19 +67,31 @@ extension AVAsset {
 
         let resourceLoader = EncryptedFileResourceLoader(
             utiType: utiType,
-            fileHandle: fileHandle
+            fileHandle: fileHandle,
         )
 
-        // AVAsset cares about the file extension. It shouldn't, but it does.
-        // If we can map the mime type to a file extension, do so for the
-        // url we give the AVAsset so it reads things correctly.
+        // Prioritize audio extensions; note these mappings differ from the generic
+        // "fileExtensionForMimeType" because reasons.
+        let mimeTypeExtensionOverride: [String: String] = [
+            "audio/3gpp": "3gp",
+            "audio/3gpp2": "3g2",
+            "audio/aac": "m4a",
+            "audio/mp3": "mp3",
+            "audio/mp4": "mp4",
+            "audio/x-m4a": "m4a",
+            "audio/x-m4b": "m4b",
+            "audio/x-m4p": "m4p",
+            "audio/x-mp3": "mp3",
+            "audio/x-mpeg": "mp3",
+            "audio/x-mpeg3": "mp3",
+        ]
+
+        // AVAsset cares about the file extension. It shouldn't, but it does. If we
+        // can map the mime type to a file extension, do so for the url we give the
+        // AVAsset so it reads things correctly.
+        let pathExtension = mimeTypeExtensionOverride[mimeType] ?? MimeTypeUtil.fileExtensionForMimeType(mimeType)
         let fileURLWithFakeExtension: URL
-        if
-            let pathExtension =
-                // Prioritize audio extensions; note these mappings differ from the
-                // generic "fileExtensionForMimeType" because reasons.
-                MimeTypeUtil.getSupportedExtensionFromAudioMimeType(mimeType)
-                ?? MimeTypeUtil.fileExtensionForMimeType(mimeType) {
+        if let pathExtension {
             fileURLWithFakeExtension = fileURL.appendingPathExtension(pathExtension)
         } else {
             fileURLWithFakeExtension = fileURL
@@ -116,7 +128,7 @@ extension AVAsset {
 
         func resourceLoader(
             _ resourceLoader: AVAssetResourceLoader,
-            shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest
+            shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest,
         ) -> Bool {
             if let _ = loadingRequest.contentInformationRequest {
                 return handleContentInfoRequest(for: loadingRequest)
@@ -189,7 +201,7 @@ private extension URL {
         guard
             var components = URLComponents(
                 url: self,
-                resolvingAgainstBaseURL: false
+                resolvingAgainstBaseURL: false,
             ),
             let scheme = components.scheme
         else {

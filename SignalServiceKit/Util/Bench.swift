@@ -4,6 +4,23 @@
 //
 
 import Foundation
+import QuartzCore
+
+public struct TimedResult<T, E: Error> {
+    let value: Result<T, E>
+    let duration: CFTimeInterval
+
+    var formattedDuration: String {
+        return String(format: "%0.2fms", duration * 1000)
+    }
+}
+
+public func withDuration<T, E: Error>(of block: () throws(E) -> T) -> TimedResult<T, E> {
+    let startTime = CACurrentMediaTime()
+    let result = Result(catching: block)
+    let endTime = CACurrentMediaTime()
+    return TimedResult(value: result, duration: endTime - startTime)
+}
 
 /// Benchmark time for async code by calling the passed in block parameter when the work
 /// is done.
@@ -48,26 +65,22 @@ private func BenchAsync(title: String, logInProduction: Bool = false, block: (@e
 ///        }
 ///    }
 ///
-public func Bench<T>(
+public func Bench<T, E: Error>(
     title: String,
     logIfLongerThan intervalLimit: TimeInterval = 0,
     logInProduction: Bool = false,
-    block: () throws -> T
-) rethrows -> T {
-    let startTime = CACurrentMediaTime()
-    let value = try block()
-    let timeElapsed = CACurrentMediaTime() - startTime
-
-    if timeElapsed > intervalLimit {
-        let formattedTime = String(format: "%0.2fms", timeElapsed * 1000)
-        let logMessage = "[Bench] title: \(title), duration: \(formattedTime)"
+    block: () throws(E) -> T,
+) throws(E) -> T {
+    let result = withDuration(of: block)
+    if result.duration > intervalLimit {
+        let logMessage = "[Bench] title: \(title), duration: \(result.formattedDuration)"
         if logInProduction {
             Logger.info(logMessage)
         } else {
             Logger.debug(logMessage)
         }
     }
-    return value
+    return try result.value.get()
 }
 
 public protocol MemorySampler {
@@ -105,12 +118,12 @@ public func BenchMemory<T>(
     title: String,
     memorySamplerRatio: Float,
     logInProduction: Bool = false,
-    block: (MemorySampler) throws -> T
+    block: (MemorySampler) throws -> T,
 ) rethrows -> T {
     let memoryBencher = MemoryBencher(
         title: title,
         logInProduction: logInProduction,
-        sampleRatio: memorySamplerRatio
+        sampleRatio: memorySamplerRatio,
     )
     let value = try block(memoryBencher)
     memoryBencher.complete()
@@ -192,10 +205,10 @@ private class MemoryBencher: MemorySampler {
     @usableFromInline var maxSize: mach_vm_size_t?
     @usableFromInline var initialSize: mach_vm_size_t?
 
-    public init(
+    init(
         title: String,
         logInProduction: Bool,
-        sampleRatio: Float
+        sampleRatio: Float,
     ) {
         self.title = title
         self.logInProduction = logInProduction
@@ -211,13 +224,13 @@ private class MemoryBencher: MemorySampler {
         self.maxSize = currentSize
     }
 
-    public func complete() {
+    func complete() {
         sample()
         reportMemoryGrowth()
     }
 
     @inlinable
-    public func sample() {
+    func sample() {
         guard
             sampleRatio > 0,
             Bool.trueWithProbability(ratio: sampleRatio)
@@ -226,7 +239,7 @@ private class MemoryBencher: MemorySampler {
         }
 
         if let currentSize = residentMemorySize() {
-            guard let maxSize = maxSize else {
+            guard let maxSize else {
                 // Because the first thing we do in this method is set maxMemoryFootprint, this
                 // shouldn't happen, but `residentMemorySize` _can_ fail and we don't want
                 // a failure to measure memory to interfere with running the `block`.
@@ -240,10 +253,12 @@ private class MemoryBencher: MemorySampler {
 
     @usableFromInline
     func reportMemoryGrowth() {
-        guard let initialSize = initialSize,
-            let maxSize = maxSize else {
-                owsFailDebug("counts were unexpectedly nil")
-                return
+        guard
+            let initialSize,
+            let maxSize
+        else {
+            owsFailDebug("counts were unexpectedly nil")
+            return
         }
 
         let initialBytes = byteFormatter.string(fromByteCount: Int64(initialSize))
@@ -261,15 +276,17 @@ private class MemoryBencher: MemorySampler {
     @usableFromInline
     func residentMemorySize() -> mach_vm_size_t? {
         var info = mach_task_basic_info()
-        let MACH_TASK_BASIC_INFO_COUNT = MemoryLayout<mach_task_basic_info>.stride/MemoryLayout<natural_t>.stride
+        let MACH_TASK_BASIC_INFO_COUNT = MemoryLayout<mach_task_basic_info>.stride / MemoryLayout<natural_t>.stride
         var count = mach_msg_type_number_t(MACH_TASK_BASIC_INFO_COUNT)
 
         let kerr: kern_return_t = withUnsafeMutablePointer(to: &info) {
             $0.withMemoryRebound(to: integer_t.self, capacity: MACH_TASK_BASIC_INFO_COUNT) {
-                task_info(mach_task_self_,
-                          task_flavor_t(MACH_TASK_BASIC_INFO),
-                          $0,
-                          &count)
+                task_info(
+                    mach_task_self_,
+                    task_flavor_t(MACH_TASK_BASIC_INFO),
+                    $0,
+                    &count,
+                )
             }
         }
 

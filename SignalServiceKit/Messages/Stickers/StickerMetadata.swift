@@ -11,7 +11,7 @@ public enum StickerType {
     case gif
 
     public static func stickerType(forContentType contentType: String?) -> StickerType {
-        if let contentType = contentType {
+        if let contentType {
             switch contentType {
             case MimeType.imageWebp.rawValue:
                 return .webp
@@ -98,6 +98,11 @@ extension StickerMetadata {
     }
 }
 
+/// Deprecated.
+///
+/// Kept around to support legacy stickers. New callers that need plaintext sticker data
+/// should use TransientStickerMetadata instead, which keeps sticker data in memory instead
+/// of referencing temporary files on disk.
 public class DecryptedStickerMetadata: StickerMetadata {
 
     public let stickerInfo: StickerInfo
@@ -109,7 +114,7 @@ public class DecryptedStickerMetadata: StickerMetadata {
         stickerInfo: StickerInfo,
         stickerType: StickerType,
         stickerDataUrl: URL,
-        emojiString: String?
+        emojiString: String?,
     ) {
         self.stickerInfo = stickerInfo
         self.stickerType = stickerType
@@ -122,10 +127,10 @@ public class DecryptedStickerMetadata: StickerMetadata {
     }
 
     public func readStickerData() throws -> Data {
-        return try Data(contentsOf: stickerDataUrl)
+        return try Data(contentsOf: stickerDataUrl, options: [.mappedIfSafe])
     }
 
-    public static func == (lhs: DecryptedStickerMetadata, rhs: DecryptedStickerMetadata) -> Bool {
+    public static func ==(lhs: DecryptedStickerMetadata, rhs: DecryptedStickerMetadata) -> Bool {
         return lhs.stickerInfo.asKey() == rhs.stickerInfo.asKey()
     }
 
@@ -150,7 +155,7 @@ public class EncryptedStickerMetadata: StickerMetadata {
         emojiString: String?,
         encryptedStickerDataUrl: URL,
         encryptionKey: Data,
-        plaintextLength: UInt32
+        plaintextLength: UInt32,
     ) {
         self.stickerInfo = stickerInfo
         self.stickerType = stickerType
@@ -171,11 +176,11 @@ public class EncryptedStickerMetadata: StickerMetadata {
             metadata: DecryptionMetadata(
                 key: AttachmentKey(combinedKey: encryptionKey),
                 plaintextLength: UInt64(safeCast: plaintextLength),
-            )
+            ),
         )
     }
 
-    public static func == (lhs: EncryptedStickerMetadata, rhs: EncryptedStickerMetadata) -> Bool {
+    public static func ==(lhs: EncryptedStickerMetadata, rhs: EncryptedStickerMetadata) -> Bool {
         return lhs.stickerInfo.asKey() == rhs.stickerInfo.asKey()
     }
 
@@ -184,21 +189,37 @@ public class EncryptedStickerMetadata: StickerMetadata {
     }
 }
 
-extension EncryptedStickerMetadata {
+public class TransientStickerMetadata: StickerMetadata {
+    public let stickerInfo: StickerInfo
+    public let stickerType: StickerType
+    public let emojiString: String?
+    public let stickerData: Data
 
-    public static func from(
-        attachment: AttachmentStream,
+    public init(
         stickerInfo: StickerInfo,
         stickerType: StickerType,
-        emojiString: String?
-    ) -> EncryptedStickerMetadata {
-        return .init(
-            stickerInfo: stickerInfo,
-            stickerType: stickerType,
-            emojiString: emojiString,
-            encryptedStickerDataUrl: attachment.fileURL,
-            encryptionKey: attachment.attachment.encryptionKey,
-            plaintextLength: attachment.info.unencryptedByteCount
-        )
+        emojiString: String?,
+        stickerData: Data,
+    ) {
+        self.stickerInfo = stickerInfo
+        self.stickerType = stickerType
+        self.emojiString = emojiString
+        self.stickerData = stickerData
+    }
+
+    public func isValidImage() -> Bool {
+        return DataImageSource(stickerData).ows_isValidImage
+    }
+
+    public func readStickerData() throws -> Data {
+        return stickerData
+    }
+
+    public static func ==(lhs: TransientStickerMetadata, rhs: TransientStickerMetadata) -> Bool {
+        return lhs.stickerInfo.asKey() == rhs.stickerInfo.asKey()
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(stickerInfo.asKey().hashValue)
     }
 }

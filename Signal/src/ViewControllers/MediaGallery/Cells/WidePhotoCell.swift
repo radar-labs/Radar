@@ -20,26 +20,26 @@ class WidePhotoCell: MediaTileListModeCell {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
+        label.textColor = .Signal.label
         label.font = .dynamicTypeSubheadlineClamped
         label.adjustsFontForContentSizeCategory = true
         label.setCompressionResistanceVerticalHigh()
-        label.textColor = UIColor(dynamicProvider: { _ in Theme.primaryTextColor })
         return label
     }()
 
     private let subtitleLabel: UILabel = {
         let label = UILabel()
+        label.textColor = .Signal.secondaryLabel
         label.font = .dynamicTypeFootnoteClamped
         label.adjustsFontForContentSizeCategory = true
         label.setCompressionResistanceVerticalHigh()
-        label.textColor = UIColor(dynamicProvider: { _ in Theme.secondaryTextAndIconColor })
         return label
     }()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        contentView.backgroundColor = UIColor(dynamicProvider: { _ in Theme.tableCell2PresentedBackgroundColor })
+        contentView.backgroundColor = .Signal.tertiaryBackground
 
         setupViews()
     }
@@ -49,12 +49,12 @@ class WidePhotoCell: MediaTileListModeCell {
     }
 
     private func setupViews() {
-        let vStack = UIStackView(arrangedSubviews: [ titleLabel, subtitleLabel ])
+        let vStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
         vStack.alignment = .leading
         vStack.axis = .vertical
         vStack.spacing = 2
 
-        let hStack = UIStackView(arrangedSubviews: [ thumbnailView, vStack ])
+        let hStack = UIStackView(arrangedSubviews: [thumbnailView, vStack])
         hStack.alignment = .center
         hStack.axis = .horizontal
         hStack.spacing = 12
@@ -67,11 +67,43 @@ class WidePhotoCell: MediaTileListModeCell {
 
         separator.autoPinEdge(.leading, to: .leading, of: vStack)
 
-        super.setupViews(constraintWithSelectionButton: constraintWithSelectionButton,
-                         constraintWithoutSelectionButton: constraintWithoutSelectionButton)
+        super.setupViews(
+            constraintWithSelectionButton: constraintWithSelectionButton,
+            constraintWithoutSelectionButton: constraintWithoutSelectionButton,
+        )
     }
 
-    override public func prepareForReuse() {
+    private lazy var tapGestureRecognizer: UITapGestureRecognizer = {
+        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTapGesture))
+        gestureRecognizer.delegate = self
+        return gestureRecognizer
+    }()
+
+    @objc
+    private func handleTapGesture(_ sender: UITapGestureRecognizer) {
+        let galleryItem: MediaGalleryItem
+        switch item {
+        case .photoVideo(let photoGridItem):
+            galleryItem = photoGridItem.galleryItem
+        case .audio, .otherFile, .none:
+            return
+        }
+
+        guard galleryItem.referencedAttachment.asReferencedStream == nil else {
+            return
+        }
+
+        if
+            let downloadTask,
+            !downloadTask.isCancelled
+        {
+            downloadTask.cancel()
+        } else {
+            downloadItemIfNeeded()
+        }
+    }
+
+    override func prepareForReuse() {
         super.prepareForReuse()
 
         thumbnailView.image = nil
@@ -83,25 +115,37 @@ class WidePhotoCell: MediaTileListModeCell {
         if let item {
             accessibilityLabel = [
                 item.type.localizedString,
-                MediaTileDateFormatter.formattedDateString(for: item.mediaMetadata?.creationDate)
+                MediaTileDateFormatter.formattedDateString(for: item.mediaMetadata?.creationDate),
             ]
-                .compactMap { $0 }
-                .joined(separator: ", ")
+            .compactMap { $0 }
+            .joined(separator: ", ")
         } else {
             accessibilityLabel = ""
         }
     }
 
-    override public func makePlaceholder() {
+    override func makePlaceholder() {
         thumbnailView.image = nil
         setUpAccessibility(item: nil)
     }
 
-    override public func configure(item: MediaGalleryCellItem, spoilerState: SpoilerRenderState) {
+    override func configure(item: MediaGalleryCellItem, spoilerState: SpoilerRenderState) {
         switch item {
         case .photoVideo(let photoGridItem):
             super.configure(item: item, spoilerState: spoilerState)
             configure(photoGridItem)
+
+            if
+                photoGridItem.galleryItem.referencedAttachment.asReferencedStream == nil,
+                photoGridItem.galleryItem.referencedAttachment.asReferencedBackupThumbnail == nil,
+                let pointer = photoGridItem.galleryItem.referencedAttachment.asReferencedAnyPointer
+            {
+                let progressView = MediaGallery.addDownloadProgressView(
+                    attachmentPointer: pointer.attachmentPointer,
+                    toView: thumbnailView,
+                )
+                progressView.addGestureRecognizer(tapGestureRecognizer)
+            }
         default:
             owsFail("Unexpected item type \(item)")
         }
@@ -154,14 +198,17 @@ class WidePhotoCell: MediaTileListModeCell {
     }
 
     override func mediaPresentationContext(collectionView: UICollectionView, in coordinateSpace: UICoordinateSpace) -> MediaPresentationContext? {
-
         let presentationFrame = coordinateSpace.convert(thumbnailView.imageView.frame, from: thumbnailView)
-        let clippingAreaInsets = UIEdgeInsets(top: collectionView.adjustedContentInset.top, leading: 0, bottom: 0, trailing: 0)
-
+        let clippingAreaInsets = UIEdgeInsets(
+            top: collectionView.adjustedContentInset.top,
+            leading: 0,
+            bottom: collectionView.adjustedContentInset.bottom,
+            trailing: 0,
+        )
         return MediaPresentationContext(
             mediaView: thumbnailView.imageView,
             presentationFrame: presentationFrame,
-            clippingAreaInsets: clippingAreaInsets
+            clippingAreaInsets: clippingAreaInsets,
         )
     }
 
@@ -211,8 +258,23 @@ class WidePhotoCell: MediaTileListModeCell {
                 x: 0.5 * (bounds.width - thumbnailSize.width),
                 y: 0.5 * (bounds.height - thumbnailSize.height),
                 width: thumbnailSize.width,
-                height: thumbnailSize.height
+                height: thumbnailSize.height,
             )
+        }
+    }
+}
+
+extension WidePhotoCell: UIGestureRecognizerDelegate {
+
+    override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard !allowsMultipleSelection else {
+            return false
+        }
+        switch item {
+        case .photoVideo(let photoGridItem):
+            return photoGridItem.galleryItem.referencedAttachment.asReferencedStream == nil
+        default:
+            return false
         }
     }
 }

@@ -9,7 +9,7 @@ public import LibSignalClient
 
 /// A record of incomplete payments activation requests.
 /// When we activate payments, we use these to find the senders that requested we
-/// activate, so we can send them a ``OWSPaymentActivationRequestFinishedMessage``,
+/// activate, so we can send them an ``OutgoingPaymentActivationRequestFinishedMessage``,
 /// then we delete these models.
 public struct TSPaymentsActivationRequestModel: Codable, FetchableRecord, PersistableRecord {
     public static let databaseTableName: String = "TSPaymentsActivationRequestModel"
@@ -18,13 +18,13 @@ public struct TSPaymentsActivationRequestModel: Codable, FetchableRecord, Persis
     public let threadUniqueId: String
     public let senderAci: Aci
 
-    mutating public func didInsert(with rowID: Int64, for column: String?) {
+    public mutating func didInsert(with rowID: Int64, for column: String?) {
         id = rowID
     }
 
     public init(
         threadUniqueId: String,
-        senderAci: Aci
+        senderAci: Aci,
     ) {
         self.threadUniqueId = threadUniqueId
         self.senderAci = senderAci
@@ -54,7 +54,7 @@ public struct TSPaymentsActivationRequestModel: Codable, FetchableRecord, Persis
     public static func createIfNotExists(
         threadUniqueId: String,
         senderAci: Aci,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) {
         let sql = """
             SELECT EXISTS (
@@ -63,41 +63,28 @@ public struct TSPaymentsActivationRequestModel: Codable, FetchableRecord, Persis
             )
         """
         let arguments: StatementArguments = [
-            threadUniqueId
+            threadUniqueId,
         ]
-        do {
+        failIfThrows {
             let exists = try Bool.fetchOne(transaction.database, sql: sql, arguments: arguments) ?? false
             if exists {
                 return
             }
-            let model = Self.init(threadUniqueId: threadUniqueId, senderAci: senderAci)
+            let model = Self(threadUniqueId: threadUniqueId, senderAci: senderAci)
             try model.insert(transaction.database)
-        } catch {
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(
-                userDefaults: CurrentAppContext().appUserDefaults(),
-                error: error
-            )
-            owsFailDebug("Unable to create payment model")
         }
     }
 
     public static func allThreadsWithPaymentActivationRequests(
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> [TSThread] {
         // This could be a SQL join, but the table is really small
         // so its fine to do an in-memory join.
-        do {
+        failIfThrows {
             return try TSPaymentsActivationRequestModel.fetchAll(transaction.database)
                 .compactMap { model in
-                    return TSThread.anyFetch(uniqueId: model.threadUniqueId, transaction: transaction)
+                    return TSThread.fetchViaCache(uniqueId: model.threadUniqueId, transaction: transaction)
                 }
-        } catch {
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(
-                userDefaults: CurrentAppContext().appUserDefaults(),
-                error: error
-            )
-            owsFailDebug("Unable to find payment models")
-            return []
         }
     }
 }

@@ -8,7 +8,7 @@ public import SignalServiceKit
 public protocol BadgeObserver {
     func didUpdateBadgeCount(
         _ badgeManager: BadgeManager,
-        badgeCount: BadgeCount
+        badgeCount: BadgeCount,
     )
 }
 
@@ -23,7 +23,7 @@ public class BadgeManager {
     }
 
     public convenience init(
-        badgeCountFetcher: any BadgeCountFetcher,
+        badgeCountFetcher: BadgeCountFetcher,
         databaseStorage: SDSDatabaseStorage,
     ) {
         self.init(
@@ -31,7 +31,7 @@ public class BadgeManager {
                 return databaseStorage.read { tx -> BadgeCount in
                     return badgeCountFetcher.fetchBadgeCount(tx: tx)
                 }
-            }
+            },
         )
     }
 
@@ -100,8 +100,8 @@ extension BadgeManager: DatabaseChangeDelegate {
     public func databaseChangesDidUpdate(databaseChanges: DatabaseChanges) {
         let badgeMightBeDifferent = (
             databaseChanges.didUpdateInteractions
-            || databaseChanges.didUpdate(tableName: ThreadAssociatedData.databaseTableName)
-            || databaseChanges.didUpdate(tableName: CallRecord.databaseTableName)
+                || databaseChanges.didUpdateThreads
+                || databaseChanges.didUpdate(tableName: CallRecord.databaseTableName),
         )
         guard badgeMightBeDifferent else {
             return

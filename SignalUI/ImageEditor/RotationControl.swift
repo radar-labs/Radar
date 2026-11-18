@@ -6,7 +6,7 @@
 import SignalServiceKit
 import UIKit
 
-class RotationControl: UIControl {
+final class RotationControl: UIControl, UIScrollViewDelegate {
 
     private var previousAngle: CGFloat = 0
     private var _angle: CGFloat = 0
@@ -53,7 +53,7 @@ class RotationControl: UIControl {
 
             let angleRounded = angle.rounded(roundingRule)
             let previousAngleRounded = previousAngle.rounded(roundingRule)
-            if previousAngleRounded != angleRounded && angleRounded.truncatingRemainder(dividingBy: Constants.stepValue) == 0 {
+            if previousAngleRounded != angleRounded, angleRounded.truncatingRemainder(dividingBy: Constants.stepValue) == 0 {
                 hapticFeedbackGenerator.selectionChanged()
             }
         }
@@ -68,15 +68,18 @@ class RotationControl: UIControl {
         super.init(frame: .zero)
 
         layoutMargins = .zero
-        tintColor = .ows_white
+        tintColor = .Signal.label
 
         // Text Label
+        textLabel.isUserInteractionEnabled = true
         textLabel.setCompressionResistanceVerticalHigh()
         textLabel.setContentHuggingVerticalHigh()
+        textLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(textLabel)
-        textLabel.autoPinTopToSuperviewMargin()
-        textLabel.autoHCenterInSuperview()
-        textLabel.isUserInteractionEnabled = true
+        NSLayoutConstraint.activate([
+            textLabel.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
+            textLabel.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor),
+        ])
         textLabel.addGestureRecognizer({
             let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(_:)))
             gestureRecognizer.numberOfTapsRequired = 2
@@ -84,27 +87,42 @@ class RotationControl: UIControl {
         }())
 
         // Band
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(scrollView)
-        scrollView.autoSetDimension(.height, toSize: Constants.bandHeight)
-        scrollView.autoPinWidthToSuperviewMargins()
-        scrollView.autoPinEdge(.top, to: .bottom, of: textLabel, withOffset: 8)
-        scrollView.autoPinBottomToSuperviewMargin()
+        NSLayoutConstraint.activate([
+            scrollView.frameLayoutGuide.topAnchor.constraint(equalTo: textLabel.bottomAnchor, constant: 8),
+            scrollView.frameLayoutGuide.heightAnchor.constraint(equalToConstant: Constants.bandHeight),
+            scrollView.frameLayoutGuide.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
+            scrollView.frameLayoutGuide.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
+            scrollView.frameLayoutGuide.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
+        ])
         initializeRuler()
 
         // Current Value Marking
-        currentValueMark.backgroundColor = UIColor.color(rgbHex: 0x62E87A)
+        currentValueMark.backgroundColor = UIColor(rgbHex: 0x62E87A)
+        currentValueMark.translatesAutoresizingMaskIntoConstraints = false
         addSubview(currentValueMark)
-        currentValueMark.autoSetDimension(.width, toSize: Constants.markingWidth)
-        currentValueMark.autoPinEdge(.top, to: .top, of: scrollView)
-        currentValueMark.autoPinEdge(.bottom, to: .bottom, of: scrollView)
-        currentValueMark.autoHCenterInSuperview()
+        NSLayoutConstraint.activate([
+            currentValueMark.topAnchor.constraint(equalTo: scrollView.frameLayoutGuide.topAnchor),
+            currentValueMark.widthAnchor.constraint(equalToConstant: Constants.markingWidth),
+            currentValueMark.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor),
+            currentValueMark.bottomAnchor.constraint(equalTo: scrollView.frameLayoutGuide.bottomAnchor),
+        ])
 
         updateFont()
+        if #available(iOS 17, *) {
+            registerForTraitChanges(
+                [UITraitPreferredContentSizeCategory.self],
+                handler: { (view: UIView, _) in
+                    guard let view = view as? RotationControl else { return }
+                    view.updateFont()
+                },
+            )
+        }
         updateColors()
         updateAppearance()
     }
 
-    @available(*, unavailable, message: "Use init()")
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -118,6 +136,8 @@ class RotationControl: UIControl {
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
+
+        guard #unavailable(iOS 17) else { return }
         if traitCollection.preferredContentSizeCategory != previousTraitCollection?.preferredContentSizeCategory {
             updateFont()
         }
@@ -130,19 +150,6 @@ class RotationControl: UIControl {
 
     override var isTracking: Bool {
         scrollView.isTracking
-    }
-
-    private static let preferredWidth: CGFloat = {
-        if UIDevice.current.isIPad {
-            return 428 // screen width on iPhone 13 max
-        } else {
-            return min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
-        }
-    }()
-
-    override var intrinsicContentSize: CGSize {
-        // Define preferred width for when width is not constrained externally (iPad).
-        CGSize(width: RotationControl.preferredWidth, height: UIView.noIntrinsicMetric)
     }
 
     private lazy var hapticFeedbackGenerator = SelectionHapticFeedback()
@@ -160,11 +167,11 @@ class RotationControl: UIControl {
     private let rulerView = UIView()
     private let currentValueMark = UIView()
 
-    private struct Constants {
-        static let stepRange = -45...45         // 45 degrees each direction
-        static let stepValue: CGFloat = 3       // 1 mark = 3 degrees
-        static let stepWidth: CGFloat = 12      // distance between markings
-        static let markingWidth: CGFloat = .hairlineWidthFraction(2)
+    private enum Constants {
+        static let stepRange = -45...45 // 45 degrees each direction
+        static let stepValue: CGFloat = 3 // 1 mark = 3 degrees
+        static let stepWidth: CGFloat = 12 // distance between markings
+        static let markingWidth: CGFloat = UITraitCollection.current.hairlineWidthFraction(2)
         static let bandHeight: CGFloat = 32
         static let markingHeight: CGFloat = 12
     }
@@ -179,7 +186,7 @@ class RotationControl: UIControl {
 
     private func updateAppearance() {
         var roundedAngle = normalizedAngle.rounded()
-        if roundedAngle == 0 && roundedAngle.sign == .minus {
+        if roundedAngle == 0, roundedAngle.sign == .minus {
             roundedAngle = 0
         }
         textLabel.text = numberFormatter.string(for: roundedAngle)
@@ -193,11 +200,8 @@ class RotationControl: UIControl {
             self.sendActions(for: .valueChanged)
         }
     }
-}
 
-// MARK: - Scroll View
-
-extension RotationControl: UIScrollViewDelegate {
+    // MARK: - Scroll View
 
     private func initializeRuler() {
         scrollView.delegate = self
@@ -211,11 +215,13 @@ extension RotationControl: UIScrollViewDelegate {
         let markingOriginY = rulerView.bounds.height - markingSize.height
         for i in 0...numberOfSteps {
             let marking = UIView(frame: CGRect(origin: .zero, size: markingSize))
-            marking.backgroundColor = .ows_white
-            marking.alpha = i%5 == 0 ? 1 : 0.5
+            marking.backgroundColor = .Signal.label
+            marking.alpha = i % 5 == 0 ? 1 : 0.5
             rulerView.addSubview(marking)
-            marking.frame.origin = CGPoint(x: CGFloat(i) * (Constants.stepWidth + Constants.markingWidth) - 0.5*Constants.markingWidth,
-                                           y: markingOriginY)
+            marking.frame.origin = CGPoint(
+                x: CGFloat(i) * (Constants.stepWidth + Constants.markingWidth) - 0.5 * Constants.markingWidth,
+                y: markingOriginY,
+            )
             if i == numberOfSteps / 2 {
                 marking.frame.origin.y = 0
                 marking.frame.size.height = Constants.bandHeight
@@ -226,8 +232,10 @@ extension RotationControl: UIScrollViewDelegate {
     }
 
     private func updateScrollViewLayout() {
-        scrollView.contentSize = CGSize(width: rulerView.bounds.width + scrollView.frame.width,
-                                        height: rulerView.height)
+        scrollView.contentSize = CGSize(
+            width: rulerView.bounds.width + scrollView.frame.width,
+            height: rulerView.height,
+        )
         rulerView.frame.origin = CGPoint(x: 0.5 * scrollView.frame.width, y: 0)
         updateScrollViewContentOffset()
     }

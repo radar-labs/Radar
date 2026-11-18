@@ -5,7 +5,7 @@
 
 import UIKit
 
-final class ImageEditorTextItem: ImageEditorItem, ImageEditorTransformable {
+final class ImageEditorTextItem: ImageEditorItem, ImageEditorTransformable, Equatable {
 
     let text: String
 
@@ -88,16 +88,18 @@ final class ImageEditorTextItem: ImageEditorItem, ImageEditorTransformable {
 
     let scaling: CGFloat
 
-    init(text: String,
-         color: ColorPickerBarColor,
-         fontSize: CGFloat,
-         textStyle: MediaTextView.TextStyle = .regular,
-         decorationStyle: MediaTextView.DecorationStyle = .none,
-         fontReferenceImageWidth: CGFloat,
-         unitCenter: ImageEditorSample = ImageEditorSample(x: 0.5, y: 0.5),
-         unitWidth: CGFloat = ImageEditorTextItem.kDefaultUnitWidth,
-         rotationRadians: CGFloat = 0.0,
-         scaling: CGFloat = 1.0) {
+    init(
+        text: String,
+        color: ColorPickerBarColor,
+        fontSize: CGFloat,
+        textStyle: MediaTextView.TextStyle = .regular,
+        decorationStyle: MediaTextView.DecorationStyle = .none,
+        fontReferenceImageWidth: CGFloat,
+        unitCenter: ImageEditorSample = ImageEditorSample(x: 0.5, y: 0.5),
+        unitWidth: CGFloat = ImageEditorTextItem.kDefaultUnitWidth,
+        rotationRadians: CGFloat = 0.0,
+        scaling: CGFloat = 1.0,
+    ) {
         self.text = text
         self.color = color
         self.fontSize = fontSize
@@ -123,7 +125,7 @@ final class ImageEditorTextItem: ImageEditorItem, ImageEditorTransformable {
         unitCenter: ImageEditorSample,
         unitWidth: CGFloat,
         rotationRadians: CGFloat,
-        scaling: CGFloat
+        scaling: CGFloat,
     ) {
         self.text = text
         self.color = color
@@ -139,136 +141,155 @@ final class ImageEditorTextItem: ImageEditorItem, ImageEditorTransformable {
         super.init(itemId: itemId, itemType: .text)
     }
 
-    class func empty(withColor color: ColorPickerBarColor,
-                     textStyle: MediaTextView.TextStyle,
-                     decorationStyle: MediaTextView.DecorationStyle,
-                     unitWidth: CGFloat,
-                     fontReferenceImageWidth: CGFloat,
-                     scaling: CGFloat,
-                     rotationRadians: CGFloat) -> ImageEditorTextItem {
-        return ImageEditorTextItem(text: "",
-                                   color: color,
-                                   fontSize: ImageEditorTextItem.defaultFontSize,
-                                   textStyle: textStyle,
-                                   decorationStyle: decorationStyle,
-                                   fontReferenceImageWidth: fontReferenceImageWidth,
-                                   unitWidth: unitWidth,
-                                   rotationRadians: rotationRadians,
-                                   scaling: scaling)
+    class func empty(
+        withColor color: ColorPickerBarColor,
+        textStyle: MediaTextView.TextStyle,
+        decorationStyle: MediaTextView.DecorationStyle,
+        unitWidth: CGFloat,
+        fontReferenceImageWidth: CGFloat,
+        scaling: CGFloat,
+        rotationRadians: CGFloat,
+    ) -> ImageEditorTextItem {
+        ImageEditorTextItem(
+            text: "",
+            color: color,
+            fontSize: ImageEditorTextItem.defaultFontSize,
+            textStyle: textStyle,
+            decorationStyle: decorationStyle,
+            fontReferenceImageWidth: fontReferenceImageWidth,
+            unitWidth: unitWidth,
+            rotationRadians: rotationRadians,
+            scaling: scaling,
+        )
     }
 
-    func copy(withText newText: String, color newColor: ColorPickerBarColor) -> ImageEditorTextItem {
-        return ImageEditorTextItem(itemId: itemId,
-                                   text: newText,
-                                   color: newColor,
-                                   fontSize: fontSize,
-                                   textStyle: textStyle,
-                                   decorationStyle: decorationStyle,
-                                   fontReferenceImageWidth: fontReferenceImageWidth,
-                                   unitCenter: unitCenter,
-                                   unitWidth: unitWidth,
-                                   rotationRadians: rotationRadians,
-                                   scaling: scaling)
+    func with(text: String, color: ColorPickerBarColor) -> ImageEditorTextItem {
+        ImageEditorTextItem(
+            itemId: itemId,
+            text: text,
+            color: color,
+            fontSize: fontSize,
+            textStyle: textStyle,
+            decorationStyle: decorationStyle,
+            fontReferenceImageWidth: fontReferenceImageWidth,
+            unitCenter: unitCenter,
+            unitWidth: unitWidth,
+            rotationRadians: rotationRadians,
+            scaling: scaling,
+        )
     }
 
-    func copy(unitCenter: CGPoint) -> ImageEditorTextItem {
-        return ImageEditorTextItem(itemId: itemId,
-                                   text: text,
-                                   color: color,
-                                   fontSize: fontSize,
-                                   textStyle: textStyle,
-                                   decorationStyle: decorationStyle,
-                                   fontReferenceImageWidth: fontReferenceImageWidth,
-                                   unitCenter: unitCenter,
-                                   unitWidth: unitWidth,
-                                   rotationRadians: rotationRadians,
-                                   scaling: scaling)
+    func with(unitCenter: CGPoint) -> ImageEditorTextItem {
+        ImageEditorTextItem(
+            itemId: itemId,
+            text: text,
+            color: color,
+            fontSize: fontSize,
+            textStyle: textStyle,
+            decorationStyle: decorationStyle,
+            fontReferenceImageWidth: fontReferenceImageWidth,
+            unitCenter: unitCenter,
+            unitWidth: unitWidth,
+            rotationRadians: rotationRadians,
+            scaling: scaling,
+        )
     }
 
-    func copy(scaling: CGFloat, rotationRadians: CGFloat) -> ImageEditorTextItem {
-        return ImageEditorTextItem(itemId: itemId,
-                                   text: text,
-                                   color: color,
-                                   fontSize: fontSize,
-                                   textStyle: textStyle,
-                                   decorationStyle: decorationStyle,
-                                   fontReferenceImageWidth: fontReferenceImageWidth,
-                                   unitCenter: unitCenter,
-                                   unitWidth: unitWidth,
-                                   rotationRadians: rotationRadians,
-                                   scaling: scaling)
+    func with(scaling: CGFloat, rotationRadians: CGFloat) -> ImageEditorTextItem {
+        ImageEditorTextItem(
+            itemId: itemId,
+            text: text,
+            color: color,
+            fontSize: fontSize,
+            textStyle: textStyle,
+            decorationStyle: decorationStyle,
+            fontReferenceImageWidth: fontReferenceImageWidth,
+            unitCenter: unitCenter,
+            unitWidth: unitWidth,
+            rotationRadians: rotationRadians,
+            scaling: scaling,
+        )
     }
 
-    func copy(unitWidth: CGFloat) -> ImageEditorTextItem {
-        return ImageEditorTextItem(itemId: itemId,
-                                   text: text,
-                                   color: color,
-                                   fontSize: fontSize,
-                                   textStyle: textStyle,
-                                   decorationStyle: decorationStyle,
-                                   fontReferenceImageWidth: fontReferenceImageWidth,
-                                   unitCenter: unitCenter,
-                                   unitWidth: unitWidth,
-                                   rotationRadians: rotationRadians,
-                                   scaling: scaling)
+    func with(unitWidth: CGFloat) -> ImageEditorTextItem {
+        ImageEditorTextItem(
+            itemId: itemId,
+            text: text,
+            color: color,
+            fontSize: fontSize,
+            textStyle: textStyle,
+            decorationStyle: decorationStyle,
+            fontReferenceImageWidth: fontReferenceImageWidth,
+            unitCenter: unitCenter,
+            unitWidth: unitWidth,
+            rotationRadians: rotationRadians,
+            scaling: scaling,
+        )
     }
 
-    func copy(fontSize: CGFloat) -> ImageEditorTextItem {
-        return ImageEditorTextItem(itemId: itemId,
-                                   text: text,
-                                   color: color,
-                                   fontSize: fontSize,
-                                   textStyle: textStyle,
-                                   decorationStyle: decorationStyle,
-                                   fontReferenceImageWidth: fontReferenceImageWidth,
-                                   unitCenter: unitCenter,
-                                   unitWidth: unitWidth,
-                                   rotationRadians: rotationRadians,
-                                   scaling: scaling)
+    func with(fontSize: CGFloat) -> ImageEditorTextItem {
+        ImageEditorTextItem(
+            itemId: itemId,
+            text: text,
+            color: color,
+            fontSize: fontSize,
+            textStyle: textStyle,
+            decorationStyle: decorationStyle,
+            fontReferenceImageWidth: fontReferenceImageWidth,
+            unitCenter: unitCenter,
+            unitWidth: unitWidth,
+            rotationRadians: rotationRadians,
+            scaling: scaling,
+        )
     }
 
-    func copy(color: ColorPickerBarColor) -> ImageEditorTextItem {
-        return ImageEditorTextItem(itemId: itemId,
-                                   text: text,
-                                   color: color,
-                                   fontSize: fontSize,
-                                   textStyle: textStyle,
-                                   decorationStyle: decorationStyle,
-                                   fontReferenceImageWidth: fontReferenceImageWidth,
-                                   unitCenter: unitCenter,
-                                   unitWidth: unitWidth,
-                                   rotationRadians: rotationRadians,
-                                   scaling: scaling)
+    func with(color: ColorPickerBarColor) -> ImageEditorTextItem {
+        ImageEditorTextItem(
+            itemId: itemId,
+            text: text,
+            color: color,
+            fontSize: fontSize,
+            textStyle: textStyle,
+            decorationStyle: decorationStyle,
+            fontReferenceImageWidth: fontReferenceImageWidth,
+            unitCenter: unitCenter,
+            unitWidth: unitWidth,
+            rotationRadians: rotationRadians,
+            scaling: scaling,
+        )
     }
 
-    func copy(textStyle: MediaTextView.TextStyle, decorationStyle: MediaTextView.DecorationStyle) -> ImageEditorTextItem {
-        return ImageEditorTextItem(itemId: itemId,
-                                   text: text,
-                                   color: color,
-                                   fontSize: fontSize,
-                                   textStyle: textStyle,
-                                   decorationStyle: decorationStyle,
-                                   fontReferenceImageWidth: fontReferenceImageWidth,
-                                   unitCenter: unitCenter,
-                                   unitWidth: unitWidth,
-                                   rotationRadians: rotationRadians,
-                                   scaling: scaling)
+    func with(textStyle: MediaTextView.TextStyle, decorationStyle: MediaTextView.DecorationStyle) -> ImageEditorTextItem {
+        ImageEditorTextItem(
+            itemId: itemId,
+            text: text,
+            color: color,
+            fontSize: fontSize,
+            textStyle: textStyle,
+            decorationStyle: decorationStyle,
+            fontReferenceImageWidth: fontReferenceImageWidth,
+            unitCenter: unitCenter,
+            unitWidth: unitWidth,
+            rotationRadians: rotationRadians,
+            scaling: scaling,
+        )
     }
 
-    override func outputScale() -> CGFloat {
-        return scaling
+    override var outputScale: CGFloat {
+        scaling
     }
 
-    static func == (left: ImageEditorTextItem, right: ImageEditorTextItem) -> Bool {
-        return (left.text == right.text &&
-                left.color == right.color &&
-                left.textStyle == right.textStyle &&
-                left.decorationStyle == right.decorationStyle &&
-                left.fontSize.fuzzyEquals(right.fontSize) &&
-                left.fontReferenceImageWidth.fuzzyEquals(right.fontReferenceImageWidth) &&
-                left.unitCenter.fuzzyEquals(right.unitCenter) &&
-                left.unitWidth.fuzzyEquals(right.unitWidth) &&
-                left.rotationRadians.fuzzyEquals(right.rotationRadians) &&
-                left.scaling.fuzzyEquals(right.scaling))
+    static func ==(lhs: ImageEditorTextItem, rhs: ImageEditorTextItem) -> Bool {
+        lhs.itemId == rhs.itemId &&
+            lhs.text == rhs.text &&
+            lhs.color == rhs.color &&
+            lhs.textStyle == rhs.textStyle &&
+            lhs.decorationStyle == rhs.decorationStyle &&
+            lhs.fontSize.fuzzyEquals(rhs.fontSize) &&
+            lhs.fontReferenceImageWidth.fuzzyEquals(rhs.fontReferenceImageWidth) &&
+            lhs.unitCenter.fuzzyEquals(rhs.unitCenter) &&
+            lhs.unitWidth.fuzzyEquals(rhs.unitWidth) &&
+            lhs.rotationRadians.fuzzyEquals(rhs.rotationRadians) &&
+            lhs.scaling.fuzzyEquals(rhs.scaling)
     }
 }

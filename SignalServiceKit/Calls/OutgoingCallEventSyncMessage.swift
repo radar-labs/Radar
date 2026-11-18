@@ -6,7 +6,7 @@
 /// Represents a call event that occurred on this device that we want to
 /// communicate to our linked devices.
 @objc(OutgoingCallEvent)
-class OutgoingCallEvent: NSObject, NSCoding {
+class OutgoingCallEvent: NSObject, NSSecureCoding {
     enum CallType: UInt {
         case audio
         case video
@@ -39,7 +39,7 @@ class OutgoingCallEvent: NSObject, NSCoding {
         callId: UInt64,
         callType: CallType,
         eventDirection: EventDirection,
-        eventType: EventType
+        eventType: EventType,
     ) {
         self.timestamp = timestamp
         self.conversationId = conversationId
@@ -49,7 +49,7 @@ class OutgoingCallEvent: NSObject, NSCoding {
         self.eventType = eventType
     }
 
-    // MARK: NSCoding
+    // MARK: NSSecureCoding
 
     private enum Keys {
         static let timestamp = "timestamp"
@@ -59,6 +59,8 @@ class OutgoingCallEvent: NSObject, NSCoding {
         static let eventDirection = "direction"
         static let eventType = "event"
     }
+
+    static var supportsSecureCoding: Bool { true }
 
     func encode(with coder: NSCoder) {
         coder.encode(NSNumber(value: timestamp), forKey: Keys.timestamp)
@@ -71,14 +73,14 @@ class OutgoingCallEvent: NSObject, NSCoding {
 
     required init?(coder: NSCoder) {
         guard
-            let timestamp = coder.decodeObject(of: NSNumber.self, forKey: Keys.timestamp) as? UInt64,
+            let timestamp = coder.decodeObject(of: NSNumber.self, forKey: Keys.timestamp)?.uint64Value,
             let conversationId = coder.decodeObject(of: NSData.self, forKey: Keys.conversationId) as Data?,
-            let callId = coder.decodeObject(of: NSNumber.self, forKey: Keys.callId) as? UInt64,
-            let callTypeRaw = coder.decodeObject(of: NSNumber.self, forKey: Keys.callType) as? UInt,
+            let callId = coder.decodeObject(of: NSNumber.self, forKey: Keys.callId)?.uint64Value,
+            let callTypeRaw = coder.decodeObject(of: NSNumber.self, forKey: Keys.callType)?.uintValue,
             let callType = CallType(rawValue: callTypeRaw),
-            let eventDirectionRaw = coder.decodeObject(of: NSNumber.self, forKey: Keys.eventDirection) as? UInt,
+            let eventDirectionRaw = coder.decodeObject(of: NSNumber.self, forKey: Keys.eventDirection)?.uintValue,
             let eventDirection = EventDirection(rawValue: eventDirectionRaw),
-            let eventTypeRaw = coder.decodeObject(of: NSNumber.self, forKey: Keys.eventType) as? UInt,
+            let eventTypeRaw = coder.decodeObject(of: NSNumber.self, forKey: Keys.eventType)?.uintValue,
             let eventType = EventType(rawValue: eventTypeRaw)
         else {
             owsFailDebug("Missing or unrecognized fields!")
@@ -101,41 +103,51 @@ class OutgoingCallEvent: NSObject, NSCoding {
 ///
 /// - SeeAlso ``IncomingCallEventSyncMessageManager``
 @objc(OutgoingCallEventSyncMessage)
-public class OutgoingCallEventSyncMessage: OWSOutgoingSyncMessage {
+public class OutgoingCallEventSyncMessage: OutgoingSyncMessage {
+    override public class var supportsSecureCoding: Bool { true }
+
+    public required init?(coder: NSCoder) {
+        guard let callEvent = coder.decodeObject(of: OutgoingCallEvent.self, forKey: "event") else {
+            return nil
+        }
+        self.callEvent = callEvent
+        super.init(coder: coder)
+    }
+
+    override public func encode(with coder: NSCoder) {
+        super.encode(with: coder)
+        coder.encode(callEvent, forKey: "event")
+    }
+
+    override public var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(super.hash)
+        hasher.combine(callEvent)
+        return hasher.finalize()
+    }
+
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard super.isEqual(object) else { return false }
+        guard self.callEvent == object.callEvent else { return false }
+        return true
+    }
 
     /// The call event.
-    ///
-    /// The ObjC name must remain as-is for compatibility with legacy data
-    /// archived using Mantle. When this model was originally written (in ObjC),
-    /// the property was named `event` - therefore, Mantle will have used that
-    /// name as a key when doing its reflection-based archiving.
-    ///
-    /// - Note
-    /// Nullability here is intentional, since Mantle will set this property via
-    /// its reflection-based `init(coder:)` when we call `super.init(coder:)`.
-    @objc(event)
-    private(set) var callEvent: OutgoingCallEvent!
+    let callEvent: OutgoingCallEvent
 
     init(
         localThread: TSContactThread,
         event: OutgoingCallEvent,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) {
         self.callEvent = event
-        super.init(localThread: localThread, transaction: tx)
-    }
-
-    required public init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
-
-    required public init(dictionary dictionaryValue: [String: Any]!) throws {
-        try super.init(dictionary: dictionaryValue)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override public var isUrgent: Bool { false }
 
-    override public func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override public func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let callEventBuilder = SSKProtoSyncMessageCallEvent.builder()
         callEventBuilder.setCallID(callEvent.callId)
         callEventBuilder.setType(callEvent.callType.protoValue)
@@ -150,7 +162,7 @@ public class OutgoingCallEventSyncMessage: OWSOutgoingSyncMessage {
     }
 }
 
-fileprivate extension OutgoingCallEvent.CallType {
+private extension OutgoingCallEvent.CallType {
     var protoValue: SSKProtoSyncMessageCallEventType {
         switch self {
         case .audio:
@@ -165,7 +177,7 @@ fileprivate extension OutgoingCallEvent.CallType {
     }
 }
 
-fileprivate extension OutgoingCallEvent.EventDirection {
+private extension OutgoingCallEvent.EventDirection {
     var protoValue: SSKProtoSyncMessageCallEventDirection {
         switch self {
         case .incoming:
@@ -176,7 +188,7 @@ fileprivate extension OutgoingCallEvent.EventDirection {
     }
 }
 
-fileprivate extension OutgoingCallEvent.EventType {
+private extension OutgoingCallEvent.EventType {
     var protoValue: SSKProtoSyncMessageCallEventEvent {
         switch self {
         case .accepted:

@@ -14,12 +14,12 @@ protocol EmojiPickerSectionToolbarDelegate: AnyObject {
 class EmojiPickerSectionToolbar: UIView, UICollectionViewDelegate {
     private var buttons = [UIButton]()
 
-    private let forceDarkTheme: Bool
     private weak var delegate: EmojiPickerSectionToolbarDelegate?
 
     private enum Section {
         case main
     }
+
     private var dataSource: UICollectionViewDiffableDataSource<Section, ThemeIcon>!
     private var collectionView: UICollectionView!
 
@@ -73,7 +73,7 @@ class EmojiPickerSectionToolbar: UIView, UICollectionViewDelegate {
                 imageView.widthAnchor.constraint(equalToConstant: EmojiSectionCellContentView.imageSize),
                 imageView.heightAnchor.constraint(equalToConstant: EmojiSectionCellContentView.imageSize),
                 imageView.centerXAnchor.constraint(equalTo: centerXAnchor),
-                imageView.centerYAnchor.constraint(equalTo: centerYAnchor)
+                imageView.centerYAnchor.constraint(equalTo: centerYAnchor),
             ])
 
             configure()
@@ -98,7 +98,7 @@ class EmojiPickerSectionToolbar: UIView, UICollectionViewDelegate {
             }
             backgroundView.isHidden = !configuration.displayBackgroundView
             imageView.image = Theme.iconImage(configuration.emojiSectionIcon)
-            if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable {
+            if #available(iOS 26, *) {
                 imageView.tintColor = UIColor.Signal.label
             } else {
                 imageView.tintColor = UIColor.Signal.secondaryLabel
@@ -108,16 +108,10 @@ class EmojiPickerSectionToolbar: UIView, UICollectionViewDelegate {
 
     init(
         delegate: EmojiPickerSectionToolbarDelegate,
-        forceDarkTheme: Bool = false
     ) {
         self.delegate = delegate
-        self.forceDarkTheme = forceDarkTheme
 
         super.init(frame: .zero)
-
-        if forceDarkTheme {
-            overrideUserInterfaceStyle = .dark
-        }
 
         // Prepare icons.
         var emojiSectionIcons: [ThemeIcon] = [
@@ -128,7 +122,7 @@ class EmojiPickerSectionToolbar: UIView, UICollectionViewDelegate {
             .emojiTravel,
             .emojiObject,
             .emojiSymbol,
-            .emojiFlag
+            .emojiFlag,
         ]
         if delegate.emojiPickerSectionToolbarShouldShowRecentsSection(self) == true {
             emojiSectionIcons.insert(.emojiRecent, at: 0)
@@ -147,7 +141,6 @@ class EmojiPickerSectionToolbar: UIView, UICollectionViewDelegate {
 
         // Prepare background.
         var backgroundConfigured = false
-#if compiler(>=6.2)
         if #available(iOS 26, *) {
             // Floating glass panel that encapsulates emoji category strip.
             // Insets are carefully configured for best on-screen appearance.
@@ -172,7 +165,6 @@ class EmojiPickerSectionToolbar: UIView, UICollectionViewDelegate {
             ])
             backgroundConfigured = true
         }
-#endif
         if !backgroundConfigured {
             // Background stretches 500 dp below bottom edge of the screen so that there's no gap where bottom safe area is.
             if UIAccessibility.isReduceTransparencyEnabled {
@@ -189,7 +181,7 @@ class EmojiPickerSectionToolbar: UIView, UICollectionViewDelegate {
 
                 addSubview(collectionView)
             } else {
-                let blurEffect = forceDarkTheme ? Theme.darkThemeBarBlurEffect : Theme.barBlurEffect
+                let blurEffect = UIBlurEffect(style: .regular)
                 let blurEffectView = UIVisualEffectView(effect: blurEffect)
                 addSubview(blurEffectView)
                 blurEffectView.translatesAutoresizingMaskIntoConstraints = false
@@ -213,8 +205,8 @@ class EmojiPickerSectionToolbar: UIView, UICollectionViewDelegate {
         // Configure data source.
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         dataSource = UICollectionViewDiffableDataSource<Section, ThemeIcon>(
-            collectionView: collectionView
-        ) { (collectionView, indexPath, itemIdentifier) -> UICollectionViewCell? in
+            collectionView: collectionView,
+        ) { collectionView, indexPath, itemIdentifier -> UICollectionViewCell? in
 
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
             cell.automaticallyUpdatesContentConfiguration = true
@@ -244,7 +236,7 @@ class EmojiPickerSectionToolbar: UIView, UICollectionViewDelegate {
         let layout = UICollectionViewCompositionalLayout { _, environment in
             let itemSize = NSCollectionLayoutSize(
                 widthDimension: .absolute(cellSize),
-                heightDimension: .absolute(cellSize)
+                heightDimension: .absolute(cellSize),
             )
             let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
@@ -256,7 +248,7 @@ class EmojiPickerSectionToolbar: UIView, UICollectionViewDelegate {
             if minimumWidth <= availableWidth {
                 let groupSize = NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1),
-                    heightDimension: .absolute(cellSize)
+                    heightDimension: .absolute(cellSize),
                 )
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: numberOfItems)
                 group.interItemSpacing = .fixed(collectionViewSectionMargin)
@@ -268,7 +260,7 @@ class EmojiPickerSectionToolbar: UIView, UICollectionViewDelegate {
             } else {
                 let groupSize = NSCollectionLayoutSize(
                     widthDimension: .absolute(cellSize),
-                    heightDimension: .absolute(cellSize)
+                    heightDimension: .absolute(cellSize),
                 )
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
@@ -277,7 +269,7 @@ class EmojiPickerSectionToolbar: UIView, UICollectionViewDelegate {
                 section.interGroupSpacing = collectionViewSectionMargin
                 section.contentInsets = .init(
                     hMargin: collectionViewSectionMargin * 2,
-                    vMargin: collectionViewSectionMargin
+                    vMargin: collectionViewSectionMargin,
                 )
                 return section
             }
@@ -297,7 +289,7 @@ class EmojiPickerSectionToolbar: UIView, UICollectionViewDelegate {
         collectionView.selectItem(
             at: IndexPath(item: section, section: 0),
             animated: true,
-            scrollPosition: .centeredHorizontally
+            scrollPosition: .centeredHorizontally,
         )
     }
 }

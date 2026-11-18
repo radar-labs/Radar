@@ -27,22 +27,24 @@ extension TSInfoMessage {
 
         private static let messagesKey = "messagesKey"
 
-        public func encode(with aCoder: NSCoder) {
+        public func encode(with coder: NSCoder) {
             let jsonEncoder = JSONEncoder()
             do {
                 let messagesData = try jsonEncoder.encode(updateItems)
-                aCoder.encode(messagesData, forKey: Self.messagesKey)
+                coder.encode(messagesData, forKey: Self.messagesKey)
             } catch let error {
                 owsFailDebug("Failed to encode updateItems data: \(error)")
                 return
             }
         }
 
-        public required init?(coder aDecoder: NSCoder) {
-            guard let updateItemsData = aDecoder.decodeObject(
-                of: NSData.self,
-                forKey: Self.messagesKey
-            ) else {
+        public required init?(coder: NSCoder) {
+            guard
+                let updateItemsData = coder.decodeObject(
+                    of: NSData.self,
+                    forKey: Self.messagesKey,
+                ) as Data?
+            else {
                 owsFailDebug("Failed to decode updateItems data")
                 return nil
             }
@@ -51,7 +53,7 @@ extension TSInfoMessage {
             do {
                 updateItems = try jsonDecoder.decode(
                     [LegacyPersistableGroupUpdateItem].self,
-                    from: updateItemsData as Data
+                    from: updateItemsData,
                 )
             } catch let error {
                 owsFailDebug("Failed to decode updateItems data: \(error)")
@@ -82,22 +84,24 @@ extension TSInfoMessage {
 
         private static let messagesKey = "messagesKey"
 
-        public func encode(with aCoder: NSCoder) {
+        public func encode(with coder: NSCoder) {
             let jsonEncoder = JSONEncoder()
             do {
                 let messagesData = try jsonEncoder.encode(updateItems)
-                aCoder.encode(messagesData, forKey: Self.messagesKey)
+                coder.encode(messagesData, forKey: Self.messagesKey)
             } catch let error {
                 owsFailDebug("Failed to encode updateItems data: \(error)")
                 return
             }
         }
 
-        public required init?(coder aDecoder: NSCoder) {
-            guard let updateItemsData = aDecoder.decodeObject(
-                of: NSData.self,
-                forKey: Self.messagesKey
-            ) else {
+        public required init?(coder: NSCoder) {
+            guard
+                let updateItemsData = coder.decodeObject(
+                    of: NSData.self,
+                    forKey: Self.messagesKey,
+                ) as Data?
+            else {
                 owsFailDebug("Failed to decode updateItems data")
                 return nil
             }
@@ -106,7 +110,7 @@ extension TSInfoMessage {
             do {
                 updateItems = try jsonDecoder.decode(
                     [PersistableGroupUpdateItem].self,
-                    from: updateItemsData as Data
+                    from: updateItemsData,
                 )
             } catch let error {
                 owsFailDebug("Failed to decode updateItems data: \(error)")
@@ -136,7 +140,7 @@ extension TSInfoMessage {
         func toNewItem(
             updater: GroupUpdateSource,
             oldGroupModel: TSGroupModel?,
-            localIdentifiers: LocalIdentifiers
+            localIdentifiers: LocalIdentifiers,
         ) -> PersistableGroupUpdateItem? {
             switch self {
             case .sequenceOfInviteLinkRequestAndCancels(let count, let isTail):
@@ -148,7 +152,7 @@ extension TSInfoMessage {
                     return .sequenceOfInviteLinkRequestAndCancels(
                         requester: aci.codableUuid,
                         count: count,
-                        isTail: isTail
+                        isTail: isTail,
                     )
                 }
 
@@ -156,9 +160,10 @@ extension TSInfoMessage {
                 return .invitedPniPromotedToFullMemberAci(
                     newMember: aci,
                     inviter: oldGroupModel?.groupMembership.addedByAci(
-                        forInvitedMember: SignalServiceAddress(pni.wrappedValue)
-                    )?.codableUuid
+                        forInvitedMember: SignalServiceAddress(pni.wrappedValue),
+                    )?.codableUuid,
                 )
+
             case .inviteRemoved(let invitee, let wasLocalUser):
                 let remover: ServiceId
                 var wasRejectedInvite = false
@@ -185,7 +190,7 @@ extension TSInfoMessage {
                 }
 
                 let inviterAci = oldGroupModel?.groupMembership.addedByAci(
-                    forInvitedMember: SignalServiceAddress(invitee.wrappedValue)
+                    forInvitedMember: SignalServiceAddress(invitee.wrappedValue),
                 )
 
                 if wasLocalUser {
@@ -193,7 +198,7 @@ extension TSInfoMessage {
                         // Local user invite that was rejected.
                         if let inviterAci {
                             return .localUserDeclinedInviteFromInviter(
-                                inviterAci: inviterAci.codableUuid
+                                inviterAci: inviterAci.codableUuid,
                             )
                         } else {
                             return .localUserDeclinedInviteFromUnknownUser
@@ -215,7 +220,7 @@ extension TSInfoMessage {
                             } else {
                                 return .otherUserDeclinedInviteFromInviter(
                                     invitee: invitee,
-                                    inviterAci: inviterAci.codableUuid
+                                    inviterAci: inviterAci.codableUuid,
                                 )
                             }
                         } else {
@@ -229,7 +234,7 @@ extension TSInfoMessage {
                             } else {
                                 return .unnamedUserInvitesWereRevokedByOtherUser(
                                     updaterAci: removerAci.codableUuid,
-                                    count: 1
+                                    count: 1,
                                 )
                             }
                         } else {
@@ -280,6 +285,9 @@ extension TSInfoMessage {
             case attributesAccessChangedByLocalUser
             case attributesAccessChangedByOtherUser
             case attributesAccessChangedByUnknownUser
+            case memberLabelsAccessChangedByLocalUser
+            case memberLabelsAccessChangedByOtherUser
+            case memberLabelsAccessChangedByUnknownUser
             case announcementOnlyEnabledByLocalUser
             case announcementOnlyEnabledByOtherUser
             case announcementOnlyEnabledByUnknownUser
@@ -377,6 +385,9 @@ extension TSInfoMessage {
             case inviteLinkApprovalEnabledByUnknownUser
             case localUserJoinedViaInviteLink
             case otherUserJoinedViaInviteLink
+            case groupTerminatedByLocalUser
+            case groupTerminatedByOtherUser
+            case groupTerminatedByUnknownUser
         }
 
         /// Represents a sequence of "request to join" and "canceled request to
@@ -418,7 +429,7 @@ extension TSInfoMessage {
         case otherUsersInvitedAfterMigration(count: UInt)
         /// As part of a gv1->gv2 migration, gv1 members whose acis were not known were removed
         /// from the group.
-        /// We have never generated these locally, but they may be present in backups from other clients. 
+        /// We have never generated these locally, but they may be present in backups from other clients.
         case otherUsersDroppedAfterMigration(count: UInt)
 
         case nameChangedByLocalUser(newGroupName: String)
@@ -452,6 +463,10 @@ extension TSInfoMessage {
         case attributesAccessChangedByLocalUser(newAccess: GroupV2Access)
         case attributesAccessChangedByOtherUser(updaterAci: AciUuid, newAccess: GroupV2Access)
         case attributesAccessChangedByUnknownUser(newAccess: GroupV2Access)
+
+        case memberLabelsAccessChangedByLocalUser(newAccess: GroupV2Access)
+        case memberLabelsAccessChangedByOtherUser(updaterAci: AciUuid, newAccess: GroupV2Access)
+        case memberLabelsAccessChangedByUnknownUser(newAccess: GroupV2Access)
 
         case announcementOnlyEnabledByLocalUser
         case announcementOnlyEnabledByOtherUser(updaterAci: AciUuid)
@@ -582,6 +597,9 @@ extension TSInfoMessage {
         case localUserJoinedViaInviteLink
         case otherUserJoinedViaInviteLink(userAci: AciUuid)
 
+        case groupTerminatedByLocalUser
+        case groupTerminatedByOtherUser(updaterAci: AciUuid)
+        case groupTerminatedByUnknownUser
     }
 }
 
@@ -589,142 +607,148 @@ extension TSInfoMessage.PersistableGroupUpdateItem {
     public var aciForSpamReporting: AciUuid? {
         switch self {
         case
-                .genericUpdateByOtherUser(let updaterAci),
-                .createdByOtherUser(let updaterAci),
-                .nameChangedByOtherUser(let updaterAci, _),
-                .nameRemovedByOtherUser(let updaterAci),
-                .avatarChangedByOtherUser(let updaterAci),
-                .avatarRemovedByOtherUser(let updaterAci),
-                .descriptionChangedByOtherUser(let updaterAci, _),
-                .descriptionRemovedByOtherUser(let updaterAci),
-                .membersAccessChangedByOtherUser(let updaterAci, _),
-                .attributesAccessChangedByOtherUser(let updaterAci, _),
-                .announcementOnlyEnabledByOtherUser(let updaterAci),
-                .announcementOnlyDisabledByOtherUser(let updaterAci),
-                .localUserWasGrantedAdministratorByOtherUser(let updaterAci),
-                .otherUserWasGrantedAdministratorByLocalUser(let updaterAci),
-                .otherUserWasGrantedAdministratorByOtherUser(let updaterAci, _),
-                .otherUserWasGrantedAdministratorByUnknownUser(let updaterAci),
-                .localUserWasRevokedAdministratorByOtherUser(let updaterAci),
-                .otherUserWasRevokedAdministratorByOtherUser(let updaterAci, _),
-                .localUserRemoved(let updaterAci),
-                .otherUserRemoved(let updaterAci, _),
-                .localUserWasInvitedByOtherUser(let updaterAci),
-                .unnamedUsersWereInvitedByOtherUser(let updaterAci, _),
-                .localUserAcceptedInviteFromInviter(let updaterAci),
-                .otherUserAcceptedInviteFromInviter(let updaterAci, _),
-                .localUserAddedByOtherUser(let updaterAci),
-                .otherUserAddedByOtherUser(let updaterAci, _),
-                .localUserDeclinedInviteFromInviter(let updaterAci),
-                .otherUserDeclinedInviteFromInviter(_, let updaterAci),
-                .unnamedUserDeclinedInviteFromInviter(let updaterAci),
-                .unnamedUserInvitesWereRevokedByOtherUser(let updaterAci, _),
-                .otherUserRequestApproved(_, let updaterAci),
-                .otherUserRequestRejectedByOtherUser(let updaterAci, _),
-                .disappearingMessagesEnabledByOtherUser(let updaterAci, _),
-                .disappearingMessagesDisabledByOtherUser(let updaterAci),
-                .inviteLinkResetByOtherUser(let updaterAci),
-                .inviteLinkEnabledWithoutApprovalByOtherUser(let updaterAci),
-                .inviteLinkEnabledWithApprovalByOtherUser(let updaterAci),
-                .inviteLinkDisabledByOtherUser(let updaterAci),
-                .inviteLinkApprovalDisabledByOtherUser(let updaterAci),
-                .inviteLinkApprovalEnabledByOtherUser(let updaterAci):
+            .genericUpdateByOtherUser(let updaterAci),
+            .createdByOtherUser(let updaterAci),
+            .nameChangedByOtherUser(let updaterAci, _),
+            .nameRemovedByOtherUser(let updaterAci),
+            .avatarChangedByOtherUser(let updaterAci),
+            .avatarRemovedByOtherUser(let updaterAci),
+            .descriptionChangedByOtherUser(let updaterAci, _),
+            .descriptionRemovedByOtherUser(let updaterAci),
+            .membersAccessChangedByOtherUser(let updaterAci, _),
+            .attributesAccessChangedByOtherUser(let updaterAci, _),
+            .announcementOnlyEnabledByOtherUser(let updaterAci),
+            .announcementOnlyDisabledByOtherUser(let updaterAci),
+            .localUserWasGrantedAdministratorByOtherUser(let updaterAci),
+            .otherUserWasGrantedAdministratorByLocalUser(let updaterAci),
+            .otherUserWasGrantedAdministratorByOtherUser(let updaterAci, _),
+            .otherUserWasGrantedAdministratorByUnknownUser(let updaterAci),
+            .localUserWasRevokedAdministratorByOtherUser(let updaterAci),
+            .otherUserWasRevokedAdministratorByOtherUser(let updaterAci, _),
+            .localUserRemoved(let updaterAci),
+            .otherUserRemoved(let updaterAci, _),
+            .localUserWasInvitedByOtherUser(let updaterAci),
+            .unnamedUsersWereInvitedByOtherUser(let updaterAci, _),
+            .localUserAcceptedInviteFromInviter(let updaterAci),
+            .otherUserAcceptedInviteFromInviter(let updaterAci, _),
+            .localUserAddedByOtherUser(let updaterAci),
+            .otherUserAddedByOtherUser(let updaterAci, _),
+            .localUserDeclinedInviteFromInviter(let updaterAci),
+            .otherUserDeclinedInviteFromInviter(_, let updaterAci),
+            .unnamedUserDeclinedInviteFromInviter(let updaterAci),
+            .unnamedUserInvitesWereRevokedByOtherUser(let updaterAci, _),
+            .otherUserRequestApproved(_, let updaterAci),
+            .otherUserRequestRejectedByOtherUser(let updaterAci, _),
+            .disappearingMessagesEnabledByOtherUser(let updaterAci, _),
+            .disappearingMessagesDisabledByOtherUser(let updaterAci),
+            .inviteLinkResetByOtherUser(let updaterAci),
+            .inviteLinkEnabledWithoutApprovalByOtherUser(let updaterAci),
+            .inviteLinkEnabledWithApprovalByOtherUser(let updaterAci),
+            .inviteLinkDisabledByOtherUser(let updaterAci),
+            .inviteLinkApprovalDisabledByOtherUser(let updaterAci),
+            .inviteLinkApprovalEnabledByOtherUser(let updaterAci),
+            .memberLabelsAccessChangedByOtherUser(let updaterAci, _),
+            .groupTerminatedByOtherUser(let updaterAci):
             return updaterAci
         case
-                .sequenceOfInviteLinkRequestAndCancels,
-                .invitedPniPromotedToFullMemberAci,
-                .genericUpdateByLocalUser,
-                .genericUpdateByUnknownUser,
-                .createdByLocalUser,
-                .createdByUnknownUser,
-                .inviteFriendsToNewlyCreatedGroup,
-                .wasMigrated,
-                .localUserInvitedAfterMigration,
-                .otherUsersInvitedAfterMigration,
-                .otherUsersDroppedAfterMigration,
-                .nameChangedByLocalUser,
-                .nameChangedByUnknownUser,
-                .nameRemovedByLocalUser,
-                .nameRemovedByUnknownUser,
-                .avatarChangedByLocalUser,
-                .avatarChangedByUnknownUser,
-                .avatarRemovedByLocalUser,
-                .avatarRemovedByUnknownUser,
-                .descriptionChangedByLocalUser,
-                .descriptionChangedByUnknownUser,
-                .descriptionRemovedByLocalUser,
-                .descriptionRemovedByUnknownUser,
-                .membersAccessChangedByLocalUser,
-                .membersAccessChangedByUnknownUser,
-                .attributesAccessChangedByLocalUser,
-                .attributesAccessChangedByUnknownUser,
-                .announcementOnlyEnabledByLocalUser,
-                .announcementOnlyEnabledByUnknownUser,
-                .announcementOnlyDisabledByLocalUser,
-                .announcementOnlyDisabledByUnknownUser,
-                .localUserWasGrantedAdministratorByLocalUser,
-                .localUserWasGrantedAdministratorByUnknownUser,
-                .localUserWasRevokedAdministratorByLocalUser,
-                .localUserWasRevokedAdministratorByUnknownUser,
-                .otherUserWasRevokedAdministratorByLocalUser,
-                .otherUserWasRevokedAdministratorByUnknownUser,
-                .localUserLeft,
-                .localUserRemovedByUnknownUser,
-                .otherUserLeft,
-                .otherUserRemovedByLocalUser,
-                .otherUserRemovedByUnknownUser,
-                .localUserWasInvitedByLocalUser,
-                .localUserWasInvitedByUnknownUser,
-                .otherUserWasInvitedByLocalUser,
-                .unnamedUsersWereInvitedByLocalUser,
-                .unnamedUsersWereInvitedByUnknownUser,
-                .localUserAcceptedInviteFromUnknownUser,
-                .otherUserAcceptedInviteFromLocalUser,
-                .otherUserAcceptedInviteFromUnknownUser,
-                .localUserJoined,
-                .otherUserJoined,
-                .localUserAddedByLocalUser,
-                .localUserAddedByUnknownUser,
-                .otherUserAddedByLocalUser,
-                .otherUserAddedByUnknownUser,
-                .localUserDeclinedInviteFromUnknownUser,
-                .otherUserDeclinedInviteFromLocalUser,
-                .otherUserDeclinedInviteFromUnknownUser,
-                .unnamedUserDeclinedInviteFromUnknownUser,
-                .localUserInviteRevoked,
-                .localUserInviteRevokedByUnknownUser,
-                .otherUserInviteRevokedByLocalUser,
-                .unnamedUserInvitesWereRevokedByLocalUser,
-                .unnamedUserInvitesWereRevokedByUnknownUser,
-                .localUserRequestedToJoin,
-                .otherUserRequestedToJoin,
-                .localUserRequestApproved,
-                .localUserRequestApprovedByUnknownUser,
-                .otherUserRequestApprovedByLocalUser,
-                .otherUserRequestApprovedByUnknownUser,
-                .localUserRequestCanceledByLocalUser,
-                .localUserRequestRejectedByUnknownUser,
-                .otherUserRequestRejectedByLocalUser,
-                .otherUserRequestRejectedByUnknownUser,
-                .otherUserRequestCanceledByOtherUser,
-                .disappearingMessagesEnabledByLocalUser,
-                .disappearingMessagesEnabledByUnknownUser,
-                .disappearingMessagesDisabledByLocalUser,
-                .disappearingMessagesDisabledByUnknownUser,
-                .inviteLinkResetByLocalUser,
-                .inviteLinkResetByUnknownUser,
-                .inviteLinkEnabledWithoutApprovalByLocalUser,
-                .inviteLinkEnabledWithoutApprovalByUnknownUser,
-                .inviteLinkEnabledWithApprovalByLocalUser,
-                .inviteLinkEnabledWithApprovalByUnknownUser,
-                .inviteLinkDisabledByLocalUser,
-                .inviteLinkDisabledByUnknownUser,
-                .inviteLinkApprovalEnabledByLocalUser,
-                .inviteLinkApprovalEnabledByUnknownUser,
-                .localUserJoinedViaInviteLink,
-                .inviteLinkApprovalDisabledByUnknownUser,
-                .otherUserJoinedViaInviteLink,
-                .inviteLinkApprovalDisabledByLocalUser:
+            .sequenceOfInviteLinkRequestAndCancels,
+            .invitedPniPromotedToFullMemberAci,
+            .genericUpdateByLocalUser,
+            .genericUpdateByUnknownUser,
+            .createdByLocalUser,
+            .createdByUnknownUser,
+            .inviteFriendsToNewlyCreatedGroup,
+            .wasMigrated,
+            .localUserInvitedAfterMigration,
+            .otherUsersInvitedAfterMigration,
+            .otherUsersDroppedAfterMigration,
+            .nameChangedByLocalUser,
+            .nameChangedByUnknownUser,
+            .nameRemovedByLocalUser,
+            .nameRemovedByUnknownUser,
+            .avatarChangedByLocalUser,
+            .avatarChangedByUnknownUser,
+            .avatarRemovedByLocalUser,
+            .avatarRemovedByUnknownUser,
+            .descriptionChangedByLocalUser,
+            .descriptionChangedByUnknownUser,
+            .descriptionRemovedByLocalUser,
+            .descriptionRemovedByUnknownUser,
+            .membersAccessChangedByLocalUser,
+            .membersAccessChangedByUnknownUser,
+            .attributesAccessChangedByLocalUser,
+            .attributesAccessChangedByUnknownUser,
+            .announcementOnlyEnabledByLocalUser,
+            .announcementOnlyEnabledByUnknownUser,
+            .announcementOnlyDisabledByLocalUser,
+            .announcementOnlyDisabledByUnknownUser,
+            .localUserWasGrantedAdministratorByLocalUser,
+            .localUserWasGrantedAdministratorByUnknownUser,
+            .localUserWasRevokedAdministratorByLocalUser,
+            .localUserWasRevokedAdministratorByUnknownUser,
+            .otherUserWasRevokedAdministratorByLocalUser,
+            .otherUserWasRevokedAdministratorByUnknownUser,
+            .localUserLeft,
+            .localUserRemovedByUnknownUser,
+            .otherUserLeft,
+            .otherUserRemovedByLocalUser,
+            .otherUserRemovedByUnknownUser,
+            .localUserWasInvitedByLocalUser,
+            .localUserWasInvitedByUnknownUser,
+            .otherUserWasInvitedByLocalUser,
+            .unnamedUsersWereInvitedByLocalUser,
+            .unnamedUsersWereInvitedByUnknownUser,
+            .localUserAcceptedInviteFromUnknownUser,
+            .otherUserAcceptedInviteFromLocalUser,
+            .otherUserAcceptedInviteFromUnknownUser,
+            .localUserJoined,
+            .otherUserJoined,
+            .localUserAddedByLocalUser,
+            .localUserAddedByUnknownUser,
+            .otherUserAddedByLocalUser,
+            .otherUserAddedByUnknownUser,
+            .localUserDeclinedInviteFromUnknownUser,
+            .otherUserDeclinedInviteFromLocalUser,
+            .otherUserDeclinedInviteFromUnknownUser,
+            .unnamedUserDeclinedInviteFromUnknownUser,
+            .localUserInviteRevoked,
+            .localUserInviteRevokedByUnknownUser,
+            .otherUserInviteRevokedByLocalUser,
+            .unnamedUserInvitesWereRevokedByLocalUser,
+            .unnamedUserInvitesWereRevokedByUnknownUser,
+            .localUserRequestedToJoin,
+            .otherUserRequestedToJoin,
+            .localUserRequestApproved,
+            .localUserRequestApprovedByUnknownUser,
+            .otherUserRequestApprovedByLocalUser,
+            .otherUserRequestApprovedByUnknownUser,
+            .localUserRequestCanceledByLocalUser,
+            .localUserRequestRejectedByUnknownUser,
+            .otherUserRequestRejectedByLocalUser,
+            .otherUserRequestRejectedByUnknownUser,
+            .otherUserRequestCanceledByOtherUser,
+            .disappearingMessagesEnabledByLocalUser,
+            .disappearingMessagesEnabledByUnknownUser,
+            .disappearingMessagesDisabledByLocalUser,
+            .disappearingMessagesDisabledByUnknownUser,
+            .inviteLinkResetByLocalUser,
+            .inviteLinkResetByUnknownUser,
+            .inviteLinkEnabledWithoutApprovalByLocalUser,
+            .inviteLinkEnabledWithoutApprovalByUnknownUser,
+            .inviteLinkEnabledWithApprovalByLocalUser,
+            .inviteLinkEnabledWithApprovalByUnknownUser,
+            .inviteLinkDisabledByLocalUser,
+            .inviteLinkDisabledByUnknownUser,
+            .inviteLinkApprovalEnabledByLocalUser,
+            .inviteLinkApprovalEnabledByUnknownUser,
+            .localUserJoinedViaInviteLink,
+            .inviteLinkApprovalDisabledByUnknownUser,
+            .otherUserJoinedViaInviteLink,
+            .inviteLinkApprovalDisabledByLocalUser,
+            .memberLabelsAccessChangedByLocalUser,
+            .memberLabelsAccessChangedByUnknownUser,
+            .groupTerminatedByLocalUser,
+            .groupTerminatedByUnknownUser:
             return nil
         }
     }

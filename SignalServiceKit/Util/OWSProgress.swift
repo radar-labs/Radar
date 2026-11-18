@@ -67,8 +67,8 @@ import Foundation
 /// OWSProgress optimizes for single-threaded updates; batching observer updates to do so efficiently.
 /// * NSProgress requires you to know unit counts for all children up-front and they must all share units.
 /// OWSProgress lets you add children lazily and renormalizes disparate units at each level of the tree.
-public class OWSProgress: Equatable, SomeOWSProgress, CustomStringConvertible {
-    public class ChildProgress: Equatable, SomeOWSProgress {
+public struct OWSProgress: Equatable, SomeOWSProgress, CustomStringConvertible {
+    public struct ChildProgress: Equatable, SomeOWSProgress {
         /// The completed unit count of this particular source/sink.
         /// The units DO NOT necessarily correspond to the units of the root OWSProgress.
         public let completedUnitCount: UInt64
@@ -100,7 +100,7 @@ public class OWSProgress: Equatable, SomeOWSProgress, CustomStringConvertible {
             return totalUnitCount == completedUnitCount
         }
 
-        public static func == (lhs: OWSProgress.ChildProgress, rhs: OWSProgress.ChildProgress) -> Bool {
+        public static func ==(lhs: OWSProgress.ChildProgress, rhs: OWSProgress.ChildProgress) -> Bool {
             return lhs.completedUnitCount == rhs.completedUnitCount
                 && lhs.totalUnitCount == rhs.totalUnitCount
                 && lhs.label == rhs.label
@@ -115,23 +115,34 @@ public class OWSProgress: Equatable, SomeOWSProgress, CustomStringConvertible {
     public init(
         completedUnitCount: UInt64,
         totalUnitCount: UInt64,
-        childProgresses: [String: [ChildProgress]] = [:],
     ) {
         self.completedUnitCount = completedUnitCount
         self.totalUnitCount = totalUnitCount
-        self.childProgresses = childProgresses
-        self.rootChildProgresses = nil
+        self._descendantProgresses = [:]
     }
+
+#if DEBUG
+
+    public static func withChildProgressForTesting(_ childProgress: ChildProgress) -> OWSProgress {
+        return OWSProgress(
+            completedUnitCount: 0,
+            totalUnitCount: 1,
+            descendantProgresses: [
+                childProgress.label: [.root().appending(childLabel: childProgress.label): childProgress],
+            ],
+        )
+    }
+
+#endif
 
     fileprivate init(
         completedUnitCount: UInt64,
         totalUnitCount: UInt64,
-        rootChildProgresses: [String: [OWSProgressRootNode.ChildIdentifier: ChildProgress]],
+        descendantProgresses: [String: [OWSProgressRootNode.Identifier: ChildProgress]],
     ) {
         self.completedUnitCount = completedUnitCount
         self.totalUnitCount = totalUnitCount
-        self.rootChildProgresses = rootChildProgresses
-        self.childProgresses = nil
+        self._descendantProgresses = descendantProgresses
     }
 
     public var description: String {
@@ -142,12 +153,9 @@ public class OWSProgress: Equatable, SomeOWSProgress, CustomStringConvertible {
         if totalUnitCount > 0 {
             return roundProgressPercent(
                 completedUnitCount: completedUnitCount,
-                totalUnitCount: totalUnitCount
+                totalUnitCount: totalUnitCount,
             )
-        } else if
-            (childProgresses?.isEmpty != false)
-            && (rootChildProgresses?.isEmpty != false)
-        {
+        } else if _descendantProgresses.isEmpty {
             // With no children, don't count as complete.
             return 0
         } else {
@@ -161,10 +169,7 @@ public class OWSProgress: Equatable, SomeOWSProgress, CustomStringConvertible {
     public var isFinished: Bool {
         if totalUnitCount > 0 {
             return totalUnitCount == completedUnitCount
-        } else if
-            (childProgresses?.isEmpty != false)
-            && (rootChildProgresses?.isEmpty != false)
-        {
+        } else if _descendantProgresses.isEmpty {
             // With no children, don't count as complete.
             return false
         } else {
@@ -175,49 +180,11 @@ public class OWSProgress: Equatable, SomeOWSProgress, CustomStringConvertible {
         }
     }
 
-    private let childProgresses: [String: [ChildProgress]]?
-    private let rootChildProgresses: [String: [OWSProgressRootNode.ChildIdentifier: ChildProgress]]?
+    private let _descendantProgresses: [String: [OWSProgressRootNode.Identifier: ChildProgress]]
 
-    /// Get the latest progress for any source/sink at any layer of the progress tree.
-    /// Maps from source/child sink label to the progress of that node.
-    /// Note: if there are multiple children with the same label, will pick an
-    /// arbitrary child. In most cases, there will be just one child and this
-    /// is fine and this API is provided for simplicity.
-    /// If not, use `progressesForAllChildren` to get the full acounting
-    /// of duplicate labels.
-    public func progressForChild(label: String) -> ChildProgress? {
-        return rootChildProgresses?[label]?.first?.value
-            ?? childProgresses?[label]?.first
-    }
-
-    /// Get the latest progress for any source/sink at any layer of the progress tree.
-    /// Maps from source/child sink label to the progress of all nodes with that label.
-    public func progressesForAllChildren(withLabel label: String) -> [ChildProgress] {
-        if let dict = rootChildProgresses?[label] {
-            return Array(dict.values)
-        } else {
-            return childProgresses?[label] ?? []
-        }
-    }
-
-    public var allChildProgresses: [ChildProgress] {
-        if let rootChildProgresses {
-            var progresses = [ChildProgress]()
-            for dict in rootChildProgresses.values {
-                for progress in dict.values {
-                    progresses.append(progress)
-                }
-            }
-            return progresses
-        } else {
-            var progresses = [ChildProgress]()
-            for arr in (childProgresses ?? [:]).values {
-                for progress in arr {
-                    progresses.append(progress)
-                }
-            }
-            return progresses
-        }
+    /// Get the latest progresses for all descendants with a given label.
+    public func descendantProgresses(withLabel label: String) -> some Collection<ChildProgress> {
+        return _descendantProgresses[label, default: [:]].values
     }
 
 #if DEBUG
@@ -252,10 +219,10 @@ public class OWSProgress: Equatable, SomeOWSProgress, CustomStringConvertible {
         return (sink, stream)
     }
 
-    public static func == (lhs: OWSProgress, rhs: OWSProgress) -> Bool {
+    public static func ==(lhs: OWSProgress, rhs: OWSProgress) -> Bool {
+        // TODO: Why is descendantProgress omitted here?
         return lhs.completedUnitCount == rhs.completedUnitCount
             && lhs.totalUnitCount == rhs.totalUnitCount
-            && lhs.childProgresses == rhs.childProgresses
     }
 }
 
@@ -300,7 +267,7 @@ public protocol OWSProgressSink {
     /// results in undefined behavior; old progress values are not renormalized to new total unit counts.
     /// Adding grandchildren is allowed; typically you want to "reserve" proportional unit counts
     /// by adding a child up-front and then adding a grandchild to that child later.
-    func addChild(withLabel label: String, unitCount: UInt64) async -> OWSProgressSink
+    func addChild(withLabel label: String, unitCount: UInt64) -> OWSProgressSink
 
     /// Add a source, returning it.
     /// Sources contribute to the total unit count of their parent.
@@ -315,7 +282,7 @@ public protocol OWSProgressSink {
     /// results in undefined behavior; old progress values are not renormalized to new total unit counts.
     /// Adding grandchildren is allowed; typically you want to "reserve" proportional unit counts
     /// by adding a child up-front and then adding a source to that child later.
-    func addSource(withLabel label: String, unitCount: UInt64) async -> OWSProgressSource
+    func addSource(withLabel label: String, unitCount: UInt64) -> OWSProgressSource
 }
 
 /// Sources are **NOT** thread-safe and should only be updated from a single thread or locking context.
@@ -332,12 +299,49 @@ public protocol OWSProgressSource {
 }
 
 extension OWSProgressSource {
-    func complete() {
+    public func complete() {
         incrementCompletedUnitCount(by: totalUnitCount)
+    }
+
+    func incrementCompletedUnitCount(to value: UInt64) {
+        if completedUnitCount >= value {
+            return
+        }
+        incrementCompletedUnitCount(by: value - completedUnitCount)
+    }
+}
+
+/// Lazily creates an OWSProgressSource after learning the total byte count.
+struct LazyProgressSource: ~Copyable {
+    private let sink: (any OWSProgressSink)?
+    private let label: String
+    private var source: (any OWSProgressSource)?
+
+    init(sink: (any OWSProgressSink)?, label: String) {
+        self.sink = sink
+        self.label = label
+        self.source = nil
+    }
+
+    mutating func handleUpdate(_ progressUpdate: OWSURLSession.ProgressUpdate) {
+        if let sink, self.source == nil, let totalByteCount = progressUpdate.totalByteCount {
+            self.source = sink.addSource(withLabel: self.label, unitCount: totalByteCount)
+        }
+        self.source?.incrementCompletedUnitCount(to: progressUpdate.completedByteCount)
+    }
+
+    consuming func complete() {
+        self.source?.complete()
     }
 }
 
 extension OWSProgressSource where Self: Sendable {
+
+    func asProgressBlock() -> OWSURLSession.ProgressBlock {
+        return { progressUpdate in
+            self.incrementCompletedUnitCount(to: progressUpdate.completedByteCount)
+        }
+    }
 
     /// Given some block of asynchronous work, update progress
     /// on the current source periodically (every ``timeInterval`` seconds)
@@ -346,59 +350,39 @@ extension OWSProgressSource where Self: Sendable {
     public func updatePeriodically<T, E>(
         timeInterval: TimeInterval = 0.1,
         estimatedTimeToCompletion: TimeInterval,
-        work: @escaping () async throws(E) -> T
+        work: () async throws(E) -> T,
     ) async throws(E) -> T {
-        let sleepDurationMillis = UInt64(timeInterval * 1000)
-        let source = self
-        let didComplete = AtomicBool(false, lock: .init())
-        let startDate = Date()
-        var lastCompletedUnitCount = source.completedUnitCount
-        // Minus one so the timer can never complete it.
-        let maxTimerCompletedUnitCount = source.totalUnitCount - 1
-        let timeToUnitsMultiplier = Double(source.totalUnitCount) / estimatedTimeToCompletion
-        let result = await withTaskGroup(of: Optional<Result<T, E>>.self) { taskGroup in
-            taskGroup.addTask {
-                while !didComplete.get() {
-                    try? await Task.sleep(nanoseconds: sleepDurationMillis * NSEC_PER_MSEC)
-                    let date = Date()
-                    var units = UInt64(date.timeIntervalSince(startDate) * timeToUnitsMultiplier)
-                    units = min(maxTimerCompletedUnitCount, units)
-                    defer { lastCompletedUnitCount = units }
-                    let incrementalUnits = units - lastCompletedUnitCount
-                    if incrementalUnits > 0 {
-                        source.incrementCompletedUnitCount(by: units)
-                    }
-                }
-                return nil
-            }
-            taskGroup.addTask {
-                let result: Result<T, E>
-                do {
-                    result = .success(try await work())
-                } catch let error as E {
-                    didComplete.set(true)
-                    return .failure(error)
-                } catch {
-                    // Impossible; work only throws E
-                    fatalError()
-                }
-                didComplete.set(true)
-                source.incrementCompletedUnitCount(by: source.totalUnitCount)
-                return result
-            }
-            while let result = await taskGroup.next() {
-                switch result {
-                case .none:
-                    break
-                case .some(let value):
-                    return value
+        let startTime = CACurrentMediaTime()
+
+        let updateTask = Task { [completedUnitCount, totalUnitCount] in
+            var oldValue: UInt64 = 0
+            // Minus one so the timer can never complete it.
+            let maxValue = totalUnitCount - completedUnitCount - 1
+            let unitsPerSecond = Double(totalUnitCount - completedUnitCount) / estimatedTimeToCompletion
+            while oldValue < maxValue {
+                try await Task.sleep(nanoseconds: timeInterval.clampedNanoseconds)
+                var newValue = UInt64(clamping: (CACurrentMediaTime() - startTime) * unitsPerSecond)
+                newValue = min(maxValue, newValue)
+                let delta = newValue - oldValue
+                oldValue = newValue
+                if delta > 0 {
+                    incrementCompletedUnitCount(by: delta)
                 }
             }
-            // Impossible to get here; the second task in the group
-            // always returns some result.
-            fatalError()
         }
-        return try result.get()
+
+        do throws(E) {
+            let result = try await work()
+            updateTask.cancel()
+            // Don't call incrementCompletedUnitCount concurrently with updateTask.
+            try? await updateTask.value
+            incrementCompletedUnitCount(by: totalUnitCount)
+            return result
+        } catch {
+            updateTask.cancel()
+            try? await updateTask.value
+            throw error
+        }
     }
 }
 
@@ -406,104 +390,97 @@ extension OWSProgressSource where Self: Sendable {
 
 /// Root node for OWSProgress. Does not itself have a unit count or concept of progress;
 /// its children define units entirely.
-private actor OWSProgressRootNode: OWSProgressSink {
+private class OWSProgressRootNode: OWSProgressSink {
 
     private let streamContinuation: AsyncStream<OWSProgress>.Continuation
-    private var observerQueue = SerialTaskQueue()
-
-    // Maps from node label to a weak reference to the node
-    // for all nodes at all layers of the tree.
-    private var allNodes = [ChildIdentifier: Weak<OWSProgressChildNode>]()
-
-    enum ParentLabel: Hashable, Equatable {
-        case root
-        case childSink(ChildIdentifier)
-
-        var label: String? {
-            switch self {
-            case .root: nil
-            case .childSink(let childIdentifier): childIdentifier.label
-            }
-        }
-
-        var identifier: ChildIdentifier? {
-            switch self {
-            case .root: nil
-            case .childSink(let identifier): identifier
-            }
-        }
-    }
+    private let observerQueue = SerialTaskQueue()
 
     /// A label is not enough to identify a child; we identify by the sequence
     /// of labels starting at the root.
-    fileprivate struct ChildIdentifier: Hashable, Equatable {
-        let labelChain: [String]
+    struct Identifier: Hashable, Equatable {
+        /// An empty chain represents the root.
+        let chain: [String]
 
-        var label: String { labelChain.last! }
-        var parentLabel: String? {
-            if labelChain.count > 1 {
-                return labelChain[labelChain.count - 2]
-            } else {
+        private init(chain: [String]) {
+            self.chain = chain
+        }
+
+        var label: String? { chain.last }
+
+        static func root() -> Self {
+            return Self(chain: [])
+        }
+
+        func appending(childLabel: String) -> Identifier {
+            return Identifier(chain: chain + [childLabel])
+        }
+
+        func parent() -> Identifier? {
+            if chain.isEmpty {
                 return nil
+            } else {
+                return Identifier(chain: chain.dropLast())
             }
-        }
-
-        static func childOfRoot(label: String) -> ChildIdentifier {
-            return ChildIdentifier(labelChain: [label])
-        }
-
-        func appending(childLabel: String) -> ChildIdentifier {
-            return ChildIdentifier(labelChain: labelChain + [childLabel])
         }
     }
 
-    // Maps from parent label (or nil for root node) to labels of direct children.
-    private var childLabels = [ChildIdentifier?: Set<String>]()
-    // Maps from child label to label of parent.
-    private var parentLabels = [ChildIdentifier: ParentLabel]()
+    private let state = AtomicValue<State>(State(), lock: .init())
 
-    // Maps from parent label to the sum of unit counts of direct
-    // children. We cache this since it doesn't change often and
-    // saves the O(n) time spent adding on every progress update.
-    private var totalUnitCountOfChildren = [ChildIdentifier: UInt64]()
-    // Maps from parent label to the sum of unit counts of direct
-    // children. We cache this since it doesn't change often and
-    // saves the O(n) time spent adding on every progress update.
-    private var completedUnitCountOfChildren = [ChildIdentifier: UInt64]()
-    // Maps from node label to the last computed unit counts
-    // of nodes with that label, in its parent's units.
-    private var childProgresses = [String: [ChildIdentifier: OWSProgress.ChildProgress]]()
+    struct State {
+        // Maps from node label to a weak reference to the node
+        // for all nodes at all layers of the tree.
+        var allDescendantNodes = [Identifier: Weak<OWSProgressChildNode>]()
 
-    // We cache these values so that we can compute diffs efficiently.
-    private var totalUnitCountOfDirectChildren: UInt64 = 0
-    private var completedUnitCountOfDirectChildren: UInt64 = 0
+        // Maps from parent identifier to labels of direct children.
+        var childLabels = [Identifier: Set<String>]()
+
+        // Maps from parent label to the sum of unit counts of direct
+        // children. We cache this since it doesn't change often and
+        // saves the O(n) time spent adding on every progress update.
+        var totalUnitCountOfChildren = [Identifier: UInt64]()
+        // Maps from parent label to the sum of unit counts of direct
+        // children. We cache this since it doesn't change often and
+        // saves the O(n) time spent adding on every progress update.
+        var completedUnitCountOfChildren = [Identifier: UInt64]()
+        // Maps from node label to the last computed unit counts
+        // of nodes with that label, in its parent's units.
+        var childProgresses = [String: [Identifier: OWSProgress.ChildProgress]]()
+
+        // We cache these values so that we can compute diffs efficiently.
+        var totalUnitCountOfDirectChildren: UInt64 = 0
+        var completedUnitCountOfDirectChildren: UInt64 = 0
+    }
 
     fileprivate init(streamContinuation: AsyncStream<OWSProgress>.Continuation) {
         self.streamContinuation = streamContinuation
     }
 
-    func addChild(withLabel label: String, unitCount: UInt64) async -> OWSProgressSink {
+    func addChild(withLabel label: String, unitCount: UInt64) -> OWSProgressSink {
         let child = OWSProgressSinkNode(
             label: label,
             parent: self,
-            rootNode: self
+            rootNode: self,
         )
-        self.addChild(child, toParent: .root, unitCount: unitCount)
+        self.addChild(child, toParent: .root(), unitCount: unitCount)
         return child
     }
 
-    func addSource(withLabel label: String, unitCount: UInt64) async -> OWSProgressSource {
+    func addSource(withLabel label: String, unitCount: UInt64) -> OWSProgressSource {
         let child = OWSProgressSourceNode(
             label: label,
             totalUnitCount: unitCount,
             parent: self,
-            rootNode: self
+            rootNode: self,
         )
-        self.addChild(child, toParent: .root, unitCount: unitCount)
+        self.addChild(child, toParent: .root(), unitCount: unitCount)
         return child
     }
 
     fileprivate func progressDidUpdate(updatedNode: OWSProgressSourceNode) {
+        state.update { _progressDidUpdate(updatedNode: updatedNode, state: &$0) }
+    }
+
+    fileprivate func _progressDidUpdate(updatedNode: OWSProgressSourceNode, state: inout State) {
         if updatedNode.isOrphaned {
             // If the node was orphaned (replaced by another node
             // created with the same label), stop. Updates from
@@ -511,24 +488,16 @@ private actor OWSProgressRootNode: OWSProgressSink {
             return
         }
 
-        guard
-            updatedNode.completedUnitCount
-                != childProgresses[updatedNode.label]![updatedNode.identifier]!
-                    .completedUnitCount
-        else {
-            // No change!
-            return
-        }
-
         self.recursiveUpdateCompletedUnitCounts(
             forNodeWithIdentifier: updatedNode.identifier,
-            newCompletedUnitCount: updatedNode.completedUnitCount
+            newCompletedUnitCount: updatedNode.completedUnitCount,
+            state: &state,
         )
 
         let progress = OWSProgress(
-            completedUnitCount: self.completedUnitCountOfDirectChildren,
-            totalUnitCount: self.totalUnitCountOfDirectChildren,
-            rootChildProgresses: self.childProgresses,
+            completedUnitCount: state.completedUnitCountOfDirectChildren,
+            totalUnitCount: state.totalUnitCountOfDirectChildren,
+            descendantProgresses: state.childProgresses,
         )
         observerQueue.enqueue { [streamContinuation, progress] in
             streamContinuation.yield(progress)
@@ -542,58 +511,57 @@ private actor OWSProgressRootNode: OWSProgressSink {
 
     fileprivate func addChild(
         _ child: OWSProgressChildNode,
-        toParent parentLabel: ParentLabel,
-        unitCount: UInt64
+        toParent parentIdentifier: Identifier,
+        unitCount: UInt64,
+    ) {
+        state.update { _addChild(child, toParent: parentIdentifier, unitCount: unitCount, state: &$0) }
+    }
+
+    fileprivate func _addChild(
+        _ child: OWSProgressChildNode,
+        toParent parentIdentifier: Identifier,
+        unitCount: UInt64,
+        state: inout State,
     ) {
         let label = child.label
         let identifier = child.identifier
 
-        switch parentLabel {
-        case .root:
-            break
-        case .childSink(let parentLabel):
-            if (allNodes[parentLabel]?.value as? OWSProgressChildNode)?.isOrphaned == true {
-                // If the parent was orphaned (replaced by another node
-                // created with the same label), stop. The new node will
-                // point nowhere and be ignored.
-                return
-            }
+        if state.allDescendantNodes[parentIdentifier]?.value?.isOrphaned == true {
+            // If the parent was orphaned (replaced by another node
+            // created with the same label), stop. The new node will
+            // point nowhere and be ignored.
+            return
         }
 
-        if allNodes[child.identifier] != nil {
+        if state.allDescendantNodes[identifier] != nil {
             // Remove any existing children first.
-            self.removeChild(withIdentifier: identifier)
+            self._removeChild(withIdentifier: identifier, state: &state)
         }
 
         // First, add the node to its parent's child references.
-        self.allNodes[identifier] = Weak(value: child)
-        self.childLabels[parentLabel.identifier] = (self.childLabels[parentLabel.identifier] ?? Set()).union([label])
-        self.parentLabels[identifier] = parentLabel
+        state.allDescendantNodes[identifier] = Weak(value: child)
+        state.childLabels[parentIdentifier, default: Set()].insert(label)
         if child is OWSProgressParentNode {
-            self.totalUnitCountOfChildren[identifier] = 0
-            self.completedUnitCountOfChildren[identifier] = 0
+            state.totalUnitCountOfChildren[identifier] = 0
+            state.completedUnitCountOfChildren[identifier] = 0
         }
-        let childProgress = OWSProgress.ChildProgress(
+        state.childProgresses[label, default: [:]][identifier] = OWSProgress.ChildProgress(
             completedUnitCount: 0,
             totalUnitCount: unitCount,
             label: label,
-            parentLabel: parentLabel.label
+            parentLabel: parentIdentifier.label,
         )
-        var labelProgresses = self.childProgresses[label] ?? [:]
-        labelProgresses[identifier] = childProgress
-        self.childProgresses[label] = labelProgresses
 
         // Update the parent's counts
-        switch parentLabel {
-        case .root:
-            self.totalUnitCountOfDirectChildren += unitCount
-        case .childSink(let parentIdentifier):
-            var totalUnitCountOfChildren = self.totalUnitCountOfChildren[parentIdentifier]!
+        if parentIdentifier == .root() {
+            state.totalUnitCountOfDirectChildren += unitCount
+        } else {
+            var totalUnitCountOfChildren = state.totalUnitCountOfChildren[parentIdentifier]!
             totalUnitCountOfChildren += unitCount
-            self.totalUnitCountOfChildren[parentIdentifier] = totalUnitCountOfChildren
+            state.totalUnitCountOfChildren[parentIdentifier] = totalUnitCountOfChildren
 
             // Update the progress of the parent.
-            let oldParentProgress = childProgresses[parentIdentifier.label]![parentIdentifier]!
+            let oldParentProgress = state.childProgresses[parentIdentifier.label!]![parentIdentifier]!
             // The _parent's_ total unit count is unchanged.
             let newParentTotalUnitCount = oldParentProgress.totalUnitCount
             // The parent's completed unit count changes proportionally.
@@ -602,24 +570,25 @@ private actor OWSProgressRootNode: OWSProgressSink {
                 newParentCompletedUnitCount = newParentTotalUnitCount
             } else {
                 newParentCompletedUnitCount = renormalizeCompletedUnitCount(
-                    childrensCompletedUnitCount: completedUnitCountOfChildren[parentIdentifier]!,
+                    childrensCompletedUnitCount: state.completedUnitCountOfChildren[parentIdentifier]!,
                     childrensTotalUnitCount: totalUnitCountOfChildren,
-                    parentTotalUnitCount: newParentTotalUnitCount
+                    parentTotalUnitCount: newParentTotalUnitCount,
                 )
             }
 
             // Now update the progress values all the way up the tree.
             self.recursiveUpdateCompletedUnitCounts(
                 forNodeWithIdentifier: parentIdentifier,
-                newCompletedUnitCount: newParentCompletedUnitCount
+                newCompletedUnitCount: newParentCompletedUnitCount,
+                state: &state,
             )
         }
 
         // Lastly recompute and emit progress
         let progress = OWSProgress(
-            completedUnitCount: completedUnitCountOfDirectChildren,
-            totalUnitCount: totalUnitCountOfDirectChildren,
-            rootChildProgresses: childProgresses,
+            completedUnitCount: state.completedUnitCountOfDirectChildren,
+            totalUnitCount: state.totalUnitCountOfDirectChildren,
+            descendantProgresses: state.childProgresses,
         )
         observerQueue.enqueue { [streamContinuation, progress] in
             streamContinuation.yield(progress)
@@ -629,53 +598,53 @@ private actor OWSProgressRootNode: OWSProgressSink {
         }
     }
 
-    fileprivate func removeChild(
-        withIdentifier identifier: ChildIdentifier
-    ) {
+    fileprivate func _removeChild(withIdentifier identifier: Identifier, state: inout State) {
+        guard let label = identifier.label else {
+            owsFailDebug("can't remove root")
+            return
+        }
+
         // Mark the child and its children orphaned; future updates to it
         // will be ignored.
         var identifiersToMarkOrphaned = Set(arrayLiteral: identifier)
         while let identifierToMarkOrphaned = identifiersToMarkOrphaned.popFirst() {
-            let childLabels = self.childLabels[identifierToMarkOrphaned] ?? Set()
+            let childLabels = state.childLabels[identifierToMarkOrphaned] ?? Set()
             identifiersToMarkOrphaned.formUnion(childLabels.map({ identifierToMarkOrphaned.appending(childLabel: $0) }))
-            allNodes[identifierToMarkOrphaned]?.value?.isOrphaned = true
+            state.allDescendantNodes[identifierToMarkOrphaned]?.value?.isOrphaned = true
         }
 
-        // Mark all its childre
+        // Mark all its children
 
         guard
-            let parentLabel = self.parentLabels[identifier],
-            let removedNodeProgress = self.childProgresses[identifier.label]?[identifier]
+            let parentIdentifier = identifier.parent(),
+            let removedNodeProgress = state.childProgresses[label]?[identifier]
         else {
             owsFailDebug("Removing a label that didn't exist?")
             return
         }
 
         // First, remove the node from its parent's child references.
-        var childrenOfParent = self.childLabels[parentLabel.identifier]
-        childrenOfParent?.remove(identifier.label)
-        self.childLabels[parentLabel.identifier] = childrenOfParent
+        state.childLabels[parentIdentifier]?.remove(label)
 
         // Next, update the progress on the parent.
-        switch parentLabel {
-        case .root:
-            self.totalUnitCountOfDirectChildren -= removedNodeProgress.totalUnitCount
-            self.completedUnitCountOfDirectChildren -= removedNodeProgress.completedUnitCount
-        case .childSink(let parentIdentifier):
+        if parentIdentifier == .root() {
+            state.totalUnitCountOfDirectChildren -= removedNodeProgress.totalUnitCount
+            state.completedUnitCountOfDirectChildren -= removedNodeProgress.completedUnitCount
+        } else {
             // The direct parent's update is special; we've affected the total
             // unit count of its children as well as the completed unit count
             // of its children. This does NOT affect the total unit count
             // in _its_ parent, so once we compute the direct parent's new
             // completed unit count we can update recursively up the tree as normal.
-            var totalUnitCountOfChildren = self.totalUnitCountOfChildren[parentIdentifier]!
+            var totalUnitCountOfChildren = state.totalUnitCountOfChildren[parentIdentifier]!
             totalUnitCountOfChildren -= removedNodeProgress.totalUnitCount
-            self.totalUnitCountOfChildren[parentIdentifier] = totalUnitCountOfChildren
-            var completedUnitCountOfChildren = self.completedUnitCountOfChildren[parentIdentifier]!
+            state.totalUnitCountOfChildren[parentIdentifier] = totalUnitCountOfChildren
+            var completedUnitCountOfChildren = state.completedUnitCountOfChildren[parentIdentifier]!
             completedUnitCountOfChildren -= removedNodeProgress.completedUnitCount
-            self.completedUnitCountOfChildren[parentIdentifier] = completedUnitCountOfChildren
+            state.completedUnitCountOfChildren[parentIdentifier] = completedUnitCountOfChildren
 
             // Update the progress of the parent.
-            let oldParentProgress = childProgresses[parentIdentifier.label]![parentIdentifier]!
+            let oldParentProgress = state.childProgresses[parentIdentifier.label!]![parentIdentifier]!
             // The _parent's_ total unit count is unchanged.
             let newParentTotalUnitCount = oldParentProgress.totalUnitCount
             // The parent's completed unit count changes proportionally.
@@ -686,71 +655,68 @@ private actor OWSProgressRootNode: OWSProgressSink {
                 newParentCompletedUnitCount = renormalizeCompletedUnitCount(
                     childrensCompletedUnitCount: completedUnitCountOfChildren,
                     childrensTotalUnitCount: totalUnitCountOfChildren,
-                    parentTotalUnitCount: newParentTotalUnitCount
+                    parentTotalUnitCount: newParentTotalUnitCount,
                 )
             }
 
             // Now update the progress values all the way up the tree.
             self.recursiveUpdateCompletedUnitCounts(
                 forNodeWithIdentifier: parentIdentifier,
-                newCompletedUnitCount: newParentCompletedUnitCount
+                newCompletedUnitCount: newParentCompletedUnitCount,
+                state: &state,
             )
         }
 
         // Last, remove it and all its children from our references.
-        var identifiersToRemove = Set<ChildIdentifier>(arrayLiteral: identifier)
+        var identifiersToRemove = Set<Identifier>(arrayLiteral: identifier)
         while let identifierToRemove = identifiersToRemove.popFirst() {
-            let childLabels = self.childLabels[identifierToRemove] ?? Set()
+            let childLabels = state.childLabels.removeValue(forKey: identifierToRemove) ?? Set()
             identifiersToRemove.formUnion(childLabels.map({ identifierToRemove.appending(childLabel: $0) }))
-            self.allNodes.removeValue(forKey: identifierToRemove)
-            self.childLabels.removeValue(forKey: identifierToRemove)
-            self.parentLabels.removeValue(forKey: identifierToRemove)
-            self.totalUnitCountOfChildren.removeValue(forKey: identifierToRemove)
-            self.completedUnitCountOfChildren.removeValue(forKey: identifierToRemove)
-            var progressesForLabel = self.childProgresses[identifierToRemove.label] ?? [:]
-            progressesForLabel.removeValue(forKey: identifierToRemove)
-            self.childProgresses[identifierToRemove.label] = progressesForLabel
+            state.allDescendantNodes.removeValue(forKey: identifierToRemove)
+            state.totalUnitCountOfChildren.removeValue(forKey: identifierToRemove)
+            state.completedUnitCountOfChildren.removeValue(forKey: identifierToRemove)
+            state.childProgresses[identifierToRemove.label!]?.removeValue(forKey: identifierToRemove)
         }
     }
 
     private func recursiveUpdateCompletedUnitCounts(
-        forNodeWithIdentifier identifier: ChildIdentifier,
-        newCompletedUnitCount: UInt64
+        forNodeWithIdentifier identifier: Identifier,
+        newCompletedUnitCount: UInt64,
+        state: inout State,
     ) {
-        var progressesForLabel = self.childProgresses[identifier.label]!
-        let oldChildProgress = progressesForLabel[identifier]!
+        let label = identifier.label!
+        let oldChildProgress = state.childProgresses[label]![identifier]!
         let newChildProgress = OWSProgress.ChildProgress(
             completedUnitCount: newCompletedUnitCount,
             totalUnitCount: oldChildProgress.totalUnitCount,
-            label: identifier.label,
-            parentLabel: identifier.parentLabel
+            label: label,
+            parentLabel: identifier.parent()?.label,
         )
-        progressesForLabel[identifier] = newChildProgress
-        self.childProgresses[identifier.label] = progressesForLabel
+        state.childProgresses[label]![identifier] = newChildProgress
 
-        switch self.parentLabels[identifier]! {
-        case .root:
-            self.completedUnitCountOfDirectChildren -= oldChildProgress.completedUnitCount
-            self.completedUnitCountOfDirectChildren += newChildProgress.completedUnitCount
+        let parentIdentifier = identifier.parent()!
+        if parentIdentifier == .root() {
+            state.completedUnitCountOfDirectChildren -= oldChildProgress.completedUnitCount
+            state.completedUnitCountOfDirectChildren += newChildProgress.completedUnitCount
             // Done.
-            return
-        case .childSink(let parentIdentifier):
+        } else {
             // Update progress on the parent and then call recursively
-            var completedUnitCountOfChildren = self.completedUnitCountOfChildren[parentIdentifier]!
+            var completedUnitCountOfChildren = state.completedUnitCountOfChildren[parentIdentifier]!
             completedUnitCountOfChildren -= oldChildProgress.completedUnitCount
             completedUnitCountOfChildren += newChildProgress.completedUnitCount
-            self.completedUnitCountOfChildren[parentIdentifier] = completedUnitCountOfChildren
+            state.completedUnitCountOfChildren[parentIdentifier] = completedUnitCountOfChildren
 
-            let totalUnitCountOfChildren = self.totalUnitCountOfChildren[parentIdentifier]!
-            let totalUnitCount = self.childProgresses[parentIdentifier.label]![parentIdentifier]!.totalUnitCount
+            let totalUnitCountOfChildren = state.totalUnitCountOfChildren[parentIdentifier]!
+            let totalUnitCount = state.childProgresses[parentIdentifier.label!]![parentIdentifier]!.totalUnitCount
             let newParentCompletedUnitCount = renormalizeCompletedUnitCount(
                 childrensCompletedUnitCount: completedUnitCountOfChildren,
                 childrensTotalUnitCount: totalUnitCountOfChildren,
-                parentTotalUnitCount: totalUnitCount
+                parentTotalUnitCount: totalUnitCount,
             )
             return self.recursiveUpdateCompletedUnitCounts(
                 forNodeWithIdentifier: parentIdentifier,
-                newCompletedUnitCount: newParentCompletedUnitCount
+                newCompletedUnitCount: newParentCompletedUnitCount,
+                state: &state,
             )
         }
     }
@@ -760,17 +726,21 @@ private actor OWSProgressRootNode: OWSProgressSink {
 
 private protocol OWSProgressNode {}
 
-private protocol OWSProgressParentNode: OWSProgressNode {}
+private protocol OWSProgressParentNode: OWSProgressNode {
+    var identifier: OWSProgressRootNode.Identifier { get }
+}
 
 private protocol OWSProgressChildNode: OWSProgressNode {
     var label: String { get }
-    var identifier: OWSProgressRootNode.ChildIdentifier { get }
+    var identifier: OWSProgressRootNode.Identifier { get }
     var parent: OWSProgressParentNode { get }
     /// Should only be read from root node's isolation context.
     var isOrphaned: Bool { get set }
 }
 
-extension OWSProgressRootNode: OWSProgressParentNode {}
+extension OWSProgressRootNode: OWSProgressParentNode {
+    nonisolated var identifier: Identifier { .root() }
+}
 
 // MARK: - Node implementations
 
@@ -780,7 +750,7 @@ private class OWSProgressSinkNode: OWSProgressSink, OWSProgressParentNode, OWSPr
     var isOrphaned: Bool = false
 
     var label: String
-    var identifier: OWSProgressRootNode.ChildIdentifier
+    var identifier: OWSProgressRootNode.Identifier
 
     let parent: OWSProgressParentNode
     let rootNode: OWSProgressRootNode
@@ -788,37 +758,34 @@ private class OWSProgressSinkNode: OWSProgressSink, OWSProgressParentNode, OWSPr
     init(
         label: String,
         parent: OWSProgressParentNode,
-        rootNode: OWSProgressRootNode
+        rootNode: OWSProgressRootNode,
     ) {
         self.label = label
         self.parent = parent
         self.rootNode = rootNode
-        self.identifier = (parent as? OWSProgressChildNode)?
-            .identifier
-            .appending(childLabel: label)
-            ?? .childOfRoot(label: label)
+        self.identifier = parent.identifier.appending(childLabel: label)
     }
 
-    func addChild(withLabel label: String, unitCount: UInt64) async -> OWSProgressSink {
+    func addChild(withLabel label: String, unitCount: UInt64) -> OWSProgressSink {
         let child = OWSProgressSinkNode(
             label: label,
             parent: self,
-            rootNode: rootNode
+            rootNode: rootNode,
         )
         // Call up to the parent to utilize its isolation context
-        await rootNode.addChild(child, toParent: .childSink(self.identifier), unitCount: unitCount)
+        rootNode.addChild(child, toParent: self.identifier, unitCount: unitCount)
         return child
     }
 
-    func addSource(withLabel label: String, unitCount: UInt64) async -> OWSProgressSource {
+    func addSource(withLabel label: String, unitCount: UInt64) -> OWSProgressSource {
         let child = OWSProgressSourceNode(
             label: label,
             totalUnitCount: unitCount,
             parent: self,
-            rootNode: rootNode
+            rootNode: rootNode,
         )
         // Call up to the parent to utilize its isolation context
-        await rootNode.addChild(child, toParent: .childSink(self.identifier), unitCount: unitCount)
+        rootNode.addChild(child, toParent: self.identifier, unitCount: unitCount)
         return child
     }
 }
@@ -827,7 +794,7 @@ private class OWSProgressSourceNode: OWSProgressSource, OWSProgressChildNode {
 
     var isOrphaned: Bool = false
     var label: String
-    var identifier: OWSProgressRootNode.ChildIdentifier
+    var identifier: OWSProgressRootNode.Identifier
 
     let totalUnitCount: UInt64
     var completedUnitCount: UInt64
@@ -839,57 +806,44 @@ private class OWSProgressSourceNode: OWSProgressSource, OWSProgressChildNode {
         label: String,
         totalUnitCount: UInt64,
         parent: OWSProgressParentNode,
-        rootNode: OWSProgressRootNode
+        rootNode: OWSProgressRootNode,
     ) {
         self.label = label
         self.parent = parent
         self.rootNode = rootNode
         self.totalUnitCount = totalUnitCount
         self.completedUnitCount = 0
-        self.identifier = (parent as? OWSProgressChildNode)?
-            .identifier
-            .appending(childLabel: label)
-            ?? .childOfRoot(label: label)
+        self.identifier = parent.identifier.appending(childLabel: label)
     }
 
     func incrementCompletedUnitCount(by increment: UInt64) {
-        let incrementedUnitCount: UInt64 = {
-            if UInt64.max - increment < completedUnitCount {
-                // Avoid UInt64 overflow, if necessary.
-                return .max
-            }
-
-            return completedUnitCount + increment
-        }()
-
-        completedUnitCount = min(
-            totalUnitCount,
-            incrementedUnitCount
-        )
+        var increment = increment
+        increment = min(increment, totalUnitCount - completedUnitCount)
+        if increment == 0 {
+            return
+        }
+        completedUnitCount += increment
         emitProgressIfNeeded()
     }
 
     /// Tracks whether an async progress update task has been scheduled
     /// but not run yet; if true further calls to ``emitProgressIfNeeded``
     /// will early exit.
-    private var dirtyBit = false
+    private let dirtyBit = AtomicBool(false, lock: .init())
 
     fileprivate func emitProgressIfNeeded() {
-        guard !dirtyBit else {
+        guard dirtyBit.tryToSetFlag() else {
             return
         }
-        dirtyBit = true
-        // Retain self, so that if the caller updates progress
-        // to 100% then discards the reference to self, its
-        // still retained long enough to update observers.
+        // Retain self, so that if the caller updates progress to 100% then
+        // discards the reference to self, it's still retained long enough to
+        // update observers.
         Task { [self, rootNode] in
-            // It looks risky to write this value from an
-            // arbitrary task thread; but because we read
-            // the progress value after setting this it should
-            // never result in missed updates (just additional
-            // unecessary updates).
-            self.dirtyBit = false
-            await rootNode.progressDidUpdate(updatedNode: self)
+            // It looks risky to write this value from an arbitrary task thread; but
+            // because we read the progress value after setting this it should never
+            // result in missed updates (just additional unecessary updates).
+            self.dirtyBit.set(false)
+            rootNode.progressDidUpdate(updatedNode: self)
         }
     }
 }
@@ -917,7 +871,7 @@ private func roundProgressPercent(
 private func renormalizeCompletedUnitCount(
     childrensCompletedUnitCount: UInt64,
     childrensTotalUnitCount: UInt64,
-    parentTotalUnitCount: UInt64
+    parentTotalUnitCount: UInt64,
 ) -> UInt64 {
     if parentTotalUnitCount == 0 {
         return 0

@@ -3,14 +3,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import UIKit
 public import SignalServiceKit
+import UIKit
 
 // MARK: - ProfileDetailLabel
 
 public class ProfileDetailLabel: UIStackView {
     private let tapAction: (() -> Void)?
-    private let longPressAction: (() -> Void)?
 
     public convenience init(
         title: String,
@@ -19,7 +18,6 @@ public class ProfileDetailLabel: UIStackView {
         showDetailDisclosure: Bool = false,
         shouldLineWrap: Bool = true,
         tapAction: (() -> Void)? = nil,
-        longPressAction: (() -> Void)? = nil
     ) {
         self.init(
             attributedTitle: NSMutableAttributedString(
@@ -27,14 +25,13 @@ public class ProfileDetailLabel: UIStackView {
                 attributes: [
                     .font: font,
                     .foregroundColor: UIColor.Signal.label,
-                ]
+                ],
             ),
             icon: icon,
             font: font,
             showDetailDisclosure: showDetailDisclosure,
             shouldLineWrap: shouldLineWrap,
             tapAction: tapAction,
-            longPressAction: longPressAction
         )
     }
 
@@ -45,16 +42,19 @@ public class ProfileDetailLabel: UIStackView {
         showDetailDisclosure: Bool = false,
         shouldLineWrap: Bool = true,
         tapAction: (() -> Void)? = nil,
-        longPressAction: (() -> Void)? = nil
     ) {
         self.tapAction = tapAction
-        self.longPressAction = longPressAction
 
         super.init(frame: .zero)
         self.axis = .horizontal
         self.spacing = 12
         self.alignment = .top
         self.layoutMargins = .zero
+        self.isAccessibilityElement = true
+        self.accessibilityLabel = attributedTitle.string
+        if tapAction != nil {
+            self.accessibilityTraits = .button
+        }
 
         // Make the icon an attributed string attachment so that it
         //  1. scales with Dynamic Type.
@@ -66,12 +66,13 @@ public class ProfileDetailLabel: UIStackView {
             attributes: [
                 .font: font,
                 .foregroundColor: UIColor.Signal.label,
-            ]
+            ],
         )
         let imageLabel = UILabel()
         self.addArrangedSubview(imageLabel)
         imageLabel.attributedText = imageString
         imageLabel.setCompressionResistanceHigh()
+        imageLabel.accessibilityElementsHidden = true
 
         let textLabel = UILabel()
         self.addArrangedSubview(textLabel)
@@ -84,10 +85,12 @@ public class ProfileDetailLabel: UIStackView {
             let attachmentString = NSAttributedString.with(
                 image: chevron,
                 font: font,
-                attributes: [.foregroundColor: UIColor.Signal.secondaryLabel]
+                attributes: [.foregroundColor: UIColor.Signal.secondaryLabel],
             )
             if shouldLineWrap {
-                // Add the chevron at the end of the last line of text
+                // Add the chevron at the end of the last line of text, preventing line break
+                let wordJoiner = "\u{2060}"
+                titleString.append(wordJoiner)
                 titleString.append(attachmentString)
             } else {
                 // Add the chevron at the end of the truncated line
@@ -107,9 +110,6 @@ public class ProfileDetailLabel: UIStackView {
         if tapAction != nil {
             addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTap)))
         }
-        if longPressAction != nil {
-            addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(didLongPress(sender:))))
-        }
     }
 
     required init(coder: NSCoder) {
@@ -120,12 +120,6 @@ public class ProfileDetailLabel: UIStackView {
     private func didTap() {
         tapAction?()
     }
-
-    @objc
-    private func didLongPress(sender: UIGestureRecognizer) {
-        guard sender.state == .began else { return }
-        longPressAction?()
-    }
 }
 
 // MARK: Convenience
@@ -135,7 +129,7 @@ public extension ProfileDetailLabel {
         displayName: String,
         secondaryName: String? = nil,
         font: UIFont = .dynamicTypeBody,
-        tapAction: (() -> Void)? = nil
+        tapAction: (() -> Void)? = nil,
     ) -> ProfileDetailLabel {
         .init(
             attributedTitle: {
@@ -144,7 +138,7 @@ public extension ProfileDetailLabel {
                         displayName,
                         " ",
                         "(\(secondaryName))"
-                            .styled(with: .color(UIColor.Signal.secondaryLabel))
+                            .styled(with: .color(UIColor.Signal.secondaryLabel)),
                     ])
                 } else {
                     return NSAttributedString.composed(of: [displayName])
@@ -152,33 +146,63 @@ public extension ProfileDetailLabel {
             }().styled(with: .font(font)),
             icon: .profileName,
             font: font,
-            tapAction: tapAction
+            tapAction: tapAction,
         )
     }
 
     static func profileNameEducation(
-        tapAction: @escaping () -> Void
+        tapAction: @escaping () -> Void,
     ) -> ProfileDetailLabel {
         .init(
             title: OWSLocalizedString(
                 "CONTACT_ABOUT_SHEET_PROFILE_NAMES_EDUCATION",
-                comment: "A label on the profile about sheet"
+                comment: "A label on the profile about sheet",
             ),
             icon: .contactInfoNameEducation,
             showDetailDisclosure: true,
-            tapAction: tapAction
+            tapAction: tapAction,
         )
     }
 
+    static func memberLabel(_ label: String?, tapAction: @escaping () -> Void) -> UIView {
+        guard let label else {
+            return ProfileDetailLabel(
+                title: OWSLocalizedString("MEMBER_LABEL_ADD", comment: "Label for an action to add a member label"),
+                icon: .memberLabel,
+                font: .dynamicTypeBody,
+                showDetailDisclosure: true,
+                tapAction: {
+                    tapAction()
+                },
+            )
+        }
+        let detailLabelView = ProfileDetailLabel(
+            title: label,
+            icon: .memberLabel,
+            font: .dynamicTypeBody,
+            showDetailDisclosure: true,
+            tapAction: {
+                tapAction()
+            },
+        )
+        detailLabelView.isAccessibilityElement = true
+        detailLabelView.accessibilityLabel = OWSLocalizedString(
+            "MEMBER_LABEL_AX_PREFIX",
+            comment: "Accessibility prefix for member labels.",
+        ) + label
+
+        return detailLabelView
+    }
+
     static func verified(
-        font: UIFont = .dynamicTypeBody
+        font: UIFont = .dynamicTypeBody,
     ) -> ProfileDetailLabel {
         .init(title: SafetyNumberStrings.verified, icon: .contactInfoSafetyNumber, font: font)
     }
 
     static func profileAbout(
         bio: String,
-        font: UIFont = .dynamicTypeBody
+        font: UIFont = .dynamicTypeBody,
     ) -> ProfileDetailLabel {
         .init(title: bio, icon: .profileAbout, font: font)
     }
@@ -187,12 +211,12 @@ public extension ProfileDetailLabel {
         font: UIFont = .dynamicTypeBody,
         shouldDismissOnNavigation: Bool,
         presentEducationFrom viewController: UIViewController?,
-        dismissalDelegate: (any SheetDismissalDelegate)? = nil
+        dismissalDelegate: (any SheetDismissalDelegate)? = nil,
     ) -> ProfileDetailLabel {
         .init(
             title: OWSLocalizedString(
                 "CONTACT_ABOUT_SHEET_SIGNAL_CONNECTION_LABEL",
-                comment: "A label indicating a user is a signal connection."
+                comment: "A label indicating a user is a signal connection.",
             ),
             icon: .contactInfoSignalConnection,
             font: font,
@@ -210,86 +234,89 @@ public extension ProfileDetailLabel {
                 } else {
                     action()
                 }
-            }
+            },
         )
     }
 
     static func noDirectChat(
         name: String,
-        font: UIFont = .dynamicTypeBody
+        font: UIFont = .dynamicTypeBody,
     ) -> ProfileDetailLabel {
         .init(
-            title: String(
-                format: OWSLocalizedString(
+            title: String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
                     "CONTACT_ABOUT_SHEET_NO_DIRECT_MESSAGES",
-                    comment: "Indicates that the user has no messages with the other account. Embeds {{name}}"
+                    comment: "Indicates that the user has no messages with the other account. Embeds {{name}}",
                 ),
-                name
+                name,
             ),
             icon: .contactInfoNoDirectChat,
-            font: font
+            font: font,
         )
     }
 
     static func blocked(
         name: String,
-        font: UIFont = .dynamicTypeBody
+        font: UIFont = .dynamicTypeBody,
     ) -> ProfileDetailLabel {
         .init(
-            title: String(
-                format: OWSLocalizedString(
+            title: String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
                     "CONTACT_ABOUT_SHEET_BLOCKED_USER_FORMAT",
-                    comment: "Indicates that the user has blocked the other account. Embeds {{name}}"
+                    comment: "Indicates that the user has blocked the other account. Embeds {{name}}",
                 ),
-                name
+                name,
             ),
             icon: .chatSettingsBlock,
-            font: font
+            font: font,
         )
     }
 
     static func pendingRequest(
         name: String,
-        font: UIFont = .dynamicTypeBody
+        font: UIFont = .dynamicTypeBody,
     ) -> ProfileDetailLabel {
         .init(
             title: OWSLocalizedString(
                 "CONTACT_ABOUT_SHEET_PENDING_REQUEST",
-                comment: "Indicates that the user has a pending request with the other account. Embeds {{name}}"
+                comment: "Indicates that the user has a pending request with the other account. Embeds {{name}}",
             ),
             icon: .contactInfoPendingRequest,
-            font: font
+            font: font,
         )
     }
 
     static func inSystemContacts(
         name: String,
-        font: UIFont = .dynamicTypeBody
+        font: UIFont = .dynamicTypeBody,
     ) -> ProfileDetailLabel {
         .init(
-            title: String(
-                format: OWSLocalizedString(
+            title: String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
                     "CONTACT_ABOUT_SHEET_CONNECTION_IN_SYSTEM_CONTACTS",
-                    comment: "Indicates that another account is in the user's system contacts. Embeds {{name}}"
+                    comment: "Indicates that another account is in the user's system contacts. Embeds {{name}}",
                 ),
-                name
+                name,
             ),
             icon: .contactInfoUserInContacts,
-            font: font
+            font: font,
         )
     }
 
     static func phoneNumber(
         _ phoneNumber: String,
         font: UIFont = .dynamicTypeBody,
-        presentSuccessToastFrom viewController: UIViewController?
+        presentSuccessToastFrom viewController: UIViewController?,
     ) -> ProfileDetailLabel {
         let copyPhoneNumber: () -> Void = { [weak viewController] in
             UIPasteboard.general.string = phoneNumber
-            viewController?.presentToast(text: OWSLocalizedString(
-                "COPIED_TO_CLIPBOARD",
-                comment: "Indicator that a value has been copied to the clipboard."
-            ))
+            viewController?.presentToast(
+                text: OWSLocalizedString(
+                    "COPIED_TO_CLIPBOARD",
+                    comment: "Indicator that a value has been copied to the clipboard.",
+                ),
+                image: UIImage(named: "copy"),
+            )
         }
         let formattedPhoneNumber = PhoneNumber.bestEffortFormatPartialUserSpecifiedTextToLookLikeAPhoneNumber(phoneNumber)
 
@@ -298,66 +325,70 @@ public extension ProfileDetailLabel {
             icon: .contactInfoPhone,
             font: font,
             tapAction: copyPhoneNumber,
-            longPressAction: copyPhoneNumber
         )
     }
 
     static func mutualGroups(
         for thread: TSThread,
         mutualGroups: [TSGroupThread],
-        font: UIFont = .dynamicTypeBody
+        font: UIFont = .dynamicTypeBody,
     ) -> ProfileDetailLabel {
         .init(
             title: mutualGroupsString(for: thread, mutualGroups: mutualGroups),
             icon: .contactInfoGroups,
-            font: font
+            font: font,
         )
     }
 
     static func note(
         _ noteText: String,
         font: UIFont = .dynamicTypeBody,
-        onTap: () -> Void
+        onTap: () -> Void,
     ) -> ProfileDetailLabel {
         .init(
             title: noteText,
-            icon: .contactInfoNote
+            icon: .contactInfoNote,
         )
     }
 
     static func mutualGroupsString(
         for thread: TSThread,
-        mutualGroups: [TSGroupThread]
+        mutualGroups: [TSGroupThread],
     ) -> String {
         mutualGroupsString(isInGroupContext: thread is TSGroupThread, mutualGroups: mutualGroups)
     }
 
     static func mutualGroupsString(
         isInGroupContext: Bool,
-        mutualGroups: [TSGroupThread]
+        mutualGroups: [TSGroupThread],
     ) -> String {
         switch (isInGroupContext, mutualGroups.count) {
         case (_, 2...):
             let formatString = OWSLocalizedString(
-                "MANY_GROUPS_IN_COMMON_%d", tableName: "PluralAware",
-                comment: "A string describing that the user has many groups in common with another user. Embeds {{common group count}}")
+                "MANY_GROUPS_IN_COMMON_%d",
+                tableName: "PluralAware",
+                comment: "A string describing that the user has many groups in common with another user. Embeds {{common group count}}",
+            )
             return String.localizedStringWithFormat(formatString, mutualGroups.count)
 
         case (false, 1):
             let formatString = OWSLocalizedString(
                 "THREAD_DETAILS_ONE_MUTUAL_GROUP",
-                comment: "A string indicating a mutual group the user shares with this contact. Embeds {{mutual group name}}")
-            return String(format: formatString, mutualGroups[0].groupNameOrDefault)
+                comment: "A string indicating a mutual group the user shares with this contact. Embeds {{mutual group name}}",
+            )
+            return String.nonPluralLocalizedStringWithFormat(formatString, mutualGroups[0].groupNameOrDefault)
 
         case (true, 1):
             return OWSLocalizedString(
                 "NO_OTHER_GROUPS_IN_COMMON",
-                comment: "A string describing that the user has no groups in common other than the group implied by the current UI context")
+                comment: "A string describing that the user has no groups in common other than the group implied by the current UI context",
+            )
 
         case (false, 0):
             return OWSLocalizedString(
                 "NO_GROUPS_IN_COMMON",
-                comment: "A string describing that the user has no groups in common with another user")
+                comment: "A string describing that the user has no groups in common with another user",
+            )
 
         default:
             owsFailDebug("Unexpected common group count")

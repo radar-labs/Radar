@@ -27,12 +27,12 @@ final class TSMessageStorageTest: SSKBaseTest {
         write { tx in
             (DependenciesBridge.shared.registrationStateChangeManager as! RegistrationStateChangeManagerImpl).registerForTests(
                 localIdentifiers: .forUnitTests,
-                tx: tx
+                tx: tx,
             )
 
             self.thread = TSContactThread.getOrCreateThread(
                 withContactAddress: self.otherAddress,
-                transaction: tx
+                transaction: tx,
             )
         }
     }
@@ -47,14 +47,16 @@ final class TSMessageStorageTest: SSKBaseTest {
                     thread: thread,
                     timestamp: timestamp,
                     authorAci: otherAci,
-                    messageBody: AttachmentContentValidatorMock.mockValidatedBody(body)
+                    messageBody: AttachmentContentValidatorMock.mockValidatedBody(body),
                 ).build()
             newMessage.anyInsert(transaction: tx)
 
-            guard let fetchedMessage = TSIncomingMessage.anyFetchIncomingMessage(
-                uniqueId: newMessage.uniqueId,
-                transaction: tx
-            ) else {
+            guard
+                let fetchedMessage = TSIncomingMessage.fetchIncomingMessageViaCache(
+                    uniqueId: newMessage.uniqueId,
+                    transaction: tx,
+                )
+            else {
                 XCTFail("Failed to find inserted message!")
                 return
             }
@@ -76,17 +78,19 @@ final class TSMessageStorageTest: SSKBaseTest {
                         thread: thread,
                         timestamp: UInt64(idx) + 1,
                         authorAci: otherAci,
-                        messageBody: AttachmentContentValidatorMock.mockValidatedBody(body)
+                        messageBody: AttachmentContentValidatorMock.mockValidatedBody(body),
                     ).build()
                 newMessage.anyInsert(transaction: tx)
                 return newMessage
             }
 
             for (idx, message) in messages.enumerated() {
-                guard let fetchedMessage = TSIncomingMessage.anyFetchIncomingMessage(
-                    uniqueId: message.uniqueId,
-                    transaction: tx
-                ) else {
+                guard
+                    let fetchedMessage = TSIncomingMessage.fetchIncomingMessageViaCache(
+                        uniqueId: message.uniqueId,
+                        transaction: tx,
+                    )
+                else {
                     XCTFail("Failed to find inserted message!")
                     return
                 }
@@ -98,13 +102,18 @@ final class TSMessageStorageTest: SSKBaseTest {
                 XCTAssertEqual(thread.uniqueId, fetchedMessage.uniqueThreadId)
             }
 
-            DependenciesBridge.shared.threadSoftDeleteManager
-                .softDelete(threads: [thread], sendDeleteForMeSyncMessage: false, tx: tx)
+            DependenciesBridge.shared.threadDeletionManager.deleteThreads(
+                [thread],
+                sendDeleteForMeSyncMessage: false,
+                updateStorageService: false,
+                localIdentifiers: .forUnitTests,
+                tx: tx,
+            )
 
             for message in messages {
-                XCTAssertNil(TSIncomingMessage.anyFetchIncomingMessage(
+                XCTAssertNil(TSIncomingMessage.fetchIncomingMessageViaCache(
                     uniqueId: message.uniqueId,
-                    transaction: tx
+                    transaction: tx,
                 ))
             }
 
@@ -118,7 +127,7 @@ final class TSMessageStorageTest: SSKBaseTest {
 
             let groupThread = try! GroupManager.createGroupForTests(members: [
                 localAddress,
-                otherAddress
+                otherAddress,
             ], transaction: tx)
 
             let messages = (0..<10).map { idx -> TSIncomingMessage in
@@ -129,17 +138,19 @@ final class TSMessageStorageTest: SSKBaseTest {
                         thread: groupThread,
                         timestamp: UInt64(idx + 1),
                         authorAci: authorAddress.aci!,
-                        messageBody: AttachmentContentValidatorMock.mockValidatedBody(body)
+                        messageBody: AttachmentContentValidatorMock.mockValidatedBody(body),
                     ).build()
                 newMessage.anyInsert(transaction: tx)
                 return newMessage
             }
 
             for (idx, message) in messages.enumerated() {
-                guard let fetchedMessage = TSIncomingMessage.anyFetchIncomingMessage(
-                    uniqueId: message.uniqueId,
-                    transaction: tx
-                ) else {
+                guard
+                    let fetchedMessage = TSIncomingMessage.fetchIncomingMessageViaCache(
+                        uniqueId: message.uniqueId,
+                        transaction: tx,
+                    )
+                else {
                     XCTFail("Failed to find inserted message!")
                     return
                 }
@@ -151,13 +162,18 @@ final class TSMessageStorageTest: SSKBaseTest {
                 XCTAssertEqual(groupThread.uniqueId, fetchedMessage.uniqueThreadId)
             }
 
-            DependenciesBridge.shared.threadSoftDeleteManager
-                .softDelete(threads: [groupThread], sendDeleteForMeSyncMessage: false, tx: tx)
+            DependenciesBridge.shared.threadDeletionManager.deleteThreads(
+                [groupThread],
+                sendDeleteForMeSyncMessage: false,
+                updateStorageService: false,
+                localIdentifiers: .forUnitTests,
+                tx: tx,
+            )
 
             for message in messages {
-                XCTAssertNil(TSIncomingMessage.anyFetchIncomingMessage(
+                XCTAssertNil(TSIncomingMessage.fetchIncomingMessageViaCache(
                     uniqueId: message.uniqueId,
-                    transaction: tx
+                    transaction: tx,
                 ))
             }
 

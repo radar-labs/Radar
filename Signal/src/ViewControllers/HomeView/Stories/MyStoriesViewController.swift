@@ -14,6 +14,7 @@ class MyStoriesViewController: OWSViewController, FailedStorySendDisplayControll
     private var items = OrderedDictionary<String, [OutgoingStoryItem]>() {
         didSet { emptyStateLabel.isHidden = items.orderedKeys.count > 0 }
     }
+
     private lazy var emptyStateLabel: UILabel = {
         let label = UILabel()
         label.textColor = .Signal.secondaryLabel
@@ -31,10 +32,9 @@ class MyStoriesViewController: OWSViewController, FailedStorySendDisplayControll
 
     private let spoilerState: SpoilerRenderState
 
-    public init(spoilerState: SpoilerRenderState) {
+    init(spoilerState: SpoilerRenderState) {
         self.spoilerState = spoilerState
         super.init()
-        hidesBottomBarWhenPushed = true
         DependenciesBridge.shared.databaseChangeObserver.appendDatabaseChangeDelegate(self)
     }
 
@@ -64,12 +64,12 @@ class MyStoriesViewController: OWSViewController, FailedStorySendDisplayControll
 
         reloadStories()
 
-        navigationItem.rightBarButtonItem = .init(
-            title: OWSLocalizedString("STORY_PRIVACY_SETTINGS", comment: "Button to access the story privacy settings menu"),
-            style: .plain,
-            target: self,
-            action: #selector(showPrivacySettings)
-        )
+        navigationItem.rightBarButtonItem = .button(title: OWSLocalizedString(
+            "STORY_PRIVACY_SETTINGS",
+            comment: "Button to access the story privacy settings menu",
+        )) { [weak self] in
+            self?.showPrivacySettings()
+        }
     }
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -77,7 +77,6 @@ class MyStoriesViewController: OWSViewController, FailedStorySendDisplayControll
         updateTableViewPaddingIfNeeded()
     }
 
-    @objc
     private func showPrivacySettings() {
         let vc = StoryPrivacySettingsViewController()
         presentFormSheet(OWSNavigationController(rootViewController: vc), animated: true)
@@ -103,7 +102,7 @@ class MyStoriesViewController: OWSViewController, FailedStorySendDisplayControll
     private func updateTableViewPaddingIfNeeded() {
         guard #available(iOS 26, *) else { return }
 
-        if let splitViewController = splitViewController, !splitViewController.isCollapsed {
+        if let splitViewController, !splitViewController.isCollapsed {
             useSidebarStoryListCellAppearance = true
         } else {
             useSidebarStoryListCellAppearance = false
@@ -128,10 +127,10 @@ class MyStoriesViewController: OWSViewController, FailedStorySendDisplayControll
             if (rhs as? TSPrivateStoryThread)?.isMyStory == true { return false }
             if lhs.lastSentStoryTimestamp == rhs.lastSentStoryTimestamp {
                 return StoryManager.storyName(for: lhs).localizedCaseInsensitiveCompare(
-                    StoryManager.storyName(for: rhs)
+                    StoryManager.storyName(for: rhs),
                 ) == .orderedAscending
             }
-            return (lhs.lastSentStoryTimestamp?.uint64Value ?? 0) > (rhs.lastSentStoryTimestamp?.uint64Value ?? 0)
+            return (lhs.lastSentStoryTimestamp ?? 0) > (rhs.lastSentStoryTimestamp ?? 0)
         })
         tableView.reloadData()
     }
@@ -170,7 +169,7 @@ extension MyStoriesViewController: UITableViewDelegate {
             spoilerState: spoilerState,
             viewableContexts: items.orderedKeys.compactMap { items[$0]?.first?.thread.storyContext },
             loadMessage: item.message,
-            onlyRenderMyStories: true
+            onlyRenderMyStories: true,
         )
         vc.contextDataSource = self
         present(vc, animated: true)
@@ -195,7 +194,7 @@ extension MyStoriesViewController: UITableViewDelegate {
             let item = item(for: indexPath),
             let action = contextMenuGenerator.deleteTableRowContextualAction(
                 for: item.message,
-                thread: item.thread
+                thread: item.thread,
             )
         else {
             return nil
@@ -220,7 +219,7 @@ extension MyStoriesViewController: UITableViewDelegate {
                 },
                 hideSaveAction: true,
                 onlyRenderMyStories: true,
-                transaction: transaction
+                transaction: transaction,
             )
         }
 
@@ -258,7 +257,7 @@ extension MyStoriesViewController: UITableViewDataSource {
                         // refetch the cell in case it changes out from underneath us.
                         return self?.tableView.dequeueReusableCell(withIdentifier: SentStoryCell.reuseIdentifier, for: indexPath)
                     },
-                    transaction: tx
+                    transaction: tx,
                 )
             }
         }()
@@ -268,7 +267,7 @@ extension MyStoriesViewController: UITableViewDataSource {
             with: item,
             spoilerState: spoilerState,
             contextMenuActions: contextMenuActions,
-            indexPath: indexPath
+            indexPath: indexPath,
         )
         return cell
     }
@@ -280,8 +279,8 @@ extension MyStoriesViewController: UITableViewDataSource {
         }
 
         let textView = LinkingTextView()
-        textView.textColor = Theme.isDarkThemeEnabled ? UIColor.ows_gray05 : UIColor.ows_gray90
-        textView.font = UIFont.dynamicTypeHeadlineClamped
+        textView.textColor = .Signal.label
+        textView.font = OWSTableViewController2.defaultHeaderFont
         textView.text = StoryManager.storyName(for: thread)
 
         var textContainerInset = OWSTableViewController2.cellOuterInsets(in: tableView)
@@ -315,17 +314,19 @@ extension MyStoriesViewController: DatabaseChangeDelegate {
 }
 
 extension MyStoriesViewController: ForwardMessageDelegate {
-    public func forwardMessageFlowDidComplete(items: [ForwardMessageItem], recipientThreads: [TSThread]) {
+    func forwardMessageFlowDidComplete(items: [ForwardMessageItem], recipientThreads: [TSThread]) {
         AssertIsOnMainThread()
 
         dismiss(animated: true) {
-            ForwardMessageViewController.finalizeForward(items: items,
-                                                         recipientThreads: recipientThreads,
-                                                         fromViewController: self)
+            ForwardMessageViewController.finalizeForward(
+                items: items,
+                recipientThreads: recipientThreads,
+                fromViewController: self,
+            )
         }
     }
 
-    public func forwardMessageFlowDidCancel() {
+    func forwardMessageFlowDidCancel() {
         dismiss(animated: true)
     }
 }
@@ -333,7 +334,7 @@ extension MyStoriesViewController: ForwardMessageDelegate {
 extension MyStoriesViewController: StoryPageViewControllerDataSource {
     func storyPageViewControllerAvailableContexts(
         _ storyPageViewController: StoryPageViewController,
-        hiddenStoryFilter: Bool?
+        hiddenStoryFilter: Bool?,
     ) -> [StoryContext] {
         return items.orderedValues.compactMap(\.first?.thread.storyContext)
     }
@@ -349,7 +350,7 @@ private struct OutgoingStoryItem {
             .init(
                 message: message,
                 attachment: .from(message, transaction: transaction),
-                thread: $0
+                thread: $0,
             )
         }
     }
@@ -379,10 +380,11 @@ class SentStoryCell: UITableViewCell {
             configuration: .gray(),
             primaryAction: UIAction { [weak self] _ in
                 self?.saveAttachmentBlock()
-            }
+            },
         )
-        button.configuration?.image = UIImage(imageLiteralResourceName: "save-20")
-        button.configuration?.contentInsets = .init(margin: 6)
+        button.configuration?.image = .save
+        let margin: CGFloat = if #available(iOS 26, *) { 10 } else { 6 }
+        button.configuration?.contentInsets = .init(margin: margin)
         button.configuration?.baseForegroundColor = .Signal.label
         button.configuration?.baseBackgroundColor = .Signal.secondaryBackground
         button.configuration?.cornerStyle = .capsule
@@ -392,15 +394,17 @@ class SentStoryCell: UITableViewCell {
     private let contextButton: ContextMenuButton = {
         let button = ContextMenuButton(empty: ())
         button.configuration = .gray()
-        button.configuration?.image = UIImage(imageLiteralResourceName: "more-compact")
-        button.configuration?.contentInsets = .init(margin: 8)
+        button.configuration?.image = .more
+        let margin: CGFloat = if #available(iOS 26, *) { 10 } else { 8 }
+        button.configuration?.contentInsets = .init(margin: margin)
         button.configuration?.baseForegroundColor = .Signal.label
         button.configuration?.baseBackgroundColor = .Signal.secondaryBackground
         button.configuration?.cornerStyle = .capsule
         // ContextMenuButton overrides `intrinsicContentSize` so manually specify size.
+        let size: CGFloat = if #available(iOS 26, *) { 44 } else { 32 }
         button.addConstraints([
-            button.widthAnchor.constraint(equalToConstant: 32),
-            button.heightAnchor.constraint(equalToConstant: 32),
+            button.widthAnchor.constraint(equalToConstant: size),
+            button.heightAnchor.constraint(equalToConstant: size),
         ])
         return button
     }()
@@ -431,6 +435,7 @@ class SentStoryCell: UITableViewCell {
         vStackView.axis = .vertical
         vStackView.alignment = .leading
 
+        let buttonSpacing: CGFloat = if #available(iOS 26, *) { 16 } else { 20 }
         let contentHStackView = UIStackView(
             arrangedSubviews: [
                 attachmentThumbnail,
@@ -439,9 +444,9 @@ class SentStoryCell: UITableViewCell {
                 vStackView,
                 .hStretchingSpacer(),
                 saveButton,
-                .spacer(withWidth: 20),
+                .spacer(withWidth: buttonSpacing),
                 contextButton,
-            ]
+            ],
         )
         contentHStackView.axis = .horizontal
         contentHStackView.alignment = .center
@@ -458,7 +463,7 @@ class SentStoryCell: UITableViewCell {
     override func updateConfiguration(using state: UICellConfigurationState) {
         var configuration = UIBackgroundConfiguration.clear()
         if state.isSelected || state.isHighlighted {
-            configuration.backgroundColor = Theme.tableCell2SelectedBackgroundColor
+            configuration.backgroundColor = OWSTableViewController2.cellSelectedBackgroundColor
             if useSidebarAppearance {
                 configuration.cornerRadius = 24
             }
@@ -474,14 +479,14 @@ class SentStoryCell: UITableViewCell {
         with item: OutgoingStoryItem,
         spoilerState: SpoilerRenderState,
         contextMenuActions: [UIAction],
-        indexPath: IndexPath
+        indexPath: IndexPath,
     ) {
         if self.attachment != item.attachment {
             self.attachment = item.attachment
             let thumbnailView = StoryThumbnailView(
                 attachment: item.attachment,
                 interactionIdentifier: .fromStoryMessage(item.message),
-                spoilerState: spoilerState
+                spoilerState: spoilerState,
             )
             attachmentThumbnail.removeAllSubviews()
             attachmentThumbnail.addSubview(thumbnailView)
@@ -502,14 +507,15 @@ class SentStoryCell: UITableViewCell {
         case .sent:
             if StoryManager.areViewReceiptsEnabled {
                 let format = OWSLocalizedString(
-                    "STORY_VIEWS_%d", tableName: "PluralAware",
-                    comment: "Text explaining how many views a story has. Embeds {{ %d number of views }}"
+                    "STORY_VIEWS_%d",
+                    tableName: "PluralAware",
+                    comment: "Text explaining how many views a story has. Embeds {{ %d number of views }}",
                 )
                 titleLabel.text = String.localizedStringWithFormat(format, item.message.remoteViewCount(in: item.thread.storyContext))
             } else {
                 titleLabel.text = OWSLocalizedString(
                     "STORY_VIEWS_OFF",
-                    comment: "Text indicating that the user has views turned off"
+                    comment: "Text indicating that the user has views turned off",
                 )
             }
             subtitleLabel.text = DateUtil.formatTimestampRelatively(item.message.timestamp)
@@ -522,7 +528,7 @@ class SentStoryCell: UITableViewCell {
             saveButton.isHiddenInStackView = false
             saveAttachmentBlock = { item.attachment.save(
                 interactionIdentifier: .fromStoryMessage(item.message),
-                spoilerState: spoilerState
+                spoilerState: spoilerState,
             ) }
         } else {
             saveButton.isHiddenInStackView = true

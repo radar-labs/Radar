@@ -3,21 +3,30 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import LibSignalClient
 import MobileCoin
-public import SignalServiceKit
+import SignalServiceKit
 import SignalUI
 
-public enum CVAttachment: Equatable {
-    case stream(ReferencedAttachmentStream)
+enum CVAttachment: Equatable {
+    case stream(ReferencedAttachmentStream, isUploading: Bool, imageMetadata: ImageMetadata?)
     case pointer(ReferencedAttachmentPointer, downloadState: AttachmentDownloadState)
     case backupThumbnail(ReferencedAttachmentBackupThumbnail)
     /// The attachment has no stream and cannot be downloaded because there is no cdn info.
     /// Typically happens if we restore from a free-tier backup with old media expired from transit tier.
     case undownloadable(ReferencedAttachment)
 
-    public var attachment: ReferencedAttachment {
+    var contentType: Attachment.ContentType {
+        return attachment.attachment.contentType
+    }
+
+    var attachmentID: Attachment.IDType {
+        return attachment.attachment.id
+    }
+
+    var attachment: ReferencedAttachment {
         switch self {
-        case .stream(let stream):
+        case .stream(let stream, _, _):
             return stream
         case .pointer(let pointer, _):
             return pointer
@@ -28,9 +37,9 @@ public enum CVAttachment: Equatable {
         }
     }
 
-    public var attachmentStream: AttachmentStream? {
+    var attachmentStream: AttachmentStream? {
         switch self {
-        case .stream(let stream):
+        case .stream(let stream, _, _):
             return stream.attachmentStream
         case .pointer, .backupThumbnail:
             return nil
@@ -39,7 +48,7 @@ public enum CVAttachment: Equatable {
         }
     }
 
-    public var attachmentPointer: AttachmentPointer? {
+    var attachmentPointer: AttachmentPointer? {
         switch self {
         case .stream, .backupThumbnail:
             return nil
@@ -50,7 +59,7 @@ public enum CVAttachment: Equatable {
         }
     }
 
-    public var attachmentBackupThumbnail: AttachmentBackupThumbnail? {
+    var attachmentBackupThumbnail: AttachmentBackupThumbnail? {
         switch self {
         case .stream, .pointer:
             return nil
@@ -61,23 +70,58 @@ public enum CVAttachment: Equatable {
         }
     }
 
-    public static func from(_ attachment: ReferencedAttachment, tx: DBReadTransaction) -> CVAttachment {
-        if let stream = attachment.asReferencedStream {
-            return .stream(stream)
-        } else if let pointer = attachment.asReferencedAnyPointer {
-            return .pointer(pointer, downloadState: pointer.attachmentPointer.downloadState(tx: tx))
-        } else if let thumbnail = attachment.asReferencedBackupThumbnail {
+    static func from(
+        referencedAttachment: ReferencedAttachment,
+        message: TSMessage,
+        tx: DBReadTransaction,
+    ) -> CVAttachment {
+        if let stream = referencedAttachment.asReferencedStream {
+            let attachmentBackfillManager = DependenciesBridge.shared.attachmentBackfillManager
+            var isUploading = false
+
+            // We can infer from the properties of an outgoing message whether
+            // it's got things being uploaded.
+            if
+                let outgoingMessage = message as? TSOutgoingMessage,
+                referencedAttachment.attachment.latestTransitTierInfo == nil,
+                referencedAttachment.attachment.mediaTierInfo == nil,
+                !outgoingMessage.wasNotCreatedLocally,
+                outgoingMessage.messageState != .failed
+            {
+                isUploading = true
+            }
+
+            // If we have an enqueued backfill for this message, assume this
+            // attachment is being reuploaded.
+            if
+                attachmentBackfillManager.hasEnqueuedInboundRequest(
+                    interactionRowId: message.sqliteRowId!,
+                    tx: tx,
+                )
+            {
+                isUploading = true
+            }
+
+            return .stream(
+                stream,
+                isUploading: isUploading,
+                imageMetadata: stream.attachmentStream.imageMetadata(),
+            )
+        } else if let thumbnail = referencedAttachment.asReferencedBackupThumbnail {
             return .backupThumbnail(thumbnail)
+        } else if let pointer = referencedAttachment.asReferencedAnyPointer {
+            return .pointer(pointer, downloadState: pointer.attachmentPointer.downloadState(tx: tx))
         } else {
-            return .undownloadable(attachment)
+            return .undownloadable(referencedAttachment)
         }
     }
 
-    public static func == (lhs: CVAttachment, rhs: CVAttachment) -> Bool {
+    static func ==(lhs: CVAttachment, rhs: CVAttachment) -> Bool {
         switch (lhs, rhs) {
-        case (.stream(let lhsStream), .stream(let rhsStream)):
+        case (.stream(let lhsStream, let lhsIsUploading, imageMetadata: _), .stream(let rhsStream, let rhsIsUploading, imageMetadata: _)):
             return lhsStream.attachment.id == rhsStream.attachment.id
                 && lhsStream.reference.hasSameOwner(as: rhsStream.reference)
+                && lhsIsUploading == rhsIsUploading
         case (.pointer(let lhsPointer, let lhsState), .pointer(let rhsPointer, let rhsState)):
             return lhsPointer.attachment.id == rhsPointer.attachment.id
                 && lhsPointer.reference.hasSameOwner(as: rhsPointer.reference)
@@ -106,73 +150,79 @@ public enum CVAttachment: Equatable {
     }
 }
 
-public class CVComponentState: Equatable {
+struct CVComponentState: Equatable {
     let messageCellType: CVMessageCellType
 
     struct SenderName: Equatable {
         let senderName: NSAttributedString
         let senderNameColor: UIColor
+        let memberLabel: String?
     }
+
     let senderName: SenderName?
 
     struct SenderAvatar: Equatable {
         let avatarDataSource: ConversationAvatarDataSource
     }
+
     let senderAvatar: SenderAvatar?
 
     enum BodyText: Equatable {
         case bodyText(displayableText: DisplayableText, hasTapForMore: Bool)
 
-        // TODO: Should we have oversizeTextFailed?
-        case oversizeTextDownloading
+        case oversizeTextDownloading(truncatedBody: DisplayableText)
+
+        case oversizeTextSkipped(truncatedBody: DisplayableText)
 
         case oversizeTextUndownloadable(truncatedBody: DisplayableText)
 
         // We use the "body text" component to
         // render the "remotely deleted" indicator.
-        case remotelyDeleted
+        case remotelyDeleted(deleteAuthor: RemoteDeleteAuthor)
 
         var displayableText: DisplayableText? {
             switch self {
-            case .bodyText(let text, _), .oversizeTextUndownloadable(let text):
+            case .bodyText(let text, _), .oversizeTextUndownloadable(let text), .oversizeTextSkipped(let text), .oversizeTextDownloading(let text):
                 return text
-            default:
+            case .remotelyDeleted:
                 return nil
             }
         }
 
         func textValue(isTextExpanded: Bool) -> CVTextValue? {
             switch self {
-            case .bodyText(let text, _), .oversizeTextUndownloadable(let text):
+            case .bodyText(let text, _), .oversizeTextUndownloadable(let text), .oversizeTextSkipped(let text), .oversizeTextDownloading(let text):
                 return text.textValue(isTextExpanded: isTextExpanded)
-            default:
+            case .remotelyDeleted:
                 return nil
             }
         }
 
         var jumbomojiCount: UInt? {
             switch self {
-            case .bodyText(let text, _), .oversizeTextUndownloadable(let text):
+            case .bodyText(let text, _), .oversizeTextUndownloadable(let text), .oversizeTextSkipped(let text), .oversizeTextDownloading(let text):
                 return text.jumbomojiCount
-            default:
+            case .remotelyDeleted:
                 return nil
             }
         }
 
         var isJumbomojiMessage: Bool {
-            guard let jumbomojiCount = jumbomojiCount else {
+            guard let jumbomojiCount else {
                 return false
             }
             return jumbomojiCount > 0
         }
     }
+
     let bodyText: BodyText?
 
     struct BodyMedia: Equatable {
         let items: [CVMediaAlbumItem]
         let mediaAlbumHasFailedAttachment: Bool
-        let mediaAlbumHasPendingAttachment: Bool
+        let mediaAlbumHasSkippedAttachment: Bool
     }
+
     let bodyMedia: BodyMedia?
 
     struct GenericAttachment: Equatable {
@@ -190,18 +240,20 @@ public class CVComponentState: Equatable {
             attachment.attachmentBackupThumbnail
         }
     }
+
     let genericAttachment: GenericAttachment?
 
-    public struct PaymentAttachment: Equatable {
+    struct PaymentAttachment: Equatable {
         let notification: TSPaymentNotification
         let model: TSPaymentModel?
         let otherUserShortName: String
 
         var status: TSPaymentState? { model?.paymentState }
     }
+
     var paymentAttachment: PaymentAttachment?
 
-    public struct ArchivedPaymentAttachment: Equatable {
+    struct ArchivedPaymentAttachment: Equatable {
         let amount: String?
         let fee: String?
         let note: String?
@@ -211,13 +263,14 @@ public class CVComponentState: Equatable {
         /// Available only for incoming payments where the local key can unmask the receipt.
         let recoveredAmountPicoMob: UInt64?
 
-        public static func == (lhs: Self, rhs: Self) -> Bool {
+        static func ==(lhs: Self, rhs: Self) -> Bool {
             lhs.amount == rhs.amount
-            && lhs.fee == rhs.fee
-            && lhs.note == rhs.note
-            && lhs.otherUserShortName == rhs.otherUserShortName
+                && lhs.fee == rhs.fee
+                && lhs.note == rhs.note
+                && lhs.otherUserShortName == rhs.otherUserShortName
         }
     }
+
     var archivedPaymentAttachment: ArchivedPaymentAttachment?
 
     // It's not practical to reload the audio cell every time
@@ -232,75 +285,86 @@ public class CVComponentState: Equatable {
     struct ViewOnce: Equatable {
         let viewOnceState: ViewOnceState
     }
+
     let viewOnce: ViewOnce?
 
     let hasRenderableContent: Bool
 
     struct QuotedReply: Equatable {
-        let viewState: QuotedMessageView.State
+        let viewState: CVQuotedMessageView.State
 
         var quotedReplyModel: QuotedReplyModel { viewState.quotedReplyModel }
     }
+
     let quotedReply: QuotedReply?
 
     enum Sticker: Equatable {
         case available(
             stickerMetadata: any StickerMetadata,
-            attachmentStream: ReferencedAttachmentStream
+            attachmentStream: ReferencedAttachmentStream,
+            isUploading: Bool,
+            imageMetadata: ImageMetadata,
         )
+        case invalidImage(attachmentId: Attachment.IDType)
         case downloading(attachmentPointer: ReferencedAttachmentPointer)
-        case failedOrPending(
+        case skipped(
             attachmentPointer: ReferencedAttachmentPointer,
-            downloadState: AttachmentDownloadState
+            downloadState: AttachmentDownloadState,
         )
 
-        public var stickerMetadata: (any StickerMetadata)? {
+        var stickerMetadata: (any StickerMetadata)? {
             switch self {
-            case .available(let stickerMetadata, _):
+            case .available(let stickerMetadata, attachmentStream: _, isUploading: _, imageMetadata: _):
                 return stickerMetadata
-            case .downloading, .failedOrPending:
+            case .invalidImage, .downloading, .skipped:
                 return nil
             }
         }
-        public var attachmentStream: ReferencedAttachmentStream? {
+
+        var attachmentStream: ReferencedAttachmentStream? {
             switch self {
-            case .available(_, let attachmentStream):
+            case .available(stickerMetadata: _, let attachmentStream, isUploading: _, imageMetadata: _):
                 return attachmentStream
-            case .downloading:
-                return nil
-            case .failedOrPending:
+            case .invalidImage, .downloading, .skipped:
                 return nil
             }
         }
-        public var attachmentPointer: ReferencedAttachmentPointer? {
+
+        var attachmentPointer: ReferencedAttachmentPointer? {
             switch self {
-            case .available:
+            case .available, .invalidImage:
                 return nil
-            case .downloading(let attachmentPointer):
-                return attachmentPointer
-            case .failedOrPending(let attachmentPointer, _):
+            case .downloading(let attachmentPointer),
+                 .skipped(let attachmentPointer, _):
                 return attachmentPointer
             }
         }
 
-        static func == (lhs: CVComponentState.Sticker, rhs: CVComponentState.Sticker) -> Bool {
+        static func ==(lhs: CVComponentState.Sticker, rhs: CVComponentState.Sticker) -> Bool {
             switch (lhs, rhs) {
-            case let (.available(lhsData, lhsStream), .available(rhsData, rhsStream)):
+            case let (
+                .available(lhsData, lhsStream, lhsIsUploading, imageMetadata: _),
+                .available(rhsData, rhsStream, rhsIsUploading, imageMetadata: _),
+            ):
                 return lhsData.stickerInfo.asKey() == rhsData.stickerInfo.asKey()
                     && lhsStream.attachment.id == rhsStream.attachment.id
                     && lhsStream.reference.hasSameOwner(as: rhsStream.reference)
+                    && lhsIsUploading == rhsIsUploading
             case let (.downloading(lhsPointer), .downloading(rhsPointer)):
                 return lhsPointer.attachment.id == rhsPointer.attachment.id
                     && lhsPointer.reference.hasSameOwner(as: rhsPointer.reference)
-            case let (.failedOrPending(lhsPointer, lhsState), .failedOrPending(rhsPointer, rhsState)):
+            case let (.skipped(lhsPointer, lhsState), .skipped(rhsPointer, rhsState)):
                 return lhsPointer.attachment.id == rhsPointer.attachment.id
                     && lhsPointer.reference.hasSameOwner(as: rhsPointer.reference)
                     && lhsState == rhsState
-            case (.available, _), (.downloading, _), (.failedOrPending, _):
+            case let (.invalidImage(lhsAttachmentId), .invalidImage(rhsAttachmentId)):
+                return lhsAttachmentId == rhsAttachmentId
+            case (.available, _), (.downloading, _), (.skipped, _), (.invalidImage, _):
                 return false
             }
         }
     }
+
     let sticker: Sticker?
 
     /// The attachment has no stream and cannot be downloaded because there is no cdn info.
@@ -309,53 +373,57 @@ public class CVComponentState: Equatable {
         case audio
         case sticker
     }
+
     let undownloadableAttachment: UndownloadableAttachment?
 
     struct ContactShare: Equatable {
         let state: CVContactShareView.State
     }
+
     let contactShare: ContactShare?
 
     struct LinkPreview: Equatable {
-        // TODO: convert OWSLinkPreview to Swift?
         let linkPreview: OWSLinkPreview
         let state: LinkPreviewState
 
         // MARK: - Equatable
 
-        public static func == (lhs: LinkPreview, rhs: LinkPreview) -> Bool {
+        static func ==(lhs: LinkPreview, rhs: LinkPreview) -> Bool {
             return lhs.state === rhs.state
         }
     }
+
     let linkPreview: LinkPreview?
 
     struct GiftBadge: Equatable {
         let messageUniqueId: String
         let otherUserShortName: String
-        let cachedBadge: CachedBadge
+        let profileBadge: ProfileBadge?
         let expirationDate: Date
         let redemptionState: OWSGiftBadgeRedemptionState
     }
+
     let giftBadge: GiftBadge?
 
     struct Poll: Equatable {
         let state: CVPollView.State
         let prevPollState: CVPollView.State?
     }
+
     let poll: Poll?
 
     struct SystemMessage: Equatable {
         typealias ReferencedUser = CVTextLabel.ReferencedUserItem
 
         let title: NSAttributedString
-        let titleColor: UIColor
-        let titleSelectionBackgroundColor: UIColor
+        let titleColorOverride: UIColor?
         let action: CVMessageAction?
 
         struct Expiration: Equatable {
             let expirationTimestamp: UInt64
             let expiresInSeconds: UInt32
         }
+
         let expiration: Expiration?
 
         /// Represents users whose names appear in the title. Only applies to
@@ -364,20 +432,17 @@ public class CVComponentState: Equatable {
 
         init(
             title: NSAttributedString,
-            titleColor: UIColor,
-            titleSelectionBackgroundColor: UIColor,
+            titleColorOverride: UIColor?,
             action: CVMessageAction?,
-            expiration: Expiration?
+            expiration: Expiration?,
         ) {
             let mutableTitle = NSMutableAttributedString(attributedString: title)
             mutableTitle.removeAttribute(
                 .addressOfName,
-                range: NSRange(location: 0, length: mutableTitle.length)
+                range: NSRange(location: 0, length: mutableTitle.length),
             )
             self.title = NSAttributedString(attributedString: mutableTitle)
-
-            self.titleColor = titleColor
-            self.titleSelectionBackgroundColor = titleSelectionBackgroundColor
+            self.titleColorOverride = titleColorOverride
             self.action = action
             self.expiration = expiration
 
@@ -388,10 +453,10 @@ public class CVComponentState: Equatable {
                 var referencedUsers = [ReferencedUser]()
 
                 title.enumerateAddressesOfNames { address, range, _ in
-                    if let address = address {
+                    if let address {
                         referencedUsers.append(ReferencedUser(
                             address: address,
-                            range: range
+                            range: range,
                         ))
                     }
                 }
@@ -400,40 +465,47 @@ public class CVComponentState: Equatable {
             }()
         }
     }
+
     let systemMessage: SystemMessage?
 
     struct DateHeader: Equatable {
     }
+
     let dateHeader: DateHeader?
 
     struct UnreadIndicator: Equatable {
     }
+
     let unreadIndicator: UnreadIndicator?
 
     struct Reactions: Equatable {
         let reactionState: InteractionReactionState
         let viewState: CVReactionCountsView.State
     }
+
     let reactions: Reactions?
 
     struct TypingIndicator: Equatable {
         let address: SignalServiceAddress
         let avatarDataSource: ConversationAvatarDataSource?
     }
+
     let typingIndicator: TypingIndicator?
 
     struct ThreadDetails: Equatable {
         struct SafetySection: Equatable {
-            /// For "⚠️ Review Carefully"
-            let shouldShowLowTrustWarning: Bool
             /// For "Profile names are not verified"
             let shouldShowProfileNamesEducation: Bool
             /// For phone numbers or group member count
             let detailsText: NSAttributedString?
             /// For mutual groups, lack thereof and note-to-self description.
             let mutualGroupsText: NSAttributedString?
+            /// Populated if `mutualGroupsText` is not suitable for a11y, for
+            /// example if it embeds an image.
+            let mutualGroupsAccessibilityText: String?
             let threadType: SafetyTipsType
             let shouldShowSafetyTipsButton: Bool
+            let isOfficialChat: Bool
         }
 
         let avatarDataSource: ConversationAvatarDataSource?
@@ -441,10 +513,11 @@ public class CVComponentState: Equatable {
         let isAvatarBeingDownloaded: Bool
         let titleText: String
         let shouldShowVerifiedBadge: Bool
-        let bioText: String?
+        let shouldShowContactIcon: Bool
         let safetySection: SafetySection?
         let groupDescriptionText: String?
     }
+
     let threadDetails: ThreadDetails?
 
     typealias UnknownThreadWarning = CVComponentState.SystemMessage
@@ -453,25 +526,47 @@ public class CVComponentState: Equatable {
     typealias DefaultDisappearingMessageTimer = CVComponentState.SystemMessage
     let defaultDisappearingMessageTimer: DefaultDisappearingMessageTimer?
 
+    struct CollapseSet: Equatable {
+        let collapsedInteractions: [TSInteraction]
+        let collapseSetType: CollapseSetInteraction.MessagesType
+        let isExpanded: Bool
+        let finalTimerDescription: String?
+
+        static func ==(lhs: CollapseSet, rhs: CollapseSet) -> Bool {
+            return lhs.collapsedInteractions.map(\.uniqueId) == rhs.collapsedInteractions.map(\.uniqueId)
+                && lhs.collapseSetType == rhs.collapseSetType
+                && lhs.finalTimerDescription == rhs.finalTimerDescription
+        }
+    }
+
+    let collapseSet: CollapseSet?
+
     struct BottomButtons: Equatable {
         let actions: [CVMessageAction]
     }
+
     let bottomButtons: BottomButtons?
 
     let bottomLabel: String?
 
-    struct FailedOrPendingDownloads: Equatable {
-        let attachmentPointers: [AttachmentPointer]
+    struct SkippedDownloads: Equatable {
+        let attachmentIds: Set<Attachment.IDType>
 
-        static func == (lhs: CVComponentState.FailedOrPendingDownloads, rhs: CVComponentState.FailedOrPendingDownloads) -> Bool {
-            return lhs.attachmentPointers.map(\.id) == rhs.attachmentPointers.map(\.id)
+        init?(attachmentIds: Set<Attachment.IDType>) {
+            if attachmentIds.isEmpty {
+                return nil
+            }
+            self.attachmentIds = attachmentIds
         }
+
     }
-    let failedOrPendingDownloads: FailedOrPendingDownloads?
+
+    let skippedDownloads: SkippedDownloads?
 
     struct SendFailureBadge: Equatable {
         let color: UIColor
     }
+
     let sendFailureBadge: SendFailureBadge?
 
     let messageHasBodyAttachments: Bool
@@ -501,13 +596,14 @@ public class CVComponentState: Equatable {
         threadDetails: ThreadDetails?,
         unknownThreadWarning: UnknownThreadWarning?,
         defaultDisappearingMessageTimer: DefaultDisappearingMessageTimer?,
+        collapseSet: CollapseSet?,
         bottomButtons: BottomButtons?,
         bottomLabel: String?,
-        failedOrPendingDownloads: FailedOrPendingDownloads?,
+        skippedDownloads: SkippedDownloads?,
         sendFailureBadge: SendFailureBadge?,
         messageHasBodyAttachments: Bool,
         hasRenderableContent: Bool,
-        poll: Poll?
+        poll: Poll?,
     ) {
         self.messageCellType = messageCellType
         self.senderName = senderName
@@ -533,9 +629,10 @@ public class CVComponentState: Equatable {
         self.threadDetails = threadDetails
         self.unknownThreadWarning = unknownThreadWarning
         self.defaultDisappearingMessageTimer = defaultDisappearingMessageTimer
+        self.collapseSet = collapseSet
         self.bottomButtons = bottomButtons
         self.bottomLabel = bottomLabel
-        self.failedOrPendingDownloads = failedOrPendingDownloads
+        self.skippedDownloads = skippedDownloads
         self.sendFailureBadge = sendFailureBadge
         self.messageHasBodyAttachments = messageHasBodyAttachments
         self.hasRenderableContent = hasRenderableContent
@@ -544,36 +641,37 @@ public class CVComponentState: Equatable {
 
     // MARK: - Equatable
 
-    public static func == (lhs: CVComponentState, rhs: CVComponentState) -> Bool {
-        return (lhs.messageCellType == rhs.messageCellType &&
-                    lhs.senderName == rhs.senderName &&
-                    lhs.senderAvatar == rhs.senderAvatar &&
-                    lhs.bodyText == rhs.bodyText &&
-                    lhs.bodyMedia == rhs.bodyMedia &&
-                    lhs.genericAttachment == rhs.genericAttachment &&
-                    lhs.paymentAttachment == rhs.paymentAttachment &&
-                    lhs.archivedPaymentAttachment == rhs.archivedPaymentAttachment &&
-                    lhs.audioAttachment == rhs.audioAttachment &&
-                    lhs.viewOnce == rhs.viewOnce &&
-                    lhs.quotedReply == rhs.quotedReply &&
-                    lhs.sticker == rhs.sticker &&
-                    lhs.undownloadableAttachment == rhs.undownloadableAttachment &&
-                    lhs.contactShare == rhs.contactShare &&
-                    lhs.linkPreview == rhs.linkPreview &&
-                    lhs.giftBadge == rhs.giftBadge &&
-                    lhs.systemMessage == rhs.systemMessage &&
-                    lhs.dateHeader == rhs.dateHeader &&
-                    lhs.unreadIndicator == rhs.unreadIndicator &&
-                    lhs.reactions == rhs.reactions &&
-                    lhs.typingIndicator == rhs.typingIndicator &&
-                    lhs.threadDetails == rhs.threadDetails &&
-                    lhs.unknownThreadWarning == rhs.unknownThreadWarning &&
-                    lhs.defaultDisappearingMessageTimer == rhs.defaultDisappearingMessageTimer &&
-                    lhs.bottomButtons == rhs.bottomButtons &&
-                    lhs.bottomLabel == rhs.bottomLabel &&
-                    lhs.failedOrPendingDownloads == rhs.failedOrPendingDownloads &&
-                    lhs.sendFailureBadge == rhs.sendFailureBadge &&
-                    lhs.poll == rhs.poll)
+    static func ==(lhs: CVComponentState, rhs: CVComponentState) -> Bool {
+        return lhs.messageCellType == rhs.messageCellType &&
+            lhs.senderName == rhs.senderName &&
+            lhs.senderAvatar == rhs.senderAvatar &&
+            lhs.bodyText == rhs.bodyText &&
+            lhs.bodyMedia == rhs.bodyMedia &&
+            lhs.genericAttachment == rhs.genericAttachment &&
+            lhs.paymentAttachment == rhs.paymentAttachment &&
+            lhs.archivedPaymentAttachment == rhs.archivedPaymentAttachment &&
+            lhs.audioAttachment == rhs.audioAttachment &&
+            lhs.viewOnce == rhs.viewOnce &&
+            lhs.quotedReply == rhs.quotedReply &&
+            lhs.sticker == rhs.sticker &&
+            lhs.undownloadableAttachment == rhs.undownloadableAttachment &&
+            lhs.contactShare == rhs.contactShare &&
+            lhs.linkPreview == rhs.linkPreview &&
+            lhs.giftBadge == rhs.giftBadge &&
+            lhs.systemMessage == rhs.systemMessage &&
+            lhs.dateHeader == rhs.dateHeader &&
+            lhs.unreadIndicator == rhs.unreadIndicator &&
+            lhs.reactions == rhs.reactions &&
+            lhs.typingIndicator == rhs.typingIndicator &&
+            lhs.threadDetails == rhs.threadDetails &&
+            lhs.unknownThreadWarning == rhs.unknownThreadWarning &&
+            lhs.defaultDisappearingMessageTimer == rhs.defaultDisappearingMessageTimer &&
+            lhs.collapseSet == rhs.collapseSet &&
+            lhs.bottomButtons == rhs.bottomButtons &&
+            lhs.bottomLabel == rhs.bottomLabel &&
+            lhs.skippedDownloads == rhs.skippedDownloads &&
+            lhs.sendFailureBadge == rhs.sendFailureBadge &&
+            lhs.poll == rhs.poll
     }
 
     // MARK: - Building
@@ -601,7 +699,7 @@ public class CVComponentState: Equatable {
         typealias ThreadDetails = CVComponentState.ThreadDetails
         typealias UnknownThreadWarning = CVComponentState.UnknownThreadWarning
         typealias DefaultDisappearingMessageTimer = CVComponentState.DefaultDisappearingMessageTimer
-        typealias FailedOrPendingDownloads = CVComponentState.FailedOrPendingDownloads
+        typealias SkippedDownloads = CVComponentState.SkippedDownloads
         typealias BottomButtons = CVComponentState.BottomButtons
         typealias SendFailureBadge = CVComponentState.SendFailureBadge
         typealias Poll = CVComponentState.Poll
@@ -609,7 +707,7 @@ public class CVComponentState: Equatable {
         let interaction: TSInteraction
         let itemBuildingContext: CVItemBuildingContext
 
-        var revealedSpoilerIdsSnapshot: Set<StyleIdType> {
+        var revealedSpoilerIdsSnapshot: Set<StyleId> {
             return itemBuildingContext.viewStateSnapshot.spoilerReveal[.fromInteraction(interaction)] ?? Set()
         }
 
@@ -635,8 +733,9 @@ public class CVComponentState: Equatable {
         var threadDetails: ThreadDetails?
         var unknownThreadWarning: UnknownThreadWarning?
         var defaultDisappearingMessageTimer: DefaultDisappearingMessageTimer?
+        var collapseSet: CollapseSet?
         var reactions: Reactions?
-        var failedOrPendingDownloads: FailedOrPendingDownloads?
+        var skippedDownloads: SkippedDownloads?
         var sendFailureBadge: SendFailureBadge?
         var messageHasBodyAttachments: Bool
         var hasRenderableContent: Bool
@@ -683,27 +782,28 @@ public class CVComponentState: Equatable {
                 threadDetails: threadDetails,
                 unknownThreadWarning: unknownThreadWarning,
                 defaultDisappearingMessageTimer: defaultDisappearingMessageTimer,
+                collapseSet: collapseSet,
                 bottomButtons: bottomButtons,
                 bottomLabel: bottomLabel,
-                failedOrPendingDownloads: failedOrPendingDownloads,
+                skippedDownloads: skippedDownloads,
                 sendFailureBadge: sendFailureBadge,
                 messageHasBodyAttachments: messageHasBodyAttachments,
                 hasRenderableContent: hasRenderableContent,
-                poll: poll
+                poll: poll,
             )
         }
 
         // MARK: -
 
-        lazy var isIncoming: Bool = {
+        var isIncoming: Bool {
             interaction is TSIncomingMessage
-        }()
+        }
 
-        lazy var isOutgoing: Bool = {
+        var isOutgoing: Bool {
             interaction is TSOutgoingMessage
-        }()
+        }
 
-        lazy var messageCellType: CVMessageCellType = {
+        var messageCellType: CVMessageCellType {
             if dateHeader != nil {
                 return .dateHeader
             }
@@ -721,6 +821,9 @@ public class CVComponentState: Equatable {
             }
             if defaultDisappearingMessageTimer != nil {
                 return .defaultDisappearingMessageTimer
+            }
+            if collapseSet != nil {
+                return .collapseSet
             }
             if systemMessage != nil {
                 return .systemMessage
@@ -767,19 +870,21 @@ public class CVComponentState: Equatable {
 
             owsFailDebug("Unknown state.")
             return .unknown
-        }()
+        }
     }
 
     // MARK: - Convenience
 
-    lazy var shouldRenderAsSticker: Bool = {
-        sticker != nil
-    }()
+    var isBorderlessStickerMessage: Bool {
+        sticker != nil && quotedReply == nil
+    }
 
-    lazy var activeComponentStateKeys: Set<CVComponentKey> = {
+    var isReplyStickerMessage: Bool {
+        sticker != nil && quotedReply != nil
+    }
 
+    var activeComponentStateKeys: Set<CVComponentKey> {
         var result = Set<CVComponentKey>()
-
         if senderName != nil {
             result.insert(.senderName)
         }
@@ -846,14 +951,17 @@ public class CVComponentState: Equatable {
         if defaultDisappearingMessageTimer != nil {
             result.insert(.defaultDisappearingMessageTimer)
         }
+        if collapseSet != nil {
+            result.insert(.collapseSet)
+        }
         if bottomButtons != nil {
             result.insert(.bottomButtons)
         }
         if bottomLabel != nil {
             result.insert(.bottomLabel)
         }
-        if failedOrPendingDownloads != nil {
-            result.insert(.failedOrPendingDownloads)
+        if skippedDownloads != nil {
+            result.insert(.skippedDownloads)
         }
         if sendFailureBadge != nil {
             result.insert(.sendFailureBadge)
@@ -862,93 +970,184 @@ public class CVComponentState: Equatable {
             result.insert(.poll)
         }
         return result
-    }()
+    }
 
-    lazy var isTextOnlyMessage: Bool = {
+    var isTextOnlyMessage: Bool {
         let validKeys: [CVComponentKey] = [
             .senderName,
             .senderAvatar,
             .bodyText,
             .footer,
             .reactions,
-            .sendFailureBadge
+            .sendFailureBadge,
         ]
         return activeComponentStateKeys.isSubset(of: Set(validKeys))
-    }()
+    }
 
-    lazy var isBorderlessJumbomojiMessage: Bool = {
+    var isBorderlessJumbomojiMessage: Bool {
         isTextOnlyMessage && (bodyText?.isJumbomojiMessage == true)
-    }()
+    }
 
-    lazy var isBodyMediaOnlyMessage: Bool = {
+    var isBodyMediaOnlyMessage: Bool {
         let validKeys: [CVComponentKey] = [
             .senderName,
             .senderAvatar,
             .bodyMedia,
             .footer,
             .reactions,
-            .sendFailureBadge
+            .sendFailureBadge,
         ]
         return activeComponentStateKeys.isSubset(of: Set(validKeys))
-    }()
+    }
 
-    lazy var isBorderlessBodyMediaMessage: Bool = {
-        if isBodyMediaOnlyMessage,
-           let bodyMedia = bodyMedia,
-           bodyMedia.items.count == 1,
-           let firstItem = bodyMedia.items.first,
-           firstItem.renderingFlag == .borderless
+    var isBorderlessBodyMediaMessage: Bool {
+        if
+            isBodyMediaOnlyMessage,
+            let bodyMedia,
+            bodyMedia.items.count == 1,
+            let firstItem = bodyMedia.items.first,
+            firstItem.renderingFlag == .borderless
         {
             return true
         }
         return false
-    }()
-}
-
-// MARK: -
-
-extension CVComponentState {
-
-    static func buildDateHeader(interaction: TSInteraction,
-                                itemBuildingContext: CVItemBuildingContext) -> CVComponentState {
-        var builder = CVComponentState.Builder(interaction: interaction,
-                                               itemBuildingContext: itemBuildingContext)
-        builder.dateHeader = DateHeader()
-        return builder.build()
     }
 
-    static func buildUnreadIndicator(interaction: TSInteraction,
-                                     itemBuildingContext: CVItemBuildingContext) -> CVComponentState {
-        var builder = CVComponentState.Builder(interaction: interaction,
-                                               itemBuildingContext: itemBuildingContext)
-        builder.unreadIndicator = UnreadIndicator()
-        return builder.build()
-    }
+    // MARK: -
 
-    static func build(interaction: TSInteraction,
-                      itemBuildingContext: CVItemBuildingContext) throws -> CVComponentState {
-        var builder = CVComponentState.Builder(interaction: interaction,
-                                               itemBuildingContext: itemBuildingContext)
+    static func build(
+        interaction: TSInteraction,
+        itemBuildingContext: CVItemBuildingContext,
+    ) throws -> CVComponentState {
+        var builder = CVComponentState.Builder(
+            interaction: interaction,
+            itemBuildingContext: itemBuildingContext,
+        )
         return try builder.populateAndBuild()
     }
+
+    // MARK: -
+
+    var hasPrimaryAndSecondaryContentForSelection: Bool {
+        var hasPrimaryContent = false
+
+        // Search for a component that qualifies as "non-body text primary".
+        for key in activeComponentStateKeys {
+            switch key {
+            case .bodyText, .linkPreview:
+                // "Primary" content is not body text.
+                // A link preview is associated with the body text.
+                break
+            case .bodyMedia, .sticker, .audioAttachment, .genericAttachment, .contactShare:
+                hasPrimaryContent = true
+            case .senderName, .senderAvatar, .footer, .reactions, .bottomButtons, .bottomLabel, .sendFailureBadge, .dateHeader, .unreadIndicator, .typingIndicator, .threadDetails, .skippedDownloads, .unknownThreadWarning, .defaultDisappearingMessageTimer, .collapseSet, .messageRoot:
+                // "Primary" content is not just metadata / UI.
+                break
+            case .giftBadge:
+                // Gift badges can't be forwarded.
+                break
+            case .viewOnce:
+                // We should never forward view-once messages.
+                break
+            case .systemMessage:
+                // We should never forward system messages.
+                break
+            case .quotedReply:
+                // Quoted replies are never forwarded.
+                break
+            case .paymentAttachment, .archivedPaymentAttachment:
+                // Payments can't be forwarded.
+                break
+            case .poll:
+                break
+            case .undownloadableAttachment:
+                break
+            }
+        }
+
+        let hasSecondaryContent = bodyText != nil
+
+        return hasPrimaryContent && hasSecondaryContent
+    }
+
+    // MARK: -
+
+    static func displayableQuotedText(
+        text: String,
+        ranges: MessageBodyRanges?,
+        interaction: TSInteraction,
+        revealedSpoilerIdsSnapshot: Set<StyleId>,
+        transaction: DBReadTransaction,
+    ) -> DisplayableText {
+        return DisplayableText.displayableText(
+            withMessageBody: MessageBody(text: text, ranges: ranges ?? .empty),
+            transaction: transaction,
+        )
+    }
+
+    static func displayableCaption(
+        text: String,
+        transaction: DBReadTransaction,
+    ) -> DisplayableText {
+        return DisplayableText.displayableText(
+            withMessageBody: MessageBody(text: text, ranges: .empty),
+            transaction: transaction,
+        )
+    }
+
+    // MARK: - DisplayableText
+
+    static func displayableBodyText(
+        text: String,
+        ranges: MessageBodyRanges?,
+        interaction: TSInteraction,
+        transaction: DBReadTransaction,
+    ) -> DisplayableText {
+        return DisplayableText.displayableText(
+            withMessageBody: MessageBody(text: text, ranges: ranges ?? .empty),
+            transaction: transaction,
+        )
+    }
+
+    static func displayableBodyText(
+        oversizeTextAttachment attachmentStream: AttachmentStream,
+        ranges: MessageBodyRanges?,
+        interaction: TSInteraction,
+        transaction: DBReadTransaction,
+    ) -> DisplayableText {
+
+        let text = { () -> String in
+            do {
+                return try attachmentStream.decryptedLongText()
+            } catch {
+                owsFailDebug("Couldn't load oversize text: \(error).")
+                return ""
+            }
+        }()
+
+        return DisplayableText.displayableText(
+            withMessageBody: MessageBody(text: text, ranges: ranges ?? .empty),
+            transaction: transaction,
+        )
+    }
 }
 
 // MARK: -
 
-fileprivate extension CVComponentState.Builder {
+private extension CVComponentState.Builder {
 
     mutating func populateAndBuild() throws -> CVComponentState {
 
-        if let reactionState = InteractionReactionState(interaction: interaction,
-                                                        transaction: transaction),
-           reactionState.hasReactions {
-            self.reactions = Reactions(reactionState: reactionState,
-                                       viewState: CVReactionCountsView.buildState(with: reactionState))
+        if let reactionState = InteractionReactionState(interaction: interaction, tx: transaction) {
+            self.reactions = Reactions(
+                reactionState: reactionState,
+                viewState: CVReactionCountsView.buildState(with: reactionState),
+            )
         }
 
         self.senderAvatar = tryToBuildSenderAvatar()
 
-        self.failedOrPendingDownloads = tryToBuildFailedOrPendingDownloads()
+        self.skippedDownloads = tryToBuildSkippedDownloads()
 
         switch interaction.interactionType {
         case .threadDetails:
@@ -961,7 +1160,7 @@ fileprivate extension CVComponentState.Builder {
             self.defaultDisappearingMessageTimer = CVComponentSystemMessage.buildDefaultDisappearingMessageTimerState(
                 interaction: interaction,
                 threadViewModel: threadViewModel,
-                transaction: transaction
+                transaction: transaction,
             )
             return build()
         case .typingIndicator:
@@ -977,17 +1176,34 @@ fileprivate extension CVComponentState.Builder {
                     forAddress: typingIndicatorInteraction.address,
                     includingBadge: true,
                     localUserDisplayMode: .asUser,
-                    diameterPoints: UInt(ConversationStyle.groupMessageAvatarSizeClass.diameter))
+                    diameterPoints: UInt(ConversationStyle.groupMessageAvatarSizeClass.diameter),
+                )
             }()
-            self.typingIndicator = TypingIndicator(address: typingIndicatorInteraction.address,
-                                                   avatarDataSource: avatarDataSource)
+            self.typingIndicator = TypingIndicator(
+                address: typingIndicatorInteraction.address,
+                avatarDataSource: avatarDataSource,
+            )
             return build()
         case .info, .error, .call:
             let currentGroupThreadCallGroupId = viewStateSnapshot.currentGroupThreadCallGroupId
-            self.systemMessage = CVComponentSystemMessage.buildComponentState(interaction: interaction,
-                                                                              threadViewModel: threadViewModel,
-                                                                              currentGroupThreadCallGroupId: currentGroupThreadCallGroupId,
-                                                                              transaction: transaction)
+            self.systemMessage = CVComponentSystemMessage.buildComponentState(
+                interaction: interaction,
+                threadViewModel: threadViewModel,
+                currentGroupThreadCallGroupId: currentGroupThreadCallGroupId,
+                transaction: transaction,
+            )
+            return build()
+        case .collapseSet:
+            guard let collapseSetInteraction = interaction as? CollapseSetInteraction else {
+                owsFailDebug("Invalid collapseSet interaction.")
+                return build()
+            }
+            self.collapseSet = CVComponentState.CollapseSet(
+                collapsedInteractions: collapseSetInteraction.collapsedInteractions,
+                collapseSetType: collapseSetInteraction.collapseSetType,
+                isExpanded: viewStateSnapshot.expandedCollapseSetIds.contains(collapseSetInteraction.uniqueId),
+                finalTimerDescription: collapseSetInteraction.finalTimerDescription,
+            )
             return build()
         case .unreadIndicator:
             unreadIndicator = CVComponentState.UnreadIndicator()
@@ -995,7 +1211,7 @@ fileprivate extension CVComponentState.Builder {
         case .dateHeader:
             dateHeader = CVComponentState.DateHeader()
             return build()
-        case .incomingMessage, .outgoingMessage:
+        case .incomingMessage, .outgoingMessage, .releaseNotesMessage:
             guard let message = interaction as? TSMessage else {
                 owsFailDebug("Invalid message.")
                 return build()
@@ -1011,41 +1227,42 @@ fileprivate extension CVComponentState.Builder {
     }
 
     private func tryToBuildSenderAvatar() -> SenderAvatar? {
-        guard thread.isGroupThread,
-              let incomingMessage = interaction as? TSIncomingMessage else {
+        guard
+            thread.isGroupThread,
+            let incomingMessage = interaction as? TSIncomingMessage
+        else {
             return nil
         }
-        guard let avatarDataSource = self.avatarBuilder.buildAvatarDataSource(
-            forAddress: incomingMessage.authorAddress,
-            includingBadge: true,
-            localUserDisplayMode: .asUser,
-            diameterPoints: UInt(ConversationStyle.groupMessageAvatarSizeClass.diameter)
-        ) else {
+        guard
+            let avatarDataSource = self.avatarBuilder.buildAvatarDataSource(
+                forAddress: incomingMessage.authorAddress,
+                includingBadge: true,
+                localUserDisplayMode: .asUser,
+                diameterPoints: UInt(ConversationStyle.groupMessageAvatarSizeClass.diameter),
+            )
+        else {
             owsFailDebug("Could build avatar image")
             return nil
         }
         return SenderAvatar(avatarDataSource: avatarDataSource)
     }
 
-    private func tryToBuildFailedOrPendingDownloads() -> FailedOrPendingDownloads? {
+    private func tryToBuildSkippedDownloads() -> SkippedDownloads? {
         guard let message = interaction as? TSMessage else {
             return nil
         }
-        let attachmentPointers = message.failedOrPendingAttachments(transaction: transaction)
-        guard !attachmentPointers.isEmpty else {
-            return nil
-        }
-        return FailedOrPendingDownloads(attachmentPointers: attachmentPointers)
+        return SkippedDownloads(attachmentIds: message.skippedAttachmentIds(tx: transaction))
     }
 
     mutating func populateAndBuild(
         message: TSMessage,
-        revealedSpoilerIdsSnapshot: Set<StyleIdType>
+        revealedSpoilerIdsSnapshot: Set<StyleId>,
     ) throws -> CVComponentState {
 
         if message.wasRemotelyDeleted {
             // If the message has been remotely deleted, suppress everything else.
-            self.bodyText = .remotelyDeleted
+            let remoteDeleteAuthor = message.displayNameForDeleteMessage(localAci: localAci, transaction: transaction)
+            self.bodyText = .remotelyDeleted(deleteAuthor: remoteDeleteAuthor)
             return build()
         }
 
@@ -1057,13 +1274,13 @@ fileprivate extension CVComponentState.Builder {
             return try buildContact(message: message, contact: contact)
         }
 
-        if let messageSticker = message.messageSticker {
-            return try buildSticker(message: message, messageSticker: messageSticker)
-        }
-
         // Check for quoted replies _before_ media album handling,
         // since that logic may exit early.
         buildQuotedReply(message: message, revealedSpoilerIdsSnapshot: revealedSpoilerIdsSnapshot)
+
+        if let messageSticker = message.messageSticker {
+            return try buildSticker(message: message, messageSticker: messageSticker)
+        }
 
         try buildBodyText(message: message)
 
@@ -1074,23 +1291,23 @@ fileprivate extension CVComponentState.Builder {
                 let receipt = paymentMessage.paymentNotification?.mcReceiptData,
                 let model = PaymentFinder.paymentModels(
                     forMcReceiptData: receipt,
-                    transaction: transaction
+                    transaction: transaction,
                 ).first
             {
                 messageStatus = MessageRecipientStatusUtils.recipientStatus(
                     outgoingMessage: outgoingMessage,
-                    paymentModel: model
+                    paymentModel: model,
                 )
             } else {
                 messageStatus = MessageRecipientStatusUtils.recipientStatus(
                     outgoingMessage: outgoingMessage,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             }
 
             switch messageStatus {
             case .failed:
-                sendFailureBadge = SendFailureBadge(color: .ows_accentRed)
+                sendFailureBadge = SendFailureBadge(color: .Signal.red)
             case .pending:
                 sendFailureBadge = SendFailureBadge(color: .ows_gray60)
             default:
@@ -1098,26 +1315,28 @@ fileprivate extension CVComponentState.Builder {
             }
         }
 
+        if let tsReleaseNotesMessage = message as? TSReleaseNotesMessage {
+            addReleaseNotesBottomButtonIfNecessary(message: tsReleaseNotesMessage, transaction: transaction)
+        }
+
         // Could be incoming or outgoing; protocol covers both
-        if let paymentMessage = message as? OWSPaymentMessage,
-           let paymentNotification = paymentMessage.paymentNotification {
+        if
+            let paymentMessage = message as? OWSPaymentMessage,
+            let paymentNotification = paymentMessage.paymentNotification
+        {
             return buildPaymentAttachment(paymentNotification: paymentNotification)
         }
 
         if let archivedPaymentMessage = message as? OWSArchivedPaymentMessage {
-            do {
-                let archivedPayment = try DependenciesBridge.shared.archivedPaymentStore.fetch(
-                    for: archivedPaymentMessage,
-                    interactionUniqueId: message.uniqueId,
-                    tx: transaction
-                )
-                return buildArchivedPaymentAttachment(
-                    archivedPaymentMessage: archivedPaymentMessage,
-                    archivedPayment: archivedPayment
-                )
-            } catch {
-                owsFail("\(error.grdbErrorForLogging)")
-            }
+            let archivedPayment = DependenciesBridge.shared.archivedPaymentStore.fetch(
+                for: archivedPaymentMessage,
+                interactionUniqueId: message.uniqueId,
+                tx: transaction,
+            )
+            return buildArchivedPaymentAttachment(
+                archivedPaymentMessage: archivedPaymentMessage,
+                archivedPayment: archivedPayment,
+            )
         }
 
         if let giftBadge = message.giftBadge {
@@ -1132,13 +1351,13 @@ fileprivate extension CVComponentState.Builder {
             let bodyAttachments = message.sqliteRowId.map {
                 DependenciesBridge.shared.attachmentStore.fetchReferencedAttachments(
                     for: .messageBodyAttachment(messageRowId: $0),
-                    tx: transaction
+                    tx: transaction,
                 )
             } ?? []
             let mediaAlbumItems = buildMediaAlbumItems(for: bodyAttachments, message: message)
             if mediaAlbumItems.count > 0 {
                 var mediaAlbumHasFailedAttachment = false
-                var mediaAlbumHasPendingAttachment = false
+                var mediaAlbumHasSkippedAttachment = false
                 // TODO
                 for attachment in bodyAttachments {
                     guard
@@ -1153,25 +1372,58 @@ fileprivate extension CVComponentState.Builder {
                     case .failed:
                         mediaAlbumHasFailedAttachment = true
                     case .none:
-                        mediaAlbumHasPendingAttachment = true
+                        // If optimize local storage is enabled, and the user has auto-downloads
+                        // disabled, show the 'skipped attachment' download indicator. Otherwise
+                        // render the attachment as normal, using the backup thumbnail for display.
+                        let backupPlan = DependenciesBridge.shared.backupPlanManager.backupPlan(tx: transaction)
+                        switch backupPlan {
+                        case
+                            .paid(let optimizeLocalStorage),
+                            .paidAsTester(let optimizeLocalStorage),
+                            .paidExpiringSoon(let optimizeLocalStorage):
+                            if
+                                optimizeLocalStorage,
+                                canAutoDownloadAttachment(pointer: pointer, reference: attachment),
+                                attachment.attachment.localRelativeFilePathThumbnail != nil
+                            {
+                                // If optimize storage is enabled, auto-downloads are enabled,
+                                // and the backup thumbnail is present, show the backup thumbnail
+                                // as a true attachment (don't show the download icon overlay).
+                                mediaAlbumHasSkippedAttachment = false
+                            } else {
+                                mediaAlbumHasSkippedAttachment = true
+                            }
+                        case
+                            .free,
+                            .disabled,
+                            .disabling:
+                            mediaAlbumHasSkippedAttachment = true
+                        }
                     }
                 }
 
-                self.bodyMedia = BodyMedia(items: mediaAlbumItems,
-                                           mediaAlbumHasFailedAttachment: mediaAlbumHasFailedAttachment,
-                                           mediaAlbumHasPendingAttachment: mediaAlbumHasPendingAttachment)
+                self.bodyMedia = BodyMedia(
+                    items: mediaAlbumItems,
+                    mediaAlbumHasFailedAttachment: mediaAlbumHasFailedAttachment,
+                    mediaAlbumHasSkippedAttachment: mediaAlbumHasSkippedAttachment,
+                )
                 return build()
             }
 
             // Only media galleries should have more than one attachment.
             owsAssertDebug(bodyAttachments.count <= 1)
             if let bodyAttachment = bodyAttachments.first {
-                try buildNonMediaAttachment(bodyAttachment: bodyAttachment)
+                buildNonMediaAttachment(
+                    referencedAttachment: bodyAttachment,
+                    message: message,
+                )
             }
         }
 
-        if !threadViewModel.hasPendingMessageRequest,
-           let linkPreview = message.linkPreview {
+        if
+            !threadViewModel.hasPendingMessageRequest,
+            let linkPreview = message.linkPreview
+        {
             try buildLinkPreview(message: message, linkPreview: linkPreview)
         }
 
@@ -1181,18 +1433,40 @@ fileprivate extension CVComponentState.Builder {
         }
         return result
     }
-}
 
-// MARK: -
+    private func canAutoDownloadAttachment(pointer: AttachmentPointer, reference: ReferencedAttachment) -> Bool {
+        let mediaBandwidthPreferenceStore = DependenciesBridge.shared.mediaBandwidthPreferenceStore
+        let reachabilityManager = SSKEnvironment.shared.reachabilityManagerRef
 
-fileprivate extension CVComponentState.Builder {
+        let policy = AutoDownloadPolicy.build(
+            context: .body,
+            mimeType: reference.attachment.mimeType,
+            renderingFlag: reference.reference.renderingFlag,
+            plaintextSize: UInt64(safeCast: pointer.unencryptedByteCount),
+        )
+        switch policy {
+        case .never:
+            return false
+        case .always:
+            return true
+        case .preference(let mediaType):
+            return AutoDownloadPolicy.canAutoDownload(
+                mediaType: mediaType,
+                preferenceStore: mediaBandwidthPreferenceStore,
+                isReachableViaWiFi: { reachabilityManager.isReachable(via: .wifi) },
+                tx: transaction,
+            )
+        }
+    }
 
     mutating func buildThreadDetails() -> ThreadDetails {
         owsAssertDebug(interaction is ThreadDetailsInteraction)
 
-        return CVComponentThreadDetails.buildComponentState(thread: thread,
-                                                            transaction: transaction,
-                                                            avatarBuilder: avatarBuilder)
+        return CVComponentThreadDetails.buildComponentState(
+            thread: thread,
+            transaction: transaction,
+            avatarBuilder: avatarBuilder,
+        )
     }
 
     // TODO: Should we throw more?
@@ -1227,9 +1501,9 @@ fileprivate extension CVComponentState.Builder {
                 DependenciesBridge.shared.attachmentStore.fetchReferences(
                     owners: [
                         .messageOversizeText(messageRowId: $0),
-                        .messageBodyAttachment(messageRowId: $0)
+                        .messageBodyAttachment(messageRowId: $0),
                     ],
-                    tx: transaction
+                    tx: transaction,
                 )
             } ?? []
             let hasMoreThanOneAttachment: Bool = attachmentRefs.count > 1
@@ -1244,7 +1518,7 @@ fileprivate extension CVComponentState.Builder {
                 DependenciesBridge.shared.attachmentStore
                     .fetchReferencedAttachments(
                         for: .messageBodyAttachment(messageRowId: $0),
-                        tx: transaction
+                        tx: transaction,
                     )
             } ?? []
             // We currently only support single attachments for view-once messages.
@@ -1254,16 +1528,17 @@ fileprivate extension CVComponentState.Builder {
             }
             let renderingFlag = mediaAttachment.reference.renderingFlag
             if let attachmentStream = mediaAttachment.attachment.asStream() {
-                if attachmentStream.contentType.isVisualMedia
-                    && (
-                        MimeTypeUtil.isSupportedImageMimeType(attachmentStream.mimeType)
-                        || MimeTypeUtil.isSupportedMaybeAnimatedMimeType(attachmentStream.mimeType)
-                        || MimeTypeUtil.isSupportedVideoMimeType(attachmentStream.mimeType)
-                    )
+                if
+                    attachmentStream.contentType.isVisualMedia,
+
+                    MimeTypeUtil.isSupportedImageMimeType(attachmentStream.mimeType)
+                    || MimeTypeUtil.isSupportedMaybeAnimatedMimeType(attachmentStream.mimeType)
+                    || MimeTypeUtil.isSupportedVideoMimeType(attachmentStream.mimeType)
+
                 {
                     return buildViewOnce(viewOnceState: .incomingAvailable(
                         attachmentStream: attachmentStream,
-                        renderingFlag: renderingFlag
+                        renderingFlag: renderingFlag,
                     ))
                 }
             } else if let attachmentPointer = mediaAttachment.attachment.asAnyPointer() {
@@ -1271,7 +1546,7 @@ fileprivate extension CVComponentState.Builder {
                 case .enqueuedOrDownloading:
                     return buildViewOnce(viewOnceState: .incomingDownloading(
                         attachmentPointer: attachmentPointer,
-                        renderingFlag: renderingFlag
+                        renderingFlag: renderingFlag,
                     ))
                 case .failed:
                     return buildViewOnce(viewOnceState: .incomingFailed)
@@ -1294,51 +1569,90 @@ fileprivate extension CVComponentState.Builder {
         let contactShare = ContactShareViewModel(
             contactShareRecord: contact,
             parentMessage: message,
-            transaction: transaction
+            transaction: transaction,
         )
         let state = CVContactShareView.buildState(
             contactShare: contactShare,
             isIncoming: isIncoming,
             conversationStyle: conversationStyle,
-            transaction: transaction
+            transaction: transaction,
         )
         self.contactShare = ContactShare(state: state)
 
-        let phoneNumberPartition = contactShare.dbRecord.phoneNumberPartition(tx: transaction)
-        let phoneNumberAction: CVMessageAction? = phoneNumberPartition.map(
-            ifSendablePhoneNumbers: {
-                // If system contacts are known/linkable, show a "Send" button.
-                return CVMessageAction(
-                    title: CommonStrings.sendMessage,
-                    accessibilityIdentifier: "send_message_to_contact_share",
-                    action: .didTapSendMessage(phoneNumbers: $0)
-                )
-            },
-            elseIfInvitablePhoneNumbers: { _ in
-                // If system contacts aren't registered, show an "Invite" button.
-                return CVMessageAction(
-                    title: OWSLocalizedString("ACTION_INVITE", comment: "Label for 'invite' button in contact view."),
-                    accessibilityIdentifier: "invite_contact_share",
-                    action: .didTapSendInvite(contactShare: contactShare)
-                )
-            },
-            elseIfAddablePhoneNumbers: { _ in
-                // Otherwise, offer to add the number(s) to your address book.
-                return CVMessageAction(
-                    title: OWSLocalizedString("CONVERSATION_VIEW_ADD_TO_CONTACTS_OFFER", comment: "Message shown in conversation view that offers to add an unknown user to your phone's contacts."),
-                    accessibilityIdentifier: "add_to_contacts",
-                    action: .didTapAddToContacts(contactShare: contactShare)
-                )
-            },
-            elseIfNoPhoneNumbers: {
-                return nil
-            }
+        let messageButtonTitle = OWSLocalizedString(
+            "CONTACT_SHARE_MESSAGE_BUTTON",
+            comment: "Button on a shared contact that opens a chat with that contact. It can share a row with other buttons, so a short label is preferred.",
         )
-        if let phoneNumberAction {
-            bottomButtonsActions.append(phoneNumberAction)
+        let contactShareAction: CVMessageAction?
+        if let aci = contactShare.dbRecord.aci {
+            contactShareAction = CVMessageAction(
+                title: messageButtonTitle,
+                accessibilityIdentifier: "send_message_to_contact_share",
+                action: .didTapSendMessageToAci(aci: aci, sharedName: contactShare.dbRecord.name),
+            )
+        } else {
+            contactShareAction = contactShare.dbRecord.phoneNumberPartition(tx: transaction).map(
+                ifSendablePhoneNumbers: {
+                    // If system contacts are known/linkable, show a "Send" button.
+                    return CVMessageAction(
+                        title: messageButtonTitle,
+                        accessibilityIdentifier: "send_message_to_contact_share",
+                        action: .didTapSendMessage(phoneNumbers: $0),
+                    )
+                },
+                elseIfInvitablePhoneNumbers: { _ in
+                    // If system contacts aren't registered, show an "Invite" button.
+                    return CVMessageAction(
+                        title: OWSLocalizedString("ACTION_INVITE", comment: "Label for 'invite' button in contact view."),
+                        accessibilityIdentifier: "invite_contact_share",
+                        action: .didTapSendInvite(contactShare: contactShare),
+                    )
+                },
+                elseIfAddablePhoneNumbers: { _ in
+                    // Otherwise, offer to add the number(s) to your address book.
+                    return CVMessageAction(
+                        title: OWSLocalizedString("CONVERSATION_VIEW_ADD_TO_CONTACTS_OFFER", comment: "Message shown in conversation view that offers to add an unknown user to your phone's contacts."),
+                        accessibilityIdentifier: "add_to_contacts",
+                        action: .didTapAddToContacts(contactShare: contactShare),
+                    )
+                },
+                elseIfNoPhoneNumbers: {
+                    return nil
+                },
+            )
+        }
+        if let contactShareAction {
+            bottomButtonsActions.append(contactShareAction)
+        }
+
+        if
+            let aci = contactShare.dbRecord.aci,
+            let groupThread = thread as? TSGroupThread,
+            canAddToGroup(aci: aci, groupThread: groupThread)
+        {
+            bottomButtonsActions.append(CVMessageAction(
+                title: OWSLocalizedString(
+                    "CONTACT_SHARE_ADD_TO_GROUP_BUTTON",
+                    comment: "Button on a shared contact in a group conversation that adds the contact to that group. It can share a row with other buttons, so a short label is preferred.",
+                ),
+                accessibilityIdentifier: "add_contact_share_to_group",
+                action: .didTapAddToGroup(aci: aci, sharedName: contactShare.dbRecord.name),
+            ))
         }
 
         return build()
+    }
+
+    private func canAddToGroup(aci: Aci, groupThread: TSGroupThread) -> Bool {
+        guard
+            let groupModel = groupThread.groupModel as? TSGroupModelV2,
+            !groupModel.isTerminated,
+            GroupViewHelper(threadViewModel: threadViewModel, memberLabelCoordinator: nil)
+                .canEditConversationMembership(localAci: localAci)
+        else {
+            return false
+        }
+        return groupModel.groupMembership.canTryToAddToGroup(serviceId: aci, tx: transaction)
     }
 
     // TODO: Should we throw more?
@@ -1346,46 +1660,62 @@ fileprivate extension CVComponentState.Builder {
 
         guard
             let rowId = message.sqliteRowId,
-            let attachment = DependenciesBridge.shared.attachmentStore.fetchFirstReferencedAttachment(
+            let referencedAttachment = DependenciesBridge.shared.attachmentStore.fetchAnyReferencedAttachment(
                 for: .messageSticker(messageRowId: rowId),
-                tx: transaction
+                tx: transaction,
             )
         else {
             throw OWSAssertionError("Missing sticker attachment.")
         }
-        if let attachmentStream = attachment.asReferencedStream {
-            let stickerMetadata = attachmentStream.attachmentStream.asStickerMetadata(
-                stickerInfo: messageSticker.info,
-                stickerType: StickerManager.stickerType(forContentType: attachmentStream.attachment.mimeType),
-                emojiString: messageSticker.emoji
-            )
-            self.sticker = .available(
-                stickerMetadata: stickerMetadata,
-                attachmentStream: attachmentStream
-            )
-            return build()
-        } else if let attachmentPointer = attachment.asReferencedAnyPointer {
-            let downloadState = attachmentPointer.attachmentPointer.downloadState(tx: transaction)
+
+        let cvAttachment = CVAttachment.from(
+            referencedAttachment: referencedAttachment,
+            message: message,
+            tx: transaction,
+        )
+
+        switch cvAttachment {
+        case .stream(let referencedAttachmentStream, let isUploading, let imageMetadata):
+            if let imageMetadata {
+                let stickerMetadata = EncryptedStickerMetadata(
+                    stickerInfo: messageSticker.info,
+                    stickerType: StickerManager.stickerType(forContentType: referencedAttachmentStream.attachment.mimeType),
+                    emojiString: messageSticker.emoji,
+                    encryptedStickerDataUrl: referencedAttachmentStream.attachmentStream.fileURL,
+                    encryptionKey: referencedAttachmentStream.attachmentStream.attachment.encryptionKey,
+                    plaintextLength: referencedAttachmentStream.attachmentStream.unencryptedByteCount,
+                )
+
+                self.sticker = .available(
+                    stickerMetadata: stickerMetadata,
+                    attachmentStream: referencedAttachmentStream,
+                    isUploading: isUploading,
+                    imageMetadata: imageMetadata,
+                )
+            } else {
+                self.sticker = .invalidImage(attachmentId: referencedAttachmentStream.attachment.id)
+            }
+        case .pointer(let referencedAttachmentPointer, let downloadState):
             switch downloadState {
             case .enqueuedOrDownloading:
-                self.sticker = .downloading(attachmentPointer: attachmentPointer)
+                self.sticker = .downloading(attachmentPointer: referencedAttachmentPointer)
             case .failed, .none:
-                self.sticker = .failedOrPending(
-                    attachmentPointer: attachmentPointer,
-                    downloadState: downloadState
+                self.sticker = .skipped(
+                    attachmentPointer: referencedAttachmentPointer,
+                    downloadState: downloadState,
                 )
             }
-            return build()
-        } else {
+        case .backupThumbnail, .undownloadable:
             self.undownloadableAttachment = .sticker
-            return build()
         }
+
+        return build()
     }
 
     // TODO: Should we validate and throw errors?
     mutating func buildQuotedReply(
         message: TSMessage,
-        revealedSpoilerIdsSnapshot: Set<StyleIdType>
+        revealedSpoilerIdsSnapshot: Set<StyleId>,
     ) {
         let quotedReplyModel: QuotedReplyModel? = {
             if
@@ -1396,10 +1726,22 @@ fileprivate extension CVComponentState.Builder {
                     storyReplyMessage: message,
                     storyTimestamp: message.storyTimestamp?.uint64Value,
                     storyAuthorAci: storyAuthorAci,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             } else if let quotedMessage = message.quotedMessage {
-                return QuotedReplyModel.build(replyMessage: message, quotedMessage: quotedMessage, transaction: transaction)
+                var memberLabel: String?
+                if
+                    let groupThread = thread as? TSGroupThread,
+                    !threadViewModel.hasPendingMessageRequest,
+                    let originalMessageAuthor = quotedMessage.authorAddress.aci
+                {
+                    memberLabel = groupThread.groupModel.groupMembership.memberLabel(for: originalMessageAuthor)?.labelForRendering()
+                    memberLabel = memberLabel?
+                        .components(separatedBy: .whitespaces)
+                        .joined(separator: SignalSymbol.LeadingCharacter.nonBreakingSpace.rawValue)
+                }
+
+                return QuotedReplyModel.build(replyMessage: message, quotedMessage: quotedMessage, memberLabel: memberLabel, transaction: transaction)
             } else {
                 return nil
             }
@@ -1414,15 +1756,15 @@ fileprivate extension CVComponentState.Builder {
                 ranges: quotedBody.ranges,
                 interaction: message,
                 revealedSpoilerIdsSnapshot: revealedSpoilerIdsSnapshot,
-                transaction: transaction
+                transaction: transaction,
             )
         }
-        let viewState = QuotedMessageView.stateForConversation(
+        let viewState = CVQuotedMessageView.stateForConversation(
             quotedReplyModel: quotedReplyModel,
             displayableQuotedText: displayableQuotedText,
             conversationStyle: conversationStyle,
             isOutgoing: isOutgoing,
-            transaction: transaction
+            transaction: transaction,
         )
         self.quotedReply = QuotedReply(viewState: viewState)
     }
@@ -1433,26 +1775,29 @@ fileprivate extension CVComponentState.Builder {
         }
         bodyText = try CVComponentBodyText.buildComponentState(
             message: message,
+            skippedAttachmentIds: skippedDownloads?.attachmentIds ?? [],
             viewStateSnapshot: viewStateSnapshot,
-            transaction: transaction
+            transaction: transaction,
         )
     }
 
     // MARK: -
 
-    func buildMediaAlbumItems(for mediaAttachments: [ReferencedAttachment],
-                              message: TSMessage) -> [CVMediaAlbumItem] {
+    func buildMediaAlbumItems(
+        for mediaAttachments: [ReferencedAttachment],
+        message: TSMessage,
+    ) -> [CVMediaAlbumItem] {
 
         let threadHasPendingMessageRequest = message.thread(tx: transaction)?
             .hasPendingMessageRequest(transaction: transaction)
             ?? false
 
         var mediaAlbumItems = [CVMediaAlbumItem]()
-        for attachment in mediaAttachments {
+        for referencedAttachment in mediaAttachments {
             guard
                 // Use the validated content type and only fall back to the mime type.
-                attachment.attachment.asStream()?.contentType.isVisualMedia
-                ?? MimeTypeUtil.isSupportedVisualMediaMimeType(attachment.attachment.mimeType)
+                referencedAttachment.attachment.asStream()?.contentType.isVisualMedia
+                ?? MimeTypeUtil.isSupportedVisualMediaMimeType(referencedAttachment.attachment.mimeType)
             else {
                 // Well behaving clients should not send a mix of visual media (like JPG) and non-visual media (like PDF's)
                 // Since we're not coped to handle a mix of media, return @[]
@@ -1460,20 +1805,24 @@ fileprivate extension CVComponentState.Builder {
                 return []
             }
 
-            let cvAttachment = CVAttachment.from(attachment, tx: transaction)
+            let cvAttachment = CVAttachment.from(
+                referencedAttachment: referencedAttachment,
+                message: message,
+                tx: transaction,
+            )
 
-            let caption = attachment.reference.legacyMessageCaption
+            let caption = referencedAttachment.reference.legacyMessageCaption
             let hasCaption = caption.map {
-                return CVComponentState.displayableCaption(
+                return !CVComponentState.displayableCaption(
                     text: $0,
-                    transaction: transaction
-                ).fullTextValue.isEmpty.negated
+                    transaction: transaction,
+                ).fullTextValue.isEmpty
             } ?? false
 
             switch cvAttachment {
             case .pointer:
                 var mediaSize: CGSize = .zero
-                if let sourceMediaSizePixels = attachment.reference.sourceMediaSizePixels {
+                if let sourceMediaSizePixels = referencedAttachment.reference.sourceMediaSizePixels {
                     mediaSize = sourceMediaSizePixels
                 } else {
                     owsFailDebug("Invalid attachment.")
@@ -1484,52 +1833,53 @@ fileprivate extension CVComponentState.Builder {
                     hasCaption: hasCaption,
                     mediaSize: mediaSize,
                     isBroken: false,
-                    threadHasPendingMessageRequest: threadHasPendingMessageRequest
+                    threadHasPendingMessageRequest: threadHasPendingMessageRequest,
                 ))
-                continue
-            case .stream(let attachmentStream):
-                let attachmentStream = attachmentStream.attachmentStream
-                guard attachmentStream.contentType.isVisualMedia else {
-                    Logger.warn("Filtering invalid media.")
-                    mediaAlbumItems.append(CVMediaAlbumItem(
-                        attachment: cvAttachment,
-                        attachmentStream: nil,
-                        hasCaption: hasCaption,
-                        mediaSize: .zero,
-                        isBroken: true,
-                        threadHasPendingMessageRequest: threadHasPendingMessageRequest
-                    ))
-                    continue
-                }
-                let mediaSizePixels: CGSize
-                switch attachmentStream.contentType {
-                case let .image(pixelSize), let .video(_, pixelSize, _), let .animatedImage(pixelSize):
-                    guard pixelSize.isNonEmpty else {
-                        Logger.warn("Filtering media with invalid size.")
-                        fallthrough
-                    }
-                    mediaSizePixels = pixelSize
-                case .audio, .file, .invalid:
-                    Logger.warn("Filtering media with invalid size.")
-                    mediaAlbumItems.append(CVMediaAlbumItem(
-                        attachment: cvAttachment,
-                        attachmentStream: nil,
-                        hasCaption: hasCaption,
-                        mediaSize: .zero,
-                        isBroken: true,
-                        threadHasPendingMessageRequest: threadHasPendingMessageRequest
-                    ))
-                    continue
-                }
-
-                mediaAlbumItems.append(CVMediaAlbumItem(
+            case .stream(let referencedAttachmentStream, isUploading: _, let imageMetadata):
+                let attachmentStream = referencedAttachmentStream.attachmentStream
+                let brokenAlbumItem = CVMediaAlbumItem(
                     attachment: cvAttachment,
-                    attachmentStream: attachmentStream,
+                    attachmentStream: nil,
                     hasCaption: hasCaption,
-                    mediaSize: mediaSizePixels,
-                    isBroken: false,
-                    threadHasPendingMessageRequest: threadHasPendingMessageRequest
-                ))
+                    mediaSize: .zero,
+                    isBroken: true,
+                    threadHasPendingMessageRequest: threadHasPendingMessageRequest,
+                )
+
+                switch attachmentStream.contentType {
+                case .audio, .file:
+                    owsFailDebug("Building media album, but have audio or file attachment?")
+                    mediaAlbumItems.append(brokenAlbumItem)
+                case .video:
+                    if let mediaSizePixels = attachmentStream.cachedMediaSizePixels {
+                        mediaAlbumItems.append(CVMediaAlbumItem(
+                            attachment: cvAttachment,
+                            attachmentStream: attachmentStream,
+                            hasCaption: hasCaption,
+                            mediaSize: mediaSizePixels,
+                            isBroken: false,
+                            threadHasPendingMessageRequest: threadHasPendingMessageRequest,
+                        ))
+                    } else {
+                        mediaAlbumItems.append(brokenAlbumItem)
+                    }
+                case .image:
+                    if
+                        let mediaSizePixels = attachmentStream.cachedMediaSizePixels,
+                        imageMetadata != nil
+                    {
+                        mediaAlbumItems.append(CVMediaAlbumItem(
+                            attachment: cvAttachment,
+                            attachmentStream: attachmentStream,
+                            hasCaption: hasCaption,
+                            mediaSize: mediaSizePixels,
+                            isBroken: false,
+                            threadHasPendingMessageRequest: threadHasPendingMessageRequest,
+                        ))
+                    } else {
+                        mediaAlbumItems.append(brokenAlbumItem)
+                    }
+                }
             case .backupThumbnail(let thumbnail):
                 // TODO: Need to make CVMediaAlbumItem take a thumbnail
                 var mediaSize: CGSize = .zero
@@ -1546,9 +1896,8 @@ fileprivate extension CVComponentState.Builder {
                     hasCaption: hasCaption,
                     mediaSize: mediaSize,
                     isBroken: false,
-                    threadHasPendingMessageRequest: threadHasPendingMessageRequest
+                    threadHasPendingMessageRequest: threadHasPendingMessageRequest,
                 ))
-                continue
             case .undownloadable(let attachment):
                 var mediaSize: CGSize = .zero
                 if let sourceMediaSizePixels = attachment.reference.sourceMediaSizePixels {
@@ -1562,73 +1911,73 @@ fileprivate extension CVComponentState.Builder {
                     hasCaption: hasCaption,
                     mediaSize: mediaSize,
                     isBroken: true,
-                    threadHasPendingMessageRequest: threadHasPendingMessageRequest
+                    threadHasPendingMessageRequest: threadHasPendingMessageRequest,
                 ))
-                continue
             }
         }
         return mediaAlbumItems
     }
 
-    mutating func buildNonMediaAttachment(bodyAttachment: ReferencedAttachment?) throws {
-
-        guard let attachment = bodyAttachment else {
-            throw OWSAssertionError("Missing attachment.")
-        }
-
-        func buildGenericAttachment() {
-            let cvAttachment = CVAttachment.from(attachment, tx: transaction)
-            self.genericAttachment = .init(attachment: cvAttachment)
-        }
-
+    mutating func buildNonMediaAttachment(
+        referencedAttachment: ReferencedAttachment,
+        message: TSMessage,
+    ) {
         guard
             // Use the validated content type and only fall back to the mime type.
-            attachment.attachment.asStream()?.contentType.isAudio
-            ?? MimeTypeUtil.isSupportedAudioMimeType(attachment.attachment.mimeType)
+            referencedAttachment.attachment.asStream()?.contentType.isAudio
+            ?? MimeTypeUtil.isSupportedAudioMimeType(referencedAttachment.attachment.mimeType)
         else {
-            buildGenericAttachment()
+            let cvAttachment = CVAttachment.from(
+                referencedAttachment: referencedAttachment,
+                message: message,
+                tx: transaction,
+            )
+            self.genericAttachment = .init(attachment: cvAttachment)
             return
         }
 
         if
-            let attachmentStream = attachment.asReferencedStream,
+            let attachmentStream = referencedAttachment.asReferencedStream,
             let audioAttachment = AudioAttachment(
                 attachmentStream: attachmentStream,
-                owningMessage: interaction as? TSMessage,
+                owningMessage: message,
                 metadata: nil,
-                receivedAtDate: interaction.receivedAtDate
+                receivedAtDate: interaction.receivedAtDate,
             )
         {
             self.audioAttachment = audioAttachment
-        } else if let attachmentPointer = attachment.asReferencedAnyPointer {
-            self.audioAttachment = AudioAttachment(
-                attachmentPointer: attachmentPointer,
-                owningMessage: interaction as? TSMessage,
+        } else if
+            let referencedAttachmentPointer = referencedAttachment.asReferencedAnyPointer,
+            let audioAttachment = AudioAttachment(
+                attachmentPointer: referencedAttachmentPointer,
+                owningMessage: message,
                 metadata: nil,
                 receivedAtDate: interaction.receivedAtDate,
-                downloadState: attachmentPointer.attachmentPointer.downloadState(tx: transaction)
+                downloadState: referencedAttachmentPointer.attachmentPointer.downloadState(tx: transaction),
             )
+        {
+            self.audioAttachment = audioAttachment
         } else {
             self.undownloadableAttachment = .audio
         }
     }
 
     mutating func buildPaymentAttachment(
-        paymentNotification: TSPaymentNotification
+        paymentNotification: TSPaymentNotification,
     ) -> CVComponentState {
 
         // Note: there should only ever be one payment model per receipt,
         // but this is unenforced.
         let paymentModel: TSPaymentModel? = PaymentFinder.paymentModels(
             forMcReceiptData: paymentNotification.mcReceiptData,
-            transaction: itemBuildingContext.transaction
+            transaction: itemBuildingContext.transaction,
         ).first
 
         self.paymentAttachment = PaymentAttachment(
             notification: paymentNotification,
             model: paymentModel,
             // Only used for 1:1 threads, but not enforced.
-            otherUserShortName: threadViewModel.shortName ?? threadViewModel.name
+            otherUserShortName: threadViewModel.shortName ?? threadViewModel.name,
         )
 
         return build()
@@ -1636,7 +1985,7 @@ fileprivate extension CVComponentState.Builder {
 
     mutating func buildArchivedPaymentAttachment(
         archivedPaymentMessage: OWSArchivedPaymentMessage,
-        archivedPayment: ArchivedPayment?
+        archivedPayment: ArchivedPayment?,
     ) -> CVComponentState {
 
         let recoveredAmountPicoMob = archivedPayment?.receipt.flatMap {
@@ -1644,13 +1993,13 @@ fileprivate extension CVComponentState.Builder {
         }
 
         self.archivedPaymentAttachment = ArchivedPaymentAttachment(
-            amount: archivedPaymentMessage.archivedPaymentInfo.amount,
-            fee: archivedPaymentMessage.archivedPaymentInfo.fee,
+            amount: PaymentsFormat.formatFromArchive(amount: archivedPaymentMessage.archivedPaymentInfo.amount),
+            fee: PaymentsFormat.formatFromArchive(amount: archivedPaymentMessage.archivedPaymentInfo.fee),
             note: archivedPaymentMessage.archivedPaymentInfo.note,
             // Only used for 1:1 threads, but not enforced.
             otherUserShortName: threadViewModel.shortName ?? threadViewModel.name,
             archivedPayment: archivedPayment,
-            recoveredAmountPicoMob: recoveredAmountPicoMob
+            recoveredAmountPicoMob: recoveredAmountPicoMob,
         )
 
         return build()
@@ -1669,46 +2018,49 @@ fileprivate extension CVComponentState.Builder {
             owsFailDebug("Invalid urlString.")
             return
         }
-        if let groupInviteLinkInfo = GroupInviteLinkInfo.parseFrom(url) {
+        if
+            let groupInviteLinkUrl = PossibleGroupInviteLinkUrl.parseFrom(url),
+            let groupInviteLink = try? GroupInviteLink.parseFrom(groupInviteLinkUrl)
+        {
             let groupInviteLinkViewModel = CVComponentState.configureGroupInviteLink(
                 url,
                 message: message,
-                groupInviteLinkInfo: groupInviteLinkInfo
+                groupInviteLink: groupInviteLink,
             )
             if !groupInviteLinkViewModel.isExpired {
                 let state = LinkPreviewGroupLink(
                     linkType: isIncoming ? .incomingMessageGroupInviteLink : .outgoingMessageGroupInviteLink,
                     linkPreview: linkPreview,
                     groupInviteLinkViewModel: groupInviteLinkViewModel,
-                    conversationStyle: conversationStyle
+                    conversationStyle: conversationStyle,
                 )
                 self.linkPreview = LinkPreview(
                     linkPreview: linkPreview,
-                    state: state
+                    state: state,
                 )
             }
         } else if let callLink = CallLink(url: url) {
             let bottomButtonAction = CVMessageAction(
                 title: OWSLocalizedString(
                     "CONVERSATION_VIEW_JOIN_CALL",
-                    comment: "Message shown in conversation view that offers to join a Call Link call."
+                    comment: "Message shown in conversation view that offers to join a Call Link call.",
                 ),
                 accessibilityIdentifier: "join_call_link_call",
-                action: .didTapJoinCallLinkCall(callLink: callLink)
+                action: .didTapJoinCallLinkCall(callLink: callLink),
             )
             bottomButtonsActions.append(bottomButtonAction)
             let state = LinkPreviewCallLink(previewType: .sent(linkPreview, conversationStyle), callLink: callLink)
             self.linkPreview = LinkPreview(
                 linkPreview: linkPreview,
-                state: state
+                state: state,
             )
         } else {
             let linkPreviewAttachment = { () -> ReferencedAttachment? in
                 guard
                     let rowId = message.sqliteRowId,
-                    let linkPreviewAttachment = DependenciesBridge.shared.attachmentStore.fetchFirstReferencedAttachment(
+                    let linkPreviewAttachment = DependenciesBridge.shared.attachmentStore.fetchAnyReferencedAttachment(
                         for: .messageLinkPreview(messageRowId: rowId),
-                        tx: transaction
+                        tx: transaction,
                     )
                 else {
                     return nil
@@ -1750,23 +2102,40 @@ fileprivate extension CVComponentState.Builder {
                 linkPreview: linkPreview,
                 imageAttachment: linkPreviewAttachment,
                 isFailedImageAttachmentDownload: isFailedImageAttachmentDownload,
-                conversationStyle: conversationStyle
+                conversationStyle: conversationStyle,
             )
             self.linkPreview = LinkPreview(
                 linkPreview: linkPreview,
-                state: state
+                state: state,
             )
+
+            if
+                StickerPackInfo.isStickerPackShare(url),
+                let stickerPackInfo = StickerPackInfo.parseStickerPackShare(url)
+            {
+                let viewStickerPack = CVMessageAction(
+                    title: OWSLocalizedString("CONVERSATION_VIEW_VIEW_STICKER_PACK", comment: "Label for a button in a message bubble that opens a sticker pack"),
+                    accessibilityIdentifier: "view_sticker_pack",
+                    action: .didTapViewStickerPack(stickerPackInfo: stickerPackInfo),
+                )
+
+                bottomButtonsActions.append(viewStickerPack)
+            }
         }
     }
 
     private mutating func buildGiftBadge(messageUniqueId: String, giftBadge: OWSGiftBadge) throws -> CVComponentState {
-        let (level, expirationDate) = try giftBadge.getReceiptDetails()
+        let profileBadgeManager = DependenciesBridge.shared.profileBadgeManager
+
+        let (_, expirationDate) = try giftBadge.getReceiptDetails()
+        let giftProfileBadge = profileBadgeManager.fetchGiftBadge(id: .gift, tx: transaction)
+
         self.giftBadge = GiftBadge(
             messageUniqueId: messageUniqueId,
             otherUserShortName: threadViewModel.shortName ?? threadViewModel.name,
-            cachedBadge: DonationSubscriptionManager.getCachedBadge(level: .giftBadge(level)),
+            profileBadge: giftProfileBadge,
             expirationDate: expirationDate,
-            redemptionState: giftBadge.redemptionState
+            redemptionState: giftBadge.redemptionState,
         )
         return build()
     }
@@ -1781,16 +2150,18 @@ fileprivate extension CVComponentState.Builder {
             poll: poll,
             isIncoming: isIncoming,
             conversationStyle: conversationStyle,
-            localAci: self.localAci
+            localAci: self.localAci,
         )
 
         let prevPollState: CVComponentState.Poll?
-        if let prevRenderState = itemBuildingContext.prevRenderState,
-           let prevPollInteraction = prevRenderState.items.first(
-            where: {
-                $0.interactionUniqueId == message.uniqueId
-            }),
-           let _prevPollState = prevPollInteraction.componentState.poll
+        if
+            let prevRenderState = itemBuildingContext.prevRenderState,
+            let prevPollInteraction = prevRenderState.items.first(
+                where: {
+                    $0.interactionUniqueId == message.uniqueId
+                },
+            ),
+            let _prevPollState = prevPollInteraction.componentState.poll
         {
             prevPollState = _prevPollState
         } else {
@@ -1803,134 +2174,50 @@ fileprivate extension CVComponentState.Builder {
         if poll.totalVoters() > 0 {
             let title = poll.isEnded ? OWSLocalizedString(
                 "POLL_BUTTON_VIEW_RESULTS",
-                comment: "Button to view poll results"
+                comment: "Button to view poll results",
             ) : OWSLocalizedString(
                 "POLL_BUTTON_VIEW_VOTES",
-                comment: "Button to view poll votes"
+                comment: "Button to view poll votes",
             )
             let viewVotesAction = CVMessageAction(
                 title: title,
                 accessibilityIdentifier: "view_votes",
-                action: .didTapViewVotes(poll: poll)
+                action: .didTapViewVotes(poll: poll),
             )
 
             bottomButtonsActions.append(viewVotesAction)
         } else {
             bottomLabel = OWSLocalizedString(
                 "POLL_NO_VOTES",
-                comment: "String to display when a poll has no votes"
+                comment: "String to display when a poll has no votes",
             )
         }
 
         return build()
     }
-}
 
-// MARK: - DisplayableText
+    mutating func addReleaseNotesBottomButtonIfNecessary(message: TSReleaseNotesMessage, transaction: DBReadTransaction) {
+        let releaseNoteStore = ReleaseNoteStore()
+        let releaseNote = releaseNoteStore.existingReleaseNoteForInteractionId(message.sqliteRowId!, tx: transaction)
 
-public extension CVComponentState {
+        if
+            let releaseNote,
+            let callToActionId = releaseNote.ctaId,
+            let ctaText = releaseNote.ctaText
+        {
+            let callToAction = RemoteAnnouncementModel.Manifest.Action(fromActionId: callToActionId)
 
-    static func displayableBodyText(text: String,
-                                    ranges: MessageBodyRanges?,
-                                    interaction: TSInteraction,
-                                    transaction: DBReadTransaction) -> DisplayableText {
-        return DisplayableText.displayableText(
-            withMessageBody: MessageBody(text: text, ranges: ranges ?? .empty),
-            transaction: transaction)
-    }
-
-    static func displayableBodyText(
-        oversizeTextAttachment attachmentStream: AttachmentStream,
-        ranges: MessageBodyRanges?,
-        interaction: TSInteraction,
-        transaction: DBReadTransaction
-    ) -> DisplayableText {
-
-        let text = { () -> String in
-            do {
-                return try attachmentStream.decryptedLongText()
-            } catch {
-                owsFailDebug("Couldn't load oversize text: \(error).")
-                return ""
+            if case .unrecognized(let actionId) = callToAction {
+                Logger.debug("Ignoring unrecognized actionId \(actionId)")
+                return
             }
-        }()
 
-        return DisplayableText.displayableText(
-            withMessageBody: MessageBody(text: text, ranges: ranges ?? .empty),
-            transaction: transaction)
-    }
-}
-
-// MARK: -
-
-fileprivate extension CVComponentState {
-
-    static func displayableQuotedText(
-        text: String,
-        ranges: MessageBodyRanges?,
-        interaction: TSInteraction,
-        revealedSpoilerIdsSnapshot: Set<StyleIdType>,
-        transaction: DBReadTransaction
-    ) -> DisplayableText {
-        return DisplayableText.displayableText(
-            withMessageBody: MessageBody(text: text, ranges: ranges ?? .empty),
-            transaction: transaction
-        )
-    }
-
-    static func displayableCaption(
-        text: String,
-        transaction: DBReadTransaction
-    ) -> DisplayableText {
-        return DisplayableText.displayableText(
-            withMessageBody: MessageBody(text: text, ranges: .empty),
-            transaction: transaction
-        )
-    }
-}
-
-// MARK: -
-
-public extension CVComponentState {
-    var hasPrimaryAndSecondaryContentForSelection: Bool {
-        var hasPrimaryContent = false
-
-        // Search for a component that qualifies as "non-body text primary".
-        for key in activeComponentStateKeys {
-            switch key {
-            case .bodyText, .linkPreview:
-                // "Primary" content is not body text.
-                // A link preview is associated with the body text.
-                break
-            case .bodyMedia, .sticker, .audioAttachment, .genericAttachment, .contactShare:
-                hasPrimaryContent = true
-            case .senderName, .senderAvatar, .footer, .reactions, .bottomButtons, .bottomLabel, .sendFailureBadge, .dateHeader, .unreadIndicator, .typingIndicator, .threadDetails, .failedOrPendingDownloads, .unknownThreadWarning, .defaultDisappearingMessageTimer, .messageRoot:
-                // "Primary" content is not just metadata / UI.
-                break
-            case .giftBadge:
-                // Gift badges can't be forwarded.
-                break
-            case .viewOnce:
-                // We should never forward view-once messages.
-                break
-            case .systemMessage:
-                // We should never forward system messages.
-                break
-            case .quotedReply:
-                // Quoted replies are never forwarded.
-                break
-            case .paymentAttachment, .archivedPaymentAttachment:
-                // Payments can't be forwarded.
-                break
-            case .poll:
-                break
-            case .undownloadableAttachment:
-                break
-            }
+            let action = CVMessageAction(
+                title: ctaText,
+                accessibilityIdentifier: "announcement_action",
+                action: .didTapReleaseNotesAnnouncementAction(action: callToAction),
+            )
+            bottomButtonsActions.append(action)
         }
-
-        let hasSecondaryContent = bodyText != nil
-
-        return hasPrimaryContent && hasSecondaryContent
     }
 }

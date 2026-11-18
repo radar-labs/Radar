@@ -7,7 +7,7 @@ import Foundation
 public import GRDB
 public import LibSignalClient
 
-public struct PendingReadReceiptRecord: Codable, FetchableRecord, PersistableRecord {
+public struct PendingReadReceiptRecord: Codable, FetchableRecord, MutablePersistableRecord {
     public static let databaseTableName = "pending_read_receipts"
 
     public private(set) var id: Int64?
@@ -44,7 +44,7 @@ public struct PendingReadReceiptRecord: Codable, FetchableRecord, PersistableRec
         self.authorPhoneNumber = (self.authorAciString == nil) ? try container.decodeIfPresent(String.self, forKey: .authorPhoneNumber) : nil
     }
 
-    mutating public func didInsert(with rowID: Int64, for column: String?) {
+    public mutating func didInsert(with rowID: Int64, for column: String?) {
         self.id = rowID
     }
 }

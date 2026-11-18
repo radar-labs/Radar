@@ -7,129 +7,144 @@ import Lottie
 import SignalServiceKit
 import SignalUI
 
-class MegaphoneView: UIView, ExperienceUpgradeView {
-    let experienceUpgrade: ExperienceUpgrade
-
-    var imageName: String? {
-        didSet {
-            if imageName != nil { image = nil }
-        }
-    }
-    var image: UIImage? {
-        didSet {
-            if image != nil { imageName = nil }
-        }
-    }
-    var imageContentMode: UIView.ContentMode = .scaleAspectFit
-
-    var animation: Animation?
-    struct Animation {
-        let name: String
-        let backgroundImageName: String?
-        let backgroundImageInset: CGFloat
-        let speed: CGFloat
-        let loopMode: LottieLoopMode
-        let backgroundBehavior: LottieBackgroundBehavior
-        let contentMode: UIView.ContentMode
-
-        init(
-            name: String,
-            backgroundImageName: String? = nil,
-            backgroundImageInset: CGFloat = 0,
-            speed: CGFloat = 1,
-            loopMode: LottieLoopMode = .playOnce,
-            backgroundBehavior: LottieBackgroundBehavior = .forceFinish,
-            contentMode: UIView.ContentMode = .scaleAspectFit
-        ) {
-            self.name = name
-            self.speed = speed
-            self.loopMode = loopMode
-            self.backgroundBehavior = backgroundBehavior
-            self.contentMode = contentMode
-            self.backgroundImageName = backgroundImageName
-            self.backgroundImageInset = backgroundImageInset
-        }
-    }
-
-    enum ButtonOrientation {
-        case horizontal, vertical
-    }
-    var buttonOrientation: ButtonOrientation = .horizontal {
-        willSet { assert(!hasPresented) }
-    }
-
-    var titleText: String? {
-        willSet { assert(!hasPresented) }
-    }
-    var bodyText: String? {
-        willSet { assert(!hasPresented) }
-    }
-
+@MainActor
+class Megaphone {
     struct Button {
         let title: String
         let action: () -> Void
     }
 
-    private var buttons: [Button] = []
-    func setButtons(primary: Button, secondary: Button? = nil) {
-        assert(!hasPresented)
+    let experienceUpgrade: ExperienceUpgrade
+    var image: UIImage?
+    var imageContentMode: UIView.ContentMode = .scaleAspectFit
+    var titleText: String?
+    var bodyText: String?
+    var buttons: [Button] = []
 
-        if let secondary = secondary {
-            buttons = [primary, secondary]
-        } else {
-            buttons = [primary]
+    init(experienceUpgrade: ExperienceUpgrade) {
+        self.experienceUpgrade = experienceUpgrade
+    }
+
+    func buildView() -> MegaphoneView {
+        guard let titleText, let bodyText else {
+            owsFail("Megaphone missing title or body text!")
+        }
+        guard (1...2).contains(buttons.count) else {
+            owsFail("Megaphone must have 1 or 2 buttons!")
+        }
+
+        return MegaphoneView(
+            image: image,
+            imageContentMode: imageContentMode,
+            titleText: titleText,
+            bodyText: bodyText,
+            buttons: buttons,
+        )
+    }
+
+    func snoozeButton(
+        fromViewController: UIViewController,
+        snoozeTitle: String,
+    ) -> Button {
+        return Button(title: snoozeTitle) { [weak self, weak fromViewController] in
+            guard let self, let fromViewController else { return }
+
+            markAsSnoozedWithSneakyTransaction()
+            fromViewController.presentToast(text: MegaphoneStrings.weWillRemindYouLater)
         }
     }
 
-    var isPresented: Bool { superview != nil }
+    // MARK: -
 
-    private let darkThemeBackgroundOverlay = UIView()
+    func markAsSnoozedWithSneakyTransaction() {
+        let db = DependenciesBridge.shared.db
+        let experienceUpgradeStore = ExperienceUpgradeStore()
+
+        db.write { tx in
+            experienceUpgradeStore.markAsSnoozed(
+                experienceUpgrade: experienceUpgrade,
+                tx: tx,
+            )
+        }
+
+        NotificationCenter.default.post(name: .megaphoneStateDidChange, object: nil)
+    }
+
+    func markAsCompleteWithSneakyTransaction() {
+        let db = DependenciesBridge.shared.db
+        let experienceUpgradeStore = ExperienceUpgradeStore()
+
+        db.write { tx in
+            experienceUpgradeStore.markAsComplete(
+                experienceUpgrade: experienceUpgrade,
+                tx: tx,
+            )
+        }
+
+        NotificationCenter.default.post(name: .megaphoneStateDidChange, object: nil)
+    }
+}
+
+// MARK: -
+
+class MegaphoneView: UIView {
+    private let image: UIImage?
+    private let imageContentMode: UIView.ContentMode
+    private let titleText: String
+    private let bodyText: String
+    private let buttons: [Megaphone.Button]
+
     private let stackView = UIStackView()
-    init(experienceUpgrade: ExperienceUpgrade) {
-        self.experienceUpgrade = experienceUpgrade
+
+    init(
+        image: UIImage?,
+        imageContentMode: UIView.ContentMode,
+        titleText: String,
+        bodyText: String,
+        buttons: [Megaphone.Button],
+    ) {
+        self.image = image
+        self.imageContentMode = imageContentMode
+        self.titleText = titleText
+        self.bodyText = bodyText
+        self.buttons = buttons
 
         super.init(frame: .zero)
 
         layer.cornerRadius = 12
         clipsToBounds = true
 
-        let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+        let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
+        blurEffectView.overrideUserInterfaceStyle = .dark
         addSubview(blurEffectView)
         blurEffectView.autoPinEdgesToSuperviewEdges()
 
+        // We want this background to change color with dark / light interface, but not the rest of the UI.
+        let darkThemeBackgroundOverlay = UIView()
+        darkThemeBackgroundOverlay.backgroundColor = UIColor(light: .clear, dark: .white.withAlphaComponent(0.1))
         addSubview(darkThemeBackgroundOverlay)
         darkThemeBackgroundOverlay.autoPinEdgesToSuperviewEdges()
-        darkThemeBackgroundOverlay.backgroundColor = UIColor.white.withAlphaComponent(0.10)
 
+        stackView.overrideUserInterfaceStyle = .dark
         stackView.axis = .vertical
         addSubview(stackView)
         stackView.autoPinEdgesToSuperviewEdges()
-
-        NotificationCenter.default.addObserver(self, selector: #selector(applyTheme), name: .themeDidChange, object: nil)
-        applyTheme()
     }
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private var hasPresented = false
+    // MARK: -
+
     func present(fromViewController: UIViewController) {
         AssertIsOnMainThread()
-
-        guard !hasPresented else { return owsFailDebug("can only present once") }
-
-        guard titleText != nil, bodyText != nil else {
-            return owsFailDebug("megaphone is not prepared for presentation")
-        }
-
-        // Top section
 
         let labelStack = createLabelStack()
 
         let topStackSubviews: [UIView]
-        if imageName != nil || image != nil || animation != nil {
-            topStackSubviews = [createImageContainer(), labelStack]
+        if let image {
+            topStackSubviews = [createImageContainer(image: image), labelStack]
         } else {
             topStackSubviews = [labelStack]
         }
@@ -141,63 +156,38 @@ class MegaphoneView: UIView, ExperienceUpgradeView {
         topStackView.layoutMargins = UIEdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12)
 
         stackView.addArrangedSubview(topStackView)
-
-        // Buttons
-
-        if buttons.count > 0 {
-            stackView.addArrangedSubview(createButtonsStack())
-        } else {
-            assert(buttons.isEmpty)
-            addDismissButton()
-        }
+        stackView.addArrangedSubview(createButtonsStack())
 
         fromViewController.view.addSubview(self)
         autoPinEdge(toSuperviewSafeArea: .leading, withInset: 8)
         autoPinEdge(toSuperviewSafeArea: .trailing, withInset: 8)
         autoPinEdge(toSuperviewSafeArea: .bottom, withInset: 8)
 
-        animationView?.play()
-
         alpha = 0
         UIView.animate(withDuration: 0.2) {
             self.alpha = 1
         }
-
-        hasPresented = true
     }
 
-    @objc
-    private func applyTheme() {
-        darkThemeBackgroundOverlay.isHidden = !Theme.isDarkThemeEnabled
+    func dismiss() {
+        removeFromSuperview()
     }
 
-    @objc
-    private func tappedDismiss() {
-        dismiss()
-    }
+    // MARK: -
 
-    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) {
-        UIView.animate(withDuration: animated ? 0.2 : 0, animations: {
-            self.alpha = 0
-        }) { _ in
-            self.removeFromSuperview()
-            completion?()
-        }
-    }
-
-    func createLabelStack() -> UIStackView {
+    private func createLabelStack() -> UIStackView {
         let titleLabel = UILabel()
         titleLabel.numberOfLines = 0
         titleLabel.lineBreakMode = .byWordWrapping
-        titleLabel.font = UIFont.semiboldFont(ofSize: 17)
-        titleLabel.textColor = Theme.darkThemePrimaryColor
+        titleLabel.font = .semiboldFont(ofSize: 17)
+        titleLabel.textColor = .Signal.label
         titleLabel.text = titleText
 
         let bodyLabel = UILabel()
         bodyLabel.numberOfLines = 0
         bodyLabel.lineBreakMode = .byWordWrapping
-        bodyLabel.font = UIFont.systemFont(ofSize: 15)
-        bodyLabel.textColor = Theme.darkThemeSecondaryTextAndIconColor
+        bodyLabel.font = .systemFont(ofSize: 15)
+        bodyLabel.textColor = .Signal.secondaryLabel
         bodyLabel.text = bodyText
 
         let topSpacer = UIView()
@@ -211,47 +201,15 @@ class MegaphoneView: UIView, ExperienceUpgradeView {
         return labelStack
     }
 
-    private var animationView: LottieAnimationView?
-    func createImageContainer() -> UIView {
-        let container: UIView
-
-        if let image = { () -> UIImage? in
-            if let imageName = imageName { return UIImage(named: imageName) }
-            return image
-        }() {
-            container = UIView()
-            let imageView = UIImageView()
-            imageView.image = image
-            imageView.contentMode = self.imageContentMode
-            container.addSubview(imageView)
-            imageView.autoPinWidthToSuperview()
-            imageView.autoPinToSquareAspectRatio()
-            imageView.autoVCenterInSuperview()
-        } else if let animation = animation {
-            container = UIView()
-
-            if let backgroundImageName = animation.backgroundImageName {
-                let backgroundImageView = UIImageView()
-                backgroundImageView.image = UIImage(named: backgroundImageName)
-                backgroundImageView.contentMode = .scaleAspectFill
-                container.addSubview(backgroundImageView)
-                backgroundImageView.autoPinWidthToSuperview(withMargin: animation.backgroundImageInset)
-                backgroundImageView.autoVCenterInSuperview()
-            }
-
-            let animationView = LottieAnimationView(name: animation.name)
-            self.animationView = animationView
-            animationView.contentMode = animation.contentMode
-            animationView.animationSpeed = animation.speed
-            animationView.loopMode = animation.loopMode
-            animationView.backgroundBehavior = animation.backgroundBehavior
-
-            container.addSubview(animationView)
-            animationView.autoPinEdgesToSuperviewEdges()
-        } else {
-            owsFailDebug("unexpectedly missing animation and image")
-            container = UIView()
-        }
+    private func createImageContainer(image: UIImage) -> UIView {
+        let container = UIView()
+        let imageView = UIImageView()
+        imageView.image = image
+        imageView.contentMode = self.imageContentMode
+        container.addSubview(imageView)
+        imageView.autoPinWidthToSuperview()
+        imageView.autoPinToSquareAspectRatio()
+        imageView.autoVCenterInSuperview()
 
         container.autoSetDimension(.width, toSize: 64)
         container.autoSetDimension(.height, toSize: 64, relation: .greaterThanOrEqual)
@@ -259,41 +217,47 @@ class MegaphoneView: UIView, ExperienceUpgradeView {
         return container
     }
 
-    func createButtonView(_ button: Button, font: UIFont = .regularFont(ofSize: 15)) -> OWSFlatButton {
-        let buttonView = OWSFlatButton()
+    private func createButtonView(
+        _ button: Megaphone.Button,
+        font: UIFont = .regularFont(ofSize: 15),
+    ) -> UIButton {
+        var buttonConfig = UIButton.Configuration.plain()
+        buttonConfig.contentInsets = .zero
+        buttonConfig.cornerStyle = .fixed
+        buttonConfig.background.cornerRadius = 0
+        buttonConfig.title = button.title
+        buttonConfig.attributedTitle?.font = font
+        buttonConfig.baseForegroundColor = .Signal.label
 
-        buttonView.setTitle(title: button.title, font: font, titleColor: Theme.darkThemePrimaryColor)
-        buttonView.setPressedBlock { button.action() }
+        let uiButton = UIButton(
+            configuration: buttonConfig,
+            primaryAction: UIAction { _ in button.action() },
+        )
+        uiButton.autoSetDimension(.height, toSize: 44)
 
-        buttonView.autoSetDimension(.height, toSize: 44)
-
-        return buttonView
+        return uiButton
     }
 
-    func createButtonsStack() -> UIStackView {
+    private func createButtonsStack() -> UIStackView {
         let buttonsStack = UIStackView()
         buttonsStack.addBackgroundView(withBackgroundColor: .ows_blackAlpha20)
 
         switch buttons.count {
         case 1:
-            buttonsStack.addArrangedSubview(createButtonView(buttons[0]))
+            buttonsStack.addArrangedSubview(createButtonView(
+                buttons[0],
+                font: .regularFont(ofSize: 15),
+            ))
         case 2:
             var previousButton: UIView?
             for button in buttons {
                 let buttonView = createButtonView(
                     button,
-                    font: previousButton == nil ? UIFont.semiboldFont(ofSize: 15) : .regularFont(ofSize: 15)
+                    font: previousButton == nil ? .semiboldFont(ofSize: 15) : .regularFont(ofSize: 15),
                 )
-
-                switch buttonOrientation {
-                case .vertical:
-                    buttonsStack.addArrangedSubview(buttonView)
-                case .horizontal:
-                    buttonsStack.insertArrangedSubview(buttonView, at: 0)
-                }
+                buttonsStack.insertArrangedSubview(buttonView, at: 0)
 
                 previousButton?.autoMatch(.width, to: .width, of: buttonView)
-
                 previousButton = buttonView
             }
 
@@ -302,44 +266,14 @@ class MegaphoneView: UIView, ExperienceUpgradeView {
             divider.backgroundColor = .ows_whiteAlpha20
             dividerContainer.addSubview(divider)
             buttonsStack.insertArrangedSubview(dividerContainer, at: 1)
-
-            switch buttonOrientation {
-            case .vertical:
-                buttonsStack.axis = .vertical
-                divider.autoSetDimension(.height, toSize: 1)
-                divider.autoPinHeightToSuperview()
-                divider.autoPinWidthToSuperview(withMargin: 12)
-            case .horizontal:
-                buttonsStack.axis = .horizontal
-                divider.autoSetDimension(.width, toSize: 1)
-                divider.autoPinWidthToSuperview()
-                divider.autoPinHeightToSuperview(withMargin: 8)
-            }
+            buttonsStack.axis = .horizontal
+            divider.autoSetDimension(.width, toSize: 1)
+            divider.autoPinWidthToSuperview()
+            divider.autoPinHeightToSuperview(withMargin: 8)
         default:
-            owsFailDebug("only supports 1 or 2 buttons")
+            owsFail("Megaphones must have one or two buttons!")
         }
 
         return buttonsStack
-    }
-
-    func addDismissButton() {
-        let dismissButton = UIButton()
-        dismissButton.setTemplateImage(Theme.iconImage(.buttonX), tintColor: Theme.darkThemePrimaryColor)
-        dismissButton.addTarget(self, action: #selector(tappedDismiss), for: .touchUpInside)
-
-        addSubview(dismissButton)
-
-        dismissButton.autoSetDimensions(to: CGSize(square: 40))
-        dismissButton.autoPinEdge(toSuperviewEdge: .trailing)
-        dismissButton.autoPinEdge(toSuperviewEdge: .top)
-    }
-
-    func snoozeButton(fromViewController: UIViewController, snoozeTitle: String = MegaphoneStrings.remindMeLater) -> Button {
-        return Button(title: snoozeTitle) { [weak self] in
-            self?.markAsSnoozedWithSneakyTransaction()
-            self?.dismiss {
-                self?.presentToast(text: MegaphoneStrings.weWillRemindYouLater, fromViewController: fromViewController)
-            }
-        }
     }
 }

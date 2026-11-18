@@ -3,49 +3,48 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import LibSignalClient
 public import SignalServiceKit
 public import SignalUI
 
 public class RegistrationNavigationController: OWSNavigationController {
 
-    private let appReadiness: AppReadinessSetter
     private let coordinator: RegistrationCoordinator
+    private var logger: PrefixedLogger { coordinator.logger }
+    private var userActionLogger: PrefixedLogger { coordinator.logger.prefixedWith(with: "[Action]") }
 
-    public static func withCoordinator(
-        _ coordinator: RegistrationCoordinator,
-        appReadiness: AppReadinessSetter
-    ) -> RegistrationNavigationController {
-        let vc = RegistrationNavigationController(coordinator: coordinator, appReadiness: appReadiness)
+    public static func withCoordinator(_ coordinator: RegistrationCoordinator) -> RegistrationNavigationController {
+        let vc = RegistrationNavigationController(coordinator: coordinator)
         return vc
     }
 
-    private init(coordinator: RegistrationCoordinator, appReadiness: AppReadinessSetter) {
-        self.appReadiness = appReadiness
+    private init(coordinator: RegistrationCoordinator) {
         self.coordinator = coordinator
         super.init()
     }
 
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
         interactivePopGestureRecognizer?.isEnabled = false
-#if compiler(>=6.2)
         if #available(iOS 26.0, *) {
             interactiveContentPopGestureRecognizer?.isEnabled = false
         }
-#endif
+        if #unavailable(iOS 26) {
+            navigationBar.tintColor = .Signal.accent
+        }
     }
 
-    public override func viewWillAppear(_ animated: Bool) {
+    override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         if viewControllers.isEmpty, !isLoading {
-            Logger.info("Performing initial load")
-            pushNextController(Guarantee.wrapAsync { await self.coordinator.nextStep() })
+            logger.info("Performing initial load")
+            pushNextStepController()
         }
 
         let submitLogsGesture = UITapGestureRecognizer(
             target: self,
-            action: #selector(didRequestToSubmitDebugLogs)
+            action: #selector(didRequestToSubmitDebugLogs),
         )
         submitLogsGesture.numberOfTapsRequired = 8
         submitLogsGesture.delaysTouchesEnded = false
@@ -56,37 +55,46 @@ public class RegistrationNavigationController: OWSNavigationController {
 
     private func pushNextController(
         _ step: Guarantee<RegistrationStep>,
-        loadingMode: RegistrationLoadingViewController.RegistrationLoadingMode? = .generic
+        loadingMode: RegistrationLoadingViewController.RegistrationLoadingMode? = .generic,
     ) {
         guard !isLoading else {
-            owsFailDebug("Parallel loads not allowed")
+            owsFailDebug("Parallel loads not allowed", logger: logger)
             return
         }
 
-        if let loadingMode, step.isSealed.negated {
-            Logger.info("Pushing loading controller")
+        if let loadingMode, !step.isSealed {
+            logger.info("Pushing loading controller")
             isLoading = true
 
             switch loadingMode {
             case .restoringBackup(let progressModal):
                 present(
                     progressModal,
-                    animated: true
+                    animated: true,
                 ) { [weak self] in
                     self?._pushNextController(step)
                 }
             default:
                 pushViewController(
                     RegistrationLoadingViewController(mode: loadingMode),
-                    animated: false
+                    animated: false,
                 ) { [weak self] in
                     self?._pushNextController(step)
                 }
             }
         } else {
-            Logger.info("Skipping loading controller for \(String(describing: try? step.result?.get().logSafeString))")
+            logger.info("Skipping loading controller for \(String(describing: try? step.result?.get()))")
             _pushNextController(step)
         }
+    }
+
+    private func pushNextStepController(
+        loadingMode: RegistrationLoadingViewController.RegistrationLoadingMode? = .generic,
+    ) {
+        pushNextController(
+            Guarantee.wrapAsync { [coordinator] in await coordinator.nextStep() },
+            loadingMode: loadingMode,
+        )
     }
 
     private func _pushNextController(_ step: Guarantee<RegistrationStep>) {
@@ -94,16 +102,16 @@ public class RegistrationNavigationController: OWSNavigationController {
         Task { @MainActor [self] in
             let step = await step.awaitable()
 
-            if let progressModal = self.presentedViewController as? BackupProgressModal {
-                Logger.info("Dismissing progress view")
+            if let progressModal = self.presentedViewController as? BackupRestoreProgressModal {
+                logger.info("Dismissing progress view")
                 await progressModal.completeAndDismiss()
             }
 
-            Logger.info("Pushing registration step: \(step.logSafeString)")
+            logger.info("Pushing registration step: \(step)")
 
             self.isLoading = false
             guard let controller = self.controller(for: step) else {
-                Logger.info("No controller for \(step.logSafeString)")
+                logger.info("No controller for \(step)")
                 return
             }
             var controllerToPush: UIViewController?
@@ -111,10 +119,10 @@ public class RegistrationNavigationController: OWSNavigationController {
                 // If we already have this controller available, update it and pop to it.
                 if type(of: viewController) == controller.viewType {
                     if let newController = controller.updateViewController(viewController) {
-                        Logger.info("Pushing new version of existing controller for \(step.logSafeString)")
+                        logger.info("Pushing new version of existing controller for \(step)")
                         controllerToPush = newController
                     } else {
-                        Logger.info("Popping to existing controller for \(step.logSafeString)")
+                        logger.info("Popping to existing controller for \(step)")
                         let animatePop = !(self.topViewController is RegistrationLoadingViewController)
                         self.popToViewController(viewController, animated: animatePop)
                         return
@@ -130,14 +138,14 @@ public class RegistrationNavigationController: OWSNavigationController {
                 !self.viewControllers.contains(where: { $0 is RegistrationSplashViewController })
             {
                 // Cancellable controllers need to have a splash view behind
-                Logger.info("Pushing splash view and controller for \(step.logSafeString)")
+                logger.info("Pushing splash view and controller for \(step)")
                 let splashController = self.registrationSplashController()
                 let newViewControllers = [splashController.makeViewController(self), vc]
                 self.setViewControllers(self.viewControllers + newViewControllers, animated: true)
                 return
             }
 
-            Logger.info("Pushing controller for \(step.logSafeString)")
+            logger.info("Pushing controller for \(step)")
             self.pushViewController(vc, animated: true)
         }
     }
@@ -154,7 +162,7 @@ public class RegistrationNavigationController: OWSNavigationController {
             type: T.Type,
             canCancel: Bool = false,
             make: @escaping (RegistrationNavigationController) -> UIViewController,
-            update: ((T) -> T?)?
+            update: ((T) -> T?)?,
         ) {
             self.type = type
             self.canCancel = canCancel
@@ -187,7 +195,7 @@ public class RegistrationNavigationController: OWSNavigationController {
                 return RegistrationSplashViewController(presenter: presenter)
             },
             // No state to update.
-            update: nil
+            update: nil,
         )
     }
 
@@ -202,7 +210,15 @@ public class RegistrationNavigationController: OWSNavigationController {
                     return RegistrationChangeNumberSplashViewController(presenter: presenter)
                 },
                 // No state to update.
-                update: nil
+                update: nil,
+            )
+        case .signalLoginSplash(let state):
+            return Controller(
+                type: RegistrationSignalLoginSplashViewController.self,
+                make: { presenter in
+                    return RegistrationSignalLoginSplashViewController(state: state, presenter: presenter)
+                },
+                update: nil,
             )
         case .permissions:
             return Controller(
@@ -213,7 +229,7 @@ public class RegistrationNavigationController: OWSNavigationController {
                 // The state never changes here. In theory we would build
                 // state update support in the permissions controller,
                 // but its overkill so we have not.
-                update: nil
+                update: nil,
             )
         case .scanQuickRegistrationQrCode:
             return Controller(
@@ -221,11 +237,11 @@ public class RegistrationNavigationController: OWSNavigationController {
                 canCancel: true,
                 make: { presenter in
                     return RegistrationQuickRestoreQRCodeViewController(
-                        presenter: presenter
+                        presenter: presenter,
                     )
                 },
                 // State never changes.
-                update: nil
+                update: nil,
             )
         case .phoneNumberEntry(let state):
             switch state {
@@ -239,7 +255,7 @@ public class RegistrationNavigationController: OWSNavigationController {
                     update: { controller in
                         controller.updateState(registrationMode)
                         return nil
-                    }
+                    },
                 )
             case .changingNumber(let changingNumberMode):
                 switch changingNumberMode {
@@ -249,13 +265,13 @@ public class RegistrationNavigationController: OWSNavigationController {
                         make: { presenter in
                             return RegistrationChangePhoneNumberViewController(
                                 state: initialEntryState,
-                                presenter: presenter
+                                presenter: presenter,
                             )
                         },
                         update: { controller in
                             controller.updateState(initialEntryState)
                             return nil
-                        }
+                        },
                     )
                 case .confirmation(let confirmationState):
                     return Controller(
@@ -263,13 +279,13 @@ public class RegistrationNavigationController: OWSNavigationController {
                         make: { presenter in
                             return RegistrationChangePhoneNumberConfirmationViewController(
                                 state: confirmationState,
-                                presenter: presenter
+                                presenter: presenter,
                             )
                         },
                         update: { controller in
                             controller.updateState(confirmationState)
                             return nil
-                        }
+                        },
                     )
                 }
             }
@@ -282,16 +298,15 @@ public class RegistrationNavigationController: OWSNavigationController {
                 update: { controller in
                     controller.updateState(state)
                     return nil
-                }
-            )
-        case .transferSelection:
-            return Controller(
-                type: RegistrationTransferChoiceViewController.self,
-                make: { presenter in
-                    return RegistrationTransferChoiceViewController(presenter: presenter)
                 },
-                // No state to update.
-                update: nil
+            )
+        case .promptForLogin(let state):
+            return Controller(
+                type: RegistrationSignalLoginViewController.self,
+                make: { presenter in
+                    return RegistrationSignalLoginViewController(state: state, presenter: presenter)
+                },
+                update: nil,
             )
         case .pinEntry(let state):
             return Controller(
@@ -311,7 +326,7 @@ public class RegistrationNavigationController: OWSNavigationController {
                         guard let self else { return nil }
                         return RegistrationPinViewController(state: state, presenter: self)
                     }
-                }
+                },
             )
         case .pinAttemptsExhaustedWithoutReglock(let state):
             return Controller(
@@ -319,13 +334,13 @@ public class RegistrationNavigationController: OWSNavigationController {
                 make: { presenter in
                     return RegistrationPinAttemptsExhaustedAndMustCreateNewPinViewController(
                         state: state,
-                        presenter: presenter
+                        presenter: presenter,
                     )
                 },
                 update: {
                     $0.updateState(state)
                     return nil
-                }
+                },
             )
         case .captchaChallenge:
             return Controller(
@@ -339,7 +354,7 @@ public class RegistrationNavigationController: OWSNavigationController {
                     }
                     // Show a fresh captcha controller if we get repeated captcha requests.
                     return RegistrationCaptchaViewController(presenter: self)
-                }
+                },
             )
         case .setupProfile(let state):
             return Controller(
@@ -348,18 +363,19 @@ public class RegistrationNavigationController: OWSNavigationController {
                     return RegistrationProfileViewController(state: state, presenter: presenter)
                 },
                 // No state to update.
-                update: nil
+                update: nil,
             )
         case .chooseRestoreMethod(let restorePath):
             return Controller(
                 type: RegistrationChooseRestoreMethodViewController.self,
-                make: { presenter in
+                make: { [securityScopedBookmarkAccess = coordinator.securityScopedBookmarkAccess] presenter in
                     return RegistrationChooseRestoreMethodViewController(
                         presenter: presenter,
                         restorePath: restorePath,
+                        securityScopedBookmarkAccess: securityScopedBookmarkAccess,
                     )
                 },
-                update: nil
+                update: nil,
             )
         case .confirmRestoreFromBackup(let state):
             return Controller(
@@ -367,16 +383,19 @@ public class RegistrationNavigationController: OWSNavigationController {
                 make: { presenter in
                     return RegistrationRestoreFromBackupConfirmationViewController(state: state, presenter: presenter)
                 },
-                update: nil
+                update: nil,
             )
-        case .deviceTransfer(let state):
+        case .deviceTransfer(let coordinator):
             return Controller(
-                type: RegistrationTransferStatusViewController.self,
+                type: RegistrationDeviceTransferStatusViewController.self,
                 make: { presenter in
-                    return RegistrationTransferStatusViewController(state: state, presenter: presenter)
+                    return RegistrationDeviceTransferStatusViewController(
+                        coordinator: coordinator,
+                        presenter: presenter,
+                    )
                 },
                 // No state to update.
-                update: nil
+                update: nil,
             )
         case .phoneNumberDiscoverability(let state):
             return Controller(
@@ -384,7 +403,7 @@ public class RegistrationNavigationController: OWSNavigationController {
                 make: { presenter in
                     return RegistrationPhoneNumberDiscoverabilityViewController(state: state, presenter: presenter)
                 },
-                update: nil
+                update: nil,
             )
         case .reglockTimeout(let state):
             return Controller(
@@ -393,46 +412,53 @@ public class RegistrationNavigationController: OWSNavigationController {
                     return RegistrationReglockTimeoutViewController(state: state, presenter: presenter)
                 },
                 // No state to update.
-                update: nil
+                update: nil,
             )
         case .enterRecoveryKey(let state):
             return Controller(
                 type: RegistrationEnterAccountEntropyPoolViewController.self,
                 make: { presenter in
-                    return RegistrationEnterAccountEntropyPoolViewController(state: state, presenter: presenter)
+                    return RegistrationEnterAccountEntropyPoolViewController(
+                        state: state,
+                        presenter: presenter,
+                    )
                 },
                 // No state to update.
-                update: nil
+                update: nil,
             )
-
         case let .showErrorSheet(errorSheet):
             let title: String?
             let message: String
             switch errorSheet {
-            case .becameDeregistered(let reregParams):
-                handleDeregistrationReset(reregParams)
+            case .sessionCanNeverRequestVerificationCode:
+                title = nil
+                message = OWSLocalizedString(
+                    "REGISTRATION_PROVIDER_FAILURE_MESSAGE_PERMANENT",
+                    comment: "Error shown if an SMS/call service provider is unable to send a verification code to the provided number.",
+                )
+            case .becameDeregistered(let localIdentifiers):
+                handleDeregistrationReset(localIdentifiers: localIdentifiers)
                 return nil
-
             case .verificationCodeSubmissionUnavailable:
                 title = nil
                 message = OWSLocalizedString(
                     "REGISTRATION_SUBMIT_CODE_ATTEMPTS_EXHAUSTED_ALERT",
-                    comment: "Alert shown when running out of attempts at submitting a verification code."
+                    comment: "Alert shown when running out of attempts at submitting a verification code.",
                 )
             case .submittingVerificationCodeBeforeAnyCodeSent:
                 title = nil
                 message = OWSLocalizedString(
                     "REGISTRATION_VERIFICATION_ERROR_INVALID_VERIFICATION_CODE",
-                    comment: "During registration and re-registration, users may have to enter a code to verify ownership of their phone number. If they enter an invalid code, they will see this error message."
+                    comment: "During registration and re-registration, users may have to enter a code to verify ownership of their phone number. If they enter an invalid code, they will see this error message.",
                 )
             case .networkError:
                 title = OWSLocalizedString(
                     "REGISTRATION_NETWORK_ERROR_TITLE",
-                    comment: "A network error occurred during registration, and an error is shown to the user. This is the title on that error sheet."
+                    comment: "A network error occurred during registration, and an error is shown to the user. This is the title on that error sheet.",
                 )
                 message = OWSLocalizedString(
                     "REGISTRATION_NETWORK_ERROR_BODY",
-                    comment: "A network error occurred during registration, and an error is shown to the user. This is the body on that error sheet."
+                    comment: "A network error occurred during registration, and an error is shown to the user. This is the body on that error sheet.",
                 )
             case .sessionInvalidated, .genericError:
                 title = nil
@@ -440,8 +466,7 @@ public class RegistrationNavigationController: OWSNavigationController {
             }
             let actionSheet = ActionSheetController(title: title, message: message)
             actionSheet.addAction(.init(title: CommonStrings.okButton, style: .default, handler: { [weak self] _ in
-                guard let self else { return }
-                self.pushNextController(Guarantee.wrapAsync { await self.coordinator.nextStep() })
+                self?.pushNextStepController()
             }))
             // We explicitly don't want the user to be able to dismiss.
             actionSheet.isCancelable = false
@@ -451,8 +476,9 @@ public class RegistrationNavigationController: OWSNavigationController {
             present(UIAlertController.registrationAppUpdateBanner(), animated: true)
             return nil
         case .done:
-            Logger.info("Finished with registration!")
-            SignalApp.shared.showConversationSplitView(appReadiness: appReadiness)
+            logger.info("Finished with registration!")
+            SignalApp.shared.showHomeTabBarController()
+            // Radar: continue into payments onboarding right after registration.
             DispatchQueue.main.async {
                 guard let rootVC = CurrentAppContext().mainWindow?.rootViewController else { return }
                 let nav = OWSNavigationController()
@@ -464,32 +490,32 @@ public class RegistrationNavigationController: OWSNavigationController {
         }
     }
 
-    private func handleDeregistrationReset(_ reregParams: RegistrationMode.ReregistrationParams) {
+    private func handleDeregistrationReset(localIdentifiers: ReregisteringLocalIdentifiers) {
         let actionSheet = ActionSheetController(
             title: OWSLocalizedString(
                 "DEREGISTRATION_NOTIFICATION",
-                comment: "Notification warning the user that they have been de-registered."
+                comment: "Notification warning the user that they have been de-registered.",
             ),
-            message: nil
+            message: nil,
         )
         actionSheet.addAction(.init(
             title: OWSLocalizedString(
                 "SETTINGS_REREGISTER_BUTTON",
-                comment: "Label for re-registration button."
+                comment: "Label for re-registration button.",
             ),
             style: .default,
-            handler: { [weak self, appReadiness] _ in
+            handler: { [weak self] _ in
                 guard let self else { return }
                 let loader = RegistrationCoordinatorLoaderImpl(dependencies: .from(self))
-                SignalApp.shared.showRegistration(loader: loader, desiredMode: .reRegistering(reregParams), appReadiness: appReadiness)
-            }
+                SignalApp.shared.showRegistration(loader: loader, desiredMode: .reRegistering(localIdentifiers))
+            },
         ))
         // We explicitly don't want the user to be able to dismiss.
         actionSheet.isCancelable = false
         self.presentActionSheet(actionSheet)
     }
 
-    public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    override public var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         let superOrientations = super.supportedInterfaceOrientations
         let onboardingOrientations: UIInterfaceOrientationMask = UIDevice.current.isIPad ? .all : .portrait
 
@@ -504,7 +530,8 @@ public class RegistrationNavigationController: OWSNavigationController {
             ))
             self.present(navVc, animated: true)
         } else {
-            DebugLogs.submitLogs(supportTag: "Registration", dumper: .fromGlobals())
+            let logs = DebugLogs(dumper: .fromGlobals())
+            logs.promptToSubmitLogs(from: self, supportTag: "Registration")
         }
     }
 }
@@ -512,40 +539,49 @@ public class RegistrationNavigationController: OWSNavigationController {
 extension RegistrationNavigationController: RegistrationSplashPresenter {
 
     public func continueFromSplash() {
-        pushNextController(coordinator.continueFromSplash())
+        coordinator.continueFromSplash()
+        pushNextStepController()
     }
 
     public func setHasOldDevice(_ hasOldDevice: Bool) {
-        pushNextController(coordinator.setHasOldDevice(hasOldDevice))
+        coordinator.setHasOldDevice(hasOldDevice)
+        pushNextStepController()
     }
 
     public func switchToDeviceLinkingMode() {
-        Logger.info("Pushing device linking")
+        logger.info("Pushing device linking")
         let controller = RegistrationConfirmModeSwitchViewController(presenter: self)
         pushViewController(controller, animated: true)
     }
-    
+
+    /// Radar: the "link device" choice of the splash's "Restore or Transfer"
+    /// prompt. Same as upstream's "Link device" menu action on the phone number
+    /// screen: start secondary-device linking at the QR code.
     public func showRelinking() {
-        guard coordinator.switchToSecondaryDeviceLinking() else {
-           owsFailBeta("Can't switch to secondary device linking")
-           return
-        }
-        SignalApp.shared.showRelinking(appReadiness: appReadiness)
+        beginSecondaryDeviceLinking(startingAtQRCode: true)
     }
 }
 
 extension RegistrationNavigationController: RegistrationConfimModeSwitchPresenter {
 
     public func confirmSwitchToDeviceLinkingMode() {
+        beginSecondaryDeviceLinking(startingAtQRCode: false)
+    }
+
+    fileprivate func beginSecondaryDeviceLinking(startingAtQRCode: Bool) {
         guard coordinator.switchToSecondaryDeviceLinking() else {
             owsFailBeta("Can't switch to secondary device linking")
             return
         }
-        SignalApp.shared.showSecondaryProvisioning(appReadiness: appReadiness)
+        SignalApp.shared.showSecondaryProvisioning(skipOnboarding: startingAtQRCode)
     }
 }
 
-extension RegistrationNavigationController: RegistrationChangeNumberSplashPresenter {}
+extension RegistrationNavigationController: RegistrationChangeNumberSplashPresenter {
+    func canChangeNumber() -> ChangeNumberAllowedResult {
+        return coordinator.canChangeNumber()
+    }
+}
 
 extension RegistrationNavigationController: RegistrationPermissionsPresenter {
     func requestPermissions() async {
@@ -561,35 +597,52 @@ extension RegistrationNavigationController: RegistrationPermissionsPresenter {
 extension RegistrationNavigationController: RegistrationPhoneNumberPresenter {
 
     func goToNextStep(withE164 e164: E164) {
-        pushNextController(coordinator.submitE164(e164), loadingMode: .submittingPhoneNumber(e164: e164.stringValue))
+        userActionLogger.info("Submitted phone number")
+        coordinator.submitE164(e164)
+        pushNextStepController(loadingMode: .submittingPhoneNumber(e164: e164.stringValue))
+    }
+
+    func switchToDeviceLinking() {
+        userActionLogger.info("Chose to link as secondary device")
+        beginSecondaryDeviceLinking(startingAtQRCode: true)
     }
 
     func exitRegistration() {
+        userActionLogger.info("Exited registration")
         guard coordinator.exitRegistration() else {
             owsFailBeta("Unable to exit registration")
             return
         }
-        Logger.info("Early exiting registration")
-        SignalApp.shared.showConversationSplitView(appReadiness: appReadiness)
+        SignalApp.shared.showHomeTabBarController()
+    }
+
+    func registerWithoutNumber() {
+        coordinator.registerWithoutNumber()
+        pushNextStepController()
     }
 }
 
 extension RegistrationNavigationController: RegistrationChangePhoneNumberPresenter {
     func submitProspectiveChangeNumberE164(newE164: E164) {
-        pushNextController(coordinator.submitProspectiveChangeNumberE164(newE164), loadingMode: .submittingPhoneNumber(e164: newE164.stringValue))
+        userActionLogger.info("Submitted prospective change-number number")
+        coordinator.submitProspectiveChangeNumberE164(newE164)
+        pushNextStepController(loadingMode: .submittingPhoneNumber(e164: newE164.stringValue))
     }
 }
 
 extension RegistrationNavigationController: RegistrationChangePhoneNumberConfirmationPresenter {
 
     func confirmChangeNumber(newE164: E164) {
-        pushNextController(coordinator.submitE164(newE164), loadingMode: .submittingPhoneNumber(e164: newE164.stringValue))
+        userActionLogger.info("Confirmed new phone number")
+        coordinator.submitE164(newE164)
+        pushNextStepController(loadingMode: .submittingPhoneNumber(e164: newE164.stringValue))
     }
 }
 
 extension RegistrationNavigationController: RegistrationCaptchaPresenter {
 
     func submitCaptcha(_ token: String) {
+        userActionLogger.info("Submitted captcha")
         pushNextController(coordinator.submitCaptcha(token))
     }
 }
@@ -597,18 +650,25 @@ extension RegistrationNavigationController: RegistrationCaptchaPresenter {
 extension RegistrationNavigationController: RegistrationVerificationPresenter {
 
     func returnToPhoneNumberEntry() {
-        pushNextController(coordinator.requestChangeE164())
+        userActionLogger.info("Went back to change phone number")
+        coordinator.requestChangeE164()
+        pushNextStepController()
     }
 
     func requestSMSCode() {
-        pushNextController(coordinator.requestSMSCode())
+        userActionLogger.info("Asked for SMS code")
+        coordinator.requestSMSCode()
+        pushNextStepController()
     }
 
     func requestVoiceCode() {
-        pushNextController(coordinator.requestVoiceCode())
+        userActionLogger.info("Asked for voice code")
+        coordinator.requestVoiceCode()
+        pushNextStepController()
     }
 
     func submitVerificationCode(_ code: String) {
+        userActionLogger.info("Submitted verification code")
         pushNextController(coordinator.submitVerificationCode(code), loadingMode: .submittingVerificationCode)
     }
 }
@@ -616,69 +676,39 @@ extension RegistrationNavigationController: RegistrationVerificationPresenter {
 extension RegistrationNavigationController: RegistrationPinPresenter {
 
     func cancelPinConfirmation() {
-        pushNextController(coordinator.resetUnconfirmedPINCode())
+        userActionLogger.info("Cancelled confirming new PIN")
+        coordinator.resetUnconfirmedPINCode()
+        pushNextStepController()
     }
 
     func askUserToConfirmPin(_ blob: RegistrationPinConfirmationBlob) {
-        pushNextController(coordinator.setPINCodeForConfirmation(blob))
+        userActionLogger.info("Entered a new PIN, now confirm")
+        coordinator.setPINCodeForConfirmation(blob)
+        pushNextStepController()
     }
 
     func submitPinCode(_ code: String) {
+        userActionLogger.info("Submitted PIN")
         pushNextController(coordinator.submitPINCode(code))
     }
 
     func submitWithSkippedPin() {
-        pushNextController(coordinator.skipPINCode())
+        userActionLogger.info("Skipped PIN entry")
+        coordinator.skipPINCode()
+        pushNextStepController()
     }
 
     func submitWithCreateNewPinInstead() {
-        pushNextController(coordinator.skipAndCreateNewPINCode())
-    }
-
-    func enterRecoveryKey() {
-        pushNextController(
-            .value(.enterRecoveryKey(
-                RegistrationEnterAccountEntropyPoolState(
-                    canShowBackButton: true,
-                    canShowNoKeyHelpButton: false
-                )
-            ))
-        )
+        userActionLogger.info("Chose to create a new PIN instead of entering")
+        coordinator.skipAndCreateNewPINCode()
+        pushNextStepController()
     }
 }
 
 extension RegistrationNavigationController: RegistrationPinAttemptsExhaustedAndMustCreateNewPinPresenter {
     func acknowledgePinGuessesExhausted() {
-        pushNextController(Guarantee.wrapAsync { await self.coordinator.nextStep() })
-    }
-}
-
-extension RegistrationNavigationController: RegistrationTransferChoicePresenter {
-
-    public func transferDevice() {
-        Logger.info("Pushing device transfer")
-
-        do {
-            // TODO: [Backups] - Don't reach into app environment, but this should be removed
-            // once Backups launches
-            let url = try AppEnvironment.shared.deviceTransferServiceRef.startAcceptingTransfersFromOldDevices(
-                mode: .primary
-            )
-
-            // We push these controllers right onto the same navigation stack, even though they
-            // are not coordinator "steps". They have their own internal logic to proceed and go
-            // back (direct calls to push and pop) and, when they complete, they will have _totally_
-            // overwritten our local database, thus wiping any in progress reg coordinator state
-            // and putting us into the chat list.
-            pushViewController(RegistrationTransferQRCodeViewController(url: url), animated: true)
-        } catch {
-            // TODO: [Backups] - update this error handling
-            Logger.error("Error transferring")
-        }
-    }
-
-    func continueRegistration() {
-        pushNextController(coordinator.skipDeviceTransfer())
+        userActionLogger.info("Acknowledged running out of PIN guesses")
+        pushNextStepController()
     }
 }
 
@@ -687,16 +717,16 @@ extension RegistrationNavigationController: RegistrationProfilePresenter {
         givenName: OWSUserProfile.NameComponent,
         familyName: OWSUserProfile.NameComponent?,
         avatarData: Data?,
-        phoneNumberDiscoverability: PhoneNumberDiscoverability
+        phoneNumberDiscoverability: PhoneNumberDiscoverability?,
     ) {
-        pushNextController(
-            coordinator.setProfileInfo(
-                givenName: givenName,
-                familyName: familyName,
-                avatarData: avatarData,
-                phoneNumberDiscoverability: phoneNumberDiscoverability
-            )
+        userActionLogger.info("Submitted profile")
+        coordinator.setProfileInfo(
+            givenName: givenName,
+            familyName: familyName,
+            avatarData: avatarData,
+            phoneNumberDiscoverability: phoneNumberDiscoverability,
         )
+        pushNextStepController()
     }
 }
 
@@ -705,20 +735,23 @@ extension RegistrationNavigationController: RegistrationPhoneNumberDiscoverabili
     var presentedAsModal: Bool { return false }
 
     func setPhoneNumberDiscoverability(_ phoneNumberDiscoverability: PhoneNumberDiscoverability) {
-        pushNextController(coordinator.setPhoneNumberDiscoverability(phoneNumberDiscoverability))
+        userActionLogger.info("Set phone number discoverability")
+        coordinator.setPhoneNumberDiscoverability(phoneNumberDiscoverability)
+        pushNextStepController()
     }
 }
 
 extension RegistrationNavigationController: RegistrationReglockTimeoutPresenter {
 
     func acknowledgeReglockTimeout() {
+        userActionLogger.info("Acknowledged reglock timeout")
         switch coordinator.acknowledgeReglockTimeout() {
         case .cannotExit:
-            Logger.warn("Tried to exit registration from reglock timeout when unable.")
+            logger.warn("Tried to exit registration from reglock timeout when unable.")
             return
         case .exitRegistration:
-            Logger.info("Exiting registration after reglock timeout")
-            SignalApp.shared.showConversationSplitView(appReadiness: appReadiness)
+            logger.info("Exiting registration after reglock timeout")
+            SignalApp.shared.showHomeTabBarController()
         case .restartRegistration(let nextStepGuarantee):
             pushNextController(nextStepGuarantee)
         }
@@ -726,75 +759,114 @@ extension RegistrationNavigationController: RegistrationReglockTimeoutPresenter 
 }
 
 extension RegistrationNavigationController: RegistrationEnterAccountEntropyPoolPresenter {
-    func next(accountEntropyPool: AccountEntropyPool) {
-        let guarantee = coordinator.updateAccountEntropyPool(accountEntropyPool)
-        pushNextController(guarantee)
+    func next(accountEntropyPool: SignalServiceKit.AccountEntropyPool) {
+        userActionLogger.info("Submitted recovery key")
+        coordinator.updateAccountEntropyPool(accountEntropyPool)
+        pushNextStepController()
     }
 
     func cancelKeyEntry() {
-        let guarantee = coordinator.cancelRecoveryKeyEntry()
-        pushNextController(guarantee)
+        userActionLogger.info("Backed out of recovery key entry")
+        coordinator.cancelRecoveryKeyEntry()
+        pushNextStepController()
     }
 
     func forgotKeyAction() {
-        let guarantee = coordinator.updateRestoreMethod(method: .declined)
-        pushNextController(guarantee)
+        userActionLogger.info("Missing recovery key")
+        coordinator.updateRestoreMethod(method: .declined)
+        pushNextStepController()
     }
 }
 
 extension RegistrationNavigationController: RegistrationChooseRestoreMethodPresenter {
     func didChooseRestoreMethod(method: RegistrationRestoreMethod) {
-        let guarantee = coordinator.updateRestoreMethod(method: method)
-        pushNextController(guarantee)
+        userActionLogger.info("Picked restore method \(method)")
+        coordinator.updateRestoreMethod(method: method)
+        pushNextStepController()
     }
 
     func didCancelRestoreMethodSelection() {
-        let guarantee = coordinator.resetRestoreMode()
-        pushNextController(guarantee)
+        userActionLogger.info("Backed out of picking a restore method")
+        coordinator.resetRestoreMode()
+        pushNextStepController()
     }
 }
 
 extension RegistrationNavigationController: RegistrationQuickRestoreQRCodePresenter {
     func didReceiveRegistrationMessage(_ message: SignalServiceKit.RegistrationProvisioningMessage) {
-        let guarantee = coordinator.restoreFromRegistrationMessage(message: message)
-        pushNextController(guarantee)
+        userActionLogger.info("Scanned the QR code on their old device")
+        coordinator.restoreFromRegistrationMessage(message: message)
+        pushNextStepController()
     }
 
     func cancelChosenRestoreMethod() {
-        let guarantee = coordinator.resetRestoreMode()
-        pushNextController(guarantee)
+        userActionLogger.info("Backed out of scanning the QR code")
+        coordinator.resetRestoreMode()
+        pushNextStepController()
     }
 }
 
 extension RegistrationNavigationController: RegistrationTransferStatusPresenter {
     func cancelTransfer() {
-        let guarantee = coordinator.resetRestoreMode()
-        pushNextController(guarantee)
+        userActionLogger.info("Cancelled the device transfer")
+        coordinator.resetRestoreMode()
+        pushNextStepController()
+    }
+
+    func transferFailed(error: Error) {
+        logger.warn("Device transfer failed: \(type(of: error))")
+        coordinator.resetRestoreMode()
+        pushNextStepController()
     }
 }
 
 extension RegistrationNavigationController: RegistrationRestoreFromBackupConfirmationPresenter {
     func skipRestoreFromBackup() {
-        let guarantee = coordinator.updateRestoreMethod(method: .declined)
-        pushNextController(guarantee)
+        userActionLogger.info("Skipped restoring from a backup")
+        coordinator.updateRestoreMethod(method: .declined)
+        pushNextStepController()
     }
 
     func cancelRestoreFromBackup() {
-        let guarantee = coordinator.resetRestoreMethodChoice()
-        pushNextController(guarantee)
+        userActionLogger.info("Backed out of confirming the backup restore")
+        coordinator.resetRestoreMethodChoice()
+        pushNextStepController()
     }
 
-    func restoreFromBackupConfirmed() {
+    func restoreFromBackupConfirmed(_ backup: RegistrationRestoreFromBackupConfirmationState.AvailableBackup) {
+        userActionLogger.info("Confirmed restoring from a backup")
         Task { @MainActor in
-            let progressModal = BackupProgressModal(style: .backupRestore)
-            let (progress, stream) = await OWSSequentialProgress<BackupRestoreProgressPhase>.createSink()
+            let progressModal = BackupRestoreProgressModal(style: .backupRestore)
+            let (progress, stream) = OWSSequentialProgress<BackupRestoreProgressPhase>.createSink()
             Task { @MainActor in
                 for await progress in stream {
                     progressModal.viewModel.updateBackupRestoreProgress(progress: progress)
                 }
             }
-            let guarantee = coordinator.confirmRestoreFromBackup(progress: progress)
-            pushNextController(guarantee, loadingMode: .restoringBackup(progressModal))
+            coordinator.confirmRestoreFromBackup(progress: progress, selectedBackup: backup)
+            pushNextStepController(loadingMode: .restoringBackup(progressModal))
+        }
+    }
+}
+
+extension RegistrationNavigationController: RegistrationSignalLoginPresenter {
+    func submitLogin(aci: Aci, aep: SignalServiceKit.AccountEntropyPool) { }
+}
+
+extension RegistrationNavigationController: RegistrationSignalLoginSplashPresenter {
+    func exitSignalLogin() {
+        coordinator.exitSignalLogin()
+        pushNextStepController()
+    }
+
+    func submitLoginSelection(_ selection: RegistrationSignalLoginSelection) {
+        switch selection {
+        case .existingLogin:
+            coordinator.beginSignalLogin(useExisting: true)
+            pushNextStepController()
+        case .purchaseLogin:
+            coordinator.beginSignalLogin(useExisting: false)
+            pushNextStepController()
         }
     }
 }

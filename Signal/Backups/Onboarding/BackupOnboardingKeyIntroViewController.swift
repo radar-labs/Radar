@@ -5,132 +5,100 @@
 
 import SignalServiceKit
 import SignalUI
-import SwiftUI
 
-class BackupOnboardingKeyIntroViewController: HostingController<BackupOnboardingKeyIntroView> {
-    private let onDeviceAuthSucceeded: (LocalDeviceAuthentication.AuthSuccess) -> Void
-    private let viewModel: BackupsOnboardingKeyIntroViewModel
+class BackupOnboardingKeyIntroViewController: OWSViewController, OWSNavigationChildController {
+    private let onBackPressed: (BackupOnboardingKeyIntroViewController) -> Void
+    private let onContinue: (BackupOnboardingKeyIntroViewController) -> Void
 
-    init(onDeviceAuthSucceeded: @escaping (LocalDeviceAuthentication.AuthSuccess) -> Void) {
-        self.onDeviceAuthSucceeded = onDeviceAuthSucceeded
-        self.viewModel = BackupsOnboardingKeyIntroViewModel()
-
-        super.init(wrappedView: BackupOnboardingKeyIntroView(viewModel: viewModel))
-
-        viewModel.actionsDelegate = self
+    init(
+        onBackPressed: @escaping (BackupOnboardingKeyIntroViewController) -> Void,
+        onContinue: @escaping (BackupOnboardingKeyIntroViewController) -> Void,
+    ) {
+        self.onBackPressed = onBackPressed
+        self.onContinue = onContinue
+        super.init()
         OWSTableViewController2.removeBackButtonText(viewController: self)
     }
-}
 
-// MARK: -
+    override func viewDidLoad() {
+        super.viewDidLoad()
 
-extension BackupOnboardingKeyIntroViewController: BackupsOnboardingKeyIntroViewModel.ActionsDelegate {
-    fileprivate func onContinue() {
-        Task {
-            if let authSuccess = await LocalDeviceAuthentication().performBiometricAuth() {
-                onDeviceAuthSucceeded(authSuccess)
-            }
-        }
-    }
-}
+        navigationItem.hidesBackButton = true
+        navigationItem.leftBarButtonItem = .init(
+            image: UIImage(named: "chevron-left-bold-28"),
+            primaryAction: UIAction { [weak self] _ in
+                guard let self else { return }
+                onBackPressed(self)
+            },
+        )
 
-// MARK: -
+        view.backgroundColor = .Signal.groupedBackground
 
-private class BackupsOnboardingKeyIntroViewModel {
-    protocol ActionsDelegate: AnyObject {
-        func onContinue()
-    }
+        let logo = UIImageView(image: .backupsKey)
+        logo.contentMode = .scaleAspectFit
+        logo.isAccessibilityElement = false
 
-    weak var actionsDelegate: ActionsDelegate?
-
-    func onContinue() {
-        actionsDelegate?.onContinue()
-    }
-}
-
-struct BackupOnboardingKeyIntroView: View {
-    private struct BulletPoint: Identifiable {
-        let image: UIImage
-        let text: String
-
-        var id: String { text }
-    }
-
-    fileprivate let viewModel: BackupsOnboardingKeyIntroViewModel
-
-    private let bulletPoints: [BulletPoint] = [
-        BulletPoint(
-            image: .number,
+        let titleLabel = UILabel.titleLabelForRegistration(
             text: OWSLocalizedString(
-                "BACKUP_ONBOARDING_KEY_INTRO_BULLET_1",
-                comment: "Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow."
+                "BACKUP_ONBOARDING_KEY_INTRO_TITLE",
+                comment: "Title for a view introducing the 'Recovery Key' during an onboarding flow.",
             ),
-        ),
-        BulletPoint(
-            image: .lock,
-            text: OWSLocalizedString(
-                "BACKUP_ONBOARDING_KEY_INTRO_BULLET_2",
-                comment: "Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow."
+        )
+
+        let bulletsStack = UIStackView.bulletPointsStack(content: [
+            (
+                image: UIImage(resource: .number),
+                text: OWSLocalizedString(
+                    "BACKUP_ONBOARDING_KEY_INTRO_BULLET_1",
+                    comment: "Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow.",
+                ),
             ),
-        ),
-        BulletPoint(
-            image: .errorCircle,
-            text: OWSLocalizedString(
-                "BACKUP_ONBOARDING_KEY_INTRO_BULLET_3",
-                comment: "Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow."
+            (
+                image: UIImage(resource: .lock),
+                text: OWSLocalizedString(
+                    "BACKUP_ONBOARDING_KEY_INTRO_BULLET_2",
+                    comment: "Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow.",
+                ),
             ),
-        ),
-    ]
+            (
+                image: UIImage(resource: .errorCircle),
+                text: OWSLocalizedString(
+                    "BACKUP_ONBOARDING_KEY_INTRO_BULLET_3",
+                    comment: "Text for a bullet point in a view introducing the 'Recovery Key' during an onboarding flow.",
+                ),
+            ),
+        ])
 
-    var body: some View {
-        ScrollableContentPinnedFooterView {
-            VStack {
-                Spacer().frame(height: 20)
+        let continueButton = UIButton(
+            configuration: .largePrimary(title: OWSLocalizedString(
+                "BACKUP_ONBOARDING_KEY_INTRO_CONTINUE_BUTTON_TITLE",
+                comment: "Title for a continue button for a view introducing the 'Recovery Key' during an onboarding flow.",
+            )),
+            primaryAction: UIAction { [weak self] _ in self?.didTapContinue() },
+        )
 
-                Image(.backupsKey)
-                    .frame(width: 80, height: 80)
+        let stackView = addStaticContentStackView(
+            arrangedSubviews: [
+                logo,
+                titleLabel,
+                bulletsStack,
+                .vStretchingSpacer(),
+                continueButton.enclosedInVerticalStackView(isFullWidthButton: true),
+            ],
+            isScrollable: true,
+        )
+        stackView.spacing = 24
+        stackView.setCustomSpacing(36, after: titleLabel)
+    }
 
-                Spacer().frame(height: 16)
+    private func didTapContinue() {
+        onContinue(self)
+    }
 
-                Text(OWSLocalizedString(
-                    "BACKUP_ONBOARDING_KEY_INTRO_TITLE",
-                    comment: "Title for a view introducing the 'Recovery Key' during an onboarding flow."
-                ))
-                .font(.title)
-                .fontWeight(.semibold)
-                .foregroundStyle(Color.Signal.label)
+    // MARK: - OWSNavigationChildController
 
-                Spacer().frame(height: 32)
-
-                VStack(alignment: .leading, spacing: 24) {
-                    ForEach(bulletPoints) { bulletPoint in
-                        HStack(alignment: .top, spacing: 12) {
-                            Image(uiImage: bulletPoint.image)
-                                .frame(width: 24, height: 24)
-
-                            Text(bulletPoint.text)
-                        }
-                        .multilineTextAlignment(.leading)
-                        .foregroundStyle(Color.Signal.label)
-                    }
-                }
-            }
-            .padding(.horizontal)
-        } pinnedFooter: {
-            Button {
-                viewModel.onContinue()
-            } label: {
-                Text(OWSLocalizedString(
-                    "BACKUP_ONBOARDING_KEY_INTRO_CONTINUE_BUTTON_TITLE",
-                    comment: "Title for a continue button for a view introducing the 'Recovery Key' during an onboarding flow."
-                ))
-            }
-            .buttonStyle(Registration.UI.LargePrimaryButtonStyle())
-            .padding(.horizontal, 24)
-        }
-        .multilineTextAlignment(.center)
-        .padding(.horizontal)
-        .background(Color.Signal.groupedBackground)
+    var shouldCancelNavigationBack: Bool {
+        true
     }
 }
 
@@ -138,23 +106,14 @@ struct BackupOnboardingKeyIntroView: View {
 
 #if DEBUG
 
-extension BackupsOnboardingKeyIntroViewModel {
-    static func forPreview() -> BackupsOnboardingKeyIntroViewModel {
-        class PreviewActionsDelegate: ActionsDelegate {
-            func onContinue() { print("Continuing...!") }
-        }
-
-        let viewModel = BackupsOnboardingKeyIntroViewModel()
-        let actionsDelegate = PreviewActionsDelegate()
-        viewModel.actionsDelegate = actionsDelegate
-        ObjectRetainer.retainObject(actionsDelegate, forLifetimeOf: viewModel)
-
-        return viewModel
-    }
-}
-
+@available(iOS 17, *)
 #Preview {
-    BackupOnboardingKeyIntroView(viewModel: .forPreview())
+    return UINavigationController(
+        rootViewController: BackupOnboardingKeyIntroViewController(
+            onBackPressed: { _ in },
+            onContinue: { _ in },
+        ),
+    )
 }
 
 #endif

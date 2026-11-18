@@ -73,7 +73,7 @@ public class NewMembersBar: UIView {
     }
 
     func updateHeightConstraint() {
-        guard let heightConstraint = heightConstraint else {
+        guard let heightConstraint else {
             owsFailDebug("Missing heightConstraint.")
             return
         }
@@ -99,9 +99,11 @@ public class NewMembersBar: UIView {
             owsFailDebug("Missing member.")
             return
         }
-        collectionView.scrollToItem(at: IndexPath(item: index, section: 0),
-                                    at: .centeredHorizontally,
-                                    animated: true)
+        collectionView.scrollToItem(
+            at: IndexPath(item: index, section: 0),
+            at: .centeredHorizontally,
+            animated: true,
+        )
     }
 }
 
@@ -134,11 +136,11 @@ extension NewMembersBar: UICollectionViewDataSource {
         cell.configure(member: member)
         assert(self.delegate != nil)
         cell.delegate = self.delegate
-        #if DEBUG
+#if DEBUG
         // These accessibilityIdentifiers won't be stable, but they
         // should work for the purposes of our automated testing.
         cell.accessibilityIdentifier = UIView.accessibilityIdentifier(in: self, name: "new-group-member-bar-\(indexPath.row)")
-        #endif
+#endif
     }
 }
 
@@ -176,25 +178,26 @@ private class NewMemberCell: UICollectionViewCell {
         self.layoutMargins = .zero
         contentView.layoutMargins = .zero
 
-        if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable {
-#if compiler(>=6.2)
+        if #available(iOS 26, *) {
             let glassView = UIVisualEffectView(effect: UIGlassEffect(style: .regular))
             glassView.cornerConfiguration = .capsule()
             backgroundView = glassView
-#endif
         } else {
-            contentView.backgroundColor = Theme.isDarkThemeEnabled ? .ows_gray65 : .ows_gray15
+            contentView.backgroundColor = UIColor.Signal.primaryFill
         }
 
         textLabel.font = NewMemberCell.nameFont
-        textLabel.textColor = Theme.primaryTextColor
+        textLabel.textColor = UIColor.Signal.label
         textLabel.numberOfLines = 1
         textLabel.lineBreakMode = .byTruncatingTail
 
         let removeButton = UIButton()
         removeButton.setImage(UIImage(named: "x-compact"), for: .normal)
         removeButton.tintColor = .Signal.label
-        removeButton.addTarget(self, action: #selector(removeButtonWasPressed), for: .touchUpInside)
+        removeButton.addAction(
+            UIAction { [weak self] _ in self?.removeButtonWasPressed() },
+            for: .primaryActionTriggered,
+        )
 
         contentView.addSubview(avatarView)
         avatarView.autoPinEdge(toSuperviewEdge: .leading)
@@ -204,7 +207,7 @@ private class NewMemberCell: UICollectionViewCell {
 
         let stackView = UIStackView(arrangedSubviews: [
             textLabel,
-            removeButton
+            removeButton,
         ])
         stackView.axis = .horizontal
         stackView.spacing = 8
@@ -218,7 +221,7 @@ private class NewMemberCell: UICollectionViewCell {
         stackView.setCompressionResistanceHorizontalLow()
     }
 
-    override public func layoutSubviews() {
+    override func layoutSubviews() {
         super.layoutSubviews()
         contentView.layer.cornerRadius = contentView.height / 2
     }
@@ -245,7 +248,6 @@ private class NewMemberCell: UICollectionViewCell {
         delegate = nil
     }
 
-    @objc
     private func removeButtonWasPressed() {
         guard let recipient = member?.recipient else {
             owsFailDebug("Missing recipient.")
@@ -284,7 +286,7 @@ private class NewMembersBarLayout: UICollectionViewLayout {
 
     // MARK: Initializers and Factory Methods
 
-    public override init() {
+    override init() {
         super.init()
     }
 
@@ -313,7 +315,7 @@ private class NewMembersBarLayout: UICollectionViewLayout {
     override func prepare() {
         super.prepare()
 
-        guard let collectionView = collectionView else {
+        guard let collectionView else {
             owsFailDebug("Missing collectionView.")
             contentSize = .zero
             return
@@ -425,7 +427,7 @@ private class NewMembersBarLayout: UICollectionViewLayout {
     }
 
     override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
-        guard let collectionView = collectionView else {
+        guard let collectionView else {
             return false
         }
         return collectionView.width != newBounds.size.width

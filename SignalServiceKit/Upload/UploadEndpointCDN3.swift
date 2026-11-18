@@ -9,8 +9,8 @@ import Foundation
 /// https://tus.io/protocols/resumable-upload
 struct UploadEndpointCDN3: UploadEndpoint {
 
-    public enum Constants {
-        public static let checksumHeaderKey = "x-signal-checksum-sha256"
+    enum Constants {
+        static let checksumHeaderKey = "x-signal-checksum-sha256"
     }
 
     private let uploadForm: Upload.Form
@@ -22,7 +22,7 @@ struct UploadEndpointCDN3: UploadEndpoint {
         form: Upload.Form,
         signalService: OWSSignalServiceProtocol,
         fileSystem: Upload.Shims.FileSystem,
-        logger: PrefixedLogger
+        logger: PrefixedLogger,
     ) {
         self.uploadForm = form
         self.signalService = signalService
@@ -37,11 +37,11 @@ struct UploadEndpointCDN3: UploadEndpoint {
         return url
     }
 
-    internal func getResumableUploadProgress<Metadata: UploadMetadata>(attempt: Upload.Attempt<Metadata>) async throws -> Upload.ResumeProgress {
+    func getResumableUploadProgress<Metadata: UploadMetadata>(attempt: Upload.Attempt<Metadata>) async throws -> Upload.ResumeProgress {
         var headers = uploadForm.headers
         headers["Tus-Resumable"] = "1.0.0"
 
-        let urlSession = await signalService.sharedUrlSessionForCdn(cdnNumber: uploadForm.cdnNumber, maxResponseSize: nil)
+        let urlSession = await signalService.sharedUrlSessionForCdn(cdnNumber: uploadForm.cdnNumber)
 
         let response: HTTPResponse
         do {
@@ -49,7 +49,8 @@ struct UploadEndpointCDN3: UploadEndpoint {
             response = try await urlSession.performRequest(
                 url.absoluteString,
                 method: .head,
-                headers: headers
+                headers: headers,
+                maxResponseSize: .max,
             )
         } catch {
             switch error.httpStatusCode ?? 0 {
@@ -73,7 +74,7 @@ struct UploadEndpointCDN3: UploadEndpoint {
             return .uploaded(0)
         }
 
-        guard let bytesAlreadyUploaded = Int(bytesAlreadyUploadedString) else {
+        guard let bytesAlreadyUploaded = UInt64(bytesAlreadyUploadedString) else {
             attempt.logger.error("'upload-offset' contains something unexpected, discard upload form and restart")
             return .restart
         }
@@ -82,18 +83,18 @@ struct UploadEndpointCDN3: UploadEndpoint {
     }
 
     func performUpload<Metadata: UploadMetadata>(
-        startPoint: Int,
+        startPoint: UInt64,
         attempt: Upload.Attempt<Metadata>,
-        progress: OWSProgressSource?
+        progressBlock: OWSURLSession.ProgressBlock,
     ) async throws(Upload.Error) {
-        let urlSession = await signalService.sharedUrlSessionForCdn(cdnNumber: uploadForm.cdnNumber, maxResponseSize: nil)
+        let urlSession = await signalService.sharedUrlSessionForCdn(cdnNumber: uploadForm.cdnNumber)
         let totalDataLength = attempt.encryptedDataLength
         var headers = uploadForm.headers
 
         let (uploadData, truncated) = try readUploadFileChunk(
             fileSystem: fileSystem,
             url: attempt.fileUrl,
-            startIndex: startPoint
+            startIndex: startPoint,
         )
         guard uploadData.count > 0 else {
             attempt.logger.error("No data to upload")
@@ -130,7 +131,8 @@ struct UploadEndpointCDN3: UploadEndpoint {
                 method: method,
                 headers: headers,
                 requestData: uploadData,
-                progress: progress
+                maxResponseSize: .max,
+                progressBlock: progressBlock,
             )
 
             switch response.responseStatusCode {
@@ -138,7 +140,7 @@ struct UploadEndpointCDN3: UploadEndpoint {
                 if truncated {
                     // The upload succeeded in uploading a chunk of data. Throw this error
                     // to the caller, which should trigger an immediate resume with the next chunk
-                    throw Upload.Error.partialUpload(bytesUploaded: UInt32(clamping: uploadData.count))
+                    throw Upload.Error.partialUpload(bytesUploaded: UInt64(uploadData.count))
                 }
                 return
             default:
@@ -179,7 +181,7 @@ struct UploadEndpointCDN3: UploadEndpoint {
                 // On 4XX errors, clients should restart the upload
                 attempt.logger.warn("Unexpected upload failure [\(error.responseStatusCode)], restart.\(debugInfo)")
                 throw Upload.Error.uploadFailure(recovery: .restart(retryMode))
-            case let error where (500...599).contains(error.responseStatusCode):
+            case let error where error.is5xxServiceResponse:
                 // On 5XX errors, clients should try to resume the upload
                 attempt.logger.warn("Temporary upload failure [\(error.responseStatusCode)], retry.\(debugInfo)")
                 throw Upload.Error.uploadFailure(recovery: .resume(retryMode))

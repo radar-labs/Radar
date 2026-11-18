@@ -39,7 +39,7 @@ public class OWSTableItem {
         customCellBlock: @escaping () -> UITableViewCell,
         willDisplayBlock: ((UITableViewCell) -> Void)? = nil,
         actionBlock: (() -> Void)? = nil,
-        contextMenuActionProvider: UIContextMenuActionProvider? = nil
+        contextMenuActionProvider: UIContextMenuActionProvider? = nil,
     ) {
         self.init(title: nil, actionBlock: actionBlock)
         self.customCellBlock = customCellBlock
@@ -50,7 +50,7 @@ public class OWSTableItem {
     public convenience init(
         dequeueCellBlock: @escaping (UITableView) -> UITableViewCell,
         actionBlock: (() -> Void)? = nil,
-        contextMenuActionProvider: UIContextMenuActionProvider? = nil
+        contextMenuActionProvider: UIContextMenuActionProvider? = nil,
     ) {
         self.init(title: nil, actionBlock: actionBlock)
         self.dequeueCellBlock = dequeueCellBlock
@@ -63,7 +63,7 @@ public class OWSTableItem {
         actionBlock: (() -> Void)?,
         accessoryText: String? = nil,
         accessoryType: UITableViewCell.AccessoryType,
-        accessibilityIdentifier: String? = nil
+        accessibilityIdentifier: String? = nil,
     ) {
         self.init(
             customCellBlock: {
@@ -72,10 +72,10 @@ public class OWSTableItem {
                     textColor: textColor,
                     accessoryText: accessoryText,
                     accessoryType: accessoryType,
-                    accessibilityIdentifier: accessibilityIdentifier
+                    accessibilityIdentifier: accessibilityIdentifier,
                 )
             },
-            actionBlock: actionBlock
+            actionBlock: actionBlock,
         )
     }
 
@@ -84,36 +84,42 @@ public class OWSTableItem {
     public static func checkmark(
         withText text: String,
         actionBlock: (() -> Void)? = nil,
-        accessibilityIdentifier: String? = nil
+        accessibilityIdentifier: String? = nil,
     ) -> OWSTableItem {
         return OWSTableItem(
             customCellBlock: {
                 return OWSTableItem.buildCell(
                     itemName: text,
                     accessoryType: .checkmark,
-                    accessibilityIdentifier: accessibilityIdentifier
+                    accessibilityIdentifier: accessibilityIdentifier,
                 )
             },
-            actionBlock: actionBlock
+            actionBlock: actionBlock,
         )
     }
 
     public static func disclosureItem(
         icon: ThemeIcon? = nil,
+        tintColor: UIColor? = nil,
         withText: String,
+        subtitle: String? = nil,
         maxNameLines: Int? = nil,
         accessoryText: String? = nil,
         addBetaLabel: Bool = false,
-        actionBlock: (() -> Void)? = nil
+        textColor: UIColor? = nil,
+        actionBlock: (() -> Void)? = nil,
     ) -> OWSTableItem {
         return item(
             icon: icon,
+            tintColor: tintColor,
             name: withText,
+            subtitle: subtitle,
             maxNameLines: maxNameLines,
+            textColor: textColor,
             accessoryText: accessoryText,
             accessoryType: .disclosureIndicator,
             addBetaLabel: addBetaLabel,
-            actionBlock: actionBlock
+            actionBlock: actionBlock,
         )
     }
 
@@ -121,7 +127,7 @@ public class OWSTableItem {
         withText text: String,
         textColor: UIColor? = nil,
         accessibilityIdentifier: String? = nil,
-        actionBlock: (() -> Void)? = nil
+        actionBlock: (() -> Void)? = nil,
     ) -> OWSTableItem {
         return OWSTableItem(
             customCellBlock: {
@@ -129,23 +135,23 @@ public class OWSTableItem {
                     itemName: text,
                     textColor: textColor,
                     accessoryType: .disclosureIndicator,
-                    accessibilityIdentifier: accessibilityIdentifier
+                    accessibilityIdentifier: accessibilityIdentifier,
                 )
             },
-            actionBlock: actionBlock
+            actionBlock: actionBlock,
         )
     }
 
     public static func subpage(
         withText text: String,
         accessibilityIdentifier: String? = nil,
-        actionBlock: @escaping ((UIViewController) -> Void)
+        actionBlock: @escaping ((UIViewController) -> Void),
     ) -> OWSTableItem {
         let item = OWSTableItem(customCellBlock: {
             return OWSTableItem.buildCell(
                 itemName: text,
                 accessoryType: .disclosureIndicator,
-                accessibilityIdentifier: accessibilityIdentifier
+                accessibilityIdentifier: accessibilityIdentifier,
             )
         })
 
@@ -162,7 +168,7 @@ public class OWSTableItem {
     }
 
     public static func softCenterLabel(
-        withText text: String
+        withText text: String,
     ) -> OWSTableItem {
         return OWSTableItem(customCellBlock: {
             let cell = OWSTableItem.newCell()
@@ -187,13 +193,13 @@ public class OWSTableItem {
     public static func label(
         withText text: String,
         accessoryText: String? = nil,
-        accessoryType: UITableViewCell.AccessoryType = .disclosureIndicator
+        accessoryType: UITableViewCell.AccessoryType = .disclosureIndicator,
     ) -> OWSTableItem {
         return OWSTableItem(customCellBlock: {
             let cell = OWSTableItem.buildCell(
                 itemName: text,
                 accessoryText: accessoryText,
-                accessoryType: accessoryType
+                accessoryType: accessoryType,
             )
 
             cell.isUserInteractionEnabled = false
@@ -202,76 +208,107 @@ public class OWSTableItem {
         })
     }
 
-    public static func longDisclosure(
-        withText text: String,
-        actionBlock: (() -> Void)? = nil
-    ) -> OWSTableItem {
-        return OWSTableItem(
-            customCellBlock: {
-                let cell = OWSTableItem.newCell()
-                cell.accessoryType = .disclosureIndicator
-
-                let textLabel = UILabel()
-                textLabel.text = text
-                textLabel.numberOfLines = 0
-                textLabel.lineBreakMode = .byWordWrapping
-                cell.contentView.addSubview(textLabel)
-                textLabel.autoPinEdgesToSuperviewMargins()
-
-                return cell
-            },
-            actionBlock: actionBlock
-        )
-    }
-
     public static func `switch`(
         withText text: String,
+        image: UIImage? = nil,
+        subtitle: String? = nil,
+        textColor: UIColor? = nil,
         accessibilityIdentifier: String? = nil,
         isOn: @escaping (() -> Bool),
         isEnabled: @escaping (() -> Bool) = { true },
-        target: AnyObject,
-        selector: Selector
+        actionBlock: @escaping ((UISwitch) -> Void) = { _ in },
     ) -> OWSTableItem {
-        return OWSTableItem(customCellBlock: { [weak target] in
-            let cell = OWSTableItem.buildCell(
+        return OWSTableItem(customCellBlock: {
+            let cell = OWSTableItem.buildImageCell(
+                image: image,
                 itemName: text,
-                accessibilityIdentifier: accessibilityIdentifier
+                subtitle: subtitle,
+                textColor: textColor,
+                accessibilityIdentifier: accessibilityIdentifier,
             )
 
             let cellSwitch = UISwitch()
             cellSwitch.isOn = isOn()
             cellSwitch.isEnabled = isEnabled()
             cellSwitch.accessibilityIdentifier = accessibilityIdentifier
-            cellSwitch.addTarget(target, action: selector, for: .valueChanged)
-
+            cellSwitch.addAction(
+                UIAction { [unowned cellSwitch] _ in actionBlock(cellSwitch) },
+                for: .valueChanged,
+            )
             cell.accessoryView = cellSwitch
             cell.selectionStyle = .none
             return cell
         })
     }
 
-    public static func `switch`(
+    public struct MenuPickerOption<Value: Equatable> {
+        public let title: String
+        public let isEnabled: Bool
+        public let value: Value
+        public let onSelect: () -> Void
+
+        public init(
+            title: String,
+            isEnabled: Bool = true,
+            value: Value,
+            onSelect: @escaping () -> Void,
+        ) {
+            self.title = title
+            self.isEnabled = isEnabled
+            self.value = value
+            self.onSelect = onSelect
+        }
+    }
+
+    /// An item with a trailing button, titled with the selected option, that
+    /// presents the options as a menu.
+    public static func menuPicker<Value: Equatable>(
         withText text: String,
-        subtitle: String? = nil,
-        accessibilityIdentifier: String? = nil,
-        isOn: @escaping (() -> Bool),
-        isEnabled: @escaping (() -> Bool) = { true },
-        actionBlock: @escaping ((UISwitch) -> Void) = { _ in }
+        menuTitle: String?,
+        menuOptions: [MenuPickerOption<Value>],
+        selectedMenuOption: Value,
     ) -> OWSTableItem {
         return OWSTableItem(customCellBlock: {
-            let cell = OWSTableItem.buildCell(
-                itemName: text,
-                subtitle: subtitle,
-                accessibilityIdentifier: accessibilityIdentifier
+            var configuration = UIButton.Configuration.plain()
+            configuration.title = menuOptions.first(where: { $0.value == selectedMenuOption })?.title
+            configuration.baseForegroundColor = .Signal.secondaryLabel
+            configuration.image = UIImage(
+                systemName: "chevron.up.chevron.down",
+                withConfiguration: UIImage.SymbolConfiguration(scale: .small),
+            )
+            configuration.imagePlacement = .trailing
+            configuration.imagePadding = 6
+            configuration.contentInsets = .zero
+
+            let button = UIButton(configuration: configuration)
+            button.setContentHuggingHorizontalHigh()
+            button.setCompressionResistanceHorizontalHigh()
+            button.showsMenuAsPrimaryAction = true
+            button.menu = UIMenu(
+                title: menuTitle ?? "",
+                options: .singleSelection,
+                children: menuOptions.map { option in
+                    UIAction(
+                        title: option.title,
+                        attributes: option.isEnabled ? [] : .disabled,
+                        state: option.value == selectedMenuOption ? .on : .off,
+                        handler: { _ in option.onSelect() },
+                    )
+                },
             )
 
-            let cellSwitch = UISwitch()
-            cellSwitch.isOn = isOn()
-            cellSwitch.isEnabled = isEnabled()
-            cellSwitch.accessibilityIdentifier = accessibilityIdentifier
-            cellSwitch.addAction(UIAction(handler: { [unowned cellSwitch] _ in actionBlock(cellSwitch) }), for: .valueChanged)
+            let cell = OWSTableItem.buildCell(
+                itemName: text,
+                accessoryContentView: button,
+            )
 
-            cell.accessoryView = cellSwitch
+            // Expose the row as a single element, so VoiceOver reads the
+            // item's name and selected option together and activating it
+            // opens the menu.
+            button.accessibilityLabel = text
+            button.accessibilityValue = configuration.title
+            cell.accessibilityElements = [button]
+
             cell.selectionStyle = .none
             return cell
         })
@@ -286,13 +323,13 @@ public class OWSTableItem {
     }
 
     public class func configureCell(_ cell: UITableViewCell) {
-        cell.backgroundColor = Theme.backgroundColor
-        cell.selectedBackgroundView?.backgroundColor = Theme.tableCell2SelectedBackgroundColor
-        cell.multipleSelectionBackgroundView?.backgroundColor = Theme.tableCell2SelectedBackgroundColor
+        cell.backgroundColor = OWSTableViewController2.defaultCellBackgroundColor
+        cell.selectedBackgroundView?.backgroundColor = OWSTableViewController2.cellSelectedBackgroundColor
+        cell.multipleSelectionBackgroundView?.backgroundColor = OWSTableViewController2.cellSelectedBackgroundColor
 
-        cell.textLabel?.font = self.primaryLabelFont
-        cell.textLabel?.textColor = Theme.primaryTextColor
-        cell.detailTextLabel?.textColor = Theme.secondaryTextAndIconColor
+        cell.textLabel?.font = primaryLabelFont
+        cell.textLabel?.textColor = .Signal.label
+        cell.detailTextLabel?.textColor = .Signal.secondaryLabel
         cell.detailTextLabel?.font = OWSTableItem.accessoryLabelFont
     }
 
@@ -316,25 +353,25 @@ public extension OWSTableItem {
     static var iconSpacing: CGFloat { 16 }
     static var iconSize: CGFloat { 24 }
 
-    private static func accessoryGray() -> UIColor {
-        Theme.isDarkThemeEnabled ? .ows_gray25 : .ows_gray45
+    static var accessoryGray: UIColor {
+        UIColor(light: .ows_gray45, dark: .ows_gray25)
     }
 
     static func imageView(
         forIcon icon: ThemeIcon,
         tintColor: UIColor? = nil,
-        iconSize: CGFloat = iconSize
+        iconSize: CGFloat = iconSize,
     ) -> UIImageView {
         let iconImage = Theme.iconImage(icon)
         let iconView = imageView(forImage: iconImage)
-        iconView.tintColor = tintColor ?? Theme.primaryIconColor
+        iconView.tintColor = tintColor ?? .Signal.label
         iconView.autoSetDimensions(to: .square(iconSize))
         return iconView
     }
 
     private static func imageView(
         forImage: UIImage,
-        iconSize: CGFloat = iconSize
+        iconSize: CGFloat = iconSize,
     ) -> UIImageView {
         let result = UIImageView(image: forImage)
         result.contentMode = .scaleAspectFit
@@ -356,7 +393,7 @@ public extension OWSTableItem {
         accessoryContentView: UIView? = nil,
         accessibilityIdentifier: String? = nil,
         addBetaLabel: Bool = false,
-        actionBlock: (() -> Void)? = nil
+        actionBlock: (() -> Void)? = nil,
     ) -> OWSTableItem {
         return OWSTableItem(
             customCellBlock: {
@@ -371,10 +408,10 @@ public extension OWSTableItem {
                     accessoryType: accessoryType,
                     accessoryContentView: accessoryContentView,
                     accessibilityIdentifier: accessibilityIdentifier,
-                    addBetaLabel: addBetaLabel
+                    addBetaLabel: addBetaLabel,
                 )
             },
-            actionBlock: actionBlock
+            actionBlock: actionBlock,
         )
     }
 
@@ -391,10 +428,10 @@ public extension OWSTableItem {
         accessoryContentView: UIView? = nil,
         customColor: UIColor? = nil,
         accessibilityIdentifier: String? = nil,
-        addBetaLabel: Bool = false
+        addBetaLabel: Bool = false,
     ) -> UITableViewCell {
         var imageView: UIImageView?
-        if let icon = icon {
+        if let icon {
             let iconView = self.imageView(forIcon: icon, tintColor: customColor ?? tintColor, iconSize: iconSize)
             iconView.setCompressionResistanceHorizontalHigh()
             imageView = iconView
@@ -412,23 +449,25 @@ public extension OWSTableItem {
             accessoryContentView: accessoryContentView,
             customColor: customColor,
             accessibilityIdentifier: accessibilityIdentifier,
-            addBetaLabel: addBetaLabel
+            addBetaLabel: addBetaLabel,
         )
     }
 
     static func buildImageCell(
         image: UIImage? = nil,
+        tintColor: UIColor? = nil,
         itemName: String,
         subtitle: String? = nil,
         maxItemNameLines: Int? = nil,
+        textColor: UIColor? = nil,
         accessoryText: String? = nil,
         accessoryTextColor: UIColor? = nil,
         accessoryType: UITableViewCell.AccessoryType = .none,
         accessoryContentView: UIView? = nil,
-        accessibilityIdentifier: String? = nil
+        accessibilityIdentifier: String? = nil,
     ) -> UITableViewCell {
         var imageView: UIImageView?
-        if let image = image {
+        if let image {
             let imgView = self.imageView(forImage: image)
             imgView.setCompressionResistanceHorizontalHigh()
             imageView = imgView
@@ -436,14 +475,16 @@ public extension OWSTableItem {
 
         return buildImageViewCell(
             imageView: imageView,
+            tintColor: tintColor,
             itemName: itemName,
             subtitle: subtitle,
             maxItemNameLines: maxItemNameLines,
+            textColor: textColor,
             accessoryText: accessoryText,
             accessoryTextColor: accessoryTextColor,
             accessoryType: accessoryType,
             accessoryContentView: accessoryContentView,
-            accessibilityIdentifier: accessibilityIdentifier
+            accessibilityIdentifier: accessibilityIdentifier,
         )
     }
 
@@ -460,24 +501,27 @@ public extension OWSTableItem {
         accessoryContentView: UIView? = nil,
         customColor: UIColor? = nil,
         accessibilityIdentifier: String? = nil,
-        addBetaLabel: Bool = false
+        addBetaLabel: Bool = false,
     ) -> UITableViewCell {
         let cell = OWSTableItem.newCell()
         cell.preservesSuperviewLayoutMargins = true
         cell.contentView.preservesSuperviewLayoutMargins = true
+        if let tintColor {
+            cell.tintColor = tintColor
+        }
 
         var subviews = [UIView]()
 
-        if let imageView = imageView {
+        if let imageView {
             subviews.append(imageView)
         }
 
         let nameLabel = UILabel()
         nameLabel.text = itemName
-        if let textColor = textColor {
+        if let textColor {
             nameLabel.textColor = textColor
         } else {
-            nameLabel.textColor = Theme.primaryTextColor
+            nameLabel.textColor = .Signal.label
         }
         nameLabel.font = OWSTableItem.primaryLabelFont
         nameLabel.adjustsFontForContentSizeCategory = true
@@ -489,7 +533,7 @@ public extension OWSTableItem {
         // very strange indeterminant behavior. To work around,
         // we only allow the longer of the two labels to be
         // multi-line.
-        if let maxItemNameLines = maxItemNameLines {
+        if let maxItemNameLines {
             nameLabel.numberOfLines = maxItemNameLines
             nameLabel.lineBreakMode = .byTruncatingTail
             nameLabel.setCompressionResistanceHorizontalHigh()
@@ -512,10 +556,11 @@ public extension OWSTableItem {
             let subtitleLabel = UILabel()
             subtitleLabel.text = subtitle
             subtitleLabel.numberOfLines = 0
-            subtitleLabel.textColor = accessoryGray()
+            subtitleLabel.textColor = OWSTableItem.accessoryGray
             subtitleLabel.font = .dynamicTypeFootnoteClamped
 
             let labels = UIStackView(arrangedSubviews: [nameLabel, subtitleLabel])
+            labels.spacing = 2
             labels.axis = .vertical
             subviews.append(labels)
         }
@@ -547,13 +592,13 @@ public extension OWSTableItem {
                 betaLabel.leadingAnchor.constraint(equalTo: betaContainer.leadingAnchor, constant: 8),
                 betaLabel.trailingAnchor.constraint(equalTo: betaContainer.trailingAnchor, constant: -8),
                 betaLabel.topAnchor.constraint(equalTo: betaContainer.topAnchor, constant: 4),
-                betaLabel.bottomAnchor.constraint(equalTo: betaContainer.bottomAnchor, constant: -4)
+                betaLabel.bottomAnchor.constraint(equalTo: betaContainer.bottomAnchor, constant: -4),
             ])
 
             subviews.append(betaContainer)
         }
 
-        if let customColor = customColor {
+        if let customColor {
             nameLabel.textColor = customColor
         }
 
@@ -564,7 +609,7 @@ public extension OWSTableItem {
         } else if let accessoryText {
             let accessoryLabel = UILabel()
             accessoryLabel.text = accessoryText
-            accessoryLabel.textColor = accessoryTextColor ?? accessoryGray()
+            accessoryLabel.textColor = accessoryTextColor ?? OWSTableItem.accessoryGray
             accessoryLabel.font = OWSTableItem.accessoryLabelFont
             accessoryLabel.adjustsFontForContentSizeCategory = true
 
@@ -600,7 +645,7 @@ public extension OWSTableItem {
                 contentRow.leadingAnchor.constraint(equalTo: cell.contentView.layoutMarginsGuide.leadingAnchor),
                 contentRow.topAnchor.constraint(equalTo: cell.contentView.topAnchor, constant: 12),
                 contentRow.bottomAnchor.constraint(equalTo: cell.contentView.bottomAnchor, constant: -12),
-                contentRow.trailingAnchor.constraint(lessThanOrEqualTo: cell.contentView.layoutMarginsGuide.trailingAnchor)
+                contentRow.trailingAnchor.constraint(lessThanOrEqualTo: cell.contentView.layoutMarginsGuide.trailingAnchor),
             ])
         } else {
             contentRow.autoPinEdgesToSuperviewMargins()
@@ -620,14 +665,14 @@ public extension OWSTableItem {
         icon: ThemeIcon,
         iconSize iconSizeParam: UInt,
         innerIconSize: CGFloat,
-        iconTintColor: UIColor
+        iconTintColor: UIColor,
     ) -> UIView {
         let iconSize = CGFloat(iconSizeParam)
         let iconView = OWSTableItem.imageView(forIcon: icon, tintColor: iconTintColor, iconSize: innerIconSize)
         let iconWrapper = UIView.container()
         iconWrapper.addSubview(iconView)
         iconView.autoCenterInSuperview()
-        iconWrapper.backgroundColor = Theme.isDarkThemeEnabled ? .ows_gray65 : .ows_gray02
+        iconWrapper.backgroundColor = UIColor(light: .ows_gray02, dark: .ows_gray65)
         iconWrapper.layer.cornerRadius = iconSize * 0.5
         iconWrapper.autoSetDimensions(to: CGSize(square: iconSize))
         iconWrapper.setCompressionResistanceHigh()
@@ -652,7 +697,7 @@ public extension OWSTableItem {
         subtitle: String? = nil,
         value displayValue: String?,
         pasteboardValue: String? = nil,
-        accessibilityIdentifier: String? = nil
+        accessibilityIdentifier: String? = nil,
     ) -> OWSTableItem {
         let pasteboardValue = pasteboardValue ?? displayValue
         let accessibilityIdentifier = accessibilityIdentifier ?? label
@@ -663,7 +708,7 @@ public extension OWSTableItem {
             accessoryText: displayValue,
             accessibilityIdentifier: accessibilityIdentifier,
             actionBlock: {
-                if let pasteboardValue = pasteboardValue {
+                if let pasteboardValue {
                     UIPasteboard.general.string = pasteboardValue
                 }
 
@@ -674,11 +719,11 @@ public extension OWSTableItem {
 
                 let toast = OWSLocalizedString(
                     "COPIED_TO_CLIPBOARD",
-                    comment: "Indicator that a value has been copied to the clipboard."
+                    comment: "Indicator that a value has been copied to the clipboard.",
                 )
 
-                fromVC.presentToast(text: toast)
-            }
+                fromVC.presentToast(text: toast, image: UIImage(named: "check"))
+            },
         )
     }
 }
@@ -705,7 +750,7 @@ public extension OWSTableItem {
 
     static func itemWrappingView(
         viewBlock: @escaping () -> UIView?,
-        margins: UIEdgeInsets
+        margins: UIEdgeInsets,
     ) -> OWSTableItem {
         return OWSTableItem(customCellBlock: {
             guard let view = viewBlock() else {
@@ -714,7 +759,7 @@ public extension OWSTableItem {
 
             return ViewWrappingTableViewCell(
                 viewToWrap: view,
-                margins: margins
+                margins: margins,
             )
         })
     }
@@ -736,7 +781,7 @@ public extension OWSTableItem {
     /// - Returns: An ``OWSTableItem`` with the `textField` embedded.
     static func textFieldItem(
         _ textField: UITextField,
-        textColor: @escaping @autoclosure () -> UIColor? = Theme.primaryTextColor
+        textColor: @escaping @autoclosure () -> UIColor? = .Signal.label,
     ) -> OWSTableItem {
         .init(customCellBlock: {
             if let textColor = textColor() {

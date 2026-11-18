@@ -48,7 +48,7 @@ class GroupCallRecordRingingCleanupManager {
         interactionStore: InteractionStore,
         groupCallPeekClient: GroupCallPeekClient,
         notificationPresenter: NotificationPresenter,
-        threadStore: ThreadStore
+        threadStore: ThreadStore,
     ) {
         self.callRecordStore = callRecordStore
         self.callRecordQuerier = callRecordQuerier
@@ -64,7 +64,7 @@ class GroupCallRecordRingingCleanupManager {
             let ringingGroupCallCursor = callRecordQuerier.fetchCursor(
                 callStatus: .group(.ringing),
                 ordering: .descending,
-                tx: tx
+                tx: tx,
             ),
             let ringingCallRecords = try? ringingGroupCallCursor.drain()
         else { return }
@@ -83,7 +83,7 @@ class GroupCallRecordRingingCleanupManager {
             callRecordStore.updateCallAndUnreadStatus(
                 callRecord: ringingCallRecord,
                 newCallStatus: .group(.ringingMissed),
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -91,8 +91,8 @@ class GroupCallRecordRingingCleanupManager {
         /// groupings to load the group thread for each row ID.
         let callRecordsByGroupId: [(GroupIdentifier, [CallRecord])] = Dictionary(
             grouping: callRecordsToPeek,
-            by: { $0.conversationId }
-        ).compactMap { (conversationId, callRecords) -> (GroupIdentifier, [CallRecord])? in
+            by: { $0.conversationId },
+        ).compactMap { conversationId, callRecords -> (GroupIdentifier, [CallRecord])? in
             switch conversationId {
             case .thread(let threadRowId):
                 guard
@@ -102,7 +102,7 @@ class GroupCallRecordRingingCleanupManager {
                     return nil
                 }
                 return (groupId, callRecords)
-            case .callLink(_):
+            case .callLink:
                 return nil
             }
         }
@@ -112,7 +112,7 @@ class GroupCallRecordRingingCleanupManager {
                 do {
                     try await peekGroupAndNotifyIfNecessary(
                         groupId: groupId,
-                        callRecords: callRecords
+                        callRecords: callRecords,
                     )
                 } catch {
                     Logger.error("Unable to peek group: \(error)")
@@ -127,14 +127,14 @@ class GroupCallRecordRingingCleanupManager {
     /// the ringing record is still ongoing), posts a notification.
     private func peekGroupAndNotifyIfNecessary(
         groupId: GroupIdentifier,
-        callRecords: [CallRecord]
+        callRecords: [CallRecord],
     ) async throws {
         let peekInfo = try await self.groupCallPeekClient.fetchPeekInfo(groupId: groupId)
         let callId = peekInfo.eraId.map({ callIdFromEra($0) })
 
         await self.db.awaitableWrite { tx in
             // Reload the group thread, since it may have changed.
-            guard let groupThread = self.threadStore.fetchGroupThread(groupId: groupId, tx: tx) else {
+            guard let groupThread = self.threadStore.fetchThread(forGroupId: groupId, tx: tx) else {
                 owsFail("Where did the thread go?")
             }
 
@@ -163,7 +163,7 @@ class GroupCallRecordRingingCleanupManager {
                     forPreviewableInteraction: groupCallInteraction,
                     thread: groupThread,
                     wantsSound: true,
-                    transaction: tx
+                    transaction: tx,
                 )
             }
         }

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+public import AVFoundation
 import Foundation
 import LibSignalClient
 
@@ -12,7 +13,7 @@ enum FeatureBuild: Int, Comparable {
     case beta
     case production
 
-    static func < (lhs: Self, rhs: Self) -> Bool {
+    static func <(lhs: Self, rhs: Self) -> Bool {
         return lhs.rawValue < rhs.rawValue
     }
 }
@@ -25,93 +26,100 @@ private let build = FeatureBuild.current
 /// it's easier to review which feature flags are in play.
 public enum BuildFlags {
 
-    public static let choochoo = build <= .internal
-
     public static let failDebug = build <= .internal
-
-    public static let linkedPhones = build <= .production
-
-    public static let preRegDeviceTransfer = build <= .production
 
     public static let isPrerelease = build <= .beta
 
     public static let shouldUseTestIntervals = build <= .beta
 
-    /// If we ever need to internally detect database corruption again in the
-    /// future, we can re-enable this.
-    public static let periodicallyCheckDatabaseIntegrity: Bool = false
-
     public enum Backups {
-        public static let registrationFlow = true
-        public static let showMegaphones = build <= .internal
         public static let showOptimizeMedia = build <= .dev
+
+        public static let detailedBenchLogging = build <= .internal
+        public static let archiveErrorDisplay = build <= .internal
+
+        public static let avoidAppAttestForDevs = build <= .dev
+        public static let avoidStoreKitForTesters = build <= .beta
+
+        public static let mediaErrorDisplay = build <= .beta
+        public static let useLowerDefaultListMediaRefreshInterval = build <= .beta
+
+        public static let takeoutExport = true
 
         /// Gates the paid Backups plan (the paid tier in the plan chooser and
         /// the upgrade button in Backup settings). Disabled.
         public static let showPaidPlan = false
 
-        public static let restoreFailOnAnyError = build <= .beta
-        public static let detailedBenchLogging = build <= .internal
-        public static let errorDisplay = build <= .internal
-
-        public static let avoidAppAttestForDevs = build <= .dev
-        public static let avoidStoreKitForTesters = build <= .beta
-
-        public static let useLowerDefaultListMediaRefreshInterval = build <= .beta
-        public static let performListMediaIntegrityChecks = build <= .beta
+        /// Radar: gates "Save to Password Manager" for the Recovery Key. Upstream
+        /// saves it under signal.org (webcredentials) with Signal's app name,
+        /// which Radar can't use; users save their key manually instead.
+        public static let saveRecoveryKeyToPasswordManager = false
     }
-
-    public static let runTSAttachmentMigrationInMainAppBackground = true
-    public static let runTSAttachmentMigrationBlockingOnLaunch = true
-
-    /// We are still making Xcode 16 builds as of writing this, and some iOS 26
-    /// changes must only be applied if the SDK is also iOS 26.
-#if compiler(>=6.2)
-    public static let iOS26SDKIsAvailable = true
-#else
-    public static let iOS26SDKIsAvailable = false
-#endif
-
-    public static let pollSend = true
-    public static let pollReceive = true
 
     static let netBuildVariant: Net.BuildVariant = build <= .beta ? .beta : .production
 
     // Turn this off after all still-registered clients have run this
-    // migration. That should happen by 2026-05-27. Then, delete all the code
-    // that's now dead because this is false.
-    public static let decodeDeprecatedPreKeys = true
+    // migration. That should happen about 210 days after the last release
+    // without this change is built. Then, delete all the code that's now dead
+    // because this is false.
+    public static let migrateHasPaymentAddress = true
 
-    public static let serviceIdBinaryProvisioning = true
-    public static let serviceIdBinaryConstantOverhead = !serviceIdStrings || (build <= .internal)
-    public static let serviceIdBinaryVariableOverhead = !serviceIdStrings || (build <= .dev)
-    public static let serviceIdBinaryOneOf = !serviceIdStrings
+    // Turn this off 14 days after the last release without this change
+    // expires. Then, delete all the code that's now dead.
+    public static let decodeOldSenderKeys = true
 
-    public static let serviceIdStrings = TSConstants.isUsingProductionService
+    // Turn this off 7 days after the last release without this change expires.
+    // Then, delete all the code that's now dead.
+    public static let migrateGroupRefreshedAt = true
 
-    public enum PinnedMessages {
-        public static let send = build <= .dev
-        public static let receive = build <= .dev
+    public enum KeyTransparency {
+        public static let conservativeSelfCheck = build <= .internal
     }
 
-    public static let useNewAttachmentLimits = false
+    public static let wifiAwareDeviceTransfer = true
+
+    public enum ReleaseNotesChannel {
+        public static let ignoreFetchDelay = build <= .internal
+    }
+
+    public enum LocalFileBackups {
+        public static let archive = true
+        public static let restore = true
+        public static let settingsUI = true
+    }
+
+    static let hardDeleteGroupThreadsDuringRefresh = true
+
+    /// New notification settings. Don't enable until Storage Service is integrated
+    public static let improvedNotifications = true
+
+    /// The new contact sharing picker, which can share signal contacts by ACI. We plan to turn this
+    /// on after receive support has baked in prod for a bit so that more devices can handle the
+    /// ACI share.
+    public static let accountIdentifierSharingSend = build <= .internal
+
+    public static let phoneNumberlessCanLinkNewDevices = true
+    public static let phoneNumberlessCanBeLinkedDevice = true
+
+    public static let phoneNumberlessRegistration = build <= .dev
+
+    public static let stickerReply = true
+
+    public static let screenshotBlocking = build <= .internal
 
     /// Gates the donations feature (the "Donate" entry in app settings and the
     /// flows it leads to). Disabled.
     public static let donations = false
-}
 
-// MARK: -
-@objc
-public class BuildFlagsObjC: NSObject {
-    @objc
-    public static let serviceIdBinaryConstantOverhead = BuildFlags.serviceIdBinaryConstantOverhead
+    /// Radar: gates Signal's remote megaphones, release notes and announcements.
+    /// They come from Signal's update server and are written by Signal, so Radar
+    /// neither fetches nor shows them. Disabled.
+    public static let remoteMegaphonesAndReleaseNotes = false
 
-    @objc
-    public static let serviceIdBinaryVariableOverhead = BuildFlags.serviceIdBinaryVariableOverhead
-
-    @objc
-    public static let serviceIdStrings = BuildFlags.serviceIdStrings
+    /// Radar: gates the post-call quality survey. Responses (and optional debug
+    /// logs) go to Signal's `v1/call_quality_survey`, which Radar can't use.
+    /// Disabled.
+    public static let callQualitySurvey = false
 }
 
 // MARK: -
@@ -139,14 +147,14 @@ extension BuildFlags {
         }
 
         let configuration: String? = {
-            #if DEBUG
+#if DEBUG
             LocalizationNotNeeded("Debug")
-            #elseif TESTABLE_BUILD
+#elseif TESTABLE_BUILD
             LocalizationNotNeeded("Testable")
-            #else
+#else
             // RELEASE can be inferred from the lack of configuration.
             nil
-            #endif
+#endif
         }()
 
         return [buildFlagString, configuration]
@@ -167,8 +175,6 @@ public enum DebugFlags {
 
     public static let testPopulationErrorAlerts = build <= .beta
 
-    public static let audibleErrorLogging = build <= .internal
-
     public static let internalSettings = build <= .internal
 
     public static let internalMegaphoneEligible = build <= .internal
@@ -183,90 +189,252 @@ public enum DebugFlags {
 
     public static let extraDebugLogs = build <= .internal
 
-    public static let messageSendsFail = TestableFlag(
-        false,
-        title: LocalizationNotNeeded("Message Sends Fail"),
-        details: LocalizationNotNeeded("All outgoing message sends will fail.")
+    // MARK: - TestableFlag: Calling
+
+    public static let callingSvcMaxBitrateBps = TestableFlag<Int>(
+        0,
+        title: LocalizationNotNeeded("SVC Maximum Bitrate (bps)"),
+        details: LocalizationNotNeeded("The bitrate to use for new calls (overrides remote config). 0 = use default bitrate."),
     )
 
-    public static let callingUseTestSFU = TestableFlag(
-        false,
-        title: LocalizationNotNeeded("Calling: Use Test SFU"),
-        details: LocalizationNotNeeded("Group calls will connect to sfu.test.voip.signal.org.")
+    public static let callingStatsIntervalSecs = TestableFlag<Int>(
+        0,
+        title: LocalizationNotNeeded("Stats Interval (secs)"),
+        details: LocalizationNotNeeded("The interval in seconds between logging call stats. 0 = use default interval."),
     )
 
-    public static let delayedMessageResend = TestableFlag(
+    public static let callingUseTestSFU = TestableFlag<Bool>(
+        false,
+        title: LocalizationNotNeeded("Use Test SFU"),
+        details: LocalizationNotNeeded("Group calls will connect to sfu.test.voip.signal.org."),
+    )
+
+    public static let callingNeverRelay = TestableFlag<Bool>(
+        false,
+        title: LocalizationNotNeeded("Never use relay"),
+        details: LocalizationNotNeeded("1:1 calls will not connect to a TURN server (remote party may still use TURN)."),
+    )
+
+    public static let callingOverrideCodecs = TestableFlag<Bool>(
+        false,
+        title: LocalizationNotNeeded("Use codec overrides below"),
+        details: LocalizationNotNeeded("Must be enabled to use the codec overrides below."),
+    )
+
+    public static let callingEnableVp9Encode = TestableFlag<Bool>(
+        false,
+        title: LocalizationNotNeeded("Enable VP9 Encode"),
+        details: LocalizationNotNeeded("Calls will offer VP9 encode (overrides remote config)."),
+    )
+
+    public static let callingEnableVp9Decode = TestableFlag<Bool>(
+        false,
+        title: LocalizationNotNeeded("Enable VP9 Decode"),
+        details: LocalizationNotNeeded("Calls will offer VP9 decode (overrides remote config)."),
+    )
+
+    public static let callingEnableSvc = TestableFlag(
+        false,
+        title: LocalizationNotNeeded("Enable SVC"),
+        details: LocalizationNotNeeded("Group calls will always use SVC (overrides remote config)"),
+    )
+
+    public static let callingTestableFlags: [AnyTestableFlag] = [
+        callingUseTestSFU,
+        callingStatsIntervalSecs,
+        callingNeverRelay,
+        callingOverrideCodecs,
+        callingEnableVp9Encode,
+        callingEnableVp9Decode,
+        callingEnableSvc,
+        callingSvcMaxBitrateBps,
+    ]
+
+    // MARK: - TestableFlag: Messaging
+
+    public static let delayedMessageResend = TestableFlag<Bool>(
         false,
         title: LocalizationNotNeeded("Delayed message resend"),
-        details: LocalizationNotNeeded("Waits 10s before responding to a resend request.")
+        details: LocalizationNotNeeded("Waits 10s before responding to a resend request."),
     )
 
-    public static let fastPlaceholderExpiration = TestableFlag(
+    public static let fastPlaceholderExpiration = TestableFlag<Bool>(
         false,
         title: LocalizationNotNeeded("Early placeholder expiration"),
         details: LocalizationNotNeeded("Shortens the valid window for message resend+recovery."),
-        toggleHandler: { _ in
-            SSKEnvironment.shared.messageDecrypterRef.cleanUpExpiredPlaceholders()
-        }
+        onSet: { _ in
+            DependenciesBridge.shared.decryptionPlaceholderExpirationJob.restart()
+        },
     )
 
-    public static func allTestableFlags() -> [TestableFlag] {
-        return [
-            callingUseTestSFU,
-            delayedMessageResend,
-            fastPlaceholderExpiration,
-            messageSendsFail,
-        ]
+    public static let messageSendsFail = TestableFlag<Bool>(
+        false,
+        title: LocalizationNotNeeded("Message Sends Fail"),
+        details: LocalizationNotNeeded("All outgoing message sends will fail."),
+    )
+
+    public static let messagingTestableFlags: [AnyTestableFlag] = [
+        delayedMessageResend,
+        fastPlaceholderExpiration,
+        messageSendsFail,
+    ]
+
+    // MARK: - TestableFlag: Notifications
+
+    public static let clearNotificationsOnAppActivate = TestableFlag<Bool>(
+        build > .internal,
+        title: LocalizationNotNeeded("Clear notifications on app activate"),
+        details: LocalizationNotNeeded("Delivered notifications are cleared when the app becomes active."),
+    )
+
+    public static let unreadReminderIntervalSecs = TestableFlag<Int>(
+        0,
+        title: LocalizationNotNeeded("Unread Reminder Interval (secs)"),
+        details: LocalizationNotNeeded("How long after a message arrives in a muted chat its unread reminder fires. 0 = use the default interval."),
+    )
+
+    // MARK: - TestableFlag: Voice Messages
+
+    public static let voiceMessageBitRate = TestableFlag<Int>(
+        32000,
+        title: LocalizationNotNeeded("Bitrate"),
+        details: LocalizationNotNeeded("The bitrate to use for new voice message recordings."),
+    )
+
+    public static let voiceMessageSampleRate = TestableFlag<Int>(
+        24000,
+        title: LocalizationNotNeeded("Sample Rate"),
+        details: LocalizationNotNeeded("The sample rate to use for new voice message recordings."),
+    )
+
+    public enum VoiceMessageAudioQuality: CaseIterable {
+        case min
+        case low
+        case medium
+        case high
+        case max
+
+        public var avAudioQuality: AVAudioQuality {
+            switch self {
+            case .min: .min
+            case .low: .low
+            case .medium: .medium
+            case .high: .high
+            case .max: .max
+            }
+        }
+    }
+
+    public static let voiceMessageAudioQuality = MenuTestableFlag<VoiceMessageAudioQuality>(
+        nil,
+        title: LocalizationNotNeeded("Audio Quality"),
+        details: LocalizationNotNeeded("The encoder audio quality to use for new voice message recordings."),
+    )
+
+    public static let voiceMessageTestableFlags: [AnyTestableFlag] = [
+        voiceMessageBitRate,
+        voiceMessageSampleRate,
+        voiceMessageAudioQuality,
+    ]
+}
+
+// MARK: -
+
+extension Notification.Name {
+    public static let resetAllTestableFlags = Notification.Name("ResetAllTestableFlags")
+}
+
+/// A type-erased `TestableFlag`, for heterogenous collections.
+public protocol AnyTestableFlag {
+    var title: String { get }
+    var details: String { get }
+}
+
+public class TestableFlag<Value>: AnyTestableFlag {
+    public let title: String
+    public let details: String
+
+    private let defaultValue: Value
+    private let flag: AtomicValue<Value>
+    private let onSet: (Value) -> Void
+
+    fileprivate init(
+        _ defaultValue: Value,
+        title: String,
+        details: String,
+        onSet: @escaping (Value) -> Void = { _ in },
+    ) {
+        self.defaultValue = defaultValue
+        self.title = title
+        self.details = details
+        self.flag = AtomicValue(defaultValue, lock: .init())
+        self.onSet = onSet
+
+        // Normally we'd store the observer here and remove it in deinit.
+        // But TestableFlags are always static; they don't *get* deinitialized except in testing.
+        NotificationCenter.default.addObserver(
+            forName: .resetAllTestableFlags,
+            object: nil,
+            queue: nil,
+        ) { [weak self] _ in
+            guard let self else { return }
+            set(defaultValue)
+        }
+    }
+
+    public func get() -> Value {
+        guard build <= .internal else {
+            return defaultValue
+        }
+
+        return flag.get()
+    }
+
+    public func set(_ value: Value) {
+        flag.update {
+            $0 = value
+            onSet(value)
+        }
     }
 }
 
 // MARK: -
 
-public class TestableFlag {
-    private let defaultValue: Bool
-    private let flag: AtomicBool
+public struct MenuTestableFlagOption {
     public let title: String
-    public let details: String
-    public let toggleHandler: ((Bool) -> Void)?
+    public let isSelected: Bool
+    public let select: () -> Void
+}
 
-    fileprivate init(_ defaultValue: Bool,
-                     title: String,
-                     details: String,
-                     toggleHandler: ((Bool) -> Void)? = nil) {
-        self.defaultValue = defaultValue
-        self.title = title
-        self.details = details
-        self.flag = AtomicBool(defaultValue, lock: .sharedGlobal)
-        self.toggleHandler = toggleHandler
+/// See `AnyTestableFlag`.
+public protocol AnyMenuTestableFlag: AnyTestableFlag {
+    var menuOptions: [MenuTestableFlagOption] { get }
+}
 
-        // Normally we'd store the observer here and remove it in deinit.
-        // But TestableFlags are always static; they don't *get* deinitialized except in testing.
-        NotificationCenter.default.addObserver(forName: Self.ResetAllTestableFlagsNotification,
-                                               object: nil, queue: nil) { [weak self] _ in
-            guard let self = self else { return }
-            self.set(self.defaultValue)
+/// A `TestableFlag` whose discrete options are presented in a menu.
+public class MenuTestableFlag<Value: CaseIterable & Equatable>:
+    TestableFlag<Value?>,
+    AnyMenuTestableFlag
+{
+    public var menuOptions: [MenuTestableFlagOption] {
+        let selectedValue = get()
+
+        let nilOption = MenuTestableFlagOption(
+            title: "unset",
+            isSelected: selectedValue == nil,
+            select: { [weak self] in
+                self?.set(nil)
+            },
+        )
+
+        return [nilOption] + Value.allCases.map { value in
+            MenuTestableFlagOption(
+                title: String(describing: value),
+                isSelected: selectedValue == value,
+                select: { [weak self] in
+                    self?.set(value)
+                },
+            )
         }
     }
-
-    public func get() -> Bool {
-        guard build <= .internal else {
-            return defaultValue
-        }
-        return flag.get()
-    }
-
-    public func set(_ value: Bool) {
-        flag.set(value)
-
-        toggleHandler?(value)
-    }
-
-    @objc
-    private func switchDidChange(_ sender: UISwitch) {
-        set(sender.isOn)
-    }
-
-    public var switchSelector: Selector { #selector(switchDidChange(_:)) }
-
-    public static let ResetAllTestableFlagsNotification = NSNotification.Name("ResetAllTestableFlags")
 }

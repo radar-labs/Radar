@@ -4,83 +4,104 @@
 //
 
 public import Contacts
-import Mantle
+public import LibSignalClient
 
 public protocol OWSContactField: AnyObject {
-
     var isValid: Bool { get }
-
     var localizedLabel: String { get }
 }
 
 // MARK: - OWSContact
 
 @objc(OWSContact)
-public class OWSContact: MTLModel {
+public final class OWSContact: NSObject, NSSecureCoding, NSCopying {
+    public static var supportsSecureCoding: Bool { true }
 
-    @objc
-    public var name: OWSContactName
+    public init?(coder: NSCoder) {
+        self.aci = Aci.parseFrom(aciString: coder.decodeObject(of: NSString.self, forKey: "aci") as String?)
+        self.addresses = coder.decodeArrayOfObjects(ofClass: OWSContactAddress.self, forKey: "addresses") ?? []
+        self.emails = coder.decodeArrayOfObjects(ofClass: OWSContactEmail.self, forKey: "emails") ?? []
+        self.name = coder.decodeObject(of: OWSContactName.self, forKey: "name") ?? OWSContactName()
+        self.nickname = coder.decodeObject(of: NSPersonNameComponents.self, forKey: "nickname") as PersonNameComponents?
+        self.note = coder.decodeObject(of: NSString.self, forKey: "note") as String?
+        self.phoneNumbers = coder.decodeArrayOfObjects(ofClass: OWSContactPhoneNumber.self, forKey: "phoneNumbers") ?? []
+    }
 
-    @objc
-    public var phoneNumbers: [OWSContactPhoneNumber] = []
-    @objc
-    public var emails: [OWSContactEmail] = []
-    @objc
-    public var addresses: [OWSContactAddress] = []
+    public func encode(with coder: NSCoder) {
+        coder.encode(self.aci?.serviceIdUppercaseString, forKey: "aci")
+        coder.encode(self.addresses, forKey: "addresses")
+        coder.encode(self.emails, forKey: "emails")
+        coder.encode(self.name, forKey: "name")
+        coder.encode(self.nickname as NSPersonNameComponents?, forKey: "nickname")
+        coder.encode(self.note, forKey: "note")
+        coder.encode(self.phoneNumbers, forKey: "phoneNumbers")
+    }
 
-    @objc
-    private var avatarAttachmentId: String?
+    override public var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(aci)
+        hasher.combine(addresses)
+        hasher.combine(emails)
+        hasher.combine(name)
+        hasher.combine(nickname)
+        hasher.combine(note)
+        hasher.combine(phoneNumbers)
+        return hasher.finalize()
+    }
 
-    public var legacyAvatarAttachmentId: String? { avatarAttachmentId }
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard type(of: self) == type(of: object) else { return false }
+        guard self.aci == object.aci else { return false }
+        guard self.addresses == object.addresses else { return false }
+        guard self.emails == object.emails else { return false }
+        guard self.name == object.name else { return false }
+        guard self.nickname == object.nickname else { return false }
+        guard self.note == object.note else { return false }
+        guard self.phoneNumbers == object.phoneNumbers else { return false }
+        return true
+    }
 
-    public var isValid: Bool {
-        return Self.isValid(
+    public func copy(with zone: NSZone? = nil) -> Any {
+        return Self(
             name: name,
             phoneNumbers: phoneNumbers,
             emails: emails,
-            addresses: addresses
+            addresses: addresses,
+            aci: aci,
+            nickname: nickname,
+            note: note,
         )
     }
 
-    public static func isValid(
-        name: OWSContactName,
-        phoneNumbers: [OWSContactPhoneNumber],
-        emails: [OWSContactEmail],
-        addresses: [OWSContactAddress]
-    ) -> Bool {
+    public var name: OWSContactName
+    public var phoneNumbers: [OWSContactPhoneNumber]
+    public var emails: [OWSContactEmail]
+    public var addresses: [OWSContactAddress]
+    public var aci: Aci?
+    public var nickname: PersonNameComponents?
+    public var note: String?
+
+    public var isValid: Bool {
+        Self.isValid(name: name)
+    }
+
+    public static func isValid(name: OWSContactName) -> Bool {
         guard !name.displayName.stripped.isEmpty else {
             Logger.warn("invalid contact; no display name.")
             return false
         }
-        var hasValue = false
-        for phoneNumber in phoneNumbers {
-            guard phoneNumber.isValid else {
-                return false
-            }
-            hasValue = true
-        }
-        for email in emails {
-            guard email.isValid else {
-                return false
-            }
-            hasValue = true
-        }
-        for address in addresses {
-            guard address.isValid else {
-                return false
-            }
-            hasValue = true
-        }
-        return hasValue
-    }
-
-    public override init() {
-        self.name = OWSContactName()
-        super.init()
+        return true
     }
 
     public init(name: OWSContactName) {
         self.name = name
+        self.addresses = []
+        self.emails = []
+        self.phoneNumbers = []
+        self.aci = nil
+        self.nickname = nil
+        self.note = nil
         super.init()
         name.updateDisplayName()
     }
@@ -90,37 +111,31 @@ public class OWSContact: MTLModel {
         phoneNumbers: [OWSContactPhoneNumber],
         emails: [OWSContactEmail],
         addresses: [OWSContactAddress],
-        avatarAttachmentId: String?
+        aci: Aci?,
+        nickname: PersonNameComponents?,
+        note: String?,
     ) {
         self.name = name
         self.phoneNumbers = phoneNumbers
         self.emails = emails
         self.addresses = addresses
-        self.avatarAttachmentId = avatarAttachmentId
+        self.aci = aci
+        self.nickname = nickname
+        self.note = note
         super.init()
     }
 
-    required init!(coder: NSCoder!) {
-        self.name = OWSContactName()
-        super.init(coder: coder)
-    }
-
-    required init(dictionary dictionaryValue: [String: Any]!) throws {
-        self.name = OWSContactName()
-        try super.init(dictionary: dictionaryValue)
-    }
-
     public func copy(with name: OWSContactName) -> OWSContact {
-        let contactCopy = self.copy() as! OWSContact
-        contactCopy.name = name
         name.updateDisplayName()
-        return contactCopy
-    }
-
-    // MARK: Avatar
-
-    public func setLegacyAvatarAttachmentId(_ attachmentId: String) {
-        self.avatarAttachmentId = attachmentId
+        return Self(
+            name: name,
+            phoneNumbers: self.phoneNumbers,
+            emails: self.emails,
+            addresses: self.addresses,
+            aci: self.aci,
+            nickname: self.nickname,
+            note: self.note,
+        )
     }
 
     // MARK: Phone Numbers and Recipient IDs
@@ -128,15 +143,15 @@ public class OWSContact: MTLModel {
     private var e164PhoneNumbersCached: [String]?
 
     public struct PhoneNumberPartition {
-        fileprivate(set) public var sendablePhoneNumbers = [String]()
-        fileprivate(set) public var invitablePhoneNumbers = [String]()
-        fileprivate(set) public var addablePhoneNumbers = [String]()
+        public fileprivate(set) var sendablePhoneNumbers = [String]()
+        public fileprivate(set) var invitablePhoneNumbers = [String]()
+        public fileprivate(set) var addablePhoneNumbers = [String]()
 
         public func map<T>(
             ifSendablePhoneNumbers: ([String]) -> T,
             elseIfInvitablePhoneNumbers: ([String]) -> T,
             elseIfAddablePhoneNumbers: ([String]) -> T,
-            elseIfNoPhoneNumbers: () -> T
+            elseIfNoPhoneNumbers: () -> T,
         ) -> T {
             if !sendablePhoneNumbers.isEmpty {
                 return ifSendablePhoneNumbers(sendablePhoneNumbers)
@@ -164,7 +179,7 @@ public class OWSContact: MTLModel {
             return PhoneNumberStatus(
                 phoneNumber: phoneNumber,
                 isSystemContact: SSKEnvironment.shared.contactManagerRef.cnContactId(for: phoneNumber) != nil,
-                canLinkToSystemContact: recipient?.isRegistered == true
+                canLinkToSystemContact: recipient?.isRegistered == true,
             )
         }
         var result = PhoneNumberPartition()
@@ -205,14 +220,14 @@ public class OWSContact: MTLModel {
 extension OWSContact {
 
     public convenience init(cnContact: CNContact) {
-        // Name
-        let contactName = OWSContactName(cnContact: cnContact)
         self.init(
-            name: contactName,
+            name: OWSContactName(cnContact: cnContact),
             phoneNumbers: cnContact.phoneNumbers.map { OWSContactPhoneNumber(cnLabeledValue: $0) },
             emails: cnContact.emailAddresses.map { OWSContactEmail(cnLabeledValue: $0) },
             addresses: cnContact.postalAddresses.map { OWSContactAddress(cnLabeledValue: $0) },
-            avatarAttachmentId: nil
+            aci: nil,
+            nickname: nil,
+            note: nil,
         )
     }
 

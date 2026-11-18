@@ -9,7 +9,7 @@ import Foundation
 public enum QuotedMessageAttachmentReference {
     /// The quoted message had a thumbnail-able attachment, so
     /// we created a thumbnail and reference it here.
-    case thumbnail(AttachmentReference)
+    case thumbnail(ReferencedAttachment)
 
     /// The quoted message had an attachment, but it couldn't be captured
     /// as a thumbnail (e.g. it was a generic file). We don't actually reference
@@ -20,26 +20,6 @@ public enum QuotedMessageAttachmentReference {
     public struct Stub: Equatable {
         public let mimeType: String?
         public let sourceFilename: String?
-
-        public init?(mimeType: String?, sourceFilename: String?) {
-            // Need at least one, otherwise there's no point!
-            guard mimeType != nil || sourceFilename != nil else {
-                return nil
-            }
-            self.mimeType = mimeType
-            self.sourceFilename = sourceFilename
-        }
-
-        public init(mimeType: String, sourceFilename: String?) {
-            self.mimeType = mimeType
-            self.sourceFilename = sourceFilename
-        }
-
-        public init?(_ info: OWSAttachmentInfo) {
-            self.init(
-                mimeType: info.originalAttachmentMimeType,
-                sourceFilename: info.originalAttachmentSourceFilename
-            )
-        }
+        public let renderingFlag: AttachmentReference.RenderingFlag?
     }
 }

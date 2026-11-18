@@ -6,6 +6,6 @@
 import UIKit
 
 public protocol CustomBackgroundColorCell: UITableViewCell {
-    func customBackgroundColor(forceDarkMode: Bool) -> UIColor
-    func customSelectedBackgroundColor(forceDarkMode: Bool) -> UIColor
+    var customBackgroundColor: UIColor { get }
+    var customSelectedBackgroundColor: UIColor { get }
 }

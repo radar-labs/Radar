@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import SignalServiceKit
 import LibSignalClient
+import SignalServiceKit
 import SignalUI
 import SwiftUI
 
@@ -25,9 +25,10 @@ class PollDetailsViewController: HostingController<PollDetailsView> {
         message: TSMessage,
         pollManager: PollMessageManager,
         db: DB,
-        databaseChangeObserver: DatabaseChangeObserver
+        databaseChangeObserver: DatabaseChangeObserver,
+        isTerminatedGroup: Bool,
     ) {
-        self.viewModel = PollDetailsViewModel(poll: poll)
+        self.viewModel = PollDetailsViewModel(poll: poll, isTerminatedGroup: isTerminatedGroup)
         self.message = message
         self.pollManager = pollManager
         self.db = db
@@ -70,7 +71,7 @@ extension PollDetailsViewController: PollDetailsViewModel.ActionsDelegate {
         ProfileSheetSheetCoordinator(
             address: address,
             groupViewHelper: nil,
-            spoilerState: SpoilerRenderState()
+            spoilerState: SpoilerRenderState(),
         )
         .presentAppropriateSheet(from: self)
     }
@@ -78,9 +79,11 @@ extension PollDetailsViewController: PollDetailsViewModel.ActionsDelegate {
 
 private class PollDetailsViewModel: ObservableObject {
     @Published var poll: OWSPoll
+    let isTerminatedGroup: Bool
 
-    init(poll: OWSPoll) {
+    init(poll: OWSPoll, isTerminatedGroup: Bool) {
         self.poll = poll
+        self.isTerminatedGroup = isTerminatedGroup
     }
 
     protocol ActionsDelegate: AnyObject {
@@ -99,16 +102,16 @@ private class PollDetailsViewModel: ObservableObject {
         OWSActionSheets.showConfirmationAlert(
             title: OWSLocalizedString(
                 "POLL_END_CONFIRMATION",
-                comment: "Title for an action sheet confirming the user wants end a poll."
+                comment: "Title for an action sheet confirming the user wants end a poll.",
             ),
             message: OWSLocalizedString(
                 "POLL_END_CONFIRMATION_MESSAGE",
-                comment: "Message for an action sheet confirming the user wants to end a poll."
+                comment: "Message for an action sheet confirming the user wants to end a poll.",
             ),
             proceedTitle: CommonStrings.okButton,
             proceedAction: { [weak self] _ in
                 self?.actionsDelegate?.pollTerminate()
-            }
+            },
         )
     }
 
@@ -139,12 +142,12 @@ struct PollDetailsView: View {
                     Text(
                         OWSLocalizedString(
                             "POLL_QUESTION_LABEL",
-                            comment: "Header for the poll question text box when making a new poll"
-                        )
+                            comment: "Header for the poll question text box when making a new poll",
+                        ),
                     )
                 }
                 if #unavailable(iOS 26) {
-                    if !poll.isEnded, poll.ownerIsLocalUser {
+                    if !poll.isEnded, poll.ownerIsLocalUser, !viewModel.isTerminatedGroup {
                         SignalSection {
                             Button {
                                 viewModel.pollTerminate()
@@ -170,7 +173,7 @@ struct PollDetailsView: View {
                                 address: SignalServiceAddress(aci),
                                 onTap: { address in
                                     viewModel.presentContactSheet(address: address)
-                                }
+                                },
                             )
                             .padding(.vertical, 1)
                             .padding(.horizontal, 4)
@@ -178,7 +181,7 @@ struct PollDetailsView: View {
                         if option.acis.count == 0 {
                             Text(OWSLocalizedString(
                                 "POLL_NO_VOTES",
-                                comment: "String to display when a poll has no votes"
+                                comment: "String to display when a poll has no votes",
                             ))
                             .font(.body)
                             .foregroundColor(Color.Signal.secondaryLabel)
@@ -190,7 +193,7 @@ struct PollDetailsView: View {
                                 .fontWeight(.medium)
                             Spacer()
                             if option.acis.count > 0 {
-                                if poll.isEnded && option.acis.count == maxVotes {
+                                if option.acis.count == maxVotes {
                                     Image("poll-win")
                                 }
                                 Text(
@@ -198,10 +201,10 @@ struct PollDetailsView: View {
                                         OWSLocalizedString(
                                             "POLL_VOTE_COUNT",
                                             tableName: "PluralAware",
-                                            comment: "Count indicating number of votes for this option. Embeds {{number of votes}}"
+                                            comment: "Count indicating number of votes for this option. Embeds {{number of votes}}",
                                         ),
-                                        option.acis.count
-                                    )
+                                        option.acis.count,
+                                    ),
                                 )
                                 .font(.body)
                             }
@@ -212,7 +215,7 @@ struct PollDetailsView: View {
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if #available(iOS 26.0, *) {
-                if !poll.isEnded, poll.ownerIsLocalUser {
+                if !poll.isEnded, poll.ownerIsLocalUser, !viewModel.isTerminatedGroup {
                     Button {
                         viewModel.pollTerminate()
                     } label: {
@@ -246,7 +249,7 @@ struct PollDetailsView: View {
 
     struct ContactRow: UIViewRepresentable {
         let address: SignalServiceAddress
-        var onTap: ((SignalServiceAddress) -> Void)
+        var onTap: (SignalServiceAddress) -> Void
 
         func updateUIView(_ uiView: ManualStackView, context: Context) {
         }
@@ -261,7 +264,7 @@ struct PollDetailsView: View {
 
         private func addressCell(address: SignalServiceAddress) -> ManualStackView? {
             let cell = ContactCellView()
-            let config = ContactCellConfiguration(address: address, localUserDisplayMode: .asLocalUser)
+            var config = ContactCellView.Configuration(address: address, localUserDisplayMode: .asLocalUser)
             config.avatarSizeClass = .twentyEight
 
             SSKEnvironment.shared.databaseStorageRef.read { transaction in
@@ -284,14 +287,14 @@ struct PollDetailsView: View {
         allowsMultiSelect: false,
         votes: [:],
         isEnded: false,
-        ownerIsLocalUser: false
+        ownerIsLocalUser: false,
     )
 
-    PollDetailsView(viewModel: PollDetailsViewModel(poll: poll))
+    PollDetailsView(viewModel: PollDetailsViewModel(poll: poll, isTerminatedGroup: false))
 }
 
 extension PollDetailsViewController: DatabaseChangeDelegate {
-    func databaseChangesDidUpdate(databaseChanges: any SignalServiceKit.DatabaseChanges) {
+    func databaseChangesDidUpdate(databaseChanges: SignalServiceKit.DatabaseChanges) {
         guard databaseChanges.interactionUniqueIds.contains(message.uniqueId) else {
             return
         }

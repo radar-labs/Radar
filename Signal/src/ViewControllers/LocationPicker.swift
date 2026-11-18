@@ -12,7 +12,7 @@ import Contacts
 import CoreLocation
 import CoreServices
 public import MapKit
-public import SignalServiceKit
+import SignalServiceKit
 import SignalUI
 import UniformTypeIdentifiers
 
@@ -54,7 +54,7 @@ public class LocationPicker: UIViewController {
         geocoder.cancelGeocode()
     }
 
-    open override func loadView() {
+    override open func loadView() {
         view = mapView
 
         let currentLocationButton = UIButton()
@@ -70,19 +70,18 @@ public class LocationPicker: UIViewController {
         currentLocationButton.autoSetDimensions(to: CGSize(square: 48))
         currentLocationButton.autoPinEdge(toSuperviewSafeArea: .trailing, withInset: 15)
         currentLocationButton.autoPinEdge(toSuperviewSafeArea: .bottom, withInset: 15)
-
-        currentLocationButton.addTarget(self, action: #selector(didPressCurrentLocation), for: .touchUpInside)
+        currentLocationButton.addAction(
+            UIAction { [weak self] _ in self?.didPressCurrentLocation() },
+            for: .primaryActionTriggered,
+        )
     }
 
-    open override func viewDidLoad() {
+    override open func viewDidLoad() {
         super.viewDidLoad()
 
         title = OWSLocalizedString("LOCATION_PICKER_TITLE", comment: "The title for the location picker view")
 
-        navigationItem.rightBarButtonItem = .button(
-            icon: .buttonX,
-            style: .plain
-        ) { [weak delegate] in
+        navigationItem.rightBarButtonItem = .closeButton { [weak delegate] in
             delegate?.locationPickerDidCancel()
         }
 
@@ -92,24 +91,8 @@ public class LocationPicker: UIViewController {
         let searchBar = self.searchController.searchBar
         searchBar.placeholder = OWSLocalizedString(
             "LOCATION_PICKER_SEARCH_PLACEHOLDER",
-            comment: "A string indicating that the user can search for a location"
+            comment: "A string indicating that the user can search for a location",
         )
-
-        if #unavailable(iOS 26) {
-            OWSSearchBar.applyTheme(to: searchBar)
-            searchBar.isTranslucent = true
-
-            // When the search bar isn't translucent, it doesn't allow
-            // setting the textField's backgroundColor. Instead, we need
-            // to use the background image.
-            let backgroundImage = UIImage.image(
-                color: Theme.searchFieldBackgroundColor,
-                size: CGSize(square: 36)
-            ).withCornerRadius(10)
-            searchBar.setSearchFieldBackgroundImage(backgroundImage, for: .normal)
-            searchBar.searchTextPositionAdjustment = UIOffset(horizontal: 8.0, vertical: 0.0)
-            searchBar.textField?.backgroundColor = .clear
-        }
 
         navigationItem.searchController = searchController
         definesPresentationContext = true
@@ -124,17 +107,16 @@ public class LocationPicker: UIViewController {
         showCurrentLocation(requestAuthorizationIfNecessary: false)
     }
 
-    public override func viewWillAppear(_ animated: Bool) {
+    override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.isTranslucent = true
     }
 
-    public override func viewWillDisappear(_ animated: Bool) {
+    override public func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
         navigationController?.navigationBar.isTranslucent = true
     }
 
-    @objc
     private func didPressCurrentLocation() {
         showCurrentLocation()
     }
@@ -154,15 +136,19 @@ public class LocationPicker: UIViewController {
         case .denied, .restricted:
             // The user previous explicitly denied access. Point them to settings to re-enable.
             let alert = ActionSheetController(
-                title: OWSLocalizedString("MISSING_LOCATION_PERMISSION_TITLE",
-                                         comment: "Alert title indicating the user has denied location permissions"),
-                message: OWSLocalizedString("MISSING_LOCATION_PERMISSION_MESSAGE",
-                                           comment: "Alert body indicating the user has denied location permissions")
+                title: OWSLocalizedString(
+                    "MISSING_LOCATION_PERMISSION_TITLE",
+                    comment: "Alert title indicating the user has denied location permissions",
+                ),
+                message: OWSLocalizedString(
+                    "MISSING_LOCATION_PERMISSION_MESSAGE",
+                    comment: "Alert body indicating the user has denied location permissions",
+                ),
             )
             let openSettingsAction = ActionSheetAction(
                 title: CommonStrings.openSystemSettingsButton,
-                style: .default
-            ) { _ in UIApplication.shared.openSystemSettings()  }
+                style: .default,
+            ) { _ in UIApplication.shared.openSystemSettings() }
             alert.addAction(openSettingsAction)
 
             let dismissAction = ActionSheetAction(title: CommonStrings.dismissButton, style: .cancel, handler: nil)
@@ -175,7 +161,7 @@ public class LocationPicker: UIViewController {
 
     func updateAnnotation() {
         mapView.removeAnnotations(mapView.annotations)
-        if let location = location {
+        if let location {
             mapView.addAnnotation(location)
             mapView.selectAnnotation(location, animated: true)
         }
@@ -199,11 +185,14 @@ public class LocationPicker: UIViewController {
             let error = error as NSError?
             let geocodeCanceled = error?.domain == kCLErrorDomain && error?.code == CLError.Code.geocodeCanceled.rawValue
 
-            if let error = error, !geocodeCanceled {
+            if let error, !geocodeCanceled {
                 // show error and remove annotation
                 let alert = ActionSheetController(title: nil, message: error.userErrorDescription)
-                alert.addAction(ActionSheetAction(title: CommonStrings.okayButton,
-                                              style: .cancel, handler: { _ in }))
+                alert.addAction(ActionSheetAction(
+                    title: CommonStrings.okayButton,
+                    style: .cancel,
+                    handler: { _ in },
+                ))
                 self.present(alert, animated: true) {
                     self.mapView.removeAnnotation(annotation)
                 }
@@ -271,7 +260,7 @@ extension LocationPicker: UISearchResultsUpdating {
 
             request.region = MKCoordinateRegion(
                 center: location.coordinate,
-                span: MKCoordinateSpan(latitudeDelta: latlongDelta, longitudeDelta: latlongDelta)
+                span: MKCoordinateSpan(latitudeDelta: latlongDelta, longitudeDelta: latlongDelta),
             )
         }
 
@@ -318,7 +307,7 @@ extension LocationPicker: MKMapViewDelegate {
         if annotation is MKUserLocation { return nil }
 
         let pin = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "annotation")
-        pin.pinTintColor = Theme.accentBlueColor
+        pin.pinTintColor = .Signal.accent
         pin.animatesDrop = annotation is MKPointAnnotation
         pin.rightCalloutAccessoryView = sendLocationButton()
         pin.canShowCallout = true
@@ -333,7 +322,7 @@ extension LocationPicker: MKMapViewDelegate {
     }
 
     public func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
-        if let location = location {
+        if let location {
             delegate?.didPickLocation(self, location: location)
         }
 
@@ -430,7 +419,7 @@ public class Location: NSObject {
         options.region = MKCoordinateRegion(
             center: self.coordinate,
             latitudinalMeters: metersOffset,
-            longitudinalMeters: metersOffset
+            longitudinalMeters: metersOffset,
         )
 
         // The output size will be 256 * the device's scale. We don't adjust the
@@ -446,7 +435,7 @@ public class Location: NSObject {
         snapshot.image.draw(at: .zero)
 
         let pinView = MKPinAnnotationView(annotation: nil, reuseIdentifier: nil)
-        pinView.pinTintColor = Theme.accentBlueColor
+        pinView.pinTintColor = .Signal.accent
         let pinImage = pinView.image
 
         var point = snapshot.point(for: self.coordinate)
@@ -475,16 +464,11 @@ public class Location: NSObject {
         self.placemark = placemark
     }
 
-    public func prepareAttachment() async throws -> SignalAttachment {
+    func prepareAttachment() async throws -> SendableAttachment {
         let image = try await generateSnapshot()
-        guard let jpegData = image.jpegData(compressionQuality: 1.0) else {
-            throw LocationError.assertion
-        }
-        let dataSource = DataSourceValue(jpegData, utiType: UTType.jpeg.identifier)
-        guard let dataSource else {
-            throw SignalAttachmentError.missingData
-        }
-        return try SignalAttachment.imageAttachment(dataSource: dataSource, dataUTI: UTType.jpeg.identifier)
+        let normalizedImage = try NormalizedImage.forImage(image)
+        let previewableAttachment = PreviewableAttachment.imageAttachmentForNormalizedImage(normalizedImage)
+        return try await SendableAttachment.forPreviewableAttachment(previewableAttachment, imageQualityLevel: .one)
     }
 
     public var messageText: String {
@@ -494,7 +478,7 @@ public class Location: NSObject {
         //
         // https://maps.google.com/maps
 
-        if let address = address {
+        if let address {
             return address + "\n\n" + urlString
         } else {
             return urlString
@@ -509,10 +493,12 @@ extension Location: MKAnnotation {
     }
 
     public var title: String? {
-        if let name = name {
+        if let name {
             return name
-        } else if let postalAddress = placemark.postalAddress,
-                  let firstAddressLine = Location.postalAddressFormatter.string(from: postalAddress).components(separatedBy: .newlines).first {
+        } else if
+            let postalAddress = placemark.postalAddress,
+            let firstAddressLine = Location.postalAddressFormatter.string(from: postalAddress).components(separatedBy: .newlines).first
+        {
             return firstAddressLine
         } else {
             return "\(coordinate.latitude), \(coordinate.longitude)"

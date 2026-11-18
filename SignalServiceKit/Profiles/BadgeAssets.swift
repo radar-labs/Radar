@@ -6,22 +6,13 @@
 import CoreServices
 import Foundation
 import ImageIO
+public import UIKit
 import UniformTypeIdentifiers
 
-public class BadgeAssets {
-    private let scale: Int
-    private let remoteSourceUrl: URL
-    private let localAssetDirectory: URL
-
-    private enum State: Equatable {
-        case initialized
-        case fetching
-        case fetched
-        case failed
-        case unavailable
-    }
-    private var lockedState = TSMutex(initialState: State.initialized)
-    public var isFetching: Bool { lockedState.withLock { $0 == .fetching } }
+public struct BadgeAssets {
+    fileprivate let scale: Int
+    fileprivate let remoteSourceUrl: URL
+    fileprivate let localAssetDirectory: URL
 
     fileprivate enum Variant: String, CaseIterable {
         case light16
@@ -52,56 +43,92 @@ public class BadgeAssets {
         self.localAssetDirectory = localAssetDirectory
     }
 
-    private func fileUrlForSpritesheet() -> URL {
+    fileprivate func fileUrlForSpritesheet() -> URL {
         localAssetDirectory.appendingPathComponent("spritesheet")
     }
 
-    private func fileUrlForVariant(_ variant: Variant) -> URL {
+    fileprivate func fileUrlForVariant(_ variant: Variant) -> URL {
         localAssetDirectory.appendingPathComponent(variant.rawValue)
     }
 
-    // MARK: - Sprite fetching
+    // MARK: - Sprite retrieval
 
-    func prepareAssetsIfNecessary() async throws {
-        let shouldFetch: Bool = lockedState.withLock { state in
-            // If we're already fetching, or have hit a terminal state, there's nothing left to do
-            guard state != .fetching, state != .fetched, state != .unavailable else { return false }
+    public var light16: UIImage? { imageForVariant(.light16) }
+    public var light24: UIImage? { imageForVariant(.light24) }
+    public var light36: UIImage? { imageForVariant(.light36) }
+    public var dark16: UIImage? { imageForVariant(.dark16) }
+    public var dark24: UIImage? { imageForVariant(.dark24) }
+    public var dark36: UIImage? { imageForVariant(.dark36) }
+    public var universal64: UIImage? { imageForVariant(.universal64) }
+    public var universal112: UIImage? { imageForVariant(.universal112) }
+    public var universal160: UIImage? { imageForVariant(.universal160) }
 
-            guard !CurrentAppContext().isNSE else {
-                Logger.info("Badge assets unavailable. Currently running in the NSE")
-                state = .unavailable
-                return false
-            }
+    private func imageForVariant(_ variant: Variant) -> UIImage? {
+        let fileUrl = fileUrlForVariant(variant)
 
-            // If we have all our assets on disk, we're good to go
-            let allAssetUrls = [fileUrlForSpritesheet()] + Variant.allCases.map { fileUrlForVariant($0) }
-            guard allAssetUrls.contains(where: { OWSFileSystem.fileOrFolderExists(url: $0) == false }) else {
-                state = .fetched
-                return false
-            }
-
-            guard CurrentAppContext().isMainApp else {
-                // The share extension can display badges that we've fetched, but we'll save fetching badges
-                // we don't have for the main app.
-                Logger.info("Skipping badge fetch. Not in main app.")
-                state = .unavailable
-                return false
-            }
-
-            state = .fetching
-            return true
+        guard
+            OWSFileSystem.fileOrFolderExists(url: fileUrl),
+            let imageSource = CGImageSourceCreateWithURL(fileUrl as CFURL, nil)
+        else {
+            return nil
         }
 
-        guard shouldFetch else { return }
+        let imageOptions = [kCGImageSourceShouldCache: kCFBooleanFalse] as CFDictionary
+        guard let rawImage = CGImageSourceCreateImageAtIndex(imageSource, 0, imageOptions) else {
+            owsFailDebug("Couldn't load image")
+            return nil
+        }
+
+        let imageScale: CGFloat
+        switch CGSize(width: rawImage.width, height: rawImage.height) {
+        case CGSize.scale(variant.pointSize, factor: 1.0): imageScale = 1.0
+        case CGSize.scale(variant.pointSize, factor: 2.0): imageScale = 2.0
+        case CGSize.scale(variant.pointSize, factor: 3.0): imageScale = 3.0
+        default:
+            owsFailDebug("Bad scale")
+            return nil
+        }
+
+        return UIImage(cgImage: rawImage, scale: imageScale, orientation: .up)
+    }
+}
+
+// MARK: -
+
+public struct BadgeAssetsFetcher {
+    private typealias Variant = BadgeAssets.Variant
+
+    private let badgeAssets: BadgeAssets
+    private var scale: Int { badgeAssets.scale }
+    private var remoteSourceUrl: URL { badgeAssets.remoteSourceUrl }
+    private var localAssetDirectory: URL { badgeAssets.localAssetDirectory }
+
+    init(badgeAssets: BadgeAssets) {
+        self.badgeAssets = badgeAssets
+    }
+
+    private func fileUrlForSpritesheet() -> URL {
+        badgeAssets.fileUrlForSpritesheet()
+    }
+
+    private func fileUrlForVariant(_ variant: Variant) -> URL {
+        badgeAssets.fileUrlForVariant(variant)
+    }
+
+    func fetchAssetsIfNecessary() async throws {
+        guard CurrentAppContext().isMainApp else {
+            return
+        }
+
+        // If we have all our assets on disk, we're good to go
+        let allAssetUrls = [fileUrlForSpritesheet()] + Variant.allCases.map { fileUrlForVariant($0) }
+        if allAssetUrls.allSatisfy({ OWSFileSystem.fileOrFolderExists(url: $0) }) {
+            return
+        }
+
         OWSFileSystem.ensureDirectoryExists(localAssetDirectory.path)
-        do {
-            try await fetchSpritesheetIfNecessary()
-            try extractSpritesFromSpritesheetIfNecessary()
-            lockedState.withLock { $0 = .fetched }
-        } catch {
-            owsFailDebug("Failed to fetch badge assets with error: \(error)")
-            lockedState.withLock { $0 = .failed }
-        }
+        try await fetchSpritesheetIfNecessary()
+        try extractSpritesFromSpritesheetIfNecessary()
     }
 
     private func fetchSpritesheetIfNecessary() async throws {
@@ -110,13 +137,10 @@ public class BadgeAssets {
 
         // TODO: Badges — Censorship circumvention
         let urlSession = SSKEnvironment.shared.signalServiceRef.urlSessionForUpdates2()
-        let result = try await urlSession.performDownload(remoteSourceUrl.absoluteString, method: .get)
+        let result = try await urlSession.performDownload(remoteSourceUrl.absoluteString, method: .get, maxResponseSize: .max)
         let resultUrl = result.downloadUrl
         guard OWSFileSystem.fileOrFolderExists(url: resultUrl) else {
             throw OWSAssertionError("Sprite url missing")
-        }
-        guard (try? DataImageSource.forPath(resultUrl.path))?.ows_isValidImage ?? false else {
-            throw OWSAssertionError("Invalid sprite")
         }
         try OWSFileSystem.moveFile(from: resultUrl, to: spriteUrl)
     }
@@ -140,54 +164,15 @@ public class BadgeAssets {
             let destinationUrl = fileUrlForVariant(variant)
             guard !OWSFileSystem.fileOrFolderExists(url: destinationUrl) else { return }
 
-            guard let spriteImage = spriteParser.copySprite(variant: variant),
-                  let imageDestination = CGImageDestinationCreateWithURL(destinationUrl as CFURL, UTType.png.identifier as CFString, 1, nil) else {
-                      throw OWSAssertionError("Couldn't load image")
-                  }
+            guard
+                let spriteImage = spriteParser.copySprite(variant: variant),
+                let imageDestination = CGImageDestinationCreateWithURL(destinationUrl as CFURL, UTType.png.identifier as CFString, 1, nil)
+            else {
+                throw OWSAssertionError("Couldn't load image")
+            }
             CGImageDestinationAddImage(imageDestination, spriteImage, nil)
             CGImageDestinationFinalize(imageDestination)
         }
-    }
-}
-// MARK: - Sprite retrieval
-extension BadgeAssets {
-
-    // TODO: Badges — Lazy initialization? Double check backing memory is all purgable
-    public var light16: UIImage? { imageForVariant(.light16) }
-    public var light24: UIImage? { imageForVariant(.light24) }
-    public var light36: UIImage? { imageForVariant(.light36) }
-    public var dark16: UIImage? { imageForVariant(.dark16) }
-    public var dark24: UIImage? { imageForVariant(.dark24) }
-    public var dark36: UIImage? { imageForVariant(.dark36) }
-    public var universal64: UIImage? { imageForVariant(.universal64) }
-    public var universal112: UIImage? { imageForVariant(.universal112) }
-    public var universal160: UIImage? { imageForVariant(.universal160) }
-
-    private func imageForVariant(_ variant: Variant) -> UIImage? {
-        guard lockedState.withLock({ $0 == .fetched }) else {
-            return nil
-        }
-
-        let fileUrl = fileUrlForVariant(variant)
-        guard let imageSource = CGImageSourceCreateWithURL(fileUrl as CFURL, nil) else { return nil }
-
-        let imageOptions = [kCGImageSourceShouldCache: kCFBooleanFalse] as CFDictionary
-        guard let rawImage = CGImageSourceCreateImageAtIndex(imageSource, 0, imageOptions) else {
-            owsFailDebug("Couldn't load image")
-            return nil
-        }
-
-        let imageScale: CGFloat
-        switch CGSize(width: rawImage.width, height: rawImage.height) {
-        case CGSize.scale(variant.pointSize, factor: 1.0): imageScale = 1.0
-        case CGSize.scale(variant.pointSize, factor: 2.0): imageScale = 2.0
-        case CGSize.scale(variant.pointSize, factor: 3.0): imageScale = 3.0
-        default:
-            owsFailDebug("Bad scale")
-            return nil
-        }
-
-        return UIImage(cgImage: rawImage, scale: imageScale, orientation: .up)
     }
 }
 
@@ -216,7 +201,7 @@ private class DefaultSpriteSheetParser {
         .dark36: [CGPoint(x: 163, y: 57), CGPoint(x: 323, y: 109), CGPoint(x: 483, y: 161)],
         .universal64: [CGPoint(x: 163, y: 97), CGPoint(x: 323, y: 193), CGPoint(x: 483, y: 289)],
         .universal112: [CGPoint(x: 233, y: 1), CGPoint(x: 457, y: 1), CGPoint(x: 681, y: 1)],
-        .universal160: [CGPoint(x: 1, y: 1), CGPoint(x: 1, y: 1), CGPoint(x: 1, y: 1)]
+        .universal160: [CGPoint(x: 1, y: 1), CGPoint(x: 1, y: 1), CGPoint(x: 1, y: 1)],
     ]
 
     func copySprite(variant: BadgeAssets.Variant) -> CGImage? {

@@ -21,30 +21,30 @@ public class SendPaymentConfirmViewController: OWSViewController {
         helper = SendPaymentHelper(delegate: self)
     }
 
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
 
         navigationItem.title = nil
-        view.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: true)
+        view.backgroundColor = OWSTableViewController2.tableBackgroundColor
 
         buildContents()
         startOptimisticPreparation()
     }
 
-    public override func viewWillAppear(_ animated: Bool) {
+    override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         helper?.refreshObservedValues()
     }
 
-    public override func viewDidAppear(_ animated: Bool) {
+    override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        if !UIDevice.current.isIPad && view.window?.windowScene?.interfaceOrientation != .portrait {
+        if !UIDevice.current.isIPad, view.window?.windowScene?.interfaceOrientation != .portrait {
             UIDevice.current.ows_setOrientation(.portrait)
         }
     }
 
-    public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    override public var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         UIDevice.current.isIPad ? .all : .portrait
     }
 
@@ -82,22 +82,22 @@ public class SendPaymentConfirmViewController: OWSViewController {
             title: String(
                 format: OWSLocalizedString(
                     "PAYMENTS_NEW_PAYMENT_RECIPIENT_AMOUNT_FORMAT",
-                    comment: "Format for the 'payment recipient amount' indicator. Embeds {{ the name of the recipient of the payment }}."
+                    comment: "Format for the 'payment recipient amount' indicator. Embeds {{ the name of the recipient of the payment }}.",
                 ),
-                recipientName
+                recipientName,
             ),
             subtitle: formatMobileCoinAmount(paymentInfo.paymentAmount),
-            trailing: fiatString(for: paymentInfo.paymentAmount)
+            trailing: fiatString(for: paymentInfo.paymentAmount),
         )
 
         let feeRowView = buildDetailRow(
             title: OWSLocalizedString(
                 "PAYMENTS_NEW_PAYMENT_ESTIMATED_FEE",
-                comment: "Label for the 'payment estimated fee' indicator."
+                comment: "Label for the 'payment estimated fee' indicator.",
             ),
             subtitle: formatMobileCoinAmount(paymentInfo.estimatedFeeAmount),
             trailing: fiatString(for: paymentInfo.estimatedFeeAmount),
-            showInfoIcon: true
+            showInfoIcon: true,
         )
         feeRowView.isUserInteractionEnabled = true
         feeRowView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapFeeInfo)))
@@ -107,10 +107,10 @@ public class SendPaymentConfirmViewController: OWSViewController {
         let totalRowView = buildDetailRow(
             title: OWSLocalizedString(
                 "PAYMENTS_NEW_PAYMENT_PAYMENT_TOTAL",
-                comment: "Label for the 'total payment amount' indicator."
+                comment: "Label for the 'total payment amount' indicator.",
             ),
             subtitle: formatMobileCoinAmount(totalAmount),
-            trailing: fiatString(for: totalAmount)
+            trailing: fiatString(for: totalAmount),
         )
         let card2 = buildCard(rows: [totalRowView])
 
@@ -125,7 +125,7 @@ public class SendPaymentConfirmViewController: OWSViewController {
             card2,
             UIView.vStretchingSpacer(),
             payButton,
-            UIView.spacer(withHeight: SendPaymentHelper.vSpacingAboveBalance)
+            UIView.spacer(withHeight: SendPaymentHelper.vSpacingAboveBalance),
         ])
         rootStack.axis = .vertical
         rootStack.alignment = .fill
@@ -136,7 +136,7 @@ public class SendPaymentConfirmViewController: OWSViewController {
             rootStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             rootStack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
             rootStack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            rootStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
+            rootStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
         ])
     }
 
@@ -144,7 +144,7 @@ public class SendPaymentConfirmViewController: OWSViewController {
         title: String,
         subtitle: String,
         trailing: String?,
-        showInfoIcon: Bool = false
+        showInfoIcon: Bool = false,
     ) -> UIView {
         let titleLabel = UILabel()
         titleLabel.text = title
@@ -196,14 +196,14 @@ public class SendPaymentConfirmViewController: OWSViewController {
     private func buildCard(rows: [UIView]) -> UIView {
         rows.dropLast().forEach { row in
             let sep = UIView()
-            sep.backgroundColor = Theme.hairlineColor
+            sep.backgroundColor = UIColor.Signal.opaqueSeparator
             sep.translatesAutoresizingMaskIntoConstraints = false
             row.addSubview(sep)
             NSLayoutConstraint.activate([
                 sep.heightAnchor.constraint(equalToConstant: 0.5),
                 sep.leadingAnchor.constraint(equalTo: row.leadingAnchor, constant: 16),
                 sep.trailingAnchor.constraint(equalTo: row.trailingAnchor),
-                sep.bottomAnchor.constraint(equalTo: row.bottomAnchor)
+                sep.bottomAnchor.constraint(equalTo: row.bottomAnchor),
             ])
         }
 
@@ -211,7 +211,7 @@ public class SendPaymentConfirmViewController: OWSViewController {
         stack.axis = .vertical
         stack.alignment = .fill
         stack.spacing = 0
-        stack.backgroundColor = OWSTableViewController2.cellBackgroundColor(isUsingPresentedStyle: true)
+        stack.backgroundColor = OWSTableViewController2.defaultCellBackgroundColor
         stack.layer.cornerRadius = 16
         stack.clipsToBounds = true
         return stack
@@ -219,11 +219,11 @@ public class SendPaymentConfirmViewController: OWSViewController {
 
     private func buildPayButton() -> UIView {
         var config = UIButton.Configuration.filled()
-        config.baseBackgroundColor = .ows_accentBlue
+        config.baseBackgroundColor = .Signal.accent
         config.baseForegroundColor = .white
         config.title = OWSLocalizedString(
             "PAYMENTS_NEW_PAYMENT_PAY_BUTTON",
-            comment: "Label for the 'pay' button in the 'send payment' UI."
+            comment: "Label for the 'pay' button in the 'send payment' UI.",
         )
         config.image = UIImage(systemName: "checkmark.circle")
         config.imagePadding = 8
@@ -293,7 +293,7 @@ public class SendPaymentConfirmViewController: OWSViewController {
                 paymentAmount: paymentInfo.paymentAmount,
                 memoMessage: paymentInfo.memoMessage,
                 isOutgoingTransfer: paymentInfo.isOutgoingTransfer,
-                canDefragment: false
+                canDefragment: false,
             )
         }
         preparedPaymentTask.set(task)
@@ -316,7 +316,7 @@ public class SendPaymentConfirmViewController: OWSViewController {
             mode: .payment(paymentInfo: paymentInfo),
             delegate: completionDelegate,
             preparedTask: preparedPaymentTask.get(),
-            startAtProgressStep: true
+            startAtProgressStep: true,
         )
         actionSheet.present(fromViewController: self)
     }

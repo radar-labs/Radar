@@ -4,31 +4,23 @@
 //
 
 import Foundation
+public import UIKit
 
 // MARK: - Color Helpers
 
 public extension UIColor {
 
     func blended(with otherColor: UIColor, alpha alphaParam: CGFloat) -> UIColor {
-        var r0: CGFloat = 0
-        var g0: CGFloat = 0
-        var b0: CGFloat = 0
-        var a0: CGFloat = 0
-        let result0 = self.getRed(&r0, green: &g0, blue: &b0, alpha: &a0)
-        assert(result0)
-
-        var r1: CGFloat = 0
-        var g1: CGFloat = 0
-        var b1: CGFloat = 0
-        var a1: CGFloat = 0
-        let result1 = otherColor.getRed(&r1, green: &g1, blue: &b1, alpha: &a1)
-        assert(result1)
+        let (r0, g0, b0, a0) = self.components() ?? (0, 0, 0, 0)
+        let (r1, g1, b1, a1) = otherColor.components() ?? (0, 0, 0, 0)
 
         let alpha = CGFloat.clamp01(alphaParam)
-        return UIColor(red: CGFloat.lerp(left: r0, right: r1, alpha: alpha),
-                       green: CGFloat.lerp(left: g0, right: g1, alpha: alpha),
-                       blue: CGFloat.lerp(left: b0, right: b1, alpha: alpha),
-                       alpha: CGFloat.lerp(left: a0, right: a1, alpha: alpha))
+        return UIColor(
+            red: CGFloat.lerp(left: r0, right: r1, alpha: alpha),
+            green: CGFloat.lerp(left: g0, right: g1, alpha: alpha),
+            blue: CGFloat.lerp(left: b0, right: b1, alpha: alpha),
+            alpha: CGFloat.lerp(left: a0, right: a1, alpha: alpha),
+        )
 
     }
 
@@ -40,13 +32,8 @@ public extension UIColor {
     func blendedWithOverlay(_ overlayColor: UIColor, opacity: CGFloat = 1.0) -> UIColor {
         let alpha = opacity.clamp01()
 
-        // Base
-        var baseR: CGFloat = 0, baseG: CGFloat = 0, baseB: CGFloat = 0, baseA: CGFloat = 0
-        self.getRed(&baseR, green: &baseG, blue: &baseB, alpha: &baseA)
-
-        // Overlay
-        var overlayR: CGFloat = 0, overlayG: CGFloat = 0, overlayB: CGFloat = 0, overlayA: CGFloat = 0
-        overlayColor.getRed(&overlayR, green: &overlayG, blue: &overlayB, alpha: &overlayA)
+        let (baseR, baseG, baseB, baseA) = self.components() ?? (0, 0, 0, 0)
+        let (overlayR, overlayG, overlayB, _) = overlayColor.components() ?? (0, 0, 0, 0)
 
         // Apply overlay blend mode formula for each channel
         func overlayBlend(_ base: CGFloat, _ overlay: CGFloat) -> CGFloat {
@@ -71,11 +58,18 @@ public extension UIColor {
     }
 
     func midPoint(with otherColor: UIColor) -> UIColor {
-        var h1: CGFloat = 0, s1: CGFloat = 0, v1: CGFloat = 0, a1: CGFloat = 0
-        var h2: CGFloat = 0, s2: CGFloat = 0, v2: CGFloat = 0, a2: CGFloat = 0
+        var h1: CGFloat = 0
+        var s1: CGFloat = 0
+        var v1: CGFloat = 0
+        var a1: CGFloat = 0
+        var h2: CGFloat = 0
+        var s2: CGFloat = 0
+        var v2: CGFloat = 0
+        var a2: CGFloat = 0
 
-        guard getHue(&h1, saturation: &s1, brightness: &v1, alpha: &a1),
-              otherColor.getHue(&h2, saturation: &s2, brightness: &v2, alpha: &a2)
+        guard
+            getHue(&h1, saturation: &s1, brightness: &v1, alpha: &a1),
+            otherColor.getHue(&h2, saturation: &s2, brightness: &v2, alpha: &a2)
         else {
             return midPointRGB(with: otherColor)
         }
@@ -104,18 +98,30 @@ public extension UIColor {
         return UIColor(hue: hue, saturation: saturation, brightness: brightness, alpha: alpha)
     }
 
-    private func midPointRGB(with otherColor: UIColor) -> UIColor {
-        var r1: CGFloat = 0, g1: CGFloat = 0, b1: CGFloat = 0, a1: CGFloat = 0
-        var r2: CGFloat = 0, g2: CGFloat = 0, b2: CGFloat = 0, a2: CGFloat = 0
+    func overlaidOpaque(on backgroundColor: UIColor) -> UIColor {
+        guard
+            let (fgRed, fgGreen, fgBlue, fgAlpha) = self.components(),
+            let (bgRed, bgGreen, bgBlue, _) = backgroundColor.components()
+        else {
+            return self
+        }
 
-        self.getRed(&r1, green: &g1, blue: &b1, alpha: &a1)
-        otherColor.getRed(&r2, green: &g2, blue: &b2, alpha: &a2)
+        let red = CGFloat.lerp(left: bgRed, right: fgRed, alpha: fgAlpha)
+        let green = CGFloat.lerp(left: bgGreen, right: fgGreen, alpha: fgAlpha)
+        let blue = CGFloat.lerp(left: bgBlue, right: fgBlue, alpha: fgAlpha)
+
+        return UIColor(red: red, green: green, blue: blue, alpha: 1)
+    }
+
+    private func midPointRGB(with otherColor: UIColor) -> UIColor {
+        let (r1, g1, b1, a1) = self.components() ?? (0, 0, 0, 0)
+        let (r2, g2, b2, a2) = otherColor.components() ?? (0, 0, 0, 0)
 
         return UIColor(
             red: (r1 + r2) / 2.0,
             green: (g1 + g2) / 2.0,
             blue: (b1 + b2) / 2.0,
-            alpha: (a1 + a2) / 2.0
+            alpha: (a1 + a2) / 2.0,
         )
     }
 }
@@ -124,63 +130,7 @@ public extension UIColor {
 
 public extension UIColor {
 
-    // MARK: Brand Colors
-
-    class var ows_signalBlue: UIColor {
-        return UIColor(rgbHex: 0x3A76F0)
-    }
-
-    class var ows_signalBlueDark: UIColor {
-        return UIColor(rgbHex: 0x1851B4)
-    }
-
-    // MARK: Accent Colors
-
-    /// Nav Bar, Primary Buttons
-    @objc(ows_accentBlueColor)
-    class var ows_accentBlue: UIColor {
-        // Radar brand orange
-        return UIColor(rgbHex: 0xF46300)
-    }
-
-    class var ows_accentBlueDark: UIColor {
-        // Radar brand orange
-        return UIColor(rgbHex: 0xF46300)
-    }
-
-    class var ows_accentBlueTint: UIColor {
-        // Light-orange tint of the Radar brand orange
-        return UIColor(rgbHex: 0xFBD0B3)
-    }
-
-    /// Making calls, success states
-    @objc(ows_accentGreenColor)
-    class var ows_accentGreen: UIColor {
-        return UIColor(rgbHex: 0x4CAF50)
-    }
-
-    /// Warning, update states
-    class var ows_accentYellow: UIColor {
-        return UIColor(rgbHex: 0xFFD624)
-    }
-
-    /// Ending calls, error states
-    @objc(ows_accentRedColor)
-    class var ows_accentRed: UIColor {
-        return UIColor(rgbHex: 0xF44336)
-    }
-
-    /// mute unmute background color
-    class var ows_accentIndigo: UIColor {
-        return UIColor(rgbHex: 0x5951c8)
-    }
-
     // MARK: - GreyScale
-
-    @objc(ows_whiteColor)
-    class var ows_white: UIColor {
-        return UIColor(rgbHex: 0xFFFFFF)
-    }
 
     class var ows_gray02: UIColor {
         return UIColor(rgbHex: 0xF6F6F6)
@@ -254,10 +204,6 @@ public extension UIColor {
 
     class var ows_gray95: UIColor {
         return UIColor(rgbHex: 0x121212)
-    }
-
-    class var ows_black: UIColor {
-        return UIColor(rgbHex: 0x000000)
     }
 
     // MARK: Masks
@@ -348,9 +294,11 @@ public extension UIColor {
         func randomComponent() -> CGFloat {
             CGFloat.random(in: 0..<1, choices: 256)
         }
-        return UIColor(red: randomComponent(),
-                       green: randomComponent(),
-                       blue: randomComponent(),
-                       alpha: isAlphaRandom ? randomComponent() : 1)
+        return UIColor(
+            red: randomComponent(),
+            green: randomComponent(),
+            blue: randomComponent(),
+            alpha: isAlphaRandom ? randomComponent() : 1,
+        )
     }
 }

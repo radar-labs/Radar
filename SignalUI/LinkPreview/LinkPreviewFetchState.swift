@@ -19,7 +19,7 @@ public class LinkPreviewFetchState {
         linkPreviewFetcher: any LinkPreviewFetcher,
         linkPreviewSettingStore: LinkPreviewSettingStore,
         onlyParseIfEnabled: Bool = true,
-        linkPreviewDraft: OWSLinkPreviewDraft? = nil
+        linkPreviewDraft: OWSLinkPreviewDraft? = nil,
     ) {
         self.db = db
         self.linkPreviewFetcher = linkPreviewFetcher
@@ -103,7 +103,7 @@ public class LinkPreviewFetchState {
     public func update(
         _ body: MessageBody,
         enableIfEmpty: Bool = false,
-        prependSchemeIfNeeded: Bool = false
+        prependSchemeIfNeeded: Bool = false,
     ) -> Task<Void, Never>? {
         if enableIfEmpty, body.text.isEmpty {
             isEnabled = true
@@ -128,13 +128,13 @@ public class LinkPreviewFetchState {
         self.fetchTask = Task { @MainActor [weak self, linkPreviewFetcher] in
             do {
                 let linkPreviewDraft = try await linkPreviewFetcher.fetchLinkPreview(for: proposedUrl)
-                guard let self = self else { return }
+                guard let self else { return }
                 // Obsolete callback.
                 guard self.currentUrl == proposedUrl else { return }
 
                 self._currentState = (.loaded(linkPreviewDraft), proposedUrl)
             } catch {
-                guard let self = self else { return }
+                guard let self else { return }
                 // Obsolete callback.
                 guard self.currentUrl == proposedUrl else { return }
 
@@ -146,7 +146,7 @@ public class LinkPreviewFetchState {
 
     private func validUrl(
         in body: MessageBody,
-        prependSchemeIfNeeded: Bool
+        prependSchemeIfNeeded: Bool,
     ) -> URL? {
         if !isEnabled {
             return nil
@@ -177,31 +177,13 @@ public class LinkPreviewFetchState {
     private func prependingSchemeIfNeeded(to body: MessageBody) -> MessageBody {
         // Prepend HTTPS if address is missing one…
         let schemePrefix = "https://"
-        guard body.text.range(of: schemePrefix, options: [ .caseInsensitive, .anchored ]) == nil else {
+        guard body.text.range(of: schemePrefix, options: [.caseInsensitive, .anchored]) == nil else {
             return body
         }
         // …and it doesn't appear to have any other protocol specified.
         guard body.text.range(of: "://") == nil else {
             return body
         }
-        let prefixLen = (schemePrefix as NSString).length
-
-        var finalMentions = [NSRange: Aci]()
-        for (range, aci) in body.ranges.mentions {
-            finalMentions[range.offset(by: prefixLen)] = aci
-        }
-
-        return MessageBody(
-            text: schemePrefix + body.text,
-            ranges: MessageBodyRanges(
-                mentions: finalMentions,
-                orderedMentions: body.ranges.orderedMentions.map {
-                    return $0.offset(by: prefixLen)
-                },
-                collapsedStyles: body.ranges.collapsedStyles.map {
-                    return $0.offset(by: prefixLen)
-                }
-            )
-        )
+        return body.prepending(schemePrefix)
     }
 }

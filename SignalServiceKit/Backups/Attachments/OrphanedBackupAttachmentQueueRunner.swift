@@ -15,13 +15,11 @@ public protocol OrphanedBackupAttachmentQueueRunner {
 
 public class OrphanedBackupAttachmentQueueRunnerImpl: OrphanedBackupAttachmentQueueRunner {
 
-    private let appReadiness: AppReadiness
     private let taskQueue: TaskQueueLoader<TaskRunner>
     private let tsAccountManager: TSAccountManager
 
     public init(
         accountKeyStore: AccountKeyStore,
-        appReadiness: AppReadiness,
         attachmentStore: AttachmentStore,
         backupRequestManager: BackupRequestManager,
         backupSettingsStore: BackupSettingsStore,
@@ -29,9 +27,8 @@ public class OrphanedBackupAttachmentQueueRunnerImpl: OrphanedBackupAttachmentQu
         db: any DB,
         listMediaManager: BackupListMediaManager,
         orphanedBackupAttachmentStore: OrphanedBackupAttachmentStore,
-        tsAccountManager: TSAccountManager
+        tsAccountManager: TSAccountManager,
     ) {
-        self.appReadiness = appReadiness
         self.tsAccountManager = tsAccountManager
         let taskRunner = TaskRunner(
             accountKeyStore: accountKeyStore,
@@ -41,18 +38,17 @@ public class OrphanedBackupAttachmentQueueRunnerImpl: OrphanedBackupAttachmentQu
             db: db,
             listMediaManager: listMediaManager,
             orphanedBackupAttachmentStore: orphanedBackupAttachmentStore,
-            tsAccountManager: tsAccountManager
+            tsAccountManager: tsAccountManager,
         )
         self.taskQueue = TaskQueueLoader(
             maxConcurrentTasks: 8,
             dateProvider: dateProvider,
             db: db,
-            runner: taskRunner
+            runner: taskRunner,
         )
     }
 
     public func runIfNeeded() async throws {
-        try await appReadiness.waitForAppReady()
         try Task.checkCancellation()
         guard tsAccountManager.localIdentifiersWithMaybeSneakyTransaction != nil else {
             return
@@ -83,7 +79,7 @@ public class OrphanedBackupAttachmentQueueRunnerImpl: OrphanedBackupAttachmentQu
             db: any DB,
             listMediaManager: BackupListMediaManager,
             orphanedBackupAttachmentStore: OrphanedBackupAttachmentStore,
-            tsAccountManager: TSAccountManager
+            tsAccountManager: TSAccountManager,
         ) {
             self.accountKeyStore = accountKeyStore
             self.attachmentStore = attachmentStore
@@ -109,7 +105,10 @@ public class OrphanedBackupAttachmentQueueRunnerImpl: OrphanedBackupAttachmentQu
 
         private let errorCounts = ErrorCounts()
 
-        func runTask(record: Store.Record, loader: TaskQueueLoader<TaskRunner>) async -> TaskRecordResult {
+        func runTask(
+            recordId: TaskRecord.ID,
+            loader: TaskQueueLoader<TaskRunner>,
+        ) async -> TaskRecordResult {
             let (
                 localAci,
                 registrationState,
@@ -126,53 +125,53 @@ public class OrphanedBackupAttachmentQueueRunnerImpl: OrphanedBackupAttachmentQu
 
             switch registrationState {
             case
-                    .unregistered,
-                    .reregistering,
-                    .deregistered,
-                    .transferringIncoming,
-                    .transferringPrimaryOutgoing,
-                    .transferred:
+                .unregistered,
+                .reregistering,
+                .deregistered,
+                .transferringIncoming,
+                .transferringPrimaryOutgoing,
+                .transferred:
                 // These states are potentially temporary. Return a retryable error
                 // but cancel the task.
                 Logger.info("Stopping when unregistered")
                 let error = OWSRetryableError()
-                try? await loader.stop(reason: error)
+                await loader.stop(reason: error)
                 return .retryableError(error)
             case
-                    .relinking,
-                    .delinked,
-                    .transferringLinkedOutgoing,
-                    .provisioned:
+                .relinking,
+                .delinked,
+                .transferringLinkedOutgoing,
+                .provisioned:
                 // Linked devices never issue these delete requests.
                 // Cancel the task so we never run it again.
-                return .cancelled
+                return .obsolete
             case .registered:
                 break
             }
 
             guard let localAci else {
                 let error = OWSAssertionError("Deleting without being registered")
-                try? await loader.stop(reason: error)
+                await loader.stop(reason: error)
                 return .retryableError(error)
             }
 
             guard let mediaRootBackupKey else {
                 let error = OWSAssertionError("Deleting without being registered")
-                try? await loader.stop(reason: error)
+                await loader.stop(reason: error)
                 return .retryableError(error)
             }
 
             if needsListMedia {
                 // If we need to list media, quit out early so we can do that.
-                try? await loader.stop(reason: NeedsListMediaError())
+                await loader.stop(reason: NeedsListMediaError())
                 return .retryableError(NeedsListMediaError())
             }
 
             let mediaId: Data
 
-            if let recordMediaId = record.record.mediaId {
+            if let recordMediaId = recordId.mediaId {
                 mediaId = recordMediaId
-            } else if let type = record.record.type, let mediaName = record.record.mediaName {
+            } else if let type = recordId.type, let mediaName = recordId.mediaName {
                 let mediaNameToUse: String
                 switch type {
                 case .fullsize:
@@ -181,16 +180,11 @@ public class OrphanedBackupAttachmentQueueRunnerImpl: OrphanedBackupAttachmentQu
                     mediaNameToUse = AttachmentBackupThumbnail.thumbnailMediaName(fullsizeMediaName: mediaName)
                 }
 
-                do {
-                    mediaId = try mediaRootBackupKey.mediaEncryptionMetadata(
-                        mediaName: mediaNameToUse,
-                        // Doesn't matter what we use, we just want the mediaId.
-                        type: .outerLayerFullsizeOrThumbnail,
-                    ).mediaId
-                } catch let error {
-                    Logger.error("Failed to generate media IDs")
-                    return .unretryableError(error)
-                }
+                mediaId = mediaRootBackupKey.mediaEncryptionMetadata(
+                    mediaName: mediaNameToUse,
+                    // Doesn't matter what we use, we just want the mediaId.
+                    type: .outerLayerFullsizeOrThumbnail,
+                ).mediaId
             } else {
                 return .unretryableError(OWSAssertionError("Invalid record"))
             }
@@ -200,24 +194,26 @@ public class OrphanedBackupAttachmentQueueRunnerImpl: OrphanedBackupAttachmentQu
                 backupAuth = try await backupRequestManager.fetchBackupServiceAuth(
                     for: mediaRootBackupKey,
                     localAci: localAci,
-                    auth: .implicit()
+                    auth: .implicit(),
+                    logger: .empty(), // TODO: [Logging]
                 )
             } catch let error {
-                try? await loader.stop(reason: error)
+                await loader.stop(reason: error)
                 return .unretryableError(error)
             }
 
             do {
                 try await backupRequestManager.deleteMediaObjects(
                     objects: [BackupArchive.Request.DeleteMediaTarget(
-                        cdn: record.record.cdnNumber,
-                        mediaId: mediaId
+                        cdn: recordId.cdnNumber,
+                        mediaId: mediaId,
                     )],
-                    auth: backupAuth
+                    auth: backupAuth,
+                    logger: .empty(), // TODO: [Logging]
                 )
             } catch let error {
                 if error.isNetworkFailureOrTimeout {
-                    let errorCount = await errorCounts.updateCount(record.id)
+                    let errorCount = await errorCounts.updateCount(recordId)
                     if error.isRetryable, errorCount < Constants.maxRetryableErrorCount {
                         return .retryableError(error)
                     } else {
@@ -231,8 +227,8 @@ public class OrphanedBackupAttachmentQueueRunnerImpl: OrphanedBackupAttachmentQu
             return .success
         }
 
-        func didSucceed(record: Store.Record, tx: DBWriteTransaction) throws {
-            Logger.info("Finished deleting backup attachment \(record.id)")
+        func didSucceed(recordId: TaskRecord.ID, tx: DBWriteTransaction) {
+            Logger.info("Finished deleting backup attachment \(recordId.rowId)")
 
             // Any time we successfully delete anything on remote cdn, optimistically wipe
             // the local state saying we've consumed all media tier quota; we will set it
@@ -240,20 +236,32 @@ public class OrphanedBackupAttachmentQueueRunnerImpl: OrphanedBackupAttachmentQu
             backupSettingsStore.setHasConsumedMediaTierCapacity(false, tx: tx)
         }
 
-        func didFail(record: Store.Record, error: any Error, isRetryable: Bool, tx: DBWriteTransaction) throws {
-            Logger.warn("Failed deleting backup attachment \(record.id), isRetryable: \(isRetryable), error: \(error)")
+        func didFail(
+            recordId: TaskRecord.ID,
+            error: any Error,
+            isRetryable: Bool,
+            tx: DBWriteTransaction,
+        ) {
+            Logger.warn("Failed deleting backup attachment \(recordId.rowId), isRetryable: \(isRetryable), error: \(error)")
         }
 
-        func didCancel(record: Store.Record, tx: DBWriteTransaction) throws {
-            Logger.info("Cancelled deleting backup attachment \(record.id)")
+        func didObsolete(recordId: TaskRecord.ID, tx: DBWriteTransaction) {
+            Logger.info("Obsoleted deleting backup attachment \(recordId.rowId)")
         }
     }
 
     // MARK: - TaskRecordStore
 
     struct TaskRecord: SignalServiceKit.TaskRecord {
-        let id: OrphanedBackupAttachment.IDType
-        let record: OrphanedBackupAttachment
+        struct ID: Hashable {
+            let rowId: OrphanedBackupAttachment.IDType
+            let cdnNumber: UInt32
+            let mediaName: String?
+            let mediaId: Data?
+            let type: OrphanedBackupAttachment.SizeType?
+        }
+
+        let id: ID
     }
 
     class TaskStore: TaskRecordStore {
@@ -264,14 +272,20 @@ public class OrphanedBackupAttachmentQueueRunnerImpl: OrphanedBackupAttachmentQu
             self.orphanedBackupAttachmentStore = orphanedBackupAttachmentStore
         }
 
-        func peek(count: UInt, tx: DBReadTransaction) throws -> [TaskRecord] {
-            return try orphanedBackupAttachmentStore.peek(count: count, tx: tx).map { record in
-                return TaskRecord(id: record.id!, record: record)
+        func peek(count: UInt, tx: DBReadTransaction) -> [TaskRecord] {
+            return orphanedBackupAttachmentStore.peek(count: count, tx: tx).map { record in
+                return TaskRecord(id: TaskRecord.ID(
+                    rowId: record.id!,
+                    cdnNumber: record.cdnNumber,
+                    mediaName: record.mediaName,
+                    mediaId: record.mediaId,
+                    type: record.type,
+                ))
             }
         }
 
-        func removeRecord(_ record: TaskRecord, tx: DBWriteTransaction) throws {
-            try orphanedBackupAttachmentStore.remove(record.record, tx: tx)
+        func removeRecord(recordId: TaskRecord.ID, tx: DBWriteTransaction) {
+            orphanedBackupAttachmentStore.remove(recordId: recordId.rowId, tx: tx)
         }
     }
 

@@ -3,25 +3,27 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
-
 #if TESTABLE_BUILD
+
+import Foundation
+public import UIKit
 
 open class QuotedReplyManagerMock: QuotedReplyManager {
 
     public init() {}
 
-    open func quotedMessage(
-        for dataMessage: SSKProtoDataMessage,
-        thread: TSThread,
-        tx: DBWriteTransaction
-    ) -> OwnedAttachmentBuilder<TSQuotedMessage>? {
-        return nil
+    open func validateAndBuildQuotedReply(
+        from quoteProto: SSKProtoDataMessageQuote,
+        threadUniqueId: String,
+        tx: DBReadTransaction,
+    ) throws -> ValidatedQuotedReply {
+        throw OWSAssertionError("Not implemented!")
     }
 
     open func buildDraftQuotedReply(
         originalMessage: TSMessage,
-        tx: DBReadTransaction
+        loadNormalizedImage: (CGImageSource, CGFloat) -> CGImage?,
+        tx: DBReadTransaction,
     ) -> DraftQuotedReplyModel? {
         return nil
     }
@@ -30,13 +32,14 @@ open class QuotedReplyManagerMock: QuotedReplyManager {
         quotedReplyMessage: TSMessage,
         quotedReply: TSQuotedMessage,
         originalMessage: TSMessage?,
-        tx: DBReadTransaction
+        loadNormalizedImage: (CGImageSource, CGFloat) -> CGImage?,
+        tx: DBReadTransaction,
     ) -> DraftQuotedReplyModel {
         fatalError("Unimplemented!")
     }
 
     open func prepareDraftForSending(
-        _ draft: DraftQuotedReplyModel
+        _ draft: DraftQuotedReplyModel,
     ) throws -> DraftQuotedReplyModel.ForSending {
         return .init(
             originalMessageTimestamp: draft.originalMessageTimestamp,
@@ -47,21 +50,21 @@ open class QuotedReplyManagerMock: QuotedReplyManager {
             threadUniqueId: draft.threadUniqueId,
             quoteBody: draft.bodyForSending,
             attachment: nil,
-            quotedMessageFromEdit: nil
+            quotedMessageFromEdit: nil,
         )
     }
 
-    open func buildQuotedReplyForSending(
+    open func prepareQuotedReplyForSending(
         draft: DraftQuotedReplyModel.ForSending,
-        tx: DBWriteTransaction
-    ) -> OwnedAttachmentBuilder<TSQuotedMessage> {
-        fatalError("Unimplemented!")
+        tx: DBReadTransaction,
+    ) -> ValidatedQuotedReply {
+        fatalError("Not implemented!")
     }
 
     open func buildProtoForSending(
         _ quote: TSQuotedMessage,
-        parentMessage: TSMessage,
-        tx: DBReadTransaction
+        outgoingMessage: TSOutgoingMessage,
+        tx: DBReadTransaction,
     ) throws -> SSKProtoDataMessageQuote {
         fatalError("Unimplemented!")
     }

@@ -23,7 +23,7 @@ public class ReactionManager: NSObject {
     }
 
     public class func setCustomEmojiSet(_ emojis: [String]?, transaction: DBWriteTransaction) {
-        emojiSetKVS.setObject(emojis, key: emojiSetKey, transaction: transaction)
+        emojiSetKVS.setStringArray(emojis, key: emojiSetKey, transaction: transaction)
     }
 
     @discardableResult
@@ -32,9 +32,9 @@ public class ReactionManager: NSObject {
         emoji: String,
         isRemoving: Bool,
         isHighPriority: Bool = false,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> Promise<Void> {
-        let outgoingMessage: TSOutgoingMessage
+        let outgoingMessage: OutgoingReactionMessage
         do {
             outgoingMessage = try _localUserReacted(to: messageUniqueId, emoji: emoji, isRemoving: isRemoving, tx: tx)
         } catch {
@@ -47,7 +47,7 @@ public class ReactionManager: NSObject {
             .promise,
             message: preparedMessage,
             isHighPriority: isHighPriority,
-            transaction: tx
+            transaction: tx,
         )
     }
 
@@ -56,11 +56,11 @@ public class ReactionManager: NSObject {
         to messageUniqueId: String,
         emoji: String,
         isRemoving: Bool,
-        tx: DBWriteTransaction
-    ) throws -> OWSOutgoingReactionMessage {
+        tx: DBWriteTransaction,
+    ) throws -> OutgoingReactionMessage {
         assert(emoji.isSingleEmoji)
 
-        guard let message = TSMessage.anyFetchMessage(uniqueId: messageUniqueId, transaction: tx) else {
+        guard let message = TSMessage.fetchMessageViaCache(uniqueId: messageUniqueId, transaction: tx) else {
             throw OWSAssertionError("Can't find message for reaction.")
         }
 
@@ -72,41 +72,45 @@ public class ReactionManager: NSObject {
             throw OWSAssertionError("missing local address")
         }
 
+        let timestamp = MessageTimestampGenerator.sharedInstance.generateTimestamp()
+
+        let previousReaction = message.reaction(for: localAci, tx: tx)
+
+        let createdReaction: OWSReaction?
+        if isRemoving {
+            message.removeReaction(for: localAci, tx: tx)
+            createdReaction = nil
+        } else {
+            createdReaction = message.recordReaction(
+                for: localAci,
+                emoji: emoji,
+                sentAtTimestamp: timestamp,
+                tx: tx,
+            )?.newValue
+
+            // Always immediately mark outgoing reactions as read.
+            createdReaction?.markAsRead(transaction: tx)
+        }
+
         let dmConfigurationStore = DependenciesBridge.shared.disappearingMessagesConfigurationStore
         let dmConfig = dmConfigurationStore.fetchOrBuildDefault(for: .thread(thread), tx: tx)
 
-        let outgoingMessage = OWSOutgoingReactionMessage(
-            thread: thread,
-            message: message,
+        return OutgoingReactionMessage(
+            timestamp: timestamp,
             emoji: emoji,
             isRemoving: isRemoving,
+            inThread: thread,
+            onMessage: message,
+            newReaction: createdReaction,
+            oldReaction: previousReaction,
             // Though we generally don't parse the expiration timer from reaction
             // messages, older desktop instances will read it from the "unsupported"
             // message resulting in the timer clearing. So we populate it to ensure
             // that does not happen.
             expiresInSeconds: dmConfig.durationSeconds,
-            expireTimerVersion: NSNumber(value: dmConfig.timerVersion),
-            transaction: tx
+            expireTimerVersion: dmConfig.timerVersion,
+            tx: tx,
         )
-
-        outgoingMessage.previousReaction = message.reaction(for: localAci, tx: tx)
-
-        if isRemoving {
-            message.removeReaction(for: localAci, tx: tx)
-        } else {
-            outgoingMessage.createdReaction = message.recordReaction(
-                for: localAci,
-                emoji: emoji,
-                sentAtTimestamp: outgoingMessage.timestamp,
-                receivedAtTimestamp: outgoingMessage.timestamp,
-                tx: tx
-            )?.newValue
-
-            // Always immediately mark outgoing reactions as read.
-            outgoingMessage.createdReaction?.markAsRead(transaction: tx)
-        }
-
-        return outgoingMessage
     }
 
     @objc(OWSReactionProcessingResult)
@@ -123,10 +127,14 @@ public class ReactionManager: NSObject {
         timestamp: UInt64,
         serverTimestamp: UInt64,
         expiresInSeconds: UInt32,
-        expireTimerVersion: UInt32?,
+        expireTimerVersion: UInt32,
         sentTranscript: OWSIncomingSentMessageTranscript?,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) -> ReactionProcessingResult {
+        guard SDS.fitsInInt64(reaction.timestamp) else {
+            Logger.warn("Ignoring reaction with too-large target timestamp.")
+            return .invalidReaction
+        }
         guard let emoji = reaction.emoji.strippedOrNil else {
             owsFailDebug("Received invalid emoji")
             return .invalidReaction
@@ -135,26 +143,33 @@ public class ReactionManager: NSObject {
             owsFailDebug("Received invalid emoji")
             return .invalidReaction
         }
-        guard let messageAuthor = Aci.parseFrom(
-            serviceIdBinary: reaction.targetAuthorAciBinary,
-            serviceIdString: reaction.targetAuthorAci,
-        ) else {
+        guard
+            let messageAuthor = Aci.parseFrom(
+                serviceIdBinary: reaction.targetAuthorAciBinary,
+                serviceIdString: reaction.targetAuthorAci,
+            )
+        else {
             owsFailDebug("reaction missing message author")
             return .invalidReaction
         }
 
-        if var message = InteractionFinder.findMessage(
-            withTimestamp: reaction.timestamp,
-            threadId: thread.uniqueId,
-            author: SignalServiceAddress(messageAuthor),
-            transaction: transaction
-        ) {
+        if
+            var message = InteractionFinder.findMessage(
+                withTimestamp: reaction.timestamp,
+                threadId: thread.uniqueId,
+                author: SignalServiceAddress(messageAuthor),
+                transaction: transaction,
+            )
+        {
             if message.editState == .pastRevision {
                 // Reaction targeted an old edit revision, fetch the latest
                 // version to ensure the reaction shows up properly.
-                if let latestEdit = DependenciesBridge.shared.editMessageStore.findMessage(
-                    fromEdit: message,
-                    tx: transaction) {
+                if
+                    let latestEdit = DependenciesBridge.shared.editMessageStore.findMessage(
+                        fromEdit: message,
+                        tx: transaction,
+                    )
+                {
                     message = latestEdit
                 } else {
                     Logger.info("Ignoring reaction for missing edit target.")
@@ -176,8 +191,7 @@ public class ReactionManager: NSObject {
                     for: reactor,
                     emoji: emoji,
                     sentAtTimestamp: timestamp,
-                    receivedAtTimestamp: NSDate.ows_millisecondTimeStamp(),
-                    tx: transaction
+                    tx: transaction,
                 )
 
                 // If this is a reaction to a message we sent, notify the user.
@@ -192,17 +206,19 @@ public class ReactionManager: NSObject {
                         forReaction: reaction.newValue,
                         onOutgoingMessage: message,
                         thread: thread,
-                        transaction: transaction
+                        transaction: transaction,
                     )
                 }
             }
 
             return .success
-        } else if let storyMessage = StoryFinder.story(
-            timestamp: reaction.timestamp,
-            author: messageAuthor,
-            transaction: transaction
-        ) {
+        } else if
+            let storyMessage = StoryFinder.story(
+                timestamp: reaction.timestamp,
+                author: messageAuthor,
+                transaction: transaction,
+            )
+        {
             // Reaction to stories show up as normal messages, they
             // are not associated with standard interactions. As such
             // we need to insert an incoming/outgoing message as appropriate.
@@ -224,7 +240,7 @@ public class ReactionManager: NSObject {
                     builder.expiresInSeconds = 0
                 } else {
                     builder.expiresInSeconds = expiresInSeconds
-                    builder.expireTimerVersion = expireTimerVersion.map(NSNumber.init(value:))
+                    builder.expireTimerVersion = NSNumber(value: expireTimerVersion)
                 }
             }
 
@@ -239,7 +255,7 @@ public class ReactionManager: NSObject {
                 let builder: TSIncomingMessageBuilder = .withDefaultValues(
                     thread: thread,
                     authorAci: reactor,
-                    serverTimestamp: serverTimestamp
+                    serverTimestamp: serverTimestamp,
                 )
                 populateStoryContext(on: builder)
                 message = builder.build()
@@ -253,7 +269,7 @@ public class ReactionManager: NSObject {
                 outgoingMessage.updateRecipientsFromNonLocalDevice(
                     sentTranscript?.recipientStates ?? [:],
                     isSentUpdate: false,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             }
 
@@ -270,7 +286,7 @@ public class ReactionManager: NSObject {
         uniqueId: String,
         thresholdDate: Date,
         shouldPerformRemove: Bool,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) -> Bool {
         guard let reaction = OWSReaction.anyFetch(uniqueId: uniqueId, transaction: transaction) else {
             // This could just be a race condition, but it should be very unlikely.
@@ -280,7 +296,7 @@ public class ReactionManager: NSObject {
 
         let creationDate = Date(millisecondsSince1970: reaction.sentAtTimestamp)
         guard creationDate <= thresholdDate else {
-            Logger.info("Skipping orphan reaction due to age: \(creationDate.timeIntervalSinceNow)")
+            Logger.info("Skipping orphan reaction due to age: \(-creationDate.timeIntervalSinceNow)")
             return false
         }
 

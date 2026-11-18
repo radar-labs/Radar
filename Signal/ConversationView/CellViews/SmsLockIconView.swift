@@ -4,7 +4,6 @@
 //
 
 import SignalUI
-import UIKit
 
 /// Holds an "unlocked lock" icon displayed for SMS messages.
 ///

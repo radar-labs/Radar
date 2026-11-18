@@ -14,7 +14,7 @@ extension BackupArchive {
         /// For example, a value of 24h will exclude messages with a
         /// "lifetime" of a day or less, regardless of whether they have
         /// been read and their expiration timer has started.
-        private let minExpirationTimeMs: UInt64
+        let minExpirationTimeMs: UInt64
 
         /// The minimum remaining time before a message will expire, such
         /// that it is eligible for inclusion.
@@ -22,7 +22,7 @@ extension BackupArchive {
         /// For example, a value of 24h will exclude messages that will
         /// expire in the next day, regardless of how long their original
         /// "lifetime" was.
-        private let minRemainingTimeUntilExpirationMs: UInt64
+        let minRemainingTimeUntilExpirationMs: UInt64
 
         /// Unviewed view-once messages should be treated as viewed and
         /// tombstoned for this export.
@@ -31,63 +31,73 @@ extension BackupArchive {
         /// Whether or not the plaintext SVR PIN should be included.
         let shouldIncludePin: Bool
 
-        init(backupPurpose: MessageBackupPurpose) {
-            self.minExpirationTimeMs = {
-                switch backupPurpose {
-                case .deviceTransfer:
-                    // Don't exclude any messages in "device transfer" backups,
-                    // i.e. Link'n'Syncs.
-                    return 0
-                case .remoteBackup:
-                    // Skip messages with timers of less than a day.
-                    return .dayInMs
-                }
-            }()
-            self.minRemainingTimeUntilExpirationMs = {
-                switch backupPurpose {
-                case .deviceTransfer:
-                    // Don't exclude any messages in "device transfer" backups,
-                    // i.e. Link'n'Syncs.
-                    return 0
-                case .remoteBackup:
-                    // Skip messages with less than a day before they'll expire.
-                    return .dayInMs
-                }
-            }()
-            self.shouldTombstoneViewOnce = {
-                switch backupPurpose {
-                case .deviceTransfer:
-                    return false
-                case .remoteBackup:
-                    return true
-                }
-            }()
-            self.shouldIncludePin = true
+        // MARK: -
+
+        init(
+            minExpirationTimeMs: UInt64,
+            minRemainingTimeUntilExpirationMs: UInt64,
+            shouldTombstoneViewOnce: Bool,
+            shouldIncludePin: Bool = true,
+        ) {
+            self.minExpirationTimeMs = minExpirationTimeMs
+            self.minRemainingTimeUntilExpirationMs = minRemainingTimeUntilExpirationMs
+            self.shouldTombstoneViewOnce = shouldTombstoneViewOnce
+            self.shouldIncludePin = shouldIncludePin
         }
 
-        func shouldSkipMessageBasedOnExpiration(
-            expireStartDate: UInt64?,
-            expiresInMs: UInt64?,
-            currentTimestamp: UInt64
+        /// A filter for the ephemeral Backup used during LinkAndSync. Includes
+        /// all messages.
+        static let linkAndSync = IncludedContentFilter(
+            minExpirationTimeMs: 0,
+            minRemainingTimeUntilExpirationMs: 0,
+            shouldTombstoneViewOnce: false,
+        )
+
+        /// A filter for Backups being uploaded remotely. Excludes messages
+        /// disappearing in the next day.
+        static let remoteBackup = IncludedContentFilter(
+            // Skip messages with timers of less than a day.
+            minExpirationTimeMs: .dayInMs,
+            // Skip messages with less than a day before they'll expire.
+            minRemainingTimeUntilExpirationMs: .dayInMs,
+            shouldTombstoneViewOnce: true,
+        )
+
+        /// A filter for plaintext takeouts. Excludes all disappearing messages.
+        ///
+        /// - Note
+        /// This filtering matches what LibSignal's JSON exporter sanitizes.
+        /// Filtering it ourselves makes it easier to skip attachments belonging
+        /// to messages the sanitization would filter out.
+        static let plaintextTakeout = IncludedContentFilter(
+            // Skip all expiring messages.
+            minExpirationTimeMs: .max,
+            minRemainingTimeUntilExpirationMs: 0,
+            shouldTombstoneViewOnce: true,
+        )
+
+        // MARK: -
+
+        func shouldSkipMessage(
+            expirationDetails: ChatItemExpirationDetails,
+            currentTimestamp: UInt64,
         ) -> Bool {
-            guard
-                let expiresInMs = expiresInMs,
-                expiresInMs > 0
-            else {
+            let expiresInMs = expirationDetails.expiresInMs
+            let expireStartDate = expirationDetails.expireStartDate
+
+            guard expiresInMs > 0 else {
                 // If the message isn't expiring, no reason to skip.
                 return false
             }
 
             if expiresInMs <= self.minExpirationTimeMs {
-                // If the expire timer was less than our minimum, we can always
-                // skip.
+                // If the expire timer was less than our minimum, we can always skip.
                 return true
-            } else if let expireStartDate = expireStartDate, expireStartDate > 0 {
+            } else if let expireStartDate, expireStartDate > 0 {
                 // If the expiration timer has started, check whether the
                 // remaining time before it expires is sufficient.
                 let expirationDate = expireStartDate + expiresInMs
                 let minExpirationDate = currentTimestamp + self.minRemainingTimeUntilExpirationMs
-
                 return expirationDate <= minExpirationDate
             } else {
                 return false
@@ -99,13 +109,12 @@ extension BackupArchive {
         /// other owners (e.g. if deduplicated by content hash), it may still be uploaded.
         func shouldSkipAttachment(
             owningMessage: TSMessage,
-            currentTimestamp: UInt64
+            currentTimestamp: UInt64,
         ) -> Bool {
             if
-                shouldSkipMessageBasedOnExpiration(
-                    expireStartDate: owningMessage.expireStartedAt,
-                    expiresInMs: UInt64(owningMessage.expiresInSeconds) * 1000,
-                    currentTimestamp: currentTimestamp
+                shouldSkipMessage(
+                    expirationDetails: ChatItemExpirationDetails(expiringInteraction: owningMessage),
+                    currentTimestamp: currentTimestamp,
                 )
             {
                 return true

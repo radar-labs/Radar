@@ -11,17 +11,19 @@ public import LibSignalClient
 public class TSConstants {
 
     private enum Environment {
-        case production, staging
+        case production
+        case staging
     }
+
     private static let environment: Environment = {
-        // You can set "USE_STAGING=1" in your Xcode Scheme. This allows you to
-        // prepare a series of commits without accidentally committing the change
-        // to the environment.
-        #if DEBUG
+// You can set "USE_STAGING=1" in your Xcode Scheme. This allows you to
+// prepare a series of commits without accidentally committing the change
+// to the environment.
+#if DEBUG
         if ProcessInfo.processInfo.environment["USE_STAGING"] == "1" {
             return .staging
         }
-        #endif
+#endif
 
         // If you do want to make a build that will always connect to staging,
         // change this value. (Scheme environment variables are only set when
@@ -40,8 +42,7 @@ public class TSConstants {
     public static let donateUrl = URL(string: "https://signal.org/donate/")!
     public static let appStoreUrl = URL(string: "https://apps.apple.com/app/id6753939776")!
 
-    public static var mainServiceIdentifiedURL: String { shared.mainServiceIdentifiedURL }
-    public static var mainServiceUnidentifiedURL: String { shared.mainServiceUnidentifiedURL }
+    public static var mainServiceURL: String { shared.mainServiceURL }
 
     public static var textSecureCDN0ServerURL: String { shared.textSecureCDN0ServerURL }
     public static var textSecureCDN2ServerURL: String { shared.textSecureCDN2ServerURL }
@@ -66,14 +67,18 @@ public class TSConstants {
     public static var storageServiceCensorshipPrefix: String { shared.storageServiceCensorshipPrefix }
     public static var svr2CensorshipPrefix: String { shared.svr2CensorshipPrefix }
 
-    static var svr2Enclave: MrEnclave { shared.svr2Enclave }
-    static var svr2PreviousEnclaves: [MrEnclave] { shared.svr2PreviousEnclaves }
+    static var svr2Enclaves: [MrEnclave] { shared.svr2Enclaves }
 
     public static var applicationGroup: String { shared.applicationGroup }
 
-    public static var serverPublicParams: Data { shared.serverPublicParams }
-    public static var callLinkPublicParams: Data { shared.callLinkPublicParams }
-    public static var backupServerPublicParams: Data { shared.backupServerPublicParams }
+    public static var serverPublicParamsData: Data { shared.serverPublicParamsData }
+    public static func serverPublicParams() -> ServerPublicParams { shared.serverPublicParams() }
+
+    public static var callLinkPublicParamsData: Data { shared.callLinkPublicParamsData }
+    public static func callLinkPublicParams() -> GenericServerPublicParams { shared.callLinkPublicParams() }
+
+    public static var backupServerPublicParamsData: Data { shared.backupServerPublicParamsData }
+    public static func backupServerPublicParams() -> GenericServerPublicParams { shared.backupServerPublicParams() }
 
     public static let shared: TSConstantsProtocol = {
         switch environment {
@@ -97,8 +102,7 @@ public class TSConstants {
 // MARK: -
 
 public protocol TSConstantsProtocol: AnyObject {
-    var mainServiceIdentifiedURL: String { get }
-    var mainServiceUnidentifiedURL: String { get }
+    var mainServiceURL: String { get }
     var textSecureCDN0ServerURL: String { get }
     var textSecureCDN2ServerURL: String { get }
     var textSecureCDN3ServerURL: String { get }
@@ -122,14 +126,34 @@ public protocol TSConstantsProtocol: AnyObject {
     var storageServiceCensorshipPrefix: String { get }
     var svr2CensorshipPrefix: String { get }
 
-    var svr2Enclave: MrEnclave { get }
-    var svr2PreviousEnclaves: [MrEnclave] { get }
+    var svr2Enclaves: [MrEnclave] { get }
+    var activeSvr2EnclaveCount: Int { get }
 
     var applicationGroup: String { get }
 
-    var serverPublicParams: Data { get }
-    var callLinkPublicParams: Data { get }
-    var backupServerPublicParams: Data { get }
+    var serverPublicParamsData: Data { get }
+    var callLinkPublicParamsData: Data { get }
+    var backupServerPublicParamsData: Data { get }
+}
+
+extension TSConstantsProtocol {
+    public func serverPublicParams() -> ServerPublicParams {
+        return failIfThrows {
+            return try ServerPublicParams(contents: serverPublicParamsData)
+        }
+    }
+
+    public func callLinkPublicParams() -> GenericServerPublicParams {
+        return failIfThrows {
+            return try GenericServerPublicParams(contents: callLinkPublicParamsData)
+        }
+    }
+
+    public func backupServerPublicParams() -> GenericServerPublicParams {
+        return failIfThrows {
+            return try GenericServerPublicParams(contents: backupServerPublicParamsData)
+        }
+    }
 }
 
 public struct MrEnclave: Equatable {
@@ -144,7 +168,7 @@ public struct MrEnclave: Equatable {
         owsPrecondition(self.dataValue.count == 32)
     }
 
-    public static func == (lhs: Self, rhs: Self) -> Bool {
+    public static func ==(lhs: Self, rhs: Self) -> Bool {
         return lhs.dataValue == rhs.dataValue
     }
 }
@@ -155,8 +179,7 @@ public class TSConstantsProduction: TSConstantsProtocol {
 
     public init() {}
 
-    public let mainServiceIdentifiedURL = "https://chat.signal.org"
-    public let mainServiceUnidentifiedURL = "https://ud-chat.signal.org"
+    public let mainServiceURL = "https://chat.signal.org"
     public let textSecureCDN0ServerURL = "https://cdn.signal.org"
     public let textSecureCDN2ServerURL = "https://cdn2.signal.org"
     public let textSecureCDN3ServerURL = "https://cdn3.signal.org"
@@ -180,30 +203,30 @@ public class TSConstantsProduction: TSConstantsProtocol {
     public let storageServiceCensorshipPrefix = "storage"
     public let svr2CensorshipPrefix = "svr2"
 
-    public let svr2Enclave = MrEnclave("ced8217b26228e4b210c985786999d095c4958a94faf37b14acaf25c4cbb02a4")
-
-    // An array of previously used enclaves that we should try and restore
-    // key material from during registration. These must be ordered from
-    // newest to oldest, so we check the latest enclaves for backups before
-    // checking earlier enclaves. Every entry must be attestable by the
-    // pinned libsignal version AND still running; a decommissioned enclave
-    // here aborts the whole restore chain instead of falling through.
+    // An array of enclaves that we should try and restore key material from
+    // during registration. These must be ordered from newest to oldest, so we
+    // check the latest enclaves before checking earlier enclaves.
     //
-    // Empty since 2026-11: Signal shut down 2026Q1 (1240acbd…) and 2025Q3
-    // (29cd63c8…), both now return 404, and libsignal 0.99.4 can no longer
-    // attest 2025Q3.
-    public let svr2PreviousEnclaves: [MrEnclave] = []
+    // When backing up, we attempt to back up to the first
+    // `activeSvr2EnclaveCount` elements of this array. We typically set it to
+    // two for a brief time after adding a new enclave.
+    public let svr2Enclaves = [
+        MrEnclave("fdbbacdc0c043d0d53fe1440f62728de0386f45ab0a275bd8f99e03a02af355e"),
+        MrEnclave("ced8217b26228e4b210c985786999d095c4958a94faf37b14acaf25c4cbb02a4"),
+    ]
+
+    public let activeSvr2EnclaveCount: Int = 2
 
     public let applicationGroup = "group." + Bundle.main.bundleIdPrefix + ".signal.group"
 
     /// We *might* need to clear credentials (or perform some other migration)
     /// when this value changes, depending on how it's changing. If you do need
     /// to perform a migration, check out `ZkParamsMigrator`.
-    public let serverPublicParams = Data(base64Encoded: "AMhf5ywVwITZMsff/eCyudZx9JDmkkkbV6PInzG4p8x3VqVJSFiMvnvlEKWuRob/1eaIetR31IYeAbm0NdOuHH8Qi+Rexi1wLlpzIo1gstHWBfZzy1+qHRV5A4TqPp15YzBPm0WSggW6PbSn+F4lf57VCnHF7p8SvzAA2ZZJPYJURt8X7bbg+H3i+PEjH9DXItNEqs2sNcug37xZQDLm7X36nOoGPs54XsEGzPdEV+itQNGUFEjY6X9Uv+Acuks7NpyGvCoKxGwgKgE5XyJ+nNKlyHHOLb6N1NuHyBrZrgtY/JYJHRooo5CEqYKBqdFnmbTVGEkCvJKxLnjwKWf+fEPoWeQFj5ObDjcKMZf2Jm2Ae69x+ikU5gBXsRmoF94GXTLfN0/vLt98KDPnxwAQL9j5V1jGOY8jQl6MLxEs56cwXN0dqCnImzVH3TZT1cJ8SW1BRX6qIVxEzjsSGx3yxF3suAilPMqGRp4ffyopjMD1JXiKR2RwLKzizUe5e8XyGOy9fplzhw3jVzTRyUZTRSZKkMLWcQ/gv0E4aONNqs4P+NameAZYOD12qRkxosQQP5uux6B2nRyZ7sAV54DgFyLiRcq1FvwKw2EPQdk4HDoePrO/RNUbyNddnM/mMgj4FW65xCoT1LmjrIjsv/Ggdlx46ueczhMgtBunx1/w8k8V+l8LVZ8gAT6wkU5J+DPQalQguMg12Jzug3q4TbdHiGCmD9EunCwOmsLuLJkz6EcSYXtrlDEnAM+hicw7iergYLLlMXpfTdGxJCWJmP4zqUFeTTmsmhsjGBt7NiEB/9pFFEB3pSbf4iiUukw63Eo8Aqnf4iwob6X1QviCWuc8t0LUlT9vALgh/f2DPVOOmR0RW6bgRvc7DSF20V/omg+YBw==")!
+    public let serverPublicParamsData = Data(base64Encoded: "AMhf5ywVwITZMsff/eCyudZx9JDmkkkbV6PInzG4p8x3VqVJSFiMvnvlEKWuRob/1eaIetR31IYeAbm0NdOuHH8Qi+Rexi1wLlpzIo1gstHWBfZzy1+qHRV5A4TqPp15YzBPm0WSggW6PbSn+F4lf57VCnHF7p8SvzAA2ZZJPYJURt8X7bbg+H3i+PEjH9DXItNEqs2sNcug37xZQDLm7X36nOoGPs54XsEGzPdEV+itQNGUFEjY6X9Uv+Acuks7NpyGvCoKxGwgKgE5XyJ+nNKlyHHOLb6N1NuHyBrZrgtY/JYJHRooo5CEqYKBqdFnmbTVGEkCvJKxLnjwKWf+fEPoWeQFj5ObDjcKMZf2Jm2Ae69x+ikU5gBXsRmoF94GXTLfN0/vLt98KDPnxwAQL9j5V1jGOY8jQl6MLxEs56cwXN0dqCnImzVH3TZT1cJ8SW1BRX6qIVxEzjsSGx3yxF3suAilPMqGRp4ffyopjMD1JXiKR2RwLKzizUe5e8XyGOy9fplzhw3jVzTRyUZTRSZKkMLWcQ/gv0E4aONNqs4P+NameAZYOD12qRkxosQQP5uux6B2nRyZ7sAV54DgFyLiRcq1FvwKw2EPQdk4HDoePrO/RNUbyNddnM/mMgj4FW65xCoT1LmjrIjsv/Ggdlx46ueczhMgtBunx1/w8k8V+l8LVZ8gAT6wkU5J+DPQalQguMg12Jzug3q4TbdHiGCmD9EunCwOmsLuLJkz6EcSYXtrlDEnAM+hicw7iergYLLlMXpfTdGxJCWJmP4zqUFeTTmsmhsjGBt7NiEB/9pFFEB3pSbf4iiUukw63Eo8Aqnf4iwob6X1QviCWuc8t0LUlT9vALgh/f2DPVOOmR0RW6bgRvc7DSF20V/omg+YBw==")!
 
-    public let callLinkPublicParams = Data(base64Encoded: "AByD873dTilmOSG0TjKrvpeaKEsUmIO8Vx9BeMmftwUs9v7ikPwM8P3OHyT0+X3EUMZrSe9VUp26Wai51Q9I8mdk0hX/yo7CeFGJyzoOqn8e/i4Ygbn5HoAyXJx5eXfIbqpc0bIxzju4H/HOQeOpt6h742qii5u/cbwOhFZCsMIbElZTaeU+BWMBQiZHIGHT5IE0qCordQKZ5iPZom0HeFa8Yq0ShuEyAl0WINBiY6xE3H/9WnvzXBbMuuk//eRxXgzO8ieCeK8FwQNxbfXqZm6Ro1cMhCOF3u7xoX83QhpN")!
+    public let callLinkPublicParamsData = Data(base64Encoded: "AeCO67P9mIv1yUHkdeZ9JF789GDbox61GvTqq3S4kYc1ADUWxWHQygU390tv1oRWt9WjkdZlU7mKkifF59ftjE+2ZlMmxns6I+ySiLpR8FEmfu+TGpVp3zYTjNV93obJJTyBCCsSHVETCyQRbKdCyb5TMa6LGrvcZaX0Q/VAavhuNA/m4kSiRMgSnYrUjGhVekdDnF+7xioo4wvFnxjIDh7uJQrYOWD6MloNGX7St5gbysTuQQ7i/HI38b9V8x8mKazuDSXxB//BKGZx/XHkK8cHX+QK1MPxYUVM1/CBI5oW")!
 
-    public let backupServerPublicParams = Data(base64Encoded: "AJwNSU55fsFCbgaxGRD11wO1juAs8Yr5GF8FPlGzzvdJJIKH5/4CC7ZJSOe3yL2vturVaRU2Cx0n751Vt8wkj1bozK3CBV1UokxV09GWf+hdVImLGjXGYLLhnI1J2TWEe7iWHyb553EEnRb5oxr9n3lUbNAJuRmFM7hrr0Al0F0wrDD4S8lo2mGaXe0MJCOM166F8oYRQqpFeEHfiLnxA1O8ZLh7vMdv4g9jI5phpRBTsJ5IjiJrWeP0zdIGHEssUeprDZ9OUJ14m0v61eYJMKsf59Bn+mAT2a7YfB+Don9O")!
+    public let backupServerPublicParamsData = Data(base64Encoded: "AZwNSU55fsFCbgaxGRD11wO1juAs8Yr5GF8FPlGzzvdJJIKH5/4CC7ZJSOe3yL2vturVaRU2Cx0n751Vt8wkj1Y4pyiScu0/S10n647ipo+iq97JZQv+UOlwH8ThyNlGT5DfxXCwTqivxHuXvZpuezPgHk5Gxl5aC6xuNxOnwmFlmu4CeSgdhW8+Pp0vAJOQ1MsU2D0+/kzI+tU94nB3tybY/Ao1AcGW2q41uKQbnOJUWwmQaFT6s+xTISgzsg7CPox6oORGX8rnyk/9lic3DbGsUHctIVpMAl/ogJBb4aYC")!
 }
 
 // MARK: - Staging
@@ -212,8 +235,7 @@ public class TSConstantsStaging: TSConstantsProtocol {
 
     public init() {}
 
-    public let mainServiceIdentifiedURL = "https://chat.staging.signal.org"
-    public let mainServiceUnidentifiedURL = "https://ud-chat.staging.signal.org"
+    public let mainServiceURL = "https://chat.staging.signal.org"
     public let textSecureCDN0ServerURL = "https://cdn-staging.signal.org"
     public let textSecureCDN2ServerURL = "https://cdn2-staging.signal.org"
     public let textSecureCDN3ServerURL = "https://cdn3-staging.signal.org"
@@ -239,28 +261,22 @@ public class TSConstantsStaging: TSConstantsProtocol {
     public let storageServiceCensorshipPrefix = "storage-staging"
     public let svr2CensorshipPrefix = "svr2-staging"
 
-    public let svr2Enclave = MrEnclave("3c699f4975aaa3d172c0aad042f94f031b2b03e10b9c19a45116a01693d83302")
-
-    // An array of previously used enclaves that we should try and restore
-    // key material from during registration. These must be ordered from
-    // newest to oldest, so we check the latest enclaves for backups before
-    // checking earlier enclaves. Every entry must be attestable by the
-    // pinned libsignal version; a decommissioned enclave here aborts the
-    // whole restore chain instead of falling through.
-    public let svr2PreviousEnclaves: [MrEnclave] = [
-        MrEnclave("97f151f6ed078edbbfd72fa9cae694dcc08353f1f5e8d9ccd79a971b10ffc535"),
+    public let svr2Enclaves = [
+        MrEnclave("0ff2d7d4efbe7cfc24ac069a16fba898928dbe6c40d500c8b6da55733c727d6e"),
     ]
+
+    public let activeSvr2EnclaveCount: Int = 1
 
     public let applicationGroup = "group." + Bundle.main.bundleIdPrefix + ".signal.group.staging"
 
     /// We *might* need to clear credentials (or perform some other migration)
     /// when this value changes, depending on how it's changing. If you do need
     /// to perform a migration, check out `ZkParamsMigrator`.
-    public let serverPublicParams = Data(base64Encoded: "ABSY21VckQcbSXVNCGRYJcfWHiAMZmpTtTELcDmxgdFbtp/bWsSxZdMKzfCp8rvIs8ocCU3B37fT3r4Mi5qAemeGeR2X+/YmOGR5ofui7tD5mDQfstAI9i+4WpMtIe8KC3wU5w3Inq3uNWVmoGtpKndsNfwJrCg0Hd9zmObhypUnSkfYn2ooMOOnBpfdanRtrvetZUayDMSC5iSRcXKpdlukrpzzsCIvEwjwQlJYVPOQPj4V0F4UXXBdHSLK05uoPBCQG8G9rYIGedYsClJXnbrgGYG3eMTG5hnx4X4ntARBgELuMWWUEEfSK0mjXg+/2lPmWcTZWR9nkqgQQP0tbzuiPm74H2wMO4u1Wafe+UwyIlIT9L7KLS19Aw8r4sPrXZSSsOZ6s7M1+rTJN0bI5CKY2PX29y5Ok3jSWufIKcgKOnWoP67d5b2du2ZVJjpjfibNIHbT/cegy/sBLoFwtHogVYUewANUAXIaMPyCLRArsKhfJ5wBtTminG/PAvuBdJ70Z/bXVPf8TVsR292zQ65xwvWTejROW6AZX6aqucUjlENAErBme1YHmOSpU6tr6doJ66dPzVAWIanmO/5mgjNEDeK7DDqQdB1xd03HT2Qs2TxY3kCK8aAb/0iM0HQiXjxZ9HIgYhbtvGEnDKW5ILSUydqH/KBhW4Pb0jZWnqN/YgbWDKeJxnDbYcUob5ZY5Lt5ZCMKuaGUvCJRrCtuugSMaqjowCGRempsDdJEt+cMaalhZ6gczklJB/IbdwENW9KeVFPoFNFzhxWUIS5ML9riVYhAtE6JE5jX0xiHNVIIPthb458cfA8daR0nYfYAUKogQArm0iBezOO+mPk5vCNWI+wwkyFCqNDXz/qxl1gAntuCJtSfq9OC3NkdhQlgYQ==")!
+    public let serverPublicParamsData = Data(base64Encoded: "ABSY21VckQcbSXVNCGRYJcfWHiAMZmpTtTELcDmxgdFbtp/bWsSxZdMKzfCp8rvIs8ocCU3B37fT3r4Mi5qAemeGeR2X+/YmOGR5ofui7tD5mDQfstAI9i+4WpMtIe8KC3wU5w3Inq3uNWVmoGtpKndsNfwJrCg0Hd9zmObhypUnSkfYn2ooMOOnBpfdanRtrvetZUayDMSC5iSRcXKpdlukrpzzsCIvEwjwQlJYVPOQPj4V0F4UXXBdHSLK05uoPBCQG8G9rYIGedYsClJXnbrgGYG3eMTG5hnx4X4ntARBgELuMWWUEEfSK0mjXg+/2lPmWcTZWR9nkqgQQP0tbzuiPm74H2wMO4u1Wafe+UwyIlIT9L7KLS19Aw8r4sPrXZSSsOZ6s7M1+rTJN0bI5CKY2PX29y5Ok3jSWufIKcgKOnWoP67d5b2du2ZVJjpjfibNIHbT/cegy/sBLoFwtHogVYUewANUAXIaMPyCLRArsKhfJ5wBtTminG/PAvuBdJ70Z/bXVPf8TVsR292zQ65xwvWTejROW6AZX6aqucUjlENAErBme1YHmOSpU6tr6doJ66dPzVAWIanmO/5mgjNEDeK7DDqQdB1xd03HT2Qs2TxY3kCK8aAb/0iM0HQiXjxZ9HIgYhbtvGEnDKW5ILSUydqH/KBhW4Pb0jZWnqN/YgbWDKeJxnDbYcUob5ZY5Lt5ZCMKuaGUvCJRrCtuugSMaqjowCGRempsDdJEt+cMaalhZ6gczklJB/IbdwENW9KeVFPoFNFzhxWUIS5ML9riVYhAtE6JE5jX0xiHNVIIPthb458cfA8daR0nYfYAUKogQArm0iBezOO+mPk5vCNWI+wwkyFCqNDXz/qxl1gAntuCJtSfq9OC3NkdhQlgYQ==")!
 
-    public let callLinkPublicParams = Data(base64Encoded: "AHILOIrFPXX9laLbalbA9+L1CXpSbM/bTJXZGZiuyK1JaI6dK5FHHWL6tWxmHKYAZTSYmElmJ5z2A5YcirjO/yfoemE03FItyaf8W1fE4p14hzb5qnrmfXUSiAIVrhaXVwIwSzH6RL/+EO8jFIjJ/YfExfJ8aBl48CKHgu1+A6kWynhttonvWWx6h7924mIzW0Czj2ROuh4LwQyZypex4GuOPW8sgIT21KNZaafgg+KbV7XM1x1tF3XA17B4uGUaDbDw2O+nR1+U5p6qHPzmJ7ggFjSN6Utu+35dS1sS0P9N")!
+    public let callLinkPublicParamsData = Data(base64Encoded: "AYhaw+NbxtNLo/RlGFEsHd904hW38LpPJ59jYJlNmT4wwtyOq4xzCs/MyXsfRbIsAYhQjDnpE0rhFtWkMcn/kV740SISwFfpPHunrtZ9h0YWz5QNNbI5I3DRGUjhKXgMU7J7s7qOr0fdms+g0e+L9FMSjJLobDkOngp/m0B5TsxTyqLscJ5VyU69Cj8txImTfHMCKrYphYfRHO78RwPoz2g2tGUAzEbKHm12OgDna2qutkE5TvYqwZczvgZyLVHdHXpvdyOlEdv4afVyWkI7u/S0XYDonIJoHlxqJoTSepZR")!
 
-    public let backupServerPublicParams = Data(base64Encoded: "AHYrGb9IfugAAJiPKp+mdXUx+OL9zBolPYHYQz6GI1gWjpEu5me3zVNSvmYY4zWboZHif+HG1sDHSuvwFd0QszSwuSF4X4kRP3fJREdTZ5MCR0n55zUppTwfHRW2S4sdQ0JGz7YDQIJCufYSKh0pGNEHL6hv79Agrdnr4momr3oXdnkpVBIp3HWAQ6IbXQVSG18X36GaicI1vdT0UFmTwU2KTneluC2eyL9c5ff8PcmiS+YcLzh0OKYQXB5ZfQ06d6DiINvDQLy75zcfUOniLAj0lGJiHxGczin/RXisKSR8")!
+    public let backupServerPublicParamsData = Data(base64Encoded: "AXYrGb9IfugAAJiPKp+mdXUx+OL9zBolPYHYQz6GI1gWjpEu5me3zVNSvmYY4zWboZHif+HG1sDHSuvwFd0QszS6h3nZ6vRdM/IYGK+cLynw3ucWo7idf3zjOG3b6JnGT/z7XYCr6HuOGkWH4DQWCH98hxVZMGOgmT8DCQoqebQb3oK1yrwEglRWmtI01KhRg9RGUKoQiwuej1JZEY8uaG4Uz9n1cVODJ1iuByhNqGHo+KfI4iWhjtx2AnhYqHViQ3CMd4ASGBJtic9UTFVk/4vegVIy0wfYsAmViftzK6t4")!
 
 }
 
@@ -272,9 +288,7 @@ public class TSConstantsMock: TSConstantsProtocol {
 
     private let defaultValues = TSConstantsProduction()
 
-    public lazy var mainServiceIdentifiedURL = defaultValues.mainServiceIdentifiedURL
-
-    public lazy var mainServiceUnidentifiedURL = defaultValues.mainServiceUnidentifiedURL
+    public lazy var mainServiceURL = defaultValues.mainServiceURL
 
     public lazy var textSecureCDN0ServerURL = defaultValues.textSecureCDN0ServerURL
 
@@ -315,17 +329,17 @@ public class TSConstantsMock: TSConstantsProtocol {
 
     public lazy var svr2CensorshipPrefix = defaultValues.svr2CensorshipPrefix
 
-    public lazy var svr2Enclave = defaultValues.svr2Enclave
+    public lazy var svr2Enclaves = defaultValues.svr2Enclaves
 
-    public lazy var svr2PreviousEnclaves = defaultValues.svr2PreviousEnclaves
+    public lazy var activeSvr2EnclaveCount = defaultValues.activeSvr2EnclaveCount
 
     public lazy var applicationGroup = defaultValues.applicationGroup
 
-    public lazy var serverPublicParams = defaultValues.serverPublicParams
+    public lazy var serverPublicParamsData = defaultValues.serverPublicParamsData
 
-    public lazy var callLinkPublicParams = defaultValues.callLinkPublicParams
+    public lazy var callLinkPublicParamsData = defaultValues.callLinkPublicParamsData
 
-    public lazy var backupServerPublicParams = defaultValues.backupServerPublicParams
+    public lazy var backupServerPublicParamsData = defaultValues.backupServerPublicParamsData
 }
 
 #endif

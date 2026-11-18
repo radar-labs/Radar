@@ -31,13 +31,13 @@ final class PreKeyTaskTests: SSKBaseTest {
         testContext.shouldProcessIncomingMessages = false
 
         let recipientDbTable = RecipientDatabaseTable()
-        let recipientFetcher = RecipientFetcherImpl(
+        let recipientFetcher = RecipientFetcher(
             recipientDatabaseTable: recipientDbTable,
             searchableNameIndexer: MockSearchableNameIndexer(),
         )
         let recipientIdFinder = RecipientIdFinder(
             recipientDatabaseTable: recipientDbTable,
-            recipientFetcher: recipientFetcher
+            recipientFetcher: recipientFetcher,
         )
         mockIdentityManager = .init(recipientIdFinder: recipientIdFinder)
         mockTSAccountManager = .init()
@@ -45,14 +45,28 @@ final class PreKeyTaskTests: SSKBaseTest {
         mockAPIClient = .init()
         mockDateProvider = .init()
         mockDb = InMemoryDB()
+        let sessionStore = SignalServiceKit.SessionStore()
 
         mockPreKeyStore = PreKeyStore()
-        mockAciProtocolStore = .mock(identity: .aci, preKeyStore: mockPreKeyStore)
-        mockPniProtocolStore = .mock(identity: .pni, preKeyStore: mockPreKeyStore)
+        mockAciProtocolStore = .build(
+            dateProvider: mockDateProvider.targetDate,
+            identity: .aci,
+            preKeyStore: mockPreKeyStore,
+            recipientIdFinder: recipientIdFinder,
+            sessionStore: sessionStore,
+        )
+        mockPniProtocolStore = .build(
+            dateProvider: mockDateProvider.targetDate,
+            identity: .pni,
+            preKeyStore: mockPreKeyStore,
+            recipientIdFinder: recipientIdFinder,
+            sessionStore: sessionStore,
+        )
         mockProtocolStoreManager = SignalProtocolStoreManager(
             aciProtocolStore: mockAciProtocolStore,
             pniProtocolStore: mockPniProtocolStore,
             preKeyStore: mockPreKeyStore,
+            sessionStore: sessionStore,
         )
 
         taskManager = PreKeyTaskManager(
@@ -64,7 +78,7 @@ final class PreKeyTaskTests: SSKBaseTest {
             messageProcessor: SSKEnvironment.shared.messageProcessorRef,
             protocolStoreManager: mockProtocolStoreManager,
             remoteConfigProvider: MockRemoteConfigProvider(),
-            tsAccountManager: mockTSAccountManager
+            tsAccountManager: mockTSAccountManager,
         )
     }
 
@@ -100,6 +114,7 @@ final class PreKeyTaskTests: SSKBaseTest {
     //
     //
     // MARK: - Create PreKey Tests
+
     //
     //
 
@@ -203,7 +218,7 @@ final class PreKeyTaskTests: SSKBaseTest {
             identity: .aci,
             targets: [.lastResortPqPreKey, .oneTimePqPreKey],
             force: true,
-            auth: .implicit()
+            auth: .implicit(),
         )
 
         // Validate
@@ -219,6 +234,7 @@ final class PreKeyTaskTests: SSKBaseTest {
     //
     //
     // MARK: - Refresh Tests
+
     //
     //
 
@@ -307,6 +323,7 @@ final class PreKeyTaskTests: SSKBaseTest {
     //
     //
     // MARK: - Force Refresh Tests
+
     //
     //
 
@@ -319,7 +336,7 @@ final class PreKeyTaskTests: SSKBaseTest {
         mockDb.write { tx in
             mockAciProtocolStore.signedPreKeyStore.setLastSuccessfulRotationDate(
                 mockDateProvider.currentDate,
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -342,7 +359,7 @@ final class PreKeyTaskTests: SSKBaseTest {
         mockDb.write { tx in
             mockAciProtocolStore.signedPreKeyStore.setLastSuccessfulRotationDate(
                 mockDateProvider.currentDate,
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -378,13 +395,13 @@ final class PreKeyTaskTests: SSKBaseTest {
     //
 
     func test422WhileSettingKeysReportsSuspectedPniIdentityKeyIssue() async {
-        mockTSAccountManager.registrationStateMock = { .provisioned }
+        mockTSAccountManager.registrationStateMock = { .provisioned(.forUnitTests) }
         mockIdentityManager.identityKeyPairs[.pni] = ECKeyPair.generateKeyPair()
         mockAPIClient.setPreKeysResult = .error(OWSHTTPError.serviceResponse(.init(
             requestUrl: URL(string: "https://example.com")!,
             responseStatus: 422,
             responseHeaders: HttpHeaders(),
-            responseData: nil
+            responseData: nil,
         )))
         var didValidateIdentityKey = false
         mockIdentityKeyMismatchManager.validateIdentityKeyMock = { _ in

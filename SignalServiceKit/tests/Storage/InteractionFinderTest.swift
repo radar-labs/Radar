@@ -8,71 +8,44 @@ import XCTest
 @testable import SignalServiceKit
 
 class InteractionFinderTest: SSKBaseTest {
-    func testInteractions() {
-        let address1 = SignalServiceAddress(phoneNumber: "+fake-id")
-        // Threads
-        let contactThread1 = TSContactThread(contactAddress: SignalServiceAddress(phoneNumber: "+13213334444"))
-        let contactThread2 = TSContactThread(contactAddress: SignalServiceAddress(phoneNumber: "+13213334445"))
-        // Messages
-        let outgoingMessage1 = TSOutgoingMessage(in: contactThread1, messageBody: "good heavens")
-        let outgoingMessage2 = TSOutgoingMessage(in: contactThread2, messageBody: "land's sakes")
-        let outgoingMessage3 = TSOutgoingMessage(in: contactThread2, messageBody: "oh my word")
-        let errorMessage1: TSErrorMessage = .nonblockingIdentityChange(
-            thread: contactThread1,
-            address: address1,
-            wasIdentityVerified: false
-        )
-        let errorMessage2: TSErrorMessage = .failedDecryption(
-            thread: contactThread1,
-            timestamp: 0,
-            sender: nil
-        )
-        // Non-message interactions
-        let missedCall = TSCall(callType: .incomingMissed,
-                                offerType: .audio,
-                                thread: contactThread1,
-                                sentAtTimestamp: NSDate.ows_millisecondTimeStamp())
 
-        let finder1 = InteractionFinder(threadUniqueId: contactThread1.uniqueId)
-        let finder2 = InteractionFinder(threadUniqueId: contactThread2.uniqueId)
-        self.read { transaction in
-            XCTAssertEqual(0, try! finder1.fetchUniqueIdsForConversationView(rowIdFilter: .newest, limit: 100, tx: transaction, onlyStarred: false).count)
-            XCTAssertEqual(0, try! finder2.fetchUniqueIdsForConversationView(rowIdFilter: .newest, limit: 100, tx: transaction, onlyStarred: false).count)
-        }
-
+    func testBuildUniqueIdCursorForConversationView() {
+        let thread = TSContactThread(contactAddress: SignalServiceAddress(phoneNumber: "+13213334444"))
+        var messages = [TSOutgoingMessage]()
         self.write { transaction in
-            // Threads
-            contactThread1.anyInsert(transaction: transaction)
-            contactThread2.anyInsert(transaction: transaction)
-            // Messages
-            outgoingMessage1.anyInsert(transaction: transaction)
-            outgoingMessage2.anyInsert(transaction: transaction)
-            outgoingMessage3.anyInsert(transaction: transaction)
-            errorMessage1.anyInsert(transaction: transaction)
-            errorMessage2.anyInsert(transaction: transaction)
-            // Non-message interactions
-            missedCall.anyInsert(transaction: transaction)
+            thread.anyInsert(transaction: transaction)
+            for idx in 1...5 {
+                let message = TSOutgoingMessage(in: thread, messageBody: "message \(idx)")
+                message.anyInsert(transaction: transaction)
+                messages.append(message)
+            }
+        }
+
+        let uniqueIds = messages.map { $0.uniqueId }
+        let rowIds = messages.map { $0.sqliteRowId! }
+
+        func drain(_ filter: InteractionFinder.RowIdFilter, tx: DBReadTransaction) -> [String] {
+            var cursor = InteractionFinder(threadUniqueId: thread.uniqueId)
+                .buildUniqueIdCursorForConversationView(rowIdFilter: filter, tx: tx)
+            var results = [String]()
+            while let uniqueId = cursor.next() {
+                results.append(uniqueId)
+            }
+            return results
         }
 
         self.read { transaction in
-            XCTAssertEqual(4, try! finder1.fetchUniqueIdsForConversationView(rowIdFilter: .newest, limit: 100, tx: transaction, onlyStarred: false).count)
-            XCTAssertEqual(2, try! finder2.fetchUniqueIdsForConversationView(rowIdFilter: .newest, limit: 100, tx: transaction, onlyStarred: false).count)
+            // These filters must yield uniqueIds newest first.
+            XCTAssertEqual(drain(.newest, tx: transaction), Array(uniqueIds.reversed()))
+            XCTAssertEqual(drain(.atOrBefore(rowIds[2]), tx: transaction), [uniqueIds[2], uniqueIds[1], uniqueIds[0]])
+            XCTAssertEqual(drain(.before(rowIds[2]), tx: transaction), [uniqueIds[1], uniqueIds[0]])
+            // These filters must yield uniqueIds oldest first.
+            XCTAssertEqual(drain(.after(rowIds[2]), tx: transaction), [uniqueIds[3], uniqueIds[4]])
+            XCTAssertEqual(drain(.range(rowIds[1]...rowIds[3]), tx: transaction), [uniqueIds[1], uniqueIds[2], uniqueIds[3]])
         }
     }
 
     func testUnreadInArchiveIsIgnored() {
-        func makeThread(withUnreadMessages unreadCount: UInt, transaction: DBWriteTransaction) -> TSContactThread {
-            let thread = ContactThreadFactory().create(transaction: transaction)
-
-            if unreadCount > 0 {
-                let messageFactory = IncomingMessageFactory()
-                messageFactory.threadCreator = { _ in return thread }
-                _ = messageFactory.create(count: unreadCount, transaction: transaction)
-            }
-
-            return thread
-        }
-
         let unarchivedCount = UInt(10)
         let archivedCount = UInt(3)
 
@@ -80,8 +53,7 @@ class InteractionFinderTest: SSKBaseTest {
             _ = makeThread(withUnreadMessages: unarchivedCount, transaction: transaction)
 
             let archivedWithMessages = makeThread(withUnreadMessages: archivedCount, transaction: transaction)
-            ThreadAssociatedData
-                .fetchOrDefault(for: archivedWithMessages, transaction: transaction)
+            archivedWithMessages
                 .updateWith(isArchived: true, updateStorageService: false, transaction: transaction)
         }
 
@@ -92,6 +64,42 @@ class InteractionFinderTest: SSKBaseTest {
             XCTAssertEqual(unarchivedCount, unreadCount)
         }
     }
+
+    func testUnreadThreadCount() {
+        write { transaction in
+            _ = makeThread(withUnreadMessages: 5, transaction: transaction)
+            _ = makeThread(withUnreadMessages: 1, transaction: transaction)
+
+            let markedUnread = makeThread(withUnreadMessages: 0, transaction: transaction)
+            // Insert a read message so it's visible in the first place
+            let outgoingFactory = OutgoingMessageFactory()
+            outgoingFactory.threadCreator = { _ in return markedUnread }
+            _ = outgoingFactory.create(transaction: transaction)
+            markedUnread.updateWith(isMarkedUnread: true, updateStorageService: false, transaction: transaction)
+
+            let archived = makeThread(withUnreadMessages: 4, transaction: transaction)
+            archived.updateWith(isArchived: true, updateStorageService: false, transaction: transaction)
+        }
+
+        read { transaction in
+            XCTAssertEqual(3, InteractionFinder.unreadThreadCountInAllThreads(transaction: transaction))
+            XCTAssertEqual(7, InteractionFinder.unreadCountInAllThreads(transaction: transaction))
+        }
+    }
+
+    // MARK: -
+
+    private func makeThread(withUnreadMessages unreadCount: UInt, transaction: DBWriteTransaction) -> TSContactThread {
+        let thread = ContactThreadFactory().create(transaction: transaction)
+
+        if unreadCount > 0 {
+            let messageFactory = IncomingMessageFactory()
+            messageFactory.threadCreator = { _ in return thread }
+            _ = messageFactory.create(count: unreadCount, transaction: transaction)
+        }
+
+        return thread
+    }
 }
 
 // MARK: -
@@ -100,7 +108,7 @@ private extension TSOutgoingMessage {
     convenience init(in thread: TSThread, messageBody: String) {
         let builder: TSOutgoingMessageBuilder = .withDefaultValues(
             thread: thread,
-            messageBody: AttachmentContentValidatorMock.mockValidatedBody(messageBody)
+            messageBody: AttachmentContentValidatorMock.mockValidatedBody(messageBody),
         )
         self.init(outgoingMessageWith: builder, recipientAddressStates: [:])
     }

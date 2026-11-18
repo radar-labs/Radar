@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import LibSignalClient
 import SignalRingRTC
 import SignalServiceKit
 import SignalUI
@@ -20,9 +21,12 @@ protocol GroupCallObserver: AnyObject {
     func groupCallPeekChanged(_ call: GroupCall)
 
     @MainActor
-    func groupCallEnded(_ call: GroupCall, reason: GroupCallEndReason)
+    func groupCallEnded(_ call: GroupCall, reason: CallEndReason)
     func groupCallReceivedReactions(_ call: GroupCall, reactions: [SignalRingRTC.Reaction])
     func groupCallReceivedRaisedHands(_ call: GroupCall, raisedHands: [DemuxId])
+    func groupCallReceivedSpeakingNotification(_ call: GroupCall, event: SpeechEvent)
+    func groupCallReceivedRemoteMute(_ call: GroupCall, muteSource: Aci)
+    func groupCallObservedRemoteMute(_ call: GroupCall, muteSource: Aci, muteTarget: Aci)
 
     /// Invoked if a call message failed to send because of a safety number change
     /// UI observing call state may choose to alert the user (e.g. presenting a SafetyNumberConfirmationSheet)
@@ -33,9 +37,12 @@ extension GroupCallObserver {
     func groupCallLocalDeviceStateChanged(_ call: GroupCall) {}
     func groupCallRemoteDeviceStatesChanged(_ call: GroupCall) {}
     func groupCallPeekChanged(_ call: GroupCall) {}
-    func groupCallEnded(_ call: GroupCall, reason: GroupCallEndReason) {}
+    func groupCallEnded(_ call: GroupCall, reason: CallEndReason) {}
     func groupCallReceivedReactions(_ call: GroupCall, reactions: [SignalRingRTC.Reaction]) {}
     func groupCallReceivedRaisedHands(_ call: GroupCall, raisedHands: [DemuxId]) {}
+    func groupCallReceivedSpeakingNotification(_ call: GroupCall, event: SpeechEvent) {}
+    func groupCallReceivedRemoteMute(_ call: GroupCall, muteSource: Aci) {}
+    func groupCallObservedRemoteMute(_ call: GroupCall, muteSource: Aci, muteTarget: Aci) {}
     func handleUntrustedIdentityError(_ call: GroupCall) {}
 }
 
@@ -61,10 +68,10 @@ class GroupCall: SignalRingRTC.GroupCallDelegate {
     init(
         audioDescription: String,
         ringRtcCall: SignalRingRTC.GroupCall,
-        videoCaptureController: VideoCaptureController
+        videoCaptureController: VideoCaptureController,
     ) {
         self.commonState = CommonCallState(
-            audioActivity: AudioActivity(audioDescription: audioDescription, behavior: .call)
+            audioActivity: AudioActivity(audioDescription: audioDescription, behavior: .call),
         )
         self.ringRtcCall = ringRtcCall
         self.videoCaptureController = videoCaptureController
@@ -85,13 +92,13 @@ class GroupCall: SignalRingRTC.GroupCallDelegate {
     }
 
     func shouldMuteAutomatically() -> Bool {
-        return (
+        return
             ringRtcCall.localDeviceState.joinState == .notJoined
-            && (ringRtcCall.peekInfo?.deviceCountExcludingPendingDevices ?? 0) >= Constants.autoMuteThreshold
-        )
+                && (ringRtcCall.peekInfo?.deviceCountExcludingPendingDevices ?? 0) >= Constants.autoMuteThreshold
+
     }
 
-    public var isJustMe: Bool {
+    var isJustMe: Bool {
         switch ringRtcCall.localDeviceState.joinState {
         case .notJoined, .joining, .pending:
             return true
@@ -213,24 +220,70 @@ class GroupCall: SignalRingRTC.GroupCallDelegate {
     }
 
     @MainActor
-    func groupCall(onEnded groupCall: SignalRingRTC.GroupCall, reason: GroupCallEndReason) {
+    func groupCall(onEnded groupCall: SignalRingRTC.GroupCall, reason: CallEndReason, summary: CallSummary) {
         self.hasInvokedConnectMethod = false
+
+        CallQualitySurveyManager(
+            callSummary: summary,
+            callType: {
+                switch groupCall.kind {
+                case .signalGroup: .group
+                case .callLink: .link
+                }
+            }(),
+            threadUniqueId: {
+                switch concreteType {
+                case .groupThread(let groupThread): groupThread.threadUniqueId
+                case .callLink: nil
+                }
+            }(),
+            deps: .init(
+                db: DependenciesBridge.shared.db,
+                accountManager: DependenciesBridge.shared.tsAccountManager,
+                networkManager: SSKEnvironment.shared.networkManagerRef,
+            ),
+        ).showIfNeeded()
 
         observers.elements.forEach { $0.groupCallEnded(self, reason: reason) }
     }
 
     @MainActor
     func groupCall(onSpeakingNotification groupCall: SignalRingRTC.GroupCall, event: SpeechEvent) {
-        // TODO: Implement speaking notification handling for group calls.
+        observers.elements.forEach { $0.groupCallReceivedSpeakingNotification(self, event: event) }
     }
 
     @MainActor
     func groupCall(onRemoteMuteRequest groupCall: SignalRingRTC.GroupCall, muteSource: UInt32) {
-        // TODO: Implement remote mute request handling for group calls.
+        guard let muteSource = groupCall.remoteDeviceStates[muteSource] else {
+            Logger.warn("Ignoring remote mute request from unknown device \(muteSource)")
+            return
+        }
+        if groupCall.isOutgoingAudioMuted {
+            return
+        }
+        groupCall.setOutgoingAudioRemotelyMuted(muteSource.demuxId)
+        self.groupCall(onLocalDeviceStateChanged: groupCall)
+
+        observers.elements.forEach { $0.groupCallReceivedRemoteMute(self, muteSource: muteSource.aci) }
     }
 
     @MainActor
     func groupCall(onObservedRemoteMute groupCall: SignalRingRTC.GroupCall, muteSource: UInt32, muteTarget: UInt32) {
-        // TODO: Implement remote mute observed handling for group calls.
+        guard let targetAci = groupCall.remoteDeviceStates[muteTarget]?.aci else {
+            Logger.warn("Ignoring observed remote mute request to unknown device \(muteTarget)")
+            return
+        }
+        let sourceAci: Aci
+        if muteSource == groupCall.localDeviceState.demuxId {
+            let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+            sourceAci = tsAccountManager.mustBeRegisteredStateWithMaybeSneakyTransaction().localIdentifiers.aci
+        } else if let remoteDeviceState = groupCall.remoteDeviceStates[muteSource] {
+            sourceAci = remoteDeviceState.aci
+        } else {
+            Logger.warn("Ignoring observed remote mute from unknown device \(muteSource)")
+            return
+        }
+
+        observers.elements.forEach { $0.groupCallObservedRemoteMute(self, muteSource: sourceAci, muteTarget: targetAci) }
     }
 }

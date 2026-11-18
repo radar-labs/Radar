@@ -17,19 +17,19 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
         case .creating:
             explanationText = OWSLocalizedString(
                 "PIN_CREATION_EXPLANATION",
-                comment: "The explanation in the 'pin creation' view."
+                comment: "The explanation in the 'pin creation' view.",
             )
             addLearnMoreLink = true
         case .changing:
             explanationText = OWSLocalizedString(
                 "PIN_CREATION_RECREATION_EXPLANATION",
-                comment: "The re-creation explanation in the 'pin creation' view."
+                comment: "The re-creation explanation in the 'pin creation' view.",
             )
             addLearnMoreLink = true
         case .confirming:
             explanationText = OWSLocalizedString(
                 "PIN_CREATION_CONFIRMATION_EXPLANATION",
-                comment: "The explanation of confirmation in the 'pin creation' view."
+                comment: "The explanation of confirmation in the 'pin creation' view.",
             )
             addLearnMoreLink = false
         }
@@ -39,8 +39,8 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
             string: explanationText,
             attributes: [
                 .font: font,
-                .foregroundColor: UIColor.Signal.secondaryLabel
-            ]
+                .foregroundColor: UIColor.Signal.secondaryLabel,
+            ],
         )
 
         if addLearnMoreLink {
@@ -60,7 +60,7 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
                 attributes: [
                     .link: URL.Support.pin,
                     .font: linkFont,
-                ]
+                ],
             )
 
             explanationLabel.tintColor = linkColor
@@ -72,7 +72,7 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
     }()
 
     private lazy var pinTextField: UITextField = {
-        let textField = UITextField()
+        let textField = NoAutofillSecureEntryTextField()
         textField.textAlignment = .center
         textField.textColor = .Signal.label
         if #available(iOS 26, *) {
@@ -80,19 +80,13 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
         }
         textField.backgroundColor = .Signal.secondaryGroupedBackground
         textField.font = .systemFont(ofSize: 22)
-        textField.textContentType = .password
-        textField.isSecureTextEntry = true
         textField.defaultTextAttributes.updateValue(5, forKey: .kern)
         textField.accessibilityIdentifier = "pinCreation.pinTextField"
-#if compiler(>=6.2)
         if #available(iOS 26, *) {
             textField.cornerConfiguration = .capsule()
         } else {
             textField.layer.cornerRadius = 10
         }
-#else
-        textField.layer.cornerRadius = 10
-#endif
         textField.delegate = self
         return textField
     }()
@@ -102,7 +96,7 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
             configuration: .mediumBorderless(title: ""),
             primaryAction: UIAction { [weak self] _ in
                 self?.togglePinType()
-            }
+            },
         )
         button.enableMultilineLabel()
         button.accessibilityIdentifier = "pinCreation.pinTypeToggle"
@@ -114,7 +108,7 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
             configuration: .largePrimary(title: CommonStrings.continueButton),
             primaryAction: UIAction { [weak self] _ in
                 self?.continuePressed()
-            }
+            },
         )
         button.accessibilityIdentifier = "pinCreation.nextButton"
         return button
@@ -122,7 +116,7 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
 
     private let validationWarningLabel: UILabel = {
         let validationWarningLabel = UILabel()
-        validationWarningLabel.textColor = .ows_accentRed
+        validationWarningLabel.textColor = .Signal.red
         validationWarningLabel.textAlignment = .center
         validationWarningLabel.font = .dynamicTypeFootnoteClamped
         validationWarningLabel.numberOfLines = 0
@@ -154,6 +148,7 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
             }
         }
     }
+
     private let mode: Mode
 
     private let initialMode: Mode
@@ -168,13 +163,14 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
             return self != .valid
         }
     }
+
     private var validationState: ValidationState = .valid {
         didSet {
             updateValidationWarnings()
         }
     }
 
-    private var pinType: SVR.PinType {
+    private var pinType: OWS2FAManager.PinType {
         didSet {
             updatePinType()
         }
@@ -182,38 +178,36 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
 
     private let showCancelButton: Bool
 
-    // Called once pin setup has finished. Error will be nil upon success
-    private let completionHandler: (PinSetupViewController, Error?) -> Void
-
+    private let onSuccess: (PinSetupViewController) -> Void
     private let context: ViewControllerContext
 
     convenience init(
         mode: Mode,
         showCancelButton: Bool = false,
-        completionHandler: @escaping (PinSetupViewController, Error?) -> Void
+        onSuccess: @escaping (PinSetupViewController) -> Void,
     ) {
         self.init(
             mode: mode,
             initialMode: mode,
             pinType: .numeric,
             showCancelButton: showCancelButton,
-            completionHandler: completionHandler
+            onSuccess: onSuccess,
         )
     }
 
     private init(
         mode: Mode,
         initialMode: Mode,
-        pinType: SVR.PinType,
+        pinType: OWS2FAManager.PinType,
         showCancelButton: Bool,
-        completionHandler: @escaping (PinSetupViewController, Error?) -> Void
+        onSuccess: @escaping (PinSetupViewController) -> Void,
     ) {
         assert(DependenciesBridge.shared.tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegisteredPrimaryDevice)
         self.mode = mode
         self.initialMode = initialMode
         self.pinType = pinType
         self.showCancelButton = showCancelButton
-        self.completionHandler = completionHandler
+        self.onSuccess = onSuccess
         // TODO[ViewContextPiping]
         self.context = ViewControllerContext.shared
         super.init()
@@ -256,52 +250,36 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
         }
         OWSTableViewController2.removeBackButtonText(viewController: self)
 
-        let buttonContainer = UIStackView(arrangedSubviews: [ pinTypeToggleButton, continueButton ])
+        let buttonContainer = UIStackView(arrangedSubviews: [pinTypeToggleButton, continueButton])
         buttonContainer.axis = .vertical
         buttonContainer.spacing = 16
         buttonContainer.isLayoutMarginsRelativeArrangement = true
-        buttonContainer.directionalLayoutMargins = .init(top: 0, leading: 12, bottom: 16, trailing: 12)
+        buttonContainer.directionalLayoutMargins = .buttonContainerLayoutMargins
 
-        let stackView = UIStackView(arrangedSubviews: [
-            explanationLabel,
-            pinTextField,
-            recommendationLabel,
-            validationWarningLabel,
-            .vStretchingSpacer(),
-            buttonContainer,
-        ])
-        stackView.axis = .vertical
-        stackView.alignment = .fill
-        stackView.spacing = 16
+        let stackView = addStaticContentStackView(
+            arrangedSubviews: [
+                explanationLabel,
+                pinTextField,
+                recommendationLabel,
+                validationWarningLabel,
+                .vStretchingSpacer(),
+                buttonContainer,
+            ],
+            isScrollable: true,
+            shouldAvoidKeyboard: true,
+        )
         stackView.setCustomSpacing(24, after: explanationLabel)
-        stackView.preservesSuperviewLayoutMargins = true
-        stackView.isLayoutMarginsRelativeArrangement = true
-        view.addSubview(stackView)
-        stackView.translatesAutoresizingMaskIntoConstraints = false
+
         pinTextField.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             pinTextField.heightAnchor.constraint(greaterThanOrEqualToConstant: 50),
-
-            stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            stackView.bottomAnchor.constraint(equalTo: keyboardLayoutGuide.topAnchor),
         ])
 
         updateValidationWarnings()
         updatePinType()
     }
 
-    override public func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-
-        let topMargin: CGFloat = self.prefersNavigationBarHidden ? 32 : 0
-        let hMargin: CGFloat = UIDevice.current.isIPhone5OrShorter ? 13 : 26
-        view.layoutMargins = UIEdgeInsets(top: topMargin, leading: hMargin, bottom: 0, trailing: hMargin)
-        view.layoutIfNeeded()
-    }
-
-    public override func viewDidAppear(_ animated: Bool) {
+    override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         // TODO: Maybe do this in will appear, to avoid the keyboard sliding in when the view is pushed?
@@ -341,7 +319,7 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
                 initialMode: initialMode,
                 pinType: pinType,
                 showCancelButton: false, // we're pushing, so we never need a cancel button
-                completionHandler: completionHandler
+                onSuccess: onSuccess,
             )
             navigationController?.pushViewController(confirmingVC, animated: true)
         case .confirming:
@@ -359,18 +337,26 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
         case .tooShort:
             switch pinType {
             case .numeric:
-                validationWarningLabel.text = OWSLocalizedString("PIN_CREATION_NUMERIC_HINT",
-                                                                comment: "Label indicating the user must use at least 4 digits")
+                validationWarningLabel.text = OWSLocalizedString(
+                    "PIN_CREATION_NUMERIC_HINT",
+                    comment: "Label indicating the user must use at least 4 digits",
+                )
             case .alphanumeric:
-                validationWarningLabel.text = OWSLocalizedString("PIN_CREATION_ALPHANUMERIC_HINT",
-                                                                comment: "Label indicating the user must use at least 4 characters")
+                validationWarningLabel.text = OWSLocalizedString(
+                    "PIN_CREATION_ALPHANUMERIC_HINT",
+                    comment: "Label indicating the user must use at least 4 characters",
+                )
             }
         case .mismatch:
-            validationWarningLabel.text = OWSLocalizedString("PIN_CREATION_MISMATCH_ERROR",
-                                                            comment: "Label indicating that the attempted PIN does not match the first PIN")
+            validationWarningLabel.text = OWSLocalizedString(
+                "PIN_CREATION_MISMATCH_ERROR",
+                comment: "Label indicating that the attempted PIN does not match the first PIN",
+            )
         case .weak:
-            validationWarningLabel.text = OWSLocalizedString("PIN_CREATION_WEAK_ERROR",
-                                                            comment: "Label indicating that the attempted PIN is too weak")
+            validationWarningLabel.text = OWSLocalizedString(
+                "PIN_CREATION_WEAK_ERROR",
+                comment: "Label indicating that the attempted PIN is too weak",
+            )
         default:
             break
         }
@@ -388,22 +374,22 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
         case .numeric:
             pinTypeToggleButton.configuration?.title = OWSLocalizedString(
                 "PIN_CREATION_CREATE_ALPHANUMERIC",
-                comment: "Button asking if the user would like to create an alphanumeric PIN"
+                comment: "Button asking if the user would like to create an alphanumeric PIN",
             )
             pinTextField.keyboardType = .asciiCapableNumberPad
             recommendationLabelText = OWSLocalizedString(
                 "PIN_CREATION_NUMERIC_HINT",
-                comment: "Label indicating the user must use at least 4 digits"
+                comment: "Label indicating the user must use at least 4 digits",
             )
         case .alphanumeric:
             pinTypeToggleButton.configuration?.title = OWSLocalizedString(
                 "PIN_CREATION_CREATE_NUMERIC",
-                comment: "Button asking if the user would like to create an numeric PIN"
+                comment: "Button asking if the user would like to create an numeric PIN",
             )
             pinTextField.keyboardType = .default
             recommendationLabelText = OWSLocalizedString(
                 "PIN_CREATION_ALPHANUMERIC_HINT",
-                comment: "Label indicating the user must use at least 4 characters"
+                comment: "Label indicating the user must use at least 4 characters",
             )
         }
 
@@ -413,7 +399,7 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
             pinTypeToggleButton.isHidden = true
             recommendationLabel.text = OWSLocalizedString(
                 "PIN_CREATION_PIN_CONFIRMATION_HINT",
-                comment: "Label indication the user must confirm their PIN."
+                comment: "Label indication the user must confirm their PIN.",
             )
         } else {
             pinTypeToggleButton.isHidden = false
@@ -430,11 +416,6 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
         }
     }
 
-    private enum PinSetupError: Error {
-        case networkFailure
-        case enable2FA
-    }
-
     private func enable2FAAndContinue(withPin pin: String) {
         Logger.debug("")
 
@@ -443,8 +424,8 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
         let progressView = AnimatedProgressView(
             loadingText: OWSLocalizedString(
                 "PIN_CREATION_PIN_PROGRESS",
-                comment: "Indicates the work we are doing while creating the user's pin"
-            )
+                comment: "Indicates the work we are doing while creating the user's pin",
+            ),
         )
         view.addSubview(progressView)
         progressView.translatesAutoresizingMaskIntoConstraints = false
@@ -468,7 +449,7 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
                 DispatchQueue.main.async {
                     // The completion handler always dismisses this view, so we don't want to animate anything.
                     progressView.stopAnimatingImmediately()
-                    self.completionHandler(self, nil)
+                    self.onSuccess(self)
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -481,47 +462,22 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
                         self.view.isUserInteractionEnabled = true
                         progressView.removeFromSuperview()
 
-                        guard let error = error as? PinSetupError else {
-                            return owsFailDebug("Unexpected error during PIN setup \(error)")
-                        }
-
-                        switch error {
-                        case .networkFailure:
+                        if error.isNetworkFailureOrTimeout {
                             OWSActionSheets.showActionSheet(
-                                title: OWSLocalizedString(
-                                    "PIN_CREATION_NO_NETWORK_ERROR_TITLE",
-                                    comment: "Error title indicating that the attempt to create a PIN failed due to network issues."),
                                 message: OWSLocalizedString(
-                                    "PIN_CREATION_NO_NETWORK_ERROR_MESSAGE",
-                                    comment: "Error body indicating that the attempt to create a PIN failed due to network issues.")
+                                    "PIN_CREATION_NETWORK_ERROR_MESSAGE",
+                                    comment: "Message when a network error occurs while creating a PIN.",
+                                ),
                             )
-                        case .enable2FA:
-                            switch self.initialMode {
-                            case .changing:
-                                OWSActionSheets.showActionSheet(
-                                    title: OWSLocalizedString(
-                                        "PIN_CHANGE_ERROR_TITLE",
-                                        comment: "Error title indicating that the attempt to change a PIN failed."),
-                                    message: OWSLocalizedString(
-                                        "PIN_CHANGE_ERROR_MESSAGE",
-                                        comment: "Error body indicating that the attempt to change a PIN failed.")
-                                ) { _ in
-                                    self.completionHandler(self, error)
-                                }
-                            case .creating:
-                                OWSActionSheets.showActionSheet(
-                                    title: OWSLocalizedString(
-                                        "PIN_RECREATION_ERROR_TITLE",
-                                        comment: "Error title indicating that the attempt to recreate a PIN failed."),
-                                    message: OWSLocalizedString(
-                                        "PIN_RECRETION_ERROR_MESSAGE",
-                                        comment: "Error body indicating that the attempt to recreate a PIN failed.")
-                                ) { _ in
-                                    self.completionHandler(self, error)
-                                }
-                            case .confirming:
-                                owsFailDebug("Unexpected initial mode")
-                            }
+                        } else {
+                            OWSActionSheets.showContactSupportActionSheet(
+                                message: OWSLocalizedString(
+                                    "PIN_CREATION_GENERIC_ERROR_MESSAGE",
+                                    comment: "Message when a generic error occurs while creating a PIN.",
+                                ),
+                                emailFilter: .custom("PinCreateFailure"),
+                                fromViewController: self,
+                            )
                         }
                     }
                 }
@@ -530,7 +486,6 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
     }
 
     private func _enable2FAAndContinue(withPin pin: String) async throws {
-        let accountAttributesUpdater = DependenciesBridge.shared.accountAttributesUpdater
         let ows2FAManager = SSKEnvironment.shared.ows2FAManagerRef
 
         Logger.warn("Setting PIN.")
@@ -539,26 +494,10 @@ public class PinSetupViewController: OWSViewController, OWSNavigationChildContro
             try await ows2FAManager.enablePin(pin)
         } catch {
             owsFailDebug("Failed to set PIN! \(error)")
-
-            if error.isNetworkFailureOrTimeout {
-                throw PinSetupError.networkFailure
-            }
-
-            throw PinSetupError.enable2FA
+            throw error
         }
 
-        await DependenciesBridge.shared.db.awaitableWrite { tx in
-            // Attempt to update account attributes. This should have been
-            // handled internally when we enabled things above, but it doesn't
-            // hurt to make sure.
-            //
-            // This just schedules an update to happen eventually; don't wait on
-            // the result.
-            accountAttributesUpdater.scheduleAccountAttributesUpdate(authedAccount: .implicit(), tx: tx)
-
-            // Clear the experience upgrade if it was pending.
-            ExperienceUpgradeManager.clearExperienceUpgrade(.introducingPins, transaction: tx)
-        }
+        NotificationCenter.default.post(name: .megaphoneStateDidChange, object: nil)
     }
 }
 

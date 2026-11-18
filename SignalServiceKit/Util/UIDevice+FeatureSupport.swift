@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import UIKit
+public import UIKit
 
 public extension UIDevice {
     var hasIPhoneXNotch: Bool {
@@ -84,6 +84,9 @@ public extension UIDevice {
         case 1920, 2208:
             // iPhone 6+/6S+/7+/8+//
             return true
+        case 2034:
+            // iPhone Duo
+            return true
         case 2340:
             // iPhone 12 Mini
             return false
@@ -124,27 +127,9 @@ public extension UIDevice {
         }
     }
 
-    var isNarrowerThanIPhone6: Bool {
-        return CurrentAppContext().frame.width < 375
-    }
-
-    var isIPhone5OrShorter: Bool {
-        return CurrentAppContext().frame.height <= 568
-    }
-
-    var isShorterThaniPhoneX: Bool {
-        return CurrentAppContext().frame.height < 812
-    }
-
     @objc
     var isIPad: Bool {
         return userInterfaceIdiom == .pad
-    }
-
-    var isFullScreen: Bool {
-        let windowSize = CurrentAppContext().frame.size
-        let screenSize = UIScreen.main.bounds.size
-        return windowSize.largerAxis == screenSize.largerAxis && windowSize.smallerAxis == screenSize.smallerAxis
     }
 
     @objc

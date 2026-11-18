@@ -5,6 +5,7 @@
 
 public import Contacts
 import Foundation
+public import UIKit
 
 public protocol ContactManager: ContactsManagerProtocol {
     func fetchSignalAccounts(for phoneNumbers: [String], transaction: DBReadTransaction) -> [SignalAccount?]
@@ -39,7 +40,7 @@ extension ContactManager {
             }
             return DisplayName.SystemContactName(
                 nameComponents: nameComponents,
-                multipleAccountLabel: $0?.multipleAccountLabelText
+                multipleAccountLabel: $0?.multipleAccountLabelText,
             )
         }
     }

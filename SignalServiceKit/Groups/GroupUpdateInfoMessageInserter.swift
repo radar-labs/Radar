@@ -14,7 +14,7 @@ public protocol GroupUpdateInfoMessageInserter {
         groupModel: TSGroupModel,
         disappearingMessageToken: DisappearingMessageToken,
         groupUpdateSource: GroupUpdateSource,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     )
 
     func insertGroupUpdateInfoMessage(
@@ -27,7 +27,7 @@ public protocol GroupUpdateInfoMessageInserter {
         newDisappearingMessageToken: DisappearingMessageToken,
         newlyLearnedPniToAciAssociations: [Pni: Aci],
         groupUpdateSource: GroupUpdateSource,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     )
 }
 
@@ -39,21 +39,21 @@ class GroupUpdateInfoMessageInserterImpl: GroupUpdateInfoMessageInserter {
     init(
         dateProvider: @escaping DateProvider,
         groupUpdateItemBuilder: GroupUpdateItemBuilder,
-        notificationPresenter: any NotificationPresenter
+        notificationPresenter: any NotificationPresenter,
     ) {
         self.dateProvider = dateProvider
         self.groupUpdateItemBuilder = groupUpdateItemBuilder
         self.notificationPresenter = notificationPresenter
     }
 
-    public func insertGroupUpdateInfoMessageForNewGroup(
+    func insertGroupUpdateInfoMessageForNewGroup(
         localIdentifiers: LocalIdentifiers,
         spamReportingMetadata: GroupUpdateSpamReportingMetadata,
         groupThread: TSGroupThread,
         groupModel: TSGroupModel,
         disappearingMessageToken: DisappearingMessageToken,
         groupUpdateSource: GroupUpdateSource,
-        transaction tx: DBWriteTransaction
+        transaction tx: DBWriteTransaction,
     ) {
         _insertGroupUpdateInfoMessage(
             localIdentifiers: localIdentifiers,
@@ -65,11 +65,11 @@ class GroupUpdateInfoMessageInserterImpl: GroupUpdateInfoMessageInserter {
             newDisappearingMessageToken: disappearingMessageToken,
             newlyLearnedPniToAciAssociations: [:],
             groupUpdateSource: groupUpdateSource,
-            transaction: tx
+            transaction: tx,
         )
     }
 
-    public func insertGroupUpdateInfoMessage(
+    func insertGroupUpdateInfoMessage(
         localIdentifiers: LocalIdentifiers,
         spamReportingMetadata: GroupUpdateSpamReportingMetadata,
         groupThread: TSGroupThread,
@@ -79,7 +79,7 @@ class GroupUpdateInfoMessageInserterImpl: GroupUpdateInfoMessageInserter {
         newDisappearingMessageToken: DisappearingMessageToken,
         newlyLearnedPniToAciAssociations: [Pni: Aci],
         groupUpdateSource: GroupUpdateSource,
-        transaction tx: DBWriteTransaction
+        transaction tx: DBWriteTransaction,
     ) {
         _insertGroupUpdateInfoMessage(
             localIdentifiers: localIdentifiers,
@@ -91,7 +91,7 @@ class GroupUpdateInfoMessageInserterImpl: GroupUpdateInfoMessageInserter {
             newDisappearingMessageToken: newDisappearingMessageToken,
             newlyLearnedPniToAciAssociations: newlyLearnedPniToAciAssociations,
             groupUpdateSource: groupUpdateSource,
-            transaction: tx
+            transaction: tx,
         )
     }
 
@@ -105,7 +105,7 @@ class GroupUpdateInfoMessageInserterImpl: GroupUpdateInfoMessageInserter {
         newDisappearingMessageToken: DisappearingMessageToken,
         newlyLearnedPniToAciAssociations: [Pni: Aci],
         groupUpdateSource: GroupUpdateSource,
-        transaction tx: DBWriteTransaction
+        transaction tx: DBWriteTransaction,
     ) {
         let updateItemsForNewMessage: [TSInfoMessage.PersistableGroupUpdateItem]
 
@@ -114,18 +114,18 @@ class GroupUpdateInfoMessageInserterImpl: GroupUpdateInfoMessageInserter {
             let invitedPniPromotions: InvitedPnisPromotionToFullMemberAcis = .from(
                 oldGroupMembership: oldGroupModel.groupMembership,
                 newGroupMembership: newGroupModel.groupMembership,
-                newlyLearnedPniToAciAssociations: newlyLearnedPniToAciAssociations
+                newlyLearnedPniToAciAssociations: newlyLearnedPniToAciAssociations,
             )
         {
             /// We can't accurately detect PNI -> ACI promotions via the group
             /// model approach we'll take below, so we need to check for it in a
             /// one-off fashion here before going into that flow.
-            updateItemsForNewMessage = invitedPniPromotions.promotions.map { (pni, aci) in
+            updateItemsForNewMessage = invitedPniPromotions.promotions.map { pni, aci in
                 return .invitedPniPromotedToFullMemberAci(
                     newMember: aci.codableUuid,
                     inviter: oldGroupModel.groupMembership.addedByAci(
-                        forInvitedMember: .init(pni)
-                    )?.codableUuid
+                        forInvitedMember: .init(pni),
+                    )?.codableUuid,
                 )
             }
         } else {
@@ -138,7 +138,7 @@ class GroupUpdateInfoMessageInserterImpl: GroupUpdateInfoMessageInserter {
                         newDisappearingMessageToken: newDisappearingMessageToken,
                         localIdentifiers: localIdentifiers,
                         groupUpdateSource: groupUpdateSource,
-                        tx: tx
+                        tx: tx,
                     )
                 } else {
                     return groupUpdateItemBuilder.precomputedUpdateItemsForNewGroup(
@@ -146,7 +146,7 @@ class GroupUpdateInfoMessageInserterImpl: GroupUpdateInfoMessageInserter {
                         newDisappearingMessageToken: newDisappearingMessageToken,
                         localIdentifiers: localIdentifiers,
                         groupUpdateSource: groupUpdateSource,
-                        tx: tx
+                        tx: tx,
                     )
                 }
             }()
@@ -174,7 +174,7 @@ class GroupUpdateInfoMessageInserterImpl: GroupUpdateInfoMessageInserter {
                     localIdentifiers: localIdentifiers,
                     groupThread: groupThread,
                     newGroupModel: newGroupModel,
-                    transaction: tx
+                    transaction: tx,
                 )
             {
                 switch collapseResult {
@@ -196,18 +196,25 @@ class GroupUpdateInfoMessageInserterImpl: GroupUpdateInfoMessageInserter {
         /// update that somehow doesn't produce a diff, we'll get back a list
         /// with a single "generic group update" item in it.
         owsPrecondition(!updateItemsForNewMessage.isEmpty)
-        let infoMessage: TSInfoMessage = .makeForGroupUpdate(
-            timestamp: dateProvider().ows_millisecondsSince1970,
-            spamReportingMetadata: spamReportingMetadata,
-            groupThread: groupThread,
-            updateItems: updateItemsForNewMessage
-        )
-        infoMessage.anyInsert(transaction: tx)
+        let timestamp = dateProvider().ows_millisecondsSince1970
+        let insertedMessages: [(
+            updateItem: TSInfoMessage.PersistableGroupUpdateItem,
+            message: TSInfoMessage,
+        )] = updateItemsForNewMessage.map { item in
+            let message: TSInfoMessage = .makeForGroupUpdate(
+                timestamp: timestamp,
+                spamReportingMetadata: spamReportingMetadata,
+                groupThread: groupThread,
+                updateItems: [item],
+            )
+            message.anyInsert(transaction: tx)
+            return (item, message)
+        }
 
-        let wasLocalUserInGroup = oldGroupModel?.groupMembership.isLocalUserMemberOfAnyKind ?? false
-        let isLocalUserInGroup = newGroupModel.groupMembership.isLocalUserMemberOfAnyKind
         let wasLocalUserRequestingMember = oldGroupModel?.groupMembership.isLocalUserRequestingMember ?? false
         let isLocalUserRequestingMember = newGroupModel.groupMembership.isLocalUserRequestingMember
+
+        var isTerminatedGroup = false
 
         let isLocalUserUpdate: Bool
         switch groupUpdateSource {
@@ -217,21 +224,68 @@ class GroupUpdateInfoMessageInserterImpl: GroupUpdateInfoMessageInserter {
             isLocalUserUpdate = false
         }
         if isLocalUserUpdate || (!wasLocalUserRequestingMember && isLocalUserRequestingMember) {
-            infoMessage.markAsRead(
-                atTimestamp: NSDate.ows_millisecondTimeStamp(),
-                thread: groupThread,
-                circumstance: .onThisDevice,
-                shouldClearNotifications: true,
-                transaction: tx
-            )
-        } else if !wasLocalUserInGroup && isLocalUserInGroup {
+            let now = NSDate.ows_millisecondTimeStamp()
+            insertedMessages.map(\.message).forEach { message in
+                message.markAsRead(
+                    atTimestamp: now,
+                    thread: groupThread,
+                    circumstance: .onThisDevice,
+                    shouldClearNotifications: true,
+                    transaction: tx,
+                )
+            }
+        } else {
             // Notify when the local user is added or invited to a group.
-            notificationPresenter.notifyUser(
-                forTSMessage: infoMessage,
-                thread: groupThread,
-                wantsSound: true,
-                transaction: tx
-            )
+            for groupJoinMessage in insertedMessages.compactMap({ item, message -> TSInfoMessage? in
+                switch item {
+                case
+                    .localUserWasInvitedByLocalUser,
+                    .localUserWasInvitedByOtherUser,
+                    .localUserWasInvitedByUnknownUser,
+                    .localUserAddedByLocalUser,
+                    .localUserAddedByOtherUser,
+                    .localUserAddedByUnknownUser,
+                    .localUserInvitedAfterMigration,
+                    .localUserJoined,
+                    .localUserJoinedViaInviteLink:
+                    return message
+                default:
+                    return nil
+                }
+            }) {
+                notificationPresenter.notifyUser(
+                    forTSMessage: groupJoinMessage,
+                    thread: groupThread,
+                    wantsSound: true,
+                    transaction: tx,
+                )
+            }
+
+            // Notify when the group ends.
+            for groupTerminateMessage in insertedMessages.compactMap({ item, message -> TSInfoMessage? in
+                switch item {
+                case
+                    .groupTerminatedByLocalUser,
+                    .groupTerminatedByOtherUser,
+                    .groupTerminatedByUnknownUser:
+                    return message
+                default:
+                    return nil
+                }
+            }) {
+                notificationPresenter.notifyUser(
+                    forTSMessage: groupTerminateMessage,
+                    thread: groupThread,
+                    wantsSound: true,
+                    transaction: tx,
+                )
+                isTerminatedGroup = true
+            }
+        }
+
+        // Delete intents for terminated group.
+        if isTerminatedGroup {
+            DependenciesBridge.shared.threadDeletionManager.removeIntentsForTerminatedGroup(threadUniqueId: groupThread.uniqueId)
         }
     }
 }
@@ -257,7 +311,7 @@ private struct InvitedPnisPromotionToFullMemberAcis {
     static func from(
         oldGroupMembership: GroupMembership,
         newGroupMembership: GroupMembership,
-        newlyLearnedPniToAciAssociations: [Pni: Aci]
+        newlyLearnedPniToAciAssociations: [Pni: Aci],
     ) -> InvitedPnisPromotionToFullMemberAcis? {
         let membersDiff: Set<ServiceId> = newGroupMembership.allMembersOfAnyKindServiceIds
             .symmetricDifference(oldGroupMembership.allMembersOfAnyKindServiceIds)

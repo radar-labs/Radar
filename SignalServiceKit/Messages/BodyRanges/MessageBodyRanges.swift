@@ -12,26 +12,46 @@ public import LibSignalClient
 ///
 /// This object must be further applied to NSAttributedString to actually display mentions and styles.
 @objc
-public class MessageBodyRanges: NSObject, NSCopying, NSSecureCoding {
+public final class MessageBodyRanges: NSObject, NSCopying, NSSecureCoding {
     // Limit to up to 250 ranges per message.
     public static let maxRangesPerMessage = 250
 
-    public static var supportsSecureCoding = true
-    public static var empty: MessageBodyRanges { MessageBodyRanges(mentions: [:], styles: []) }
-
-    // Styles are kept separate from mentions; mentions are not allowed to overlap,
-    // which is partially enforced by its structure (it enforces they at least can't have
-    // identical ranges) while styles can overlap with each other and
-    // with mentions.
-
-    /// Mentions can overlap with styles but not with each other.
-    public let mentions: [NSRange: Aci]
+    public static var supportsSecureCoding: Bool { true }
+    public static var empty: MessageBodyRanges { MessageBodyRanges(mentions: [], styles: []) }
 
     @objc
-    public var hasMentions: Bool { !mentions.isEmpty }
+    public var hasMentions: Bool { !orderedMentions.isEmpty }
 
-    /// Sorted from lowest location to highest location
+    /// Unsorted, potentially overlapping mentions
+    private let originalMentions: [NSRangedValue<Aci>]
+
+    /// Sorted, non-overlapping mentions
     public let orderedMentions: [NSRangedValue<Aci>]
+
+    private static func normalizeMentions(_ mentions: [NSRangedValue<Aci>]) -> [NSRangedValue<Aci>] {
+        // Sort by location
+        let sortedMentions = mentions.sorted(by: {
+            if $0.range.location != $1.range.location {
+                return $0.range.location < $1.range.location
+            }
+            if $0.range.length != $1.range.length {
+                return $0.range.length < $1.range.length
+            }
+            return $0.value < $1.value
+        })
+        // then keep non-empty ranges that don't overlap
+        var filteredMentions = [NSRangedValue<Aci>]()
+        for mention in sortedMentions {
+            guard mention.range.length > 0 else {
+                continue
+            }
+            guard mention.range.location >= (filteredMentions.last?.range.upperBound ?? .min) else {
+                continue
+            }
+            filteredMentions.append(mention)
+        }
+        return filteredMentions
+    }
 
     /// Sorted from lowest location to highest location.
     /// Styles can overlap with mentions but not with each other.
@@ -40,47 +60,51 @@ public class MessageBodyRanges: NSObject, NSCopying, NSSecureCoding {
     public let collapsedStyles: [NSRangedValue<CollapsedStyle>]
 
     public var hasRanges: Bool {
-        return mentions.isEmpty.negated || collapsedStyles.isEmpty.negated
+        return !orderedMentions.isEmpty || !collapsedStyles.isEmpty
     }
 
-    public init(
-        mentions: [NSRange: Aci],
+    private init(
+        originalMentions: [NSRangedValue<Aci>],
         orderedMentions: [NSRangedValue<Aci>],
-        collapsedStyles: [NSRangedValue<CollapsedStyle>]
+        collapsedStyles: [NSRangedValue<CollapsedStyle>],
     ) {
-        self.mentions = mentions
+        self.originalMentions = originalMentions
         self.orderedMentions = orderedMentions
         self.collapsedStyles = collapsedStyles
-
-        super.init()
     }
 
-    public convenience init(mentions: [NSRange: Aci], styles: [NSRangedValue<SingleStyle>]) {
-        let orderedMentions = mentions.lazy
-            .sorted(by: { $0.key.location < $1.key.location })
-            .map { return NSRangedValue($0.value, range: $0.key) }
-        let collapsedStyles = Self.processStylesForInitialization(styles, orderedMentions: orderedMentions)
-
-        self.init(mentions: mentions, orderedMentions: orderedMentions, collapsedStyles: collapsedStyles)
+    public convenience init(collapsedStyles: [NSRangedValue<CollapsedStyle>]) {
+        self.init(
+            originalMentions: [],
+            orderedMentions: [],
+            collapsedStyles: collapsedStyles,
+        )
     }
 
-    @objc
+    public convenience init(mentions: [NSRangedValue<Aci>], styles: [NSRangedValue<SingleStyle>]) {
+        let orderedMentions = Self.normalizeMentions(mentions)
+        self.init(
+            originalMentions: mentions,
+            orderedMentions: orderedMentions,
+            collapsedStyles: Self.normalizeStyles(styles, orderedMentions: orderedMentions),
+        )
+    }
+
     public convenience init(protos: [SSKProtoBodyRange]) {
-        var mentions = [NSRange: Aci]()
+        var mentions = [NSRangedValue<Aci>]()
         var styles = [NSRangedValue<SingleStyle>]()
         for proto in protos.prefix(Self.maxRangesPerMessage) {
-            guard proto.length > 0 else {
-                // Ignore empty ranges.
+            guard let location = Int(exactly: proto.start), let length = Int(exactly: proto.length) else {
                 continue
             }
-            let range = NSRange(location: Int(proto.start), length: Int(proto.length))
+            let range = NSRange(location: location, length: length)
             if let mentionAci = Aci.parseFrom(serviceIdBinary: proto.mentionAciBinary, serviceIdString: proto.mentionAci) {
-                mentions[range] = mentionAci
+                mentions.append(NSRangedValue(mentionAci, range: range))
             } else if
                 let protoStyle = proto.style,
                 let style = SingleStyle.from(protoStyle)
             {
-                styles.append(.init(style, range: range))
+                styles.append(NSRangedValue(style, range: range))
             }
         }
         self.init(mentions: mentions, styles: styles)
@@ -89,7 +113,7 @@ public class MessageBodyRanges: NSObject, NSCopying, NSSecureCoding {
     public required init?(coder: NSCoder) {
         let mentionsCount = coder.decodeInteger(forKey: "mentionsCount")
 
-        var mentions = [NSRange: Aci]()
+        var mentions = [NSRangedValue<Aci>]()
         for idx in 0..<mentionsCount {
             guard let range = coder.decodeObject(of: NSValue.self, forKey: "mentions.range.\(idx)")?.rangeValue else {
                 owsFailDebug("Failed to decode mention range key of MessageBody")
@@ -99,14 +123,11 @@ public class MessageBodyRanges: NSObject, NSCopying, NSSecureCoding {
                 owsFailDebug("Failed to decode mention range value of MessageBody")
                 return nil
             }
-            mentions[range] = Aci(fromUUID: aciUuid)
+            mentions.append(NSRangedValue(Aci(fromUUID: aciUuid), range: range))
         }
 
-        self.mentions = mentions
-        let orderedMentions = mentions.lazy
-            .sorted(by: { $0.key.location < $1.key.location })
-            .map { NSRangedValue($0.value, range: $0.key) }
-        self.orderedMentions = orderedMentions
+        self.originalMentions = mentions
+        self.orderedMentions = Self.normalizeMentions(mentions)
 
         let stylesCount: Int = {
             let key = "stylesCount"
@@ -151,231 +172,161 @@ public class MessageBodyRanges: NSObject, NSCopying, NSSecureCoding {
         }
 
         if isMissingStyleOriginalInfo {
-            self.collapsedStyles = Self.processStylesForInitialization(
+            self.collapsedStyles = Self.normalizeStyles(
                 rawStyles,
                 orderedMentions: orderedMentions,
                 // Legacy styles are going to be split; aggresively re-merge them which
                 // drops some info but that info was ignored in the originals, anyway.
-                mergeAdjacentRangesOfSameStyle: true
+                mergeAdjacentRangesOfSameStyle: true,
             )
         } else {
             self.collapsedStyles = styles
         }
     }
 
-    private static func processStylesForInitialization(
+    private static func normalizeStyles(
         _ styles: [NSRangedValue<SingleStyle>],
         orderedMentions: [NSRangedValue<Aci>],
-        mergeAdjacentRangesOfSameStyle: Bool = false
+        mergeAdjacentRangesOfSameStyle: Bool = false,
     ) -> [NSRangedValue<CollapsedStyle>] {
-        guard !styles.isEmpty else {
-            return []
-        }
         var sortedSingleStyles = styles.lazy
             .filter {
-                return $0.range.location >= 0
+                return $0.range.length > 0 && $0.range.location >= 0
             }
             .sorted(by: { $0.range.location < $1.range.location })
         Self.extendStylesAcrossMentions(&sortedSingleStyles, orderedMentions: orderedMentions)
         var sortedStyles = MergedSingleStyle.merge(
             sortedOriginals: sortedSingleStyles,
-            mergeAdjacentRangesOfSameStyle: mergeAdjacentRangesOfSameStyle
-        )
+            mergeAdjacentRangesOfSameStyle: mergeAdjacentRangesOfSameStyle,
+        )[...]
 
-        var indexesOfInterestSet = Set<Int>()
-        var indexesOfInterest = [Int]()
-        func insertIntoIndexesOfInterest(_ value: Int) {
-            guard !indexesOfInterestSet.contains(value) else {
-                return
-            }
-            indexesOfInterest.append(value)
-            indexesOfInterestSet.insert(value)
-        }
-
+        var changeIndicesSet = Set<Int>()
         sortedStyles.forEach {
-            insertIntoIndexesOfInterest($0.mergedRange.location)
-            insertIntoIndexesOfInterest($0.mergedRange.upperBound)
+            changeIndicesSet.insert($0.mergedRange.location)
+            changeIndicesSet.insert($0.mergedRange.upperBound)
         }
-        // This O(nlogn) operation can theoretically be flattened to O(n) via a lot
-        // of index management, but as long as we limit the number of body ranges
-        // we allow, the difference is trivial.
-        indexesOfInterest.sort()
+        let changeIndices = changeIndicesSet.sorted()
 
         // Collapse all overlaps.
         var finalStyles = [NSRangedValue<CollapsedStyle>]()
-        var collapsedStyleAtIndex: (start: Int, CollapsedStyle) = (start: 0, .empty())
+        var currentCollapsedStyle: CollapsedStyle = .empty()
+        var currentCollapsedStyleStartIndex = 0
         var endIndexToStyles = [Int: Set<SingleStyle>]()
 
-        for i in indexesOfInterest {
+        for idx in changeIndices {
             var newStylesToApply: [MergedSingleStyle] = []
 
             func startApplyingStyles(at index: Int) {
                 while let newMergedStyle = sortedStyles.first, newMergedStyle.mergedRange.location == index {
                     sortedStyles.removeFirst()
                     newStylesToApply.append(newMergedStyle)
-                    var stylesAtEnd = endIndexToStyles[newMergedStyle.mergedRange.upperBound] ?? []
-                    stylesAtEnd.insert(newMergedStyle.style)
-                    endIndexToStyles[newMergedStyle.mergedRange.upperBound] = stylesAtEnd
+                    endIndexToStyles[newMergedStyle.mergedRange.upperBound, default: Set()].insert(newMergedStyle.style)
                 }
             }
 
-            startApplyingStyles(at: i)
-            let stylesToRemove = endIndexToStyles.removeValue(forKey: i) ?? []
+            startApplyingStyles(at: idx)
+            let stylesToRemove = endIndexToStyles.removeValue(forKey: idx) ?? []
 
-            if newStylesToApply.isEmpty.negated || stylesToRemove.isEmpty.negated {
-                // We have changes. End the previous style if any, and start a new one.
-                var (startIndex, currentCollapsedStyle) = collapsedStyleAtIndex
-                if currentCollapsedStyle.isEmpty.negated {
-                    finalStyles.append(.init(
-                        currentCollapsedStyle,
-                        range: NSRange(location: startIndex, length: i - startIndex)
-                    ))
-                }
+            // Every element of changeIndices adds or removes at least one style, so at
+            // least one of these will always be non-empty.
+            assert(!newStylesToApply.isEmpty || !stylesToRemove.isEmpty)
 
-                stylesToRemove.forEach {
-                    currentCollapsedStyle.remove($0)
-                }
-                newStylesToApply.forEach {
-                    currentCollapsedStyle.insert($0)
-                }
-                collapsedStyleAtIndex = (start: i, currentCollapsedStyle)
+            // We have changes. End the previous style if any, and start a new one.
+            if !currentCollapsedStyle.isEmpty {
+                finalStyles.append(.init(
+                    currentCollapsedStyle,
+                    range: NSRange(location: currentCollapsedStyleStartIndex, length: idx - currentCollapsedStyleStartIndex),
+                ))
             }
+
+            stylesToRemove.forEach {
+                currentCollapsedStyle.remove($0)
+            }
+            newStylesToApply.forEach {
+                currentCollapsedStyle.insert($0)
+            }
+            currentCollapsedStyleStartIndex = idx
         }
 
-        if collapsedStyleAtIndex.1.isEmpty.negated {
-            finalStyles.append(.init(
-                collapsedStyleAtIndex.1,
-                range: NSRange(
-                    location: collapsedStyleAtIndex.start,
-                    length: max(0, (indexesOfInterest.last ?? 0) - collapsedStyleAtIndex.start)
-                )
-            ))
-        }
+        // Every style is removed in the loop above; it's always empty at the end.
+        assert(currentCollapsedStyle.isEmpty)
 
         return finalStyles
     }
 
-    /// If a style starts or ends in the middle of a mention range, the style should be extended
-    /// to cover the entire mention.
+    /// If a style starts or ends in the middle of a mention range, the style
+    /// should be extended to cover the entire mention.
+    ///
     /// This needs to happen _before_ we merge styles, so that two disconnected
     /// styles that partly cover the same mention end up overlapping after being
     /// extended to cover the mention, and are therefore merged.
     private static func extendStylesAcrossMentions(
         _ sortedStyles: inout [NSRangedValue<SingleStyle>],
-        orderedMentions: [NSRangedValue<Aci>]
+        orderedMentions: [NSRangedValue<Aci>],
     ) {
-        let orderedMentions = orderedMentions
-        let enumeratedStyles = sortedStyles.enumerated()
+        // TODO: Make this O(n lg n) rather than O(n^2).
         for mention in orderedMentions {
-            guard mention.range.length > 0 else {
-                continue
-            }
             // Styles always apply to an entire mention. This means when we find
             // a mention we have to do two things:
             // 1) any styles that start later in the mention are treated as if they start now.
-            for (styleIndex, enumeratedStyle) in enumeratedStyles {
-                var style = enumeratedStyle
-                if style.range.location > mention.range.location && style.range.location < mention.range.upperBound {
+            for idx in sortedStyles.indices {
+                var style = sortedStyles[idx]
+                if style.range.location > mention.range.location, style.range.location < mention.range.upperBound {
                     // Starts inside, move it to start at the beginning.
                     style = NSRangedValue(
                         style.value,
                         range: NSRange(
                             location: mention.range.location,
-                            length: style.range.length + style.range.location - mention.range.location
-                        )
+                            length: style.range.length + style.range.location - mention.range.location,
+                        ),
                     )
                     // Note this maintains sort; it can't move the location before another
                     // style because that other style would gets its location moved up, too.
-                    sortedStyles[styleIndex] = style
+                    sortedStyles[idx] = style
                 }
-                if style.range.upperBound > mention.range.location && style.range.upperBound < mention.range.upperBound {
+                if style.range.upperBound > mention.range.location, style.range.upperBound < mention.range.upperBound {
                     // Ends inside, move it to end at the end of the mention.
                     style = NSRangedValue(
                         style.value,
                         range: NSRange(
                             location: style.range.location,
-                            length: style.range.length + mention.range.upperBound - style.range.upperBound
-                        )
+                            length: style.range.length + mention.range.upperBound - style.range.upperBound,
+                        ),
                     )
-                    sortedStyles[styleIndex] = style
+                    sortedStyles[idx] = style
                 }
             }
         }
     }
 
-    internal struct SubrangeStyles {
-        let substringRange: NSRange
-        let stylesInSubstring: [NSRangedValue<Style>]
-    }
-
-    /// Given a subrange and set of styles indexed _within that subrange_,
-    /// filters ranges to those within that subrange and merges them with
-    /// the provided styles.
-    ///
-    /// This method is confusing because of the interpretation of ranges.
-    /// _First_ we filter the ranges to those falling in the subrange; the subrange
-    /// is now our coordinate system, with its start being 0.
-    /// _Then_ we merge in the styles, which are already in this coordinate system.
-    internal func mergingStyles(_ styles: SubrangeStyles) -> MessageBodyRanges {
-        func intersect(_ range: NSRange) -> NSRange? {
-            guard
-                let intersection = range.intersection(styles.substringRange),
-                intersection.location != NSNotFound,
-                intersection.length > 0
-            else {
-                return nil
-            }
-            return NSRange(
-                location: intersection.location - styles.substringRange.location,
-                length: intersection.length
-            )
-        }
-
-        var mentions = [NSRange: Aci]()
-        for (range, aci) in self.mentions {
-            guard let newRange = intersect(range) else {
-                continue
-            }
-            mentions[newRange] = aci
-        }
+    func addingStyles(_ newStyles: [NSRangedValue<Style>]) -> Self {
         // Flatten out all the collapsed styles so we can re-merge from
         // scratch with the new styles being added.
-        let oldStyles: [NSRangedValue<SingleStyle>] = self.collapsedStyles.flatMap { collapsedStyle -> [NSRangedValue<SingleStyle>] in
-            guard intersect(collapsedStyle.range) != nil else {
-                return []
-            }
+        let oldSingleStyles = self.collapsedStyles.flatMap { collapsedStyle -> [NSRangedValue<SingleStyle>] in
             return collapsedStyle.value.style.contents.map {
                 return NSRangedValue($0, range: collapsedStyle.range)
             }
         }
-        let stylesInSubstring = styles.stylesInSubstring.flatMap { style in
+        let newSingleStyles = newStyles.flatMap { style in
             return style.value.contents.map {
                 return NSRangedValue($0, range: style.range)
             }
         }
-        let orderedMentions = mentions.lazy
-            .sorted(by: { $0.key.location < $1.key.location })
-            .map { NSRangedValue($0.value, range: $0.key) }
-        let finalStyles = Self.processStylesForInitialization(
-            oldStyles + stylesInSubstring,
-            orderedMentions: orderedMentions
-        )
-        return MessageBodyRanges(
-            mentions: mentions,
-            orderedMentions: orderedMentions,
-            collapsedStyles: finalStyles
+        return Self(
+            mentions: originalMentions,
+            styles: oldSingleStyles + newSingleStyles,
         )
     }
 
     public func copy(with zone: NSZone? = nil) -> Any {
-        return MessageBodyRanges(mentions: mentions, orderedMentions: orderedMentions, collapsedStyles: collapsedStyles)
+        return self
     }
 
     public func encode(with coder: NSCoder) {
-        coder.encode(mentions.count, forKey: "mentionsCount")
-        for (idx, (range, aci)) in mentions.enumerated() {
-            coder.encode(NSValue(range: range), forKey: "mentions.range.\(idx)")
-            coder.encode(aci.rawUUID, forKey: "mentions.uuid.\(idx)")
+        coder.encode(originalMentions.count, forKey: "mentionsCount")
+        for (idx, mention) in originalMentions.enumerated() {
+            coder.encode(NSValue(range: mention.range), forKey: "mentions.range.\(idx)")
+            coder.encode(mention.value.rawUUID, forKey: "mentions.uuid.\(idx)")
         }
         coder.encode(collapsedStyles.count, forKey: "stylesCount")
         for (idx, style) in collapsedStyles.enumerated() {
@@ -391,42 +342,44 @@ public class MessageBodyRanges: NSObject, NSCopying, NSSecureCoding {
         guard let other = object as? MessageBodyRanges else {
             return false
         }
-        guard mentions == other.mentions else {
-            return false
-        }
-        guard collapsedStyles.count == other.collapsedStyles.count else {
-            return false
-        }
-        for i in 0..<collapsedStyles.count {
-            let style = collapsedStyles[i]
-            let otherStyle = other.collapsedStyles[i]
-            guard style.value == otherStyle.value else {
-                return false
-            }
-            guard style.range == otherStyle.range else {
-                return false
-            }
-        }
-        return true
+        return (
+            orderedMentions == other.orderedMentions
+                && collapsedStyles == other.collapsedStyles,
+        )
+    }
+
+    func clamped(to range: NSRange) -> Self {
+        // This doesn't keep originalMentions because normalizing mentions and
+        // clamping them isn't commutative. (In other words,
+        // normalize(clamp(mentions)) may not equal clamp(normalize(mentions)).)
+        let clampedMentions = self.orderedMentions.compactMap { $0.intersection(range) }
+        return Self(
+            originalMentions: clampedMentions,
+            orderedMentions: clampedMentions,
+            collapsedStyles: self.collapsedStyles.compactMap { $0.intersection(range) },
+        )
+    }
+
+    public func offset(by utf16Count: Int) -> Self {
+        return Self(
+            originalMentions: self.originalMentions.map { $0.offset(by: utf16Count) },
+            orderedMentions: self.orderedMentions.map { $0.offset(by: utf16Count) },
+            collapsedStyles: self.collapsedStyles.map { $0.offset(by: utf16Count) },
+        )
     }
 
     // MARK: Proto conversion
 
-    /// If bodyLength is provided (is nonnegative), drops any ranges that exceed the length.
-    @objc
-    func toProtoBodyRanges(bodyLength: Int = -1) -> [SSKProtoBodyRange] {
-        let maxBodyLength = bodyLength < 0 ? nil : bodyLength
+    /// If bodyLength is provided, drops any ranges that exceed the length.
+    func toProtoBodyRanges(bodyLength: Int? = nil) -> [SSKProtoBodyRange] {
+        let maxBodyLength = bodyLength
         var protos = [SSKProtoBodyRange]()
 
         func appendMention(_ mention: NSRangedValue<Aci>) {
             guard let builder = self.protoBuilder(mention.range, maxBodyLength: maxBodyLength) else {
                 return
             }
-            if BuildFlags.serviceIdBinaryOneOf {
-                builder.setMentionAciBinary(mention.value.serviceIdBinary)
-            } else {
-                builder.setMentionAci(mention.value.serviceIdString)
-            }
+            builder.setMentionAciBinary(mention.value.serviceIdBinary)
             protos.append(builder.buildInfallibly())
         }
 
@@ -451,7 +404,7 @@ public class MessageBodyRanges: NSObject, NSCopying, NSSecureCoding {
 
     private func protoBuilder(
         _ range: NSRange,
-        maxBodyLength: Int?
+        maxBodyLength: Int?,
     ) -> SSKProtoBodyRangeBuilder? {
         var range = range
         if let maxBodyLength {

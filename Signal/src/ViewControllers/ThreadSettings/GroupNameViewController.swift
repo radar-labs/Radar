@@ -10,7 +10,7 @@ protocol GroupNameViewControllerDelegate: AnyObject {
     func groupNameViewControllerDidComplete(groupName: String?)
 }
 
-class GroupNameViewController: OWSTableViewController2 {
+class GroupNameViewController: OWSTableViewController2, GroupAttributesEditorHelperDelegate {
     private let helper: GroupAttributesEditorHelper
 
     weak var nameDelegate: GroupNameViewControllerDelegate?
@@ -18,7 +18,7 @@ class GroupNameViewController: OWSTableViewController2 {
     init(groupModel: TSGroupModel, groupNameCurrent: String? = nil) {
         self.helper = GroupAttributesEditorHelper(groupModel: groupModel)
 
-        if let groupNameCurrent = groupNameCurrent {
+        if let groupNameCurrent {
             self.helper.groupNameOriginal = groupNameCurrent
         }
 
@@ -37,12 +37,12 @@ class GroupNameViewController: OWSTableViewController2 {
 
         title = OWSLocalizedString(
             "GROUP_NAME_VIEW_TITLE",
-            comment: "Title for the group name view."
+            comment: "Title for the group name view.",
         )
 
         navigationItem.leftBarButtonItem = .cancelButton(
             dismissingFrom: self,
-            hasUnsavedChanges: { [weak self] in self?.helper.hasUnsavedChanges }
+            hasUnsavedChanges: { [weak self] in self?.helper.hasUnsavedChanges },
         )
 
         navigationItem.rightBarButtonItem = .setButton { [weak self] in
@@ -56,7 +56,7 @@ class GroupNameViewController: OWSTableViewController2 {
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
 
-        coordinator.animate(alongsideTransition: { (_) in
+        coordinator.animate(alongsideTransition: { _ in
             self.helper.descriptionTextView.scrollToFocus(in: self.tableView, animated: true)
         }, completion: nil)
     }
@@ -71,7 +71,7 @@ class GroupNameViewController: OWSTableViewController2 {
         navigationItem.rightBarButtonItem?.isEnabled = helper.hasUnsavedChanges
     }
 
-    public override func viewWillAppear(_ animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         updateNavigation()
@@ -88,20 +88,14 @@ class GroupNameViewController: OWSTableViewController2 {
         section.add(.init(
             customCellBlock: {
                 let cell = OWSTableItem.newCell()
-
                 cell.selectionStyle = .none
-
-                nameTextField.font = .dynamicTypeBodyClamped
-                nameTextField.textColor = Theme.primaryTextColor
-
                 cell.contentView.addSubview(nameTextField)
                 nameTextField.autoPinEdgesToSuperviewMargins()
-
                 return cell
             },
             actionBlock: {
                 nameTextField.becomeFirstResponder()
-            }
+            },
         ))
 
         contents.add(section)
@@ -114,9 +108,9 @@ class GroupNameViewController: OWSTableViewController2 {
         nameDelegate?.groupNameViewControllerDidComplete(groupName: helper.groupNameCurrent)
         dismiss(animated: true)
     }
-}
 
-extension GroupNameViewController: GroupAttributesEditorHelperDelegate {
+    // MARK: - GroupAttributesEditorHelperDelegate
+
     func groupAttributesEditorContentsDidChange() {
         updateNavigation()
     }

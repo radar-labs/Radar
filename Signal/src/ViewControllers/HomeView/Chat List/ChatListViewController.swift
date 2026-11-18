@@ -8,13 +8,9 @@ public import SignalUI
 import StoreKit
 
 public class ChatListViewController: OWSViewController, HomeTabViewController {
-    let appReadiness: AppReadinessSetter
-
     init(
         chatListMode: ChatListMode,
-        appReadiness: AppReadinessSetter
     ) {
-        self.appReadiness = appReadiness
         self.viewState = CLVViewState(chatListMode: chatListMode, inboxFilter: nil)
 
         super.init()
@@ -24,22 +20,25 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         loadCoordinator.viewController = self
         viewState.reminderViews.chatListViewController = self
         viewState.backupDownloadProgressView.chatListViewController = self
+        viewState.backupExportProgressView.chatListViewController = self
+        viewState.localFileBackupRestoreProgressView.chatListViewController = self
+        viewState.localFileBackupExportProgressView.chatListViewController = self
         viewState.settingsButtonCreator.delegate = self
         viewState.proxyButtonCreator.delegate = self
         viewState.configure()
     }
 
-    public override var canBecomeFirstResponder: Bool {
+    override public var canBecomeFirstResponder: Bool {
         true
     }
 
     // MARK: View Lifecycle
 
-    public override func loadView() {
+    override public func loadView() {
         view = containerView
     }
 
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
 
         view.backgroundColor = .Signal.background
@@ -70,13 +69,13 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         }
 
         // Empty Inbox
-        view.addSubview(emptyInboxView)
-        emptyInboxView.autoPinWidthToSuperviewMargins()
-        emptyInboxView.autoAlignAxis(.horizontal, toSameAxisOf: view, withMultiplier: 0.85)
+        view.addSubview(emptyChatListView)
+        emptyChatListView.autoPinWidthToSuperviewMargins()
+        emptyChatListView.autoAlignAxis(.horizontal, toSameAxisOf: view, withMultiplier: 0.85)
 
         // First Conversation Cue
         view.addSubview(firstConversationCueView)
-        firstConversationCueView.autoPin(toTopLayoutGuideOf: self, withInset: 0)
+        firstConversationCueView.autoPinEdge(toSuperviewSafeArea: .top)
         // This inset bakes in assumptions about UINavigationBar layout, but I'm not sure
         // there's a better way to do it, since it isn't safe to use iOS auto layout with
         // UINavigationBar contents.
@@ -89,6 +88,12 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         viewState.searchController.searchResultsUpdater = self
         searchResultsController.delegate = self
 
+        // Backups
+        viewState.backupDownloadProgressView.startTracking()
+        viewState.backupExportProgressView.startTracking()
+        viewState.localFileBackupRestoreProgressView.startTracking()
+        viewState.localFileBackupExportProgressView.startTracking()
+
         updateBarButtonItems()
         updateArchiveReminderView()
         updateRegistrationReminderView()
@@ -98,15 +103,11 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         updateUsernameReminderView()
         updateTableViewPaddingIfNeeded()
         observeNotifications()
-        DependenciesBridge.shared.db.read { tx in
-            self.viewState.backupDownloadProgressViewState.refetchDBState(tx: tx)
-        }
-        self.viewState.backupDownloadProgressView.update(viewState: self.viewState.backupDownloadProgressViewState)
     }
 
     private var viewHasAppeared = false
 
-    public override func viewWillAppear(_ animated: Bool) {
+    override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         isViewVisible = true
@@ -118,7 +119,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
             extendedLayoutIncludesOpaqueBars = true
         }
 
-        guard #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable else {
+        guard #available(iOS 26, *) else {
             self._viewWillAppear(animated)
             return
         }
@@ -170,6 +171,9 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
 
         viewState.searchResultsController.viewWillAppear(animated)
         viewState.backupDownloadProgressView.willAppear()
+        viewState.backupExportProgressView.willAppear()
+        viewState.localFileBackupRestoreProgressView.willAppear()
+        viewState.localFileBackupExportProgressView.willAppear()
 
         updateUnreadPaymentNotificationsCountWithSneakyTransaction()
 
@@ -229,25 +233,16 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         }
     }
 
-    private var hasPresentedBackupErrors = false
-
-    public override func viewDidAppear(_ animated: Bool) {
+    override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
-        appReadiness.setUIIsReady()
-
-        if getStartedBanner == nil && !hasEverPresentedExperienceUpgrade && ExperienceUpgradeManager.presentNext(fromViewController: self) {
-            hasEverPresentedExperienceUpgrade = true
-        } else if !hasEverAppeared {
-            presentGetStartedBannerIfNecessary()
+        defer {
+            hasEverAppeared = true
         }
 
-        if !hasPresentedBackupErrors {
-            hasPresentedBackupErrors = true
-            DependenciesBridge.shared.backupArchiveErrorPresenter.presentOverTopmostViewController(completion: {})
-        }
-
+        presentGetStartedBannerIfNecessary()
+        reconcileExperienceUpgrades()
         requestReviewIfAppropriate()
+        showFYISheetIfNecessary()
 
         viewState.searchResultsController.viewDidAppear(animated)
 
@@ -258,10 +253,8 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
             }
         }
 
-        showFYISheetIfNecessary()
         Task { try? await self.checkForFailedServiceExtensionLaunches() }
 
-        hasEverAppeared = true
         if viewState.multiSelectState.isActive {
             showToolbar()
         } else {
@@ -270,7 +263,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         tableDataSource.updateAndSetRefreshTimer()
     }
 
-    public override func viewWillDisappear(_ animated: Bool) {
+    override public func viewWillDisappear(_ animated: Bool) {
         leaveMultiselectMode()
         tableDataSource.stopRefreshTimer()
 
@@ -280,23 +273,26 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         searchResultsController.viewWillDisappear(animated)
     }
 
-    public override func viewDidDisappear(_ animated: Bool) {
+    override public func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
 
         searchResultsController.viewDidDisappear(animated)
         viewState.backupDownloadProgressView.didDisappear()
+        viewState.backupExportProgressView.didDisappear()
+        viewState.localFileBackupRestoreProgressView.didDisappear()
+        viewState.localFileBackupExportProgressView.didDisappear()
     }
 
-    public override func viewIsAppearing(_ animated: Bool) {
+    override public func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
 
         updateFilterControl(animated: false)
     }
 
-    public override func viewDidLayoutSubviews() {
+    override public func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
-        let bottomInset = if let getStartedBanner, getStartedBanner.isViewLoaded, !getStartedBanner.view.isHidden {
+        let bottomInset = if let getStartedBanner, getStartedBanner.isViewLoaded, getStartedBanner.view.alpha > 0 {
             getStartedBanner.opaqueHeight
         } else {
             CGFloat(0.0)
@@ -305,27 +301,28 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         if tableView.contentInset.bottom != bottomInset {
             UIView.animate(withDuration: CATransaction.animationDuration()) {
                 self.tableView.contentInset.bottom = bottomInset
+                self.tableView.verticalScrollIndicatorInsets.bottom = bottomInset
             }
         }
     }
 
     // MARK: Theme, content size, and layout changes
 
-    public override func contentSizeCategoryDidChange() {
+    override public func contentSizeCategoryDidChange() {
         super.contentSizeCategoryDidChange()
 
         // This is expensive but this event is very rare.
         reloadTableDataAndResetCellContentCache()
     }
 
-    public override func themeDidChange() {
+    override public func themeDidChange() {
         super.themeDidChange()
 
         reloadTableDataAndResetCellContentCache()
         applyThemeToContextMenuAndToolbar()
     }
 
-    public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    override public func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
 
         guard isViewLoaded else { return }
@@ -364,19 +361,34 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         }
     }
 
+    // MARK: - Experience Upgrades
+
+    @objc
+    func reconcileExperienceUpgrades() {
+        let experienceUpgradeManager = AppEnvironment.shared.experienceUpgradeManager!
+        experienceUpgradeManager.reconcilePresentedExperienceUpgrade(fromViewController: self)
+    }
+
     // MARK: - FYI sheets
 
     @objc
     func showFYISheetIfNecessary() {
         let fyiSheetCoordinator = ChatListFYISheetCoordinator(
+            backupArchiveErrorStore: BackupArchiveErrorStore(),
+            backupAttachmentDownloadStore: BackupAttachmentDownloadStore(),
             backupExportJobRunner: DependenciesBridge.shared.backupExportJobRunner,
-            backupFailureStateManager: DependenciesBridge.shared.backupFailureStateManager,
             backupSubscriptionIssueStore: BackupSubscriptionIssueStore(),
-            donationReceiptCredentialResultStore: DependenciesBridge.shared.donationReceiptCredentialResultStore,
-            donationSubscriptionManager: DonationSubscriptionManager.self,
+            dateProvider: { Date() },
             db: DependenciesBridge.shared.db,
+            donationReceiptCredentialResultStore: DependenciesBridge.shared.donationReceiptCredentialResultStore,
+            donationSubscriptionManager: DependenciesBridge.shared.donationSubscriptionManager,
+            keyTransparencyStore: KeyTransparencyStore(),
+            lowDiskSpaceManager: AppEnvironment.shared.lowDiskSpaceManager,
             networkManager: SSKEnvironment.shared.networkManagerRef,
+            profileBadgeManager: DependenciesBridge.shared.profileBadgeManager,
             profileManager: SSKEnvironment.shared.profileManagerRef,
+            localFileBackupManager: DependenciesBridge.shared.localFileBackupManager,
+            localFileBackupStore: LocalFileBackupStore(),
         )
 
         Task {
@@ -384,22 +396,26 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         }
     }
 
-    // MARK: UI Components
+    // MARK: UI Components -
 
-    private lazy var emptyInboxView: UIView = {
-        let emptyInboxLabel = UILabel()
-        emptyInboxLabel.text = NSLocalizedString(
-            "INBOX_VIEW_EMPTY_INBOX",
-            comment: "Message shown in the conversation list when the inbox is empty."
-        )
-        emptyInboxLabel.font = .dynamicTypeSubheadlineClamped
-        emptyInboxLabel.textColor
-            = Theme.isDarkThemeEnabled ? Theme.darkThemeSecondaryTextAndIconColor : UIColor.ows_gray45
-        emptyInboxLabel.textAlignment = .center
-        emptyInboxLabel.numberOfLines = 0
-        emptyInboxLabel.lineBreakMode = .byWordWrapping
-        emptyInboxLabel.accessibilityIdentifier = "ChatListViewController.emptyInboxView"
-        return emptyInboxLabel
+    private lazy var emptyChatListView: UIView = {
+        let titleLabel = UILabel.explanationTextLabel(text: NSLocalizedString(
+            "CHAT_LIST_NO_CHATS_TITLE",
+            comment: "Message shown in the chat list when the chat list is empty.",
+        ))
+        titleLabel.font = .dynamicTypeTitle3.semibold()
+        titleLabel.adjustsFontForContentSizeCategory = true
+
+        let subtitleLabel = UILabel.explanationTextLabel(text: NSLocalizedString(
+            "CHAT_LIST_NO_CHATS_SUBTITLE",
+            comment: "Message shown in the chat list when the chat list is empty.",
+        ))
+        subtitleLabel.adjustsFontForContentSizeCategory = true
+
+        let textStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
+        textStack.axis = .vertical
+        textStack.spacing = 4
+        return textStack
     }()
 
     private lazy var firstConversationLabel: UILabel = {
@@ -423,7 +439,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         layerView.layoutMargins = UIEdgeInsets(top: 11 + kTailHeight, leading: 16, bottom: 11, trailing: 16)
 
         let shapeLayer = CAShapeLayer()
-        shapeLayer.fillColor = UIColor.ows_accentBlue.cgColor
+        shapeLayer.fillColor = UIColor.Signal.accent.cgColor
         layerView.layer.addSublayer(shapeLayer)
         layerView.layoutCallback = { view in
             let bezierPath = UIBezierPath()
@@ -461,6 +477,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
 
     private func settingsBarButtonItem() -> UIBarButtonItem {
         let backupSettingsStore = BackupSettingsStore()
+        let failureStateManager = DependenciesBridge.shared.backupFailureStateManager
         let backupSubscriptionIssueStore = BackupSubscriptionIssueStore()
         let db = SSKEnvironment.shared.databaseStorageRef
 
@@ -519,18 +536,27 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
                             UIAction(
                                 title: OWSLocalizedString(
                                     "HOME_VIEW_TITLE_FAILED_TO_BACKUP",
-                                    comment: "Title for the conversation list's failed to backup context menu action."
+                                    comment: "Title for the conversation list's failed to backup context menu action.",
                                 ),
                                 image: image,
                                 handler: { [weak self] _ in
-                                    SignalApp.shared.showAppSettings(mode: .backups)
+                                    let backupSettingPageType: HomeTabBarController.ShowAppSettingsMode.BackupSettingsPage = db.read { tx in
+                                        if failureStateManager.hasFailedRemoteBackup(tx: tx) {
+                                            return .remote()
+                                        } else if failureStateManager.hasFailedLocalBackup(tx: tx) {
+                                            return .local
+                                        }
+                                        return .landingPage
+                                    }
+
+                                    SignalApp.shared.showAppSettings(mode: .backups(page: backupSettingPageType))
                                     db.write { tx in
                                         backupSettingsStore.setErrorBadgeMuted(target: .chatListMenuItem, tx: tx)
                                     }
                                     self?.updateBackupFailureAlertsWithSneakyTransaction()
-                                }
-                            )
-                        ])
+                                },
+                            ),
+                        ]),
                     )
                 } else if viewState.settingsButtonCreator.showBackupsSubscriptionAlreadyRedeemedMenuItem {
                     let image = Theme.iconImage(.backup)
@@ -546,21 +572,21 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
                                 ),
                                 image: image,
                                 handler: { [weak self] _ in
-                                    SignalApp.shared.showAppSettings(mode: .backups)
+                                    SignalApp.shared.showAppSettings(mode: .backups())
                                     db.write { tx in
                                         backupSubscriptionIssueStore.setDidAckIAPSubscriptionAlreadyRedeemedChatListMenuItem(tx: tx)
                                     }
                                     self?.updateBackupSubscriptionFailedToRedeemAlertsWithSneakyTx()
-                                }
-                            )
-                        ])
+                                },
+                            ),
+                        ]),
                     )
                 } else if viewState.settingsButtonCreator.showBackupsIAPNotFoundLocallyMenuItem {
                     let image = Theme.iconImage(.backup)
                         .withTintColor(.Signal.label)
                         .withBadge(
                             color: .Signal.yellow,
-                            badgeSize: .square(8.5)
+                            badgeSize: .square(8.5),
                         )
 
                     contextMenuActions.append(
@@ -572,14 +598,14 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
                                 ),
                                 image: image,
                                 handler: { [weak self] _ in
-                                    SignalApp.shared.showAppSettings(mode: .backups)
+                                    SignalApp.shared.showAppSettings(mode: .backups())
                                     db.write { tx in
                                         backupSubscriptionIssueStore.setDidAckIAPSubscriptionNotFoundLocallyChatListMenuItem(tx: tx)
                                     }
                                     self?.updateBackupIAPNotFoundLocallyAlertsWithSneakyTx()
-                                }
-                            )
-                        ])
+                                },
+                            ),
+                        ]),
                     )
                 } else if viewState.settingsButtonCreator.hasConsumedMediaTierCapacity {
                     let image = Theme.iconImage(.backup)
@@ -591,14 +617,14 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
                             UIAction(
                                 title: OWSLocalizedString(
                                     "HOME_VIEW_TITLE_BACKUP_OUT_OF_STORAGE_QUOTA",
-                                    comment: "Title for the conversation list's backup storage full context menu action."
+                                    comment: "Title for the conversation list's backup storage full context menu action.",
                                 ),
                                 image: image,
                                 handler: { _ in
-                                    SignalApp.shared.showAppSettings(mode: .backups)
-                                }
-                            )
-                        ])
+                                    SignalApp.shared.showAppSettings(mode: .backups())
+                                },
+                            ),
+                        ]),
                     )
                 }
 
@@ -606,7 +632,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
                 switch viewState.inboxFilter {
                 case .unread:
                     contextMenuActions.append(.disableChatListFilter(target: self))
-                case .none?, nil:
+                case .unfiltered, nil:
                     contextMenuActions.append(.enableChatListFilter(target: self))
                 }
 
@@ -615,13 +641,13 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
                         UIAction(
                             title: OWSLocalizedString(
                                 "HOME_VIEW_TITLE_SELECT_CHATS",
-                                comment: "Title for the 'Select Chats' option in the ChatList."
+                                comment: "Title for the 'Select Chats' option in the ChatList.",
                             ),
                             image: Theme.iconImage(.contextMenuSelect),
                             handler: { [weak self] _ in
                                 self?.willEnterMultiselectMode()
-                            }
-                        )
+                            },
+                        ),
                     )
                 }
 
@@ -632,20 +658,21 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
                         UIAction(
                             title: OWSLocalizedString(
                                 "HOME_VIEW_TITLE_ARCHIVE",
-                                comment: "Title for the conversation list's 'archive' mode."
+                                comment: "Title for the conversation list's 'archive' mode.",
                             ),
                             image: Theme.iconImage(.contextMenuArchive),
                             handler: { [weak self] _ in
                                 self?.showArchivedConversations(offerMultiSelectMode: true)
-                            }
-                        )
+                            },
+                        ),
                     )
                 }
 
                 return contextMenuActions
-            }, showAppSettings: { [weak self] in
+            },
+            showAppSettings: { [weak self] in
                 self?.showAppSettings()
-            }
+            },
         )
         barButtonItem.accessibilityLabel = CommonStrings.openAppSettingsButton
         return barButtonItem
@@ -728,7 +755,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         guard #available(iOS 26, *) else { return }
 
         let useSidebarChatListCellAppearance: Bool
-        if let splitViewController = splitViewController, !splitViewController.isCollapsed {
+        if let splitViewController, !splitViewController.isCollapsed {
             useSidebarChatListCellAppearance = true
         } else {
             useSidebarChatListCellAppearance = false
@@ -753,42 +780,34 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
     }
 
     private func updateLeftBarButtonItem() {
-        guard viewState.chatListMode == .inbox && !viewState.multiSelectState.isActive else { return }
+        guard viewState.chatListMode == .inbox, !viewState.multiSelectState.isActive else { return }
 
         // Settings button.
         navigationItem.leftBarButtonItem = settingsBarButtonItem()
     }
 
     private func updateRightBarButtonItems() {
-        guard viewState.chatListMode == .inbox && !viewState.multiSelectState.isActive else { return }
+        guard viewState.chatListMode == .inbox, !viewState.multiSelectState.isActive else { return }
 
         var rightBarButtonItems = [UIBarButtonItem]()
 
-        let compose = UIBarButtonItem(
-            image: Theme.iconImage(.buttonCompose),
-            style: .plain,
-            target: self,
-            action: #selector(showNewConversationView),
-            accessibilityIdentifier: "ChatListViewController.compose"
-        )
+        let compose = UIBarButtonItem.button(icon: .buttonCompose) { [weak self] in
+            self?.showNewConversationView()
+        }
         compose.accessibilityLabel = NSLocalizedString("COMPOSE_BUTTON_LABEL", comment: "Accessibility label from compose button.")
         compose.accessibilityHint = NSLocalizedString(
             "COMPOSE_BUTTON_HINT",
-            comment: "Accessibility hint describing what you can do with the compose button"
+            comment: "Accessibility hint describing what you can do with the compose button",
         )
         rightBarButtonItems.append(compose)
 
-        let camera = UIBarButtonItem(
-            image: Theme.iconImage(.buttonCamera),
-            style: .plain,
-            target: self,
-            action: #selector(showCameraView),
-            accessibilityIdentifier: "ChatListViewController.camera"
-        )
+        let camera = UIBarButtonItem.button(icon: .buttonCamera) { [weak self] in
+            self?.showCameraView()
+        }
         camera.accessibilityLabel = NSLocalizedString("CAMERA_BUTTON_LABEL", comment: "Accessibility label for camera button.")
         camera.accessibilityHint = NSLocalizedString(
             "CAMERA_BUTTON_HINT",
-            comment: "Accessibility hint describing what you can do with the camera button"
+            comment: "Accessibility hint describing what you can do with the camera button",
         )
         rightBarButtonItems.append(camera)
 
@@ -799,14 +818,11 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         navigationItem.rightBarButtonItems = rightBarButtonItems
     }
 
-    @objc
     func showNewConversationView() {
-        AssertIsOnMainThread()
-
         Logger.info("")
 
         // Dismiss any message actions if they're presented
-        conversationSplitViewController?.selectedConversationViewController?.dismissMessageContextMenu(animated: true)
+        homeTabBarController?.selectedConversationViewController?.dismissMessageContextMenu(animated: true)
 
         let viewController = ComposeViewController()
         SSKEnvironment.shared.contactManagerImplRef.requestSystemContactsOnce { error in
@@ -825,12 +841,10 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
     }
 
     func showNewGroupView() {
-        AssertIsOnMainThread()
-
         Logger.info("")
 
         // Dismiss any message actions if they're presented
-        conversationSplitViewController?.selectedConversationViewController?.dismissMessageContextMenu(animated: true)
+        homeTabBarController?.selectedConversationViewController?.dismissMessageContextMenu(animated: true)
 
         let newGroupViewController = NewGroupMembersViewController()
         SSKEnvironment.shared.contactManagerImplRef.requestSystemContactsOnce { error in
@@ -848,6 +862,10 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         }
     }
 
+    func showAppSettings(mode: HomeTabBarController.ShowAppSettingsMode? = nil, completion: (() -> Void)? = nil) {
+        homeTabBarController?.showAppSettingsWithMode(mode, completion: completion)
+    }
+
     @objc
     private func firstConversationCueWasTapped(_ gestureRecognizer: UITapGestureRecognizer) {
         Logger.info("")
@@ -858,7 +876,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
     private func applyDefaultBackButton() {
         AssertIsOnMainThread()
 
-        if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable { return }
+        if #available(iOS 26, *) { return }
 
         // We don't show any text for the back button, so there's no need to localize it. But because we left align the
         // conversation title view, we add a little tappable padding after the back button, by having a title of spaces.
@@ -868,11 +886,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         let paddingLength: Int = 3
         let paddingString = "".padding(toLength: paddingLength, withPad: " ", startingAt: 0)
 
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: paddingString,
-                                                           style: .plain,
-                                                           target: nil,
-                                                           action: nil,
-                                                           accessibilityIdentifier: "back")
+        navigationItem.backBarButtonItem = .button(title: paddingString) {}
     }
 
     // We want to delay asking for a review until an opportune time.
@@ -900,6 +914,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         }
 
         // In Production this will pop up at most 3 times per 365 days.
+        Logger.info("requesting review")
         SKStoreReviewController.requestReview(in: windowScene)
         Self.didRequestReview = true
     }
@@ -919,7 +934,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
     func updateViewState() {
         if shouldShowEmptyInboxView {
             tableView.isHidden = true
-            emptyInboxView.isHidden = false
+            emptyChatListView.isHidden = false
             if shouldShowFirstConversationCue() {
                 firstConversationCueView.isHidden = false
                 updateFirstConversationLabel()
@@ -928,7 +943,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
             }
         } else {
             tableView.isHidden = false
-            emptyInboxView.isHidden = true
+            emptyChatListView.isHidden = true
             firstConversationCueView.isHidden = true
         }
     }
@@ -943,8 +958,9 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
 
     func isChatListTopmostViewController() -> Bool {
         guard
-            UIApplication.shared.frontmostViewController == self.conversationSplitViewController,
-            conversationSplitViewController?.selectedThread == nil,
+            UIApplication.shared.frontmostViewController == homeTabBarController,
+            homeTabBarController?.selectedHomeTab == .chatList,
+            homeTabBarController?.selectedThread == nil,
             presentedViewController == nil
         else { return false }
 
@@ -953,15 +969,19 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
 
     // MARK: - Payments
 
-    func configureUnreadPaymentsBannerSingle(_ paymentsReminderView: UIView,
-                                             paymentModel: TSPaymentModel,
-                                             transaction: DBReadTransaction) {
+    func configureUnreadPaymentsBannerSingle(
+        _ paymentsReminderView: UIView,
+        paymentModel: TSPaymentModel,
+        transaction: DBReadTransaction,
+    ) {
 
-        guard paymentModel.isIncoming,
-              !paymentModel.isUnidentified,
-              let senderAci = paymentModel.senderOrRecipientAci?.wrappedAciValue,
-              let paymentAmount = paymentModel.paymentAmount,
-              paymentAmount.isValid else {
+        guard
+            paymentModel.isIncoming,
+            !paymentModel.isUnidentified,
+            let senderAci = paymentModel.senderOrRecipientAci,
+            let paymentAmount = paymentModel.paymentAmount,
+            paymentAmount.isValid
+        else {
             configureUnreadPaymentsBannerMultiple(paymentsReminderView, unreadCount: 1)
             return
         }
@@ -976,11 +996,13 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
             paymentAmount,
             isShortForm: true,
             withCurrencyCode: true,
-            withSpace: true
+            withSpace: true,
         )
-        let format = OWSLocalizedString("PAYMENTS_NOTIFICATION_BANNER_1_WITH_DETAILS_FORMAT",
-                                       comment: "Format for the payments notification banner for a single payment notification with details. Embeds: {{ %1$@ the name of the user who sent you the payment, %2$@ the amount of the payment }}.")
-        let title = String(format: format, shortName, formattedAmount)
+        let format = OWSLocalizedString(
+            "PAYMENTS_NOTIFICATION_BANNER_1_WITH_DETAILS_FORMAT",
+            comment: "Format for the payments notification banner for a single payment notification with details. Embeds: {{ %1$@ the name of the user who sent you the payment, %2$@ the amount of the payment }}.",
+        )
+        let title = String.nonPluralLocalizedStringWithFormat(format, shortName, formattedAmount)
 
         let avatarView = ConversationAvatarView(sizeClass: .customDiameter(Self.paymentsBannerAvatarSize), localUserDisplayMode: .asUser)
         avatarView.update(transaction) { config in
@@ -989,26 +1011,34 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
 
         let paymentsHistoryItem = PaymentsHistoryModelItem(
             paymentModel: paymentModel,
-            displayName: shortName
+            displayName: shortName,
         )
 
-        configureUnreadPaymentsBanner(paymentsReminderView,
-                                      title: title,
-                                      avatarView: avatarView) { [weak self] in
+        configureUnreadPaymentsBanner(
+            paymentsReminderView,
+            title: title,
+            avatarView: avatarView,
+        ) { [weak self] in
             self?.showAppSettings(mode: .payment(paymentsHistoryItem: paymentsHistoryItem))
         }
     }
 
-    func configureUnreadPaymentsBannerMultiple(_ paymentsReminderView: UIView,
-                                               unreadCount: UInt) {
+    func configureUnreadPaymentsBannerMultiple(
+        _ paymentsReminderView: UIView,
+        unreadCount: UInt,
+    ) {
         let title: String
         if unreadCount == 1 {
-            title = OWSLocalizedString("PAYMENTS_NOTIFICATION_BANNER_1",
-                                      comment: "Label for the payments notification banner for a single payment notification.")
+            title = OWSLocalizedString(
+                "PAYMENTS_NOTIFICATION_BANNER_1",
+                comment: "Label for the payments notification banner for a single payment notification.",
+            )
         } else {
-            let format = OWSLocalizedString("PAYMENTS_NOTIFICATION_BANNER_N_FORMAT",
-                                           comment: "Format for the payments notification banner for multiple payment notifications. Embeds: {{ the number of unread payment notifications }}.")
-            title = String(format: format, OWSFormat.formatUInt(unreadCount))
+            let format = OWSLocalizedString(
+                "PAYMENTS_NOTIFICATION_BANNER_N_FORMAT",
+                comment: "Format for the payments notification banner for multiple payment notifications. Embeds: {{ the number of unread payment notifications }}.",
+            )
+            title = String.nonPluralLocalizedStringWithFormat(format, OWSFormat.formatUInt(unreadCount))
         }
 
         let iconView = UIImageView()
@@ -1017,9 +1047,11 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         iconView.contentMode = .scaleAspectFit
         iconView.autoSetDimensions(to: .square(CGFloat(Self.paymentsBannerAvatarSize)))
 
-        configureUnreadPaymentsBanner(paymentsReminderView,
-                                      title: title,
-                                      avatarView: iconView) { [weak self] in
+        configureUnreadPaymentsBanner(
+            paymentsReminderView,
+            title: title,
+            avatarView: iconView,
+        ) { [weak self] in
             self?.showAppSettings(mode: .payments)
         }
     }
@@ -1063,10 +1095,12 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         }
     }
 
-    private func configureUnreadPaymentsBanner(_ paymentsReminderView: UIView,
-                                               title: String,
-                                               avatarView: UIView,
-                                               block: @escaping () -> Void) {
+    private func configureUnreadPaymentsBanner(
+        _ paymentsReminderView: UIView,
+        title: String,
+        avatarView: UIView,
+        block: @escaping () -> Void,
+    ) {
         paymentsReminderView.removeAllSubviews()
 
         let paymentsBannerView = PaymentsBannerView(block: block)
@@ -1074,13 +1108,17 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         paymentsBannerView.autoPinEdgesToSuperviewEdges()
 
         if UIDevice.current.isIPad {
-            paymentsReminderView.backgroundColor = (Theme.isDarkThemeEnabled
-                                                        ? .ows_gray75
-                                                        : .ows_gray05)
+            paymentsReminderView.backgroundColor = (
+                Theme.isDarkThemeEnabled
+                    ? .ows_gray75
+                    : .ows_gray05,
+            )
         } else {
-            paymentsReminderView.backgroundColor = (Theme.isDarkThemeEnabled
-                                                        ? .ows_gray90
-                                                        : .ows_gray02)
+            paymentsReminderView.backgroundColor = (
+                Theme.isDarkThemeEnabled
+                    ? .ows_gray90
+                    : .ows_gray02,
+            )
         }
 
         avatarView.setCompressionResistanceHigh()
@@ -1093,41 +1131,45 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
 
         let viewLabel = UILabel()
         viewLabel.text = CommonStrings.viewButton
-        viewLabel.textColor = Theme.accentBlueColor
+        viewLabel.textColor = .Signal.accent
         viewLabel.font = UIFont.dynamicTypeSubheadlineClamped
 
-        let textStack = UIStackView(arrangedSubviews: [ titleLabel, viewLabel ])
+        let textStack = UIStackView(arrangedSubviews: [titleLabel, viewLabel])
         textStack.axis = .vertical
         textStack.alignment = .leading
 
         let dismissButton = OWSLayerView.circleView(size: 20)
-        dismissButton.backgroundColor = (Theme.isDarkThemeEnabled
-                                            ? .ows_gray65
-                                            : .ows_gray05)
+        dismissButton.backgroundColor = (
+            Theme.isDarkThemeEnabled
+                ? .ows_gray65
+                : .ows_gray05,
+        )
         dismissButton.setCompressionResistanceHigh()
         dismissButton.setContentHuggingHigh()
         dismissButton.isUserInteractionEnabled = true
 
-        let dismissIcon = UIImageView.withTemplateImageName("x-compact",
-                                                            tintColor: (Theme.isDarkThemeEnabled
-                                                                            ? .ows_white
-                                                                            : .ows_gray60))
+        let dismissIcon = UIImageView.withTemplateImageName(
+            "x-compact",
+            tintColor: Theme.isDarkThemeEnabled ? .white : .ows_gray60,
+        )
         dismissIcon.autoSetDimensions(to: .square(16))
         dismissButton.addSubview(dismissIcon)
         dismissIcon.autoCenterInSuperview()
 
         paymentsBannerView.dismissButton = dismissButton
         paymentsBannerView.dismissBlock = { [weak self, weak paymentsReminderView] in
-            PaymentsViewUtils.markAllUnreadPaymentsAsReadWithSneakyTransaction()
+            PaymentUtils.markAllUnreadPaymentsAsReadWithSneakyTransaction()
             paymentsReminderView?.isHidden = true
             self?.loadCoordinator.loadIfNecessary()
         }
         let dismissTap = UITapGestureRecognizer(target: paymentsBannerView, action: #selector(PaymentsBannerView.didTapDismiss))
         dismissButton.addGestureRecognizer(dismissTap)
 
-        let stack = UIStackView(arrangedSubviews: [ avatarView,
-                                                    textStack,
-                                                    dismissButton ])
+        let stack = UIStackView(arrangedSubviews: [
+            avatarView,
+            textStack,
+            dismissButton,
+        ])
         stack.axis = .horizontal
         stack.alignment = .center
         stack.spacing = 10
@@ -1135,7 +1177,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
             top: OWSTableViewController2.cellVInnerMargin,
             left: OWSTableViewController2.cellOuterInset(in: view),
             bottom: OWSTableViewController2.cellVInnerMargin,
-            right: OWSTableViewController2.cellOuterInset(in: view)
+            right: OWSTableViewController2.cellOuterInset(in: view),
         )
         stack.isLayoutMarginsRelativeArrangement = true
         paymentsBannerView.addSubview(stack)
@@ -1195,13 +1237,13 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
             return
         }
 
-        let keyValueStore = KeyValueStore(collection: "FailedNSELaunches")
+        let keyValueStore = NewKeyValueStore(collection: "FailedNSELaunches")
         let mostRecentDateKey = "mostRecentPromptDate"
         let promptCountKey = "promptCount"
 
         let shouldShowPrompt = SSKEnvironment.shared.databaseStorageRef.read { tx -> Bool in
             // If we've shown the prompt recently, don't show it again.
-            let promptCount = keyValueStore.getInt(promptCountKey, defaultValue: 0, transaction: tx)
+            let promptCount = keyValueStore.fetchValue(Int64.self, forKey: promptCountKey, tx: tx) ?? 0
             let promptBackoff: TimeInterval = {
                 switch promptCount {
                 case 0:
@@ -1216,7 +1258,7 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
                     return 96 * .hour
                 }
             }()
-            let mostRecentDate = keyValueStore.getDate(mostRecentDateKey, transaction: tx)
+            let mostRecentDate = keyValueStore.fetchValue(Date.self, forKey: mostRecentDateKey, tx: tx)
             if let mostRecentDate, -mostRecentDate.timeIntervalSinceNow < promptBackoff {
                 return false
             }
@@ -1253,26 +1295,26 @@ public class ChatListViewController: OWSViewController, HomeTabViewController {
         OWSActionSheets.showContactSupportActionSheet(
             title: OWSLocalizedString(
                 "NOTIFICATIONS_ERROR_TITLE",
-                comment: "Shown as the title of an alert when notifications can't be shown due to an error."
+                comment: "Shown as the title of an alert when notifications can't be shown due to an error.",
             ),
-            message: String(
-                format: OWSLocalizedString(
+            message: String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
                     "NOTIFICATIONS_ERROR_MESSAGE",
-                    comment: "Shown as the body of an alert when notifications can't be shown due to an error."
+                    comment: "Shown as the body of an alert when notifications can't be shown due to an error.",
                 ),
-                UIDevice.current.localizedModel
+                UIDevice.current.localizedModel,
             ),
             emailFilter: .custom("NotLaunchingNSE"),
-            fromViewController: self
+            fromViewController: self,
         )
 
         let promptDate = Date()
         await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
-            keyValueStore.setDate(promptDate, key: mostRecentDateKey, transaction: tx)
-            keyValueStore.setInt(
-                keyValueStore.getInt(promptCountKey, defaultValue: 0, transaction: tx) + 1,
-                key: promptCountKey,
-                transaction: tx
+            keyValueStore.writeValue(promptDate, forKey: mostRecentDateKey, tx: tx)
+            keyValueStore.writeValue(
+                (keyValueStore.fetchValue(Int64.self, forKey: promptCountKey, tx: tx) ?? 0) + 1,
+                forKey: promptCountKey,
+                tx: tx,
             )
         }
     }
@@ -1292,7 +1334,7 @@ extension ChatListViewController {
     }
 
     func disableChatListFilter(_ sender: AnyObject?) {
-        updateChatListFilter(.none)
+        updateChatListFilter(.unfiltered)
         updateBarButtonItems()
 
         filterControl?.stopFiltering(animated: true)
@@ -1301,9 +1343,10 @@ extension ChatListViewController {
 
     private func updateFilterControl(animated: Bool) {
         guard let filterControl else { return }
-        if viewState.inboxFilter == .unread {
+        switch viewState.inboxFilter {
+        case .unread:
             filterControl.startFiltering(animated: animated)
-        } else {
+        case .unfiltered, nil:
             filterControl.stopFiltering(animated: animated)
         }
     }
@@ -1333,144 +1376,19 @@ extension ChatListViewController: ChatListProxyButtonDelegate {
     }
 }
 
-// MARK: -
+// MARK: - ThreadContextualActionProvider
 
-extension ChatListViewController {
-    enum ShowAppSettingsMode {
-        case payments
-        case payment(paymentsHistoryItem: PaymentsHistoryItem)
-        case paymentsTransferIn
-        case appearance
-        case avatarBuilder
-        case backups
-        case corruptedUsernameResolution
-        case corruptedUsernameLinkResolution
-        case donate(donateMode: DonateViewController.DonateMode)
-        case linkedDevices
-        case proxy
+extension ChatListViewController: ThreadContextualActionProvider {
+    func threadContextualActionShouldCloseThreadIfActive(threadViewModel: ThreadViewModel) {
+        guard
+            let homeTabBarController,
+            homeTabBarController.selectedThread?.uniqueId == threadViewModel.threadUniqueId
+        else { return }
+
+        homeTabBarController.closeSelectedConversation(animated: true)
     }
 
-    func showAppSettings(mode: ShowAppSettingsMode? = nil, completion: (() -> Void)? = nil) {
-        AssertIsOnMainThread()
-
-        Logger.info("")
-
-        // Dismiss any message actions if they're presented
-        conversationSplitViewController?.selectedConversationViewController?
-            .dismissMessageContextMenu(animated: true)
-
-        let navigationController = OWSNavigationController()
-        let appSettingsViewController = AppSettingsViewController(appReadiness: appReadiness)
-
-        var internalCompletion: (() -> Void)?
-        var viewControllers: [UIViewController] = [ appSettingsViewController ]
-
-        switch mode {
-        case nil:
-            break
-
-        case .payments:
-            let paymentsSettings = PaymentsSettingsViewController(mode: .inAppSettings, appReadiness: appReadiness)
-            viewControllers += [ paymentsSettings ]
-
-        case .payment(let paymentsHistoryItem):
-            let paymentsSettings = PaymentsSettingsViewController(mode: .inAppSettings, appReadiness: appReadiness)
-            let paymentsDetail = PaymentsDetailViewController(paymentItem: paymentsHistoryItem)
-            viewControllers += [ paymentsSettings, paymentsDetail ]
-
-        case .paymentsTransferIn:
-            let paymentsSettings = PaymentsSettingsViewController(mode: .inAppSettings, appReadiness: appReadiness)
-            let paymentsTransferIn = PaymentsTransferInViewController()
-            viewControllers += [ paymentsSettings, paymentsTransferIn ]
-
-        case .appearance:
-            let appearance = AppearanceSettingsTableViewController()
-            viewControllers += [ appearance ]
-
-        case .avatarBuilder:
-            let profile = ProfileSettingsViewController(
-                usernameChangeDelegate: appSettingsViewController,
-                usernameLinkScanDelegate: appSettingsViewController
-            )
-            viewControllers += [ profile ]
-            internalCompletion = { profile.presentAvatarSettingsView() }
-
-        case .backups:
-            viewControllers += [
-                BackupOnboardingCoordinator()
-                    .prepareForPresentation(inNavController: navigationController)
-            ]
-
-        case .corruptedUsernameResolution:
-            let profile = ProfileSettingsViewController(
-                usernameChangeDelegate: appSettingsViewController,
-                usernameLinkScanDelegate: appSettingsViewController
-            )
-            viewControllers += [ profile ]
-            internalCompletion = { profile.presentUsernameCorruptedResolution() }
-
-        case .corruptedUsernameLinkResolution:
-            let profile = ProfileSettingsViewController(
-                usernameChangeDelegate: appSettingsViewController,
-                usernameLinkScanDelegate: appSettingsViewController
-            )
-            viewControllers += [ profile ]
-            internalCompletion = { profile.presentUsernameLinkCorruptedResolution() }
-
-        case let .donate(donateMode):
-            guard DonationUtilities.canDonate(
-                inMode: donateMode.asDonationMode,
-                tsAccountManager: DependenciesBridge.shared.tsAccountManager,
-            ) else {
-                DonationViewsUtil.openDonateWebsite()
-                return
-            }
-            let donate = DonateViewController(preferredDonateMode: donateMode) { [weak self] finishResult in
-                switch finishResult {
-                case let .completedDonation(donateSheet, receiptCredentialSuccessMode):
-                    donateSheet.dismiss(animated: true) { [weak self] in
-                        guard
-                            let self,
-                            let badgeThanksSheetPresenter = BadgeThanksSheetPresenter.fromGlobalsWithSneakyTransaction(
-                                successMode: receiptCredentialSuccessMode
-                            )
-                        else { return }
-
-                        Task {
-                            await badgeThanksSheetPresenter.presentAndRecordBadgeThanks(
-                                fromViewController: self
-                            )
-                        }
-                    }
-                case let .monthlySubscriptionCancelled(donateSheet, toastText):
-                    donateSheet.dismiss(animated: true) { [weak self] in
-                        guard let self = self else { return }
-                        self.view.presentToast(text: toastText, fromViewController: self)
-                    }
-                }
-            }
-            viewControllers += [donate]
-
-        case .linkedDevices:
-            viewControllers += [ LinkedDevicesHostingController() ]
-
-        case .proxy:
-            viewControllers += [ PrivacySettingsViewController(), AdvancedPrivacySettingsViewController(), ProxySettingsViewController() ]
-
-        }
-
-        navigationController.setViewControllers(viewControllers, animated: false)
-        presentFormSheet(navigationController, animated: true) {
-            completion?()
-            internalCompletion?()
-        }
-    }
-}
-
-// MARK: - ThreadSwipeHandler
-
-extension ChatListViewController: ThreadSwipeHandler {
-    func updateUIAfterSwipeAction() {
+    func threadContextualActionDidComplete() {
         updateViewState()
     }
 }
@@ -1479,7 +1397,7 @@ extension ChatListViewController: ThreadSwipeHandler {
 
 extension ChatListViewController: GetStartedBannerViewControllerDelegate {
     func presentGetStartedBannerIfNecessary() {
-        guard getStartedBanner == nil && viewState.chatListMode == .inbox else { return }
+        guard getStartedBanner == nil, viewState.chatListMode == .inbox else { return }
 
         let getStartedVC = GetStartedBannerViewController(delegate: self)
         if getStartedVC.hasIncompleteCards {
@@ -1538,7 +1456,7 @@ extension ChatListViewController {
         let contactNames = SSKEnvironment.shared.databaseStorageRef.read { tx -> [ComparableDisplayName] in
             let comparableNames = SSKEnvironment.shared.contactManagerRef.sortedComparableNames(
                 for: SSKEnvironment.shared.profileManagerRef.allWhitelistedRegisteredAddresses(tx: tx),
-                tx: tx
+                tx: tx,
             )
             let tsAccountManager = DependenciesBridge.shared.tsAccountManager
             guard let localIdentifiers = tsAccountManager.localIdentifiers(tx: tx) else {
@@ -1547,7 +1465,7 @@ extension ChatListViewController {
             return Array(
                 comparableNames.lazy
                     .filter { !localIdentifiers.contains(address: $0.address) }
-                    .prefix(3)
+                    .prefix(3),
             )
         }
 
@@ -1556,22 +1474,22 @@ extension ChatListViewController {
             case 0:
                 return OWSLocalizedString(
                     "HOME_VIEW_FIRST_CONVERSATION_OFFER_NO_CONTACTS",
-                    comment: "A label offering to start a new conversation with your contacts, if you have no Signal contacts."
+                    comment: "A label offering to start a new conversation with your contacts, if you have no Signal contacts.",
                 )
             case 1:
                 return OWSLocalizedString(
                     "HOME_VIEW_FIRST_CONVERSATION_OFFER_1_CONTACT_FORMAT",
-                    comment: "Format string for a label offering to start a new conversation with your contacts, if you have 1 Signal contact.  Embeds {{The name of 1 of your Signal contacts}}."
+                    comment: "Format string for a label offering to start a new conversation with your contacts, if you have 1 Signal contact.  Embeds {{The name of 1 of your Signal contacts}}.",
                 )
             case 2:
                 return OWSLocalizedString(
                     "HOME_VIEW_FIRST_CONVERSATION_OFFER_2_CONTACTS_FORMAT",
-                    comment: "Format string for a label offering to start a new conversation with your contacts, if you have 2 Signal contacts.  Embeds {{The names of 2 of your Signal contacts}}."
+                    comment: "Format string for a label offering to start a new conversation with your contacts, if you have 2 Signal contacts.  Embeds {{The names of 2 of your Signal contacts}}.",
                 )
             case 3:
                 return OWSLocalizedString(
                     "HOME_VIEW_FIRST_CONVERSATION_OFFER_3_CONTACTS_FORMAT",
-                    comment: "Format string for a label offering to start a new conversation with your contacts, if you have at least 3 Signal contacts.  Embeds {{The names of 3 of your Signal contacts}}."
+                    comment: "Format string for a label offering to start a new conversation with your contacts, if you have at least 3 Signal contacts.  Embeds {{The names of 3 of your Signal contacts}}.",
                 )
             default:
                 owsFail("Too many contactNames.")
@@ -1583,9 +1501,9 @@ extension ChatListViewController {
             attributedFormatArgs: contactNames.map { comparableName in
                 return .string(
                     comparableName.resolvedValue(),
-                    attributes: [.font: firstConversationLabel.font.semibold()]
+                    attributes: [.font: firstConversationLabel.font.semibold()],
                 )
-            }
+            },
         )
 
         firstConversationLabel.attributedText = attributedString
@@ -1621,7 +1539,7 @@ extension ChatListViewController: ChatListFilterControlDelegate {
         case .on:
             updateChatListFilter(.unread)
         case .off:
-            updateChatListFilter(.none)
+            updateChatListFilter(.unfiltered)
         }
 
         // Because this happens in response to an interactive gesture, it feels

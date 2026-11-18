@@ -37,8 +37,10 @@ extension TSPaymentAmount: TSPaymentBaseModel {
     }
 
     public func buildProto() throws -> SSKProtoDataMessagePaymentAmount {
-        guard isValid,
-              currency == .mobileCoin else {
+        guard
+            isValid,
+            currency == .mobileCoin
+        else {
             throw PaymentsError.invalidModel
         }
 
@@ -52,8 +54,10 @@ extension TSPaymentAmount: TSPaymentBaseModel {
         guard let mobileCoin = proto.mobileCoin else {
             throw PaymentsError.invalidModel
         }
-        let instance = TSPaymentAmount(currency: .mobileCoin,
-                                       picoMob: mobileCoin.picoMob)
+        let instance = TSPaymentAmount(
+            currency: .mobileCoin,
+            picoMob: mobileCoin.picoMob,
+        )
         guard instance.isValidAmount(canBeEmpty: true) else {
             throw PaymentsError.invalidModel
         }
@@ -96,16 +100,20 @@ extension TSPaymentAddress: TSPaymentBaseModel {
         guard isValid, currency == .bitcoin else {
             throw PaymentsError.invalidModel
         }
-        
+
         // Sign the MC public address.
         let identityManager = DependenciesBridge.shared.identityManager
         guard let identityKeyPair: ECKeyPair = identityManager.identityKeyPair(for: .aci, tx: tx) else {
             throw OWSAssertionError("Missing identityKeyPair")
         }
-        let signatureData = try Self.sign(identityKeyPair: identityKeyPair,
-                                          publicAddressData: mobileCoinPublicAddressData)
-        let mobileCoinBuilder = SSKProtoPaymentAddressMobileCoin.builder(publicAddress: mobileCoinPublicAddressData,
-                                                                         signature: signatureData)
+        let signatureData = try Self.sign(
+            identityKeyPair: identityKeyPair,
+            publicAddressData: mobileCoinPublicAddressData,
+        )
+        let mobileCoinBuilder = SSKProtoPaymentAddressMobileCoin.builder(
+            publicAddress: mobileCoinPublicAddressData,
+            signature: signatureData,
+        )
         let builder = SSKProtoPaymentAddress.builder()
         builder.setMobileCoin(try mobileCoinBuilder.build())
         return try builder.build()
@@ -118,18 +126,26 @@ extension TSPaymentAddress: TSPaymentBaseModel {
         }
         let mobileCoinPublicAddressData = mobileCoin.publicAddress
         let signatureData = mobileCoin.signature
-        guard !mobileCoinPublicAddressData.isEmpty,
-              !signatureData.isEmpty else {
+        guard
+            !mobileCoinPublicAddressData.isEmpty,
+            !signatureData.isEmpty
+        else {
             throw PaymentsError.invalidModel
         }
-        guard Self.verifySignature(identityKey: identityKey,
-                                   publicAddressData: mobileCoinPublicAddressData,
-                                   signatureData: signatureData) else {
+        guard
+            Self.verifySignature(
+                identityKey: identityKey,
+                publicAddressData: mobileCoinPublicAddressData,
+                signatureData: signatureData,
+            )
+        else {
             owsFailDebug("Signature verification failed.")
             throw PaymentsError.invalidModel
         }
-        let instance = TSPaymentAddress(currency: .bitcoin,
-                                        mobileCoinPublicAddressData: mobileCoin.publicAddress)
+        let instance = TSPaymentAddress(
+            currency: .bitcoin,
+            mobileCoinPublicAddressData: mobileCoin.publicAddress,
+        )
         guard instance.isValid else {
             throw PaymentsError.invalidModel
         }
@@ -172,7 +188,7 @@ extension TSPaymentNotification: TSPaymentBaseModel {
         let mobileCoinBuilder = SSKProtoDataMessagePaymentNotificationMobileCoin.builder(receipt: mcReceiptData)
         let builder = SSKProtoDataMessagePaymentNotification.builder()
         builder.setMobileCoin(try mobileCoinBuilder.build())
-        if let memoMessage = memoMessage {
+        if let memoMessage {
             builder.setNote(memoMessage)
         }
         return try builder.build()
@@ -187,7 +203,7 @@ extension TSPaymentNotification: TSPaymentBaseModel {
 
     public class func fromProto(
         _ proto: SSKProtoDataMessagePaymentNotification,
-        dataMessage: SSKProtoDataMessage
+        dataMessage: SSKProtoDataMessage,
     ) throws -> TSPaymentNotification {
         guard let mobileCoin = proto.mobileCoin else {
             owsFailDebug("Missing mobileCoin.")
@@ -275,9 +291,11 @@ public extension TSPaymentModel {
 
     // We need to be cautious when updating the state of payment records,
     // to avoid races.
-    func updatePaymentModelState(fromState: TSPaymentState,
-                                 toState: TSPaymentState,
-                                 transaction: DBWriteTransaction) throws {
+    func updatePaymentModelState(
+        fromState: TSPaymentState,
+        toState: TSPaymentState,
+        transaction: DBWriteTransaction,
+    ) throws {
         guard isCurrentPaymentState(paymentState: fromState, transaction: transaction) else {
             throw OWSAssertionError("Payment model has unexpected state.")
         }
@@ -310,7 +328,7 @@ extension TSPaymentModel: TSPaymentBaseModel {
             isValid = false
         }
 
-        if let paymentAmount = paymentAmount {
+        if let paymentAmount {
             // This might be a scrubbed defragmentation.
             let canBeEmpty = self.isDefragmentation || self.isUnidentified
             if !paymentAmount.isValidAmount(canBeEmpty: canBeEmpty) {
@@ -552,24 +570,14 @@ extension TSPaymentModel: TSPaymentBaseModel {
         }
         return "[" + components.joined(separator: ", ") + "]"
     }
-
-    #if TESTABLE_BUILD
-    public var diffableRepresentation: String {
-        var result = [String]()
-        let pairs = dictionaryValue.sorted { $0.0 < $1.0 }
-        for (key, value) in pairs {
-            result.append("\(key): \(value)")
-        }
-        return result.joined(separator: "\n")
-    }
-    #endif
 }
 
 // MARK: - DeepCopyable
 
 extension TSPaymentAmount: DeepCopyable {
     public func deepCopy() throws -> AnyObject {
-        try TSPaymentAmount(dictionary: self.dictionaryValue)
+        _ = self as NSCopying
+        return self.copy() as! Self
     }
 }
 
@@ -577,7 +585,7 @@ extension TSPaymentAmount: DeepCopyable {
 
 public extension Array where Element == TSPaymentModel {
     private func sortBySortDateBlock(descending: Bool) -> (TSPaymentModel, TSPaymentModel) -> Bool {
-        return { (left, right) -> Bool in
+        return { left, right -> Bool in
             if descending {
                 return left.sortDate > right.sortDate
             } else {
@@ -767,7 +775,7 @@ extension TSPaymentFailure {
 public class PaymentUtils: NSObject {
 
     @available(*, unavailable, message: "Do not instantiate this class.")
-    private override init() {}
+    override private init() {}
 
     @objc
     public static func isIncomingPaymentState(_ value: TSPaymentState) -> Bool {

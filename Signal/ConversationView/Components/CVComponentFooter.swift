@@ -3,23 +3,31 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import SignalServiceKit
-public import SignalUI
+import SignalServiceKit
+import SignalUI
 
-public class CVComponentFooter: CVComponentBase, CVComponent {
+class CVComponentFooter: CVComponentBase, CVComponent {
 
-    public var componentKey: CVComponentKey { .footer }
+    var componentKey: CVComponentKey { .footer }
+
+    enum TimestampMode {
+        case original
+        case mostRecentEdit
+    }
 
     struct StatusIndicator: Equatable {
         let imageName: String
-        let imageSize: CGSize
         let isAnimated: Bool
+
+        static var size: CGSize { .init(width: 18, height: 12) }
     }
 
-    public enum TapForMoreState {
+    enum TapForMoreState {
         case none
         case tapForMore
         case undownloadableLongText
+        case skippedLongText
+        case downloadingLongText
 
         var shouldShowFooter: Bool {
             switch self {
@@ -28,6 +36,10 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
             case .tapForMore:
                 return true
             case .undownloadableLongText:
+                return true
+            case .skippedLongText:
+                return true
+            case .downloadingLongText:
                 return true
             }
         }
@@ -40,34 +52,43 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
         let tapForMoreState: TapForMoreState
         let displayEditedLabel: Bool
         let isPinnedMessage: Bool
+        let adminDeleteRecipientAddressStates: AdminDeleteManager.RecipientAddressStates?
 
         struct Expiration: Equatable {
             let expirationTimestamp: UInt64
             let expiresInSeconds: UInt32
         }
+
         let expiration: Expiration?
 
     }
+
     private let footerState: State
 
-    public var timestampText: String {
+    var timestampText: String {
         footerState.timestampText
     }
-    public var footerAccessibilityLabel: String? {
+
+    var footerAccessibilityLabel: String? {
         footerState.accessibilityLabel
     }
+
     private var statusIndicator: StatusIndicator? {
         footerState.statusIndicator
     }
-    public var tapForMoreState: TapForMoreState {
+
+    var tapForMoreState: TapForMoreState {
         footerState.tapForMoreState
     }
-    public var displayEditedLabel: Bool {
+
+    var displayEditedLabel: Bool {
         footerState.displayEditedLabel
     }
+
     private var expiration: State.Expiration? {
         footerState.expiration
     }
+
     private var isPinnedMessage: Bool {
         footerState.isPinnedMessage
     }
@@ -75,10 +96,12 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
     let isOverlayingMedia: Bool
     private let isOutsideBubble: Bool
 
-    init(itemModel: CVItemModel,
-         footerState: State,
-         isOverlayingMedia: Bool,
-         isOutsideBubble: Bool) {
+    init(
+        itemModel: CVItemModel,
+        footerState: State,
+        isOverlayingMedia: Bool,
+        isOutsideBubble: Bool,
+    ) {
 
         self.footerState = footerState
         self.isOverlayingMedia = isOverlayingMedia
@@ -87,27 +110,25 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
         super.init(itemModel: itemModel)
     }
 
-    public func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
+    func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
         CVComponentViewFooter()
     }
 
-    public override func updateScrollingContent(componentView: CVComponentView) {
-        super.updateScrollingContent(componentView: componentView)
-
+    override func wallpaperBlurView(componentView: CVComponentView) -> CVWallpaperBlurView? {
         guard let componentView = componentView as? CVComponentViewFooter else {
             owsFailDebug("Unexpected componentView.")
-            return
+            return nil
         }
-        componentView.chatColorView.updateAppearance()
+        return componentView.wallpaperBlurView
     }
 
-    public static let textViewVSpacing: CGFloat = 2
-    public static let bodyMediaQuotedReplyVSpacing: CGFloat = 6
-    public static let quotedReplyTopMargin: CGFloat = 6
+    static let textViewVSpacing: CGFloat = 2
 
-    public func configureForRendering(componentView componentViewParam: CVComponentView,
-                                      cellMeasurement: CVCellMeasurement,
-                                      componentDelegate: CVComponentDelegate) {
+    func configureForRendering(
+        componentView componentViewParam: CVComponentView,
+        cellMeasurement: CVCellMeasurement,
+        componentDelegate: CVComponentDelegate,
+    ) {
         guard let componentView = componentViewParam as? CVComponentViewFooter else {
             owsFailDebug("Unexpected componentView.")
             componentViewParam.reset()
@@ -122,15 +143,55 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
         var outerViews = [UIView]()
         var innerViews = [UIView]()
 
-        if isBorderless && conversationStyle.hasWallpaper {
-            let chatColorView = componentView.chatColorView
-            chatColorView.configure(value: conversationStyle.bubbleChatColor(isIncoming: isIncoming),
-                                    referenceView: componentDelegate.view,
-                                    hasPillRounding: true)
-            innerStack.addSubviewToFillSuperviewEdges(chatColorView)
+        if isBorderless, conversationStyle.hasWallpaper {
+            var messageDirection: ConversationStyle.MessageDirection
+            if isOutgoing {
+                messageDirection = .outgoing
+            } else {
+                messageDirection = .incoming
+            }
+            owsAssertDebug(!isReleaseNotesMessage, "Release notes messages should never be borderless")
+
+            let bubbleColor = itemModel.conversationStyle.bubbleChatColor(messageDirection: messageDirection)
+            let bubbleConfiguration = BubbleConfiguration(
+                corners: .capsule(),
+                stroke: itemModel.conversationStyle.bubbleStroke(isIncoming: isIncoming),
+            )
+
+            let bubbleView: UIView
+            if case .blur = bubbleColor {
+                let wallpaperBlurView = componentView.ensureWallpaperBlurView()
+                configureWallpaperBlurView(
+                    wallpaperBlurView: wallpaperBlurView,
+                    componentDelegate: componentDelegate,
+                    bubbleConfig: bubbleConfiguration,
+                )
+                bubbleView = wallpaperBlurView
+            } else {
+                let chatColorView = componentView.chatColorView
+                chatColorView.configure(
+                    value: bubbleColor,
+                    referenceView: componentDelegate.view,
+                    bubbleConfig: bubbleConfiguration,
+                )
+                bubbleView = chatColorView
+            }
+            innerStack.addSubviewToFillSuperviewEdges(bubbleView)
         }
 
-        if let tapForMoreLabelConfig = self.tapForMoreLabelConfig {
+        let textColor: UIColor
+        if wasRemotelyDeleted, !conversationStyle.hasWallpaper {
+            owsAssertDebug(!isOverlayingMedia)
+            textColor = UIColor.Signal.secondaryLabel
+        } else if isOverlayingMedia {
+            textColor = .white
+        } else if isOutsideBubble, !conversationStyle.hasWallpaper {
+            textColor = Theme.secondaryTextAndIconColor
+        } else {
+            textColor = conversationStyle.bubbleSecondaryTextColor(isIncoming: isIncoming)
+        }
+
+        if let tapForMoreLabelConfig = self.tapForMoreLabelConfig(secondaryTextColor: textColor) {
             let tapForMoreLabel = componentView.tapForMoreLabel
             tapForMoreLabelConfig.applyForRendering(label: tapForMoreLabel)
             outerViews.append(tapForMoreLabel)
@@ -139,19 +200,6 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
         // We always use a stretching spacer.
         outerViews.append(UIView.hStretchingSpacer())
         outerViews.append(innerStack)
-
-        let timestampLabel = componentView.timestampLabel
-        let textColor: UIColor
-        if wasRemotelyDeleted && !conversationStyle.hasWallpaper {
-            owsAssertDebug(!isOverlayingMedia)
-            textColor = Theme.primaryTextColor
-        } else if isOverlayingMedia {
-            textColor = .ows_white
-        } else if isOutsideBubble && !conversationStyle.hasWallpaper {
-            textColor = Theme.secondaryTextAndIconColor
-        } else {
-            textColor = conversationStyle.bubbleSecondaryTextColor(isIncoming: isIncoming)
-        }
 
         if isPinnedMessage {
             let pinIconView = componentView.pinnedImageView
@@ -165,15 +213,16 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
             innerViews.append(editedLabel)
         }
 
+        let timestampLabel = componentView.timestampLabel
         timestampLabelConfig(textColor: textColor).applyForRendering(label: timestampLabel)
         innerViews.append(timestampLabel)
 
-        if let expiration = expiration {
+        if let expiration {
             let messageTimerView = componentView.messageTimerView
             messageTimerView.configure(
                 expirationTimestampMs: expiration.expirationTimestamp,
                 disappearingMessageInterval: expiration.expiresInSeconds,
-                tintColor: textColor
+                tintColor: textColor,
             )
             innerViews.append(messageTimerView)
         }
@@ -184,13 +233,28 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
             innerViews.append(smsLockIconView)
         }
 
-        if let statusIndicator = self.statusIndicator {
+        if let statusIndicator {
             if let icon = UIImage(named: statusIndicator.imageName) {
+                let iconSize = icon.size
+                let statusIndicatorAreaSize = StatusIndicator.size
+
+                owsAssertDebug(iconSize.width <= statusIndicatorAreaSize.width)
+                owsAssertDebug(iconSize.height == statusIndicatorAreaSize.height)
+
                 let statusIndicatorImageView = componentView.statusIndicatorImageView
-                owsAssertDebug(icon.size == statusIndicator.imageSize)
                 statusIndicatorImageView.image = icon.withRenderingMode(.alwaysTemplate)
                 statusIndicatorImageView.tintColor = textColor
-                innerViews.append(statusIndicatorImageView)
+
+                // We need exactly the same amount of space for all status indicator images.
+                // Can't bake the space into icons because some icons are animated.
+                // The solution is to use a container view.
+                let statusIndicatorImageViewContainer = UIView(frame: CGRect(origin: .zero, size: statusIndicatorAreaSize))
+                statusIndicatorImageViewContainer.addSubview(statusIndicatorImageView)
+                statusIndicatorImageView.frame = CGRect(origin: .zero, size: iconSize)
+                if CurrentAppContext().isRTL {
+                    statusIndicatorImageView.frame.origin.x = statusIndicatorAreaSize.width - iconSize.width
+                }
+                innerViews.append(statusIndicatorImageViewContainer)
 
                 if statusIndicator.isAnimated {
                     componentView.animateSpinningIcon()
@@ -200,14 +264,18 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
             }
         }
 
-        innerStack.configure(config: innerStackConfig,
-                             cellMeasurement: cellMeasurement,
-                             measurementKey: Self.measurementKey_innerStack,
-                             subviews: innerViews)
-        outerStack.configure(config: outerStackConfig,
-                             cellMeasurement: cellMeasurement,
-                             measurementKey: Self.measurementKey_outerStack,
-                             subviews: outerViews)
+        innerStack.configure(
+            config: innerStackConfig,
+            cellMeasurement: cellMeasurement,
+            measurementKey: Self.measurementKey_innerStack,
+            subviews: innerViews,
+        )
+        outerStack.configure(
+            config: outerStackConfig,
+            cellMeasurement: cellMeasurement,
+            measurementKey: Self.measurementKey_outerStack,
+            subviews: outerViews,
+        )
     }
 
     static func outgoingMessageStatus(interaction: TSInteraction, hasBodyAttachments: Bool) -> MessageReceiptStatus? {
@@ -217,36 +285,50 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
         return MessageRecipientStatusUtils.recipientStatus(outgoingMessage: outgoingMessage, hasBodyAttachments: hasBodyAttachments)
     }
 
-    public static func timestampText(
+    static func timestampText(
         forInteraction interaction: TSInteraction,
+        originalTimestamp: UInt64? = nil,
         shouldUseLongFormat: Bool,
-        hasBodyAttachments: Bool
+        hasBodyAttachments: Bool,
+        adminDeleteRecipientStates: AdminDeleteManager.RecipientAddressStates?,
     ) -> String {
-
         let status = Self.outgoingMessageStatus(interaction: interaction, hasBodyAttachments: hasBodyAttachments)
         let isPendingOutgoingMessage = status == .pending
         let isFailedOutgoingMessage = status == .failed
+        let isFailedIncomingMessage = AdminDeleteManager.isFailedAdminDelete(recipientAddressStates: adminDeleteRecipientStates)
+
         let wasSentToAnyRecipient: Bool = {
-            guard let outgoingMessage = interaction as? TSOutgoingMessage else {
-                return false
+            if let outgoingMessage = interaction as? TSOutgoingMessage {
+                return outgoingMessage.wasSentToAnyRecipient
             }
-            return outgoingMessage.wasSentToAnyRecipient
+            if let message = interaction as? TSMessage, message.wasRemotelyDeleted {
+                return AdminDeleteManager.wasSentToAnyRecipient(recipientAddressStates: adminDeleteRecipientStates)
+            }
+            return false
         }()
 
         if isPendingOutgoingMessage {
-            return OWSLocalizedString("MESSAGE_STATUS_PENDING",
-                                     comment: "Label indicating that a message send was paused.")
-        } else if isFailedOutgoingMessage {
+            return OWSLocalizedString(
+                "MESSAGE_STATUS_PENDING",
+                comment: "Label indicating that a message send was paused.",
+            )
+        } else if isFailedOutgoingMessage || isFailedIncomingMessage {
             if wasSentToAnyRecipient {
-                return OWSLocalizedString("MESSAGE_STATUS_PARTIALLY_SENT",
-                                         comment: "Label indicating that a message was only sent to some recipients.")
+                return OWSLocalizedString(
+                    "MESSAGE_STATUS_PARTIALLY_SENT",
+                    comment: "Label indicating that a message was only sent to some recipients.",
+                )
             } else {
-                return OWSLocalizedString("MESSAGE_STATUS_SEND_FAILED",
-                                         comment: "Label indicating that a message failed to send.")
+                return OWSLocalizedString(
+                    "MESSAGE_STATUS_SEND_FAILED",
+                    comment: "Label indicating that a message failed to send.",
+                )
             }
         } else {
-            return DateUtil.formatMessageTimestampForCVC(interaction.timestamp,
-                                                         shouldUseLongFormat: shouldUseLongFormat)
+            return DateUtil.formatMessageTimestampForCVC(
+                originalTimestamp ?? interaction.timestamp,
+                shouldUseLongFormat: shouldUseLongFormat,
+            )
         }
     }
 
@@ -254,20 +336,22 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
         interaction: TSInteraction,
         paymentNotification: TSPaymentNotification?,
         tapForMoreState: TapForMoreState,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> State {
 
         guard
             let receiptData = paymentNotification?.mcReceiptData,
             let paymentModel = PaymentFinder.paymentModels(
                 forMcReceiptData: receiptData,
-                transaction: transaction).first
+                transaction: transaction,
+            ).first
         else {
             let hasBodyAttachments = (interaction as? TSMessage)?.hasBodyAttachments(transaction: transaction) ?? false
             let timestampText = Self.timestampText(
                 forInteraction: interaction,
                 shouldUseLongFormat: false,
-                hasBodyAttachments: hasBodyAttachments
+                hasBodyAttachments: hasBodyAttachments,
+                adminDeleteRecipientStates: nil,
             )
 
             return State(
@@ -277,14 +361,15 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
                 tapForMoreState: tapForMoreState,
                 displayEditedLabel: false,
                 isPinnedMessage: false,
-                expiration: nil
+                adminDeleteRecipientAddressStates: nil,
+                expiration: nil,
             )
         }
 
         let timestampText = Self.paymentMessageTimestampText(
             forInteraction: interaction,
             paymentState: paymentModel.paymentState,
-            shouldUseLongFormat: false
+            shouldUseLongFormat: false,
         )
 
         var statusIndicator: StatusIndicator?
@@ -293,43 +378,38 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
 
             let messageStatus = MessageRecipientStatusUtils.recipientStatus(
                 outgoingMessage: outgoingMessage,
-                paymentModel: paymentModel
+                paymentModel: paymentModel,
             )
             accessibilityLabel = MessageRecipientStatusUtils.receiptMessage(
                 outgoingMessage: outgoingMessage,
-                paymentModel: paymentModel
+                paymentModel: paymentModel,
             )
 
             switch messageStatus {
             case .uploading, .sending:
                 statusIndicator = StatusIndicator(
                     imageName: "message_status_sending",
-                    imageSize: .square(12),
-                    isAnimated: true
+                    isAnimated: true,
                 )
             case .pending:
                 statusIndicator = StatusIndicator(
                     imageName: "message_status_sending",
-                    imageSize: .square(12),
-                    isAnimated: false
+                    isAnimated: false,
                 )
             case .sent, .skipped:
                 statusIndicator = StatusIndicator(
                     imageName: "message_status_sent",
-                    imageSize: .square(12),
-                    isAnimated: false
+                    isAnimated: false,
                 )
             case .delivered:
                 statusIndicator = StatusIndicator(
                     imageName: "message_status_delivered",
-                    imageSize: .init(width: 18, height: 12),
-                    isAnimated: false
+                    isAnimated: false,
                 )
             case .read, .viewed:
                 statusIndicator = StatusIndicator(
                     imageName: "message_status_read",
-                    imageSize: .init(width: 18, height: 12),
-                    isAnimated: false
+                    isAnimated: false,
                 )
             case .failed:
                 // No status indicator icon.
@@ -342,11 +422,13 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
         }
 
         var expiration: State.Expiration?
-        if let message = interaction as? TSMessage,
-           message.hasPerConversationExpiration {
+        if
+            let message = interaction as? TSMessage,
+            message.hasPerConversationExpiration
+        {
             expiration = State.Expiration(
                 expirationTimestamp: message.expiresAt,
-                expiresInSeconds: message.expiresInSeconds
+                expiresInSeconds: message.expiresInSeconds,
             )
         }
 
@@ -357,31 +439,32 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
             tapForMoreState: tapForMoreState,
             displayEditedLabel: false,
             isPinnedMessage: false,
-            expiration: expiration
+            adminDeleteRecipientAddressStates: nil,
+            expiration: expiration,
         )
     }
 
-    public static func paymentMessageTimestampText(
+    static func paymentMessageTimestampText(
         forInteraction interaction: TSInteraction,
         paymentState: TSPaymentState,
-        shouldUseLongFormat: Bool
+        shouldUseLongFormat: Bool,
     ) -> String {
 
         switch paymentState.messageReceiptStatus {
         case .pending:
             return OWSLocalizedString(
                 "MESSAGE_STATUS_PENDING",
-                comment: "Label indicating that a message send was paused."
+                comment: "Label indicating that a message send was paused.",
             )
         case .failed:
             return OWSLocalizedString(
                 "MESSAGE_STATUS_SEND_FAILED",
-                comment: "Label indicating that a message failed to send."
+                comment: "Label indicating that a message failed to send.",
             )
         default:
             return DateUtil.formatMessageTimestampForCVC(
                 interaction.timestamp,
-                shouldUseLongFormat: shouldUseLongFormat
+                shouldUseLongFormat: shouldUseLongFormat,
             )
         }
     }
@@ -390,14 +473,55 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
         interaction: TSInteraction,
         tapForMoreState: TapForMoreState,
         isPinnedMessage: Bool,
-        transaction: DBReadTransaction
+        adminDeleteRecipientStates: AdminDeleteManager.RecipientAddressStates?,
+        timestampMode: TimestampMode,
+        transaction tx: DBReadTransaction,
     ) -> State {
+        var expiration: State.Expiration?
+        var isEdited: Bool = false
+        var originalTimestamp: UInt64?
+        if let message = interaction as? TSMessage {
+            if message.hasPerConversationExpiration {
+                expiration = State.Expiration(
+                    expirationTimestamp: message.expiresAt,
+                    expiresInSeconds: message.expiresInSeconds,
+                )
+            }
 
-        let hasBodyAttachments = (interaction as? TSMessage)?.hasBodyAttachments(transaction: transaction) ?? false
+            if !message.wasRemotelyDeleted {
+                switch message.editState {
+                case .latestRevisionRead, .latestRevisionUnread:
+                    isEdited = true
+                case .none, .pastRevision:
+                    isEdited = false
+                }
+            }
+
+            if isEdited {
+                switch timestampMode {
+                case .original:
+                    let editMessageStore = DependenciesBridge.shared.editMessageStore
+                    if
+                        let originalMessage = editMessageStore.findEditHistory(
+                            forMostRecentRevision: message,
+                            tx: tx,
+                        ).lazy.compactMap(\.message).last
+                    {
+                        originalTimestamp = originalMessage.timestamp
+                    }
+                case .mostRecentEdit:
+                    break
+                }
+            }
+        }
+
+        let hasBodyAttachments = (interaction as? TSMessage)?.hasBodyAttachments(transaction: tx) ?? false
         let timestampText = Self.timestampText(
             forInteraction: interaction,
+            originalTimestamp: originalTimestamp,
             shouldUseLongFormat: false,
-            hasBodyAttachments: hasBodyAttachments
+            hasBodyAttachments: hasBodyAttachments,
+            adminDeleteRecipientStates: adminDeleteRecipientStates,
         )
 
         var statusIndicator: StatusIndicator?
@@ -405,58 +529,60 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
         if let outgoingMessage = interaction as? TSOutgoingMessage {
             let (messageStatus, label) = MessageRecipientStatusUtils.receiptStatusAndMessage(
                 outgoingMessage: outgoingMessage,
-                transaction: transaction
+                transaction: tx,
             )
             accessibilityLabel = label
 
             switch messageStatus {
             case .uploading, .sending:
-                statusIndicator = StatusIndicator(imageName: "message_status_sending",
-                                                  imageSize: .square(12),
-                                                  isAnimated: true)
+                statusIndicator = StatusIndicator(
+                    imageName: "message_status_sending",
+                    isAnimated: true,
+                )
             case .pending:
-                statusIndicator = StatusIndicator(imageName: "message_status_sending",
-                                                  imageSize: .square(12),
-                                                  isAnimated: false)
+                statusIndicator = StatusIndicator(
+                    imageName: "message_status_sending",
+                    isAnimated: false,
+                )
             case .sent, .skipped:
-                statusIndicator = StatusIndicator(imageName: "message_status_sent",
-                                                  imageSize: .square(12),
-                                                  isAnimated: false)
+                statusIndicator = StatusIndicator(
+                    imageName: "message_status_sent",
+                    isAnimated: false,
+                )
             case .delivered:
-                statusIndicator = StatusIndicator(imageName: "message_status_delivered",
-                                                  imageSize: .init(width: 18, height: 12),
-                                                  isAnimated: false)
+                statusIndicator = StatusIndicator(
+                    imageName: "message_status_delivered",
+                    isAnimated: false,
+                )
             case .read, .viewed:
-                statusIndicator = StatusIndicator(imageName: "message_status_read",
-                                                  imageSize: .init(width: 18, height: 12),
-                                                  isAnimated: false)
+                statusIndicator = StatusIndicator(
+                    imageName: "message_status_read",
+                    isAnimated: false,
+                )
             case .failed:
                 // No status indicator icon.
                 break
             }
 
             if outgoingMessage.wasRemotelyDeleted {
-                statusIndicator = nil
-            }
-        }
-
-        var expiration: State.Expiration?
-        var displayEditedLabel: Bool = false
-        if let message = interaction as? TSMessage {
-            if message.hasPerConversationExpiration {
-                expiration = State.Expiration(
-                    expirationTimestamp: message.expiresAt,
-                    expiresInSeconds: message.expiresInSeconds
-                )
-            }
-
-            if !message.wasRemotelyDeleted {
-                switch message.editState {
-                case .latestRevisionRead, .latestRevisionUnread:
-                    displayEditedLabel = true
-                case .none, .pastRevision:
-                    displayEditedLabel = false
+                if messageStatus != .uploading, messageStatus != .sending {
+                    statusIndicator = nil
                 }
+            }
+        } else if
+            let incomingMessage = interaction as? TSIncomingMessage,
+            incomingMessage.wasRemotelyDeleted,
+            let adminDeleteRecipientStates
+        {
+            let messageStatus = TSMessage.messageStateForRecipientStates(Array(adminDeleteRecipientStates.values))
+            switch messageStatus {
+            case .sending:
+                statusIndicator = StatusIndicator(
+                    imageName: "message_status_sending",
+                    isAnimated: true,
+                )
+            case .pending, .sent, .sent_OBSOLETE, .delivered_OBSOLETE, .failed:
+                statusIndicator = nil
             }
         }
 
@@ -465,22 +591,23 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
             statusIndicator: statusIndicator,
             accessibilityLabel: accessibilityLabel,
             tapForMoreState: tapForMoreState,
-            displayEditedLabel: displayEditedLabel,
+            displayEditedLabel: isEdited,
             isPinnedMessage: isPinnedMessage,
-            expiration: expiration
+            adminDeleteRecipientAddressStates: adminDeleteRecipientStates,
+            expiration: expiration,
         )
     }
 
     private func editedLabelConfig(textColor: UIColor) -> CVLabelConfig {
         let text = OWSLocalizedString(
             "MESSAGE_STATUS_EDITED",
-            comment: "status meesage for edited messages"
+            comment: "status meesage for edited messages",
         )
 
         return CVLabelConfig.unstyledText(
             text,
             font: .dynamicTypeCaption1,
-            textColor: textColor
+            textColor: textColor,
         )
     }
 
@@ -488,11 +615,11 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
         return CVLabelConfig.unstyledText(
             timestampText,
             font: .dynamicTypeCaption1,
-            textColor: textColor
+            textColor: textColor,
         )
     }
 
-    private var tapForMoreLabelConfig: CVLabelConfig? {
+    private func tapForMoreLabelConfig(secondaryTextColor: UIColor) -> CVLabelConfig? {
         switch tapForMoreState {
         case .none:
             return nil
@@ -504,13 +631,33 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
                 owsFailDebug("Invalid interaction.")
                 return nil
             }
-            let text = OWSLocalizedString("CONVERSATION_VIEW_OVERSIZE_TEXT_TAP_FOR_MORE",
-                                         comment: "Indicator on truncated text messages that they can be tapped to see the entire text message.")
+            let text = OWSLocalizedString(
+                "CONVERSATION_VIEW_OVERSIZE_TEXT_TAP_FOR_MORE",
+                comment: "Indicator on truncated text messages that they can be tapped to see the entire text message.",
+            )
             return CVLabelConfig.unstyledText(
                 text,
                 font: UIFont.dynamicTypeSubheadlineClamped.semibold(),
                 textColor: conversationStyle.bubbleReadMoreTextColor(message: message),
-                textAlignment: .trailing
+                textAlignment: .trailing,
+            )
+        case .skippedLongText:
+            guard !wasRemotelyDeleted else {
+                return nil
+            }
+            guard let message = interaction as? TSMessage else {
+                owsFailDebug("Invalid interaction.")
+                return nil
+            }
+            let text = OWSLocalizedString(
+                "CONVERSATION_VIEW_OVERSIZE_TEXT_TAP_TO_DOWNLOAD",
+                comment: "Button on truncated text messages that they can be tapped to download the entire text message.",
+            )
+            return CVLabelConfig.unstyledText(
+                text,
+                font: UIFont.dynamicTypeSubheadlineClamped.semibold(),
+                textColor: conversationStyle.bubbleReadMoreTextColor(message: message),
+                textAlignment: .trailing,
             )
         case .undownloadableLongText:
             guard !wasRemotelyDeleted else {
@@ -525,17 +672,17 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
             let attributedString = NSAttributedString.composed(of: [
                 NSAttributedString.with(
                     image: UIImage(named: "error-circle-20")!,
-                    font: font
+                    font: font,
                 ),
                 " ",
                 OWSLocalizedString(
                     "OVERSIZE_TEXT_UNAVAILABLE_FOOTER",
-                    comment: "Footer for message cell for long text when it is expired and unavailable for download"
+                    comment: "Footer for message cell for long text when it is expired and unavailable for download",
                 ),
                 " ",
                 NSAttributedString.with(
                     image: UIImage(named: "chevron-right-20")!,
-                    font: font
+                    font: font,
                 ),
             ])
             // TODO[AttachmentRendering]: have to render a horizontal line
@@ -545,7 +692,21 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
                 displayConfig: .forUnstyledText(font: font, textColor: textColor),
                 font: font,
                 textColor: textColor,
-                textAlignment: .trailing
+                textAlignment: .trailing,
+            )
+        case .downloadingLongText:
+            guard !wasRemotelyDeleted else {
+                return nil
+            }
+            let text = OWSLocalizedString(
+                "CONVERSATION_VIEW_OVERSIZE_TEXT_DOWNLOADING",
+                comment: "Label on truncated text messages that's shown while the full contents of a text message are being downloaded.",
+            )
+            return CVLabelConfig.unstyledText(
+                text,
+                font: UIFont.dynamicTypeSubheadlineClamped.italic(),
+                textColor: secondaryTextColor,
+                textAlignment: .trailing,
             )
         }
     }
@@ -553,37 +714,43 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
     private let tapForMoreHeightFactor: CGFloat = 1.25
 
     private var outerStackConfig: CVStackViewConfig {
-        CVStackViewConfig(axis: .horizontal,
-                          alignment: .bottom,
-                          spacing: CVComponentFooter.hSpacing,
-                          layoutMargins: .zero)
+        CVStackViewConfig(
+            axis: .horizontal,
+            alignment: .bottom,
+            spacing: CVComponentFooter.hSpacing,
+            layoutMargins: .zero,
+        )
     }
 
     private var innerStackConfig: CVStackViewConfig {
         let layoutMargins = isBorderless ? UIEdgeInsets(hMargin: 12, vMargin: 3) : .zero
-        return CVStackViewConfig(axis: .horizontal,
-                                 alignment: .center,
-                                 spacing: CVComponentFooter.hSpacing,
-                                 layoutMargins: layoutMargins)
+        return CVStackViewConfig(
+            axis: .horizontal,
+            alignment: .center,
+            spacing: CVComponentFooter.hSpacing,
+            layoutMargins: layoutMargins,
+        )
     }
 
     private static let measurementKey_outerStack = "CVComponentFooter.measurementKey_outerStack"
     private static let measurementKey_innerStack = "CVComponentFooter.measurementKey_innerStack"
 
     // Extract the overall measurement for this component.
-    public static func footerMeasurement(measurementBuilder: CVCellMeasurement.Builder) -> CVCellMeasurement.Measurement? {
+    static func footerMeasurement(measurementBuilder: CVCellMeasurement.Builder) -> CVCellMeasurement.Measurement? {
         measurementBuilder.getMeasurement(key: measurementKey_outerStack)
     }
 
-    public func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
+    func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
         owsAssertDebug(maxWidth > 0)
 
         var outerSubviewInfos = [ManualStackSubviewInfo]()
         var innerSubviewInfos = [ManualStackSubviewInfo]()
 
-        if let tapForMoreLabelConfig = self.tapForMoreLabelConfig {
-            var tapForMoreSize = CVText.measureLabel(config: tapForMoreLabelConfig,
-                                                     maxWidth: maxWidth)
+        if let tapForMoreLabelConfig = self.tapForMoreLabelConfig(secondaryTextColor: .black) {
+            var tapForMoreSize = CVText.measureLabel(
+                config: tapForMoreLabelConfig,
+                maxWidth: maxWidth,
+            )
             tapForMoreSize.height *= tapForMoreHeightFactor
             outerSubviewInfos.append(tapForMoreSize.asManualSubviewInfo(hasFixedWidth: true))
         }
@@ -604,12 +771,16 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
 
         // The color doesn't matter for measurement.
         let timestampLabelConfig = self.timestampLabelConfig(textColor: UIColor.black)
-        let timestampLabelSize = CVText.measureLabel(config: timestampLabelConfig,
-                                                     maxWidth: maxWidth)
+        let timestampLabelSize = CVText.measureLabel(
+            config: timestampLabelConfig,
+            maxWidth: maxWidth,
+        )
         innerSubviewInfos.append(timestampLabelSize.asManualSubviewInfo(hasFixedWidth: true))
 
-        if hasPerConversationExpiration,
-           interaction is TSMessage {
+        if
+            hasPerConversationExpiration,
+            interaction is TSMessage
+        {
             let timerSize = MessageTimerView.measureSize
             innerSubviewInfos.append(timerSize.asManualSubviewInfo(hasFixedWidth: true))
         }
@@ -619,21 +790,25 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
             innerSubviewInfos.append(lockIconSize.asManualSubviewInfo(hasFixedWidth: true))
         }
 
-        if let statusIndicator = self.statusIndicator {
-            let statusSize = statusIndicator.imageSize
+        if statusIndicator != nil {
+            let statusSize = StatusIndicator.size
             innerSubviewInfos.append(statusSize.asManualSubviewInfo(hasFixedWidth: true))
         }
 
-        let innerStackMeasurement = ManualStackView.measure(config: innerStackConfig,
-                                                            measurementBuilder: measurementBuilder,
-                                                            measurementKey: Self.measurementKey_innerStack,
-                                                            subviewInfos: innerSubviewInfos)
+        let innerStackMeasurement = ManualStackView.measure(
+            config: innerStackConfig,
+            measurementBuilder: measurementBuilder,
+            measurementKey: Self.measurementKey_innerStack,
+            subviewInfos: innerSubviewInfos,
+        )
         outerSubviewInfos.append(innerStackMeasurement.measuredSize.asManualSubviewInfo(hasFixedWidth: true))
-        let outerStackMeasurement = ManualStackView.measure(config: outerStackConfig,
-                                                            measurementBuilder: measurementBuilder,
-                                                            measurementKey: Self.measurementKey_outerStack,
-                                                            subviewInfos: outerSubviewInfos,
-                                                            maxWidth: maxWidth)
+        let outerStackMeasurement = ManualStackView.measure(
+            config: outerStackConfig,
+            measurementBuilder: measurementBuilder,
+            measurementKey: Self.measurementKey_outerStack,
+            subviewInfos: outerSubviewInfos,
+            maxWidth: maxWidth,
+        )
         return outerStackMeasurement.measuredSize
     }
 
@@ -641,10 +816,12 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
 
     // MARK: - Events
 
-    public override func handleTap(sender: UIGestureRecognizer,
-                                   componentDelegate: CVComponentDelegate,
-                                   componentView: CVComponentView,
-                                   renderItem: CVRenderItem) -> Bool {
+    override func handleTap(
+        sender: UIGestureRecognizer,
+        componentDelegate: CVComponentDelegate,
+        componentView: CVComponentView,
+        renderItem: CVRenderItem,
+    ) -> Bool {
 
         guard let componentView = componentView as? CVComponentViewFooter else {
             owsFailDebug("Unexpected componentView.")
@@ -652,20 +829,26 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
         }
 
         switch tapForMoreState {
-        case .none:
+        case .none, .downloadingLongText:
             break
-        case .tapForMore, .undownloadableLongText:
+        case .tapForMore, .undownloadableLongText, .skippedLongText:
             let readMoreLabel = componentView.tapForMoreLabel
             let location = sender.location(in: readMoreLabel)
             if readMoreLabel.bounds.contains(location) {
                 let itemViewModel = CVItemViewModelImpl(renderItem: renderItem)
                 switch tapForMoreState {
-                case .none:
+                case .none, .downloadingLongText:
                     break
                 case .tapForMore:
                     componentDelegate.didTapTruncatedTextMessage(itemViewModel)
                 case .undownloadableLongText:
                     componentDelegate.didTapUndownloadableOversizeText()
+                case .skippedLongText:
+                    guard let message = interaction as? TSMessage else {
+                        owsFailDebug("invalid interaction")
+                        break
+                    }
+                    componentDelegate.didTapSkippedDownloads(message)
                 }
                 return true
             }
@@ -686,7 +869,7 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
 
     // Used for rendering some portion of an Conversation View item.
     // It could be the entire item or some part thereof.
-    public class CVComponentViewFooter: NSObject, CVComponentView {
+    class CVComponentViewFooter: CVComponentView {
 
         fileprivate let outerStack = ManualStackView(name: "footer.outerStack")
         fileprivate let innerStack = ManualStackViewWithLayer(name: "footer.innerStack")
@@ -696,22 +879,34 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
         fileprivate let statusIndicatorImageView = CVImageView()
         fileprivate let messageTimerView = MessageTimerView()
         fileprivate let smsLockIconView = SmsLockIconView()
-        fileprivate let chatColorView = CVColorOrGradientView()
         fileprivate let pinnedImageView = PinnedMessageIconView()
 
-        public var isDedicatedCellView = false
+        // Bubble view when there is no chat wallpaper.
+        fileprivate let chatColorView = CVColorOrGradientView()
+        // Bubble view when there is a chat wallpaper.
+        fileprivate var wallpaperBlurView: CVWallpaperBlurView?
+        fileprivate func ensureWallpaperBlurView() -> CVWallpaperBlurView {
+            if let wallpaperBlurView {
+                return wallpaperBlurView
+            }
+            let wallpaperBlurView = CVWallpaperBlurView()
+            self.wallpaperBlurView = wallpaperBlurView
+            return wallpaperBlurView
+        }
 
-        public var rootView: UIView {
+        var isDedicatedCellView = false
+
+        var rootView: UIView {
             outerStack
         }
 
-        override init() {
+        init() {
             timestampLabel.textAlignment = .trailing
         }
 
-        public func setIsCellVisible(_ isCellVisible: Bool) {}
+        func setIsCellVisible(_ isCellVisible: Bool) {}
 
-        public func reset() {
+        func reset() {
             outerStack.reset()
             innerStack.reset()
             innerStack.backgroundColor = nil
@@ -731,10 +926,12 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
 
             chatColorView.reset()
             chatColorView.removeFromSuperview()
+
+            wallpaperBlurView?.removeFromSuperview()
         }
 
         fileprivate func animateSpinningIcon() {
-            let animation = CABasicAnimation.init(keyPath: "transform.rotation.z")
+            let animation = CABasicAnimation(keyPath: "transform.rotation.z")
             animation.toValue = CGFloat.pi * 2
             animation.duration = TimeInterval.second
             animation.isCumulative = true
@@ -742,16 +939,14 @@ public class CVComponentFooter: CVComponentBase, CVComponent {
             statusIndicatorImageView.layer.add(animation, forKey: "animation")
         }
     }
-}
 
-// MARK: -
+    // MARK: -
 
-private extension CVComponentFooter {
     /// Is this footer representing an SMS message we restored from a Backup?
     ///
     /// If so, we want to add some UI to indicate such, matching the UI for
     /// these on Android, where they originated.
-    var isRepresentingSmsMessageRestoredFromBackup: Bool {
+    private var isRepresentingSmsMessageRestoredFromBackup: Bool {
         if
             let message = interaction as? TSMessage,
             message.isSmsMessageRestoredFromBackup

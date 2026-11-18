@@ -7,11 +7,11 @@ import SignalServiceKit
 
 public extension UIViewPropertyAnimator {
 
-    convenience init (
+    convenience init(
         duration: TimeInterval,
         springDamping: CGFloat,
         springResponse: CGFloat,
-        initialVelocity velocity: CGVector = .zero
+        initialVelocity velocity: CGVector = .zero,
     ) {
         let stiffness = pow(2 * .pi / springResponse, 2)
         let damping = 4 * .pi * springDamping / springResponse
@@ -19,7 +19,7 @@ public extension UIViewPropertyAnimator {
             mass: 1,
             stiffness: stiffness,
             damping: damping,
-            initialVelocity: velocity
+            initialVelocity: velocity,
         )
         self.init(duration: duration, timingParameters: timingParameters)
         isUserInteractionEnabled = true
@@ -33,7 +33,7 @@ public extension UIView {
         velocity: CGPoint,
         velocityThreshold: CGFloat = 500,
         boundingRect: CGRect,
-        completion: ((Bool) -> Void)? = nil
+        completion: ((Bool) -> Void)? = nil,
     ) {
         var velocity = velocity
         if abs(velocity.x) < velocityThreshold { velocity.x = 0 }
@@ -75,12 +75,12 @@ public extension UIView {
             if timeUntilHorizontalEdge > timeUntilVerticalEdge {
                 intersectPoint = CGPoint(
                     x: velocity.x > 0 ? (boundingRect.maxX - width) : boundingRect.minX,
-                    y: (timeUntilVerticalEdge * velocity.y) + currentPosition.y
+                    y: (timeUntilVerticalEdge * velocity.y) + currentPosition.y,
                 )
             } else {
                 intersectPoint = CGPoint(
                     x: (timeUntilHorizontalEdge * velocity.x) + currentPosition.x,
-                    y: velocity.y > 0 ? (boundingRect.maxY - height) : boundingRect.minY
+                    y: velocity.y > 0 ? (boundingRect.maxY - height) : boundingRect.minY,
                 )
             }
 
@@ -99,7 +99,7 @@ public extension UIView {
             initialSpringVelocity: abs(velocity.length / distance),
             options: .curveEaseOut,
             animations: { self.frame = destinationFrame },
-            completion: completion
+            completion: completion,
         )
     }
 
@@ -114,27 +114,56 @@ public extension UIView {
             return
         }
 
-        let initialAlpha = alpha
-        if !isHidden && initialAlpha > 0 {
+        if self.isHidden, alpha > 0 {
             UIView.performWithoutAnimation {
                 self.alpha = 0
                 self.isHidden = false
             }
         }
 
-        UIView.animate(withDuration: duration,
-                       animations: {
-            self.alpha = isHidden ? 0 : initialAlpha
-        },
-                       completion: { finished in
-            guard finished else {
-                completion?(false)
-                return
-            }
+        UIView.animate(
+            withDuration: duration,
+            animations: {
+                self.alpha = isHidden ? 0 : 1
+            },
+            completion: { finished in
+                guard finished else {
+                    completion?(false)
+                    return
+                }
+                if isHidden {
+                    self.alpha = 1
+                    self.isHidden = true
+                }
+                completion?(true)
+            },
+        )
+    }
+
+    func setIsHidden(_ isHidden: Bool, using animator: UIViewPropertyAnimator?) {
+        guard self.isHidden != isHidden else {
+            return
+        }
+        guard let animator else {
             self.isHidden = isHidden
-            self.alpha = initialAlpha
-            completion?(true)
-        })
+            return
+        }
+
+        if self.isHidden, alpha > 0 {
+            UIView.performWithoutAnimation {
+                self.alpha = 0
+                self.isHidden = false
+            }
+        }
+        animator.addAnimations {
+            self.alpha = isHidden ? 0 : 1
+        }
+        animator.addCompletion { position in
+            guard isHidden, position == .end else { return }
+
+            self.alpha = 1
+            self.isHidden = true
+        }
     }
 }
 
@@ -205,7 +234,7 @@ public extension UIBezierPath {
         _ rect: CGRect,
         sharpCorners: UIRectCorner,
         sharpCornerRadius: CGFloat,
-        wideCornerRadius: CGFloat
+        wideCornerRadius: CGFloat,
     ) -> UIBezierPath {
 
         return roundedRect(
@@ -213,7 +242,7 @@ public extension UIBezierPath {
             sharpCorners: sharpCorners,
             sharpCornerRadius: sharpCornerRadius,
             wideCorners: .allCorners.subtracting(sharpCorners),
-            wideCornerRadius: wideCornerRadius
+            wideCornerRadius: wideCornerRadius,
         )
     }
 
@@ -233,7 +262,7 @@ public extension UIBezierPath {
         sharpCorners: UIRectCorner,
         sharpCornerRadius: CGFloat,
         wideCorners: UIRectCorner,
-        wideCornerRadius: CGFloat
+        wideCornerRadius: CGFloat,
     ) -> UIBezierPath {
 
         assert(sharpCorners.isDisjoint(with: wideCorners))
@@ -253,7 +282,7 @@ public extension UIBezierPath {
             topLeftRounding: cornerRounding(forCorner: .topLeft),
             topRightRounding: cornerRounding(forCorner: .topRight),
             bottomRightRounding: cornerRounding(forCorner: .bottomRight),
-            bottomLeftRounding: cornerRounding(forCorner: .bottomLeft)
+            bottomLeftRounding: cornerRounding(forCorner: .bottomLeft),
         )
     }
 
@@ -262,7 +291,7 @@ public extension UIBezierPath {
         topLeftRounding: CGFloat,
         topRightRounding: CGFloat,
         bottomRightRounding: CGFloat,
-        bottomLeftRounding: CGFloat
+        bottomLeftRounding: CGFloat,
     ) -> UIBezierPath {
 
         let topAngle = CGFloat.halfPi * 3
@@ -282,42 +311,50 @@ public extension UIBezierPath {
 
         // top right corner
         bezierPath.addArc(
-            withCenter: CGPoint(x: bubbleRight - topRightRounding,
-                                y: bubbleTop + topRightRounding),
+            withCenter: CGPoint(
+                x: bubbleRight - topRightRounding,
+                y: bubbleTop + topRightRounding,
+            ),
             radius: topRightRounding,
             startAngle: topAngle,
             endAngle: rightAngle,
-            clockwise: true
+            clockwise: true,
         )
 
         // bottom right corner
         bezierPath.addArc(
-            withCenter: CGPoint(x: bubbleRight - bottomRightRounding,
-                                y: bubbleBottom - bottomRightRounding),
+            withCenter: CGPoint(
+                x: bubbleRight - bottomRightRounding,
+                y: bubbleBottom - bottomRightRounding,
+            ),
             radius: bottomRightRounding,
             startAngle: rightAngle,
             endAngle: bottomAngle,
-            clockwise: true
+            clockwise: true,
         )
 
         // bottom left corner
         bezierPath.addArc(
-            withCenter: CGPoint(x: bubbleLeft + bottomLeftRounding,
-                                y: bubbleBottom - bottomLeftRounding),
+            withCenter: CGPoint(
+                x: bubbleLeft + bottomLeftRounding,
+                y: bubbleBottom - bottomLeftRounding,
+            ),
             radius: bottomLeftRounding,
             startAngle: bottomAngle,
             endAngle: leftAngle,
-            clockwise: true
+            clockwise: true,
         )
 
         // top left corner
         bezierPath.addArc(
-            withCenter: CGPoint(x: bubbleLeft + topLeftRounding,
-                                y: bubbleTop + topLeftRounding),
+            withCenter: CGPoint(
+                x: bubbleLeft + topLeftRounding,
+                y: bubbleTop + topLeftRounding,
+            ),
             radius: topLeftRounding,
             startAngle: leftAngle,
             endAngle: topAngle,
-            clockwise: true
+            clockwise: true,
         )
 
         return bezierPath

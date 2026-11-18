@@ -92,10 +92,12 @@ class ValidatedIncomingEnvelope {
     // MARK: - Source
 
     func validateSource<T: ServiceId>(_ type: T.Type) throws -> (T, DeviceId) {
-        guard let sourceServiceId = T.parseFrom(
-            serviceIdBinary: envelope.sourceServiceIDBinary,
-            serviceIdString: envelope.sourceServiceID,
-        ) else {
+        guard
+            let sourceServiceId = T.parseFrom(
+                serviceIdBinary: envelope.sourceServiceIDBinary,
+                serviceIdString: envelope.sourceServiceID,
+            )
+        else {
             throw OWSAssertionError("Invalid source.")
         }
         guard envelope.hasSourceDevice, let sourceDevice = DeviceId(validating: envelope.sourceDevice) else {
@@ -108,7 +110,7 @@ class ValidatedIncomingEnvelope {
 
     private static func localServiceId(
         for envelope: SSKProtoEnvelope,
-        localIdentifiers: LocalIdentifiers
+        localIdentifiers: LocalIdentifiers,
     ) throws -> ServiceId {
         let destinationServiceId: ServiceId
         if envelope.destinationServiceID?.nilIfEmpty != nil || envelope.hasDestinationServiceIDBinary {

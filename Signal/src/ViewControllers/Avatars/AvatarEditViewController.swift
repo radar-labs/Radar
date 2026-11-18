@@ -6,7 +6,8 @@
 import SignalServiceKit
 import SignalUI
 
-class AvatarEditViewController: OWSViewController, OWSNavigationChildController {
+class AvatarEditViewController: OWSViewController, OWSNavigationChildController, UITextFieldDelegate, OptionViewDelegate {
+
     private let originalModel: AvatarModel
     private var model: AvatarModel {
         didSet {
@@ -16,9 +17,8 @@ class AvatarEditViewController: OWSViewController, OWSNavigationChildController 
             }
         }
     }
-    private let completion: (AvatarModel) -> Void
 
-    static let headerAvatarSize: CGFloat = UIDevice.current.isIPhone5OrShorter ? 120 : 160
+    private let completion: (AvatarModel) -> Void
 
     init(model: AvatarModel, completion: @escaping (AvatarModel) -> Void) {
         self.originalModel = model
@@ -45,7 +45,7 @@ class AvatarEditViewController: OWSViewController, OWSNavigationChildController 
             dismissingFrom: self,
             hasUnsavedChanges: { [weak self] in
                 self?.model != self?.originalModel
-            }
+            },
         )
 
         navigationItem.rightBarButtonItem = .doneButton { [weak self] in
@@ -57,40 +57,32 @@ class AvatarEditViewController: OWSViewController, OWSNavigationChildController 
         updateFooterViewState()
 
         let scrollView = UIScrollView()
-        view.addSubview(scrollView)
         scrollView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(scrollView)
+
+        topHeader.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.addSubview(topHeader)
+
+        bottomFooterStack.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.addSubview(bottomFooterStack)
+
         NSLayoutConstraint.activate([
             scrollView.frameLayoutGuide.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor),
             scrollView.frameLayoutGuide.leadingAnchor.constraint(equalTo: view.readableContentGuide.leadingAnchor),
             scrollView.frameLayoutGuide.trailingAnchor.constraint(equalTo: view.readableContentGuide.trailingAnchor),
             scrollView.frameLayoutGuide.bottomAnchor.constraint(equalTo: keyboardLayoutGuide.topAnchor, constant: -8),
-        ])
 
-        scrollView.addSubview(topHeader)
-        topHeader.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
             topHeader.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
             topHeader.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             topHeader.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
             topHeader.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
-        ])
 
-        scrollView.addSubview(bottomFooterStack)
-        bottomFooterStack.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
             bottomFooterStack.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
             bottomFooterStack.topAnchor.constraint(equalTo: topHeader.bottomAnchor),
             bottomFooterStack.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
             bottomFooterStack.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
             bottomFooterStack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
         ])
-    }
-
-    override func themeDidChange() {
-        super.themeDidChange()
-
-        optionViews.removeAll()
-        updateFooterViewLayout(forceUpdate: true)
     }
 
     private func didTapDone() {
@@ -121,7 +113,9 @@ class AvatarEditViewController: OWSViewController, OWSNavigationChildController 
         super.viewWillTransition(to: size, with: coordinator)
 
         coordinator.animate { [weak self] _ in
-            self?.updateFooterViewLayout()
+            guard let self else { return }
+            self.updateFooterViewLayout()
+            self.headerImageViewSizeConstraint?.constant = self.headerImageViewSize
         } completion: { [weak self] _ in
             self?.updateFooterViewLayout()
         }
@@ -137,43 +131,51 @@ class AvatarEditViewController: OWSViewController, OWSNavigationChildController 
     // MARK: - Segmented Control
 
     private enum Segments: Int {
-        case text, color
+        case text
+        case color
     }
+
     private lazy var segmentedControl: UISegmentedControl = {
         let control = UISegmentedControl()
 
         control.insertSegment(
             withTitle: OWSLocalizedString(
                 "AVATAR_EDIT_VIEW_TEXT_SEGMENT",
-                comment: "Segment indicating the user can edit the text of the avatar"
+                comment: "Segment indicating the user can edit the text of the avatar",
             ),
             at: Segments.text.rawValue,
-            animated: false
+            animated: false,
         )
         control.insertSegment(
             withTitle: OWSLocalizedString(
                 "AVATAR_EDIT_VIEW_COLOR_SEGMENT",
-                comment: "Segment indicating the user can edit the color of the avatar"
+                comment: "Segment indicating the user can edit the color of the avatar",
             ),
             at: Segments.color.rawValue,
-            animated: false
+            animated: false,
         )
 
         control.selectedSegmentIndex = Segments.color.rawValue
 
-        control.addTarget(
-            self,
-            action: #selector(segmentedControlDidChange),
-            for: .valueChanged
+        control.addAction(
+            UIAction { [weak self] action in
+                guard
+                    let self,
+                    let segmentedControl = action.sender as? UISegmentedControl,
+                    let segment = Segments(rawValue: segmentedControl.selectedSegmentIndex)
+                else {
+                    return
+                }
+                self.segmentedControlDidChange(segment: segment)
+            },
+            for: .valueChanged,
         )
 
         return control
     }()
 
-    @objc
-    private func segmentedControlDidChange() {
-        guard let selectedSegment = Segments(rawValue: segmentedControl.selectedSegmentIndex) else { return }
-        switch selectedSegment {
+    private func segmentedControlDidChange(segment: Segments) {
+        switch segment {
         case .color:
             headerTextField.resignFirstResponder()
             updateFooterViewState()
@@ -185,64 +187,78 @@ class AvatarEditViewController: OWSViewController, OWSNavigationChildController 
 
     // MARK: - Header
 
-    private lazy var headerImageView: AvatarImageView = {
-        let imageView = AvatarImageView()
-        imageView.isUserInteractionEnabled = true
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
-    }()
+    private var headerImageViewSizeConstraint: NSLayoutConstraint?
+
+    private var headerImageViewSize: CGFloat {
+        min(160, CGFloat(view.width * 0.4).rounded(.up))
+    }
+
+    private lazy var headerImageView = AvatarImageView()
+
     private lazy var headerTextField: UITextField = {
         let textField = UITextField()
         textField.adjustsFontSizeToFitWidth = true
         textField.textAlignment = .center
         textField.delegate = self
-        textField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
+        textField.addAction(
+            UIAction { [weak self] _ in self?.textFieldDidChange() },
+            for: .editingChanged,
+        )
         textField.returnKeyType = .done
         textField.autocorrectionType = .no
         textField.spellCheckingType = .no
         textField.isHidden = true
-        textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
-    private lazy var topHeader: UIView = {
-        headerImageView.addSubview(headerTextField)
-        let insets = AvatarBuilder.avatarTextMargins(diameter: Self.headerAvatarSize)
-        NSLayoutConstraint.activate([
-            headerImageView.widthAnchor.constraint(equalToConstant: Self.headerAvatarSize),
-            headerImageView.heightAnchor.constraint(equalToConstant: Self.headerAvatarSize),
-            headerTextField.leadingAnchor.constraint(equalTo: headerImageView.leadingAnchor, constant: insets.left),
-            headerTextField.trailingAnchor.constraint(equalTo: headerImageView.trailingAnchor, constant: -insets.right),
-            headerTextField.topAnchor.constraint(equalTo: headerImageView.topAnchor, constant: insets.top),
-            headerTextField.bottomAnchor.constraint(equalTo: headerImageView.bottomAnchor, constant: -insets.bottom),
-       ])
 
+    private lazy var topHeader: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
+        headerImageView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(headerImageView)
+        headerTextField.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(headerTextField)
         NSLayoutConstraint.activate([
             headerImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             headerImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             headerImageView.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor),
             headerImageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 32),
+
+            headerTextField.centerXAnchor.constraint(equalTo: headerImageView.centerXAnchor),
+            headerTextField.widthAnchor.constraint(equalTo: headerImageView.widthAnchor, multiplier: 0.8),
+
+            headerTextField.centerYAnchor.constraint(equalTo: headerImageView.centerYAnchor),
+            headerTextField.heightAnchor.constraint(equalTo: headerImageView.heightAnchor, multiplier: 0.8),
         ])
 
         return view
     }()
 
     private func updateHeaderViewState() {
+        if headerImageViewSizeConstraint == nil {
+            headerImageView.translatesAutoresizingMaskIntoConstraints = false
+
+            let headerImageViewSizeConstraint = headerImageView.widthAnchor.constraint(equalToConstant: headerImageViewSize)
+            NSLayoutConstraint.activate([
+                headerImageViewSizeConstraint,
+                headerImageView.widthAnchor.constraint(equalTo: headerImageView.heightAnchor),
+            ])
+            self.headerImageViewSizeConstraint = headerImageViewSizeConstraint
+        }
+
         switch model.type {
         case .icon:
             headerTextField.isHidden = true
             headerImageView.image = SSKEnvironment.shared.avatarBuilderRef.avatarImage(
                 model: model,
-                diameterPoints: UInt(Self.headerAvatarSize)
+                diameterPoints: UInt(headerImageViewSize),
             )
         case .text(let text):
             headerTextField.isHidden = false
             headerTextField.textColor = model.theme.foregroundColor
             headerTextField.font = AvatarBuilder.avatarMaxFont(
-                diameter: Self.headerAvatarSize,
-                isEmojiOnly: text.containsOnlyEmoji
+                diameter: headerImageViewSize,
+                isEmojiOnly: text.containsOnlyEmoji,
             )
             if !headerTextField.isFirstResponder { headerTextField.text = text }
             headerImageView.image = .image(color: model.theme.backgroundColor)
@@ -253,7 +269,7 @@ class AvatarEditViewController: OWSViewController, OWSNavigationChildController 
 
     // MARK: - Footer View
 
-    private lazy var bottomFooterStack: UIStackView = {
+    private lazy var bottomFooterStack: UIView = {
         let stackView = UIStackView(arrangedSubviews: [
             segmentedControlContainer,
             themeHeaderContainer,
@@ -263,6 +279,7 @@ class AvatarEditViewController: OWSViewController, OWSNavigationChildController 
         stackView.setCustomSpacing(16, after: segmentedControlContainer)
         return stackView
     }()
+
     private lazy var segmentedControlContainer: UIView = {
         let container = UIView()
         container.addSubview(segmentedControl)
@@ -275,20 +292,23 @@ class AvatarEditViewController: OWSViewController, OWSNavigationChildController 
         ])
         return container
     }()
+
     private lazy var themePickerContainer = UIView()
     private lazy var themeHeaderContainer: UIView = {
         let label = UILabel()
         label.text = OWSLocalizedString(
             "AVATAR_EDIT_VIEW_CHOOSE_A_COLOR",
-            comment: "Text prompting the user to choose a color when editing their avatar"
+            comment: "Text prompting the user to choose a color when editing their avatar",
         )
-        label.textColor = .Signal.label
-        label.font = UIFont.dynamicTypeHeadlineClamped
+        label.textColor = OWSTableViewController2.defaultHeaderTextColor
+        label.font = OWSTableViewController2.defaultHeaderFont
 
         let view = UIView()
-        view.layoutMargins = UIEdgeInsets(
-            hMargin: OWSTableViewController2.cellHInnerMargin * 0.5,
-            vMargin: 8
+        view.directionalLayoutMargins = NSDirectionalEdgeInsets(
+            top: 32,
+            leading: OWSTableViewController2.defaultHeaderTextHorizontalInset,
+            bottom: 12,
+            trailing: OWSTableViewController2.defaultHeaderTextHorizontalInset,
         )
         view.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -326,12 +346,12 @@ class AvatarEditViewController: OWSViewController, OWSNavigationChildController 
     }
 
     private var previousSizeReference: CGFloat?
-    private func updateFooterViewLayout(forceUpdate: Bool = false) {
+    private func updateFooterViewLayout() {
         // Update theme options layout only when the view size changes.
-        guard view.readableContentGuide.layoutFrame.width != previousSizeReference || forceUpdate else { return }
+        guard view.readableContentGuide.layoutFrame.width != previousSizeReference else { return }
         previousSizeReference = view.readableContentGuide.layoutFrame.width
 
-        updateThemePickerContainer()
+        reloadThemePickerContainer()
     }
 
     private var optionViews = [OptionView]()
@@ -346,51 +366,51 @@ class AvatarEditViewController: OWSViewController, OWSNavigationChildController 
         return optionView
     }
 
-    private func updateThemePickerContainer() {
+    private func reloadThemePickerContainer() {
         themePickerContainer.removeAllSubviews()
         themePickerContainer.layoutMargins = UIEdgeInsets(
             hMargin: OWSTableViewController2.cellHInnerMargin,
-            vMargin: OWSTableViewController2.cellVInnerMargin
+            vMargin: OWSTableViewController2.cellVInnerMargin,
         )
-        themePickerContainer.backgroundColor = Theme.tableCell2PresentedBackgroundColor
+        themePickerContainer.backgroundColor = .Signal.secondaryGroupedBackground
         themePickerContainer.layer.cornerRadius = OWSTableViewController2.cellRounding
 
         let rowWidth = max(0, view.readableContentGuide.layoutFrame.width - OWSTableViewController2.cellHInnerMargin * 2)
-        let themeSpacing: CGFloat = 16
-        let minThemeSize: CGFloat = min(66, (rowWidth - (themeSpacing * 3)) / 4)
-        let themesPerRow = max(1, Int(floor(rowWidth + themeSpacing) / (minThemeSize + themeSpacing)))
-        let themeSize = max(minThemeSize, (rowWidth - (themeSpacing * CGFloat(themesPerRow - 1))) / CGFloat(themesPerRow))
+        let itemSpacing: CGFloat = 16
+        let minItemSize: CGFloat = min(66, (rowWidth - (itemSpacing * 3)) / 4)
+        let itemsPerRow = max(1, Int(floor(rowWidth + itemSpacing) / (minItemSize + itemSpacing)))
+        let itemSize = max(minItemSize, (rowWidth - (itemSpacing * CGFloat(itemsPerRow - 1))) / CGFloat(itemsPerRow))
 
         let vStackView = UIStackView()
         vStackView.axis = .vertical
-        vStackView.spacing = themeSpacing
+        vStackView.spacing = itemSpacing
         vStackView.alignment = .leading
         themePickerContainer.addSubview(vStackView)
         vStackView.autoPinEdgesToSuperviewMargins()
 
-        for (row, themes) in AvatarTheme.allCases.chunked(by: themesPerRow).enumerated() {
+        for (row, items) in AvatarTheme.allCases.chunked(by: itemsPerRow).enumerated() {
             let hStackView = UIStackView()
             hStackView.axis = .horizontal
-            hStackView.spacing = themeSpacing
+            hStackView.spacing = itemSpacing
             vStackView.addArrangedSubview(hStackView)
 
-            for (index, theme) in themes.enumerated() {
-                let view = reusableOptionView(for: (row * themesPerRow) + index)
-                view.autoSetDimensions(to: CGSize(square: themeSize))
-                view.configure(theme: theme, isSelected: model.theme == theme)
+            for (index, item) in items.enumerated() {
+                let view = reusableOptionView(for: (row * itemsPerRow) + index)
+                view.autoSetDimensions(to: CGSize(square: itemSize))
+                view.configure(theme: item, isSelected: model.theme == item)
                 hStackView.addArrangedSubview(view)
             }
         }
     }
-}
 
-extension AvatarEditViewController: UITextFieldDelegate {
+    // MARK: - UITextFieldDelegate
+
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         TextFieldHelper.textField(
             textField,
             shouldChangeCharactersInRange: range,
             replacementString: string,
-            maxGlyphCount: 3
+            maxGlyphCount: 3,
         )
     }
 
@@ -400,7 +420,6 @@ extension AvatarEditViewController: UITextFieldDelegate {
         return false
     }
 
-    @objc
     func textFieldDidChange() {
         guard case .text = model.type else { return }
         model.type = .text(headerTextField.text ?? "")
@@ -415,9 +434,9 @@ extension AvatarEditViewController: UITextFieldDelegate {
         segmentedControl.selectedSegmentIndex = Segments.color.rawValue
         updateFooterViewState()
     }
-}
 
-extension AvatarEditViewController: OptionViewDelegate {
+    // MARK: - OptionViewDelegate
+
     fileprivate func didSelectOptionView(_ optionView: OptionView, theme: AvatarTheme) {
         optionViews.forEach { $0.isSelected = $0 == optionView }
         model.theme = theme
@@ -463,11 +482,20 @@ private class OptionView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        // Reload border color.
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            updateSelectionState()
+        }
+    }
+
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        layer.cornerRadius = width / 2
-        colorView.layer.cornerRadius = colorView.width / 2
+        layer.cornerRadius = bounds.size.smallerAxis / 2
+        colorView.layer.cornerRadius = colorView.bounds.size.smallerAxis / 2
     }
 
     @objc

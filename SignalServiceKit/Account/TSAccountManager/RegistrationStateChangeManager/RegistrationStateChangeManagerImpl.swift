@@ -15,19 +15,19 @@ public class RegistrationStateChangeManagerImpl: RegistrationStateChangeManager 
     private let backupCDNCredentialStore: BackupCDNCredentialStore
     private let backupSubscriptionManager: BackupSubscriptionManager
     private let backupTestFlightEntitlementManager: BackupTestFlightEntitlementManager
-    private var chatConnectionManager: any ChatConnectionManager {
-        // TODO: Fix circular dependency.
-        return DependenciesBridge.shared.chatConnectionManager
-    }
+    private let chatConnectionManager: any ChatConnectionManager
+    private let cron: Cron
     private let db: DB
     private let dmConfigurationStore: DisappearingMessagesConfigurationStore
     private let identityManager: OWSIdentityManager
+    private let keyTransparencyStore: KeyTransparencyStore
     private let networkManager: NetworkManager
     private let notificationPresenter: any NotificationPresenter
     private let paymentsEvents: PaymentsEvents
     private let recipientManager: any SignalRecipientManager
     private let recipientMerger: RecipientMerger
-    private let senderKeyStore: SenderKeyStore
+    private let recipientStore: RecipientDatabaseTable
+    private let senderKeyManager: SenderKeyManager
     private let signalProtocolStoreManager: SignalProtocolStoreManager
     private let storageServiceManager: StorageServiceManager
     private let tsAccountManager: TSAccountManager
@@ -40,35 +40,43 @@ public class RegistrationStateChangeManagerImpl: RegistrationStateChangeManager 
         backupCDNCredentialStore: BackupCDNCredentialStore,
         backupSubscriptionManager: BackupSubscriptionManager,
         backupTestFlightEntitlementManager: BackupTestFlightEntitlementManager,
+        chatConnectionManager: any ChatConnectionManager,
+        cron: Cron,
         db: DB,
         dmConfigurationStore: DisappearingMessagesConfigurationStore,
         identityManager: OWSIdentityManager,
+        keyTransparencyStore: KeyTransparencyStore,
         networkManager: NetworkManager,
         notificationPresenter: any NotificationPresenter,
         paymentsEvents: PaymentsEvents,
         recipientManager: any SignalRecipientManager,
         recipientMerger: RecipientMerger,
-        senderKeyStore: SenderKeyStore,
+        recipientStore: RecipientDatabaseTable,
+        senderKeyManager: SenderKeyManager,
         signalProtocolStoreManager: SignalProtocolStoreManager,
         storageServiceManager: StorageServiceManager,
         tsAccountManager: TSAccountManager,
         udManager: OWSUDManager,
-        versionedProfiles: VersionedProfiles
+        versionedProfiles: VersionedProfiles,
     ) {
         self.authCredentialStore = authCredentialStore
         self.backupAttachmentUploadEraStore = backupAttachmentUploadEraStore
         self.backupCDNCredentialStore = backupCDNCredentialStore
         self.backupSubscriptionManager = backupSubscriptionManager
         self.backupTestFlightEntitlementManager = backupTestFlightEntitlementManager
+        self.chatConnectionManager = chatConnectionManager
+        self.cron = cron
         self.db = db
         self.dmConfigurationStore = dmConfigurationStore
         self.identityManager = identityManager
+        self.keyTransparencyStore = keyTransparencyStore
         self.networkManager = networkManager
         self.notificationPresenter = notificationPresenter
         self.paymentsEvents = paymentsEvents
         self.recipientManager = recipientManager
         self.recipientMerger = recipientMerger
-        self.senderKeyStore = senderKeyStore
+        self.recipientStore = recipientStore
+        self.senderKeyManager = senderKeyManager
         self.signalProtocolStoreManager = signalProtocolStoreManager
         self.storageServiceManager = storageServiceManager
         self.tsAccountManager = tsAccountManager
@@ -80,48 +88,17 @@ public class RegistrationStateChangeManagerImpl: RegistrationStateChangeManager 
         return tsAccountManager.registrationState(tx: tx)
     }
 
-    public func didRegisterPrimary(
-        e164: E164,
-        aci: Aci,
-        pni: Pni,
-        authToken: String,
-        tx: DBWriteTransaction
+    public func didRegisterOrProvision(
+        account: AuthedAccount.Explicit,
+        tx: DBWriteTransaction,
     ) {
-        tsAccountManager.initializeLocalIdentifiers(
-            e164: e164,
-            aci: aci,
-            pni: pni,
-            deviceId: .primary,
-            serverAuthToken: authToken,
-            tx: tx
+        tsAccountManager.initializeLocalIdentifiers(account: account, tx: tx)
+        didUpdateLocalIdentifiers(
+            account.localIdentifiers,
+            deviceId: account.deviceId,
+            shouldUpdateStorageService: account.deviceId == .primary,
+            tx: tx,
         )
-
-        didUpdateLocalIdentifiers(e164: e164, aci: aci, pni: pni, deviceId: .primary, tx: tx)
-
-        tx.addSyncCompletion {
-            self.postLocalNumberDidChangeNotification()
-            self.postRegistrationStateDidChangeNotification()
-        }
-    }
-
-    public func didProvisionSecondary(
-        e164: E164,
-        aci: Aci,
-        pni: Pni,
-        authToken: String,
-        deviceId: DeviceId,
-        tx: DBWriteTransaction
-    ) {
-        tsAccountManager.initializeLocalIdentifiers(
-            e164: e164,
-            aci: aci,
-            pni: pni,
-            deviceId: deviceId,
-            serverAuthToken: authToken,
-            tx: tx
-        )
-        didUpdateLocalIdentifiers(e164: e164, aci: aci, pni: pni, deviceId: deviceId, tx: tx)
-
         tx.addSyncCompletion {
             self.postLocalNumberDidChangeNotification()
             self.postRegistrationStateDidChangeNotification()
@@ -129,22 +106,44 @@ public class RegistrationStateChangeManagerImpl: RegistrationStateChangeManager 
     }
 
     public func didUpdateLocalPhoneNumber(
-        _ e164: E164,
         aci: Aci,
-        pni: Pni,
-        tx: DBWriteTransaction
+        phoneNumber: LocalIdentifiers.PhoneNumber,
+        tx: DBWriteTransaction,
     ) {
-        tsAccountManager.changeLocalNumber(newE164: e164, aci: aci, pni: pni, tx: tx)
+        tsAccountManager.changeLocalNumber(phoneNumber: phoneNumber, tx: tx)
 
-        didUpdateLocalIdentifiers(e164: e164, aci: aci, pni: pni, deviceId: .primary, tx: tx)
+        didUpdateLocalIdentifiers(
+            LocalIdentifiers(aci: aci, accountType: .forPhoneNumber(phoneNumber)),
+            deviceId: .primary,
+            shouldUpdateStorageService: false,
+            tx: tx,
+        )
+
+        // Our local phone E164 has changed, and we should inform LibSignal for
+        // KT self-check monitoring.
+        KeyTransparencyManager.handleSelfCheckIdentifierChanged(
+            accountDataField: .e164,
+            localAci: aci,
+            tx: tx,
+            db: db,
+            keyTransparencyStore: keyTransparencyStore,
+        )
 
         tx.addSyncCompletion {
             self.postLocalNumberDidChangeNotification()
         }
     }
 
-    public func setIsDeregisteredOrDelinked(_ isDeregisteredOrDelinked: Bool, tx: DBWriteTransaction) {
-        let didChange = tsAccountManager.setIsDeregisteredOrDelinked(isDeregisteredOrDelinked, tx: tx)
+    public func setIsDeregisteredOrDelinked(
+        _ isDeregisteredOrDelinked: Bool,
+        notify: Bool,
+        tx: DBWriteTransaction,
+    ) {
+        let didChange = tsAccountManager.setIsDeregisteredOrDelinked(
+            isDeregisteredOrDelinked,
+            tx: tx,
+        )
+        let localIdentifiers = tsAccountManager.localIdentifiers(tx: tx)
         guard didChange else {
             return
         }
@@ -153,7 +152,7 @@ public class RegistrationStateChangeManagerImpl: RegistrationStateChangeManager 
         if isDeregisteredOrDelinked {
             if self.isUnregisteringFromService.get() {
                 Logger.warn("Skipping notification because we're unregistering ourselves.")
-            } else {
+            } else if notify {
                 notificationPresenter.notifyUserOfDeregistration(tx: tx)
             }
 
@@ -165,6 +164,13 @@ public class RegistrationStateChangeManagerImpl: RegistrationStateChangeManager 
             // eventually re-register.
             authCredentialStore.removeAllBackupAuthCredentials(tx: tx)
             backupCDNCredentialStore.wipe(tx: tx)
+
+            // Wipe KT state for the local user. If we re-register, we'll want
+            // to start self-monitoring from a clean slate.
+            keyTransparencyStore.wipeSelfCheckState(
+                localAci: localIdentifiers?.aci,
+                tx: tx,
+            )
 
             // A registration event that caused us to become deregistered will
             // have wiped our server-side Backup entitlement, so we should make
@@ -181,42 +187,35 @@ public class RegistrationStateChangeManagerImpl: RegistrationStateChangeManager 
             // up via contact sync.
             switch tsAccountManager.registrationState(tx: tx) {
             case .delinked:
-                do {
-                    try dmConfigurationStore.resetAllDMTimerVersions(tx: tx)
-                } catch {
-                    owsFailDebug("Failed to reset dm timer versions \(error.grdbErrorForLogging)")
-                }
+                dmConfigurationStore.resetAllDMTimerVersions(tx: tx)
             default:
                 break
             }
         }
-        postRegistrationStateDidChangeNotification()
+        tx.addSyncCompletion {
+            self.postRegistrationStateDidChangeNotification()
+        }
     }
 
     public func resetForReregistration(
-        localPhoneNumber: E164,
-        localAci: Aci,
-        discoverability: PhoneNumberDiscoverability?,
-        wasPrimaryDevice: Bool,
-        tx: DBWriteTransaction
+        localIdentifiers: ReregisteringLocalIdentifiers,
+        isPrimaryDevice: Bool,
+        tx: DBWriteTransaction,
     ) {
         tsAccountManager.resetForReregistration(
-            localNumber: localPhoneNumber,
-            localAci: localAci,
-            discoverability: discoverability,
-            wasPrimaryDevice: wasPrimaryDevice,
-            tx: tx
+            localIdentifiers: localIdentifiers,
+            isPrimaryDevice: isPrimaryDevice,
+            tx: tx,
         )
 
-        signalProtocolStoreManager.signalProtocolStore(for: .aci).sessionStore.resetSessionStore(tx: tx)
-        signalProtocolStoreManager.signalProtocolStore(for: .pni).sessionStore.resetSessionStore(tx: tx)
-        senderKeyStore.resetSenderKeyStore(transaction: tx)
+        signalProtocolStoreManager.sessionStore.deleteAllSessions(tx: tx)
+        senderKeyManager.resetAll(tx: tx)
         udManager.removeSenderCertificates(tx: tx)
         versionedProfiles.clearProfileKeyCredentials(tx: tx)
         authCredentialStore.removeAllGroupAuthCredentials(tx: tx)
         authCredentialStore.removeAllCallLinkAuthCredentials(tx: tx)
 
-        if wasPrimaryDevice {
+        if isPrimaryDevice {
             // Don't reset payments state at this time.
         } else {
             // PaymentsEvents will dispatch this event to the appropriate singletons.
@@ -240,7 +239,7 @@ public class RegistrationStateChangeManagerImpl: RegistrationStateChangeManager 
 
     public func setIsTransferComplete(
         sendStateUpdateNotification: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         guard tsAccountManager.setIsTransferInProgress(false, tx: tx) else {
             return
@@ -288,8 +287,8 @@ public class RegistrationStateChangeManagerImpl: RegistrationStateChangeManager 
 
         do {
             _ = try await networkManager.asyncRequest(request)
-        } catch OWSHTTPError.networkFailure(.wrappedFailure(SignalError.connectionInvalidated)) {
-            Logger.warn("Connection was invalidated -- we this device (or account) was probably deleted.")
+        } catch SignalError.connectionInvalidated {
+            Logger.warn("Connection was invalidated -- this device (or account) was probably deleted.")
             // The server closed the connection before we got a response. This almost
             // certainly happened because this device is no longer registered, but
             // `connectionInvalidated` may happen for other reasons. This is (sort of)
@@ -316,25 +315,26 @@ public class RegistrationStateChangeManagerImpl: RegistrationStateChangeManager 
     // MARK: - Helpers
 
     private func didUpdateLocalIdentifiers(
-        e164: E164,
-        aci: Aci,
-        pni: Pni,
+        _ localIdentifiers: LocalIdentifiers,
         deviceId: DeviceId,
-        tx: DBWriteTransaction
+        shouldUpdateStorageService: Bool,
+        tx: DBWriteTransaction,
     ) {
         udManager.removeSenderCertificates(tx: tx)
         identityManager.clearShouldSharePhoneNumberForEveryone(tx: tx)
         versionedProfiles.clearProfileKeyCredentials(tx: tx)
         authCredentialStore.removeAllGroupAuthCredentials(tx: tx)
         authCredentialStore.removeAllCallLinkAuthCredentials(tx: tx)
+        cron.resetMostRecentDates(tx: tx)
 
-        storageServiceManager.setLocalIdentifiers(LocalIdentifiers(aci: aci, pni: pni, e164: e164))
+        storageServiceManager.setLocalIdentifiers(localIdentifiers)
 
         var recipient = recipientMerger.applyMergeForLocalAccount(
-            aci: aci,
-            phoneNumber: e164,
-            pni: pni,
-            tx: tx
+            aci: localIdentifiers.aci,
+            phoneNumber: E164(localIdentifiers.phoneNumber),
+            pni: localIdentifiers.pni,
+            shouldUpdateStorageService: shouldUpdateStorageService,
+            tx: tx,
         )
         // Always add the .primary DeviceId as well as our own. This is how linked
         // devices know to send their initial sync messages to the primary.
@@ -342,9 +342,17 @@ public class RegistrationStateChangeManagerImpl: RegistrationStateChangeManager 
             &recipient,
             deviceIdsToAdd: [deviceId, .primary],
             deviceIdsToRemove: [],
-            shouldUpdateStorageService: false,
-            tx: tx
+            shouldUpdateStorageService: shouldUpdateStorageService,
+            tx: tx,
         )
+        // Always make sure we haven't blocked ourselves. (It's logically
+        // impossible to do so, so we set the bit in the database directly.)
+        if recipient.isBlocked {
+            owsFailDebug("shouldn't have been able to block note to self")
+            recipient.status = .unspecified
+            recipient.blockedAt = .unspecified
+            recipientStore.updateRecipient(recipient, transaction: tx)
+        }
     }
 
     // MARK: Notifications
@@ -352,14 +360,14 @@ public class RegistrationStateChangeManagerImpl: RegistrationStateChangeManager 
     private func postRegistrationStateDidChangeNotification() {
         NotificationCenter.default.postOnMainThread(
             name: .registrationStateDidChange,
-            object: nil
+            object: nil,
         )
     }
 
     private func postLocalNumberDidChangeNotification() {
         NotificationCenter.default.postOnMainThread(
             name: .localNumberDidChange,
-            object: nil
+            object: nil,
         )
     }
 }
@@ -372,24 +380,23 @@ extension RegistrationStateChangeManagerImpl {
 
     public func registerForTests(
         localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         owsAssertDebug(CurrentAppContext().isRunningTests)
 
-        tsAccountManager.initializeLocalIdentifiers(
-            e164: E164(localIdentifiers.phoneNumber)!,
+        let account = AuthedAccount.Explicit(
             aci: localIdentifiers.aci,
-            pni: localIdentifiers.pni!,
+            accountType: localIdentifiers.accountType,
             deviceId: .primary,
-            serverAuthToken: "",
-            tx: tx
+            authPassword: "",
         )
+
+        tsAccountManager.initializeLocalIdentifiers(account: account, tx: tx)
         didUpdateLocalIdentifiers(
-            e164: E164(localIdentifiers.phoneNumber)!,
-            aci: localIdentifiers.aci,
-            pni: localIdentifiers.pni!,
-            deviceId: .primary,
-            tx: tx
+            localIdentifiers,
+            deviceId: account.deviceId,
+            shouldUpdateStorageService: false,
+            tx: tx,
         )
     }
 }

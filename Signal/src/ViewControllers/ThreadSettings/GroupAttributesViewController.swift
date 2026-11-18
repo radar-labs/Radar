@@ -12,9 +12,11 @@ protocol GroupAttributesViewControllerDelegate: AnyObject {
 
 // MARK: -
 
-class GroupAttributesViewController: OWSTableViewController2 {
+class GroupAttributesViewController: OWSTableViewController2, GroupAttributesEditorHelperDelegate,
+    GroupDescriptionViewControllerDelegate, GroupNameViewControllerDelegate
+{
 
-    public enum EditAction {
+    enum EditAction {
         case none
         case avatar
     }
@@ -31,9 +33,11 @@ class GroupAttributesViewController: OWSTableViewController2 {
         return helper.hasUnsavedChanges
     }
 
-    public init(groupThread: TSGroupThread,
-                editAction: EditAction,
-                delegate: GroupAttributesViewControllerDelegate) {
+    init(
+        groupThread: TSGroupThread,
+        editAction: EditAction,
+        delegate: GroupAttributesViewControllerDelegate,
+    ) {
         self.groupThread = groupThread
         self.editAction = editAction
         self.attributesDelegate = delegate
@@ -45,10 +49,8 @@ class GroupAttributesViewController: OWSTableViewController2 {
 
     // MARK: - View Lifecycle
 
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
-
-        view.backgroundColor = Theme.backgroundColor
 
         title = OWSLocalizedString("EDIT_GROUP_DEFAULT_TITLE", comment: "The navbar title for the 'update group' view.")
 
@@ -69,7 +71,7 @@ class GroupAttributesViewController: OWSTableViewController2 {
             customCellBlock: { [weak self] in
                 let cell = OWSTableItem.newCell()
                 cell.selectionStyle = .none
-                guard let self = self else { return cell }
+                guard let self else { return cell }
                 cell.contentView.addSubview(self.helper.avatarWrapper)
                 self.helper.avatarWrapper.autoPinHeightToSuperviewMargins()
                 self.helper.avatarWrapper.autoHCenterInSuperview()
@@ -77,7 +79,7 @@ class GroupAttributesViewController: OWSTableViewController2 {
             },
             actionBlock: { [weak self] in
                 self?.didTapAvatarView()
-            }
+            },
         ))
         contents.add(avatarSection)
 
@@ -86,35 +88,35 @@ class GroupAttributesViewController: OWSTableViewController2 {
             icon: .groupInfoEditName,
             withText: helper.groupNameCurrent ?? OWSLocalizedString(
                 "GROUP_NAME_VIEW_TITLE",
-                comment: "Title for the group name view."
+                comment: "Title for the group name view.",
             ),
             actionBlock: { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 let vc = GroupNameViewController(
                     groupModel: self.groupThread.groupModel,
-                    groupNameCurrent: self.helper.groupNameCurrent
+                    groupNameCurrent: self.helper.groupNameCurrent,
                 )
                 vc.nameDelegate = self
                 self.presentFormSheet(OWSNavigationController(rootViewController: vc), animated: true)
-            }
+            },
         ))
         nameAndDescriptionSection.add(.disclosureItem(
             icon: .groupInfoEditDescription,
             withText: helper.groupDescriptionCurrent ?? OWSLocalizedString(
                 "GROUP_DESCRIPTION_VIEW_TITLE",
-                comment: "Title for the group description view."
+                comment: "Title for the group description view.",
             ),
             maxNameLines: 2,
             actionBlock: { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 let vc = GroupDescriptionViewController(
                     groupModel: self.groupThread.groupModel,
                     groupDescriptionCurrent: self.helper.groupDescriptionCurrent,
-                    options: .editable
+                    options: .editImmediately,
                 )
                 vc.descriptionDelegate = self
                 self.presentFormSheet(OWSNavigationController(rootViewController: vc), animated: true)
-            }
+            },
         ))
         contents.add(nameAndDescriptionSection)
 
@@ -139,110 +141,100 @@ class GroupAttributesViewController: OWSTableViewController2 {
 
     fileprivate func updateNavbar() {
         if helper.hasUnsavedChanges {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(
-                title: CommonStrings.setButton,
-                style: .done,
-                target: self,
-                action: #selector(setButtonPressed),
-                accessibilityIdentifier: "set_button"
-            )
+            navigationItem.rightBarButtonItem = .setButton { [weak self] in
+                self?.setButtonPressed()
+            }
         } else {
             navigationItem.rightBarButtonItem = nil
         }
     }
 
-    @objc
     private func setButtonPressed() {
         updateGroupThreadAndDismiss()
     }
 
     // MARK: - Events
 
-    @objc
     private func didTapAvatarView() {
         helper.didTapAvatarView()
     }
-}
 
-// MARK: -
+    // MARK: -
 
-extension GroupAttributesViewController {
-
-    public var shouldCancelNavigationBack: Bool {
+    var shouldCancelNavigationBack: Bool {
         let result = hasUnsavedChanges
         if result {
-            GroupAttributesViewController.showUnsavedGroupChangesActionSheet(from: self,
-                                                                             saveBlock: {
-                                                                                self.updateGroupThreadAndDismiss()
-            }, discardBlock: {
-                self.navigationController?.popViewController(animated: true)
-            })
+            GroupAttributesViewController.showUnsavedGroupChangesActionSheet(
+                from: self,
+                saveBlock: {
+                    self.updateGroupThreadAndDismiss()
+                },
+                discardBlock: {
+                    self.navigationController?.popViewController(animated: true)
+                },
+            )
         }
         return result
     }
 
-    public static func showUnsavedGroupChangesActionSheet(
+    static func showUnsavedGroupChangesActionSheet(
         from fromViewController: UIViewController,
         saveBlock: @escaping () -> Void,
-        discardBlock: @escaping () -> Void
+        discardBlock: @escaping () -> Void,
     ) {
         let actionSheet = ActionSheetController(
             title: OWSLocalizedString(
                 "EDIT_GROUP_VIEW_UNSAVED_CHANGES_TITLE",
-                comment: "The alert title if user tries to exit update group view without saving changes."
+                comment: "The alert title if user tries to exit update group view without saving changes.",
             ),
             message: OWSLocalizedString(
                 "EDIT_GROUP_VIEW_UNSAVED_CHANGES_MESSAGE",
-                comment: "The alert message if user tries to exit update group view without saving changes."
-            )
+                comment: "The alert message if user tries to exit update group view without saving changes.",
+            ),
         )
         actionSheet.addAction(ActionSheetAction(
             title: CommonStrings.saveButton,
-            style: .default
+            style: .default,
         ) { _ in
             saveBlock()
         })
         actionSheet.addAction(ActionSheetAction(
             title: OWSLocalizedString(
                 "ALERT_DONT_SAVE",
-                comment: "The label for the 'don't save' button in action sheets."
+                comment: "The label for the 'don't save' button in action sheets.",
             ),
-            style: .destructive
+            style: .destructive,
         ) { _ in
             discardBlock()
         })
         fromViewController.presentActionSheet(actionSheet)
     }
-}
 
-// MARK: -
+    // MARK: -
 
-private extension GroupAttributesViewController {
-    func updateGroupThreadAndDismiss() {
+    private func updateGroupThreadAndDismiss() {
         helper.updateGroupIfNecessary(fromViewController: self) { [weak self] in
             self?.attributesDelegate?.groupAttributesDidUpdate()
             self?.navigationController?.popViewController(animated: true)
         }
     }
-}
 
-// MARK: -
+    // MARK: - GroupAttributesEditorHelperDelegate
 
-extension GroupAttributesViewController: GroupAttributesEditorHelperDelegate {
     func groupAttributesEditorContentsDidChange() {
         updateNavbar()
     }
-}
 
-extension GroupAttributesViewController: GroupDescriptionViewControllerDelegate {
+    // MARK: - GroupDescriptionViewControllerDelegate
+
     func groupDescriptionViewControllerDidComplete(groupDescription: String?) {
         helper.groupDescriptionCurrent = groupDescription
         updateNavbar()
         updateTableContents()
     }
-}
 
-extension GroupAttributesViewController: GroupNameViewControllerDelegate {
+    // MARK: - GroupNameViewControllerDelegate
+
     func groupNameViewControllerDidComplete(groupName: String?) {
         helper.groupNameCurrent = groupName
         updateNavbar()

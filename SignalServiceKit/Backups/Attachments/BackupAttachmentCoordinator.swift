@@ -94,7 +94,7 @@ public actor BackupAttachmentCoordinatorImpl: BackupAttachmentCoordinator {
         orphanRunner: OrphanedBackupAttachmentQueueRunner,
         orphanStore: OrphanedBackupAttachmentStore,
         tsAccountManager: TSAccountManager,
-        uploadRunner: BackupAttachmentUploadQueueRunner
+        uploadRunner: BackupAttachmentUploadQueueRunner,
     ) {
         self.appContext = appContext
         self.appReadiness = appReadiness
@@ -168,43 +168,43 @@ public actor BackupAttachmentCoordinatorImpl: BackupAttachmentCoordinator {
             self,
             selector: #selector(backUpAllAttachmentsFromNotification),
             name: .startBackupAttachmentUploadQueue,
-            object: nil
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(fullsizeDownloadQueueStatusDidChange),
             name: .backupAttachmentDownloadQueueStatusDidChange(mode: .fullsize),
-            object: nil
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(thumbnailDownloadQueueStatusDidChange),
             name: .backupAttachmentDownloadQueueStatusDidChange(mode: .thumbnail),
-            object: nil
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(fullsizeUploadQueueStatusDidChange),
             name: .backupAttachmentUploadQueueStatusDidChange(for: .fullsize),
-            object: nil
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(thumbnailUploadQueueStatusDidChange),
             name: .backupAttachmentUploadQueueStatusDidChange(for: .thumbnail),
-            object: nil
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(backupPlanDidChange),
             name: .backupPlanChanged,
-            object: nil
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(registrationStateDidChange),
             name: .registrationStateDidChange,
-            object: nil
+            object: nil,
         )
     }
 
@@ -272,15 +272,8 @@ public actor BackupAttachmentCoordinatorImpl: BackupAttachmentCoordinator {
     // MARK: - State Management
 
     private struct Observer {
-        let id: UUID
-        let continuation: CancellableContinuation<Void>?
-
-        var isCancellable: Bool { continuation != nil }
-
-        init(_ continuation: CancellableContinuation<Void>? = nil) {
-            self.id = UUID()
-            self.continuation = continuation
-        }
+        let id = UUID()
+        let continuation = CancellableContinuation<Void>()
     }
 
     private enum Operation: Hashable, CaseIterable {
@@ -303,6 +296,7 @@ public actor BackupAttachmentCoordinatorImpl: BackupAttachmentCoordinator {
     private func needsToRun(_ operation: Operation) -> Bool {
         return !(pendingObservers[operation]?.isEmpty ?? true)
     }
+
     private func isRunning(_ operation: Operation) -> Bool {
         return runningTasks[operation] != nil
     }
@@ -331,8 +325,10 @@ public actor BackupAttachmentCoordinatorImpl: BackupAttachmentCoordinator {
             return
         }
 
+        try Task.checkCancellation()
+
         let observers = operations.map { operation in
-            let observer = Observer(CancellableContinuation())
+            let observer = Observer()
             self.pendingObservers[operation, default: []] += [observer]
             return (operation, observer)
         }
@@ -347,16 +343,16 @@ public actor BackupAttachmentCoordinatorImpl: BackupAttachmentCoordinator {
                 taskGroup.addTask {
                     try await withTaskCancellationHandler(
                         operation: {
-                            try await continuation?.wait()
+                            try await continuation.wait()
                         },
                         onCancel: {
                             Task {
                                 await weakSelf.value?.cancelOperation(
                                     operation,
-                                    observerId: observerId
+                                    observerId: observerId,
                                 )
                             }
-                        }
+                        },
                     )
                 }
             }
@@ -366,16 +362,16 @@ public actor BackupAttachmentCoordinatorImpl: BackupAttachmentCoordinator {
 
     private func cancelOperation(
         _ operation: Operation,
-        observerId: UUID
+        observerId: UUID,
     ) {
         var pendingObservers = self.pendingObservers[operation] ?? []
-        if let observer = pendingObservers.removeFirst(where: { $0.isCancellable && $0.id == observerId }) {
+        if let observer = pendingObservers.removeFirst(where: { $0.id == observerId }) {
             self.pendingObservers[operation] = pendingObservers
-            observer.continuation?.cancel()
+            observer.continuation.cancel()
             return
         }
         var runningTaskObservers = self.runningTaskObservers[operation] ?? []
-        if nil != runningTaskObservers.removeFirst(where: { $0.isCancellable && $0.id == observerId }) {
+        if nil != runningTaskObservers.removeFirst(where: { $0.id == observerId }) {
             self.runningTaskObservers[operation] = runningTaskObservers
             if runningTaskObservers.isEmpty {
                 // Cancel the actual operation if this is the only observer.
@@ -393,17 +389,12 @@ public actor BackupAttachmentCoordinatorImpl: BackupAttachmentCoordinator {
 
         // Always check if we need to run list media and do so aggresively
         // even if there are no observers. The other operations rely on this.
-        let hasUncancellableListMediaObserver = (self.pendingObservers[.listMedia] ?? [])
-            .contains(where: \.isCancellable.negated)
-        if !hasUncancellableListMediaObserver, self.runningTasks.isEmpty {
-            let needsListMedia = db.read { tx in
-                return listMediaManager.getNeedsQueryListMedia(tx: tx)
-            }
-            if needsListMedia {
-                var listMediaObservers = self.pendingObservers[.listMedia] ?? []
-                listMediaObservers.append(Observer())
-                self.pendingObservers[.listMedia] = listMediaObservers
-            }
+        if
+            self.pendingObservers[.listMedia] == nil,
+            self.runningTasks.isEmpty,
+            db.read(block: { listMediaManager.getNeedsQueryListMedia(tx: $0) })
+        {
+            pendingObservers[.listMedia, default: []] += [Observer()]
         }
 
         if needsToRun(.listMedia) {
@@ -448,7 +439,7 @@ public actor BackupAttachmentCoordinatorImpl: BackupAttachmentCoordinator {
             if canRunDeleteOrphans(), needsToRun(.deleteOrphans) {
 
                 let orphanCount = db.read { tx in
-                    (try? orphanStore.peek(count: 1, tx: tx))?.count ?? 1
+                    orphanStore.peek(count: 1, tx: tx).count
                 }
                 if orphanCount > 0 {
                     self.runOperation(.deleteOrphans)
@@ -486,8 +477,8 @@ public actor BackupAttachmentCoordinatorImpl: BackupAttachmentCoordinator {
             let isRunningNonUploadDownload: Bool = runningTasks.contains(where: {
                 switch $0.key {
                 case
-                        .downloadFullsize, .downloadThumbnail,
-                        .uploadFullsize, .uploadThumbnail:
+                    .downloadFullsize, .downloadThumbnail,
+                    .uploadFullsize, .uploadThumbnail:
                     return false
                 case .listMedia, .deleteOrphans, .offloading:
                     return true
@@ -583,26 +574,32 @@ public actor BackupAttachmentCoordinatorImpl: BackupAttachmentCoordinator {
         case .failure(let error) where error is NeedsListMediaError:
             // If we stopped because we need to list media,
             // do that by inserting a list media operation observer.
-            // (Even if there was already an observer, insert a new one
-            // so that it can't be cancelled).
-            var listMediaObservers = self.pendingObservers[.listMedia] ?? []
-            listMediaObservers.append(Observer())
-            self.pendingObservers[.listMedia] = listMediaObservers
+            // (Even if there was already an observer, insert a new one.)
+            pendingObservers[.listMedia, default: []] += [Observer()]
 
             // Do not mark the current operation finished, it will
             // run again after list media is done. Mark all observers
             // pending instead.
-            var pendingObservers = self.pendingObservers[operation] ?? []
-            pendingObservers.append(contentsOf: self.runningTaskObservers[operation] ?? [])
-            self.pendingObservers[operation] = pendingObservers
+            pendingObservers[operation, default: []]
+                .append(contentsOf: self.runningTaskObservers[operation] ?? [])
+
+            self.kickOffNextOperation()
+        case .failure(let error) where error is CancellationError:
+            // Any remaining operations won't run due to cancellation, so notify any observers.
+            // Related to this, skip calling `kickOffNextOperation` on cancellation to avoid
+            // beginning any further operations (e.g. - implicit listMedia operations).
+            for operationObservers in pendingObservers.values {
+                operationObservers.forEach { observer in
+                    observer.continuation.resume(with: result)
+                }
+            }
         case .success, .failure:
             self.runningTaskObservers[operation]?.forEach { observer in
-                observer.continuation?.resume(with: result)
+                observer.continuation.resume(with: result)
             }
             self.runningTaskObservers[operation] = nil
+            self.kickOffNextOperation()
         }
-
-        self.kickOffNextOperation()
     }
 }
 

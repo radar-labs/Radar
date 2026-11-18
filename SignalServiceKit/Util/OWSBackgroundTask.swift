@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import UIKit
 
 public enum BackgroundTaskState {
     case success
@@ -172,7 +173,6 @@ public class OWSBackgroundTaskManager {
     /// Due to `isAppActive` should only be executed from the main thread.
     private init() {
         AssertIsOnMainThread()
-        SwiftSingletons.register(self)
     }
 
     deinit {
@@ -202,8 +202,6 @@ public class OWSBackgroundTaskManager {
             self.clearObservers()
 
             self.didBecomeActiveObserver = NotificationCenter.default.addObserver(forName: .OWSApplicationDidBecomeActive, object: nil, queue: nil) { [weak self] _ in
-                AssertIsOnMainThread()
-
                 guard let self else {
                     return
                 }
@@ -214,8 +212,6 @@ public class OWSBackgroundTaskManager {
                 }
             }
             self.willResignActiveObserver = NotificationCenter.default.addObserver(forName: .OWSApplicationWillResignActive, object: nil, queue: nil) { [weak self] _ in
-                AssertIsOnMainThread()
-
                 guard let self else {
                     return
                 }
@@ -231,7 +227,7 @@ public class OWSBackgroundTaskManager {
     /// This method registers a new task with this manager.  We only bother
     /// requesting a background task from iOS if the app is inactive (or about
     /// to become inactive), so this will often not start a background task.
-    /// 
+    ///
     /// - Returns nil if adding this task _should have_ started a
     /// background task, but the background task couldn't be begun.
     /// In that case expirationBlock will not be called.

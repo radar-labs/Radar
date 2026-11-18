@@ -6,6 +6,22 @@
 import Foundation
 public import LibSignalClient
 
+// There's no easy way to instantiate a LibSignalClient.BackupAuth
+// for testing, so instead wrap the type in a private protocol/wrapper
+// that _can_ be mocked in the test. Not that if we ever need to pass
+// a BackupAuth back to a caller, this wrapper will have to be made
+// public (and probably renamed).
+private protocol BackupAuthProvider {
+    var backupAuth: BackupAuth { get }
+}
+
+private struct BackupAuthWrapper: BackupAuthProvider {
+    let backupAuth: BackupAuth
+    init(_ backupAuth: BackupAuth) {
+        self.backupAuth = backupAuth
+    }
+}
+
 public struct BackupServiceAuth {
     private let authHeaders: [String: String]
     public let publicKey: PublicKey
@@ -18,23 +34,32 @@ public struct BackupServiceAuth {
     // as long as the credential remains valid.
     public let backupLevel: BackupLevel
 
+    public var backupAuth: BackupAuth { _backupAuth.backupAuth }
+    private var _backupAuth: BackupAuthProvider
+
     public init(
         privateKey: PrivateKey,
         authCredential: BackupAuthCredential,
         type: BackupAuthCredentialType,
     ) {
-        let backupServerPublicParams = try! GenericServerPublicParams(contents: TSConstants.backupServerPublicParams)
+        let backupServerPublicParams = TSConstants.backupServerPublicParams()
         let presentation = authCredential.present(serverParams: backupServerPublicParams).serialize()
         let signedPresentation = privateKey.generateSignature(message: presentation)
 
+        let backupAuth = BackupAuth(
+            credential: authCredential,
+            serverKeys: backupServerPublicParams,
+            signingKey: privateKey,
+        )
         self.init(
             authHeaders: [
                 "X-Signal-ZK-Auth": presentation.base64EncodedString(),
-                "X-Signal-ZK-Auth-Signature": signedPresentation.base64EncodedString()
+                "X-Signal-ZK-Auth-Signature": signedPresentation.base64EncodedString(),
             ],
             publicKey: privateKey.publicKey,
             type: type,
-            backupLevel: authCredential.backupLevel
+            backupLevel: authCredential.backupLevel,
+            backupAuthProvider: BackupAuthWrapper(backupAuth),
         )
     }
 
@@ -43,11 +68,13 @@ public struct BackupServiceAuth {
         publicKey: PublicKey,
         type: BackupAuthCredentialType,
         backupLevel: BackupLevel,
+        backupAuthProvider: any BackupAuthProvider,
     ) {
         self.authHeaders = authHeaders
         self.publicKey = publicKey
         self.type = type
         self.backupLevel = backupLevel
+        self._backupAuth = backupAuthProvider
     }
 
     public func apply(to httpHeaders: inout HttpHeaders) {
@@ -56,19 +83,24 @@ public struct BackupServiceAuth {
         }
     }
 
-    #if TESTABLE_BUILD
+#if TESTABLE_BUILD
+
+    private struct MockBackupAuthWrapper: BackupAuthProvider {
+        var backupAuth: LibSignalClient.BackupAuth { fatalError("NotImplemented") }
+    }
 
     static func mock(
         type: BackupAuthCredentialType = .messages,
-        backupLevel: BackupLevel = .free
+        backupLevel: BackupLevel = .free,
     ) -> Self {
         return .init(
             authHeaders: [:],
             publicKey: PrivateKey.generate().publicKey,
             type: type,
-            backupLevel: backupLevel
+            backupLevel: backupLevel,
+            backupAuthProvider: MockBackupAuthWrapper(),
         )
     }
 
-    #endif
+#endif
 }

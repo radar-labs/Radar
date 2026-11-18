@@ -11,38 +11,6 @@ import SignalUI
 import UIKit
 import WebRTC
 
-enum LaunchPreflightError {
-    case unknownDatabaseVersion
-    case couldNotRestoreTransferredData
-    case databaseCorruptedAndMightBeRecoverable
-    case databaseUnrecoverablyCorrupted
-    case lastAppLaunchCrashed
-    case incrementalTSAttachmentMigrationFailed
-    case lowStorageSpaceAvailable
-    case possibleReadCorruptionCrashed
-
-    var supportTag: String {
-        switch self {
-        case .unknownDatabaseVersion:
-            return "LaunchFailure_UnknownDatabaseVersion"
-        case .couldNotRestoreTransferredData:
-            return "LaunchFailure_CouldNotRestoreTransferredData"
-        case .databaseCorruptedAndMightBeRecoverable:
-            return "LaunchFailure_DatabaseCorruptedAndMightBeRecoverable"
-        case .databaseUnrecoverablyCorrupted:
-            return "LaunchFailure_DatabaseUnrecoverablyCorrupted"
-        case .lastAppLaunchCrashed:
-            return "LaunchFailure_LastAppLaunchCrashed"
-        case .incrementalTSAttachmentMigrationFailed:
-            return "LaunchFailure_incrementalTSAttachmentMigrationFailed"
-        case .lowStorageSpaceAvailable:
-            return "LaunchFailure_NoDiskSpaceAvailable"
-        case .possibleReadCorruptionCrashed:
-            return "LaunchFailure_PossibleReadCorruption"
-        }
-    }
-}
-
 private func uncaughtExceptionHandler(_ exception: NSException) {
     if DebugFlags.internalLogging {
         Logger.error("exception: \(exception)")
@@ -88,10 +56,23 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
 
     func willEnterForeground() {
         Logger.info("")
+
+        // The disk may have filled while we were suspended, during which the
+        // periodic check can't run. Check before notifying observers, which
+        // may write to disk.
+        if
+            appReadiness.isAppReady,
+            !mainAppContext.isRunningTests
+        {
+            AppEnvironment.shared.lowDiskSpaceMonitoringManager.checkDiskSpaceNow()
+        }
+
+        mainAppContext.applicationWillEnterForeground()
     }
 
     func didBecomeActive() {
-        AssertIsOnMainThread()
+        mainAppContext.applicationDidBecomeActive()
+
         if CurrentAppContext().isRunningTests {
             return
         }
@@ -111,7 +92,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         clearAppropriateNotificationsAndRestoreBadgeCount()
 
         // On every activation, clear old temp directories.
-        ClearOldTemporaryDirectories()
+        OWSFileSystem.clearOldTemporaryDirectories()
 
         // Ensure that all windows have the correct frame.
         AppEnvironment.shared.windowManagerRef.updateWindowFrames()
@@ -123,6 +104,8 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         AssertIsOnMainThread()
 
         Logger.warn("")
+
+        mainAppContext.applicationWillResignActive()
 
         if didAppLaunchFail {
             return
@@ -144,9 +127,10 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
     func didEnterBackground() {
         Logger.info("")
 
+        mainAppContext.applicationDidEnterBackground()
+
         if shouldKillAppWhenBackgrounded {
-            Logger.flush()
-            exit(0)
+            owsFail("")
         }
     }
 
@@ -194,7 +178,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         let debugLogger = DebugLogger.shared
         debugLogger.enableTTYLoggingIfNeeded()
         DebugLogger.registerLibsignal()
-        DebugLogger.registerRingRTC()
+        DebugLogger.registerRingRTC(appContext: mainAppContext)
 
         if mainAppContext.isRunningTests {
             return true
@@ -202,12 +186,9 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
 
         debugLogger.enableFileLogging(appContext: mainAppContext, canLaunchInBackground: true)
         DebugLogger.configureSwiftLogging()
-        if DebugFlags.audibleErrorLogging {
-            debugLogger.enableErrorReporting()
-        }
 
         Logger.warn("Launching…")
-        Logger.warn("applicationState: \(UIApplication.shared.applicationState.logString)")
+        Logger.warn("applicationState: \(mainAppContext.reportedApplicationState.logString)")
         defer { Logger.info("Launched.") }
 
         BenchEventStart(title: "Presenting HomeView", eventId: "AppStart", logInProduction: true)
@@ -215,39 +196,40 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
 
         MessageFetchBGRefreshTask.register(appReadiness: appReadiness)
 
-        let deviceBatteryLevelManager = DeviceBatteryLevelManagerImpl()
         let deviceSleepManager = DeviceSleepManagerImpl()
         let keychainStorage = KeychainStorageImpl(isUsingProductionService: TSConstants.isUsingProductionService)
-        let deviceTransferService = DeviceTransferService(
+        let deviceTransferRestore = DeviceTransferRestoreImpl(
             appReadiness: appReadiness,
-            deviceSleepManager: deviceSleepManager,
-            keychainStorage: keychainStorage
+            keychainStorage: keychainStorage,
         )
 
         AppEnvironment.setSharedEnvironment(AppEnvironment(
             appReadiness: appReadiness,
-            deviceTransferService: deviceTransferService
+            deviceTransferRestore: deviceTransferRestore,
         ))
+
+        // Check before opening the database, which may itself write to disk.
+        if let additionalBytesRequiredToLaunch = LowDiskSpaceManager.additionalBytesRequiredToLaunch() {
+            handleLaunchFailure(.preflight(.lowStorageSpaceAvailable(
+                bytesRequired: additionalBytesRequiredToLaunch,
+            )))
+            return true
+        }
 
         // This *must* happen before we try and access or verify the database,
         // since we may be in a state where the database has been partially
         // restored from transfer (e.g. the key was replaced, but the database
         // files haven't been moved into place)
-        let didDeviceTransferRestoreSucceed = Bench(
-            title: "Slow device transfer service launch",
-            logIfLongerThan: 0.01,
-            logInProduction: true,
-            block: { deviceTransferService.launchCleanup() }
-        )
+        let didDeviceTransferRestoreSucceed = deviceTransferRestore.launchCleanup()
 
         let databaseStorage: SDSDatabaseStorage
         do {
             databaseStorage = try SDSDatabaseStorage(
                 appReadiness: appReadiness,
                 databaseFileUrl: SDSDatabaseStorage.grdbDatabaseFileUrl,
-                keychainStorage: keychainStorage
+                keychainStorage: keychainStorage,
             )
-        } catch KeychainError.notAllowed where UIApplication.shared.applicationState == .background {
+        } catch KeychainError.notAllowed where mainAppContext.isInBackground() {
             notifyThatPhoneMustBeUnlocked()
         } catch {
             // It's so corrupt that we can't even try to repair it.
@@ -265,7 +247,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         // If there's a notification, queue it up for processing. (This processing
         // may happen immediately, after a short delay, or never.)
         if let remoteNotification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
-            Logger.info("Application was launched by tapping a push notification.")
+            Logger.info("launched in response to an APNs push")
             Task {
                 do {
                     try await processRemoteNotification(remoteNotification)
@@ -275,38 +257,31 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             }
         }
 
-        // Do this even if `appVersion` isn't used -- there's side effects.
         let appVersion = AppVersionImpl.shared
-
-        // Set up and register incremental migration for TSAttachment -> v2 Attachment.
-        // TODO: remove this (and the incremental migrator itself) once we make this
-        // migration a launch-blocking GRDB migration.
-        let incrementalMessageTSAttachmentMigrationStore = IncrementalTSAttachmentMigrationStore(
-            userDefaults: mainAppContext.appUserDefaults()
-        )
-        let incrementalMessageTSAttachmentMigratorFactory = IncrementalMessageTSAttachmentMigratorFactoryImpl(
-            store: incrementalMessageTSAttachmentMigrationStore
-        )
+        appVersion.dumpToLog()
+        appVersion.updateFirstVersionIfNeeded()
 
         let launchContext = LaunchContext(
             appContext: mainAppContext,
             databaseStorage: databaseStorage,
-            deviceBatteryLevelManager: deviceBatteryLevelManager,
             deviceSleepManager: deviceSleepManager,
             keychainStorage: keychainStorage,
             launchStartedAt: launchStartedAt,
-            incrementalMessageTSAttachmentMigrationStore: incrementalMessageTSAttachmentMigrationStore,
-            incrementalMessageTSAttachmentMigratorFactory: incrementalMessageTSAttachmentMigratorFactory
         )
         self.launchContext = launchContext
+
+        let userDefaults = mainAppContext.appUserDefaults()
+        if appVersion.lastAppVersionForCrashDetection != appVersion.currentAppVersion {
+            userDefaults.removeObject(forKey: Constants.appLaunchesAttemptedKey)
+        }
+        appVersion.updateLastVersionForCrashDetection()
 
         // We need to do this _after_ we set up logging, when the keychain is unlocked,
         // but before we access the database or files on disk.
         let preflightError = checkIfAllowedToLaunch(
             mainAppContext: mainAppContext,
             appVersion: appVersion,
-            incrementalTSAttachmentMigrationStore: incrementalMessageTSAttachmentMigrationStore,
-            didDeviceTransferRestoreSucceed: didDeviceTransferRestoreSucceed
+            didDeviceTransferRestoreSucceed: didDeviceTransferRestoreSucceed,
         )
 
         if let preflightError {
@@ -317,26 +292,17 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         // If this is a regular launch, increment the "launches attempted" counter.
         // If repeatedly start launching but never finish them (ie the app is
         // crashing while launching), we'll notice in `checkIfAllowedToLaunch`.
-        let userDefaults = mainAppContext.appUserDefaults()
         let appLaunchesAttempted = userDefaults.integer(forKey: Constants.appLaunchesAttemptedKey)
         userDefaults.set(appLaunchesAttempted + 1, forKey: Constants.appLaunchesAttemptedKey)
 
         // We _must_ register BGProcessingTask handlers synchronously in didFinishLaunching.
         // https://developer.apple.com/documentation/backgroundtasks/bgtaskscheduler/register(fortaskwithidentifier:using:launchhandler:)
         // WARNING: Apple docs say we can only have 10 BGProcessingTasks registered.
-        let attachmentMigrationRunner = IncrementalMessageTSAttachmentMigrationRunner(
-            appContext: mainAppContext,
-            db: databaseStorage,
-            store: incrementalMessageTSAttachmentMigrationStore,
-            migrator: { DependenciesBridge.shared.incrementalMessageTSAttachmentMigrator }
-        )
-        attachmentMigrationRunner.registerBGProcessingTask(appReadiness: appReadiness)
-
         let attachmentBackfillStore = AttachmentValidationBackfillStore()
         let attachmentValidationRunner = AttachmentValidationBackfillRunner(
             db: databaseStorage,
             store: attachmentBackfillStore,
-            migrator: { DependenciesBridge.shared.attachmentValidationBackfillMigrator }
+            migrator: { DependenciesBridge.shared.attachmentValidationBackfillMigrator },
         )
         attachmentValidationRunner.registerBGProcessingTask(appReadiness: appReadiness)
 
@@ -345,31 +311,37 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             backupSettingsStore: BackupSettingsStore(),
             dateProvider: { Date() },
             db: databaseStorage,
-            exportJob: { DependenciesBridge.shared.backupExportJob },
+            exportJobRunner: { DependenciesBridge.shared.backupExportJobRunner },
             tsAccountManager: { DependenciesBridge.shared.tsAccountManager },
         )
         backupRunner.registerBGProcessingTask(appReadiness: appReadiness)
+
+        let localFileBackupRunner = LocalFileBackupBGProcessingTaskRunner(
+            backgroundMessageFetcherFactory: { DependenciesBridge.shared.backgroundMessageFetcherFactory },
+            localFileBackupStore: LocalFileBackupStore(),
+            dateProvider: { Date() },
+            db: databaseStorage,
+            exportJobRunner: { DependenciesBridge.shared.localFileBackupExportJobRunner },
+            tsAccountManager: { DependenciesBridge.shared.tsAccountManager },
+        )
+        localFileBackupRunner.registerBGProcessingTask(appReadiness: appReadiness)
 
         let databaseMigratorRunner = LazyDatabaseMigratorRunner(
             databaseStorage: databaseStorage,
             modelReadCaches: { SSKEnvironment.shared.modelReadCachesRef },
             tsAccountManager: { DependenciesBridge.shared.tsAccountManager },
+            stickerManager: { DependenciesBridge.shared.stickerManager },
         )
         databaseMigratorRunner.registerBGProcessingTask(appReadiness: appReadiness)
 
         appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
-            if SSKEnvironment.shared.remoteConfigManagerRef.currentConfig().shouldRunTSAttachmentMigrationInBGProcessingTask {
-                attachmentMigrationRunner.scheduleBGProcessingTaskIfNeeded()
-            }
-            attachmentValidationRunner.scheduleBGProcessingTaskIfNeeded()
-            backupRunner.scheduleBGProcessingTaskIfNeeded()
-        }
-
-        appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
             Task {
-                databaseMigratorRunner.scheduleBGProcessingTaskIfNeeded()
+                await attachmentValidationRunner.scheduleBGProcessingTaskIfNeeded()
+                await backupRunner.scheduleBGProcessingTaskIfNeeded()
+                await databaseMigratorRunner.scheduleBGProcessingTaskIfNeeded()
+                await localFileBackupRunner.scheduleBGProcessingTaskIfNeeded()
 
-                #if targetEnvironment(simulator)
+#if targetEnvironment(simulator)
                 // The simulator won't run BGProcessingTasks, but we still want to run
                 // these migrations for simulators. So, if they're needed, run them.
                 //
@@ -387,7 +359,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                         Logger.error("Encountered error during db migration: \(error)")
                     }
                 }
-                #endif
+#endif
             }
         }
 
@@ -396,14 +368,11 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
     }
 
     private struct LaunchContext {
-        var appContext: MainAppContext
+        let appContext: MainAppContext
         var databaseStorage: SDSDatabaseStorage
-        var deviceBatteryLevelManager: DeviceBatteryLevelManagerImpl
-        var deviceSleepManager: DeviceSleepManagerImpl
-        var keychainStorage: any KeychainStorage
-        var launchStartedAt: CFTimeInterval
-        var incrementalMessageTSAttachmentMigrationStore: IncrementalTSAttachmentMigrationStore
-        var incrementalMessageTSAttachmentMigratorFactory: IncrementalMessageTSAttachmentMigratorFactory
+        let deviceSleepManager: DeviceSleepManagerImpl
+        let keychainStorage: any KeychainStorage
+        let launchStartedAt: CFTimeInterval
     }
 
     /// Runs the launch steps that don't need a window: setting up the app's
@@ -431,7 +400,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
     /// this happens whenever a scene first connects, which may be long after
     /// the launch finished, or never.
     func connectUI(in windowScene: UIWindowScene) -> UIWindow {
-        Logger.info("applicationState: \(UIApplication.shared.applicationState.logString)")
+        Logger.info("applicationState: \(mainAppContext.reportedApplicationState.logString)")
 
         if let window {
             // Our scene was replaced with a new one. Keep the windows we have,
@@ -447,9 +416,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             return window
         }
 
-        let pendingLaunchOutcome = self.pendingLaunchOutcome
-        self.pendingLaunchOutcome = nil
-        switch pendingLaunchOutcome {
+        switch pendingLaunchOutcome.take() {
         case .failure(let launchFailure):
             Logger.info("Showing a launch failure that was waiting for a window.")
             let viewController = terminalErrorViewController()
@@ -525,16 +492,18 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         )
     }
 
-    private lazy var screenLockUI = ScreenLockUI(appReadiness: appReadiness)
-
     private func configureGlobalUI(in window: UIWindow) {
-        Theme.setupSignalAppearance()
+        let screenLockUI = AppEnvironment.shared.screenLockUI
+        let windowManager = AppEnvironment.shared.windowManagerRef
+
+        Theme.setupAppearance()
 
         screenLockUI.setupWithRootWindow(window)
-        AppEnvironment.shared.windowManagerRef.setupWithRootWindow(window, screenBlockingWindow: screenLockUI.screenBlockingWindow)
+        windowManager.setupWithRootWindow(window, screenBlockingWindow: screenLockUI.screenBlockingWindow)
         screenLockUI.startObserving()
     }
 
+    @MainActor
     private func setUpMainAppEnvironment(
         launchContext: LaunchContext,
     ) async -> (AppSetup.FinalContinuation, DeviceSleepBlockObject) {
@@ -546,24 +515,23 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
 
         let schemaMigrationContinuation = AppSetup().start(
             appContext: launchContext.appContext,
-            databaseStorage: launchContext.databaseStorage
+            databaseStorage: launchContext.databaseStorage,
         )
         let globalsContinuation = await schemaMigrationContinuation.migrateDatabaseSchema()
         let dataMigrationContinuation = globalsContinuation.initGlobals(
+            appContext: launchContext.appContext,
             appReadiness: appReadiness,
-            backupArchiveErrorPresenterFactory: BackupArchiveErrorPresenterFactoryInternal(),
-            deviceBatteryLevelManager: launchContext.deviceBatteryLevelManager,
+            deviceBatteryLevelManager: DeviceBatteryLevelManagerImpl(),
             deviceSleepManager: launchContext.deviceSleepManager,
             paymentsEvents: PaymentsEventsMainApp(),
             mobileCoinHelper: MobileCoinHelperSDK(),
             callMessageHandler: WebRTCCallMessageHandler(),
             currentCallProvider: currentCall,
             notificationPresenter: NotificationPresenterImpl(),
-            incrementalMessageTSAttachmentMigratorFactory: launchContext.incrementalMessageTSAttachmentMigratorFactory
         )
         await SUIEnvironment.shared.setUp(
             appReadiness: appReadiness,
-            authCredentialManager: dataMigrationContinuation.authCredentialManager
+            authCredentialManager: dataMigrationContinuation.authCredentialManager,
         )
         AppEnvironment.shared.setUp(
             appReadiness: appReadiness,
@@ -575,56 +543,22 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                 callLinkStore: dataMigrationContinuation.dependenciesBridge.callLinkStore,
                 callRecordDeleteManager: dataMigrationContinuation.dependenciesBridge.callRecordDeleteManager,
                 callRecordStore: dataMigrationContinuation.dependenciesBridge.callRecordStore,
+                callServiceSettingsStore: CallServiceSettingsStore(),
+                cron: dataMigrationContinuation.dependenciesBridge.cron,
+                databaseChangeObserver: dataMigrationContinuation.dependenciesBridge.databaseChangeObserver,
                 db: dataMigrationContinuation.dependenciesBridge.db,
                 deviceSleepManager: launchContext.deviceSleepManager,
                 mutableCurrentCall: _currentCall,
                 networkManager: dataMigrationContinuation.sskEnvironment.networkManagerRef,
                 remoteConfig: dataMigrationContinuation.sskEnvironment.remoteConfigManagerRef.currentConfig(),
-                tsAccountManager: dataMigrationContinuation.dependenciesBridge.tsAccountManager
-            )
+                signalService: dataMigrationContinuation.sskEnvironment.signalServiceRef,
+                tsAccountManager: dataMigrationContinuation.dependenciesBridge.tsAccountManager,
+            ),
         )
         let finalContinuation = await dataMigrationContinuation.migrateDatabaseData()
         finalContinuation.runLaunchTasksIfNeededAndReloadCaches()
-        guard BuildFlags.runTSAttachmentMigrationBlockingOnLaunch else {
-            return (finalContinuation, sleepBlockObject)
-        }
 
-        // The loading view only exists once a scene has connected, so look it
-        // up each time rather than holding one from the start of the launch.
-        let progressSink = OWSProgress.createSink { [weak self] progress in
-            await MainActor.run {
-                (self?.window?.rootViewController as? LoadingViewController)?.updateProgress(progress)
-            }
-        }
-        let migrateTask = Task {
-            _ = await finalContinuation.dependenciesBridge.incrementalMessageTSAttachmentMigrator
-                .runInMainAppUntilFinished(ignorePastFailures: true, progress: progressSink)
-        }
-        await migrateTask.value
         return (finalContinuation, sleepBlockObject)
-    }
-
-    private func checkEnoughDiskSpaceAvailable() -> Bool {
-        guard let freeSpaceInBytes = try? OWSFileSystem.freeSpaceInBytes(
-            forPath: SDSDatabaseStorage.grdbDatabaseFileUrl
-        ) else {
-            owsFailDebug("Failed to get free space: falling back to trying to create a temp dir.")
-
-            let tempDir = URL(fileURLWithPath: NSTemporaryDirectory())
-                .appendingPathComponent(UUID().uuidString)
-                .path
-            let succeededCreatingDir = OWSFileSystem.ensureDirectoryExists(tempDir)
-
-            // Best effort at deleting temp dir, which shouldn't ever fail
-            if succeededCreatingDir && !OWSFileSystem.deleteFile(tempDir) {
-                owsFailDebug("Failed to delete temp dir used for checking disk space!")
-            }
-
-            return succeededCreatingDir
-        }
-
-        // Require 500MB free in order to launch.
-        return freeSpaceInBytes >= 500_000_000
     }
 
     private func didLoadDatabase(
@@ -662,7 +596,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
 
         switch finalContinuation.setUpLocalIdentifiers(
             willResumeInProgressRegistration: hasInProgressRegistration,
-            canInitiateRegistration: true
+            canInitiateRegistration: true,
         ) {
         case .corruptRegistrationState:
             handleLaunchFailure(.corruptRegistrationState)
@@ -676,7 +610,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                 DispatchQueue.main.async {
                     self.setAppIsReady(
                         launchInterface: launchInterface,
-                        launchContext: launchContext
+                        launchContext: launchContext,
                     )
                     finalContinuation.dependenciesBridge.deviceSleepManager?.removeBlock(blockObject: sleepBlockObject)
                 }
@@ -687,30 +621,75 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
     @MainActor
     private func setAppIsReady(
         launchInterface: LaunchInterface,
-        launchContext: LaunchContext
+        launchContext: LaunchContext,
     ) {
         owsPrecondition(!appReadiness.isAppReady)
         owsPrecondition(!CurrentAppContext().isRunningTests)
 
         let appContext = launchContext.appContext
+        let dependenciesBridge = DependenciesBridge.shared
+        let db = DependenciesBridge.shared.db
+        let cron = dependenciesBridge.cron
 
-        SignalApp.shared.performInitialSetup(appReadiness: appReadiness)
+        // Choose a long interval so that app updates are the "only" trigger.
+        cron.schedulePeriodically(
+            uniqueKey: .cleanUpObsoleteKeyValueStores,
+            approximateInterval: .year,
+            mustBeRegistered: false,
+            mustBeConnected: false,
+            operation: {
+                await KeyValueStoreDeleter(db: db).cleanUpDeprecatedCollections()
+            },
+        )
 
-        appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
-            // This runs every 24 hours or so.
-            let messageSendLog = SSKEnvironment.shared.messageSendLogRef
-            messageSendLog.cleanUpAndScheduleNextOccurrence()
-        }
+        let messageSendLog = SSKEnvironment.shared.messageSendLogRef
+        cron.schedulePeriodically(
+            uniqueKey: .cleanUpMessageSendLog,
+            approximateInterval: .day,
+            mustBeRegistered: false,
+            mustBeConnected: false,
+            operation: { try await messageSendLog.cleanUpExpiredEntries() },
+        )
 
-        appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
-            OWSOrphanDataCleaner.auditOnLaunchIfNecessary()
-        }
+        var orphanedDataCleanerFailureCount = 0
+        cron.schedulePeriodically(
+            uniqueKey: .cleanUpOrphanedData,
+            approximateInterval: 2 * .week,
+            mustBeRegistered: true,
+            mustBeConnected: false,
+            operation: {
+                // Prior to Cron, if the orphaned data cleaner encountered 3 errors, it
+                // would give up until the app restarted. We maintain a similar behavior
+                // here by throwing OWSRetryableErrors that bypass the cleanup operation
+                // that's likely hitting repeated timeouts.
+                // TODO: Make this better; remove this hack.
+                if orphanedDataCleanerFailureCount >= 3 {
+                    throw OWSRetryableError()
+                }
+                do {
+                    try await OWSOrphanDataCleaner.cleanUp(shouldRemoveOrphanedData: true)
+                } catch {
+                    orphanedDataCleanerFailureCount += 1
+                    throw error
+                }
+            },
+        )
+
+        cron.schedulePeriodically(
+            uniqueKey: .cleanUpOrphanedAttachments,
+            approximateInterval: 5 * .minute,
+            mustBeRegistered: true,
+            mustBeConnected: false,
+            operation: {
+                try await DependenciesBridge.shared.orphanedAttachmentCleaner.runUntilFinished()
+            },
+        )
 
         appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
             Task.detached(priority: .low) {
                 await FullTextSearchOptimizer(
                     appContext: appContext,
-                    db: DependenciesBridge.shared.db
+                    db: db,
                 ).run()
             }
         }
@@ -720,9 +699,9 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                 await AuthorMergeHelperBuilder(
                     appContext: appContext,
                     authorMergeHelper: DependenciesBridge.shared.authorMergeHelper,
-                    db: DependenciesBridge.shared.db,
+                    db: db,
                     modelReadCaches: AuthorMergeHelperBuilder.Wrappers.ModelReadCaches(SSKEnvironment.shared.modelReadCachesRef),
-                    recipientDatabaseTable: DependenciesBridge.shared.recipientDatabaseTable
+                    recipientDatabaseTable: DependenciesBridge.shared.recipientDatabaseTable,
                 ).buildTableIfNeeded()
             }
         }
@@ -735,7 +714,6 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         // and simply treat the default as "nobody". The migration exists to ensure
         // old linked devices respect the setting before they upgrade.
         appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
-            let db = DependenciesBridge.shared.db
             guard db.read(block: SSKEnvironment.shared.udManagerRef.phoneNumberSharingMode(tx:)) == nil else {
                 return
             }
@@ -746,18 +724,42 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                 SSKEnvironment.shared.udManagerRef.setPhoneNumberSharingMode(
                     .nobody,
                     updateStorageServiceAndProfile: true,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
 
-        appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
-            StaleProfileFetcher(
-                db: DependenciesBridge.shared.db,
-                profileFetcher: SSKEnvironment.shared.profileFetcherRef,
-                tsAccountManager: DependenciesBridge.shared.tsAccountManager
-            ).scheduleProfileFetches()
-        }
+        cron.schedulePeriodically(
+            uniqueKey: .fetchStaleProfiles,
+            approximateInterval: .day,
+            mustBeRegistered: true,
+            mustBeConnected: true,
+            operation: {
+                try await StaleProfileFetcher(
+                    db: db,
+                    profileFetcher: SSKEnvironment.shared.profileFetcherRef,
+                    tsAccountManager: DependenciesBridge.shared.tsAccountManager,
+                ).fetchSomeStaleProfiles()
+            },
+        )
+
+        let groupV2Updates = SSKEnvironment.shared.groupV2UpdatesRef
+        cron.scheduleFrequently(
+            mustBeRegistered: true,
+            mustBeConnected: true,
+            operation: { try await groupV2Updates.autoRefreshGroups() },
+        )
+
+        // Run this even when we're not registered/connected/a primary to ensure we
+        // prune any pending groups that have been deleted.
+        let groupsV2 = SSKEnvironment.shared.groupsV2Ref
+        cron.scheduleFrequently(
+            mustBeRegistered: false,
+            mustBeConnected: false,
+            maxAverageBackoff: 6 * .hour,
+            isRetryable: { !$0.isCancellation },
+            operation: { try await groupsV2.processProfileKeyUpdates() },
+        )
 
         appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
             Task.detached(priority: .low) {
@@ -768,13 +770,29 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             }
         }
 
-        appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
-            Task {
-                try? await RemoteMegaphoneFetcher(
-                    databaseStorage: SSKEnvironment.shared.databaseStorageRef,
-                    signalService: SSKEnvironment.shared.signalServiceRef
-                ).syncRemoteMegaphonesIfNecessary()
-            }
+        // Radar: Signal's remote megaphones/release notes are gated off.
+        if BuildFlags.remoteMegaphonesAndReleaseNotes {
+            let remoteReleaseNotesFetchingManager = RemoteReleaseNotesFetchingManager(
+                db: db,
+                attachmentContentValidator: DependenciesBridge.shared.attachmentContentValidator,
+                attachmentManager: DependenciesBridge.shared.attachmentManager,
+                blockingManager: SSKEnvironment.shared.blockingManagerRef,
+                tsAccountManager: DependenciesBridge.shared.tsAccountManager,
+                notificationPresenter: SSKEnvironment.shared.notificationPresenterRef,
+                threadStore: DependenciesBridge.shared.threadStore,
+                interactionStore: DependenciesBridge.shared.interactionStore,
+                appVersion: AppVersionImpl.shared,
+                dateProvider: { Date() },
+                remoteReleaseNotesService: DependenciesBridge.shared.remoteReleaseNotesService,
+                releaseNoteStore: ReleaseNoteStore(),
+            )
+            cron.schedulePeriodically(
+                uniqueKey: .fetchMegaphones,
+                approximateInterval: 3 * .day,
+                mustBeRegistered: true,
+                mustBeConnected: true,
+                operation: { try await remoteReleaseNotesFetchingManager.syncRemoteReleaseNotes() },
+            )
         }
 
         appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
@@ -789,16 +807,56 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             let fetchJobRunner = CallLinkFetchJobRunner(
                 callLinkStore: DependenciesBridge.shared.callLinkStore,
                 callLinkStateUpdater: AppEnvironment.shared.callService.callLinkStateUpdater,
-                db: DependenciesBridge.shared.db
+                db: db,
             )
             fetchJobRunner.observeDatabase(DependenciesBridge.shared.databaseChangeObserver)
             fetchJobRunner.setMightHavePendingFetchAndFetch()
             AppEnvironment.shared.ownedObjects.append(fetchJobRunner)
         }
 
-        appReadiness.runNowOrWhenMainAppDidBecomeReadyAsync {
-            ViewOnceMessages.startExpiringWhenNecessary()
-        }
+        cron.schedulePeriodically(
+            uniqueKey: .cleanUpViewOnceMessages,
+            approximateInterval: .day,
+            mustBeRegistered: false,
+            mustBeConnected: false,
+            operation: { try await ViewOnceMessages.expireIfNecessary() },
+        )
+
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+
+        let backupRefreshManager = BackupRefreshManager(
+            accountKeyStore: DependenciesBridge.shared.accountKeyStore,
+            backupRequestManager: DependenciesBridge.shared.backupRequestManager,
+            backupSettingsStore: BackupSettingsStore(),
+            db: db,
+            networkManager: SSKEnvironment.shared.networkManagerRef,
+        )
+        cron.schedulePeriodically(
+            uniqueKey: .refreshBackup,
+            approximateInterval: BackupRefreshManager.backupRefreshTimeInterval,
+            mustBeRegistered: true,
+            mustBeConnected: true,
+            operation: {
+                let registeredState = try tsAccountManager.registeredStateWithMaybeSneakyTransaction()
+                try await backupRefreshManager.refreshBackup(
+                    localIdentifiers: registeredState.localIdentifiers,
+                    logger: PrefixedLogger(prefix: "[Backups][Refresh]"),
+                )
+            },
+        )
+
+        let preKeyManager = DependenciesBridge.shared.preKeyManager
+        cron.scheduleFrequently(
+            mustBeRegistered: true,
+            mustBeConnected: true,
+            operation: { try await preKeyManager.checkPreKeysIfNecessary() },
+        )
+
+        let storageServiceManager = SSKEnvironment.shared.storageServiceManagerRef
+        storageServiceManager.registerForCron(cron)
+
+        let keyTransparencyManager = dependenciesBridge.keyTransparencyManager
+        keyTransparencyManager.registerSelfCheckForCron(cron: cron)
 
         // Note that this does much more than set a flag; it will also run all deferred blocks.
         appReadiness.setAppIsReadyUIStillPending()
@@ -814,18 +872,79 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             appContext.appUserDefaults().removeObject(forKey: Constants.appLaunchesAttemptedKey)
         }
 
-        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
         let recipientDatabaseTable = DependenciesBridge.shared.recipientDatabaseTable
-        let tsRegistrationState: TSRegistrationState = SSKEnvironment.shared.databaseStorageRef.read { tx in
-            let registrationState = tsAccountManager.registrationState(tx: tx)
-            if registrationState.isRegistered, let localIdentifiers = tsAccountManager.localIdentifiers(tx: tx) {
+        let registeredState = try? tsAccountManager.registeredStateWithMaybeSneakyTransaction()
+        SSKEnvironment.shared.databaseStorageRef.read { tx in
+            if let registeredState {
+                let localIdentifiers = registeredState.localIdentifiers
                 let deviceId = tsAccountManager.storedDeviceId(tx: tx)
                 let localRecipient = recipientDatabaseTable.fetchRecipient(serviceId: localIdentifiers.aci, transaction: tx)
                 let deviceCount = localRecipient?.deviceIds.count ?? 0
                 let linkedDeviceMessage = deviceCount > 1 ? "\(deviceCount) devices including the primary" : "no linked devices"
                 Logger.info("localAci: \(localIdentifiers.aci), deviceId: \(deviceId) (\(linkedDeviceMessage))")
+            } else {
+                Logger.info("localAcI: not yet registered!")
             }
-            return registrationState
+        }
+
+        let profileManager = SSKEnvironment.shared.profileManagerRef
+        cron.schedulePeriodically(
+            uniqueKey: .fetchLocalProfile,
+            approximateInterval: .day,
+            mustBeRegistered: true,
+            mustBeConnected: true,
+            operation: {
+                do {
+                    _ = try await profileManager.fetchLocalUsersProfile(authedAccount: .implicit)
+                    // Don't remove this -- fetching the local user's profile is special-cased
+                    // and won't download the avatar via the normal mechanism.
+                    try await profileManager.downloadAndDecryptLocalUserAvatarIfNeeded(authedAccount: .implicit)
+                } catch {
+                    Logger.warn("Couldn't fetch local user profile or avatar: \(error)")
+                    throw error
+                }
+            },
+        )
+
+        cron.schedulePeriodically(
+            uniqueKey: .fetchEmojiSearch,
+            approximateInterval: 3 * .day,
+            mustBeRegistered: false,
+            mustBeConnected: true,
+            operation: { try await EmojiSearchIndex.updateManifest() },
+        )
+
+        let blockingManager = SSKEnvironment.shared.blockingManagerRef
+        cron.scheduleFrequently(
+            mustBeRegistered: true,
+            mustBeConnected: true,
+            operation: { try await blockingManager.syncBlockListIfNecessary(force: false) },
+        )
+
+        let svr = DependenciesBridge.shared.svr
+
+        // We must refresh our SVR2 credentials periodically. We typically do this
+        // when updating to a new version, but we want to refresh it after 14 days
+        // if we haven't upgraded.
+        cron.schedulePeriodically(
+            uniqueKey: .refreshSVRCredentials,
+            approximateInterval: 14 * .day,
+            mustBeRegistered: true,
+            mustBeDeviceType: .primary,
+            mustBeConnected: true,
+            operation: { try await svr.refreshCredentialsIfNecessary() },
+        )
+
+        cron.scheduleFrequently(
+            mustBeRegistered: true,
+            mustBeDeviceType: .primary,
+            mustBeConnected: true,
+            operation: { try await svr.refreshBackupIfNecessary() },
+        )
+
+        // Warm the "available emoji" cache, intentionally off the main thread.
+        Task.detached {
+            Emoji.warmAvailableCache()
         }
 
         // Fetch messages as soon as possible after launching. In particular, when
@@ -835,13 +954,14 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             self.refreshConnection(isAppActive: false)
         }
 
-        if tsRegistrationState.isRegistered {
+        if registeredState != nil {
             // This should happen at any launch, background or foreground.
             SyncPushTokensJob.run()
+            // Radar: keep the push relay registration in sync.
             Task { await RadarPushRelay.ensure(apnsHexToken: nil) }
         }
 
-        if tsRegistrationState.isRegistered {
+        if registeredState != nil {
             Task {
                 do {
                     try await APNSRotationStore.rotateIfNeededOnAppLaunchAndReadiness(
@@ -850,25 +970,10 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                         },
                         performRotation: {
                             try await SyncPushTokensJob(mode: .rotateIfEligible).run()
-                        }
+                        },
                     )
                 } catch {
                     Logger.warn("\(error)")
-                }
-            }
-        }
-
-        if tsRegistrationState.isRegistered {
-            Task {
-                do {
-                    _ = try await SSKEnvironment.shared.profileManagerRef.fetchLocalUsersProfile(authedAccount: .implicit())
-                    // Don't remove this -- fetching the local user's profile is special-cased
-                    // and won't download the avatar via the normal mechanism.
-                    try await SSKEnvironment.shared.profileManagerRef.downloadAndDecryptLocalUserAvatarIfNeeded(
-                        authedAccount: .implicit()
-                    )
-                } catch {
-                    Logger.warn("Couldn't fetch local user profile or avatar: \(error)")
                 }
             }
         }
@@ -877,17 +982,15 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         AppVersionImpl.shared.mainAppLaunchDidComplete()
 
         scheduleBgAppRefresh()
-        Self.updateApplicationShortcutItems(isRegistered: tsRegistrationState.isRegistered)
+        Self.updateApplicationShortcutItems(isRegistered: registeredState != nil)
 
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(
             self,
             selector: #selector(registrationStateDidChange),
             name: .registrationStateDidChange,
-            object: nil
+            object: nil,
         )
-
-        checkDatabaseIntegrityIfNecessary(isRegistered: tsRegistrationState.isRegistered)
 
         handleLaunchInterface(launchInterface, launchStartedAt: launchContext.launchStartedAt)
     }
@@ -901,18 +1004,18 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         Logger.warn("Exiting because we are in the background and the database password is not accessible.")
 
         let notificationContent = UNMutableNotificationContent()
-        notificationContent.body = String(
-            format: OWSLocalizedString(
+        notificationContent.body = String.nonPluralLocalizedStringWithFormat(
+            OWSLocalizedString(
                 "NOTIFICATION_BODY_PHONE_LOCKED_FORMAT",
-                comment: "Lock screen notification text presented after user powers on their device without unlocking. Embeds {{device model}} (either 'iPad' or 'iPhone')"
+                comment: "Lock screen notification text presented after user powers on their device without unlocking. Embeds {{device model}} (either 'iPad' or 'iPhone')",
             ),
-            UIDevice.current.localizedModel
+            UIDevice.current.localizedModel,
         )
 
         let notificationRequest = UNNotificationRequest(
             identifier: UUID().uuidString,
             content: notificationContent,
-            trigger: nil
+            trigger: nil,
         )
 
         let application: UIApplication = .shared
@@ -935,11 +1038,11 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
     private func buildLaunchInterface(regLoader: RegistrationCoordinatorLoader) -> LaunchInterface {
         let (
             tsRegistrationState,
-            lastMode
+            lastMode,
         ) = SSKEnvironment.shared.databaseStorageRef.read { tx in
             return (
                 DependenciesBridge.shared.tsAccountManager.registrationState(tx: tx),
-                regLoader.restoreLastMode(transaction: tx)
+                regLoader.restoreLastMode(transaction: tx),
             )
         }
 
@@ -952,17 +1055,11 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             // We're already registered.
             return .chatList
 
-        case .reregistering(let reregNumber, let reregAci):
-            if let reregE164 = E164(reregNumber), let reregAci {
-                Logger.info("Found legacy re-registration; continuing in new registration")
-                // A user who started re-registration before the new
-                // registration flow shipped; kick them to new re-reg.
-                return .registration(regLoader, .reRegistering(.init(e164: reregE164, aci: reregAci)))
-            } else {
-                // If we're missing the e164 or aci, drop into normal reg.
-                Logger.info("Found legacy initial registration; continuing in new registration")
-                return .registration(regLoader, .registering)
-            }
+        case .reregistering(let localIdentifiers):
+            Logger.info("Found legacy re-registration; continuing in new registration")
+            // A user who started re-registration before the new
+            // registration flow shipped; kick them to new re-reg.
+            return .registration(regLoader, .reRegistering(localIdentifiers))
 
         case .relinking:
             return .secondaryProvisioning
@@ -979,17 +1076,17 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             return .chatList
 
         case
-                .transferringIncoming,
-                .transferringPrimaryOutgoing,
-                .transferringLinkedOutgoing,
-                .transferred:
+            .transferringIncoming,
+            .transferringPrimaryOutgoing,
+            .transferringLinkedOutgoing,
+            .transferred:
             fallthrough
 
         case .unregistered:
-            if UIDevice.current.isIPad {
-                return .secondaryProvisioning
-            } else {
+            if RegistrationUtils.isPrimaryByDefault {
                 return .registration(regLoader, .registering)
+            } else {
+                return .secondaryProvisioning
             }
         }
     }
@@ -1040,16 +1137,26 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
 
     private func showLaunchFailureUI(
         _ launchFailure: LaunchFailure,
-        from viewController: UIViewController
+        from viewController: UIViewController,
     ) {
         switch launchFailure {
         case .databaseLoadFailed(let keychainStorage):
-            presentDatabaseUnrecoverablyCorruptedError(
+            presentLaunchFailureActionSheet(
                 from: viewController,
+                supportTag: "LaunchFailure_DatabaseLoadFailed",
+                logDumper: .preLaunch(),
+                title: OWSLocalizedString(
+                    "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE",
+                    comment: "Error indicating that the app could not launch because the database could not be loaded.",
+                ),
+                message: OWSLocalizedString(
+                    "APP_LAUNCH_FAILURE_ALERT_MESSAGE",
+                    comment: "Default message for the 'app launch failed' alert.",
+                ),
                 actions: [
                     .submitDebugLogsAndCrash,
                     .wipeAppDataAndCrash(keyFetcher: GRDBKeyFetcher(keychainStorage: keychainStorage)),
-                ]
+                ],
             )
 
         case .preflight(let preflightError):
@@ -1062,27 +1169,45 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                 logDumper: .fromGlobals(),
                 title: OWSLocalizedString(
                     "APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_TITLE",
-                    comment: "Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status."
+                    comment: "Title for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status.",
                 ),
                 message: OWSLocalizedString(
                     "APP_LAUNCH_FAILURE_CORRUPT_REGISTRATION_MESSAGE",
-                    comment: "Message for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status."
+                    comment: "Message for an error indicating that the app couldn't launch because some unexpected error happened with the user's registration status.",
                 ),
-                actions: [.submitDebugLogsAndCrash]
+                actions: [.submitDebugLogsAndCrash],
             )
+        }
+    }
+
+    private enum LaunchPreflightError {
+        case unknownDatabaseVersion
+        case couldNotRestoreTransferredData
+        case databaseCorrupted
+        case lastAppLaunchCrashed
+        case lowStorageSpaceAvailable(bytesRequired: UInt64)
+
+        var supportTag: String {
+            switch self {
+            case .unknownDatabaseVersion:
+                return "LaunchFailure_UnknownDatabaseVersion"
+            case .couldNotRestoreTransferredData:
+                return "LaunchFailure_CouldNotRestoreTransferredData"
+            case .databaseCorrupted:
+                return "LaunchFailure_DatabaseCorrupted"
+            case .lastAppLaunchCrashed:
+                return "LaunchFailure_LastAppLaunchCrashed"
+            case .lowStorageSpaceAvailable:
+                return "LaunchFailure_NoDiskSpaceAvailable"
+            }
         }
     }
 
     private func checkIfAllowedToLaunch(
         mainAppContext: MainAppContext,
         appVersion: AppVersion,
-        incrementalTSAttachmentMigrationStore: IncrementalTSAttachmentMigrationStore,
-        didDeviceTransferRestoreSucceed: Bool
+        didDeviceTransferRestoreSucceed: Bool,
     ) -> LaunchPreflightError? {
-        guard checkEnoughDiskSpaceAvailable() else {
-            return .lowStorageSpaceAvailable
-        }
-
         guard didDeviceTransferRestoreSucceed else {
             return .couldNotRestoreTransferredData
         }
@@ -1097,42 +1222,20 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
 
         let databaseCorruptionState = DatabaseCorruptionState(userDefaults: userDefaults)
         switch databaseCorruptionState.status {
-        case .notCorrupted, .readCorrupted:
+        case .notCorrupted:
             break
         case .corrupted, .corruptedButAlreadyDumpedAndRestored:
             guard !UIDevice.current.isIPad else {
                 // Database recovery theoretically works on iPad,
                 // but we haven't built the UI for it.
-                return .databaseUnrecoverablyCorrupted
+                return .lastAppLaunchCrashed
             }
-            guard databaseCorruptionState.count <= 5 else {
-                return .databaseUnrecoverablyCorrupted
-            }
-            return .databaseCorruptedAndMightBeRecoverable
+            return .databaseCorrupted
         }
 
         let launchAttemptFailureThreshold = DebugFlags.betaLogging ? 2 : 3
-        if
-            appVersion.lastAppVersion == appVersion.currentAppVersion,
-            userDefaults.integer(forKey: Constants.appLaunchesAttemptedKey) >= launchAttemptFailureThreshold
-        {
-            if case .readCorrupted = databaseCorruptionState.status {
-                return .possibleReadCorruptionCrashed
-            }
+        if userDefaults.integer(forKey: Constants.appLaunchesAttemptedKey) >= launchAttemptFailureThreshold {
             return .lastAppLaunchCrashed
-        }
-
-        if incrementalTSAttachmentMigrationStore.shouldReportFailureInUI() {
-            if let (logString, wasLoggedBefore) = incrementalTSAttachmentMigrationStore.consumeLastBGProcessingTaskError() {
-                if wasLoggedBefore {
-                    Logger.error("Previously failed TSAttachment migration in some BGProcessingTask: \(logString)")
-                } else {
-                    Logger.error("Failed TSAttachment migration in last BGProcessingTask: \(logString)")
-                }
-            } else if let checkpointString = incrementalTSAttachmentMigrationStore.getLastCheckpoint() {
-                Logger.error("Previously failed TSAttachment migration, last checkpoint: \(checkpointString)")
-            }
-            return .incrementalTSAttachmentMigrationFailed
         }
 
         return nil
@@ -1140,74 +1243,88 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
 
     private func showPreflightErrorUI(
         _ preflightError: LaunchPreflightError,
-        from viewController: UIViewController
+        from viewController: UIViewController,
     ) {
         let title: String
         let message: String
         let actions: [LaunchFailureActionSheetAction]
 
         switch preflightError {
-        case .databaseCorruptedAndMightBeRecoverable, .possibleReadCorruptionCrashed:
-            presentDatabaseRecovery(from: viewController)
-            return
-
-        case .databaseUnrecoverablyCorrupted:
-            presentDatabaseUnrecoverablyCorruptedError(
-                from: viewController,
-                actions: [
-                    .submitDebugLogsWithDatabaseIntegrityCheckAndCrash(databaseStorage: launchContext.databaseStorage),
-                    .wipeAppDataAndCrash(keyFetcher: GRDBKeyFetcher(keychainStorage: launchContext.keychainStorage)),
-                ]
+        case .databaseCorrupted:
+            title = OWSLocalizedString(
+                "APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_TITLE",
+                comment: "Title for an action sheet explaining that Signal can't launch because the database is corrupted.",
             )
-            return
+            message = OWSLocalizedString(
+                "APP_LAUNCH_FAILURE_DATABASE_CORRUPTED_MESSAGE",
+                comment: "Message for an action sheet explaining that Signal can't launch because the database is corrupted.",
+            )
+            actions = [
+                .presentDatabaseRecovery,
+                .submitDebugLogsAndCrash,
+                .launchApp,
+                .wipeAppDataAndCrash(keyFetcher: GRDBKeyFetcher(keychainStorage: launchContext.keychainStorage)),
+            ]
 
         case .unknownDatabaseVersion:
             title = OWSLocalizedString(
                 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_TITLE",
-                comment: "Error indicating that the app could not launch without reverting unknown database migrations."
+                comment: "Error indicating that the app could not launch without reverting unknown database migrations.",
             )
             message = OWSLocalizedString(
                 "APP_LAUNCH_FAILURE_INVALID_DATABASE_VERSION_MESSAGE",
-                comment: "Error indicating that the app could not launch without reverting unknown database migrations."
+                comment: "Error indicating that the app could not launch without reverting unknown database migrations.",
             )
             actions = [.submitDebugLogsAndCrash]
 
         case .couldNotRestoreTransferredData:
             title = OWSLocalizedString(
                 "APP_LAUNCH_FAILURE_RESTORE_FAILED_TITLE",
-                comment: "Error indicating that the app could not restore transferred data."
+                comment: "Error indicating that the app could not restore transferred data.",
             )
             message = OWSLocalizedString(
                 "APP_LAUNCH_FAILURE_RESTORE_FAILED_MESSAGE",
-                comment: "Error indicating that the app could not restore transferred data."
+                comment: "Error indicating that the app could not restore transferred data.",
             )
             actions = [.submitDebugLogsAndCrash]
 
-        case .lastAppLaunchCrashed, .incrementalTSAttachmentMigrationFailed:
+        case .lastAppLaunchCrashed:
             title = OWSLocalizedString(
                 "APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_TITLE",
-                comment: "Error indicating that the app crashed during the previous launch."
+                comment: "Error indicating that the app crashed during the previous launch.",
             )
             message = OWSLocalizedString(
                 "APP_LAUNCH_FAILURE_LAST_LAUNCH_CRASHED_MESSAGE",
-                comment: "Error indicating that the app crashed during the previous launch."
+                comment: "Error indicating that the app crashed during the previous launch.",
             )
             actions = [
                 .submitDebugLogsAndLaunchApp,
-                .launchApp
+                .launchApp,
             ]
 
-        case .lowStorageSpaceAvailable:
+        case .lowStorageSpaceAvailable(let bytesRequired):
             shouldKillAppWhenBackgrounded = true
+
+            let localizedDeviceModel = UIDevice.current.localizedModel
+            let formattedBytesRequired = OWSByteCountFormatStyle(zeroPadFractionDigits: false)
+                .format(bytesRequired)
+
             title = OWSLocalizedString(
-                "APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_TITLE",
-                comment: "Error title indicating that the app crashed because there was low storage space available on the device."
+                "APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_TITLE",
+                comment: "Title for an error sheet shown when the app cannot launch because the device is out of storage space.",
             )
-            message = OWSLocalizedString(
-                "APP_LAUNCH_FAILURE_LOW_STORAGE_SPACE_AVAILABLE_MESSAGE",
-                comment: "Error description indicating that the app crashed because there was low storage space available on the device."
+            message = String(
+                format: OWSLocalizedString(
+                    "APP_LAUNCH_FAILURE_NOT_ENOUGH_STORAGE_SPACE_MESSAGE_FORMAT",
+                    comment: "Message for an error sheet shown when the app cannot launch because the device is out of storage space. Embeds 1:{{ the localized name of the user's device model, e.g. iPhone }}; 2:{{ an amount of storage space as a file size, e.g. 1 GB }}.",
+                ),
+                localizedDeviceModel,
+                formattedBytesRequired,
             )
-            actions = []
+            actions = [
+                .submitDebugLogsAndCrash,
+                .exitApp,
+            ]
         }
 
         presentLaunchFailureActionSheet(
@@ -1216,7 +1333,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             logDumper: .preLaunch(),
             title: title,
             message: message,
-            actions: actions
+            actions: actions,
         )
     }
 
@@ -1235,7 +1352,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                     return await self.setUpMainAppEnvironment(launchContext: self.launchContext)
                 }
             },
-            launchApp: { (finalContinuation, sleepBlockObject) in
+            launchApp: { finalContinuation, sleepBlockObject in
                 // Pretend we didn't fail!
                 self.didAppLaunchFail = false
                 self.configureGlobalUI(in: window)
@@ -1244,7 +1361,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                     launchContext: self.launchContext,
                     sleepBlockObject: sleepBlockObject,
                 )
-            }
+            },
         )
 
         // Prevent dismissal.
@@ -1259,30 +1376,11 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         viewController.present(recoveryViewController, animated: true)
     }
 
-    private func presentDatabaseUnrecoverablyCorruptedError(
-        from viewController: UIViewController,
-        actions: [LaunchFailureActionSheetAction],
-    ) {
-        presentLaunchFailureActionSheet(
-            from: viewController,
-            supportTag: LaunchPreflightError.databaseUnrecoverablyCorrupted.supportTag,
-            logDumper: .preLaunch(),
-            title: OWSLocalizedString(
-                "APP_LAUNCH_FAILURE_COULD_NOT_LOAD_DATABASE",
-                comment: "Error indicating that the app could not launch because the database could not be loaded."
-            ),
-            message: OWSLocalizedString(
-                "APP_LAUNCH_FAILURE_ALERT_MESSAGE",
-                comment: "Default message for the 'app launch failed' alert."
-            ),
-            actions: actions
-        )
-    }
-
     private enum LaunchFailureActionSheetAction {
+        case exitApp
         case submitDebugLogsAndCrash
         case submitDebugLogsAndLaunchApp
-        case submitDebugLogsWithDatabaseIntegrityCheckAndCrash(databaseStorage: SDSDatabaseStorage)
+        case presentDatabaseRecovery
         case wipeAppDataAndCrash(keyFetcher: GRDBKeyFetcher)
         case launchApp
     }
@@ -1293,20 +1391,20 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         logDumper: DebugLogDumper,
         title: String,
         message: String,
-        actions: [LaunchFailureActionSheetAction]
+        actions: [LaunchFailureActionSheetAction],
     ) {
         let actionSheet = ActionSheetController(title: title, message: message)
 
         if DebugFlags.internalSettings {
             actionSheet.addAction(.init(title: "Export Database (internal)") { [unowned viewController] _ in
-                SignalApp.showExportDatabaseUI(from: viewController) {
+                SignalApp.shared.showExportDatabaseUI(from: viewController) {
                     self.presentLaunchFailureActionSheet(
                         from: viewController,
                         supportTag: supportTag,
                         logDumper: logDumper,
                         title: title,
                         message: message,
-                        actions: actions
+                        actions: actions,
                     )
                 }
             })
@@ -1326,7 +1424,13 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
 
             // Pretend we didn't fail!
             self.didAppLaunchFail = false
-            self.launchContext.incrementalMessageTSAttachmentMigrationStore.didReportFailureInUI()
+
+            // If we're wrong about this, we'll find out pretty quickly when a
+            // database operation fails.
+            DatabaseCorruptionState.flagDatabaseAsNotCorrupted(
+                userDefaults: self.launchContext.appContext.appUserDefaults(),
+            )
+
             window.rootViewController = LoadingViewController()
             self.configureGlobalUI(in: window)
             self.startLaunchPipeline(launchContext: self.launchContext)
@@ -1334,33 +1438,52 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
 
         for action in actions {
             switch action {
+            case .exitApp:
+                actionSheet.addAction(ActionSheetAction(
+                    title: OWSLocalizedString(
+                        "APP_LAUNCH_FAILURE_EXIT_APP_ACTION_TITLE",
+                        comment: "Action in an action sheet offering to exit the app.",
+                    ),
+                    handler: { _ in
+                        owsFail("Exiting.")
+                    },
+                ))
+
             case .submitDebugLogsAndCrash:
                 addSubmitDebugLogsAction {
-                    DebugLogs.submitLogs(supportTag: supportTag, dumper: logDumper) {
+                    DebugLogs(dumper: logDumper).promptToSubmitLogs(
+                        from: viewController,
+                        supportTag: supportTag,
+                    ) {
                         owsFail("Exiting after submitting debug logs")
                     }
                 }
 
             case .submitDebugLogsAndLaunchApp:
                 addSubmitDebugLogsAction {
-                    DebugLogs.submitLogs(supportTag: supportTag, dumper: logDumper) {
+                    DebugLogs(dumper: logDumper).promptToSubmitLogs(
+                        from: viewController,
+                        supportTag: supportTag,
+                    ) {
                         ignoreErrorAndLaunchApp()
                     }
                 }
 
-            case .submitDebugLogsWithDatabaseIntegrityCheckAndCrash(let databaseStorage):
-                addSubmitDebugLogsAction { [unowned viewController] in
-                    SignalApp.showDatabaseIntegrityCheckUI(from: viewController, databaseStorage: databaseStorage) {
-                        DebugLogs.submitLogs(supportTag: supportTag, dumper: logDumper) {
-                            owsFail("Exiting after submitting debug logs")
-                        }
-                    }
-                }
+            case .presentDatabaseRecovery:
+                actionSheet.addAction(.init(
+                    title: OWSLocalizedString(
+                        "APP_LAUNCH_FAILURE_DATABASE_RECOVERY_ACTION_TITLE",
+                        comment: "Action in an action sheet offering to attempt recovery of a corrupted database.",
+                    ),
+                    handler: { [self] _ in
+                        presentDatabaseRecovery(from: viewController)
+                    },
+                ))
 
             case .wipeAppDataAndCrash(let keyFetcher):
                 let wipeAppDataActionTitle = OWSLocalizedString(
                     "APP_LAUNCH_FAILURE_WIPE_APP_DATA_ACTION_TITLE",
-                    comment: "Action in an action sheet offering to wipe all app data."
+                    comment: "Action in an action sheet offering to wipe all app data.",
                 )
 
                 actionSheet.addAction(.init(
@@ -1370,33 +1493,35 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                         OWSActionSheets.showConfirmationAlert(
                             title: OWSLocalizedString(
                                 "APP_LAUNCH_FAILURE_WIPE_APP_DATA_CONFIRMATION_TITLE",
-                                comment: "Title for an action sheet confirming the user wants to wipe all app data."
+                                comment: "Title for an action sheet confirming the user wants to wipe all app data.",
                             ),
                             message: OWSLocalizedString(
                                 "APP_LAUNCH_FAILURE_WIPE_APP_DATA_CONFIRMATION_MESSAGE",
-                                comment: "Message for an action sheet confirming the user wants to wipe all app data."
+                                comment: "Message for an action sheet confirming the user wants to wipe all app data.",
                             ),
                             proceedTitle: wipeAppDataActionTitle,
                             proceedStyle: .destructive,
                             proceedAction: { _ in
-                                ModalActivityIndicatorViewController.present(fromViewController: viewController) { _ in
-                                    SignalApp.resetAppDataAndExit(keyFetcher: keyFetcher)
+                                ModalActivityIndicatorViewController.present(
+                                    fromViewController: viewController,
+                                    title: CommonStrings.deletingModal,
+                                ) { _ in
+                                    SignalApp.shared.resetAppDataAndExit(keyFetcher: keyFetcher)
                                 }
                             },
                         )
-                    }
+                    },
                 ))
 
             case .launchApp:
                 actionSheet.addAction(.init(
                     title: OWSLocalizedString(
                         "APP_LAUNCH_FAILURE_CONTINUE",
-                        comment: "Button to try launching the app even though the last launch failed"
+                        comment: "Button to try launching the app even though the last launch failed",
                     ),
-                    style: .cancel, // Use a cancel-style button to draw attention.
                     handler: { _ in
                         ignoreErrorAndLaunchApp()
-                    }
+                    },
                 ))
             }
         }
@@ -1425,25 +1550,15 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             Logger.info("Activated.")
         }
 
-        let tsRegistrationState: TSRegistrationState = DependenciesBridge.shared.db.read { tx in
-            // Always check prekeys after app launches, and sometimes check on app activation.
-            let registrationState = DependenciesBridge.shared.tsAccountManager.registrationState(tx: tx)
-            if registrationState.isRegistered {
-                DependenciesBridge.shared.preKeyManager.checkPreKeysIfNecessary(tx: tx)
-            }
-            return registrationState
-        }
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        let registeredState = try? tsAccountManager.registeredStateWithMaybeSneakyTransaction()
 
         if !hasActivated {
             hasActivated = true
 
             RTCInitializeSSL()
 
-            // Clean up any messages that expired since last launch and continue
-            // cleaning in the background.
-            SSKEnvironment.shared.disappearingMessagesJobRef.startIfNecessary()
-
-            if !tsRegistrationState.isRegistered {
+            if registeredState == nil {
                 // Unregistered user should have no unread messages. e.g. if you delete your account.
                 SSKEnvironment.shared.notificationPresenterRef.clearAllNotifications()
             }
@@ -1452,7 +1567,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         refreshConnection(isAppActive: true)
 
         // Every time we become active...
-        if tsRegistrationState.isRegistered {
+        if registeredState != nil {
             // TODO: Should we run this immediately even if we would like to process already decrypted envelopes handed to us by the NSE?
             Task {
                 await SSKEnvironment.shared.groupMessageProcessorManagerRef.startAllProcessors()
@@ -1472,9 +1587,8 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                     SyncPushTokensJob.run()
                 }
 
-                // If the user previously skipped the relay onboarding prompt
-                // because OS notifications were denied, but has since enabled
-                // them in Settings.app, surface the Allow/Disable prompt now.
+                // Radar: if the user skipped the relay prompt because OS notifications were
+                // denied, but has since enabled them in Settings, offer it now.
                 if !RadarPushRelay.hasAskedAboutRelay() {
                     Task { @MainActor in
                         guard let frontmost = UIApplication.shared.frontmostViewControllerIgnoringAlerts else { return }
@@ -1490,15 +1604,45 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { identityManager.tryToSyncQueuedVerificationStates() }
     }
 
+    // MARK: - Cron
+
+    private func runCron() async {
+        let cron = DependenciesBridge.shared.cron
+        let chatConnectionManager = DependenciesBridge.shared.chatConnectionManager
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        await cron.runOnce(ctx: CronContext(
+            chatConnectionManager: chatConnectionManager,
+            tsAccountManager: tsAccountManager,
+        ))
+    }
+
     // MARK: - Connections & Fetching
 
     /// Tokens to keep the web socket open when the app is in the foreground.
     private var activeConnectionTokens = [OWSChatConnection.ConnectionToken]()
 
+    /// Task that should be continued/waited for/canceled in the background.
+    @MainActor
+    private var cronTask: Task<Void, Never>?
+
+    @MainActor
+    private func startCronTask() {
+        self.cronTask?.cancel()
+        self.cronTask = Task {
+            await self.runCron()
+            if Task.isCancelled {
+                return
+            }
+            self.cronTask = nil
+        }
+    }
+
     /// A background fetching task that keeps the web socket open while the app
     /// is in the background.
     private var backgroundFetchHandle: BackgroundTaskHandle?
+    private var expirationJobTask: Task<Void, Never>?
 
+    @MainActor
     private func refreshConnection(isAppActive: Bool) {
         let chatConnectionManager = DependenciesBridge.shared.chatConnectionManager
 
@@ -1508,6 +1652,17 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             self.activeConnectionTokens = chatConnectionManager.requestConnections()
             oldActiveConnectionTokens.forEach { $0.releaseConnection() }
 
+            // Start a new Cron task on activate.
+            self.startCronTask()
+
+            // Start expiration jobs on activation.
+            let oldExpirationJobTask = self.expirationJobTask
+            oldExpirationJobTask?.cancel()
+            self.expirationJobTask = Task {
+                await oldExpirationJobTask?.value
+                await self.runExpirationJobs()
+            }
+
             // We're back in the foreground. We've passed off connection management to
             // the foreground logic, so just tear it down without waiting for anything.
             self.backgroundFetchHandle?.interrupt()
@@ -1516,13 +1671,23 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             let backgroundFetcher = DependenciesBridge.shared.backgroundMessageFetcherFactory.buildFetcher()
             self.activeConnectionTokens = []
             self.backgroundFetchHandle?.interrupt()
+            let cronTask = self.cronTask.take()
             let startDate = MonotonicDate()
-            let isPastRegistration = SignalApp.shared.conversationSplitViewController != nil
+            let isPastRegistration = SignalApp.shared.homeTabBarController != nil
+            let expirationJobTask = self.expirationJobTask
             self.backgroundFetchHandle = UIApplication.shared.beginBackgroundTask(
                 backgroundBlock: {
                     do {
                         await backgroundFetcher.start()
                         oldActiveConnectionTokens.forEach { $0.releaseConnection() }
+
+                        // If there's a Cron task running that was started in the foreground, wait
+                        // for it to finish.
+                        await withTaskCancellationHandler(
+                            operation: { await cronTask?.value },
+                            onCancel: { cronTask?.cancel() },
+                        )
+
                         // This will usually be limited to 30 seconds rather than 3 minutes.
                         let waitDeadline = startDate.adding(180)
                         if isPastRegistration {
@@ -1537,6 +1702,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                         // We were canceled, either because we entered the foreground or our
                         // background execution time expired.
                     }
+                    expirationJobTask?.cancel()
                 },
                 completionHandler: { result in
                     switch result {
@@ -1544,9 +1710,32 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                         await backgroundFetcher.reset()
                     case .finished, .expired:
                         await backgroundFetcher.stopAndWaitBeforeSuspending()
+                        await expirationJobTask?.value
                     }
                 },
             )
+        }
+    }
+
+    /// Run our various expiration jobs. Callers who add a new "expiring
+    /// element" should call .restart() on the appropriate job.
+    private func runExpirationJobs() async {
+        let dependenciesBridge = DependenciesBridge.shared
+        do {
+            try await withThrowingTaskGroup { taskGroup in
+                taskGroup.addTask { try await dependenciesBridge.deletedCallRecordExpirationJob.run() }
+                taskGroup.addTask { try await dependenciesBridge.disappearingMessagesExpirationJob.run() }
+                taskGroup.addTask { try await dependenciesBridge.decryptionPlaceholderExpirationJob.run() }
+                taskGroup.addTask { try await dependenciesBridge.storyMessageExpirationJob.run() }
+                taskGroup.addTask { try await dependenciesBridge.pinnedMessageExpirationJob.run() }
+                taskGroup.addTask { try await AppEnvironment.shared.groupSendEndorsementExpirationJob.run() }
+                taskGroup.addTask { try await AppEnvironment.shared.senderKeyExpirationJob.run() }
+                try await taskGroup.waitForAll()
+            }
+        } catch is CancellationError {
+            // This is expected.
+        } catch {
+            owsFailDebug("expiration jobs must throw CancellationError")
         }
     }
 
@@ -1593,11 +1782,11 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
 
         Logger.warn("")
         self.appReadiness.runNowOrWhenAppDidBecomeReadySync {
-            #if DEBUG
+#if DEBUG
             AppEnvironment.shared.pushRegistrationManagerRef.didReceiveVanillaPushToken(Data(count: 32))
-            #else
+#else
             AppEnvironment.shared.pushRegistrationManagerRef.didFailToReceiveVanillaPushToken(error: error)
-            #endif
+#endif
         }
     }
 
@@ -1640,17 +1829,15 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
     }
 
     // TODO: NSE Lifecycle, is this invoked when the NSE wakes the main app?
-    private nonisolated func processRemoteNotification(_ remoteNotification: [AnyHashable: Any]) async throws {
+    @concurrent
+    private func processRemoteNotification(_ remoteNotification: [AnyHashable: Any]) async throws {
         try await self.appReadiness.waitForAppReady()
         switch try await self.handleSilentPushContent(remoteNotification) {
         case .handled:
             break
         case .notHandled:
             let tsAccountManager = DependenciesBridge.shared.tsAccountManager
-            guard tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered else {
-                Logger.info("Ignoring remote notification; user is not registered.")
-                return
-            }
+            _ = try tsAccountManager.registeredStateWithMaybeSneakyTransaction()
             let backgroundMessageFetcher = DependenciesBridge.shared.backgroundMessageFetcherFactory.buildFetcher()
             await backgroundMessageFetcher.start()
 
@@ -1677,7 +1864,8 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         }
     }
 
-    private nonisolated func handleSilentPushContent(_ remoteNotification: [AnyHashable: Any]) async throws -> HandleSilentPushContentResult {
+    @concurrent
+    private func handleSilentPushContent(_ remoteNotification: [AnyHashable: Any]) async throws -> HandleSilentPushContentResult {
         if let spamChallengeToken = remoteNotification["rateLimitChallenge"] as? String {
             SSKEnvironment.shared.spamChallengeResolverRef.handleIncomingPushChallengeToken(spamChallengeToken)
             // TODO: Wait only until the token has been submitted.
@@ -1697,6 +1885,10 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
 
     private func clearAppropriateNotificationsAndRestoreBadgeCount() {
         AssertIsOnMainThread()
+
+        guard DebugFlags.clearNotificationsOnAppActivate.get() else {
+            return
+        }
 
         appReadiness.runNowOrWhenAppDidBecomeReadySync {
             let oldBadgeValue = UIApplication.shared.applicationIconBadgeNumber
@@ -1745,7 +1937,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                 }
                 SignalApp.shared.presentConversationAndScrollToFirstUnreadMessage(
                     threadUniqueId: threadUniqueId,
-                    animated: false
+                    animated: false,
                 )
             }
             return true
@@ -1754,21 +1946,21 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                 INStartVideoCallIntent.self,
                 userActivity: userActivity,
                 contacts: \.contacts,
-                isVideoCall: { _ in true }
+                isVideoCall: { _ in true },
             )
         case "INStartAudioCallIntent":
             return handleStartCallIntent(
                 INStartAudioCallIntent.self,
                 userActivity: userActivity,
                 contacts: \.contacts,
-                isVideoCall: { _ in false }
+                isVideoCall: { _ in false },
             )
         case "INStartCallIntent":
             return handleStartCallIntent(
                 INStartCallIntent.self,
                 userActivity: userActivity,
                 contacts: \.contacts,
-                isVideoCall: { $0.callCapability == .videoCall }
+                isVideoCall: { $0.callCapability == .videoCall },
             )
         case NSUserActivityTypeBrowsingWeb:
             guard let webpageUrl = userActivity.webpageURL else {
@@ -1785,7 +1977,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         _ intentType: T.Type,
         userActivity: NSUserActivity,
         contacts: KeyPath<T, [INPerson]?>,
-        isVideoCall: (T) -> Bool
+        isVideoCall: (T) -> Bool,
     ) -> Bool {
         let intent = userActivity.interaction?.intent
         guard let intent = intent as? T else {
@@ -1797,13 +1989,30 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             return false
         }
         let isVideo = isVideoCall(intent)
-        appReadiness.runNowOrWhenAppDidBecomeReadySync {
+
+        Task { @MainActor [appReadiness] in
+            do {
+                try await appReadiness.waitForAppReady()
+            } catch {
+                return
+            }
+
+            let callService = AppEnvironment.shared.callService!
+            let screenLockUI = AppEnvironment.shared.screenLockUI
             let tsAccountManager = DependenciesBridge.shared.tsAccountManager
-            guard tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered else {
+
+            do {
+                try await screenLockUI.waitForScreenUnlockThrowingPrevious()
+            } catch {
+                return
+            }
+
+            guard let registeredState = try? tsAccountManager.registeredStateWithMaybeSneakyTransaction() else {
                 Logger.warn("Ignoring user activity; not registered.")
                 return
             }
-            guard let callTarget = CallKitCallManager.callTargetForHandleWithSneakyTransaction(handle) else {
+            let callTarget = CallKitCallManager.callTargetForHandleWithSneakyTransaction(handle, registeredState: registeredState)
+            guard let callTarget else {
                 Logger.warn("Ignoring user activity; unknown user.")
                 return
             }
@@ -1816,7 +2025,6 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             // * It can be received if the user taps the "video" button for a contact
             // in the contacts app. If so, the correct response is to try to initiate a
             // new call to that user - unless there is another call in progress.
-            let callService = AppEnvironment.shared.callService!
             if let currentCall = callService.callServiceState.currentCall {
                 if isVideo, case .individual = currentCall.mode, currentCall.mode.matches(callTarget) {
                     Logger.info("Upgrading existing call to video")
@@ -1828,6 +2036,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             }
             callService.initiateCall(to: callTarget, isVideo: isVideo)
         }
+
         return true
     }
 
@@ -1841,30 +2050,25 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
 
         scheduleBgAppRefresh()
 
+        let attachmentDownloadManager = DependenciesBridge.shared.attachmentDownloadManager
         let tsAccountManager = DependenciesBridge.shared.tsAccountManager
-        let isRegistered = tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered
-        if isRegistered {
-            appReadiness.runNowOrWhenAppDidBecomeReadySync {
-                SSKEnvironment.shared.databaseStorageRef.write { transaction in
-                    let localAddress = tsAccountManager.localIdentifiers(tx: transaction)?.aciAddress
-                    Logger.info("localAddress: \(String(describing: localAddress))")
 
-                    ExperienceUpgradeFinder.markAllCompleteForNewUser(transaction: transaction)
-                }
-            }
-            DependenciesBridge.shared.attachmentDownloadManager.beginDownloadingIfNecessary()
-            Task {
-                do {
-                    try await StickerManager.downloadPendingSickerPacks()
-                } catch {
-                    Logger.warn("Failed to download pending sticker packs: \(error)")
-                }
+        let registeredState = try? tsAccountManager.registeredStateWithMaybeSneakyTransaction()
+        if let registeredState {
+            Logger.info("localAci: \(registeredState.localIdentifiers.aci)")
+
+            attachmentDownloadManager.beginDownloadingIfNecessary()
+
+            // Schedule a Cron run if we're in the foreground.
+            if !self.activeConnectionTokens.isEmpty {
+                self.startCronTask()
             }
         } else {
+            // Radar: stop relaying pushes for an account we're no longer registered to.
             Task { await RadarPushRelay.unregister() }
         }
 
-        Self.updateApplicationShortcutItems(isRegistered: isRegistered)
+        Self.updateApplicationShortcutItems(isRegistered: registeredState != nil)
     }
 
     // MARK: - Shortcut Items
@@ -1885,7 +2089,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             guard tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered else {
                 let controller = ActionSheetController(
                     title: OWSLocalizedString("REGISTER_CONTACTS_WELCOME", comment: ""),
-                    message: OWSLocalizedString("REGISTRATION_RESTRICTED_MESSAGE", comment: "")
+                    message: OWSLocalizedString("REGISTRATION_RESTRICTED_MESSAGE", comment: ""),
                 )
                 controller.addAction(ActionSheetAction(title: CommonStrings.okButton))
                 UIApplication.shared.frontmostViewController?.present(controller, animated: true, completion: {
@@ -1898,7 +2102,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         }
     }
 
-    public static func updateApplicationShortcutItems(isRegistered: Bool) {
+    static func updateApplicationShortcutItems(isRegistered: Bool) {
         guard CurrentAppContext().isMainApp else { return }
         UIApplication.shared.shortcutItems = applicationShortcutItems(isRegistered: isRegistered)
     }
@@ -1909,10 +2113,10 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             type: "\(Bundle.main.bundleIdPrefix).quickCompose",
             localizedTitle: OWSLocalizedString(
                 "APPLICATION_SHORTCUT_NEW_MESSAGE",
-                comment: "On the iOS home screen, if you tap and hold the Signal icon, this shortcut will appear. Tapping it will let users send a new message. You may want to refer to similar behavior in other iOS apps, such as Messages, for equivalent strings."
+                comment: "On the iOS home screen, if you tap and hold the Signal icon, this shortcut will appear. Tapping it will let users send a new message. You may want to refer to similar behavior in other iOS apps, such as Messages, for equivalent strings.",
             ),
             localizedSubtitle: nil,
-            icon: UIApplicationShortcutIcon(type: .compose)
+            icon: UIApplicationShortcutIcon(type: .compose),
         )]
     }
 
@@ -1928,39 +2132,18 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
         guard let parsedUrl = UrlOpener.parseUrl(url) else {
             return false
         }
-        let appReadiness: AppReadinessSetter = self.appReadiness
-        appReadiness.runNowOrWhenUIDidBecomeReadySync {
+        self.appReadiness.runNowOrWhenUIDidBecomeReadySync {
             let urlOpener = UrlOpener(
-                appReadiness: appReadiness,
                 databaseStorage: SSKEnvironment.shared.databaseStorageRef,
-                tsAccountManager: DependenciesBridge.shared.tsAccountManager
+                donationSubscriptionManager: DependenciesBridge.shared.donationSubscriptionManager,
+                idealStore: DependenciesBridge.shared.pendingIDEALDonationStore,
+                profileBadgeManager: DependenciesBridge.shared.profileBadgeManager,
+                tsAccountManager: DependenciesBridge.shared.tsAccountManager,
             )
 
             urlOpener.openUrl(parsedUrl, in: self.window!)
         }
         return true
-    }
-
-    // MARK: - Database integrity checks
-
-    private func checkDatabaseIntegrityIfNecessary(
-        isRegistered: Bool
-    ) {
-        guard isRegistered, BuildFlags.periodicallyCheckDatabaseIntegrity else { return }
-
-        let appReadiness: AppReadiness = self.appReadiness
-        DispatchQueue.sharedUtility.async {
-            switch GRDBDatabaseStorageAdapter.checkIntegrity(databaseStorage: SSKEnvironment.shared.databaseStorageRef) {
-            case .ok: break
-            case .notOk:
-                appReadiness.runNowOrWhenUIDidBecomeReadySync {
-                    OWSActionSheets.showActionSheet(
-                        title: "Database corrupted!",
-                        message: "We have detected database corruption on your device. Please submit debug logs to the iOS team."
-                    )
-                }
-            }
-        }
     }
 
     // MARK: - UNUserNotificationCenterDelegate
@@ -1987,7 +2170,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
     nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse,
-        withCompletionHandler completionHandler: @escaping () -> Void
+        withCompletionHandler completionHandler: @escaping () -> Void,
     ) {
         let startDate = MonotonicDate()
         Task { @MainActor [appReadiness] () -> Void in
@@ -1996,11 +2179,12 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
             do {
                 try await self.appReadiness.waitForAppReady()
             } catch {
-                Logger.warn("\(error)")
                 return
             }
 
+            let screenLockUI = AppEnvironment.shared.screenLockUI
             let backgroundMessageFetcherFactory = DependenciesBridge.shared.backgroundMessageFetcherFactory
+
             let backgroundMessageFetcher = backgroundMessageFetcherFactory.buildFetcher()
             // So that we open up a connection for replies.
             await backgroundMessageFetcher.start()
@@ -2009,7 +2193,11 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
                 let elapsedDuration = (MonotonicDate() - startDate).seconds
                 try await withCooperativeTimeout(seconds: 27 - elapsedDuration) {
                     // Do the actual thing we care about.
-                    try await NotificationActionHandler.handleNotificationResponse(response, appReadiness: appReadiness)
+                    try await NotificationActionHandler.handleNotificationResponse(
+                        response,
+                        appReadiness: appReadiness,
+                        screenLockUI: screenLockUI,
+                    )
 
                     // Then wait for any enqueued messages (e.g., read receipts) to be sent.
                     try await backgroundMessageFetcher.waitForFetchingProcessingAndSideEffects()

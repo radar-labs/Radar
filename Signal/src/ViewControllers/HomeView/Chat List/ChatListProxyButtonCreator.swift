@@ -5,6 +5,7 @@
 
 import Foundation
 import SignalServiceKit
+import UIKit
 
 protocol ChatListProxyButtonDelegate: AnyObject {
     func didUpdateButton(_ proxyButtonCreator: ChatListProxyButtonCreator)
@@ -31,7 +32,7 @@ final class ChatListProxyButtonCreator: NSObject {
             forName: OWSChatConnection.chatConnectionStateDidChange,
             object: nil,
             queue: .main,
-            using: { [weak self] _ in MainActor.assumeIsolated { self?.updateState() } }
+            using: { [weak self] _ in MainActor.assumeIsolated { self?.updateState() } },
         ))
     }
 
@@ -57,29 +58,25 @@ final class ChatListProxyButtonCreator: NSObject {
         guard let proxyState else {
             return nil
         }
-        let proxyStatusImage: UIImage?
+        let proxyStatusImage: UIImage
         let tintColor: UIColor
         switch proxyState {
         case .open:
-            proxyStatusImage = UIImage(named: "safety-number")
-            tintColor = UIColor.ows_accentGreen
+            proxyStatusImage = .safetyNumber
+            tintColor = .Signal.green
         case .closed:
-            proxyStatusImage = UIImage(named: "error-shield")
-            tintColor = UIColor.ows_accentRed
+            proxyStatusImage = .errorShield
+            tintColor = .Signal.red
         case .connecting:
-            proxyStatusImage = UIImage(named: "error-shield")
+            proxyStatusImage = .errorShield
             tintColor = UIColor.ows_middleGray
         }
-        let button = UIBarButtonItem(
-            image: proxyStatusImage,
-            style: .plain,
-            target: self,
-            action: #selector(didTapButton)
-        )
+        let button = UIBarButtonItem.button(image: proxyStatusImage) { [weak self] in
+            self?.didTapButton()
+        }
         button.tintColor = tintColor
         return button
     }
 
-    @objc
     private func didTapButton() { delegate?.didTapButton(self) }
 }

@@ -24,26 +24,27 @@ public protocol BodyRangesTextViewDelegate: UITextViewDelegate {
 }
 
 extension BodyRangesTextViewDelegate {
-
-    // Do nothing by default
     public func textViewDidInsertMemoji(_ memojiGlyph: OWSAdaptiveImageGlyph) {}
 }
 
-open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
+// MARK: -
+
+open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate, UITextViewDelegate, UIEditMenuInteractionDelegate {
 
     public weak var bodyRangesDelegate: BodyRangesTextViewDelegate? {
         didSet { updateMentionState() }
     }
 
-    public override var delegate: UITextViewDelegate? {
+    override public var delegate: UITextViewDelegate? {
         didSet {
-            if let delegate = delegate {
+            if let delegate {
                 owsAssertDebug(delegate === self)
             }
         }
     }
 
     private let customLayoutManager: NSLayoutManager
+    private var iOS15EditMenu: BodyRangesTextViewIOS15EditMenu?
 
     public init() {
         let editableBody = EditableMessageBodyTextStorage(db: DependenciesBridge.shared.db)
@@ -60,9 +61,18 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
         editableBody.editableBodyDelegate = self
         textAlignment = .natural
         enablesReturnKeyAutomatically = true
+
+        if #available(iOS 16, *) {
+            iOS15EditMenu = nil
+        } else {
+            iOS15EditMenu = BodyRangesTextViewIOS15EditMenu(
+                textView: self,
+                didSelectStyleBlock: { [unowned self] in didSelectStyle($0) },
+            )
+        }
     }
 
-    public override var layoutManager: NSLayoutManager {
+    override public var layoutManager: NSLayoutManager {
         return customLayoutManager
     }
 
@@ -70,8 +80,56 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
         pickerView?.removeFromSuperview()
     }
 
-    required public init?(coder: NSCoder) {
+    public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: -
+
+    /// Can we perform the ``paste(_:)`` action?
+    ///
+    /// False by default. Subclasses that can handle pasted contents should
+    /// override this method.
+    ///
+    /// - SeeAlso ``canPerformAction(_:withSender:)``
+    open func canPerformPasteAction() -> Bool {
+        return false
+    }
+
+    override open func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        if
+            let iOS15EditMenu,
+            let allowAction = iOS15EditMenu.allowAction(action)
+        {
+            return allowAction
+        }
+
+        // By default, canPerformAction returns false for the "paste" action. As
+        // a result, we need to manually intercept and potentially allow it.
+        if action == #selector(paste(_:)), canPerformPasteAction() {
+            return true
+        }
+
+        return super.canPerformAction(action, withSender: sender)
+    }
+
+    override open func forwardingTarget(for aSelector: Selector!) -> Any? {
+        if
+            let iOS15EditMenu,
+            iOS15EditMenu.selectorsHandledByThisType.contains(aSelector)
+        {
+            return iOS15EditMenu
+        }
+
+        return super.forwardingTarget(for: aSelector)
+    }
+
+    override open func resignFirstResponder() -> Bool {
+        if let iOS15EditMenu {
+            iOS15EditMenu.reset()
+        }
+
+        return super.resignFirstResponder()
     }
 
     // MARK: -
@@ -84,17 +142,17 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
         replaceCharacters(
             in: NSRange(
                 location: range.location - Mention.prefix.count,
-                length: range.length + Mention.prefix.count
+                length: range.length + Mention.prefix.count,
             ),
-            withMentionAddress: address
+            withMentionAddress: address,
         )
     }
 
     public func replaceCharacters(
         in range: NSRange,
-        withMentionAddress mentionAddress: SignalServiceAddress
+        withMentionAddress mentionAddress: SignalServiceAddress,
     ) {
-        guard let bodyRangesDelegate = bodyRangesDelegate else {
+        guard let bodyRangesDelegate else {
             return owsFailDebug("Can't replace characters without delegate")
         }
         guard let mentionAci = mentionAddress.aci else {
@@ -103,12 +161,12 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
 
         let body = MessageBody(
             text: "@",
-            ranges: MessageBodyRanges(mentions: [NSRange(location: 0, length: 1): mentionAci], styles: [])
+            ranges: MessageBodyRanges(mentions: [NSRangedValue(mentionAci, range: NSRange(location: 0, length: 1))], styles: []),
         )
         let (hydrated, possibleAcis) = DependenciesBridge.shared.db.read { tx in
             return (
                 body.hydrating(mentionHydrator: ContactsMentionHydrator.mentionHydrator(transaction: tx)),
-                bodyRangesDelegate.textViewMentionPickerPossibleAcis(self, tx: tx)
+                bodyRangesDelegate.textViewMentionPickerPossibleAcis(self, tx: tx),
             )
         }
         let hydratedPlaintext = hydrated.asPlaintext()
@@ -123,6 +181,7 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
             editableBody.replaceCharacters(in: range, with: hydratedPlaintext, selectedRange: selectedRange)
             editableBody.endEditing()
         }
+        textViewDidChange(self)
     }
 
     public var currentlyTypingMentionText: String? {
@@ -135,8 +194,8 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
 
     public var defaultAttributes: [NSAttributedString.Key: Any] {
         var defaultAttributes = [NSAttributedString.Key: Any]()
-        if let font = font { defaultAttributes[.font] = font }
-        if let textColor = textColor { defaultAttributes[.foregroundColor] = textColor }
+        if let font { defaultAttributes[.font] = font }
+        if let textColor { defaultAttributes[.foregroundColor] = textColor }
         return defaultAttributes
     }
 
@@ -149,7 +208,7 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
     }
 
     @available(*, unavailable)
-    public override var text: String! {
+    override public var text: String! {
         get {
             return textStorage.string
         }
@@ -159,7 +218,7 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
     }
 
     @available(*, unavailable)
-    public override var attributedText: NSAttributedString! {
+    override public var attributedText: NSAttributedString! {
         get {
             return textStorage.attributedString()
         }
@@ -168,19 +227,19 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
         }
     }
 
-    public override var textColor: UIColor? {
+    override public var textColor: UIColor? {
         didSet {
             editableBody.didUpdateTheming()
         }
     }
 
-    open override var font: UIFont? {
+    override open var font: UIFont? {
         didSet {
             editableBody.didUpdateTheming()
         }
     }
 
-    private let editableBody: EditableMessageBodyTextStorage
+    fileprivate let editableBody: EditableMessageBodyTextStorage
 
     public var messageBodyForSending: MessageBody {
         return editableBody.messageBody.filterStringForDisplay()
@@ -221,6 +280,7 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
         case typingMention(range: NSRange)
         case notTypingMention
     }
+
     private var state: State = .notTypingMention {
         didSet {
             switch state {
@@ -230,7 +290,7 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
                 if oldValue == .notTypingMention {
                     didBeginTypingMention()
                 } else {
-                    guard let currentlyTypingMentionText = currentlyTypingMentionText else {
+                    guard let currentlyTypingMentionText else {
                         return owsFailDebug("unexpectedly missing mention text while typing a mention")
                     }
 
@@ -252,8 +312,9 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
             self.pickerView = nil
         }
 
-        guard let pickerReferenceView = bodyRangesDelegate.textViewMentionPickerReferenceView(self),
-              let pickerParentView = bodyRangesDelegate.textViewMentionPickerParentView(self) else { return }
+        guard
+            let pickerReferenceView = bodyRangesDelegate.textViewMentionPickerReferenceView(self),
+            let pickerParentView = bodyRangesDelegate.textViewMentionPickerParentView(self) else { return }
 
         let mentionableAcis = SSKEnvironment.shared.databaseStorageRef.read { tx in
             return bodyRangesDelegate.textViewMentionPickerPossibleAcis(self, tx: tx)
@@ -262,9 +323,10 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
 
         let pickerView = MentionPicker(
             mentionableAcis: mentionableAcis,
-            style: bodyRangesDelegate.mentionPickerStyle(self)) { [weak self] selectedAddress in
-                self?.insertTypedMention(address: selectedAddress)
-            }
+            style: bodyRangesDelegate.mentionPickerStyle(self),
+        ) { [weak self] selectedAddress in
+            self?.insertTypedMention(address: selectedAddress)
+        }
 
         // IS THIS EVEN POSSIBLE?
         guard let currentlyTypingMentionText, pickerView.mentionTextChanged(currentlyTypingMentionText) else {
@@ -329,8 +391,9 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
         } else if
             range.location > 0,
             mentionRanges.first(where: { mentionRange in
-              mentionRange.upperBound == range.location
-            }) != nil {
+                mentionRange.upperBound == range.location
+            }) != nil
+        {
             // If there is a mention to the left, the typing attributes will
             // be the mention's attributes. We don't want that, so we need
             // to reset them here.
@@ -360,7 +423,7 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
 
         while location > 0 {
             let possiblePrefix = editableBody.hydratedPlaintext.substring(
-                withRange: NSRange(location: location - Mention.prefix.count, length: Mention.prefix.count)
+                withRange: NSRange(location: location - Mention.prefix.count, length: Mention.prefix.count),
             )
 
             let mentionRanges = editableBody.mentionRanges
@@ -387,8 +450,8 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
                     let characterPrecedingPrefix: Character = editableBody.hydratedPlaintext.substring(
                         withRange: NSRange(
                             location: location - Mention.prefix.count - 1,
-                            length: 1
-                        )
+                            length: 1,
+                        ),
                     ).first!
 
                     // If it's alphanumeric, keep looking back. We don't want to
@@ -402,7 +465,7 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
                 }
 
                 state = .typingMention(
-                    range: NSRange(location: location, length: selectedRange.location - location)
+                    range: NSRange(location: location, length: selectedRange.location - location),
                 )
                 return
             } else {
@@ -414,256 +477,10 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
         state = .notTypingMention
     }
 
-    // MARK: - Text Formatting
-
-    // MARK: Menu items
-
-    private let cutUIMenuAction = #selector(cut)
-    private let copyUIMenuAction = #selector(UIResponderStandardEditActions.copy(_:))
-    private let pasteUIMenuAction = #selector(UIResponderStandardEditActions.paste(_:))
-
-    private let uiMenuPromptReplaceAction = Selector(("_promptForReplace:"))
-    private let uiMenuReplaceAction = Selector(("replace:"))
-    private let customUIMenuPromptReplaceAction = #selector(customUIMenuPromptReplace)
-    @objc
-    func customUIMenuPromptReplace(_ sender: Any?) { super.perform(uiMenuPromptReplaceAction, with: sender) }
-
-    private let uiMenuTranslateAction = Selector(("_translate:"))
-    private let customUIMenuTranslateAction = #selector(customUIMenuTranslate)
-    @objc
-    func customUIMenuTranslate(_ sender: Any?) { super.perform(uiMenuTranslateAction, with: sender) }
-
-    private let uiMenuLookUpAction = Selector(("_define:"))
-    private let customUIMenuLookUpAction = #selector(customUIMenuLookUp)
-    @objc
-    func customUIMenuLookUp(_ sender: Any?) { super.perform(uiMenuLookUpAction, with: sender) }
-
-    private let uiMenuShareAction = Selector(("_share:"))
-    private let customUIMenuShareAction = #selector(customUIMenuShare)
-    @objc
-    func customUIMenuShare(_ sender: Any?) { super.perform(uiMenuShareAction, with: sender) }
-
-    open override func buildMenu(with builder: UIMenuBuilder) {
-        if builder.menu(for: .lookup) != nil, selectedRange.length > 0 {
-            // The lookup action is special; for whatever reason it doesn't go
-            // through `canPerformAction` at all, so we have to disable it here
-            // or it will appear before our custom format options.
-            builder.remove(menu: .lookup)
-        }
-        super.buildMenu(with: builder)
-    }
-
-    public func disallowsAnyPasteAction() -> Bool {
-        return isShowingFormatMenu
-    }
-
-    open override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-        // We only mess with actions when there's a selection.
-        guard selectedRange.length > 0 else {
-            return super.canPerformAction(action, withSender: sender)
-        }
-        // Let our custom style actions through.
-        if action == #selector(didSelectTextFormattingSubmenu) {
-            return selectedRange.length > 0
-        }
-        if MessageBodyRanges.SingleStyle.allCases.lazy
-            .map({ (style: MessageBodyRanges.SingleStyle) -> Selector in
-                return self.uiMenuItemSelector(for: style)
-            })
-            .contains(action) {
-            return isShowingFormatMenu
-        }
-        if action == #selector(didSelectClearStyles) {
-            guard isShowingFormatMenu, selectedRange.length > 0 else {
-                return false
-            }
-            return editableBody.hasFormatting(in: selectedRange)
-        }
-
-        switch action {
-        // Cut, copy, paste are let through as they are first in the list.
-        case cutUIMenuAction, copyUIMenuAction, pasteUIMenuAction:
-            guard !isShowingFormatMenu else {
-                return false
-            }
-            return super.canPerformAction(action, withSender: sender)
-
-        // We want these actions to appear, but _after_ format. To do that, we disable
-        // the system's action and use custom ones of our own that forward to the same selector.
-        case customUIMenuPromptReplaceAction:
-            return super.canPerformAction(uiMenuPromptReplaceAction, withSender: sender)
-        case customUIMenuLookUpAction:
-            return super.canPerformAction(uiMenuLookUpAction, withSender: sender)
-        case customUIMenuShareAction:
-            return super.canPerformAction(uiMenuShareAction, withSender: sender)
-        case customUIMenuTranslateAction:
-            return true
-
-        // The second stage of replace (picking the thing to replace with) is allowed.
-        case uiMenuReplaceAction:
-            return super.canPerformAction(action, withSender: sender)
-
-        // All other actions are disallowed.
-        default:
-            return false
-        }
-    }
-
-    // When the user selects text, we show a "format" option in the menu. Tapping
-    // that sets this to true, reloading the menu with styles (bold, italic, etc) and
-    // omitting all other options.
-    // We have to be careful to set this to false again once the menu is dismissed by
-    // any means, so that when it shows again we see cut/copy/paste and "format" again.
-    // There is no one callback for this dismissal, so we have to set it to false all over:
-    // resign first responder, selection changed, text changed, style option tapped, etc.
-    private var isShowingFormatMenu = false {
-        didSet {
-            if oldValue, !isShowingFormatMenu, UIMenuController.shared.isMenuVisible {
-                UIMenuController.shared.hideMenu(from: self)
-            }
-        }
-    }
-
-    open override func resignFirstResponder() -> Bool {
-        isShowingFormatMenu = false
-        return super.resignFirstResponder()
-    }
-
-    fileprivate func updateUIMenuState() {
-        if selectedRange.length > 0 {
-            if isShowingFormatMenu {
-                let orderedStyles: [MessageBodyRanges.SingleStyle] = [
-                    .bold, .italic, .monospace, .strikethrough, .spoiler
-                ]
-                UIMenuController.shared.menuItems = orderedStyles.map { style in
-                    return UIMenuItem(title: style.displayText, action: self.uiMenuItemSelector(for: style))
-                } + [UIMenuItem(
-                    title: OWSLocalizedString(
-                        "TEXT_MENU_CLEAR_FORMATTING",
-                        comment: "Option in selected text edit menu to clear all text formatting in the selected text range"
-                    ),
-                    action: #selector(didSelectClearStyles)
-                )]
-            } else {
-                UIMenuController.shared.menuItems = [
-                    // to get format to show up before system menu items, put our format
-                    // first and then our own replacements for the system ones after.
-                    UIMenuItem(
-                        title: OWSLocalizedString(
-                            "TEXT_MENU_FORMAT",
-                            comment: "Option in selected text edit menu to view text formatting options"
-                        ),
-                        action: #selector(didSelectTextFormattingSubmenu)
-                    ),
-                    UIMenuItem(
-                        title: OWSLocalizedString(
-                            "TEXT_MENU_REPLACE",
-                            comment: "Option in selected text edit menu to replace text with suggestions"
-                        ),
-                        action: #selector(customUIMenuPromptReplace)
-                    ),
-                    UIMenuItem(
-                        title: OWSLocalizedString(
-                            "TEXT_MENU_LOOK_UP",
-                            comment: "Option in selected text edit menu to look up word definitions"
-                        ),
-                        action: #selector(customUIMenuLookUp)
-                    ),
-                    UIMenuItem(
-                        title: OWSLocalizedString(
-                            "TEXT_MENU_TRANSLATE",
-                            comment: "Option in selected text edit menu to translate the word"
-                        ),
-                        action: #selector(customUIMenuTranslate)
-                    ),
-                    UIMenuItem(
-                        title: OWSLocalizedString(
-                            "TEXT_MENU_SHARE",
-                            comment: "Option in selected text edit menu to share selected text"
-                        ),
-                        action: #selector(customUIMenuShare)
-                    )
-                ]
-            }
-        } else {
-            UIMenuController.shared.menuItems = nil
-        }
-        UIMenuController.shared.update()
-    }
-
-    @objc
-    private func didSelectTextFormattingSubmenu(_ sender: UIMenu) {
-        isShowingFormatMenu = true
-        updateUIMenuState()
-        // No way to set a sub-menu in iOS 13. Have to wait for it to dismiss
-        // and then show it again in the next runloop.
-        DispatchQueue.main.async { [self] in
-            guard let selectedTextRange, isShowingFormatMenu else {
-                return
-            }
-            let selectionRects = selectionRects(for: selectedTextRange)
-            var completeRect = CGRect.null
-            for rect in selectionRects {
-                if completeRect.isNull {
-                    completeRect = rect.rect
-                } else {
-                    completeRect = rect.rect.union(completeRect)
-                }
-            }
-            UIMenuController.shared.showMenu(from: self, rect: completeRect)
-        }
-    }
-
-    private func uiMenuItemSelector(for style: MessageBodyRanges.SingleStyle) -> Selector {
-        switch style {
-        case .bold: return #selector(didSelectBold)
-        case .italic: return #selector(didSelectItalic)
-        case .spoiler: return #selector(didSelectSpoiler)
-        case .strikethrough: return #selector(didSelectStrikethrough)
-        case .monospace: return #selector(didSelectMonospace)
-        }
-    }
-
-    @objc
-    func didSelectBold() { didSelectStyle(.bold) }
-    @objc
-    func didSelectItalic() { didSelectStyle(.italic) }
-    @objc
-    func didSelectSpoiler() { didSelectStyle(.spoiler) }
-    @objc
-    func didSelectStrikethrough() { didSelectStyle(.strikethrough) }
-    @objc
-    func didSelectMonospace() { didSelectStyle(.monospace) }
-
-    private func didSelectStyle(_ style: MessageBodyRanges.SingleStyle) {
-        Logger.info("Applying style: \(style)")
-        isShowingFormatMenu = false
-        guard selectedRange.length > 0 else {
-            return
-        }
-        editableBody.beginEditing()
-        editableBody.toggleStyle(style, in: selectedRange)
-        editableBody.endEditing()
-        textViewDidChange(self)
-    }
-
-    @objc
-    private func didSelectClearStyles() {
-        Logger.info("Clearing styles")
-        isShowingFormatMenu = false
-        guard selectedRange.length > 0 else {
-            return
-        }
-        editableBody.beginEditing()
-        editableBody.clearFormatting(in: selectedRange)
-        editableBody.endEditing()
-        textViewDidChange(self)
-    }
-
     // MARK: - Text Container Insets
 
     open var defaultTextContainerInset: UIEdgeInsets {
-        UIEdgeInsets(hMargin: 7, vMargin: 7 - .hairlineWidth)
+        UIEdgeInsets(hMargin: 7, vMargin: 7 - hairlineWidth)
     }
 
     public func updateTextContainerInset() {
@@ -672,7 +489,7 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
         let currentFont = font ?? UIFont.dynamicTypeBody
         let systemDefaultFont = UIFont.preferredFont(
             forTextStyle: .body,
-            compatibleWith: .init(preferredContentSizeCategory: .large)
+            compatibleWith: .init(preferredContentSizeCategory: .large),
         )
         guard systemDefaultFont.pointSize > currentFont.pointSize else {
             textContainerInset = newTextContainerInset
@@ -728,51 +545,47 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate {
     public func didInsertMemoji(_ memojiGlyph: OWSAdaptiveImageGlyph) {
         bodyRangesDelegate?.textViewDidInsertMemoji(memojiGlyph)
     }
-}
 
-// MARK: - Picker Keyboard Interaction
+    // MARK: - Picker Keyboard Interaction
 
-extension BodyRangesTextView {
-    open override var keyCommands: [UIKeyCommand]? {
+    override open var keyCommands: [UIKeyCommand]? {
         guard pickerView != nil else { return nil }
 
         return [
             UIKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: [], action: #selector(upArrowPressed(_:))),
             UIKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: [], action: #selector(downArrowPressed(_:))),
             UIKeyCommand(input: "\r", modifierFlags: [], action: #selector(returnPressed(_:))),
-            UIKeyCommand(input: "\t", modifierFlags: [], action: #selector(tabPressed(_:)))
+            UIKeyCommand(input: "\t", modifierFlags: [], action: #selector(tabPressed(_:))),
         ]
     }
 
     @objc
     func upArrowPressed(_ sender: UIKeyCommand) {
-        guard let pickerView = pickerView else { return }
+        guard let pickerView else { return }
         pickerView.didTapUpArrow()
     }
 
     @objc
     func downArrowPressed(_ sender: UIKeyCommand) {
-        guard let pickerView = pickerView else { return }
+        guard let pickerView else { return }
         pickerView.didTapDownArrow()
     }
 
     @objc
     func returnPressed(_ sender: UIKeyCommand) {
-        guard let pickerView = pickerView else { return }
+        guard let pickerView else { return }
         pickerView.didTapReturn()
     }
 
     @objc
     func tabPressed(_ sender: UIKeyCommand) {
-        guard let pickerView = pickerView else { return }
+        guard let pickerView else { return }
         pickerView.didTapTab()
     }
-}
 
-// MARK: - Cut/Copy/Paste
+    // MARK: - Cut/Copy/Paste
 
-extension BodyRangesTextView {
-    open override func cut(_ sender: Any?) {
+    override open func cut(_ sender: Any?) {
         let selectedRange = self.selectedRange
         copy(sender)
         editableBody.beginEditing()
@@ -813,9 +626,11 @@ extension BodyRangesTextView {
         UIPasteboard.general.addItems([["public.utf8-plain-text": plaintextData]])
     }
 
-    public static var pasteboardType: String { SignalAttachment.bodyRangesPasteboardType }
+    // This can be more than just mentions (e.g. also text formatting styles)
+    // but the name remains as-is for backwards compatibility.
+    public static let pasteboardType = "private.archived-mention-text"
 
-    open override func copy(_ sender: Any?) {
+    override open func copy(_ sender: Any?) {
         let messageBody: MessageBody
         if selectedRange.length > 0 {
             messageBody = editableBody.messageBody(forHydratedTextSubrange: selectedRange)
@@ -825,9 +640,11 @@ extension BodyRangesTextView {
         Self.copyToPasteboard(messageBody)
     }
 
-    open override func paste(_ sender: Any?) {
-        if let encodedMessageBody = UIPasteboard.general.data(forPasteboardType: Self.pasteboardType),
-            var messageBody = try? NSKeyedUnarchiver.unarchivedObject(ofClass: MessageBody.self, from: encodedMessageBody) {
+    override open func paste(_ sender: Any?) {
+        if
+            let encodedMessageBody = UIPasteboard.general.data(forPasteboardType: Self.pasteboardType),
+            var messageBody = try? NSKeyedUnarchiver.unarchivedObject(ofClass: MessageBody.self, from: encodedMessageBody)
+        {
             editableBody.beginEditing()
             DependenciesBridge.shared.db.read { tx in
                 if let possibleAcis = bodyRangesDelegate?.textViewMentionPickerPossibleAcis(self, tx: tx) {
@@ -849,9 +666,9 @@ extension BodyRangesTextView {
             // part contains invisible characters. The exact root of the issue is still unclear but the following
             // lines of code work as a workaround.
             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) { [weak self] in
-                if let self = self {
+                if let self {
                     let oldRange = self.selectedRange
-                    self.selectedRange = NSRange.init(location: 0, length: 0)
+                    self.selectedRange = NSRange(location: 0, length: 0)
                     // inserting blank text into the text storage will remove the invisible characters
                     self.textStorage.insert(NSAttributedString(string: ""), at: 0)
                     // setting the range (again) will ensure scrolling to the correct position
@@ -861,25 +678,28 @@ extension BodyRangesTextView {
         }
         self.textViewDidChange(self)
     }
-}
 
-// MARK: - UITextViewDelegate
+    // MARK: - UITextViewDelegate
 
-extension BodyRangesTextView: UITextViewDelegate {
     open func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         guard shouldUpdateMentionText(in: range, changedText: text) else { return false }
         return bodyRangesDelegate?.textView?(textView, shouldChangeTextIn: range, replacementText: text) ?? true
     }
 
     open func textViewDidChangeSelection(_ textView: UITextView) {
+        if let iOS15EditMenu {
+            iOS15EditMenu.reset()
+        }
+
         bodyRangesDelegate?.textViewDidChangeSelection?(textView)
         updateMentionState()
-        isShowingFormatMenu = false
-        updateUIMenuState()
     }
 
     open func textViewDidChange(_ textView: UITextView) {
-        isShowingFormatMenu = false
+        if let iOS15EditMenu {
+            iOS15EditMenu.reset()
+        }
+
         bodyRangesDelegate?.textViewDidChange?(textView)
         if editableBody.hydratedPlaintext.isEmpty { updateMentionState() }
         self.textAlignment = editableBody.naturalTextAlignment
@@ -890,7 +710,10 @@ extension BodyRangesTextView: UITextViewDelegate {
     }
 
     open func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
-        isShowingFormatMenu = false
+        if let iOS15EditMenu {
+            iOS15EditMenu.reset()
+        }
+
         return bodyRangesDelegate?.textViewShouldEndEditing?(textView) ?? true
     }
 
@@ -909,37 +732,287 @@ extension BodyRangesTextView: UITextViewDelegate {
     open func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         return bodyRangesDelegate?.textView?(textView, shouldInteractWith: textAttachment, in: characterRange, interaction: interaction) ?? true
     }
+
+    // MARK: - Text Formatting
+
+    private func didSelectStyle(_ style: MessageBodyRanges.SingleStyle?) {
+        guard selectedRange.length > 0 else {
+            return
+        }
+        editableBody.beginEditing()
+        if let style {
+            editableBody.toggleStyle(style, in: selectedRange)
+        } else {
+            editableBody.removeFormatting(in: selectedRange)
+        }
+        editableBody.endEditing()
+        textViewDidChange(self)
+    }
+
+    // MARK: - UIEditMenuInteractionDelegate-ish
+
+    /// Not technically part of `UIEditMenuInteractionDelegate`, but exposed by
+    /// `UITextInput` to allow us to configure the `UIEditMenuInteraction` that
+    /// comes pre-configured on ourselves as a `UITextView`.
+    override open func editMenu(for textRange: UITextRange, suggestedActions: [UIMenuElement]) -> UIMenu? {
+        guard selectedRange.length > 0 else {
+            // Only add the format menu if we've got text selected.
+            return UIMenu(children: suggestedActions)
+        }
+
+        var formatMenuItems: [FormatEditMenuItem] = [
+            .applyBold,
+            .applyItalic,
+            .applySpoiler,
+            .applyStrikethrough,
+            .applyMonospace,
+        ]
+
+        if editableBody.hasFormatting(in: selectedRange) {
+            formatMenuItems.append(.removeFormatting)
+        }
+
+        let formatMenu = UIMenu(
+            title: FormatEditMenuItem.showFormatMenu.title,
+            options: [],
+            children: formatMenuItems.map { menuItem in
+                UIAction(
+                    title: menuItem.title,
+                    image: menuItem.image,
+                ) { [self] _ in
+                    let styleToApply: MessageBodyRanges.SingleStyle? = switch menuItem {
+                    case .showFormatMenu: owsFail("Not possible")
+                    case .removeFormatting: nil
+                    case .applyBold: .bold
+                    case .applyItalic: .italic
+                    case .applyMonospace: .monospace
+                    case .applyStrikethrough: .strikethrough
+                    case .applySpoiler: .spoiler
+                    }
+
+                    didSelectStyle(styleToApply)
+                }
+            },
+        )
+
+        return UIMenu(children: [formatMenu] + suggestedActions)
+    }
 }
 
-extension MessageBodyRanges.SingleStyle {
+// MARK: -
 
-    var displayText: String {
+private enum FormatEditMenuItem: CaseIterable {
+    case showFormatMenu
+    case removeFormatting
+    case applyBold
+    case applyItalic
+    case applyMonospace
+    case applyStrikethrough
+    case applySpoiler
+
+    var title: String {
         switch self {
-        case .bold:
-            return OWSLocalizedString(
+        case .showFormatMenu:
+            OWSLocalizedString(
+                "TEXT_MENU_FORMAT",
+                comment: "Option in selected text edit menu to view text formatting options",
+            )
+        case .removeFormatting:
+            OWSLocalizedString(
+                "TEXT_MENU_REMOVE_FORMATTING",
+                comment: "Option in selected text edit menu to remove all text formatting in the selected text range",
+            )
+        case .applyBold:
+            OWSLocalizedString(
                 "TEXT_MENU_BOLD",
-                comment: "Option in selected text edit menu to make text bold"
+                comment: "Option in selected text edit menu to make text bold",
             )
-        case .italic:
-            return OWSLocalizedString(
+        case .applyItalic:
+            OWSLocalizedString(
                 "TEXT_MENU_ITALIC",
-                comment: "Option in selected text edit menu to make text italic"
+                comment: "Option in selected text edit menu to make text italic",
             )
-        case .spoiler:
-            return OWSLocalizedString(
-                "TEXT_MENU_SPOILER",
-                comment: "Option in selected text edit menu to make text spoiler"
-            )
-        case .strikethrough:
-            return OWSLocalizedString(
-                "TEXT_MENU_STRIKETHROUGH",
-                comment: "Option in selected text edit menu to make text strikethrough"
-            )
-        case .monospace:
-            return OWSLocalizedString(
+        case .applyMonospace:
+            OWSLocalizedString(
                 "TEXT_MENU_MONOSPACE",
-                comment: "Option in selected text edit menu to make text monospace"
+                comment: "Option in selected text edit menu to make text monospace",
+            )
+        case .applyStrikethrough:
+            OWSLocalizedString(
+                "TEXT_MENU_STRIKETHROUGH",
+                comment: "Option in selected text edit menu to make text strikethrough",
+            )
+        case .applySpoiler:
+            OWSLocalizedString(
+                "TEXT_MENU_SPOILER",
+                comment: "Option in selected text edit menu to make text spoiler",
             )
         }
+    }
+
+    var image: UIImage? {
+        return switch self {
+        case .showFormatMenu: nil
+        case .removeFormatting: UIImage(named: "minus-circle")
+        case .applyBold: UIImage(named: "text-format-bold")
+        case .applyItalic: UIImage(named: "text-format-italic")
+        case .applyMonospace: UIImage(named: "text-format-monospace")
+        case .applyStrikethrough: UIImage(named: "text-format-strikethrough")
+        case .applySpoiler: UIImage(named: "text-format-spoiler")
+        }
+    }
+}
+
+// MARK: -
+
+/// Manages the "edit menu", i.e. the context menu presented when text is
+/// selected, for `BodyRangesTextView` on iOS 15.
+///
+/// On iOS 16 and above, edit-menu configuration is supported via
+/// `UIEditMenuInteraction`. On iOS 15, we do a whole bunch of complicated
+/// interception of `UIAction`s and manipulation of `UIMenuController.shared`;
+/// this type is intended to isolate that as much as possible.
+///
+/// The contents of this file were cut-pasted from `BodyRangesTextView` and
+/// minimally adapated to accomodate being in a separate type.
+@available(iOS, obsoleted: 16.0)
+private class BodyRangesTextViewIOS15EditMenu {
+
+    private unowned let textView: BodyRangesTextView
+    private let didSelectStyleBlock: (MessageBodyRanges.SingleStyle?) -> Void
+
+    private var isShowingFormatMenu = false
+
+    init(
+        textView: BodyRangesTextView,
+        didSelectStyleBlock: @escaping (MessageBodyRanges.SingleStyle?) -> Void,
+    ) {
+        self.textView = textView
+        self.didSelectStyleBlock = didSelectStyleBlock
+
+        updateEditMenuItems()
+    }
+
+    // MARK: -
+
+    var selectorsHandledByThisType: [Selector] {
+        return FormatEditMenuItem.allCases.map { selectorFor(formatEditMenuItem: $0) }
+    }
+
+    func allowAction(_ action: Selector) -> Bool? {
+        let isActionHandledByThisType = selectorsHandledByThisType.contains(action)
+
+        if isShowingFormatMenu {
+            // If we're showing the format menu, only allow format-menu actions.
+            return isActionHandledByThisType
+        }
+
+        // Otherwise, we always allow actions we handle and defer on the rest.
+        return isActionHandledByThisType ? true : nil
+    }
+
+    func reset() {
+        isShowingFormatMenu = false
+        updateEditMenuItems()
+
+        if UIMenuController.shared.isMenuVisible {
+            UIMenuController.shared.hideMenu(from: textView)
+        }
+    }
+
+    // MARK: -
+
+    private func updateEditMenuItems() {
+        guard textView.selectedRange.length > 0 else {
+            // We only want to mess with the edit menu when text is selected.
+            UIMenuController.shared.menuItems = nil
+            return
+        }
+
+        defer { UIMenuController.shared.update() }
+
+        if isShowingFormatMenu {
+            var formatMenuItems: [FormatEditMenuItem] = [
+                .applyBold,
+                .applyItalic,
+                .applyMonospace,
+                .applyStrikethrough,
+                .applySpoiler,
+            ]
+
+            if textView.editableBody.hasFormatting(in: textView.selectedRange) {
+                formatMenuItems.append(.removeFormatting)
+            }
+
+            UIMenuController.shared.menuItems = formatMenuItems.map { menuItem -> UIMenuItem in
+                return UIMenuItem(title: menuItem.title, action: selectorFor(formatEditMenuItem: menuItem))
+            }
+        } else {
+            UIMenuController.shared.menuItems = [
+                UIMenuItem(
+                    title: FormatEditMenuItem.showFormatMenu.title,
+                    action: selectorFor(formatEditMenuItem: .showFormatMenu),
+                ),
+            ]
+        }
+    }
+
+    private func selectorFor(formatEditMenuItem: FormatEditMenuItem) -> Selector {
+        switch formatEditMenuItem {
+        case .showFormatMenu: #selector(BodyRangesTextViewIOS15EditMenu.showFormatMenu)
+        case .removeFormatting: #selector(BodyRangesTextViewIOS15EditMenu.removeFormatting)
+        case .applyBold: #selector(BodyRangesTextViewIOS15EditMenu.applyBold)
+        case .applyItalic: #selector(BodyRangesTextViewIOS15EditMenu.applyItalic)
+        case .applySpoiler: #selector(BodyRangesTextViewIOS15EditMenu.applySpoiler)
+        case .applyStrikethrough: #selector(BodyRangesTextViewIOS15EditMenu.applyStrikethrough)
+        case .applyMonospace: #selector(BodyRangesTextViewIOS15EditMenu.applyMonospace)
+        }
+    }
+
+    // MARK: -
+
+    @objc
+    private func showFormatMenu(_ sender: UIMenu) {
+        isShowingFormatMenu = true
+
+        // Update the menu items...
+        updateEditMenuItems()
+
+        // ...then wait for the menu to dismiss, and re-show it. (This system
+        // doesn't support nested sub-menus.)
+        DispatchQueue.main.async { [self] in
+            guard let selectedTextRange = textView.selectedTextRange else {
+                return
+            }
+
+            let selectionRects = textView.selectionRects(for: selectedTextRange)
+            var completeRect = CGRect.null
+            for rect in selectionRects {
+                if completeRect.isNull {
+                    completeRect = rect.rect
+                } else {
+                    completeRect = rect.rect.union(completeRect)
+                }
+            }
+            UIMenuController.shared.showMenu(from: textView, rect: completeRect)
+        }
+    }
+
+    @objc
+    private func removeFormatting() { selectStyle(nil) }
+    @objc
+    private func applyBold() { selectStyle(.bold) }
+    @objc
+    private func applyItalic() { selectStyle(.italic) }
+    @objc
+    private func applySpoiler() { selectStyle(.spoiler) }
+    @objc
+    private func applyStrikethrough() { selectStyle(.strikethrough) }
+    @objc
+    private func applyMonospace() { selectStyle(.monospace) }
+
+    private func selectStyle(_ style: MessageBodyRanges.SingleStyle?) {
+        reset()
+        didSelectStyleBlock(style)
     }
 }

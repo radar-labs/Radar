@@ -5,6 +5,7 @@
 
 import Foundation
 import SignalServiceKit
+import UIKit
 
 class NSEContext: NSObject, AppContext {
     let type: SignalServiceKit.AppContextType = .nse
@@ -13,7 +14,6 @@ class NSEContext: NSObject, AppContext {
 
     func isInBackground() -> Bool { true }
     func isAppForegroundAndActive() -> Bool { false }
-    func mainApplicationStateOnLaunch() -> UIApplication.State { .inactive }
     var shouldProcessIncomingMessages: Bool { true }
     var hasUI: Bool { false }
     func canPresentNotifications() -> Bool { true }
@@ -47,7 +47,7 @@ class NSEContext: NSObject, AppContext {
 
     let memoryPressureSource = DispatchSource.makeMemoryPressureSource(
         eventMask: .all,
-        queue: .global()
+        queue: .global(),
     )
 
     override init() {
@@ -88,7 +88,7 @@ class NSEContext: NSObject, AppContext {
     }
 }
 
-fileprivate extension DispatchSourceMemoryPressure {
+private extension DispatchSourceMemoryPressure {
     var memoryEvent: DispatchSource.MemoryPressureEvent {
         DispatchSource.MemoryPressureEvent(rawValue: data)
     }

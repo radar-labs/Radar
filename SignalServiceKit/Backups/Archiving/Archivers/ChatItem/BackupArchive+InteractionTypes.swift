@@ -4,34 +4,21 @@
 //
 
 extension BackupArchive {
-    public struct InteractionUniqueId: BackupArchive.LoggableId, Hashable {
+    struct InteractionUniqueId: Hashable {
         let value: String
         let timestamp: UInt64
-        let isPoll: Bool
 
-        public init(interaction: TSInteraction) {
+        init(interaction: TSInteraction) {
             self.value = interaction.uniqueId
             self.timestamp = interaction.timestamp
-            self.isPoll = (interaction as? TSMessage)?.isPoll ?? false
         }
 
         /// Constructs an ID for an `InteractionRecord` from which constructing
         /// a `TSInteraction` fails.
-        public init(invalidInteractionRecord: InteractionRecord) {
+        init(invalidInteractionRecord: InteractionRecord) {
             self.value = invalidInteractionRecord.uniqueId
             self.timestamp = invalidInteractionRecord.timestamp
-            self.isPoll = invalidInteractionRecord.isPoll ?? false
         }
-
-        // MARK: BackupArchive.LoggableId
-
-        public var typeLogString: String {
-            if isPoll {
-                return "TSInteraction_Poll"
-            }
-            return "TSInteraction"
-        }
-        public var idLogString: String { "\(value):\(timestamp)" }
     }
 }
 
@@ -45,9 +32,84 @@ extension TSInteraction {
     var uniqueInteractionId: BackupArchive.InteractionUniqueId {
         return .init(interaction: self)
     }
+}
 
-    var chatItemId: BackupArchive.ChatItemId {
-        return .init(interaction: self)
+// MARK: -
+
+extension BackupArchive {
+    struct ChatItemExpirationDetails: Equatable {
+        /// 0 if not expiring.
+        let expiresInSeconds: UInt32
+        /// 0 if not expiring.
+        var expiresInMs: UInt64 { UInt64(expiresInSeconds) * 1000 }
+        /// 0 if the timer hasn't started.
+        let expireStartedAt: UInt64
+        /// nil if the timer hasn't started.
+        var expireStartDate: UInt64? { expireStartedAt > 0 ? expireStartedAt : nil }
+
+        private init(expiresInSeconds: UInt32, expireStartedAt: UInt64) {
+            self.expiresInSeconds = expiresInSeconds
+            self.expireStartedAt = expireStartedAt
+        }
+
+        init(expiringInteraction: ExpiringInteraction) {
+            self.init(
+                expiresInSeconds: expiringInteraction.expiresInSeconds,
+                expireStartedAt: expiringInteraction.expireStartedAt,
+            )
+        }
+
+        /// - Parameter shouldStartUnstartedTimer
+        /// Whether to start an expire timer that's set but hasn't started, as
+        /// of `restoreStartTimestamp`.
+        init?(
+            chatItem: BackupProto_ChatItem,
+            editState: TSEditState,
+            shouldStartUnstartedTimer: Bool,
+            restoreStartTimestamp: UInt64,
+        ) {
+            switch editState {
+            case .none, .latestRevisionRead, .latestRevisionUnread:
+                break
+            case .pastRevision:
+                // Past revisions don't have their own expire timer; they're
+                // deleted alongside the latest revision.
+                self.init(
+                    expiresInSeconds: 0,
+                    expireStartedAt: 0,
+                )
+                return
+            }
+
+            let expiresInSeconds: UInt32
+            if chatItem.hasExpiresInMs {
+                guard let _expiresInSeconds: UInt32 = .msToSecs(chatItem.expiresInMs) else {
+                    return nil
+                }
+                expiresInSeconds = _expiresInSeconds
+            } else {
+                // 0 == no expiration
+                expiresInSeconds = 0
+            }
+
+            let expireStartedAt: UInt64
+            if chatItem.hasExpireStartDate {
+                expireStartedAt = chatItem.expireStartDate
+            } else if expiresInSeconds > 0, shouldStartUnstartedTimer {
+                // If the timer should have started but hasn't, that's a bug
+                // on the export side, but we can recover from it now by
+                // starting the timer now.
+                expireStartedAt = restoreStartTimestamp
+            } else {
+                // 0 == hasn't started expiring.
+                expireStartedAt = 0
+            }
+
+            self.init(
+                expiresInSeconds: expiresInSeconds,
+                expireStartedAt: expireStartedAt,
+            )
+        }
     }
 }
 
@@ -62,8 +124,6 @@ extension BackupArchive {
         let author: RecipientId
         let directionalDetails: DirectionalDetails
         let dateCreated: UInt64
-        let expireStartDate: UInt64?
-        let expiresInMs: UInt64?
         let isSealedSender: Bool
         private(set) var chatItemType: ChatItemType
 
@@ -77,6 +137,8 @@ extension BackupArchive {
         mutating func addPastRevision(_ pastRevision: InteractionArchiveDetails) {
             pastRevisions.append(pastRevision)
         }
+
+        private(set) var pinMessageDetails: PinMessageDetails?
 
         // MARK: -
 
@@ -100,7 +162,7 @@ extension BackupArchive {
 
         // MARK: - Construction
 
-        public enum AuthorAddress {
+        enum AuthorAddress {
             case localUser
             case contact(BackupArchive.ContactAddress)
         }
@@ -109,22 +171,20 @@ extension BackupArchive {
             author: RecipientId,
             directionalDetails: DirectionalDetails,
             dateCreated: UInt64,
-            expireStartDate: UInt64?,
-            expiresInMs: UInt64?,
             isSealedSender: Bool,
             chatItemType: ChatItemType,
             isSmsPreviouslyRestoredFromBackup: Bool,
-            pastRevisions: [InteractionArchiveDetails]
+            pastRevisions: [InteractionArchiveDetails],
+            pinMessageDetails: PinMessageDetails?,
         ) {
             self.author = author
             self.directionalDetails = directionalDetails
             self.dateCreated = dateCreated
-            self.expireStartDate = expireStartDate
-            self.expiresInMs = expiresInMs
             self.isSealedSender = isSealedSender
             self.chatItemType = chatItemType
             self.isSmsPreviouslyRestoredFromBackup = isSmsPreviouslyRestoredFromBackup
             self.pastRevisions = pastRevisions
+            self.pinMessageDetails = pinMessageDetails
         }
 
         static func validateAndBuild(
@@ -132,15 +192,20 @@ extension BackupArchive {
             author: AuthorAddress,
             directionalDetails: DirectionalDetails,
             dateCreated: UInt64,
-            expireStartDate: UInt64?,
-            expiresInMs: UInt64?,
             isSealedSender: Bool,
             chatItemType: ChatItemType,
             isSmsPreviouslyRestoredFromBackup: Bool,
             pastRevisions: [InteractionArchiveDetails] = [],
             threadInfo: BackupArchive.ChatArchivingContext.CachedThreadInfo,
-            context: BackupArchive.RecipientArchivingContext
+            pinMessageDetails: PinMessageDetails?,
+            context: BackupArchive.RecipientArchivingContext,
         ) -> BackupArchive.ArchiveInteractionResult<Self> {
+            guard BackupArchive.Timestamps.isValid(dateCreated) else {
+                return .skippableInteraction(.timestampTooLarge)
+            }
+
+            var partialErrors = [BackupArchive.ArchiveFrameError]()
+
             var authorRecipientId: RecipientId
             var author = author
             switch author {
@@ -150,22 +215,11 @@ extension BackupArchive {
                 guard let recipientId = context[.contact(contactAddress)] else {
                     return .messageFailure([.archiveFrameError(
                         .referencedRecipientIdMissing(.contact(contactAddress)),
-                        interactionUniqueId
                     )])
                 }
                 authorRecipientId = recipientId
                 if authorRecipientId == context.localRecipientId {
                     author = .localUser
-                }
-            }
-
-            var partialErrors = [BackupArchive.ArchiveFrameError<BackupArchive.InteractionUniqueId>]()
-            for timestamp in [dateCreated, expireStartDate, expiresInMs] {
-                switch BackupArchive.Timestamps.validateTimestamp(timestamp).bubbleUp(Self.self, partialErrors: &partialErrors) {
-                case .continue:
-                    break
-                case .bubbleUpError(let error):
-                    return error
                 }
             }
 
@@ -189,10 +243,7 @@ extension BackupArchive {
                     // which is more trustworthy.
                     authorRecipientId = threadRecipientId
                     // Add a partial error so we log these.
-                    partialErrors.append(.archiveFrameError(
-                        .messageFromOtherRecipientInContactThread,
-                        interactionUniqueId
-                    ))
+                    partialErrors.append(.archiveFrameError(.messageFromOtherRecipientInContactThread))
                 }
             }
 
@@ -210,12 +261,11 @@ extension BackupArchive {
                 author: authorRecipientId,
                 directionalDetails: directionalDetails,
                 dateCreated: dateCreated,
-                expireStartDate: expireStartDate,
-                expiresInMs: expiresInMs,
                 isSealedSender: isSealedSender,
                 chatItemType: chatItemType,
                 isSmsPreviouslyRestoredFromBackup: isSmsPreviouslyRestoredFromBackup,
-                pastRevisions: pastRevisions
+                pastRevisions: pastRevisions,
+                pinMessageDetails: pinMessageDetails,
             )
             if partialErrors.isEmpty {
                 return .success(details)
@@ -333,6 +383,18 @@ extension BackupArchive {
         /// own stories; these replies would go into the Note To Self thread.
         /// We just drop these on export as they're meant to be impossible.
         case directStoryReplyInNoteToSelf
+
+        /// It's possible for us to create a thread-merge event without an ACI
+        /// author; for example, if we have an old chat with an E164, then learn
+        /// that E164's PNI later. We don't need to back these up (and the
+        /// LibSignal validator rejects them).
+        case threadMergeWithoutAciAuthor
+
+        /// It's possible for us to create a thread-merge event in our own Note
+        /// to Self; for example, if we have an old chat with an E164, then we
+        /// claim that E164 later. We don't need to back these up (and the
+        /// LibSignal validator rejects them).
+        case threadMergeInNoteToSelf
     }
 
     enum ArchiveInteractionResult<Component> {
@@ -347,10 +409,10 @@ extension BackupArchive {
 
         /// Some portion of the interaction failed to archive, but we can still archive the rest of it.
         /// e.g. some recipient details are missing, so we archive without that recipient.
-        case partialFailure(Component, [ArchiveFrameError<InteractionUniqueId>])
+        case partialFailure(Component, [ArchiveFrameError])
         /// The entire message failed and should be skipped.
         /// Other messages are unaffected.
-        case messageFailure([ArchiveFrameError<InteractionUniqueId>])
+        case messageFailure([ArchiveFrameError])
         /// Catastrophic failure, which should stop _all_ message archiving.
         case completeFailure(FatalArchivingError)
     }
@@ -362,10 +424,10 @@ extension BackupArchive {
         case unrecognizedEnum(UnrecognizedEnumError)
         /// Some portion of the interaction failed to restore, but we can still restore the rest of it.
         /// e.g. a reaction failed to parse, so we just drop that reaction.
-        case partialRestore(Component, [RestoreFrameError<ChatItemId>])
+        case partialRestore(Component, [RestoreFrameError])
         /// The entire message failed and should be skipped.
         /// Other messages are unaffected.
-        case messageFailure([RestoreFrameError<ChatItemId>])
+        case messageFailure([RestoreFrameError])
     }
 }
 
@@ -409,7 +471,7 @@ extension BackupArchive.ArchiveInteractionResult {
     /// }
     func bubbleUp<ErrorComponentType>(
         _ errorComponentType: ErrorComponentType.Type = Component.self,
-        partialErrors: inout [BackupArchive.ArchiveFrameError<BackupArchive.InteractionUniqueId>]
+        partialErrors: inout [BackupArchive.ArchiveFrameError],
     ) -> BubbleUp<Component, ErrorComponentType> {
         switch self {
         case .success(let value):
@@ -423,6 +485,7 @@ extension BackupArchive.ArchiveInteractionResult {
         // These types are just bubbled up as-is
         case .skippableInteraction(let skippableInteraction):
             return .bubbleUpError(.skippableInteraction(skippableInteraction))
+
         case .completeFailure(let error):
             return .bubbleUpError(.completeFailure(error))
 
@@ -472,7 +535,7 @@ extension BackupArchive.RestoreInteractionResult {
     /// }
     func bubbleUp<ErrorComponentType>(
         _ errorComponentType: ErrorComponentType.Type = Component.self,
-        partialErrors: inout [BackupArchive.RestoreFrameError<BackupArchive.ChatItemId>]
+        partialErrors: inout [BackupArchive.RestoreFrameError],
     ) -> BubbleUp<Component, ErrorComponentType> {
         switch self {
         case .success(let component):

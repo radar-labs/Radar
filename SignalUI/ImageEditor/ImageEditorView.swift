@@ -7,6 +7,8 @@ import SignalServiceKit
 
 protocol ImageEditorViewDelegate: AnyObject {
 
+    func imageEditorViewModelDidChange(_ imageEditorView: ImageEditorView)
+
     func imageEditorView(_ imageEditorView: ImageEditorView, didRequestAddTextItem textItem: ImageEditorTextItem)
 
     func imageEditorView(_ imageEditorView: ImageEditorView, didTapTextItem textItem: ImageEditorTextItem)
@@ -22,7 +24,7 @@ protocol ImageEditorViewDelegate: AnyObject {
 
 // A view for editing outgoing image attachments.
 // It can also be used to render the final output.
-class ImageEditorView: UIView {
+class ImageEditorView: UIView, AttachmentPrepContentView, UIGestureRecognizerDelegate, ImageEditorModelObserver {
 
     weak var delegate: ImageEditorViewDelegate?
 
@@ -30,25 +32,37 @@ class ImageEditorView: UIView {
 
     let canvasView: ImageEditorCanvasView
 
-    private let trashViewSize: CGFloat = 42
-    private lazy var trashView: UIView = {
-        let backgroundView = UIView()
-        backgroundView.layoutMargins = .init(margin: 9)
+    private static let trashViewSize: CGFloat = 42
 
-        let image = UIImage(named: "trash")
+    private lazy var trashView: UIView = {
+        let image = UIImage(imageLiteralResourceName: "trash")
+
+        let backgroundView = UIView()
+        backgroundView.clipsToBounds = true
+        backgroundView.backgroundColor = .ows_blackAlpha40
+        if #available(iOS 26, *) {
+            backgroundView.cornerConfiguration = .capsule()
+        } else {
+            backgroundView.layer.cornerRadius = Self.trashViewSize / 2
+        }
+        backgroundView.isUserInteractionEnabled = false
+
         let imageView = UIImageView(image: image)
         imageView.tintColor = .white
-        imageView.contentMode = .scaleAspectFill
-        imageView.isUserInteractionEnabled = false
-
-        backgroundView.layer.cornerRadius = trashViewSize / 2
-        backgroundView.backgroundColor = .ows_blackAlpha40
-        backgroundView.isUserInteractionEnabled = false
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
         backgroundView.addSubview(imageView)
-        imageView.autoPinEdgesToSuperviewMargins()
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 9),
+            imageView.centerYAnchor.constraint(equalTo: backgroundView.centerYAnchor),
+
+            imageView.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor, constant: 9),
+            imageView.centerXAnchor.constraint(equalTo: backgroundView.centerXAnchor),
+        ])
 
         return backgroundView
     }()
+
     private var isTrashShowing: Bool {
         get {
             trashView.alpha > 0
@@ -57,6 +71,7 @@ class ImageEditorView: UIView {
             trashView.alpha = newValue ? 1 : 0
         }
     }
+
     private var isHoveringOverTrash = false {
         didSet {
             guard isHoveringOverTrash != oldValue else { return }
@@ -74,9 +89,14 @@ class ImageEditorView: UIView {
         model.add(observer: self)
     }
 
-    @available(*, unavailable, message: "use other init() instead.")
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    // Allows us to set `contentMode` on ImageEditorCanvasView from outside.
+    override var contentMode: UIView.ContentMode {
+        get { canvasView.contentMode }
+        set { canvasView.contentMode = newValue }
     }
 
     // MARK: - Views
@@ -88,6 +108,7 @@ class ImageEditorView: UIView {
         gestureRecognizer.delegate = self
         return gestureRecognizer
     }()
+
     private lazy var tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTapGesture(_:)))
     private lazy var pinchGestureRecognizer: ImageEditorPinchGestureRecognizer = {
         let gestureRecognizer = ImageEditorPinchGestureRecognizer(target: self, action: #selector(handlePinchGesture(_:)))
@@ -97,24 +118,29 @@ class ImageEditorView: UIView {
 
     func configureSubviews() {
         canvasView.configureSubviews()
+        canvasView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(canvasView)
-        canvasView.autoPinEdgesToSuperviewEdges()
-
-        canvasView.contentView.addSubview(trashView)
+        NSLayoutConstraint.activate([
+            canvasView.topAnchor.constraint(equalTo: topAnchor),
+            canvasView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            canvasView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            canvasView.bottomAnchor.constraint(equalTo: bottomAnchor),
+        ])
 
         // Center trash view instead of aligning the bottom so that it
         // resizes from the center when hovering over it.
         // 20 spacing to bottom + half the height for the center point.
-        let distanceFromCenterToBottom = 20 + trashViewSize / 2
-        trashView.centerYAnchor.constraint(
-            equalTo: canvasView.contentView.bottomAnchor,
-            constant: -distanceFromCenterToBottom
-        )
-        .isActive = true
-
-        trashView.autoHCenterInSuperview()
-        trashView.autoSetDimensions(to: .square(trashViewSize))
-        trashView.layer.zPosition = ImageEditorCanvasView.trashLazerZ
+        trashView.translatesAutoresizingMaskIntoConstraints = false
+        canvasView.imageLayerView.addSubview(trashView)
+        let distanceFromCenterToBottom = 20 + Self.trashViewSize / 2
+        NSLayoutConstraint.activate([
+            trashView.centerXAnchor.constraint(equalTo: canvasView.centerXAnchor),
+            trashView.centerYAnchor.constraint(
+                equalTo: canvasView.bottomAnchor,
+                constant: -distanceFromCenterToBottom,
+            ),
+        ])
+        trashView.layer.zPosition = ImageEditorCanvasView.trashLayerZ
         isTrashShowing = false
 
         addGestureRecognizer(moveTextGestureRecognizer)
@@ -164,7 +190,7 @@ class ImageEditorView: UIView {
         canvasView.shouldFadeTransformableItem = isHoveringOverTrash
 
         UIView.animate(withDuration: 0.15) {
-            self.trashView.transform = isHoveringOverTrash ? .scale(4/3) : .identity
+            self.trashView.transform = isHoveringOverTrash ? .scale(4 / 3) : .identity
         }
 
         if isHoveringOverTrash {
@@ -180,12 +206,12 @@ class ImageEditorView: UIView {
     struct TextInteractionModes: OptionSet {
         let rawValue: Int
 
-        static let tap    = TextInteractionModes(rawValue: 1 << 0)
+        static let tap = TextInteractionModes(rawValue: 1 << 0)
         static let select = TextInteractionModes(rawValue: 1 << 1 | 1 << 0) // "select" requires "tap" to be supported
-        static let move   = TextInteractionModes(rawValue: 1 << 2)
+        static let move = TextInteractionModes(rawValue: 1 << 2)
         static let resize = TextInteractionModes(rawValue: 1 << 3)
 
-        static let all: TextInteractionModes = [ .tap, .select, .move, .resize ]
+        static let all: TextInteractionModes = [.tap, .select, .move, .resize]
     }
 
     var textInteractionModes: TextInteractionModes = [] {
@@ -206,27 +232,34 @@ class ImageEditorView: UIView {
             // Update the tooltip when a new item is selected.
             // Dragging a sticker hides the tooltip, so avoid
             // showing it if it was selected by a drag.
-            if newValueIsDifferent && movingItem == nil {
+            if newValueIsDifferent, movingItem == nil {
                 canvasView.updateTooltip()
             }
         }
     }
 
     func updateSelectedTextItem(withColor color: ColorPickerBarColor) {
-        if let selectedTextItemId = selectedTransformableItemID,
-           let textItem = model.item(forId: selectedTextItemId) as? ImageEditorTextItem {
-            let newTextItem = textItem.copy(color: color)
+        if
+            let selectedTextItemId = selectedTransformableItemID,
+            let textItem = model.item(forId: selectedTextItemId) as? ImageEditorTextItem
+        {
+            let newTextItem = textItem.with(color: color)
             model.replace(item: newTextItem)
         }
     }
 
-    func createNewTextItem(withColor color: ColorPickerBarColor = ColorPickerBarColor.white,
-                           textStyle: MediaTextView.TextStyle = .regular,
-                           decorationStyle: MediaTextView.DecorationStyle = .none) -> ImageEditorTextItem {
+    func createNewTextItem(
+        withColor color: ColorPickerBarColor = ColorPickerBarColor.white,
+        textStyle: MediaTextView.TextStyle = .regular,
+        decorationStyle: MediaTextView.DecorationStyle = .none,
+    ) -> ImageEditorTextItem {
         let viewSize = canvasView.gestureReferenceView.bounds.size
         let imageSize = model.srcImageSizePixels
-        let imageFrame = ImageEditorCanvasView.imageFrame(forViewSize: viewSize, imageSize: imageSize,
-                                                          transform: model.currentTransform())
+        let imageFrame = ImageEditorCanvasView.imageFrame(
+            forViewSize: viewSize,
+            imageSize: imageSize,
+            transform: model.currentTransform(),
+        )
 
         let textWidthPoints = viewSize.width * ImageEditorTextItem.kDefaultUnitWidth
         let textWidthUnit = textWidthPoints / imageFrame.size.width
@@ -237,13 +270,15 @@ class ImageEditorView: UIView {
         // Similarly, the size of the text item shuo
         let scaling = 1 / model.currentTransform().scaling
 
-        let textItem = ImageEditorTextItem.empty(withColor: color,
-                                                 textStyle: textStyle,
-                                                 decorationStyle: decorationStyle,
-                                                 unitWidth: textWidthUnit,
-                                                 fontReferenceImageWidth: imageFrame.size.width,
-                                                 scaling: scaling,
-                                                 rotationRadians: rotationRadians)
+        let textItem = ImageEditorTextItem.empty(
+            withColor: color,
+            textStyle: textStyle,
+            decorationStyle: decorationStyle,
+            unitWidth: textWidthUnit,
+            fontReferenceImageWidth: imageFrame.size.width,
+            scaling: scaling,
+            rotationRadians: rotationRadians,
+        )
         return textItem
     }
 
@@ -253,7 +288,7 @@ class ImageEditorView: UIView {
         let imageFrame = ImageEditorCanvasView.imageFrame(
             forViewSize: viewSize,
             imageSize: imageSize,
-            transform: model.currentTransform()
+            transform: model.currentTransform(),
         )
 
         let rotationRadians = -model.currentTransform().rotationRadians
@@ -263,7 +298,7 @@ class ImageEditorView: UIView {
             sticker: sticker,
             referenceImageWidth: imageFrame.size.width,
             rotationRadians: rotationRadians,
-            scaling: scaling
+            scaling: scaling,
         )
     }
 
@@ -300,14 +335,16 @@ class ImageEditorView: UIView {
             return
         }
 
-        guard let itemID = textLayer.name,
-              let item = model.item(forId: itemID) as? ImageEditorTransformable else {
+        guard
+            let itemID = textLayer.name,
+            let item = model.item(forId: itemID) as? ImageEditorTransformable
+        else {
             owsFailDebug("Missing or invalid text item.")
             return
         }
 
         // Text objects are selectable: select object if not selected yet...
-        if textInteractionModes.contains(.select) && item.itemId != selectedTransformableItemID {
+        if textInteractionModes.contains(.select), item.itemId != selectedTransformableItemID {
             selectedTransformableItemID = item.itemId
             delegate?.imageEditorViewDidUpdateSelection(self)
         }
@@ -323,11 +360,11 @@ class ImageEditorView: UIView {
             switch storySticker {
             case .clockDigital(let clockStyle):
                 let newSticker = clockStyle.stickerWithNextStyle()
-                let newStickerItem = stickerItem.copy(sticker: newSticker)
+                let newStickerItem = stickerItem.with(sticker: newSticker)
                 model.replace(item: newStickerItem)
             case .clockAnalog(let clockStyle):
                 let newSticker = clockStyle.stickerWithNextStyle()
-                let newStickerItem = stickerItem.copy(sticker: newSticker)
+                let newStickerItem = stickerItem.with(sticker: newSticker)
                 model.replace(item: newStickerItem)
             }
             ImpactHapticFeedback.impactOccurred(style: .medium)
@@ -350,9 +387,11 @@ class ImageEditorView: UIView {
         switch gestureRecognizer.state {
         case .began:
             let pinchState = gestureRecognizer.pinchStateStart
-            guard let textLayer = transformableLayer(forLocation: pinchState.centroid),
-                  let itemID = textLayer.name,
-                  itemID == selectedTransformableItemID else {
+            guard
+                let textLayer = transformableLayer(forLocation: pinchState.centroid),
+                let itemID = textLayer.name,
+                itemID == selectedTransformableItemID
+            else {
                 // The pinch needs to start centered on selected text item.
                 return
             }
@@ -372,26 +411,33 @@ class ImageEditorView: UIView {
             let viewBounds = view.bounds
             let locationStart = gestureRecognizer.pinchStateStart.centroid
             let locationNow = gestureRecognizer.pinchStateLast.centroid
-            let gestureStartImageUnit = ImageEditorCanvasView.locationImageUnit(forLocationInView: locationStart,
-                                                                                viewBounds: viewBounds,
-                                                                                model: model,
-                                                                                transform: model.currentTransform())
-            let gestureNowImageUnit = ImageEditorCanvasView.locationImageUnit(forLocationInView: locationNow,
-                                                                              viewBounds: viewBounds,
-                                                                              model: model,
-                                                                              transform: model.currentTransform())
+            let gestureStartImageUnit = ImageEditorCanvasView.locationImageUnit(
+                forLocationInView: locationStart,
+                viewBounds: viewBounds,
+                model: model,
+                transform: model.currentTransform(),
+            )
+            let gestureNowImageUnit = ImageEditorCanvasView.locationImageUnit(
+                forLocationInView: locationNow,
+                viewBounds: viewBounds,
+                model: model,
+                transform: model.currentTransform(),
+            )
             let gestureDeltaImageUnit = gestureNowImageUnit.minus(gestureStartImageUnit)
             let unitCenter = CGPoint.clamp01(item.unitCenter.plus(gestureDeltaImageUnit))
 
             // NOTE: We use max(1, ...) to avoid divide-by-zero.
-            let newScaling = CGFloat.clamp(item.scaling * gestureRecognizer.pinchStateLast.distance / max(1.0, gestureRecognizer.pinchStateStart.distance),
-                                           min: ImageEditorTextItem.kMinScaling,
-                                           max: ImageEditorTextItem.kMaxScaling)
+            let newScaling = CGFloat.clamp(
+                item.scaling * gestureRecognizer.pinchStateLast.distance / max(1.0, gestureRecognizer.pinchStateStart.distance),
+                min: ImageEditorTextItem.kMinScaling,
+                max: ImageEditorTextItem.kMaxScaling,
+            )
 
             let newRotationRadians = item.rotationRadians + gestureRecognizer.pinchStateLast.angleRadians - gestureRecognizer.pinchStateStart.angleRadians
 
-            let newItem = item.copy(unitCenter: unitCenter).copy(scaling: newScaling,
-                                                                     rotationRadians: newRotationRadians)
+            let newItem = item
+                .with(unitCenter: unitCenter)
+                .with(scaling: newScaling, rotationRadians: newRotationRadians)
 
             if pinchHasChanged {
                 model.replace(item: newItem, suppressUndo: true)
@@ -417,6 +463,7 @@ class ImageEditorView: UIView {
             updateControls()
         }
     }
+
     private var movingTextStartUnitCenter: CGPoint?
     private var movingTextHasMoved = false
 
@@ -448,8 +495,10 @@ class ImageEditorView: UIView {
                 owsFailDebug("No text layer")
                 return
             }
-            guard let itemID = textLayer.name,
-                  let item = model.item(forId: itemID) as? ImageEditorTransformable else {
+            guard
+                let itemID = textLayer.name,
+                let item = model.item(forId: itemID) as? ImageEditorTransformable
+            else {
                 owsFailDebug("Missing or invalid text item.")
                 return
             }
@@ -472,7 +521,7 @@ class ImageEditorView: UIView {
                 owsFailDebug("Missing locationStart.")
                 return
             }
-            guard let movingTextStartUnitCenter = movingTextStartUnitCenter else {
+            guard let movingTextStartUnitCenter else {
                 owsFailDebug("Missing movingTextStartUnitCenter.")
                 return
             }
@@ -480,17 +529,21 @@ class ImageEditorView: UIView {
             let view = canvasView.gestureReferenceView
             let viewBounds = view.bounds
             let locationInView = gestureRecognizer.location(in: view)
-            let gestureStartImageUnit = ImageEditorCanvasView.locationImageUnit(forLocationInView: locationStart,
-                                                                          viewBounds: viewBounds,
-                                                                          model: model,
-                                                                          transform: model.currentTransform())
-            let gestureNowImageUnit = ImageEditorCanvasView.locationImageUnit(forLocationInView: locationInView,
-                                                                        viewBounds: viewBounds,
-                                                                        model: model,
-                                                                        transform: model.currentTransform())
+            let gestureStartImageUnit = ImageEditorCanvasView.locationImageUnit(
+                forLocationInView: locationStart,
+                viewBounds: viewBounds,
+                model: model,
+                transform: model.currentTransform(),
+            )
+            let gestureNowImageUnit = ImageEditorCanvasView.locationImageUnit(
+                forLocationInView: locationInView,
+                viewBounds: viewBounds,
+                model: model,
+                transform: model.currentTransform(),
+            )
             let gestureDeltaImageUnit = gestureNowImageUnit.minus(gestureStartImageUnit)
             let unitCenter = CGPoint.clamp01(movingTextStartUnitCenter.plus(gestureDeltaImageUnit))
-            let newItem = item.copy(unitCenter: unitCenter)
+            let newItem = item.with(unitCenter: unitCenter)
 
             if movingTextHasMoved {
                 model.replace(item: newItem, suppressUndo: true)
@@ -520,29 +573,36 @@ class ImageEditorView: UIView {
                 movingItem = nil
                 isHoveringOverTrash = false
             }
+
         default:
             movingItem = nil
         }
     }
-}
 
-// MARK: - Corner Radius
+    // MARK: - Corner Radius
 
-extension ImageEditorView {
+    static let defaultCornerRadius: CGFloat = if #available(iOS 26, *) { 26 } else { 18 }
 
-    static let defaultCornerRadius: CGFloat = 18
+    private var _hasRoundedCorners: Bool = false
 
-    func setHasRoundCorners(_ roundCorners: Bool, animationDuration: TimeInterval = 0) {
-        canvasView.setCornerRadius(roundCorners ? ImageEditorView.defaultCornerRadius : 0,
-                                   animationDuration: animationDuration)
+    var hasRoundedCorners: Bool {
+        get { _hasRoundedCorners }
+        set { setHasRoundedCorners(newValue, animationDuration: 0) }
     }
-}
 
-// MARK: -
+    func setHasRoundedCorners(_ hasRoundedCorners: Bool, animationDuration: TimeInterval) {
+        guard _hasRoundedCorners != hasRoundedCorners else { return }
 
-extension ImageEditorView: UIGestureRecognizerDelegate {
+        _hasRoundedCorners = hasRoundedCorners
+        canvasView.setCornerRadius(
+            hasRoundedCorners ? ImageEditorView.defaultCornerRadius : 0,
+            animationDuration: animationDuration,
+        )
+    }
 
-    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+    // MARK: - UIGestureRecognizerDelegate
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         guard moveTextGestureRecognizer == gestureRecognizer else {
             owsFailDebug("Unexpected gesture.")
             return false
@@ -552,15 +612,12 @@ extension ImageEditorView: UIGestureRecognizerDelegate {
         let isInTextArea = self.transformableLayer(forLocation: location) != nil
         return isInTextArea
     }
-}
 
-// MARK: -
-
-extension ImageEditorView: ImageEditorModelObserver {
+    // MARK: - ImageEditorModelObserver
 
     func imageEditorModelDidChange(before: ImageEditorContents, after: ImageEditorContents) {
+        delegate?.imageEditorViewModelDidChange(self)
     }
 
-    func imageEditorModelDidChange(changedItemIds: [String]) {
-    }
+    func imageEditorModelDidChange(changedItemIds: [String]) { }
 }

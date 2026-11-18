@@ -19,7 +19,7 @@ struct UploadEndpointCDN2: UploadEndpoint {
         form: Upload.Form,
         signalService: OWSSignalServiceProtocol,
         fileSystem: Upload.Shims.FileSystem,
-        logger: PrefixedLogger
+        logger: PrefixedLogger,
     ) {
         self.uploadForm = form
         self.signalService = signalService
@@ -31,7 +31,7 @@ struct UploadEndpointCDN2: UploadEndpoint {
     //
     // See: https://cloud.google.com/storage/docs/performing-resumable-uploads#xml-api
     // NOTE: follow the "XML API" instructions.
-    internal func fetchResumableUploadLocation() async throws -> URL {
+    func fetchResumableUploadLocation() async throws -> URL {
         return try await _fetchResumableUploadLocation(attemptCount: 0)
     }
 
@@ -40,7 +40,7 @@ struct UploadEndpointCDN2: UploadEndpoint {
             logger.info("attemptCount: \(attemptCount)")
         }
 
-        let urlSession = await signalService.sharedUrlSessionForCdn(cdnNumber: uploadForm.cdnNumber, maxResponseSize: nil)
+        let urlSession = await signalService.sharedUrlSessionForCdn(cdnNumber: uploadForm.cdnNumber)
         let urlString = uploadForm.signedUploadLocation
         guard urlString.lowercased().hasPrefix("http") else {
             throw OWSAssertionError("Invalid signedUploadLocation.")
@@ -57,11 +57,12 @@ struct UploadEndpointCDN2: UploadEndpoint {
                 urlString,
                 method: .post,
                 headers: headers,
-                body: nil
+                body: nil,
+                maxResponseSize: .max,
             )
 
             guard response.responseStatusCode == 201 else {
-                throw OWSAssertionError("Invalid statusCode: \(response.responseStatusCode).")
+                throw response.asError()
             }
             guard
                 let locationHeader = response.headers["location"],
@@ -84,19 +85,20 @@ struct UploadEndpointCDN2: UploadEndpoint {
     }
 
     // Determine how much has already been uploaded.
-    internal func getResumableUploadProgress<Metadata: UploadMetadata>(
-        attempt: Upload.Attempt<Metadata>
+    func getResumableUploadProgress<Metadata: UploadMetadata>(
+        attempt: Upload.Attempt<Metadata>,
     ) async throws -> Upload.ResumeProgress {
         var headers = HttpHeaders()
         headers["Content-Length"] = "0"
         headers["Content-Range"] = "bytes */\(attempt.encryptedDataLength)"
 
-        let urlSession = await signalService.sharedUrlSessionForCdn(cdnNumber: uploadForm.cdnNumber, maxResponseSize: nil)
+        let urlSession = await signalService.sharedUrlSessionForCdn(cdnNumber: uploadForm.cdnNumber)
         let response = try await urlSession.performRequest(
             attempt.uploadLocation.absoluteString,
             method: .put,
             headers: headers,
-            body: nil
+            body: nil,
+            maxResponseSize: .max,
         )
 
         let statusCode = response.responseStatusCode
@@ -120,17 +122,14 @@ struct UploadEndpointCDN2: UploadEndpoint {
         let expectedPrefix = "bytes=0-"
         guard
             let rangeHeader = response.headers["range"],
-            rangeHeader.hasPrefix(expectedPrefix)
+            let rangePrefix = rangeHeader.range(of: expectedPrefix, options: [.anchored])
         else {
             // Return zero to restart the upload.
             return .uploaded(0)
         }
 
-        let rangeEndString = rangeHeader.suffix(rangeHeader.count - expectedPrefix.count)
-        guard
-            !rangeEndString.isEmpty,
-            let rangeEnd = Int(rangeEndString)
-        else {
+        let rangeEndString = rangeHeader[rangePrefix.upperBound...]
+        guard !rangeEndString.isEmpty, let rangeEnd = UInt64(rangeEndString) else {
             logger.warn("Invalid Range header: \(rangeHeader) (\(rangeEndString)).")
             // There was a range header present, but it was
             // invalid - restart the upload from scratch
@@ -146,9 +145,9 @@ struct UploadEndpointCDN2: UploadEndpoint {
     }
 
     func performUpload<Metadata: UploadMetadata>(
-        startPoint: Int,
+        startPoint: UInt64,
         attempt: Upload.Attempt<Metadata>,
-        progress: OWSProgressSource?
+        progressBlock: OWSURLSession.ProgressBlock,
     ) async throws(Upload.Error) {
         let totalDataLength = attempt.encryptedDataLength
         var headers = HttpHeaders()
@@ -156,7 +155,7 @@ struct UploadEndpointCDN2: UploadEndpoint {
         let (uploadData, truncated) = try readUploadFileChunk(
             fileSystem: fileSystem,
             url: attempt.fileUrl,
-            startIndex: startPoint
+            startIndex: startPoint,
         )
 
         guard uploadData.count > 0 else {
@@ -165,31 +164,32 @@ struct UploadEndpointCDN2: UploadEndpoint {
         }
 
         headers["Content-Length"] = "\(uploadData.count)"
-        if startPoint > 0 {
+        if truncated || startPoint > 0 {
             // Example: Resuming after uploading 2359296 of 7351375 bytes.
             // Content-Range: bytes 2359296-7351374/7351375
             // Content-Length: 4992079
             // Since this is an index into the range, subtract one from the byte count uploaded
-            headers["Content-Range"] = "bytes \(startPoint)-\(startPoint + uploadData.count - 1)/\(totalDataLength)"
+            // `truncated` (chunked) uploads should always add this header, even on the first request
+            headers["Content-Range"] = "bytes \(startPoint)-\(startPoint + UInt64(uploadData.count) - 1)/\(totalDataLength)"
         }
 
         do {
-            let urlSession = await signalService.sharedUrlSessionForCdn(cdnNumber: uploadForm.cdnNumber, maxResponseSize: nil)
+            let urlSession = await signalService.sharedUrlSessionForCdn(cdnNumber: uploadForm.cdnNumber)
             let response = try await urlSession.performUpload(
                 attempt.uploadLocation.absoluteString,
                 method: .put,
                 headers: headers,
                 requestData: uploadData,
-                progress: progress
+                maxResponseSize: .max,
+                progressBlock: progressBlock,
             )
             switch response.responseStatusCode {
             case 200, 201:
-                if truncated {
-                    // The upload succeeded in uploading a chunk of data. Throw this error
-                    // to the caller, which should trigger an immediate resume with the next chunk
-                    throw Upload.Error.partialUpload(bytesUploaded: UInt32(clamping: uploadData.count))
-                }
                 return
+            case 308 where truncated:
+                // The upload succeeded in uploading a chunk of data. Throw this error
+                // to the caller, which should trigger an immediate resume with the next chunk
+                throw Upload.Error.partialUpload(bytesUploaded: UInt64(uploadData.count))
             default:
                 throw Upload.Error.unknown
             }
@@ -209,7 +209,7 @@ struct UploadEndpointCDN2: UploadEndpoint {
             switch error {
             case let error as Upload.Error:
                 throw error
-            case let error as OWSHTTPError where (500...599).contains(error.responseStatusCode):
+            case let error as OWSHTTPError where error.is5xxServiceResponse:
                 // On 5XX errors, clients should try to resume the upload
                 attempt.logger.warn("Temporary upload failure [\(error.responseStatusCode)], retry.")
                 // Check for any progress here

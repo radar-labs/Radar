@@ -52,7 +52,7 @@ import UIKit
 // ImageEditorCanvasView.imageFrame(forViewSize:...).  Transforming between
 // the "image" and "canvas" coordinate systems is done with that image frame.
 
-class ImageEditorTransform: NSObject {
+struct ImageEditorTransform: Equatable, Hashable, CustomStringConvertible {
     // The outputSizePixels is used to specify the aspect ratio and size of the
     // output.
     let outputSizePixels: CGSize
@@ -66,29 +66,19 @@ class ImageEditorTransform: NSObject {
     // Flipping is horizontal.
     let isFlipped: Bool
 
-    init(outputSizePixels: CGSize,
-         unitTranslation: CGPoint,
-         rotationRadians: CGFloat,
-         scaling: CGFloat,
-         isFlipped: Bool) {
-        self.outputSizePixels = outputSizePixels
-        self.unitTranslation = unitTranslation
-        self.rotationRadians = rotationRadians
-        self.scaling = scaling
-        self.isFlipped = isFlipped
-    }
-
-    class func defaultTransform(srcImageSizePixels: CGSize) -> ImageEditorTransform {
+    static func defaultTransform(srcImageSizePixels: CGSize) -> ImageEditorTransform {
         // It shouldn't be necessary normalize the default transform, but we do so to be safe.
-        return ImageEditorTransform(outputSizePixels: srcImageSizePixels,
-                                    unitTranslation: .zero,
-                                    rotationRadians: 0.0,
-                                    scaling: 1.0,
-                                    isFlipped: false).normalize(srcImageSizePixels: srcImageSizePixels)
+        ImageEditorTransform(
+            outputSizePixels: srcImageSizePixels,
+            unitTranslation: .zero,
+            rotationRadians: 0.0,
+            scaling: 1.0,
+            isFlipped: false,
+        ).normalized(srcImageSizePixels: srcImageSizePixels)
     }
 
     var isNonDefault: Bool {
-        return !isEqual(ImageEditorTransform.defaultTransform(srcImageSizePixels: outputSizePixels))
+        self != ImageEditorTransform.defaultTransform(srcImageSizePixels: outputSizePixels)
     }
 
     func affineTransform(viewSize: CGSize) -> CGAffineTransform {
@@ -98,8 +88,10 @@ class ImageEditorTransform: NSObject {
         // (in this case the center of the content).
         //
         // NOTE: CGAffineTransform transforms are composed in reverse order.
-        let transform = CGAffineTransform.identity.translate(translation).rotated(by: rotationRadians).scaledBy(x: scaling, y: scaling)
-        return transform
+        return CGAffineTransform.identity
+            .translate(translation)
+            .rotated(by: rotationRadians)
+            .scaledBy(x: scaling, y: scaling)
     }
 
     func transform3D(viewSize: CGSize) -> CATransform3D {
@@ -118,7 +110,7 @@ class ImageEditorTransform: NSObject {
 
     // This method normalizes a "proposed" transform (self) into
     // one that is guaranteed to be valid.
-    func normalize(srcImageSizePixels: CGSize) -> ImageEditorTransform {
+    func normalized(srcImageSizePixels: CGSize) -> ImageEditorTransform {
         // Normalize scaling.
         // The "src/background" image is rendered at a size that will fill
         // the canvas bounds if scaling = 1.0 and translation = .zero.
@@ -154,11 +146,13 @@ class ImageEditorTransform: NSObject {
         let viewBounds = CGRect(origin: .zero, size: self.outputSizePixels)
         // This "naive" transform represents the proposed transform
         // with no translation.
-        let naiveTransform = ImageEditorTransform(outputSizePixels: outputSizePixels,
-                                                  unitTranslation: .zero,
-                                                  rotationRadians: rotationRadians,
-                                                  scaling: scaling,
-                                                  isFlipped: self.isFlipped)
+        let naiveTransform = ImageEditorTransform(
+            outputSizePixels: outputSizePixels,
+            unitTranslation: .zero,
+            rotationRadians: rotationRadians,
+            scaling: scaling,
+            isFlipped: self.isFlipped,
+        )
         let naiveAffineTransform = naiveTransform.affineTransform(viewSize: viewBounds.size)
         var naiveViewportMinCanvas = CGPoint.zero
         var naiveViewportMaxCanvas = CGPoint.zero
@@ -173,7 +167,7 @@ class ImageEditorTransform: NSObject {
             viewBounds.topLeft,
             viewBounds.topRight,
             viewBounds.bottomLeft,
-            viewBounds.bottomRight
+            viewBounds.bottomRight,
         ] {
             let naiveViewCornerInCanvas = viewCorner.minus(viewBounds.center).applyingInverse(naiveAffineTransform).plus(viewBounds.center)
             if isFirstCorner {
@@ -221,35 +215,26 @@ class ImageEditorTransform: NSObject {
         let clampedTranslationInView = clampedTranslationInCanvas.applying(naiveAffineTransform)
         let unitTranslation = clampedTranslationInView.toUnitCoordinates(viewBounds: viewBounds, shouldClamp: false)
 
-        return ImageEditorTransform(outputSizePixels: outputSizePixels,
-                                    unitTranslation: unitTranslation,
-                                    rotationRadians: rotationRadians,
-                                    scaling: scaling,
-                                    isFlipped: self.isFlipped)
+        return ImageEditorTransform(
+            outputSizePixels: outputSizePixels,
+            unitTranslation: unitTranslation,
+            rotationRadians: rotationRadians,
+            scaling: scaling,
+            isFlipped: self.isFlipped,
+        )
     }
 
-    override func isEqual(_ object: Any?) -> Bool {
-        guard let other = object as? ImageEditorTransform  else {
-            return false
-        }
-        return (outputSizePixels == other.outputSizePixels &&
-                unitTranslation == other.unitTranslation &&
-                rotationRadians == other.rotationRadians &&
-                scaling == other.scaling &&
-                isFlipped == other.isFlipped)
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(outputSizePixels.width)
+        hasher.combine(outputSizePixels.height)
+        hasher.combine(unitTranslation.x)
+        hasher.combine(unitTranslation.y)
+        hasher.combine(rotationRadians)
+        hasher.combine(scaling)
+        hasher.combine(isFlipped)
     }
 
-    override var hash: Int {
-        return (outputSizePixels.width.hashValue ^
-                outputSizePixels.height.hashValue ^
-                unitTranslation.x.hashValue ^
-                unitTranslation.y.hashValue ^
-                rotationRadians.hashValue ^
-                scaling.hashValue ^
-                isFlipped.hashValue)
-    }
-
-    open override var description: String {
-        return "[outputSizePixels: \(outputSizePixels), unitTranslation: \(unitTranslation), rotationRadians: \(rotationRadians), scaling: \(scaling), isFlipped: \(isFlipped)]"
+    var description: String {
+        "[outputSizePixels: \(outputSizePixels), unitTranslation: \(unitTranslation), rotationRadians: \(rotationRadians), scaling: \(scaling), isFlipped: \(isFlipped)]"
     }
 }

@@ -10,8 +10,10 @@ import SignalServiceKit
 import SignalUI
 
 protocol GroupThreadCallDelegate: AnyObject {
-    @MainActor func groupThreadCallRequestMembershipProof(_ call: GroupThreadCall)
-    @MainActor func groupThreadCallRequestGroupMembers(_ call: GroupThreadCall)
+    @MainActor
+    func groupThreadCallRequestMembershipProof(_ call: GroupThreadCall)
+    @MainActor
+    func groupThreadCallRequestGroupMembers(_ call: GroupThreadCall)
 }
 
 final class GroupThreadCall: Signal.GroupCall {
@@ -25,14 +27,14 @@ final class GroupThreadCall: Signal.GroupCall {
         delegate: any GroupThreadCallDelegate,
         ringRtcCall: SignalRingRTC.GroupCall,
         groupId: GroupIdentifier,
-        videoCaptureController: VideoCaptureController
+        videoCaptureController: VideoCaptureController,
     ) {
         self.delegate = delegate
         self.groupId = groupId
 
         let databaseStorage = SSKEnvironment.shared.databaseStorageRef
         let groupThread = databaseStorage.read { tx in
-            return TSGroupThread.fetch(forGroupId: groupId, tx: tx)
+            return TSGroupThread.fetchThread(forGroupId: groupId, tx: tx)
         }
         guard let groupThread else {
             owsFailDebug("Missing thread for active call.")
@@ -44,7 +46,7 @@ final class GroupThreadCall: Signal.GroupCall {
         super.init(
             audioDescription: "[SignalCall] with group \(groupId)",
             ringRtcCall: ringRtcCall,
-            videoCaptureController: videoCaptureController
+            videoCaptureController: videoCaptureController,
         )
 
         if groupThread.groupModel.groupMembers.count > RemoteConfig.current.maxGroupCallRingSize {
@@ -118,7 +120,7 @@ final class GroupThreadCall: Signal.GroupCall {
         }
         let databaseStorage = SSKEnvironment.shared.databaseStorageRef
         let groupThread = databaseStorage.read { tx in
-            return TSGroupThread.fetch(forGroupId: groupId, tx: tx)
+            return TSGroupThread.fetchThread(forGroupId: groupId, tx: tx)
         }
         guard let groupThread else {
             owsFailDebug("Missing group thread for active call.")
@@ -176,10 +178,8 @@ final class GroupThreadCall: Signal.GroupCall {
 
     override func groupCall(onPeekChanged groupCall: SignalRingRTC.GroupCall) {
         let tsAccountManager = DependenciesBridge.shared.tsAccountManager
-        guard let localAci = tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.aci else {
-            owsFailDebug("Peek changed for a group call, but we're not registered?")
-            return
-        }
+        let registeredState = tsAccountManager.mustBeRegisteredStateWithMaybeSneakyTransaction()
+        let localAci = registeredState.localIdentifiers.aci
 
         if let peekInfo = groupCall.peekInfo {
             // Note that we track this regardless of whether ringing is available.
@@ -197,7 +197,7 @@ final class GroupThreadCall: Signal.GroupCall {
 
             ringRestrictions.update(
                 .callInProgress,
-                present: peekInfo.deviceCountExcludingPendingDevices >= minDevicesToConsiderCallInProgress
+                present: peekInfo.deviceCountExcludingPendingDevices >= minDevicesToConsiderCallInProgress,
             )
         }
 
@@ -221,14 +221,14 @@ final class GroupThreadCall: Signal.GroupCall {
 
 extension SignalRingRTC.GroupCall {
     var isFull: Bool {
-        guard let peekInfo = peekInfo, let maxDevices = peekInfo.maxDevices else {
+        guard let peekInfo, let maxDevices = peekInfo.maxDevices else {
             return false
         }
         return peekInfo.deviceCountIncludingPendingDevices >= maxDevices
     }
 
     var maxDevices: UInt32? {
-        guard let peekInfo = peekInfo, let maxDevices = peekInfo.maxDevices else {
+        guard let peekInfo, let maxDevices = peekInfo.maxDevices else {
             return nil
         }
         return maxDevices

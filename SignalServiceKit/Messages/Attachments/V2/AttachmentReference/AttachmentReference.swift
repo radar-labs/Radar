@@ -8,9 +8,6 @@ import Foundation
 /// Represents an edge between some owner (a message, a story, a thread, etc) and an attachment.
 public class AttachmentReference {
 
-    /// We keep the raw type, without any metadata, on the reference table.
-    public typealias ContentType = Attachment.ContentTypeRaw
-
     // MARK: - Vars
 
     /// Sqlite row id of the attachment on the Attachments table.
@@ -35,29 +32,29 @@ public class AttachmentReference {
 
     // MARK: - Init
 
-    internal init(record: MessageAttachmentReferenceRecord) throws {
+    init(record: MessageAttachmentReferenceRecord) throws {
         self.owner = try Owner.validateAndBuild(record: record)
         self.attachmentRowId = record.attachmentRowId
         self.sourceFilename = record.sourceFilename
         self.sourceUnencryptedByteCount = record.sourceUnencryptedByteCount
-        self.sourceMediaSizePixels = try Self.buildSourceMediaSizePixels(
+        self.sourceMediaSizePixels = Self.buildSourceMediaSizePixels(
             sourceMediaWidthPixels: record.sourceMediaWidthPixels,
-            sourceMediaHeightPixels: record.sourceMediaHeightPixels
+            sourceMediaHeightPixels: record.sourceMediaHeightPixels,
         )
     }
 
-    internal init(record: StoryMessageAttachmentReferenceRecord) throws {
+    init(record: StoryMessageAttachmentReferenceRecord) throws {
         self.owner = try Owner.validateAndBuild(record: record)
         self.attachmentRowId = record.attachmentRowId
         self.sourceFilename = record.sourceFilename
         self.sourceUnencryptedByteCount = record.sourceUnencryptedByteCount
-        self.sourceMediaSizePixels = try Self.buildSourceMediaSizePixels(
+        self.sourceMediaSizePixels = Self.buildSourceMediaSizePixels(
             sourceMediaWidthPixels: record.sourceMediaWidthPixels,
-            sourceMediaHeightPixels: record.sourceMediaHeightPixels
+            sourceMediaHeightPixels: record.sourceMediaHeightPixels,
         )
     }
 
-    internal init(record: ThreadAttachmentReferenceRecord) throws {
+    init(record: ThreadAttachmentReferenceRecord) throws {
         self.owner = try Owner.validateAndBuild(record: record)
         self.attachmentRowId = record.attachmentRowId
         self.sourceFilename = nil
@@ -65,28 +62,28 @@ public class AttachmentReference {
         self.sourceMediaSizePixels = nil
     }
 
+    // MARK: -
+
     private static func buildSourceMediaSizePixels(
         sourceMediaWidthPixels: UInt32?,
-        sourceMediaHeightPixels: UInt32?
-    ) throws -> CGSize? {
+        sourceMediaHeightPixels: UInt32?,
+    ) -> CGSize? {
         guard
             let sourceMediaWidthPixels,
             let sourceMediaHeightPixels
         else {
             owsAssertDebug(
                 sourceMediaWidthPixels == nil
-                && sourceMediaHeightPixels == nil,
-                "Got partial source media size"
+                    && sourceMediaHeightPixels == nil,
+                "Got partial source media size",
             )
             return nil
         }
-        guard
-            let sourceMediaWidthPixels = Int(exactly: sourceMediaWidthPixels),
-            let sourceMediaHeightPixels = Int(exactly: sourceMediaHeightPixels)
-        else {
-            throw OWSAssertionError("Invalid pixel size")
-        }
-        return CGSize(width: sourceMediaWidthPixels, height: sourceMediaHeightPixels)
+        // Safe Int conversion: all UInt32 can be an Int on 64b systems
+        return CGSize(
+            width: Int(sourceMediaWidthPixels),
+            height: Int(sourceMediaHeightPixels),
+        )
     }
 }
 
@@ -133,7 +130,7 @@ extension AttachmentReference {
     public var orderInOwningMessage: UInt32? {
         switch owner {
         case .message(.bodyAttachment(let metadata)):
-            return metadata.orderInOwner
+            return metadata.orderInMessage
         default:
             return nil
         }

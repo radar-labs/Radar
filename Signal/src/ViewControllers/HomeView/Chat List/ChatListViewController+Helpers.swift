@@ -6,26 +6,16 @@
 import SignalServiceKit
 import SignalUI
 
-public extension ChatListViewController {
+extension ChatListViewController {
 
     var presentedChatListViewController: ChatListViewController? {
-        AssertIsOnMainThread()
-
-        guard let topViewController = navigationController?.topViewController as? ChatListViewController,
-              topViewController != self else {
+        guard
+            let topViewController = navigationController?.topViewController as? ChatListViewController,
+            topViewController != self
+        else {
             return nil
         }
         return topViewController
-    }
-
-    func isConversationActive(threadUniqueId: String) -> Bool {
-        AssertIsOnMainThread()
-
-        guard let conversationSplitViewController = splitViewController as? ConversationSplitViewController else {
-            owsFailDebug("Missing conversationSplitViewController.")
-            return false
-        }
-        return conversationSplitViewController.selectedThread?.uniqueId == threadUniqueId
     }
 
     func updateLastViewedThreadUniqueId(_ threadUniqueId: String, animated: Bool) {
@@ -78,52 +68,54 @@ public extension ChatListViewController {
     // MARK: Archive
 
     func archiveSelectedConversation() {
-        AssertIsOnMainThread()
-
         Logger.info("")
 
-        guard let selectedThread = conversationSplitViewController?.selectedThread else { return }
+        let databaseStorage = SSKEnvironment.shared.databaseStorageRef
+        let pinnedThreadManager = DependenciesBridge.shared.pinnedThreadManager
 
-        let threadAssociatedData = SSKEnvironment.shared.databaseStorageRef.read { transaction in
-            ThreadAssociatedData.fetchOrDefault(for: selectedThread, transaction: transaction)
+        guard
+            let homeTabBarController,
+            let selectedThread = homeTabBarController.selectedThread
+        else {
+            return
         }
 
-        guard !threadAssociatedData.isArchived else { return }
+        guard !selectedThread.isArchived else { return }
 
-        conversationSplitViewController?.closeSelectedConversation(animated: true)
+        homeTabBarController.closeSelectedConversation(animated: true)
 
-        SSKEnvironment.shared.databaseStorageRef.write { transaction in
-            threadAssociatedData.updateWith(isArchived: true, updateStorageService: true, transaction: transaction)
+        databaseStorage.write { transaction in
+            pinnedThreadManager.unpinThread(selectedThread, updateStorageService: true, tx: transaction)
+            selectedThread.updateWith(isArchived: true, updateStorageService: true, transaction: transaction)
         }
 
         updateViewState()
     }
 
     func unarchiveSelectedConversation() {
-        AssertIsOnMainThread()
-
         Logger.info("")
 
-        guard let selectedThread = conversationSplitViewController?.selectedThread else { return }
+        let databaseStorage = SSKEnvironment.shared.databaseStorageRef
 
-        let threadAssociatedData = SSKEnvironment.shared.databaseStorageRef.read { transaction in
-            ThreadAssociatedData.fetchOrDefault(for: selectedThread, transaction: transaction)
+        guard
+            let homeTabBarController,
+            let selectedThread = homeTabBarController.selectedThread
+        else {
+            return
         }
 
-        guard threadAssociatedData.isArchived else { return }
+        guard selectedThread.isArchived else { return }
 
-        conversationSplitViewController?.closeSelectedConversation(animated: true)
+        homeTabBarController.closeSelectedConversation(animated: true)
 
-        SSKEnvironment.shared.databaseStorageRef.write { transaction in
-            threadAssociatedData.updateWith(isArchived: false, updateStorageService: true, transaction: transaction)
+        databaseStorage.write { transaction in
+            selectedThread.updateWith(isArchived: false, updateStorageService: true, transaction: transaction)
         }
 
         updateViewState()
     }
 
     func showArchivedConversations(offerMultiSelectMode: Bool = true) {
-        AssertIsOnMainThread()
-
         owsAssertDebug(viewState.chatListMode == .inbox)
 
         // When showing archived conversations, we want to use a conventional "back" button
@@ -131,16 +123,14 @@ public extension ChatListViewController {
         applyArchiveBackButton()
 
         // Push a separate instance of this view using "archive" mode.
-        let chatList = ChatListViewController(chatListMode: .archive, appReadiness: appReadiness)
-        chatList.hidesBottomBarWhenPushed = true
+        let chatList = ChatListViewController(chatListMode: .archive)
 
         if offerMultiSelectMode {
-            chatList.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            chatList.navigationItem.rightBarButtonItem = .button(
                 title: CommonStrings.selectButton,
-                style: .plain,
-                target: chatList,
-                action: #selector(chatList.switchMultiSelectState),
-                accessibilityIdentifier: "select")
+            ) { [unowned chatList] in
+                chatList.switchMultiSelectState()
+            }
         }
         show(chatList, sender: self)
     }
@@ -148,13 +138,9 @@ public extension ChatListViewController {
     func applyArchiveBackButton() {
         AssertIsOnMainThread()
 
-        if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable { return }
+        if #available(iOS 26, *) { return }
 
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: CommonStrings.backButton,
-                                                           style: .plain,
-                                                           target: nil,
-                                                           action: nil,
-                                                           accessibilityIdentifier: "back")
+        navigationItem.backBarButtonItem = .button(title: CommonStrings.backButton) { }
     }
 }
 
@@ -168,7 +154,7 @@ extension ChatListViewController {
 
         switch renderState.sections[indexPath.section].type {
         case .pinned, .unpinned:
-            let currentSelectedThreadId = conversationSplitViewController?.selectedThread?.uniqueId
+            let currentSelectedThreadId = homeTabBarController?.selectedThread?.uniqueId
             // Currently, no previewing the currently selected thread.
             // Though, in a scene-aware, multiwindow world, we may opt to permit this.
             // If only to allow the user to pick up and drag a conversation to a new window.
@@ -186,11 +172,10 @@ extension ChatListViewController {
         }
         let vc = SSKEnvironment.shared.databaseStorageRef.read { tx in
             ConversationViewController.load(
-                appReadiness: appReadiness,
                 threadViewModel: threadViewModel,
                 action: .none,
                 focusMessageId: nil,
-                tx: tx
+                tx: tx,
             )
         }
         vc.previewSetup()
@@ -204,7 +189,7 @@ extension ChatListViewController {
         }
         presentThread(
             threadUniqueId: previewController.thread.uniqueId,
-            animated: false
+            animated: false,
         )
     }
 }

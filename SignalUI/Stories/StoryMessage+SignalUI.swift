@@ -27,9 +27,9 @@ extension StoryMessage {
         case .media:
             guard
                 let rowId = self.id,
-                let attachmentPointer = DependenciesBridge.shared.attachmentStore.fetchFirstReference(
+                let attachmentPointer = DependenciesBridge.shared.attachmentStore.fetchAnyReference(
                     owner: .storyMessageMedia(storyMessageRowId: rowId),
-                    tx: transaction
+                    tx: transaction,
                 )
             else {
                 owsFailDebug("Missing attachment for story message \(timestamp)")
@@ -48,7 +48,7 @@ extension StoryMessage {
         // to turn a MessageBody into something we can display.
         return MessageBody(
             text: caption,
-            ranges: MessageBodyRanges(mentions: [:], orderedMentions: [], collapsedStyles: captionStyles)
+            ranges: MessageBodyRanges(collapsedStyles: captionStyles),
         )
     }
 }

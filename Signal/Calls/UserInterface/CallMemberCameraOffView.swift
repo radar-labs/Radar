@@ -65,7 +65,7 @@ class CallMemberCameraOffView: UIView, CallMemberComposableView {
     func configure(
         call: SignalCall,
         isFullScreen: Bool = false,
-        remoteGroupMemberDeviceState: RemoteDeviceState?
+        remoteGroupMemberDeviceState: RemoteDeviceState?,
     ) {
         if !hasConfiguredOnce {
             self.createOptionalViews(type: type, call: call)
@@ -116,7 +116,7 @@ class CallMemberCameraOffView: UIView, CallMemberComposableView {
         // Update blurred avatar background
         self.blurredAvatarBackgroundView.update(
             type: self.type,
-            remoteGroupMemberDeviceState: remoteGroupMemberDeviceState
+            remoteGroupMemberDeviceState: remoteGroupMemberDeviceState,
         )
 
         // Update circular avatar
@@ -129,7 +129,7 @@ class CallMemberCameraOffView: UIView, CallMemberComposableView {
                 }
                 updateCircularAvatarIfNecessary(
                     address: localAddress,
-                    tx: tx
+                    tx: tx,
                 )
             }
         case .remoteInGroup:
@@ -137,14 +137,14 @@ class CallMemberCameraOffView: UIView, CallMemberComposableView {
             SSKEnvironment.shared.databaseStorageRef.read { tx in
                 updateCircularAvatarIfNecessary(
                     address: remoteGroupMemberDeviceState.address,
-                    tx: tx
+                    tx: tx,
                 )
             }
         case .remoteInIndividual(let individualCall):
             SSKEnvironment.shared.databaseStorageRef.read { tx in
                 updateCircularAvatarIfNecessary(
                     address: individualCall.remoteAddress,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
@@ -163,7 +163,7 @@ class CallMemberCameraOffView: UIView, CallMemberComposableView {
     }
 
     func clearConfiguration() {
-        self.backgroundColor = .ows_black
+        self.backgroundColor = .black
         self.blurredAvatarBackgroundView.clear()
         avatarView?.reset()
     }
@@ -184,7 +184,7 @@ class CallMemberCameraOffView: UIView, CallMemberComposableView {
 
     private func updateCircularAvatarIfNecessary(
         address: SignalServiceAddress,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) {
         guard let avatarView else {
             Logger.info("Skipping refresh of avatar view in call member view.")
@@ -202,35 +202,21 @@ class CallMemberCameraOffView: UIView, CallMemberComposableView {
     private func createDetailedVideoOffIndicatorView() -> UIStackView {
         let icon = UIImageView()
         icon.contentMode = .scaleAspectFit
-        icon.setTemplateImageName("video-slash-fill-28", tintColor: .ows_white)
+        icon.setTemplateImageName("video-slash-fill-28", tintColor: .white)
 
         let label = UILabel()
         label.font = .dynamicTypeCaption1
         label.text = OWSLocalizedString(
             "CALLING_MEMBER_VIEW_YOUR_CAMERA_IS_OFF",
-            comment: "Indicates to the user that their camera is currently off."
+            comment: "Indicates to the user that their camera is currently off.",
         )
         label.textAlignment = .center
         label.textColor = Theme.darkThemePrimaryColor
 
         let container = UIStackView(arrangedSubviews: [icon, label])
-        if UIDevice.current.isIPhone5OrShorter {
-            // Use a horizontal layout to save on vertical space.
-            // Allow the icon to shrink below its natural size of 28pt...
-            icon.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
-            container.axis = .horizontal
-            container.spacing = 4
-            // ...by always matching the label's height.
-            container.alignment = .fill
-        } else {
-            // Use a simple vertical layout.
-            icon.autoSetDimensions(to: CGSize(square: 28))
-            container.axis = .vertical
-            container.spacing = 10
-            container.alignment = .center
-            label.autoPinWidthToSuperview()
-        }
-
+        container.axis = .vertical
+        container.spacing = 10
+        container.alignment = .center
         return container
     }
 
@@ -245,7 +231,7 @@ class CallMemberCameraOffView: UIView, CallMemberComposableView {
     private func createVideoOffIndicatorImageView() -> UIImageView {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.setTemplateImageName("video-slash-fill-28", tintColor: .ows_white)
+        imageView.setTemplateImageName("video-slash-fill-28", tintColor: .white)
         return imageView
     }
 
@@ -279,17 +265,14 @@ class BlurredAvatarBackgroundView: UIView {
 
     func update(
         type: CallMemberView.MemberType,
-        remoteGroupMemberDeviceState: RemoteDeviceState?
+        remoteGroupMemberDeviceState: RemoteDeviceState?,
     ) {
         let address: SignalServiceAddress
         switch type {
         case .local:
             let tsAccountManager = DependenciesBridge.shared.tsAccountManager
-            guard let localAddress = tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.aciAddress else {
-                owsFailDebug("missing local address")
-                return
-            }
-            address = localAddress
+            let registeredState = tsAccountManager.mustBeRegisteredStateWithMaybeSneakyTransaction()
+            address = registeredState.localIdentifiers.aciAddress
         case .remoteInGroup:
             guard let remoteGroupMemberDeviceState else { return }
             address = remoteGroupMemberDeviceState.address
@@ -302,7 +285,7 @@ class BlurredAvatarBackgroundView: UIView {
     }
 
     private func avatarImageAndBackgroundColorWithSneakyTransaction(
-        for address: SignalServiceAddress
+        for address: SignalServiceAddress,
     ) -> (UIImage?, UIColor) {
         let avatarDefaultColorManager = DependenciesBridge.shared.avatarDefaultColorManager
         let contactManagerImpl = SSKEnvironment.shared.contactManagerImplRef
@@ -311,19 +294,19 @@ class BlurredAvatarBackgroundView: UIView {
 
         let (
             profileImage,
-            defaultAvatarColor
+            defaultAvatarColor,
         ): (UIImage?, AvatarTheme) = databaseStorage.read { tx in
             let avatarImage = contactManagerImpl.avatarImage(forAddress: address, transaction: tx)
 
             if let recipient = recipientDatabaseTable.fetchRecipient(address: address, tx: tx) {
                 return (
                     avatarImage,
-                    avatarDefaultColorManager.defaultColor(useCase: .contact(recipient: recipient), tx: tx)
+                    avatarDefaultColorManager.defaultColor(useCase: .contact(recipient: recipient), tx: tx),
                 )
             } else {
                 return (
                     avatarImage,
-                    avatarDefaultColorManager.defaultColor(useCase: .contactWithoutRecipient(address: address), tx: tx)
+                    avatarDefaultColorManager.defaultColor(useCase: .contactWithoutRecipient(address: address), tx: tx),
                 )
             }
         }
@@ -335,6 +318,8 @@ class BlurredAvatarBackgroundView: UIView {
         backgroundAvatarView.image = nil
     }
 }
+
+// MARK: -
 
 extension RemoteDeviceState {
     var aci: Aci { Aci(fromUUID: userId) }

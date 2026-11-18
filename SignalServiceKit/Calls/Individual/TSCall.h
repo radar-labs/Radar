@@ -40,7 +40,7 @@ NSString *NSStringFromCallType(RPRecentCallType callType);
 /// bridge between "call IDs" used to identify this call across devices and
 /// ``TSCall`` instances local to this device.
 ///
-/// Not to be confused with an ``OWSOutgoingCallMessage``.
+/// Not to be confused with an ``OutgoingCallMessage``.
 @interface TSCall : TSInteraction <OWSPreviewText>
 
 /// Encodes both what kind of call it is, and the state of that call (pending, answered, missed, etc.)
@@ -53,10 +53,14 @@ NSString *NSStringFromCallType(RPRecentCallType callType);
 /// - SeeAlso ``OWSReadTracking``
 @property (nonatomic, getter=wasRead) BOOL read;
 
+@property (nonatomic, readonly) uint32_t expiresInSeconds;
+@property (nonatomic) uint64_t expireStartedAt;
+@property (nonatomic, readonly) uint64_t expiresAt;
+
 - (instancetype)initWithCustomUniqueId:(NSString *)uniqueId
                              timestamp:(uint64_t)timestamp
                    receivedAtTimestamp:(uint64_t)receivedAtTimestamp
-                                thread:(TSThread *)thread NS_UNAVAILABLE;
+                        threadUniqueId:(nonnull NSString *)threadUniqueId NS_UNAVAILABLE;
 - (instancetype)initWithTimestamp:(uint64_t)timestamp
               receivedAtTimestamp:(uint64_t)receivedAtTimestamp
                            thread:(TSThread *)thread NS_UNAVAILABLE;
@@ -67,12 +71,13 @@ NSString *NSStringFromCallType(RPRecentCallType callType);
                      timestamp:(uint64_t)timestamp
                 uniqueThreadId:(NSString *)uniqueThreadId NS_UNAVAILABLE;
 
-- (nullable instancetype)initWithCoder:(NSCoder *)coder NS_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder *)coder NS_UNAVAILABLE;
 
 - (instancetype)initWithCallType:(RPRecentCallType)callType
                        offerType:(TSRecentCallOfferType)offerType
                           thread:(TSContactThread *)thread
-                 sentAtTimestamp:(uint64_t)sentAtTimestamp NS_DESIGNATED_INITIALIZER;
+                 sentAtTimestamp:(uint64_t)sentAtTimestamp
+                expiresInSeconds:(uint32_t)expiresInSeconds NS_DESIGNATED_INITIALIZER;
 
 // --- CODE GENERATION MARKER
 
@@ -88,9 +93,12 @@ NSString *NSStringFromCallType(RPRecentCallType callType);
                        timestamp:(uint64_t)timestamp
                   uniqueThreadId:(NSString *)uniqueThreadId
                         callType:(RPRecentCallType)callType
+                 expireStartedAt:(uint64_t)expireStartedAt
+                       expiresAt:(uint64_t)expiresAt
+                expiresInSeconds:(unsigned int)expiresInSeconds
                        offerType:(TSRecentCallOfferType)offerType
                             read:(BOOL)read
-NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp:sortId:timestamp:uniqueThreadId:callType:offerType:read:));
+NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp:sortId:timestamp:uniqueThreadId:callType:expireStartedAt:expiresAt:expiresInSeconds:offerType:read:));
 
 // clang-format on
 

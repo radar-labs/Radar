@@ -7,7 +7,7 @@ import Foundation
 import LibSignalClient
 import MessageUI
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
 // This extension reproduces some of the UITextView link interaction behavior.
 // This is how UITextView behaves:
@@ -29,7 +29,7 @@ public import SignalUI
 //   * long press - show email address + new email message / facetime audio / facetime video / send message / add to contacts / copy email.
 extension ConversationViewController {
 
-    public func didTapBodyTextItem(_ item: CVTextLabel.Item) {
+    func didTapBodyTextItem(_ item: CVTextLabel.Item) {
         AssertIsOnMainThread()
 
         guard DependenciesBridge.shared.tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered else {
@@ -67,10 +67,12 @@ extension ConversationViewController {
             didTapOrLongPressUnrevealedSpoiler(unrevealedSpoilerItem)
         case .referencedUser(let referencedUserItem):
             owsFailDebug("Should never have a referenced user item in body text, but tapped \(referencedUserItem)")
+        case .deleteAuthor(let deleteAuthor):
+            didTapOrLongPressDeleteAuthor(aci: deleteAuthor.deleteAuthorAci)
         }
     }
 
-    public func didLongPressBodyTextItem(_ item: CVTextLabel.Item) {
+    func didLongPressBodyTextItem(_ item: CVTextLabel.Item) {
         AssertIsOnMainThread()
 
         guard DependenciesBridge.shared.tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered else {
@@ -104,6 +106,8 @@ extension ConversationViewController {
             didTapOrLongPressUnrevealedSpoiler(unrevealedSpoilerItem)
         case .referencedUser(let referencedUserItem):
             owsFailDebug("Should never have a referenced user item in body text, but long pressed \(referencedUserItem)")
+        case .deleteAuthor(let deleteAuthor):
+            didTapOrLongPressDeleteAuthor(aci: deleteAuthor.deleteAuthorAci)
         }
     }
 
@@ -117,13 +121,13 @@ extension ConversationViewController {
             if StickerPackInfo.isStickerPackShare(dataItem.url) {
                 return OWSLocalizedString(
                     "MESSAGE_ACTION_TITLE_STICKER_PACK",
-                    comment: "Title for message actions for a sticker pack."
+                    comment: "Title for message actions for a sticker pack.",
                 )
             }
-            if GroupManager.isPossibleGroupInviteLink(dataItem.url) {
+            if PossibleGroupInviteLinkUrl.parseFrom(dataItem.url) != nil {
                 return OWSLocalizedString(
                     "MESSAGE_ACTION_TITLE_GROUP_INVITE",
-                    comment: "Title for message actions for a group invite link."
+                    comment: "Title for message actions for a group invite link.",
                 )
             }
             return dataItem.snippet.strippedOrNil
@@ -138,18 +142,18 @@ extension ConversationViewController {
                     style: .default,
                     handler: { [weak self] _ in
                         self?.didTapStickerPack(stickerPackInfo)
-                    }
+                    },
                 ))
             } else {
                 owsFailDebug("Invalid URL: \(dataItem.url)")
             }
-        } else if GroupManager.isPossibleGroupInviteLink(dataItem.url) {
+        } else if let url = PossibleGroupInviteLinkUrl.parseFrom(dataItem.url) {
             actionSheet.addAction(ActionSheetAction(
                 title: OWSLocalizedString("MESSAGE_ACTION_LINK_OPEN_GROUP_INVITE", comment: "Label for button to open a group invite."),
                 style: .default,
                 handler: { [weak self] _ in
-                    self?.didTapGroupInviteLink(url: dataItem.url)
-                }
+                    self?.didTapGroupInviteLink(url: url)
+                },
             ))
         } else if SignalProxy.isValidProxyLink(dataItem.url) {
             actionSheet.addAction(ActionSheetAction(
@@ -157,7 +161,7 @@ extension ConversationViewController {
                 style: .default,
                 handler: { [weak self] _ in
                     self?.didTapProxyLink(url: dataItem.url)
-                }
+                },
             ))
         } else if let callLink = CallLink(url: dataItem.url) {
             actionSheet.addAction(ActionSheetAction(
@@ -165,7 +169,7 @@ extension ConversationViewController {
                 style: .default,
                 handler: { [weak self] _ in
                     self?.didTapCallLink(callLink)
-                }
+                },
             ))
         } else {
             actionSheet.addAction(ActionSheetAction(
@@ -173,7 +177,7 @@ extension ConversationViewController {
                 style: .default,
                 handler: { [weak self] _ in
                     self?.openLink(dataItem: dataItem)
-                }
+                },
             ))
         }
 
@@ -183,14 +187,14 @@ extension ConversationViewController {
             handler: { _ in
                 UIPasteboard.general.string = dataItem.snippet
                 // TODO: Show toast?
-            }
+            },
         ))
         actionSheet.addAction(ActionSheetAction(
             title: CommonStrings.shareButton,
             style: .default,
             handler: { _ in
                 AttachmentSharing.showShareUI(for: dataItem.url, sender: self)
-            }
+            },
         ))
         actionSheet.addAction(OWSActionSheets.cancelAction)
 
@@ -206,28 +210,28 @@ extension ConversationViewController {
         actionSheet.addAction(ActionSheetAction(
             title: OWSLocalizedString(
                 "MESSAGE_ACTION_LINK_OPEN_ADDRESS_APPLE_MAPS",
-                comment: "A label for a button that will open an address in Apple Maps. \"Maps\" is a proper noun referring to the Apple Maps app, and should be translated as such."
+                comment: "A label for a button that will open an address in Apple Maps. \"Maps\" is a proper noun referring to the Apple Maps app, and should be translated as such.",
             ),
             handler: { _ in
                 UIApplication.shared.open(dataItem.url, options: [:], completionHandler: nil)
-            }
+            },
         ))
 
         if
             let googleMapsUrl = TextCheckingDataItem.buildAddressQueryUrl(
                 appScheme: "comgooglemaps",
-                addressToQuery: addressString
+                addressToQuery: addressString,
             ),
             UIApplication.shared.canOpenURL(googleMapsUrl)
         {
             actionSheet.addAction(ActionSheetAction(
                 title: OWSLocalizedString(
                     "MESSAGE_ACTION_LINK_OPEN_ADDRESS_GOOGLE_MAPS",
-                    comment: "A label for a button that will open an address in Google Maps. \"Google Maps\" is a proper noun referring to the Google Maps app, and should be translated as such."
+                    comment: "A label for a button that will open an address in Google Maps. \"Google Maps\" is a proper noun referring to the Google Maps app, and should be translated as such.",
                 ),
                 handler: { _ in
                     UIApplication.shared.open(googleMapsUrl, options: [:], completionHandler: nil)
-                }
+                },
             ))
         }
 
@@ -235,7 +239,7 @@ extension ConversationViewController {
             title: CommonStrings.copyButton,
             handler: { _ in
                 UIPasteboard.general.string = addressString
-            }
+            },
         ))
 
         actionSheet.addAction(OWSActionSheets.cancelAction)
@@ -277,83 +281,94 @@ extension ConversationViewController {
             actionSheet.addAction(
                 ActionSheetAction(
                     title: OWSLocalizedString("BLOCK_LIST_UNBLOCK_BUTTON", comment: "Button label for the 'unblock' button"),
-                    style: .default
+                    style: .default,
                 ) { [weak self] _ in
-                    guard let self = self else { return }
+                    guard let self else { return }
                     BlockListUIUtils.showUnblockAddressActionSheet(
                         blockedAddress,
                         from: self,
-                        completion: nil
+                        completion: nil,
                     )
-                })
+                },
+            )
 
         } else {
             // https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/PhoneLinks/PhoneLinks.html
-            actionSheet.addAction(ActionSheetAction(
-                title: OWSLocalizedString(
-                    "MESSAGE_ACTION_PHONE_NUMBER_CALL",
-                    comment: "Label for button to call a phone number."
-                ),
-                style: .default) { _ in
+            actionSheet.addAction(
+                ActionSheetAction(
+                    title: OWSLocalizedString(
+                        "MESSAGE_ACTION_PHONE_NUMBER_CALL",
+                        comment: "Label for button to call a phone number.",
+                    ),
+                    style: .default,
+                ) { _ in
                     guard let url = URL(string: "tel:" + phoneNumber) else {
                         owsFailDebug("Invalid phone number.")
                         return
                     }
                     UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                }
+                },
             )
             // https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/SMSLinks/SMSLinks.html
-            actionSheet.addAction(ActionSheetAction(
-                title: OWSLocalizedString(
-                    "MESSAGE_ACTION_PHONE_NUMBER_SMS",
-                    comment: "Label for button to send a text message a phone number."
-                ),
-                style: .default) { _ in
+            actionSheet.addAction(
+                ActionSheetAction(
+                    title: OWSLocalizedString(
+                        "MESSAGE_ACTION_PHONE_NUMBER_SMS",
+                        comment: "Label for button to send a text message a phone number.",
+                    ),
+                    style: .default,
+                ) { _ in
                     guard let url = URL(string: "sms:" + phoneNumber) else {
                         owsFailDebug("Invalid phone number.")
                         return
                     }
                     UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                }
+                },
             )
             // https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/FacetimeLinks/FacetimeLinks.html
-            actionSheet.addAction(ActionSheetAction(
-                title: OWSLocalizedString(
-                    "MESSAGE_ACTION_PHONE_NUMBER_FACETIME_VIDEO",
-                    comment: "Label for button to make a FaceTime video call to a phone number."
-                ),
-                style: .default) { _ in
+            actionSheet.addAction(
+                ActionSheetAction(
+                    title: OWSLocalizedString(
+                        "MESSAGE_ACTION_PHONE_NUMBER_FACETIME_VIDEO",
+                        comment: "Label for button to make a FaceTime video call to a phone number.",
+                    ),
+                    style: .default,
+                ) { _ in
                     guard let url = URL(string: "facetime:" + phoneNumber) else {
                         owsFailDebug("Invalid phone number.")
                         return
                     }
                     UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                }
+                },
             )
-            actionSheet.addAction(ActionSheetAction(
-                title: OWSLocalizedString(
-                    "MESSAGE_ACTION_PHONE_NUMBER_FACETIME_AUDIO",
-                    comment: "Label for button to make a FaceTime audio call to a phone number."
-                ),
-                style: .default) { _ in
+            actionSheet.addAction(
+                ActionSheetAction(
+                    title: OWSLocalizedString(
+                        "MESSAGE_ACTION_PHONE_NUMBER_FACETIME_AUDIO",
+                        comment: "Label for button to make a FaceTime audio call to a phone number.",
+                    ),
+                    style: .default,
+                ) { _ in
                     guard let url = URL(string: "facetime-audio:" + phoneNumber) else {
                         owsFailDebug("Invalid phone number.")
                         return
                     }
                     UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                }
+                },
             )
             // TODO: We could show an "add to contact" action for this phone number.
             //       Ideally we could detect whether this phone number is already in a system contact.
             // TODO: We could show an "share" action for this phone number.
         }
 
-        actionSheet.addAction(ActionSheetAction(
-            title: CommonStrings.copyButton,
-            style: .default) { _ in
+        actionSheet.addAction(
+            ActionSheetAction(
+                title: CommonStrings.copyButton,
+                style: .default,
+            ) { _ in
                 UIPasteboard.general.string = dataItem.snippet
                 // TODO: Show toast?
-            }
+            },
         )
 
         actionSheet.addAction(OWSActionSheets.cancelAction)
@@ -369,7 +384,7 @@ extension ConversationViewController {
             style: .default,
             handler: { [weak self] _ in
                 self?.composeEmail(dataItem: dataItem)
-            }
+            },
         ))
         actionSheet.addAction(ActionSheetAction(
             title: CommonStrings.copyButton,
@@ -377,7 +392,7 @@ extension ConversationViewController {
             handler: { _ in
                 UIPasteboard.general.string = dataItem.snippet
                 // TODO: Show toast?
-            }
+            },
         ))
 
         // TODO: We could show (facetime audio/facetime video/iMessage) actions for this email address.
@@ -421,7 +436,7 @@ extension ConversationViewController {
             Logger.info("Device cannot send mail")
             OWSActionSheets.showErrorAlert(message: OWSLocalizedString(
                 "MESSAGE_ACTION_ERROR_EMAIL_NOT_CONFIGURED",
-                comment: "Error show when user tries to send email without email being configured."
+                comment: "Error show when user tries to send email without email being configured.",
             ))
             return
         }
@@ -439,11 +454,21 @@ extension ConversationViewController {
     private func didTapOrLongPressUnrevealedSpoiler(_ unrevealedSpoilerItem: CVTextLabel.UnrevealedSpoilerItem) {
         viewState.spoilerState.revealState.setSpoilerRevealed(
             withID: unrevealedSpoilerItem.spoilerId,
-            interactionIdentifier: unrevealedSpoilerItem.interactionIdentifier
+            interactionIdentifier: unrevealedSpoilerItem.interactionIdentifier,
         )
         self.loadCoordinator.enqueueReload(
             updatedInteractionIds: [unrevealedSpoilerItem.interactionUniqueId],
-            deletedInteractionIds: []
+            deletedInteractionIds: [],
         )
+    }
+
+    // Taps and long presses do the same thing.
+    private func didTapOrLongPressDeleteAuthor(aci: Aci) {
+        ProfileSheetSheetCoordinator(
+            address: SignalServiceAddress(aci),
+            groupViewHelper: nil,
+            spoilerState: SpoilerRenderState(),
+        )
+        .presentAppropriateSheet(from: self)
     }
 }

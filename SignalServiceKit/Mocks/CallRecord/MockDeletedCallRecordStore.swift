@@ -12,10 +12,10 @@ class MockDeletedCallRecordStore: DeletedCallRecordStore {
 
     func fetch(callId: UInt64, conversationId: CallRecord.ConversationID, tx: DBReadTransaction) -> DeletedCallRecord? {
         return deletedCallRecords.first { deletedCallRecord in
-            return (
+            return
                 deletedCallRecord.callId == callId
-                && deletedCallRecord.conversationId == conversationId
-            )
+                    && deletedCallRecord.conversationId == conversationId
+
         }
     }
 
@@ -23,26 +23,20 @@ class MockDeletedCallRecordStore: DeletedCallRecordStore {
         deletedCallRecords.append(deletedCallRecord)
     }
 
-    var deleteMock: ((DeletedCallRecord) -> Void)?
     func delete(expiredDeletedCallRecord: DeletedCallRecord, tx: DBWriteTransaction) {
-        if let deleteMock {
-            deleteMock(expiredDeletedCallRecord)
-        }
-
         _ = deletedCallRecords.removeFirst { expiredDeletedCallRecord.matches($0) }
     }
 
-    var nextDeletedRecordMock: (() -> DeletedCallRecord?)?
-    func nextDeletedRecord(tx: DBReadTransaction) -> DeletedCallRecord? {
-        if let nextDeletedRecordMock {
-            return nextDeletedRecordMock()
-        }
+    func deleteRecords(forThreadId threadId: TSThread.RowId, tx: DBWriteTransaction) {
+        deletedCallRecords.removeAll(where: { $0.conversationId == .thread(threadRowId: threadId) })
+    }
 
+    func nextDeletedRecord(tx: DBReadTransaction) -> DeletedCallRecord? {
         return deletedCallRecords.min(by: { $0.deletedAtTimestamp < $1.deletedAtTimestamp })
     }
 
-    var askedToMergeThread: (from: Int64, into: Int64)?
-    func updateWithMergedThread(fromThreadRowId fromRowId: Int64, intoThreadRowId intoRowId: Int64, tx: DBWriteTransaction) {
+    var askedToMergeThread: (from: TSThread.RowId, into: TSThread.RowId)?
+    func updateWithMergedThread(fromThreadRowId fromRowId: TSThread.RowId, intoThreadRowId intoRowId: TSThread.RowId, tx: DBWriteTransaction) {
         askedToMergeThread = (from: fromRowId, into: intoRowId)
     }
 }

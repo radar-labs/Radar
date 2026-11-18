@@ -18,6 +18,7 @@ import Foundation
 extension RecipientHidingManager {
 
     // MARK: Read
+
     /// Returns set of ``SignalServiceAddress``es corresponding with
     /// all hidden recipients.
     ///
@@ -40,17 +41,18 @@ extension RecipientHidingManager {
     public func isHiddenAddress(_ address: SignalServiceAddress, tx: DBReadTransaction) -> Bool {
         guard
             let localAddress = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: tx)?.aciAddress,
-            !localAddress.isEqualToAddress(address) else
-        {
+            !localAddress.isEqualToAddress(address)
+        else {
             return false
         }
         guard let recipient = recipient(from: address, tx: tx) else {
             return false
         }
-        return isHiddenRecipient(recipient, tx: tx)
+        return isHiddenRecipient(recipientId: recipient.id, tx: tx)
     }
 
     // MARK: Write
+
     /// Inserts hidden-recipient state for the given `SignalServiceAddress`.
     ///
     /// - Parameter inKnownMessageRequestState
@@ -62,7 +64,7 @@ extension RecipientHidingManager {
         _ address: SignalServiceAddress,
         inKnownMessageRequestState: Bool,
         wasLocallyInitiated: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws {
         guard
             let localAddress = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: tx)?.aciAddress,
@@ -71,20 +73,18 @@ extension RecipientHidingManager {
             throw RecipientHidingError.cannotHideLocalAddress
         }
         let recipientFetcher = DependenciesBridge.shared.recipientFetcher
-        let recipient = try { () throws -> SignalRecipient in
-            if let serviceId = address.serviceId {
-                return recipientFetcher.fetchOrCreate(serviceId: serviceId, tx: tx)
-            }
-            if let phoneNumber = address.e164 {
-                return recipientFetcher.fetchOrCreate(phoneNumber: phoneNumber, tx: tx)
+        var recipient = try { () throws -> SignalRecipient in
+            let recipient = recipientFetcher.fetchOrCreate(address: address, tx: tx)
+            if let recipient {
+                return recipient
             }
             throw RecipientHidingError.invalidRecipientAddress(address)
         }()
-        try addHiddenRecipient(
-            recipient,
+        addHiddenRecipient(
+            &recipient,
             inKnownMessageRequestState: inKnownMessageRequestState,
             wasLocallyInitiated: wasLocallyInitiated,
-            tx: tx
+            tx: tx,
         )
     }
 
@@ -98,8 +98,8 @@ extension RecipientHidingManager {
     public func removeHiddenRecipient(
         _ address: SignalServiceAddress,
         wasLocallyInitiated: Bool,
-        tx: DBWriteTransaction
-    ) throws {
+        tx: DBWriteTransaction,
+    ) {
         guard
             let localAddress = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: tx)?.aciAddress,
             !localAddress.isEqualToAddress(address)
@@ -107,8 +107,8 @@ extension RecipientHidingManager {
             owsFailDebug("Cannot unhide the local address")
             return
         }
-        if let recipient = recipient(from: address, tx: tx) {
-            try removeHiddenRecipient(recipient, wasLocallyInitiated: wasLocallyInitiated, tx: tx)
+        if var recipient = recipient(from: address, tx: tx) {
+            removeHiddenRecipient(&recipient, wasLocallyInitiated: wasLocallyInitiated, tx: tx)
         }
     }
 

@@ -10,9 +10,11 @@ public enum OWSFormat {
     // We evacuate this cache in the background in case the
     // user changes a system setting that would affect
     // formatting behavior.
-    private static let shortNameComponentsCache = LRUCache<String, String>(maxSize: 512,
-                                                                           nseMaxSize: 64,
-                                                                           shouldEvacuateInBackground: true)
+    private static let shortNameComponentsCache = LRUCache<String, String>(
+        maxSize: 512,
+        nseMaxSize: 64,
+        shouldEvacuateInBackground: true,
+    )
 
     public static func formatNameComponents(_ nameComponents: PersonNameComponents) -> String {
         formatNameComponents(nameComponents, style: .default)
@@ -22,15 +24,19 @@ public enum OWSFormat {
         formatNameComponents(nameComponents, style: .short)
     }
 
-    public static func formatNameComponents(_ nameComponents: PersonNameComponents,
-                                            style: PersonNameComponentsFormatter.Style) -> String {
+    public static func formatNameComponents(
+        _ nameComponents: PersonNameComponents,
+        style: PersonNameComponentsFormatter.Style,
+    ) -> String {
         let cacheKey = String(describing: nameComponents) + ".\(style.rawValue)"
         if let value = shortNameComponentsCache.get(key: cacheKey) {
             return value
         }
-        let value = PersonNameComponentsFormatter.localizedString(from: nameComponents,
-                                                                  style: style,
-                                                                  options: [])
+        let value = PersonNameComponentsFormatter.localizedString(
+            from: nameComponents,
+            style: style,
+            options: [],
+        )
         shortNameComponentsCache.set(key: cacheKey, value: value)
         return value
     }
@@ -45,34 +51,6 @@ public extension OWSFormat {
         formatter.numberStyle = .none
         return formatter
     }()
-
-    private static func fileSizeFormatter(_ maximumFractionalDigits: Int) -> NumberFormatter {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = maximumFractionalDigits
-        return formatter
-    }
-
-    static func formatFileSize(_ fileSize: UInt, maximumFractionalDigits: Int = 1) -> String {
-        let kOneKilobyte: UInt = 1024
-        let kOneMegabyte = kOneKilobyte * kOneKilobyte
-        let kOneGigabyte = kOneMegabyte * kOneKilobyte
-
-        // NOTE: These values are not localized.
-        if fileSize > kOneGigabyte * 1 {
-            let gbSize = max(Double(1), Double(fileSize) / Double(kOneGigabyte))
-            let value = fileSizeFormatter(maximumFractionalDigits).string(from: NSNumber(value: gbSize)) ?? "0"
-            return "\(value) GB"
-        } else if fileSize > kOneMegabyte * 1 {
-            let mbSize = max(Double(1), Double(fileSize) / Double(kOneMegabyte))
-            let value = fileSizeFormatter(maximumFractionalDigits).string(from: NSNumber(value: mbSize)) ?? "0"
-            return "\(value) MB"
-        } else {
-            let kbSize = max(Double(1), Double(fileSize) / Double(kOneKilobyte))
-            let value = defaultNumberFormatter.string(from: NSNumber(value: kbSize)) ?? "0"
-            return "\(value) KB"
-        }
-    }
 
     static func formatDurationSeconds(_ timeSeconds: Int) -> String {
         let timeSeconds = max(0, timeSeconds)
@@ -136,12 +114,13 @@ public extension OWSFormat {
         return result ?? ""
     }
 
-    static func localizedFileSizeString(from fileSize: Int64) -> String {
-        return byteCountFormatter.string(fromByteCount: fileSize)
+    static func localizedFileSizeString(from fileSize: UInt64) -> String {
+        return byteCountFormatter.string(fromByteCount: Int64(clamping: fileSize))
     }
 }
 
 // MARK: - Time
+
 public extension OWSFormat {
 
     private static let durationFormatterS: DateComponentsFormatter = {
@@ -149,21 +128,21 @@ public extension OWSFormat {
         // `dropTrailing` produces a single leading zero: "0:ss".
         formatter.zeroFormattingBehavior = .dropTrailing
         formatter.formattingContext = .standalone
-        formatter.allowedUnits = [ .minute, .second ]
+        formatter.allowedUnits = [.minute, .second]
         return formatter
     }()
 
     private static let durationFormatterMS: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
         formatter.formattingContext = .standalone
-        formatter.allowedUnits = [ .minute, .second ]
+        formatter.allowedUnits = [.minute, .second]
         return formatter
     }()
 
     private static let durationFormatterHMS: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
         formatter.formattingContext = .standalone
-        formatter.allowedUnits = [ .hour, .minute, .second ]
+        formatter.allowedUnits = [.hour, .minute, .second]
         return formatter
     }()
 
@@ -176,7 +155,7 @@ public extension OWSFormat {
         let formatter = DateComponentsFormatter()
         formatter.formattingContext = .standalone
         formatter.zeroFormattingBehavior = .pad
-        formatter.allowedUnits = [ .minute, .second ]
+        formatter.allowedUnits = [.minute, .second]
         guard let longString = formatter.string(from: 0) else {
             return nil
         }

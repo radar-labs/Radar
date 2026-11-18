@@ -3,10 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import UIKit
-import SignalUI
 import LibSignalClient
 import SignalServiceKit
+import SignalUI
 
 // MARK: - CallLinkApprovalRequestDetailsSheet
 
@@ -19,7 +18,7 @@ class CallLinkApprovalRequestDetailsSheet: OWSTableSheetViewController {
 
     private let deps = Deps(
         contactsManager: SSKEnvironment.shared.contactManagerRef,
-        db: DependenciesBridge.shared.db
+        db: DependenciesBridge.shared.db,
     )
 
     let approvalRequest: CallLinkApprovalRequest
@@ -31,14 +30,14 @@ class CallLinkApprovalRequestDetailsSheet: OWSTableSheetViewController {
 
     init(
         approvalRequest: CallLinkApprovalRequest,
-        approvalViewModel: CallLinkApprovalViewModel
+        approvalViewModel: CallLinkApprovalViewModel,
     ) {
         self.approvalRequest = approvalRequest
         self.approvalViewModel = approvalViewModel
+
         super.init()
 
-        self.overrideUserInterfaceStyle = .dark
-        self.tableViewController.forceDarkMode = true
+        overrideUserInterfaceStyle = .dark
     }
 
     private weak var fromViewController: UIViewController?
@@ -46,7 +45,7 @@ class CallLinkApprovalRequestDetailsSheet: OWSTableSheetViewController {
     func present(
         from viewController: UIViewController,
         dismissalDelegate: (any SheetDismissalDelegate)? = nil,
-        animated: Bool = true
+        animated: Bool = true,
     ) {
         self.fromViewController = viewController
         self.dismissalDelegate = dismissalDelegate
@@ -66,9 +65,9 @@ class CallLinkApprovalRequestDetailsSheet: OWSTableSheetViewController {
                     tintColor: UIColor.Signal.label,
                     name: OWSLocalizedString(
                         "CALL_LINK_JOIN_REQUEST_APPROVE_BUTTON",
-                        comment: "Button on an action sheet to approve a request to join a call link."
+                        comment: "Button on an action sheet to approve a request to join a call link.",
                     ),
-                    textColor: UIColor.Signal.label
+                    textColor: UIColor.Signal.label,
                 ) { [weak self] in
                     guard let self else { return }
                     self.dismiss(animated: true)
@@ -79,16 +78,16 @@ class CallLinkApprovalRequestDetailsSheet: OWSTableSheetViewController {
                     tintColor: UIColor.Signal.label,
                     name: OWSLocalizedString(
                         "CALL_LINK_JOIN_REQUEST_DENY_BUTTON",
-                        comment: "Button on an action sheet to deny a request to join a call link."
+                        comment: "Button on an action sheet to deny a request to join a call link.",
                     ),
-                    textColor: UIColor.Signal.label
+                    textColor: UIColor.Signal.label,
                 ) { [weak self] in
                     guard let self else { return }
                     self.dismiss(animated: true)
                     self.approvalViewModel.performRequestAction.send((.deny, self.approvalRequest))
                 },
             ],
-            headerView: self.buildHeader()
+            headerView: self.buildHeader(),
         ))
 
         return contents
@@ -106,14 +105,14 @@ class CallLinkApprovalRequestDetailsSheet: OWSTableSheetViewController {
             top: 20,
             left: 0,
             bottom: 36,
-            right: 0
+            right: 0,
         )
 
         // [CallLink] TODO: This should expand to a full-screen preview when tapped
         let avatarView = ConversationAvatarView(
             sizeClass: .eightyEight,
             localUserDisplayMode: .asLocalUser,
-            badged: true
+            badged: true,
         )
 
         let (contactTitle, mutualThreads): (NSAttributedString, [TSGroupThread]) = self.deps.db.read { tx in
@@ -123,22 +122,21 @@ class CallLinkApprovalRequestDetailsSheet: OWSTableSheetViewController {
 
             let isSystemContact = self.deps.contactsManager.fetchSignalAccount(
                 for: self.approvalRequest.address,
-                transaction: tx
+                transaction: tx,
             ) != nil
 
-            let mutualThreads = TSGroupThread.groupThreads(
-                with: self.approvalRequest.address,
-                transaction: tx
+            let mutualThreads = TSGroupThread.mutualVisibleGroupThreads(
+                withFullMember: self.approvalRequest.address,
+                tx: tx,
             )
-            .filter(\.groupModel.groupMembership.isLocalUserFullMember)
-            .filter(\.shouldThreadBeVisible)
 
             let contactTitle = ConversationHeaderBuilder.threadAttributedString(
                 threadName: self.approvalRequest.name,
                 isNoteToSelf: false,
                 isSystemContact: isSystemContact,
+                isReleaseNotes: false,
                 canTap: true,
-                tx: tx
+                tx: tx,
             )
 
             return (contactTitle, mutualThreads)
@@ -146,13 +144,16 @@ class CallLinkApprovalRequestDetailsSheet: OWSTableSheetViewController {
 
         vStack.addArrangedSubview(avatarView)
 
-        let nameButton = OWSButton { [weak self] in
-            self?.didTapName()
-        }
-        nameButton.dimsWhenHighlighted = true
-        nameButton.titleLabel?.numberOfLines = 0
-        nameButton.titleLabel?.textAlignment = .center
-        nameButton.setAttributedTitle(contactTitle, for: .normal)
+        var nameButtonConfig = UIButton.Configuration.plain()
+        nameButtonConfig.titleAlignment = .center
+        nameButtonConfig.titleLineBreakMode = .byWordWrapping
+        nameButtonConfig.attributedTitle = AttributedString(contactTitle)
+        let nameButton = UIButton(
+            configuration: nameButtonConfig,
+            primaryAction: UIAction { [weak self] _ in
+                self?.didTapName()
+            },
+        )
         vStack.addArrangedSubview(nameButton)
 
         let mutualGroupsLabel = UILabel()
@@ -187,7 +188,7 @@ class CallLinkApprovalRequestDetailsSheet: OWSTableSheetViewController {
     SheetPreviewViewController { viewController, animated in
         CallLinkApprovalRequestDetailsSheet(
             approvalRequest: .init(aci: .init(fromUUID: UUID()), name: "Candice"),
-            approvalViewModel: CallLinkApprovalViewModel()
+            approvalViewModel: CallLinkApprovalViewModel(),
         )
         .present(from: viewController, animated: animated)
     }

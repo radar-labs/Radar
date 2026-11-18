@@ -13,9 +13,7 @@ class NSECallMessageHandler: CallMessageHandler {
 
     // MARK: Initializers
 
-    init() {
-        SwiftSingletons.register(self)
-    }
+    init() {}
 
     private var databaseStorage: SDSDatabaseStorage { SSKEnvironment.shared.databaseStorageRef }
     private var groupCallManager: GroupCallManager { SSKEnvironment.shared.groupCallManagerRef }
@@ -37,13 +35,17 @@ class NSECallMessageHandler: CallMessageHandler {
         sentAtTimestamp: UInt64,
         serverReceivedTimestamp: UInt64,
         serverDeliveryTimestamp: UInt64,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         let bufferSecondsForMainAppToAnswerRing: UInt64 = 10
 
         let serverReceivedTimestamp = serverReceivedTimestamp > 0 ? serverReceivedTimestamp : sentAtTimestamp
-        let approxMessageAge = (serverDeliveryTimestamp - serverReceivedTimestamp)
-        let messageAgeForRingRtc = approxMessageAge / UInt64.secondInMs + bufferSecondsForMainAppToAnswerRing
+        let approxMessageAgeMs: UInt64 = if serverDeliveryTimestamp > serverReceivedTimestamp {
+            serverDeliveryTimestamp - serverReceivedTimestamp
+        } else {
+            0
+        }
+        let messageAgeForRingRtc = approxMessageAgeMs / UInt64.secondInMs + bufferSecondsForMainAppToAnswerRing
 
         switch callEnvelope {
         case .offer(let offer):
@@ -52,9 +54,10 @@ class NSECallMessageHandler: CallMessageHandler {
             }
             let callOfferHandler = CallOfferHandlerImpl(
                 identityManager: identityManager,
+                notificationPreferencesManager: DependenciesBridge.shared.notificationPreferencesManager,
                 notificationPresenter: notificationPresenter,
                 profileManager: profileManager,
-                tsAccountManager: tsAccountManager
+                tsAccountManager: tsAccountManager,
             )
             let partialResult = callOfferHandler.startHandlingOffer(
                 caller: caller.aci,
@@ -63,7 +66,7 @@ class NSECallMessageHandler: CallMessageHandler {
                 callId: offer.id,
                 callType: offer.type ?? .offerAudioCall,
                 sentAtTimestamp: sentAtTimestamp,
-                tx: tx
+                tx: tx,
             )
             guard let partialResult else {
                 return
@@ -77,7 +80,7 @@ class NSECallMessageHandler: CallMessageHandler {
             let isValid = isValidOfferMessage(
                 opaque: opaque,
                 messageAgeSec: messageAgeForRingRtc,
-                callMediaType: callType
+                callMediaType: callType,
             )
             guard isValid else {
                 NSELogger.uncorrelated.warn("missed a call because it's not valid (according to RingRTC)")
@@ -87,7 +90,7 @@ class NSECallMessageHandler: CallMessageHandler {
                     outcome: .incomingMissed,
                     callType: partialResult.offerMediaType,
                     sentAtTimestamp: sentAtTimestamp,
-                    tx: tx
+                    tx: tx,
                 )
                 return
             }
@@ -105,16 +108,18 @@ class NSECallMessageHandler: CallMessageHandler {
                         return false
                     }
 
-                    guard let thread = TSGroupThread.fetch(forGroupId: groupId, tx: transaction) else {
+                    guard let thread = TSGroupThread.fetchThread(forGroupId: groupId, tx: transaction) else {
                         owsFailDebug("discarding group ring \(ringId) from \(caller.aci) for unknown group")
                         return false
                     }
 
-                    guard GroupMessageProcessorManager.discardMode(
-                        forMessageFrom: caller.aci,
-                        groupId: groupId,
-                        tx: transaction
-                    ) == .doNotDiscard else {
+                    guard
+                        GroupMessageProcessorManager.discardMode(
+                            forMessageFrom: caller.aci,
+                            groupId: groupId,
+                            tx: transaction,
+                        ) == .doNotDiscard
+                    else {
                         NSELogger.uncorrelated.warn("discarding group ring \(ringId) from \(caller.aci)")
                         return false
                     }
@@ -138,7 +143,7 @@ class NSECallMessageHandler: CallMessageHandler {
                 return isValidOpaqueRing(
                     opaqueCallMessage: opaqueData,
                     messageAgeSec: messageAgeForRingRtc,
-                    validateGroupRing: validateGroupRing
+                    validateGroupRing: validateGroupRing,
                 )
             }()
             guard shouldHandleExternally else {
@@ -153,60 +158,59 @@ class NSECallMessageHandler: CallMessageHandler {
 
         externallyHandleCallMessage(
             envelope: envelope,
+            callerAci: caller.aci,
             plaintextData: plaintextData,
             wasReceivedByUD: wasReceivedByUD,
             serverDeliveryTimestamp: serverDeliveryTimestamp,
-            tx: tx
+            tx: tx,
         )
     }
 
     private func externallyHandleCallMessage(
         envelope: SSKProtoEnvelope,
+        callerAci: Aci,
         plaintextData: Data,
         wasReceivedByUD: Bool,
         serverDeliveryTimestamp: UInt64,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
-        do {
-            let payload = try CallMessageRelay.enqueueCallMessageForMainApp(
-                envelope: envelope,
-                plaintextData: plaintextData,
-                wasReceivedByUD: wasReceivedByUD,
-                serverDeliveryTimestamp: serverDeliveryTimestamp,
-                transaction: tx
-            )
+        let payload = CallMessageRelay.enqueueCallMessageForMainApp(
+            envelope: envelope,
+            callerAci: callerAci,
+            plaintextData: plaintextData,
+            wasReceivedByUD: wasReceivedByUD,
+            serverDeliveryTimestamp: serverDeliveryTimestamp,
+            transaction: tx,
+        )
 
-            // We don't want to risk consuming any call messages that the main app needs to perform the call
-            // We suspend message processing in our process to give the main app a chance to wake and take over
-            let suspension = messagePipelineSupervisor.suspendMessageProcessing(for: .nseWakingUpApp(suspensionId: UUID(), payloadString: "\(payload)"))
-            DispatchQueue.sharedUtility.asyncAfter(deadline: .now() + .seconds(10)) {
-                suspension.invalidate()
-            }
+        // We don't want to risk consuming any call messages that the main app needs to perform the call
+        // We suspend message processing in our process to give the main app a chance to wake and take over
+        let suspension = messagePipelineSupervisor.suspendMessageProcessing(for: .nseWakingUpApp(suspensionId: UUID(), payloadString: "\(payload)"))
+        DispatchQueue.sharedUtility.asyncAfter(deadline: .now() + .seconds(10)) {
+            suspension.invalidate()
+        }
 
-            NSELogger.uncorrelated.info("Notifying primary app of incoming call with push payload: \(payload)")
-            CXProvider.reportNewIncomingVoIPPushPayload(payload.payloadDict) { error in
-                if let error = error {
-                    owsFailDebug("Failed to notify main app of call message: \(error)")
-                } else {
-                    NSELogger.uncorrelated.info("Successfully notified main app of call message.")
-                }
+        NSELogger.uncorrelated.info("Notifying primary app of incoming call with push payload: \(payload)")
+        CXProvider.reportNewIncomingVoIPPushPayload(payload.payloadDict) { error in
+            if let error {
+                owsFailDebug("Failed to notify main app of call message: \(error)")
+            } else {
+                NSELogger.uncorrelated.info("Successfully notified main app of call message.")
             }
-        } catch {
-            owsFailDebug("Failed to create relay voip payload for call message \(error)")
         }
     }
 
     func receivedGroupCallUpdateMessage(
         _ updateMessage: SSKProtoDataMessageGroupCallUpdate,
         forGroupId groupId: GroupIdentifier,
-        serverReceivedTimestamp: UInt64
+        serverReceivedTimestamp: UInt64,
     ) async {
         await groupCallManager.peekGroupCallAndUpdateThread(
             forGroupId: groupId,
             peekTrigger: .receivedGroupUpdateMessage(
                 eraId: updateMessage.eraID,
-                messageTimestamp: serverReceivedTimestamp
-            )
+                messageTimestamp: serverReceivedTimestamp,
+            ),
         )
     }
 }

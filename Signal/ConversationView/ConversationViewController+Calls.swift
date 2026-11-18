@@ -7,7 +7,7 @@ import LibSignalClient
 import SignalServiceKit
 import SignalUI
 
-public extension ConversationViewController {
+extension ConversationViewController {
 
     var isCurrentCallForThread: Bool {
         switch AppEnvironment.shared.callService.callServiceState.currentCall?.mode {
@@ -34,11 +34,10 @@ public extension ConversationViewController {
         .init(
             blockingManager: SSKEnvironment.shared.blockingManagerRef,
             databaseStorage: SSKEnvironment.shared.databaseStorageRef,
-            callService: AppEnvironment.shared.callService
+            callService: AppEnvironment.shared.callService,
         )
     }
 
-    @objc
     func showGroupLobbyOrActiveCall() {
         guard let groupId = try? (thread as? TSGroupThread)?.groupIdentifier else {
             owsFailDebug("Tried to present group call for non-group thread.")
@@ -47,16 +46,14 @@ public extension ConversationViewController {
 
         _ = CallStarter(
             groupId: groupId,
-            context: self.callStarterContext
+            context: self.callStarterContext,
         ).startCall(from: self)
     }
 
-    @objc
     func startIndividualAudioCall() {
         startIndividualCall(withVideo: false)
     }
 
-    @objc
     func startIndividualVideoCall() {
         startIndividualCall(withVideo: true)
     }
@@ -70,7 +67,7 @@ public extension ConversationViewController {
         let startCallResult = CallStarter(
             contactThread: contactThread,
             withVideo: withVideo,
-            context: self.callStarterContext
+            context: self.callStarterContext,
         ).startCall(from: self)
 
         switch startCallResult {
@@ -89,7 +86,7 @@ public extension ConversationViewController {
             Task {
                 await SSKEnvironment.shared.groupCallManagerRef.peekGroupCallAndUpdateThread(
                     forGroupId: groupId,
-                    peekTrigger: .localEvent()
+                    peekTrigger: .localEvent(),
                 )
             }
         }

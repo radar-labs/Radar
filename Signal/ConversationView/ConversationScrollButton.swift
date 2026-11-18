@@ -3,11 +3,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import SignalUI
 import SignalServiceKit
-public import UIKit
+import SignalUI
 
-public class ConversationScrollButton: UIButton {
+class ConversationScrollButton: UIButton {
 
     let iconName: String
 
@@ -18,31 +17,29 @@ public class ConversationScrollButton: UIButton {
         }
     }
 
+    var badgeTintColor: UIColor! {
+        get { unreadBadge.backgroundColor ?? UIColor.Signal.accent }
+        set { unreadBadge.backgroundColor = newValue ?? UIColor.Signal.accent }
+    }
+
     init(iconName: String) {
         self.iconName = iconName
         super.init(frame: .zero)
 
         var configuration: UIButton.Configuration?
-#if compiler(>=6.2)
         if #available(iOS 26, *) {
             configuration = .glass()
-            configuration?.imageColorTransformer = UIConfigurationColorTransformer { _ in
-                return .Signal.label
-            }
         }
-#endif
         if configuration == nil {
             configuration = .gray()
-            configuration?.imageColorTransformer = UIConfigurationColorTransformer { _ in
-                return UIColor { traitCollection in
-                    return traitCollection.userInterfaceStyle == .dark ? .ows_gray15 : .ows_gray75
-                }
-            }
-            configuration?.background.backgroundColorTransformer = UIConfigurationColorTransformer { _ in
-                return UIColor { traitCollection in
-                    return traitCollection.userInterfaceStyle == .dark ? .ows_gray65 : .ows_gray02
-                }
-            }
+            configuration?.baseForegroundColor = UIColor(
+                light: .ows_gray75,
+                dark: .ows_gray15,
+            )
+            configuration?.baseBackgroundColor = UIColor(
+                light: .ows_gray02,
+                dark: .ows_gray65,
+            )
             if #available(iOS 18, *) {
                 configuration?.background.shadowProperties.offset = CGSize(width: 0, height: 4)
                 configuration?.background.shadowProperties.color = .black
@@ -57,11 +54,19 @@ public class ConversationScrollButton: UIButton {
         addUnreadLabel()
     }
 
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        if previousTraitCollection?.userInterfaceStyle != traitCollection.userInterfaceStyle {
+            applyUnreadBadgeStroke()
+        }
+    }
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override var intrinsicContentSize: CGSize {
+    override var intrinsicContentSize: CGSize {
         .square(ConversationScrollButton.circleDiameter)
     }
 
@@ -102,5 +107,16 @@ public class ConversationScrollButton: UIButton {
             unreadBadge.centerXAnchor.constraint(equalTo: centerXAnchor),
             unreadBadge.bottomAnchor.constraint(equalTo: topAnchor, constant: pillViewOverlap),
         ])
+
+        applyUnreadBadgeStroke()
+    }
+
+    private func applyUnreadBadgeStroke() {
+        let strokeColor = switch traitCollection.userInterfaceStyle {
+        case .dark: UIColor(white: 1, alpha: 0.1)
+        default: UIColor(white: 0, alpha: 0.1)
+        }
+        unreadBadge.layer.borderWidth = 1
+        unreadBadge.layer.borderColor = strokeColor.cgColor
     }
 }

@@ -27,15 +27,8 @@ protocol ProvisioningCoordinator {
     func completeProvisioning(
         provisionMessage: LinkingProvisioningMessage,
         deviceName: String,
-        progressViewModel: LinkAndSyncSecondaryProgressViewModel
+        progressViewModel: LinkAndSyncSecondaryProgressViewModel,
     ) async throws(CompleteProvisioningError)
-}
-
-protocol ProvisioningLinkAndSyncError {
-    var error: SecondaryLinkNSyncError { get }
-    func retryLinkAndSync() async throws(CompleteProvisioningError)
-    func continueWithoutSyncing() async throws(CompleteProvisioningError)
-    func restartProvisioning() async throws
 }
 
 enum CompleteProvisioningError: Error {
@@ -47,7 +40,7 @@ enum CompleteProvisioningError: Error {
     /// The server told us the number of devices on the account has exceeded the limit.
     case deviceLimitExceededError(DeviceLimitExceededError)
 
-    case linkAndSyncError(ProvisioningLinkAndSyncError)
+    case linkAndSyncError(ProvisioningCoordinatorImpl.LinkAndSyncError)
 
     case genericError(Error)
 }

@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import UIKit
+import UIKit
 
-public protocol SingleOrDoubleTapGestureDelegate: AnyObject {
+protocol SingleOrDoubleTapGestureDelegate: AnyObject {
 
     /// A single tap was recognized; return true if handled to end the gesture immediately.
     func handleSingleTap(_ sender: SingleOrDoubleTapGestureRecognizer) -> Bool
@@ -22,11 +22,11 @@ public protocol SingleOrDoubleTapGestureDelegate: AnyObject {
     func didEndGesture(_ sender: SingleOrDoubleTapGestureRecognizer, wasHandled: Bool) -> Void
 }
 
-public class SingleOrDoubleTapGestureRecognizer: UIGestureRecognizer {
+class SingleOrDoubleTapGestureRecognizer: UIGestureRecognizer {
 
     // MARK: - API
 
-    public func setTapDelegate(_ delegate: SingleOrDoubleTapGestureDelegate) {
+    func setTapDelegate(_ delegate: SingleOrDoubleTapGestureDelegate) {
         self.tapDelegate = delegate
     }
 
@@ -51,7 +51,7 @@ public class SingleOrDoubleTapGestureRecognizer: UIGestureRecognizer {
 
     // MARK: - Event Handling
 
-    override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
         super.touchesBegan(touches, with: event)
 
         if touches.count != 1 {
@@ -59,7 +59,7 @@ public class SingleOrDoubleTapGestureRecognizer: UIGestureRecognizer {
         }
     }
 
-    override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) {
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) {
         super.touchesEnded(touches, with: event)
 
         guard !touches.isEmpty else {
@@ -84,7 +84,7 @@ public class SingleOrDoubleTapGestureRecognizer: UIGestureRecognizer {
                             return
                         }
                         endGesture()
-                    }
+                    },
                 )
             }
         } else if numTouches == 1 {
@@ -104,7 +104,7 @@ public class SingleOrDoubleTapGestureRecognizer: UIGestureRecognizer {
         tapDelegate?.didEndGesture(self, wasHandled: wasHandled)
     }
 
-    override public func reset() {
+    override func reset() {
         super.reset()
         numTouches = 0
         singleTapHandled = false

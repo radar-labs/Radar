@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
 import CFNetwork
+import Foundation
 import LibSignalClient
 
 /// This extension sacrifices Dictionary performance in order to ignore http
@@ -30,94 +30,11 @@ private extension Dictionary where Key == String {
 }
 
 public class HTTPUtils {
-    #if TESTABLE_BUILD
-    public static func logCurl(for request: URLRequest) {
-        guard let httpMethod = request.httpMethod else {
-            Logger.debug("attempted to log curl on a request with no http method")
-            return
-        }
-        guard let url = request.url else {
-            Logger.debug("attempted to log curl on a request with no url")
-            return
-        }
-        logCurl(
-            url: url,
-            method: httpMethod,
-            headers: HttpHeaders(httpHeaders: request.allHTTPHeaderFields, overwriteOnConflict: true),
-            body: request.httpBody
-        )
-    }
-
-    public static func logCurl(for request: TSRequest) {
-        logCurl(
-            url: request.url,
-            method: request.method,
-            headers: request.headers,
-            body: {
-                switch request.body {
-                case .data(let bodyData):
-                    return bodyData
-                case .parameters(_):
-                    return nil
-                }
-            }()
-        )
-    }
-
-    public static func logCurl(url: URL, method httpMethod: String, headers: HttpHeaders, body httpBody: Data?) {
-        var curlComponents = ["curl", "-v", "-k", "-X", httpMethod]
-
-        for (header, headerValue) in headers.headers {
-            // We don't yet support escaping header values.
-            // If these asserts trip, we'll need to add that.
-            owsAssertDebug(!header.contains("'"))
-            owsAssertDebug(!headerValue.contains("'"))
-
-            curlComponents.append("-H")
-            curlComponents.append("'\(header): \(headerValue)'")
-        }
-
-        if let httpBody, !httpBody.isEmpty {
-            let contentType = headers["Content-Type"]
-            switch contentType {
-            case MimeType.applicationJson.rawValue:
-                guard let jsonBody = String(data: httpBody, encoding: .utf8) else {
-                    Logger.debug("data attached to request as json was not utf8 encoded")
-                    return
-                }
-                // We don't yet support escaping JSON.
-                // If these asserts trip, we'll need to add that.
-                owsAssertDebug(!jsonBody.contains("'"))
-                curlComponents.append("--data-ascii")
-                curlComponents.append("'\(jsonBody)'")
-            case MimeType.applicationXProtobuf.rawValue, "application/x-www-form-urlencoded", "application/vnd.signal-messenger.mrm":
-                let filename = "\(UUID().uuidString).tmp"
-                var echoBytes = ""
-                for byte in httpBody {
-                    echoBytes.append(String(format: "\\\\x%02X", byte))
-                }
-                let echoCommand = "echo -n -e \(echoBytes) > \(filename)"
-
-                Logger.verbose("curl for request: \(echoCommand)")
-                curlComponents.append("--data-binary")
-                curlComponents.append("@\(filename)")
-            default:
-                owsFailDebug("Unknown content type: \(contentType ?? "<nil>")")
-            }
-
-        }
-        // TODO: Add support for cookies.
-        curlComponents.append("\"\(url.absoluteString)\"")
-        let curlCommand = curlComponents.joined(separator: " ")
-        Logger.verbose("curl for request: \(curlCommand)")
-    }
-    #endif
-
     public static func preprocessMainServiceHTTPError(
         requestUrl: URL,
         responseStatus: Int,
         responseHeaders: HttpHeaders,
-        responseData: Data?
+        responseData: Data?,
     ) async -> OWSHTTPError {
         let httpError: OWSHTTPError
         if responseStatus == 0 {
@@ -127,7 +44,7 @@ public class HTTPUtils {
                 requestUrl: requestUrl,
                 responseStatus: responseStatus,
                 responseHeaders: responseHeaders,
-                responseData: responseData
+                responseData: responseData,
             ))
         }
 
@@ -148,16 +65,7 @@ public class HTTPUtils {
     }
 
     public static func retryDelayNanoSeconds(_ response: HTTPResponse, defaultRetryTime: TimeInterval = 15) -> UInt64 {
-        let retryAfter: TimeInterval
-        if
-            let retryAfterHeader = response.headers["retry-after"],
-            let retryAfterTime = TimeInterval(retryAfterHeader)
-        {
-            retryAfter = retryAfterTime
-        } else {
-            retryAfter = defaultRetryTime
-        }
-        return retryAfter.clampedNanoseconds
+        return (response.headers.retryAfterTimeInterval ?? defaultRetryTime).clampedNanoseconds
     }
 }
 
@@ -198,11 +106,19 @@ public extension Error {
         return error.responseHeaders
     }
 
+    var isCancellation: Bool {
+        switch self {
+        case is CancellationError: true
+        case URLError.cancelled: true
+        default: false
+        }
+    }
+
     /// Does this error represent a transient networking issue?
     ///
     /// a.k.a. "the internet gave up" (see also `isTimeout`)
     var isNetworkFailure: Bool {
-        switch (self as any Error) {
+        switch self as any Error {
         case URLError.cannotConnectToHost: return true
         case URLError.networkConnectionLost: return true
         case URLError.dnsLookupFailed: return true
@@ -213,8 +129,12 @@ public extension Error {
         case URLError.badURL: return true
         case POSIXError.EPROTO: return true
         case let httpError as OWSHTTPError: return httpError.isNetworkFailureImpl
+        case SignalError.chatServiceInactive: return true
         case SignalError.connectionFailed: return true
-        case StorageService.StorageError.networkError: return true
+        case SignalError.connectionInvalidated: return true
+        case SignalError.ioError: return true
+        case SignalError.possibleCaptiveNetwork: return true
+        case SignalError.webSocketError: return true
         case Upload.Error.networkError: return true
         default: return false
         }
@@ -224,12 +144,13 @@ public extension Error {
     ///
     /// a.k.a. "we gave up" (see also `isNetworkFailure`)
     var isTimeout: Bool {
-        switch (self as any Error) {
+        switch self as any Error {
         case URLError.timedOut: return true
         case let httpError as OWSHTTPError: return httpError.isTimeoutImpl
         case GroupsV2Error.timeout: return true
         case PaymentsError.timeout: return true
         case SignalError.connectionTimeoutError: return true
+        case SignalError.requestTimeoutError: return true
         case Upload.Error.networkTimeout: return true
         default: return false
         }
@@ -243,7 +164,7 @@ public extension Error {
         switch self as? OWSHTTPError {
         case .serviceResponse(let serviceResponse):
             return serviceResponse.is5xx
-        case nil, .invalidRequest, .wrappedFailure, .networkFailure:
+        case nil, .wrappedFailure, .networkFailure:
             return false
         }
     }
@@ -252,10 +173,12 @@ public extension Error {
 // MARK: -
 
 @inlinable
-public func owsFailDebugUnlessNetworkFailure(_ error: Error,
-                                             file: String = #file,
-                                             function: String = #function,
-                                             line: Int = #line) {
+public func owsFailDebugUnlessNetworkFailure(
+    _ error: Error,
+    file: String = #file,
+    function: String = #function,
+    line: Int = #line,
+) {
     if error.isNetworkFailureOrTimeout {
         // Log but otherwise ignore network failures.
         Logger.warn("Error: \(error)", file: file, function: function, line: line)
@@ -269,7 +192,7 @@ public func owsFailBetaUnlessNetworkFailure(
     _ error: Error,
     file: String = #file,
     function: String = #function,
-    line: Int = #line
+    line: Int = #line,
 ) {
     if error.isNetworkFailureOrTimeout {
         // Log but otherwise ignore network failures.
@@ -284,17 +207,7 @@ public func owsFailBetaUnlessNetworkFailure(
 extension HttpHeaders {
 
     public var retryAfterTimeInterval: TimeInterval? {
-        guard let retryAfterStringValue else {
-            return nil
-        }
-
-        let timeInterval = TimeInterval(retryAfterStringValue)
-
-        guard let timeInterval, timeInterval > 0 else {
-            return nil
-        }
-
-        return timeInterval
+        return retryAfterStringValue.flatMap(TimeInterval.init(_:))
     }
 
     public var retryAfterDate: Date? {
@@ -308,14 +221,13 @@ extension HttpHeaders {
             return date
         } else if let retryAfterTimeInterval {
             return Date().addingTimeInterval(retryAfterTimeInterval)
+        } else {
+            owsAssertDebug(
+                CurrentAppContext().isRunningTests,
+                "Failed to parse retry-after string: \(String(describing: retryAfterStringValue))",
+            )
+            return nil
         }
-
-        if !CurrentAppContext().isRunningTests {
-            owsFailDebug("Failed to parse retry-after string: \(String(describing: retryAfterStringValue))")
-        }
-
-        // Historically, if we failed to parse here we returned a +60s date.
-        return Date().addingTimeInterval(.minute)
     }
 
     private var retryAfterStringValue: String? {

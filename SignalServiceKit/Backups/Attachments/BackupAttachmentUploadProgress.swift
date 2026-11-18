@@ -3,75 +3,66 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import GRDB
+import GRDB
 
 public class BackupAttachmentUploadProgressObserver {
     fileprivate let queueSnapshot: BackupAttachmentUploadProgressImpl.UploadQueueSnapshot
     fileprivate let sink: OWSProgressSink
     fileprivate let source: OWSProgressSource
-    private weak var progress: BackupAttachmentUploadProgress?
     fileprivate let id: UUID = UUID()
 
     fileprivate init(
         queueSnapshot: BackupAttachmentUploadProgressImpl.UploadQueueSnapshot,
         sink: OWSProgressSink,
         source: OWSProgressSource,
-        progress: BackupAttachmentUploadProgress?
     ) {
         self.queueSnapshot = queueSnapshot
         self.sink = sink
         self.source = source
-        self.progress = progress
-    }
-
-    deinit {
-        Task { [weak progress, id] in
-            await progress?.removeObserver(id)
-        }
     }
 }
 
-/// Tracks and reports progress for backup (media tier) attachment uploads.
+/// Tracks and reports the progress of the "initial Backup attachment upload",
+/// or the one-time upload of historical attachments performed when paid-tier
+/// Backups are enabled.
 ///
-/// At observation time, checks the current total scheduled bytes to upload, and uses that
-/// as the fixed total for the lifetime of the observation. Creating a new observation recomputes
-/// the remaining total (which may have gone up if new attachments have been scheduled,
-/// or gone down, including to 0, if uploads completed).
-/// Note this contrasts with BackupAttachmentDownloadProgress, which is a singleton observer
-/// and "remembers" the total bytes to download.
+/// If you have paid-tier Backups enabled, new attachments are backed up to the
+/// media tier CDN as they are sent/received. However, when you first enable
+/// paid-tier Backups you must also back up all of your historical attachments.
 ///
-/// Note: ignores/excludes thumbnail uploads; just deals with fullsize attachments.
+/// While this type tracks the progress of all Backup attachment uploads, it
+/// filters internally to only report the progress of attachments included in
+/// that "initial" upload.
+///
+/// - Note
+/// Only considers fullsize attachments; ignores thumbnails.
+///
+/// - SeeAlso
+/// `BackupAttachmentUploadTracker`
 public protocol BackupAttachmentUploadProgress: AnyObject {
 
     typealias Observer = BackupAttachmentUploadProgressObserver
 
-    /// Begin observing progress of all backup attachment uploads that are scheduled as of the time this method is called.
-    /// The total count will not change over the lifetime of the observer, even if new attachments are scheduled for upload.
-    /// The returned observer must be retained to continue receiving updates (Careful of retain cycles; the observer retains the block).
-    func addObserver(_ block: @escaping (OWSProgress) -> Void) async throws -> Observer
+    /// Add an observer, calling the given `block` with progress updates.
+    /// - Warning
+    /// The returned observer must be caller-retained. Be careful of retain
+    /// cycles, as the observer retains the passed block.
+    func addObserver(_ block: @escaping (OWSProgress) -> Void) -> Observer
 
-    func removeObserver(_ observer: Observer) async
+    func removeObserver(_ observer: Observer)
 
-    func removeObserver(_ id: UUID) async
+    func removeObserver(_ id: UUID)
 
-    /// Create an OWSProgressSink for a single attachment to be uploaded.
-    /// Should be called prior to uploading any backup attachment.
-    func willBeginUploadingFullsizeAttachment(
-        uploadRecord: QueuedBackupAttachmentUpload
-    ) async -> OWSProgressSink
-
-    /// Stopgap to inform that an attachment finished uploading.
-    /// There are a couple edge cases (e.g. already uploaded) that result in uploads
-    /// finishing without reporting any progress updates. This method ensures we always mark
-    /// attachments as finished in all cases.
-    func didFinishUploadOfFullsizeAttachment(
-        uploadRecord: QueuedBackupAttachmentUpload
-    ) async
+    func didUpdateProgressForFullsizeAttachment(
+        uploadRecord: QueuedBackupAttachmentUpload,
+        completedByteCount: UInt64,
+        totalByteCount: UInt64,
+    )
 
     /// Called when there are no more enqueued uploads.
     /// As a final stopgap, in case we missed some bytes and counting got out of sync,
     /// this should fully advance the uploaded byte count to the total byte count.
-    func didEmptyFullsizeUploadQueue() async
+    func didEmptyFullsizeUploadQueue()
 
     /// Called when the BackupPlan changes, allowing us to reset progress-related
     /// state.
@@ -82,22 +73,23 @@ public protocol BackupAttachmentUploadProgress: AnyObject {
     )
 }
 
-public actor BackupAttachmentUploadProgressImpl: BackupAttachmentUploadProgress {
+public class BackupAttachmentUploadProgressImpl: BackupAttachmentUploadProgress {
 
     // MARK: - Public API
 
-    public func addObserver(_ block: @escaping (OWSProgress) -> Void) async throws -> Observer {
-        let queueSnapshot = try self.computeRemainingUnuploadedByteCount()
+    public func addObserver(_ block: @escaping (OWSProgress) -> Void) -> Observer {
+        let queueSnapshot = self.computeRemainingUnuploadedByteCount()
         let sink = OWSProgress.createSink(block)
-        let source = await sink.addSource(withLabel: "", unitCount: queueSnapshot.totalByteCount)
+        let source = sink.addSource(withLabel: "", unitCount: queueSnapshot.totalByteCount)
         source.incrementCompletedUnitCount(by: queueSnapshot.completedByteCount)
         let observer = Observer(
             queueSnapshot: queueSnapshot,
             sink: sink,
             source: source,
-            progress: self
         )
-        observers.append(observer)
+        state.update { _state in
+            _state.observers.append(observer)
+        }
         return observer
     }
 
@@ -107,58 +99,24 @@ public actor BackupAttachmentUploadProgressImpl: BackupAttachmentUploadProgress 
 
     // MARK: - BackupAttachmentUploadManager API
 
-    public func willBeginUploadingFullsizeAttachment(
-        uploadRecord: QueuedBackupAttachmentUpload
-    ) async -> OWSProgressSink {
-        guard uploadRecord.isFullsize else {
-            owsFailDebug("Attempting to count thumbnail upload!")
-            return OWSProgress.createSink({ _ in })
-        }
-        let sink = OWSProgress.createSink { [weak self] progress in
-            Task {
-                await self?.didUpdateProgressForActiveUpload(
-                    uploadRecord: uploadRecord,
-                    completedByteCount: progress.completedUnitCount,
-                    totalByteCount: progress.totalUnitCount
-                )
-            }
-        }
-        return sink
-    }
-
-    public func didFinishUploadOfFullsizeAttachment(
-        uploadRecord: QueuedBackupAttachmentUpload
-    ) {
-        guard uploadRecord.isFullsize else {
-            owsFailDebug("Attempting to count thumbnail upload!")
-            return
-        }
-        didUpdateProgressForActiveUpload(
-            uploadRecord: uploadRecord,
-            completedByteCount: UInt64(uploadRecord.estimatedByteCount),
-            totalByteCount: UInt64(uploadRecord.estimatedByteCount)
-        )
-    }
-
-    public func didEmptyFullsizeUploadQueue() async {
-        activeUploadCompletedByteCounts.keys.forEach {
-            recentlyCompletedUploads.set(key: $0, value: ())
-        }
-        activeUploadCompletedByteCounts = [:]
-        activeUploadTotalByteCounts = [:]
-        observers.cullExpired()
-        observers.elements.forEach { observer in
-            let source = observer.source
-            if source.totalUnitCount > 0, source.totalUnitCount > source.completedUnitCount {
-                source.incrementCompletedUnitCount(by: source.totalUnitCount - source.completedUnitCount)
+    public func didEmptyFullsizeUploadQueue() {
+        state.update { _state in
+            _state.activeUploadCompletedByteCounts = [:]
+            _state.activeUploadTotalByteCounts = [:]
+            _state.observers.cullExpired()
+            _state.observers.elements.forEach { observer in
+                let source = observer.source
+                if source.totalUnitCount > 0, source.totalUnitCount > source.completedUnitCount {
+                    source.incrementCompletedUnitCount(by: source.totalUnitCount - source.completedUnitCount)
+                }
             }
         }
     }
 
-    public nonisolated func backupPlanDidChange(
+    public func backupPlanDidChange(
         oldBackupPlan: BackupPlan,
         newBackupPlan: BackupPlan,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         if oldBackupPlan.isPaidPlan() == newBackupPlan.isPaidPlan() {
             // If paid-plan status isn't changing then we're not starting new
@@ -184,10 +142,10 @@ public actor BackupAttachmentUploadProgressImpl: BackupAttachmentUploadProgress 
         static let maxAttachmentRowId: String = "maxAttachmentRowId"
     }
 
-    private nonisolated let attachmentStore: AttachmentStore
-    private nonisolated let backupSettingsStore: BackupSettingsStore
-    private nonisolated let db: DB
-    private nonisolated let kvStore: NewKeyValueStore
+    private let attachmentStore: AttachmentStore
+    private let backupSettingsStore: BackupSettingsStore
+    private let db: DB
+    private let kvStore: NewKeyValueStore
 
     init(
         attachmentStore: AttachmentStore,
@@ -202,62 +160,73 @@ public actor BackupAttachmentUploadProgressImpl: BackupAttachmentUploadProgress 
 
     // MARK: -
 
-    private var observers = WeakArray<Observer>()
-
     private struct PerObserverUploadId: Hashable {
         let observerId: UUID
         let attachmentId: Attachment.IDType
     }
 
-    /// Currently active uploads for which we update progress byte-by-byte.
-    private var activeUploadCompletedByteCounts = [PerObserverUploadId: UInt64]()
-    private var activeUploadTotalByteCounts = [PerObserverUploadId: UInt64]()
-    /// There is a race between receiving the final OWSProgress update for a given attachment
-    /// and being told the attachment finished uploading by BackupAttachmentUploadManager.
-    /// To resolve this race, track recently completed uploads so we know not to double count.
-    /// There could be tens of thousands of attachments, so to minimize memory usage only keep
-    /// an LRUCache. In practice that will catch all races. Even if it doesn't, the downside
-    /// is we misreport progress until we hit 100%, big whoop.
-    private var recentlyCompletedUploads = LRUCache<PerObserverUploadId, Void>(maxSize: 100)
+    private struct State {
+        var observers = WeakArray<BackupAttachmentUploadProgressObserver>()
 
-    private func didUpdateProgressForActiveUpload(
+        /// Currently active uploads for which we update progress byte-by-byte.
+        var activeUploadCompletedByteCounts = [PerObserverUploadId: UInt64]()
+        var activeUploadTotalByteCounts = [PerObserverUploadId: UInt64]()
+    }
+
+    private let state = AtomicValue<State>(State(), lock: .init())
+
+    public func didUpdateProgressForFullsizeAttachment(
         uploadRecord: QueuedBackupAttachmentUpload,
         completedByteCount: UInt64,
-        totalByteCount totalByteCountInput: UInt64
+        totalByteCount totalByteCountInput: UInt64,
     ) {
-        guard
-            totalByteCountInput != 0
-        else {
+        guard totalByteCountInput != 0 else {
             return
         }
 
-        observers.elements.forEach { observer in
+        state.update { _state in
+            _didUpdateProgressForFullsizeAttachment(
+                state: &_state,
+                uploadRecord: uploadRecord,
+                completedByteCount: completedByteCount,
+                totalByteCount: totalByteCountInput,
+            )
+        }
+    }
+
+    private func _didUpdateProgressForFullsizeAttachment(
+        state: inout State,
+        uploadRecord: QueuedBackupAttachmentUpload,
+        completedByteCount: UInt64,
+        totalByteCount totalByteCountInput: UInt64,
+    ) {
+        for observer in state.observers.elements {
             guard
                 observer.queueSnapshot.maxAttachmentRowId >= uploadRecord.attachmentRowId
             else {
-                return
+                continue
             }
             let uploadId = PerObserverUploadId(
                 observerId: observer.id,
-                attachmentId: uploadRecord.attachmentRowId
+                attachmentId: uploadRecord.attachmentRowId,
             )
             let source = observer.source
 
-            let prevCompletedByteCount = activeUploadCompletedByteCounts[uploadId] ?? 0
-            let totalByteCount = activeUploadTotalByteCounts[uploadId] ?? totalByteCountInput
-            activeUploadTotalByteCounts[uploadId] = totalByteCount
+            let prevCompletedByteCount = state.activeUploadCompletedByteCounts[uploadId] ?? 0
+            let totalByteCount = state.activeUploadTotalByteCounts[uploadId] ?? totalByteCountInput
+            state.activeUploadTotalByteCounts[uploadId] = totalByteCount
+
             if completedByteCount >= totalByteCountInput {
                 // If the caller's intent is to complete to 100%, complete
                 // to 100% even if the caller got the unit count wrong
                 // (e.g. because it was only doing an estimated byte count).
-                if prevCompletedByteCount < totalByteCount{
+                if prevCompletedByteCount < totalByteCount {
                     source.incrementCompletedUnitCount(by: totalByteCount - prevCompletedByteCount)
-                    activeUploadCompletedByteCounts[uploadId] = totalByteCount
-                    recentlyCompletedUploads.set(key: uploadId, value: ())
+                    state.activeUploadCompletedByteCounts[uploadId] = totalByteCount
                 }
             } else if completedByteCount > prevCompletedByteCount {
                 source.incrementCompletedUnitCount(by: completedByteCount - prevCompletedByteCount)
-                activeUploadCompletedByteCounts[uploadId] = completedByteCount
+                state.activeUploadCompletedByteCounts[uploadId] = completedByteCount
             } else {
                 // The completed byte count is less than the previous completed
                 // byte count, which is strange but not impossible given that we
@@ -268,7 +237,9 @@ public actor BackupAttachmentUploadProgressImpl: BackupAttachmentUploadProgress 
     }
 
     public func removeObserver(_ id: UUID) {
-        observers.removeAll(where: { $0.id == id })
+        state.update {
+            $0.observers.removeAll(where: { $0.id == id })
+        }
     }
 
     fileprivate struct UploadQueueSnapshot {
@@ -279,7 +250,7 @@ public actor BackupAttachmentUploadProgressImpl: BackupAttachmentUploadProgress 
         let maxAttachmentRowId: Attachment.IDType
     }
 
-    private nonisolated func computeMaxAttachmentRowId(
+    private func computeMaxAttachmentRowId(
         currentBackupPlan: BackupPlan,
         tx: DBReadTransaction,
     ) -> Attachment.IDType {
@@ -288,22 +259,19 @@ public actor BackupAttachmentUploadProgressImpl: BackupAttachmentUploadProgress 
             return 0
         }
 
-        do {
-            return try attachmentStore.fetchMaxRowId(tx: tx) ?? 0
-        } catch {
-            owsFailDebug("Failed to get max attachment row ID! \(error)")
-            return 0
-        }
+        return attachmentStore.fetchMaxRowId(tx: tx) ?? 0
     }
 
-    private nonisolated func computeRemainingUnuploadedByteCount() throws -> UploadQueueSnapshot {
-        return try db.read { tx in
+    private func computeRemainingUnuploadedByteCount() -> UploadQueueSnapshot {
+        return db.read { tx in
             let maxAttachmentRowId: Attachment.IDType = {
-                if let persistedValue = kvStore.fetchValue(
-                    Attachment.IDType.self,
-                    forKey: StoreKeys.maxAttachmentRowId,
-                    tx: tx,
-                ) {
+                if
+                    let persistedValue = kvStore.fetchValue(
+                        Attachment.IDType.self,
+                        forKey: StoreKeys.maxAttachmentRowId,
+                        tx: tx,
+                    )
+                {
                     return persistedValue
                 }
 
@@ -317,27 +285,30 @@ public actor BackupAttachmentUploadProgressImpl: BackupAttachmentUploadProgress 
 
             func fetchBackupAttachmentUploadCursor(
                 state: QueuedBackupAttachmentUpload.State,
-            ) throws -> RecordCursor<QueuedBackupAttachmentUpload> {
-                return try QueuedBackupAttachmentUpload
+            ) -> FailIfThrowsRecordCursor<QueuedBackupAttachmentUpload> {
+                let query = QueuedBackupAttachmentUpload
                     .filter(Column(QueuedBackupAttachmentUpload.CodingKeys.isFullsize) == true)
                     .filter(Column(QueuedBackupAttachmentUpload.CodingKeys.state) == state.rawValue)
                     .filter(Column(QueuedBackupAttachmentUpload.CodingKeys.attachmentRowId) <= maxAttachmentRowId)
-                    .fetchCursor(tx.database)
+
+                return FailIfThrowsRecordCursor {
+                    try query.fetchCursor(tx.database)
+                }
             }
 
             var remainingByteCount: UInt64 = 0
-            let remainingCursor = try fetchBackupAttachmentUploadCursor(
+            var remainingCursor = fetchBackupAttachmentUploadCursor(
                 state: .ready,
             )
-            while let uploadRecord = try remainingCursor.next() {
+            while let uploadRecord = remainingCursor.next() {
                 remainingByteCount += UInt64(uploadRecord.estimatedByteCount)
             }
 
             var completedByteCount: UInt64 = 0
-            let completedCursor = try fetchBackupAttachmentUploadCursor(
+            var completedCursor = fetchBackupAttachmentUploadCursor(
                 state: .done,
             )
-            while let uploadRecord = try completedCursor.next() {
+            while let uploadRecord = completedCursor.next() {
                 completedByteCount += UInt64(uploadRecord.estimatedByteCount)
             }
 
@@ -366,54 +337,67 @@ private extension BackupPlan {
 #if TESTABLE_BUILD
 
 open class BackupAttachmentUploadProgressMock: BackupAttachmentUploadProgress {
+    var progressMock: OWSProgress {
+        didSet {
+            mockObserverBlocks.get().forEach { $0(progressMock) }
+        }
+    }
 
-    init() {}
+    private let mockObserverBlocks: AtomicValue<[(OWSProgress) -> Void]>
+
+    init(
+        initialCompleted: UInt64,
+        total: UInt64,
+    ) {
+        self.progressMock = OWSProgress(
+            completedUnitCount: initialCompleted,
+            totalUnitCount: total,
+        )
+        self.mockObserverBlocks = AtomicValue([], lock: .init())
+    }
 
     open func addObserver(
-        _ block: @escaping (OWSProgress) -> Void
-    ) async throws -> BackupAttachmentUploadProgressObserver {
+        _ block: @escaping (OWSProgress) -> Void,
+    ) -> BackupAttachmentUploadProgressObserver {
+        mockObserverBlocks.update { $0.append(block) }
+
         let sink = OWSProgress.createSink(block)
-        let source = await sink.addSource(withLabel: "", unitCount: 100)
+        let source = sink.addSource(withLabel: "", unitCount: progressMock.totalUnitCount)
         return BackupAttachmentUploadProgressObserver(
-            queueSnapshot: .init(
-                totalByteCount: 100,
-                completedByteCount: 0,
+            queueSnapshot: BackupAttachmentUploadProgressImpl.UploadQueueSnapshot(
+                totalByteCount: progressMock.totalUnitCount,
+                completedByteCount: progressMock.completedUnitCount,
                 maxAttachmentRowId: 0,
             ),
             sink: sink,
             source: source,
-            progress: nil
         )
     }
 
-    open func removeObserver(_ observer: Observer) async {
+    open func removeObserver(_ observer: Observer) {
         // Do nothing
     }
 
-    open func removeObserver(_ id: UUID) async {
+    open func removeObserver(_ id: UUID) {
         // Do nothing
     }
 
-    open func willBeginUploadingFullsizeAttachment(
-        uploadRecord: QueuedBackupAttachmentUpload
-    ) async -> any OWSProgressSink {
-        OWSProgress.createSink({ _ in })
-    }
-
-    open func didFinishUploadOfFullsizeAttachment(
-        uploadRecord: QueuedBackupAttachmentUpload
-    ) async {
+    open func didUpdateProgressForFullsizeAttachment(
+        uploadRecord: QueuedBackupAttachmentUpload,
+        completedByteCount: UInt64,
+        totalByteCount: UInt64,
+    ) {
         // Do nothing
     }
 
-    open func didEmptyFullsizeUploadQueue() async {
+    open func didEmptyFullsizeUploadQueue() {
         // Do nothing
     }
 
     open func backupPlanDidChange(
         oldBackupPlan: BackupPlan,
         newBackupPlan: BackupPlan,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         // Do nothing
     }

@@ -9,7 +9,7 @@ import SignalServiceKit
 
 public enum MentionPickerStyle {
     case `default`
-    case composingAttachment
+    @available(iOS, deprecated: 26) case composingAttachment
     case groupReply
 }
 
@@ -23,13 +23,13 @@ class MentionPicker: UIView {
     init(
         mentionableAcis: [Aci],
         style: Style,
-        selectedAddressCallback: @escaping (SignalServiceAddress) -> Void
+        selectedAddressCallback: @escaping (SignalServiceAddress) -> Void,
     ) {
         let databaseStorage = SSKEnvironment.shared.databaseStorageRef
         mentionableUsers = databaseStorage.read { transaction in
             let sortedAddresses = SSKEnvironment.shared.contactManagerImplRef.sortSignalServiceAddresses(
                 mentionableAcis.map({ SignalServiceAddress($0) }),
-                transaction: transaction
+                transaction: transaction,
             )
 
             return sortedAddresses.compactMap { address in
@@ -40,7 +40,7 @@ class MentionPicker: UIView {
 
                 return MentionableUser(
                     address: address,
-                    displayName: SSKEnvironment.shared.contactManagerRef.displayName(for: address, tx: transaction).resolvedValue()
+                    displayName: SSKEnvironment.shared.contactManagerRef.displayName(for: address, tx: transaction).resolvedValue(),
                 )
             }
         }
@@ -71,7 +71,7 @@ class MentionPicker: UIView {
 
         case .default:
             useVisualEffectViewBackground = true
-            if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable {
+            if #available(iOS 26, *) {
                 useGlassBackground = true
             } else {
                 useGlassBackground = false
@@ -79,7 +79,6 @@ class MentionPicker: UIView {
         }
 
         if useVisualEffectViewBackground {
-#if compiler(>=6.2)
             // Glass background, rounded corners, horizontal insets.
             if #available(iOS 26, *), useGlassBackground {
                 let glassEffectView = UIVisualEffectView(effect: backgroundViewVisualEffect())
@@ -94,14 +93,11 @@ class MentionPicker: UIView {
 
                 directionalLayoutMargins = .init(hMargin: OWSTableViewController2.cellHInnerMargin, vMargin: 0)
             }
-#endif
 
             // Blur background.
             if backgroundView == nil {
                 if UIAccessibility.isReduceTransparencyEnabled {
-                    tableView.backgroundColor = overrideUserInterfaceStyle == .dark
-                    ? Theme.darkThemeBackgroundColor
-                    : Theme.backgroundColor
+                    tableView.backgroundColor = .Signal.background
                 } else {
                     backgroundView = UIVisualEffectView(effect: backgroundViewVisualEffect())
                 }
@@ -140,9 +136,10 @@ class MentionPicker: UIView {
                 hairlineView.backgroundColor = .ows_gray65
 
             case .groupReply, .default:
-                hairlineView.backgroundColor = UIColor { traitCollection in
-                    traitCollection.userInterfaceStyle == .dark ? UIColor.ows_gray75 : UIColor.ows_gray05
-                }
+                hairlineView.backgroundColor = UIColor(
+                    light: UIColor.ows_gray05,
+                    dark: UIColor.ows_gray75,
+                )
             }
             hairlineView.translatesAutoresizingMaskIntoConstraints = false
             addSubview(hairlineView)
@@ -181,16 +178,9 @@ class MentionPicker: UIView {
     private var backgroundView: UIVisualEffectView?
 
     private func backgroundViewVisualEffect() -> UIVisualEffect? {
-#if compiler(>=6.2)
         if #available(iOS 26.1, *) {
             let glassEffect = UIGlassEffect(style: .regular)
-            // Copy from ConversationInputToolbar.
-            glassEffect.tintColor = UIColor { traitCollection in
-                if traitCollection.userInterfaceStyle == .dark {
-                    return UIColor(white: 0, alpha: 0.2)
-                }
-                return UIColor(white: 1, alpha: 0.12)
-            }
+            glassEffect.tintColor = .Signal.glassBackgroundTint
             return glassEffect
         }
         // 26.0 would still use a panel with rounded corners, but with blur effect instead of glass.
@@ -198,7 +188,6 @@ class MentionPicker: UIView {
         if #available(iOS 26, *) {
             return UIBlurEffect(style: .systemThinMaterial)
         }
-#endif
 
         guard !UIAccessibility.isReduceTransparencyEnabled else { return nil }
 
@@ -241,10 +230,11 @@ class MentionPicker: UIView {
             withDuration: 0.25,
             animations: {
                 self.superview?.layoutIfNeeded()
-            }, completion: { _ in
+            },
+            completion: { _ in
                 self.isUpdatingHeight = false
                 self.lastContentOffset = self.tableView.contentOffset.y
-            }
+            },
         )
     }
 
@@ -293,13 +283,13 @@ class MentionPicker: UIView {
         return UIViewPropertyAnimator(
             duration: 0.35,
             springDamping: 1,
-            springResponse: 0.35
+            springResponse: 0.35,
         )
     }
 
     // Make sure to match parementers in ConversationInputToolbar.StickerLayout.
     private static var animationTransform: CGAffineTransform {
-        guard #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable else { return .identity }
+        guard #available(iOS 26, *) else { return .identity }
         return .scale(0.9)
     }
 
@@ -317,8 +307,9 @@ class MentionPicker: UIView {
         animator.addAnimations {
             self.transform = .identity
 
-            if let backgroundView = self.backgroundView,
-               let backgroundViewEffect = self.backgroundViewVisualEffect()
+            if
+                let backgroundView = self.backgroundView,
+                let backgroundViewEffect = self.backgroundViewVisualEffect()
             {
                 backgroundView.effect = backgroundViewEffect
             }
@@ -376,7 +367,7 @@ class MentionPicker: UIView {
 
     private let mentionableUsers: [MentionableUser]
 
-    lazy private(set) var filteredMentionableUsers = mentionableUsers
+    private(set) lazy var filteredMentionableUsers = mentionableUsers
 
     /// Used to update the filtered list of users for display.
     /// If the mention text results in no users remaining, returns
@@ -419,7 +410,7 @@ class MentionPicker: UIView {
 extension MentionPicker {
 
     func highlightAndScrollToRow(_ row: Int, animated: Bool = true) {
-        guard row >= 0 && row < filteredMentionableUsers.count else { return }
+        guard row >= 0, row < filteredMentionableUsers.count else { return }
 
         tableView.selectRow(at: IndexPath(row: row, section: 0), animated: animated, scrollPosition: .none)
         tableView.scrollToRow(at: IndexPath(row: row, section: 0), at: .none, animated: animated)
@@ -460,7 +451,8 @@ extension MentionPicker {
     }
 
     func selectHighlightedRow() {
-        guard let selectedIndex = tableView.indexPathForSelectedRow,
+        guard
+            let selectedIndex = tableView.indexPathForSelectedRow,
             let mentionableUser = filteredMentionableUsers[safe: selectedIndex.row] else { return }
         selectedAddressCallback(mentionableUser.address)
     }
@@ -524,7 +516,7 @@ private class MentionableUserCell: UITableViewCell {
         let cellSize = cell.systemLayoutSizeFitting(
             CGSize(width: 300, height: CGFloat.greatestFiniteMagnitude),
             withHorizontalFittingPriority: .required,
-            verticalFittingPriority: .fittingSizeLevel
+            verticalFittingPriority: .fittingSizeLevel,
         )
         return cellSize.height
     }
@@ -539,7 +531,7 @@ private class MentionableUserCell: UITableViewCell {
     private let avatarView = ConversationAvatarView(
         sizeClass: MentionableUserCell.avatarSizeClass,
         localUserDisplayMode: .asUser,
-        useAutolayout: true
+        useAutolayout: true,
     )
 
     private static let vMargin: CGFloat = 10
@@ -561,7 +553,7 @@ private class MentionableUserCell: UITableViewCell {
             avatarView.trailingAnchor.constraint(equalTo: avatarContainer.trailingAnchor),
         ])
 
-        let stackView = UIStackView(arrangedSubviews: [ avatarContainer, displayNameLabel ])
+        let stackView = UIStackView(arrangedSubviews: [avatarContainer, displayNameLabel])
         stackView.axis = .horizontal
         stackView.spacing = 12
         stackView.isUserInteractionEnabled = false
@@ -579,7 +571,7 @@ private class MentionableUserCell: UITableViewCell {
         var configuration = UIBackgroundConfiguration.clear()
         if state.isSelected || state.isHighlighted {
             configuration.backgroundColor = .Signal.primaryFill
-            if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable {
+            if #available(iOS 26, *) {
                 configuration.backgroundInsets = .init(hMargin: 0.5 * Self.hMargin, vMargin: 0)
                 configuration.cornerRadius = 50
             }

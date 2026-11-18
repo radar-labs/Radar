@@ -4,6 +4,7 @@
 //
 
 import Foundation
+public import LibSignalClient
 
 /// Temporary bridge between [legacy code that uses global accessors for manager instances]
 /// and [new code that expects references to instances to be explicitly passed around].
@@ -32,13 +33,14 @@ public class DependenciesBridge {
 
         return _shared
     }
+
     private static var _shared: DependenciesBridge?
 
-    #if TESTABLE_BUILD
+#if TESTABLE_BUILD
     static var hasShared: Bool {
         return _shared != nil
     }
-    #endif
+#endif
 
     static func setShared(_ dependenciesBridge: DependenciesBridge?, isRunningTests: Bool) {
         owsPrecondition((_shared == nil && dependenciesBridge != nil) || isRunningTests)
@@ -47,7 +49,9 @@ public class DependenciesBridge {
 
     public let accountAttributesUpdater: AccountAttributesUpdater
     public let accountEntropyPoolManager: AccountEntropyPoolManager
+    public let aciContactShareNameManager: any AciContactShareNameManager
     public let adHocCallRecordManager: any AdHocCallRecordManager
+    public let adminDeleteManager: AdminDeleteManager
     public let appExpiry: AppExpiry
     public let attachmentContentValidator: AttachmentContentValidator
     public let attachmentDownloadManager: AttachmentDownloadManager
@@ -55,6 +59,7 @@ public class DependenciesBridge {
     public let attachmentManager: AttachmentManager
     public let attachmentStore: AttachmentStore
     public let attachmentThumbnailService: AttachmentThumbnailService
+    public let attachmentBackfillManager: AttachmentBackfillManager
     public let attachmentUploadManager: AttachmentUploadManager
     public let attachmentValidationBackfillMigrator: AttachmentValidationBackfillMigrator
     public let attachmentViewOnceManager: AttachmentViewOnceManager
@@ -62,30 +67,26 @@ public class DependenciesBridge {
     public let authorMergeHelper: AuthorMergeHelper
     public let avatarDefaultColorManager: AvatarDefaultColorManager
     public let backgroundMessageFetcherFactory: BackgroundMessageFetcherFactory
-    public let backupArchiveErrorPresenter: BackupArchiveErrorPresenter
     public let backupArchiveManager: BackupArchiveManager
     public let backupAttachmentDownloadProgress: BackupAttachmentDownloadProgress
     public let backupAttachmentDownloadStore: BackupAttachmentDownloadStore
-    public let backupAttachmentDownloadQueueStatusReporter: BackupAttachmentDownloadQueueStatusReporter
+    public let backupAttachmentDownloadQueueStatusManager: BackupAttachmentDownloadQueueStatusManager
     public let backupAttachmentCoordinator: BackupAttachmentCoordinator
     public let backupAttachmentUploadProgress: BackupAttachmentUploadProgress
-    public let backupAttachmentUploadQueueStatusReporter: BackupAttachmentUploadQueueStatusReporter
+    public let backupAttachmentUploadQueueStatusManager: BackupAttachmentUploadQueueStatusManager
     public let backupAttachmentUploadStore: BackupAttachmentUploadStore
-    public let backupDisablingManager: BackupDisablingManager
-    public let backupExportJob: BackupExportJob
     public let backupExportJobRunner: BackupExportJobRunner
     public let backupFailureStateManager: BackupFailureStateManager
     public let backupIdService: BackupIdService
     public let backupKeyService: BackupKeyService
     public let backupListMediaManager: BackupListMediaManager
     public let backupListMediaStore: BackupListMediaStore
-    public let backupRefreshManager: BackupRefreshManager
-    public let backupRequestManager: BackupRequestManager
     public let backupPlanManager: BackupPlanManager
+    public let backupRequestManager: BackupRequestManager
     public let backupSubscriptionManager: BackupSubscriptionManager
     public let backupTestFlightEntitlementManager: BackupTestFlightEntitlementManager
     public let badgeCountFetcher: BadgeCountFetcher
-    public let callLinkStore: any CallLinkRecordStore
+    public let callLinkStore: CallLinkRecordStore
     public let callRecordDeleteManager: any CallRecordDeleteManager
     public let callRecordMissedCallManager: CallRecordMissedCallManager
     public let callRecordQuerier: CallRecordQuerier
@@ -93,11 +94,14 @@ public class DependenciesBridge {
     public let changePhoneNumberPniManager: ChangePhoneNumberPniManager
     public let chatColorSettingStore: ChatColorSettingStore
     public let chatConnectionManager: ChatConnectionManager
+    public let clockSkewManager: ClockSkewManager
     public let contactShareManager: ContactShareManager
+    public let cron: Cron
     public let currentCallProvider: any CurrentCallProvider
     public let databaseChangeObserver: DatabaseChangeObserver
     public let db: any DB
-    public let deletedCallRecordCleanupManager: DeletedCallRecordCleanupManager
+    public let decryptionPlaceholderExpirationJob: OWSDecryptionPlaceholderExpirationJob
+    public let deletedCallRecordExpirationJob: DeletedCallRecordExpirationJob
     let deletedCallRecordStore: DeletedCallRecordStore
     let deleteForMeIncomingSyncMessageManager: DeleteForMeIncomingSyncMessageManager
     public let deleteForMeOutgoingSyncMessageManager: DeleteForMeOutgoingSyncMessageManager
@@ -106,14 +110,16 @@ public class DependenciesBridge {
     public let deviceStore: OWSDeviceStore
     public let deviceSleepManager: (any DeviceSleepManager)?
     public let disappearingMessagesConfigurationStore: DisappearingMessagesConfigurationStore
+    public let disappearingMessagesExpirationJob: DisappearingMessagesExpirationJob
+    public let donationPermitFetcher: DonationPermitFetcher
     public let donationReceiptCredentialResultStore: DonationReceiptCredentialResultStore
+    public let donationSubscriptionManager: DonationSubscriptionManager
     public let editManager: EditManager
     public let editMessageStore: EditMessageStore
-    public let externalPendingIDEALDonationStore: ExternalPendingIDEALDonationStore
     public let groupCallRecordManager: GroupCallRecordManager
     public let groupMemberStore: GroupMemberStore
     public let groupMemberUpdater: GroupMemberUpdater
-    let groupSendEndorsementStore: any GroupSendEndorsementStore
+    public let groupSendEndorsementStore: GroupSendEndorsementStore
     public let groupUpdateInfoMessageInserter: GroupUpdateInfoMessageInserter
     public let identityKeyMismatchManager: IdentityKeyMismatchManager
     public let identityManager: OWSIdentityManager
@@ -122,32 +128,42 @@ public class DependenciesBridge {
     let incomingCallEventSyncMessageManager: IncomingCallEventSyncMessageManager
     let incomingCallLogEventSyncMessageManager: IncomingCallLogEventSyncMessageManager
     public let incomingPniChangeNumberProcessor: IncomingPniChangeNumberProcessor
-    public let incrementalMessageTSAttachmentMigrator: IncrementalMessageTSAttachmentMigrator
     public let individualCallRecordManager: IndividualCallRecordManager
     public let interactionDeleteManager: InteractionDeleteManager
     public let interactionStore: InteractionStore
+    public let keyTransparencyManager: KeyTransparencyManager
     public let lastVisibleInteractionStore: LastVisibleInteractionStore
+    public let libsignalNet: LibSignalClient.Net
     public let linkAndSyncManager: LinkAndSyncManager
     public let linkPreviewManager: LinkPreviewManager
     public let linkPreviewSettingStore: LinkPreviewSettingStore
     public let linkPreviewSettingManager: any LinkPreviewSettingManager
     public let accountKeyStore: AccountKeyStore
     let localProfileChecker: LocalProfileChecker
+    public let localFileBackupAttachmentRestoreProgress: LocalFileBackupAttachmentRestoreProgress
+    public let localFileBackupExportJobRunner: LocalFileBackupExportJobRunner
+    public let localFileBackupManager: LocalFileBackupManager
     public let localUsernameManager: LocalUsernameManager
-    public let masterKeySyncManager: MasterKeySyncManager
     public let mediaBandwidthPreferenceStore: MediaBandwidthPreferenceStore
+    public let messageSender: any MessageSender
     public let messageStickerManager: MessageStickerManager
     public let nicknameManager: any NicknameManager
+    public let notificationPreferencesManager: NotificationPreferencesManager
     public let orphanedAttachmentCleaner: OrphanedAttachmentCleaner
     public let archivedPaymentStore: ArchivedPaymentStore
+    public let pendingIDEALDonationStore: PendingIDEALDonationStore
     public let phoneNumberDiscoverabilityManager: PhoneNumberDiscoverabilityManager
     public let phoneNumberVisibilityFetcher: any PhoneNumberVisibilityFetcher
     public let pinnedMessageManager: PinnedMessageManager
+    public let pinnedMessageExpirationJob: PinnedMessageExpirationJob
     public let pinnedThreadManager: PinnedThreadManager
-    public let pinnedThreadStore: PinnedThreadStore
+    let pinnedThreadMerger: any PinnedThreadMerger
+    let pinnedThreadStore: PinnedThreadStore
+    public let plaintextTakeoutManager: PlaintextTakeoutManager
     public let pollMessageManager: PollMessageManager
     public let preKeyManager: PreKeyManager
     public let privateStoryThreadDeletionManager: any PrivateStoryThreadDeletionManager
+    public let profileBadgeManager: ProfileBadgeManager
     public let quotedReplyManager: QuotedReplyManager
     public let reactionStore: any ReactionStore
     public let recipientDatabaseTable: RecipientDatabaseTable
@@ -158,25 +174,28 @@ public class DependenciesBridge {
     public let recipientMerger: RecipientMerger
     public let registrationSessionManager: RegistrationSessionManager
     public let registrationStateChangeManager: RegistrationStateChangeManager
+    public let remoteReleaseNotesService: any RemoteReleaseNotesServiceProtocol
     public let searchableNameIndexer: SearchableNameIndexer
+    let senderKeySendingManager: SenderKeySendingManager
     public let sentMessageTranscriptReceiver: SentMessageTranscriptReceiver
     public let signalProtocolStoreManager: SignalProtocolStoreManager
     public let svr: SecureValueRecovery
-    public let svrCredentialStorage: SVRAuthCredentialStorage
+    public let svrAuthCredentialManager: SVRAuthCredentialManager
+    public let senderKeyStore: SenderKeyStore
+    public let stickerManager: StickerManager
     public let storageServiceRecordIkmMigrator: StorageServiceRecordIkmMigrator
+    public let storyMessageExpirationJob: StoryMessageExpirationJob
     public let storyRecipientManager: StoryRecipientManager
     public let storyRecipientStore: StoryRecipientStore
     public let subscriptionConfigManager: SubscriptionConfigManager
     public let svrLocalStorage: SVRLocalStorage
-    public let threadAssociatedDataStore: ThreadAssociatedDataStore
-    public let threadRemover: ThreadRemover
     public let threadReplyInfoStore: ThreadReplyInfoStore
-    public let threadSoftDeleteManager: ThreadSoftDeleteManager
+    public let threadDeletionManager: ThreadDeletionManager
+    public let threadMuteManager: ThreadMuteManager
     public let threadStore: ThreadStore
     public let tsAccountManager: TSAccountManager
-    public let usernameApiClient: UsernameApiClient
+    public let unreadReminderManager: UnreadReminderManager
     public let usernameEducationManager: UsernameEducationManager
-    public let usernameLinkManager: UsernameLinkManager
     public let usernameLookupManager: UsernameLookupManager
     public let usernameValidationManager: UsernameValidationManager
     public let wallpaperImageStore: WallpaperImageStore
@@ -185,7 +204,9 @@ public class DependenciesBridge {
     init(
         accountAttributesUpdater: AccountAttributesUpdater,
         accountEntropyPoolManager: AccountEntropyPoolManager,
+        aciContactShareNameManager: any AciContactShareNameManager,
         adHocCallRecordManager: any AdHocCallRecordManager,
+        adminDeleteManager: AdminDeleteManager,
         appExpiry: AppExpiry,
         attachmentContentValidator: AttachmentContentValidator,
         attachmentDownloadManager: AttachmentDownloadManager,
@@ -193,6 +214,7 @@ public class DependenciesBridge {
         attachmentManager: AttachmentManager,
         attachmentStore: AttachmentStore,
         attachmentThumbnailService: AttachmentThumbnailService,
+        attachmentBackfillManager: AttachmentBackfillManager,
         attachmentUploadManager: AttachmentUploadManager,
         attachmentValidationBackfillMigrator: AttachmentValidationBackfillMigrator,
         attachmentViewOnceManager: AttachmentViewOnceManager,
@@ -200,30 +222,26 @@ public class DependenciesBridge {
         authorMergeHelper: AuthorMergeHelper,
         avatarDefaultColorManager: AvatarDefaultColorManager,
         backgroundMessageFetcherFactory: BackgroundMessageFetcherFactory,
-        backupArchiveErrorPresenter: BackupArchiveErrorPresenter,
         backupArchiveManager: BackupArchiveManager,
         backupAttachmentDownloadProgress: BackupAttachmentDownloadProgress,
         backupAttachmentDownloadStore: BackupAttachmentDownloadStore,
-        backupAttachmentDownloadQueueStatusReporter: BackupAttachmentDownloadQueueStatusReporter,
+        backupAttachmentDownloadQueueStatusManager: BackupAttachmentDownloadQueueStatusManager,
         backupAttachmentCoordinator: BackupAttachmentCoordinator,
         backupAttachmentUploadProgress: BackupAttachmentUploadProgress,
-        backupAttachmentUploadQueueStatusReporter: BackupAttachmentUploadQueueStatusReporter,
+        backupAttachmentUploadQueueStatusManager: BackupAttachmentUploadQueueStatusManager,
         backupAttachmentUploadStore: BackupAttachmentUploadStore,
-        backupDisablingManager: BackupDisablingManager,
-        backupExportJob: BackupExportJob,
         backupExportJobRunner: BackupExportJobRunner,
         backupFailureStateManager: BackupFailureStateManager,
         backupIdService: BackupIdService,
         backupKeyService: BackupKeyService,
         backupListMediaManager: BackupListMediaManager,
         backupListMediaStore: BackupListMediaStore,
-        backupRefreshManager: BackupRefreshManager,
         backupRequestManager: BackupRequestManager,
         backupPlanManager: BackupPlanManager,
         backupSubscriptionManager: BackupSubscriptionManager,
         backupTestFlightEntitlementManager: BackupTestFlightEntitlementManager,
         badgeCountFetcher: BadgeCountFetcher,
-        callLinkStore: any CallLinkRecordStore,
+        callLinkStore: CallLinkRecordStore,
         callRecordDeleteManager: CallRecordDeleteManager,
         callRecordMissedCallManager: CallRecordMissedCallManager,
         callRecordQuerier: CallRecordQuerier,
@@ -231,11 +249,14 @@ public class DependenciesBridge {
         changePhoneNumberPniManager: ChangePhoneNumberPniManager,
         chatColorSettingStore: ChatColorSettingStore,
         chatConnectionManager: ChatConnectionManager,
+        clockSkewManager: ClockSkewManager,
         contactShareManager: ContactShareManager,
+        cron: Cron,
         currentCallProvider: any CurrentCallProvider,
         databaseChangeObserver: DatabaseChangeObserver,
         db: any DB,
-        deletedCallRecordCleanupManager: DeletedCallRecordCleanupManager,
+        decryptionPlaceholderExpirationJob: OWSDecryptionPlaceholderExpirationJob,
+        deletedCallRecordExpirationJob: DeletedCallRecordExpirationJob,
         deletedCallRecordStore: DeletedCallRecordStore,
         deleteForMeIncomingSyncMessageManager: DeleteForMeIncomingSyncMessageManager,
         deleteForMeOutgoingSyncMessageManager: DeleteForMeOutgoingSyncMessageManager,
@@ -244,14 +265,16 @@ public class DependenciesBridge {
         deviceSleepManager: (any DeviceSleepManager)?,
         deviceStore: OWSDeviceStore,
         disappearingMessagesConfigurationStore: DisappearingMessagesConfigurationStore,
+        disappearingMessagesExpirationJob: DisappearingMessagesExpirationJob,
+        donationPermitFetcher: DonationPermitFetcher,
         donationReceiptCredentialResultStore: DonationReceiptCredentialResultStore,
+        donationSubscriptionManager: DonationSubscriptionManager,
         editManager: EditManager,
         editMessageStore: EditMessageStore,
-        externalPendingIDEALDonationStore: ExternalPendingIDEALDonationStore,
         groupCallRecordManager: GroupCallRecordManager,
         groupMemberStore: GroupMemberStore,
         groupMemberUpdater: GroupMemberUpdater,
-        groupSendEndorsementStore: any GroupSendEndorsementStore,
+        groupSendEndorsementStore: GroupSendEndorsementStore,
         groupUpdateInfoMessageInserter: GroupUpdateInfoMessageInserter,
         identityKeyMismatchManager: IdentityKeyMismatchManager,
         identityManager: OWSIdentityManager,
@@ -260,32 +283,41 @@ public class DependenciesBridge {
         incomingCallEventSyncMessageManager: IncomingCallEventSyncMessageManager,
         incomingCallLogEventSyncMessageManager: IncomingCallLogEventSyncMessageManager,
         incomingPniChangeNumberProcessor: IncomingPniChangeNumberProcessor,
-        incrementalMessageTSAttachmentMigrator: IncrementalMessageTSAttachmentMigrator,
         individualCallRecordManager: IndividualCallRecordManager,
         interactionDeleteManager: InteractionDeleteManager,
         interactionStore: InteractionStore,
+        keyTransparencyManager: KeyTransparencyManager,
         lastVisibleInteractionStore: LastVisibleInteractionStore,
+        libsignalNet: LibSignalClient.Net,
         linkAndSyncManager: LinkAndSyncManager,
         linkPreviewManager: LinkPreviewManager,
         linkPreviewSettingStore: LinkPreviewSettingStore,
         linkPreviewSettingManager: any LinkPreviewSettingManager,
+        localFileBackupAttachmentRestoreProgress: LocalFileBackupAttachmentRestoreProgress,
+        localFileBackupExportJobRunner: LocalFileBackupExportJobRunner,
         accountKeyStore: AccountKeyStore,
+        localFileBackupManager: LocalFileBackupManager,
         localProfileChecker: LocalProfileChecker,
         localUsernameManager: LocalUsernameManager,
-        masterKeySyncManager: MasterKeySyncManager,
         mediaBandwidthPreferenceStore: MediaBandwidthPreferenceStore,
+        messageSender: any MessageSender,
         messageStickerManager: MessageStickerManager,
         nicknameManager: any NicknameManager,
+        notificationPreferencesManager: NotificationPreferencesManager,
         orphanedAttachmentCleaner: OrphanedAttachmentCleaner,
         archivedPaymentStore: ArchivedPaymentStore,
+        pendingIDEALDonationStore: PendingIDEALDonationStore,
         phoneNumberDiscoverabilityManager: PhoneNumberDiscoverabilityManager,
         phoneNumberVisibilityFetcher: any PhoneNumberVisibilityFetcher,
         pinnedMessageManager: PinnedMessageManager,
-        pinnedThreadManager: PinnedThreadManager,
+        pinnedMessageExpirationJob: PinnedMessageExpirationJob,
+        pinnedThreadManager: any PinnedThreadManager & PinnedThreadMerger,
         pinnedThreadStore: PinnedThreadStore,
+        plaintextTakeoutManager: PlaintextTakeoutManager,
         pollMessageManager: PollMessageManager,
         preKeyManager: PreKeyManager,
         privateStoryThreadDeletionManager: any PrivateStoryThreadDeletionManager,
+        profileBadgeManager: ProfileBadgeManager,
         quotedReplyManager: QuotedReplyManager,
         reactionStore: any ReactionStore,
         recipientDatabaseTable: RecipientDatabaseTable,
@@ -296,33 +328,38 @@ public class DependenciesBridge {
         recipientMerger: RecipientMerger,
         registrationSessionManager: RegistrationSessionManager,
         registrationStateChangeManager: RegistrationStateChangeManager,
+        remoteReleaseNotesService: any RemoteReleaseNotesServiceProtocol,
         searchableNameIndexer: SearchableNameIndexer,
+        senderKeySendingManager: SenderKeySendingManager,
+        senderKeyStore: SenderKeyStore,
         sentMessageTranscriptReceiver: SentMessageTranscriptReceiver,
         signalProtocolStoreManager: SignalProtocolStoreManager,
+        stickerManager: StickerManager,
         storageServiceRecordIkmMigrator: StorageServiceRecordIkmMigrator,
+        storyMessageExpirationJob: StoryMessageExpirationJob,
         storyRecipientManager: StoryRecipientManager,
         storyRecipientStore: StoryRecipientStore,
         subscriptionConfigManager: SubscriptionConfigManager,
         svr: SecureValueRecovery,
-        svrCredentialStorage: SVRAuthCredentialStorage,
+        svrAuthCredentialManager: SVRAuthCredentialManager,
         svrLocalStorage: SVRLocalStorage,
-        threadAssociatedDataStore: ThreadAssociatedDataStore,
-        threadRemover: ThreadRemover,
         threadReplyInfoStore: ThreadReplyInfoStore,
-        threadSoftDeleteManager: ThreadSoftDeleteManager,
+        threadDeletionManager: ThreadDeletionManager,
+        threadMuteManager: ThreadMuteManager,
         threadStore: ThreadStore,
         tsAccountManager: TSAccountManager,
-        usernameApiClient: UsernameApiClient,
+        unreadReminderManager: UnreadReminderManager,
         usernameEducationManager: UsernameEducationManager,
-        usernameLinkManager: UsernameLinkManager,
         usernameLookupManager: UsernameLookupManager,
         usernameValidationManager: UsernameValidationManager,
         wallpaperImageStore: WallpaperImageStore,
-        wallpaperStore: WallpaperStore
+        wallpaperStore: WallpaperStore,
     ) {
         self.accountAttributesUpdater = accountAttributesUpdater
         self.accountEntropyPoolManager = accountEntropyPoolManager
+        self.aciContactShareNameManager = aciContactShareNameManager
         self.adHocCallRecordManager = adHocCallRecordManager
+        self.adminDeleteManager = adminDeleteManager
         self.appExpiry = appExpiry
         self.attachmentContentValidator = attachmentContentValidator
         self.attachmentDownloadManager = attachmentDownloadManager
@@ -330,6 +367,7 @@ public class DependenciesBridge {
         self.attachmentManager = attachmentManager
         self.attachmentStore = attachmentStore
         self.attachmentThumbnailService = attachmentThumbnailService
+        self.attachmentBackfillManager = attachmentBackfillManager
         self.attachmentUploadManager = attachmentUploadManager
         self.attachmentValidationBackfillMigrator = attachmentValidationBackfillMigrator
         self.attachmentViewOnceManager = attachmentViewOnceManager
@@ -337,24 +375,20 @@ public class DependenciesBridge {
         self.authorMergeHelper = authorMergeHelper
         self.avatarDefaultColorManager = avatarDefaultColorManager
         self.backgroundMessageFetcherFactory = backgroundMessageFetcherFactory
-        self.backupArchiveErrorPresenter = backupArchiveErrorPresenter
         self.backupArchiveManager = backupArchiveManager
         self.backupAttachmentDownloadProgress = backupAttachmentDownloadProgress
         self.backupAttachmentDownloadStore = backupAttachmentDownloadStore
-        self.backupAttachmentDownloadQueueStatusReporter = backupAttachmentDownloadQueueStatusReporter
+        self.backupAttachmentDownloadQueueStatusManager = backupAttachmentDownloadQueueStatusManager
         self.backupAttachmentCoordinator = backupAttachmentCoordinator
         self.backupAttachmentUploadProgress = backupAttachmentUploadProgress
-        self.backupAttachmentUploadQueueStatusReporter = backupAttachmentUploadQueueStatusReporter
+        self.backupAttachmentUploadQueueStatusManager = backupAttachmentUploadQueueStatusManager
         self.backupAttachmentUploadStore = backupAttachmentUploadStore
-        self.backupDisablingManager = backupDisablingManager
-        self.backupExportJob = backupExportJob
         self.backupExportJobRunner = backupExportJobRunner
         self.backupFailureStateManager = backupFailureStateManager
         self.backupIdService = backupIdService
         self.backupKeyService = backupKeyService
         self.backupListMediaManager = backupListMediaManager
         self.backupListMediaStore = backupListMediaStore
-        self.backupRefreshManager = backupRefreshManager
         self.backupRequestManager = backupRequestManager
         self.backupPlanManager = backupPlanManager
         self.backupSubscriptionManager = backupSubscriptionManager
@@ -368,11 +402,14 @@ public class DependenciesBridge {
         self.changePhoneNumberPniManager = changePhoneNumberPniManager
         self.chatColorSettingStore = chatColorSettingStore
         self.chatConnectionManager = chatConnectionManager
+        self.clockSkewManager = clockSkewManager
         self.contactShareManager = contactShareManager
+        self.cron = cron
         self.currentCallProvider = currentCallProvider
         self.databaseChangeObserver = databaseChangeObserver
         self.db = db
-        self.deletedCallRecordCleanupManager = deletedCallRecordCleanupManager
+        self.decryptionPlaceholderExpirationJob = decryptionPlaceholderExpirationJob
+        self.deletedCallRecordExpirationJob = deletedCallRecordExpirationJob
         self.deletedCallRecordStore = deletedCallRecordStore
         self.deleteForMeIncomingSyncMessageManager = deleteForMeIncomingSyncMessageManager
         self.deleteForMeOutgoingSyncMessageManager = deleteForMeOutgoingSyncMessageManager
@@ -381,10 +418,12 @@ public class DependenciesBridge {
         self.deviceSleepManager = deviceSleepManager
         self.deviceStore = deviceStore
         self.disappearingMessagesConfigurationStore = disappearingMessagesConfigurationStore
+        self.disappearingMessagesExpirationJob = disappearingMessagesExpirationJob
+        self.donationPermitFetcher = donationPermitFetcher
         self.donationReceiptCredentialResultStore = donationReceiptCredentialResultStore
+        self.donationSubscriptionManager = donationSubscriptionManager
         self.editManager = editManager
         self.editMessageStore = editMessageStore
-        self.externalPendingIDEALDonationStore = externalPendingIDEALDonationStore
         self.groupCallRecordManager = groupCallRecordManager
         self.groupMemberStore = groupMemberStore
         self.groupMemberUpdater = groupMemberUpdater
@@ -397,32 +436,42 @@ public class DependenciesBridge {
         self.incomingCallEventSyncMessageManager = incomingCallEventSyncMessageManager
         self.incomingCallLogEventSyncMessageManager = incomingCallLogEventSyncMessageManager
         self.incomingPniChangeNumberProcessor = incomingPniChangeNumberProcessor
-        self.incrementalMessageTSAttachmentMigrator = incrementalMessageTSAttachmentMigrator
         self.individualCallRecordManager = individualCallRecordManager
         self.interactionDeleteManager = interactionDeleteManager
         self.interactionStore = interactionStore
+        self.keyTransparencyManager = keyTransparencyManager
         self.lastVisibleInteractionStore = lastVisibleInteractionStore
+        self.libsignalNet = libsignalNet
         self.linkAndSyncManager = linkAndSyncManager
         self.linkPreviewManager = linkPreviewManager
         self.linkPreviewSettingStore = linkPreviewSettingStore
         self.linkPreviewSettingManager = linkPreviewSettingManager
         self.accountKeyStore = accountKeyStore
+        self.localFileBackupAttachmentRestoreProgress = localFileBackupAttachmentRestoreProgress
+        self.localFileBackupExportJobRunner = localFileBackupExportJobRunner
+        self.localFileBackupManager = localFileBackupManager
         self.localProfileChecker = localProfileChecker
         self.localUsernameManager = localUsernameManager
-        self.masterKeySyncManager = masterKeySyncManager
         self.mediaBandwidthPreferenceStore = mediaBandwidthPreferenceStore
+        self.messageSender = messageSender
         self.messageStickerManager = messageStickerManager
         self.nicknameManager = nicknameManager
+        self.notificationPreferencesManager = notificationPreferencesManager
         self.orphanedAttachmentCleaner = orphanedAttachmentCleaner
         self.archivedPaymentStore = archivedPaymentStore
+        self.pendingIDEALDonationStore = pendingIDEALDonationStore
         self.phoneNumberDiscoverabilityManager = phoneNumberDiscoverabilityManager
         self.phoneNumberVisibilityFetcher = phoneNumberVisibilityFetcher
         self.pinnedMessageManager = pinnedMessageManager
+        self.pinnedMessageExpirationJob = pinnedMessageExpirationJob
         self.pinnedThreadManager = pinnedThreadManager
+        self.pinnedThreadMerger = pinnedThreadManager
         self.pinnedThreadStore = pinnedThreadStore
+        self.plaintextTakeoutManager = plaintextTakeoutManager
         self.pollMessageManager = pollMessageManager
         self.preKeyManager = preKeyManager
         self.privateStoryThreadDeletionManager = privateStoryThreadDeletionManager
+        self.profileBadgeManager = profileBadgeManager
         self.quotedReplyManager = quotedReplyManager
         self.reactionStore = reactionStore
         self.recipientDatabaseTable = recipientDatabaseTable
@@ -433,25 +482,28 @@ public class DependenciesBridge {
         self.recipientMerger = recipientMerger
         self.registrationSessionManager = registrationSessionManager
         self.registrationStateChangeManager = registrationStateChangeManager
+        self.remoteReleaseNotesService = remoteReleaseNotesService
         self.searchableNameIndexer = searchableNameIndexer
+        self.senderKeySendingManager = senderKeySendingManager
+        self.senderKeyStore = senderKeyStore
         self.sentMessageTranscriptReceiver = sentMessageTranscriptReceiver
         self.signalProtocolStoreManager = signalProtocolStoreManager
+        self.stickerManager = stickerManager
         self.storageServiceRecordIkmMigrator = storageServiceRecordIkmMigrator
+        self.storyMessageExpirationJob = storyMessageExpirationJob
         self.storyRecipientManager = storyRecipientManager
         self.storyRecipientStore = storyRecipientStore
         self.subscriptionConfigManager = subscriptionConfigManager
         self.svr = svr
-        self.svrCredentialStorage = svrCredentialStorage
+        self.svrAuthCredentialManager = svrAuthCredentialManager
         self.svrLocalStorage = svrLocalStorage
-        self.threadAssociatedDataStore = threadAssociatedDataStore
-        self.threadRemover = threadRemover
         self.threadReplyInfoStore = threadReplyInfoStore
-        self.threadSoftDeleteManager = threadSoftDeleteManager
+        self.threadDeletionManager = threadDeletionManager
+        self.threadMuteManager = threadMuteManager
         self.threadStore = threadStore
         self.tsAccountManager = tsAccountManager
-        self.usernameApiClient = usernameApiClient
+        self.unreadReminderManager = unreadReminderManager
         self.usernameEducationManager = usernameEducationManager
-        self.usernameLinkManager = usernameLinkManager
         self.usernameLookupManager = usernameLookupManager
         self.usernameValidationManager = usernameValidationManager
         self.wallpaperImageStore = wallpaperImageStore

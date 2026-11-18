@@ -3,35 +3,34 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import Foundation
-public import SignalServiceKit
-public import SignalUI
+import SignalServiceKit
+import SignalUI
 
 extension ConversationViewController {
 
-    public var isGroupConversation: Bool { thread.isGroupThread }
+    var isGroupConversation: Bool { thread.isGroupThread }
 
-    public static var messageSection: Int { CVLoadCoordinator.messageSection }
+    static var messageSection: Int { CVLoadCoordinator.messageSection }
 
-    public var hasRenderState: Bool { !renderState.isEmptyInitialState }
+    var hasRenderState: Bool { !renderState.isEmptyInitialState }
 
-    public var hasAppearedAndHasAppliedFirstLoad: Bool {
-        (hasRenderState &&
+    var hasAppearedAndHasAppliedFirstLoad: Bool {
+        hasRenderState &&
             hasViewDidAppearEverBegun &&
-            !loadCoordinator.shouldHideCollectionViewContent)
+            !loadCoordinator.shouldHideCollectionViewContent
     }
 
-    public var lastReloadDate: Date { renderState.loadDate }
+    var lastReloadDate: Date { renderState.loadDate }
 
-    public func indexPath(forInteractionUniqueId interactionUniqueId: String) -> IndexPath? {
+    func indexPath(forInteractionUniqueId interactionUniqueId: String) -> IndexPath? {
         loadCoordinator.indexPath(forInteractionUniqueId: interactionUniqueId)
     }
 
-    public func indexPath(forItemViewModel itemViewModel: CVItemViewModelImpl) -> IndexPath? {
+    func indexPath(forItemViewModel itemViewModel: CVItemViewModelImpl) -> IndexPath? {
         indexPath(forInteractionUniqueId: itemViewModel.interaction.uniqueId)
     }
 
-    public func interaction(forIndexPath indexPath: IndexPath) -> TSInteraction? {
+    func interaction(forIndexPath indexPath: IndexPath) -> TSInteraction? {
         guard let renderItem = self.renderItem(forIndex: indexPath.row) else {
             return nil
         }
@@ -42,30 +41,27 @@ extension ConversationViewController {
         loadCoordinator.indexPathOfUnreadIndicator
     }
 
-    public var canLoadOlderItems: Bool {
+    var canLoadOlderItems: Bool {
         loadCoordinator.canLoadOlderItems
     }
 
-    public var canLoadNewerItems: Bool {
+    var canLoadNewerItems: Bool {
         loadCoordinator.canLoadNewerItems
     }
 
-    public var currentRenderStateDebugDescription: String {
+    var currentRenderStateDebugDescription: String {
         renderState.debugDescription
     }
 
-    public var areCellsAnimating: Bool {
+    var areCellsAnimating: Bool {
         viewState.activeCellAnimations.count > 0
     }
-}
 
-// MARK: - Message Highlighting
-//
-// The purpose of the code below is to briefly dim message bubble to indicate the message of interest to the user.
-// Because bubble highlighting is designed to be very brief, all the logic operates exclusively with the
-// presentation layer and no state is saved or restored.
+    // MARK: - Message Highlighting
 
-extension ConversationViewController {
+    // The purpose of the code below is to briefly dim message bubble to indicate the message of interest to the user.
+    // Because bubble highlighting is designed to be very brief, all the logic operates exclusively with the
+    // presentation layer and no state is saved or restored.
 
     func performMessageHighlightAnimationIfNeeded() {
         if let messageId = viewState.highlightedMessageId {
@@ -76,8 +72,9 @@ extension ConversationViewController {
 
     private func performHighlightAnimationSequenceFor(messageId: String) {
         if let indexPath = indexPath(forInteractionUniqueId: messageId) {
-            guard let cell = collectionView.cellForItem(at: indexPath) as? CVCell,
-                  let componentViewMessage = cell.componentView as? CVComponentMessage.CVComponentViewMessage
+            guard
+                let cell = collectionView.cellForItem(at: indexPath) as? CVCell,
+                let componentViewMessage = cell.componentView as? CVComponentMessage.CVComponentViewMessage
             else {
                 owsFailDebug("Could not find CVComponentViewMessage")
                 return
@@ -88,13 +85,10 @@ extension ConversationViewController {
             owsFailDebug("Unable to find a message to highlight. [\(messageId)]")
         }
     }
-}
 
-// MARK: -
+    // MARK: - CVLoadCoordinatorDelegate
 
-extension ConversationViewController: CVLoadCoordinatorDelegate {
-
-    public var conversationViewController: ConversationViewController? {
+    var conversationViewController: ConversationViewController? {
         self
     }
 
@@ -109,19 +103,25 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
         }
 
         let itemViewModel = CVItemViewModelImpl(renderItem: renderItem)
-        let shouldAllowReply = shouldAllowReplyForItem(itemViewModel)
+        let shouldAllowMessageSendActions = shouldAllowMessageSendActionsForItem(itemViewModel)
         let messageActions: [MessageAction]
         if itemViewModel.messageCellType == .systemMessage {
-            messageActions = MessageActions.infoMessageActions(itemViewModel: itemViewModel,
-                                                               delegate: self)
+            messageActions = MessageActions.infoMessageActions(
+                itemViewModel: itemViewModel,
+                delegate: self,
+            )
         } else if itemViewModel.messageCellType == .stickerMessage || itemViewModel.messageCellType == .genericAttachment {
-            messageActions = MessageActions.mediaActions(itemViewModel: itemViewModel,
-                                                         shouldAllowReply: shouldAllowReply,
-                                                         delegate: self)
+            messageActions = MessageActions.mediaActions(
+                itemViewModel: itemViewModel,
+                shouldAllowMessageSendActions: shouldAllowMessageSendActions,
+                delegate: self,
+            )
         } else {
-            messageActions = MessageActions.textActions(itemViewModel: itemViewModel,
-                                                        shouldAllowReply: shouldAllowReply,
-                                                        delegate: self)
+            messageActions = MessageActions.textActions(
+                itemViewModel: itemViewModel,
+                shouldAllowMessageSendActions: shouldAllowMessageSendActions,
+                delegate: self,
+            )
         }
 
         var actions: [CVAccessibilityCustomAction] = []
@@ -129,7 +129,7 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
             let action = CVAccessibilityCustomAction(
                 name: messageAction.accessibilityLabel ?? messageAction.accessibilityIdentifier,
                 target: self,
-                selector: #selector(handleCustomAccessibilityActionInvoked(sender:))
+                selector: #selector(handleCustomAccessibilityActionInvoked(sender:)),
             )
             action.messageAction = messageAction
             actions.append(action)
@@ -146,7 +146,7 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
         cvCustomAction.messageAction?.block(self)
     }
 
-    func willUpdateWithNewRenderState(_ renderState: CVRenderState) -> CVUpdateToken {
+    func willUpdateWithNewRenderState(_ update: CVUpdate) -> CVUpdateToken {
         AssertIsOnMainThread()
 
         // HACK to work around radar #28167779
@@ -162,22 +162,28 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
 
         // Snapshot CVC layout state before we land the load;
         // we use this to ensure scroll continuity when landing the load.
-        let scrollContinuityToken = layout.buildScrollContinuityToken()
+        let scrollContinuityToken = layout.buildScrollContinuityToken(
+            preferredAnchorInteractionId: update.loadRequest.preferredScrollContinuityAnchorInteractionId,
+        )
 
         // CVC will often use this state to ensure scroll continuity
         // when landing loads, so ensure the value is updated before
         // landing loads.
         let lastKnownDistanceFromBottom = self.updateLastKnownDistanceFromBottom()
 
-        return CVUpdateToken(isScrolledToBottom: self.isScrolledToBottom,
-                             lastMessageForInboxSortId: threadViewModel.lastMessageForInbox?.sortId,
-                             scrollContinuityToken: scrollContinuityToken,
-                             lastKnownDistanceFromBottom: lastKnownDistanceFromBottom)
+        return CVUpdateToken(
+            isScrolledToBottom: self.isScrolledToBottom,
+            lastMessageForInboxSortId: threadViewModel.lastMessageForInbox?.sortId,
+            scrollContinuityToken: scrollContinuityToken,
+            lastKnownDistanceFromBottom: lastKnownDistanceFromBottom,
+        )
     }
 
-    func updateWithNewRenderState(update: CVUpdate,
-                                  scrollAction: CVScrollAction,
-                                  updateToken: CVUpdateToken) {
+    func updateWithNewRenderState(
+        update: CVUpdate,
+        scrollAction: CVScrollAction,
+        updateToken: CVUpdateToken,
+    ) {
         AssertIsOnMainThread()
 
         guard hasViewWillAppearEverBegun else {
@@ -208,10 +214,20 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
         updateNavigationBarSubtitleLabel()
         updateBarButtonItems()
 
+        let pinnedMessagesChanged = renderState.prevThreadViewModel?.pinnedMessages != threadViewModel.pinnedMessages
+
         // This will be nil for non-group threads.
         let newGroupModel = thread.groupModelIfGroupThread
-        if oldGroupModel != newGroupModel {
+        if oldGroupModel != newGroupModel || pinnedMessagesChanged {
             ensureBannerState()
+        }
+
+        let groupNameColors = GroupNameColors.forThread(thread)
+        if let groupModelV2 = newGroupModel as? TSGroupModelV2 {
+            self.memberLabelCoordinator?.updateWithNewThreadInfo(
+                groupModel: groupModelV2,
+                groupNameColors: groupNameColors,
+            )
         }
 
         // If the message has been deleted / disappeared, we need to dismiss
@@ -242,12 +258,16 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
                         items: items,
                         shouldAnimateUpdate: shouldAnimateUpdate,
                         scrollAction: scrollAction,
-                        updateToken: updateToken
+                        updateToken: updateToken,
                     )
                 }
             }
 
             setHasAppliedFirstLoadIfNecessary()
+        }
+
+        if thread.isReleaseNotesThread {
+            updateReleaseNotesBarButtonItems()
         }
     }
 
@@ -289,11 +309,11 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
     //
     // This means performing much of the work we do when we land
     // the first load.
-    public func viewWillAppearForLoad() {
+    func viewWillAppearForLoad() {
         updateShouldHideCollectionViewContent(reloadIfClearingFlag: true)
     }
 
-    public func viewSafeAreaInsetsDidChangeForLoad() {
+    func viewSafeAreaInsetsDidChangeForLoad() {
         updateShouldHideCollectionViewContent(reloadIfClearingFlag: true)
     }
 
@@ -419,7 +439,7 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
         reloadCollectionViewImmediately()
 
         DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
 
             // If the scroll action is not animated, perform it _before_
             // updateViewToReflectLoad().
@@ -446,7 +466,7 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
         items: [CVUpdate.Item],
         shouldAnimateUpdate: Bool,
         scrollAction scrollActionParam: CVScrollAction,
-        updateToken: CVUpdateToken
+        updateToken: CVUpdateToken,
     ) {
         AssertIsOnMainThread()
         owsAssertDebug(!items.isEmpty)
@@ -490,16 +510,20 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
                         isAutoScrollInteraction = false
                     }
 
-                    if let outgoingMessage = renderItem.interaction as? TSOutgoingMessage,
-                       !outgoingMessage.wasNotCreatedLocally,
-                       wasJustInserted {
+                    if
+                        let outgoingMessage = renderItem.interaction as? TSOutgoingMessage,
+                        !outgoingMessage.wasNotCreatedLocally,
+                        wasJustInserted
+                    {
                         // Whenever we send an outgoing message from the local device,
                         // auto-scroll to the bottom of the conversation, regardless
                         // of scroll state.
                         scrollAction = CVScrollAction(action: .bottomForNewMessage, isAnimated: true)
                         break
-                    } else if isAutoScrollInteraction,
-                              isScrolledToBottom {
+                    } else if
+                        isAutoScrollInteraction,
+                        isScrolledToBottom
+                    {
                         // If we're already at the bottom of the conversation and
                         // a freshly inserted message or typing indicator appears,
                         // auto-scroll to show it.
@@ -510,6 +534,14 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
                     break
                 }
             }
+        }
+
+        if
+            scrollAction.action == .none,
+            update.loadRequest.preferredScrollContinuityAnchorInteractionId != nil,
+            isScrolledToBottom
+        {
+            scrollAction = CVScrollAction(action: .bottomOfLoadWindow, isAnimated: false)
         }
 
         if .loadOlder == renderState.loadType {
@@ -546,17 +578,25 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
             case .loadInitialMapping:
                 return .none
             case .loadSameLocation:
-                return .contentRelativeToViewport(token: scrollContinuityToken,
-                                                  isRelativeToTop: false)
+                return .contentRelativeToViewport(
+                    token: scrollContinuityToken,
+                    isRelativeToTop: false,
+                )
             case .loadOlder:
-                return .contentRelativeToViewport(token: scrollContinuityToken,
-                                                  isRelativeToTop: true)
+                return .contentRelativeToViewport(
+                    token: scrollContinuityToken,
+                    isRelativeToTop: true,
+                )
             case .loadNewer, .loadNewest:
-                return .contentRelativeToViewport(token: scrollContinuityToken,
-                                                  isRelativeToTop: false)
+                return .contentRelativeToViewport(
+                    token: scrollContinuityToken,
+                    isRelativeToTop: false,
+                )
             case .loadPageAroundInteraction:
-                return .contentRelativeToViewport(token: scrollContinuityToken,
-                                                  isRelativeToTop: false)
+                return .contentRelativeToViewport(
+                    token: scrollContinuityToken,
+                    isRelativeToTop: false,
+                )
             }
         }()
 
@@ -586,7 +626,7 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
         let completion = { [weak self] (finished: Bool) in
             AssertIsOnMainThread()
 
-            guard let self = self else {
+            guard let self else {
                 return
             }
 
@@ -617,12 +657,14 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
         }
 
         // We use an obj-c free function so that we can handle NSException.
-        self.collectionView.cvc_performBatchUpdates(batchUpdatesBlock,
-                                                    completion: completion,
-                                                    animated: shouldAnimateUpdate,
-                                                    scrollContinuity: scrollContinuity,
-                                                    lastKnownDistanceFromBottom: updateToken.lastKnownDistanceFromBottom,
-                                                    cvc: self)
+        self.collectionView.cvc_performBatchUpdates(
+            batchUpdatesBlock,
+            completion: completion,
+            animated: shouldAnimateUpdate,
+            scrollContinuity: scrollContinuity,
+            lastKnownDistanceFromBottom: updateToken.lastKnownDistanceFromBottom,
+            cvc: self,
+        )
 
         if !shouldAnimateUpdate {
             self.loadDidLand()
@@ -643,27 +685,31 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
         return isScrolledToBottom(tolerancePoints: scrolledToEdgeTolerancePoints)
     }
 
-    public func registerReuseIdentifiers() {
+    func registerReuseIdentifiers() {
         CVCell.registerReuseIdentifiers(collectionView: self.collectionView)
-        collectionView.register(LoadMoreMessagesView.self,
-                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                withReuseIdentifier: LoadMoreMessagesView.reuseIdentifier)
-        collectionView.register(LoadMoreMessagesView.self,
-                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-                                withReuseIdentifier: LoadMoreMessagesView.reuseIdentifier)
+        collectionView.register(
+            LoadMoreMessagesView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: LoadMoreMessagesView.reuseIdentifier,
+        )
+        collectionView.register(
+            LoadMoreMessagesView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+            withReuseIdentifier: LoadMoreMessagesView.reuseIdentifier,
+        )
     }
 
-    public static func buildInitialConversationStyle(
+    static func buildInitialConversationStyle(
         for thread: TSThread,
         chatColor: ColorOrGradientSetting,
-        wallpaperViewBuilder: WallpaperViewBuilder?
+        wallpaperViewBuilder: WallpaperViewBuilder?,
     ) -> ConversationStyle {
         buildConversationStyle(
             type: .initial,
             thread: thread,
             viewWidth: 0,
             chatColor: chatColor,
-            wallpaperViewBuilder: wallpaperViewBuilder
+            wallpaperViewBuilder: wallpaperViewBuilder,
         )
     }
 
@@ -672,28 +718,31 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
         thread: TSThread,
         viewWidth: CGFloat,
         chatColor: ColorOrGradientSetting,
-        wallpaperViewBuilder: WallpaperViewBuilder?
+        wallpaperViewBuilder: WallpaperViewBuilder?,
     ) -> ConversationStyle {
         let hasWallpaper: Bool
-        let isWallpaperPhoto: Bool
+        let shouldDimWallpaperInDarkMode: Bool
         switch wallpaperViewBuilder {
-        case .customPhoto:
+        case .customPhoto(_, let shouldDimInDarkMode):
             hasWallpaper = true
-            isWallpaperPhoto = true
-        case .colorOrGradient:
+            shouldDimWallpaperInDarkMode = shouldDimInDarkMode
+        case .colorOrGradient(_, let shouldDimInDarkMode):
             hasWallpaper = true
-            isWallpaperPhoto = false
+            shouldDimWallpaperInDarkMode = shouldDimInDarkMode
+        case .releaseNotes:
+            hasWallpaper = true
+            shouldDimWallpaperInDarkMode = false
         case .none:
             hasWallpaper = false
-            isWallpaperPhoto = false
+            shouldDimWallpaperInDarkMode = false
         }
         return ConversationStyle(
             type: type,
             thread: thread,
             viewWidth: viewWidth,
             hasWallpaper: hasWallpaper,
-            isWallpaperPhoto: isWallpaperPhoto,
-            chatColor: chatColor
+            shouldDimWallpaperInDarkMode: shouldDimWallpaperInDarkMode,
+            chatColor: chatColor,
         )
     }
 
@@ -706,7 +755,7 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
                 thread: thread,
                 viewWidth: viewWidth,
                 chatColor: viewState.chatColor,
-                wallpaperViewBuilder: viewState.wallpaperViewBuilder
+                wallpaperViewBuilder: viewState.wallpaperViewBuilder,
             )
         }
 
@@ -724,7 +773,7 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
             return buildDefaultConversationStyle(type: .`default`)
         }
 
-        guard let navigationController = navigationController else {
+        guard let navigationController else {
             if viewState.isInPreviewPlatter {
                 // In a preview platter, we'll never have a navigation controller
                 return buildDefaultConversationStyle(type: .`default`)
@@ -741,10 +790,14 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
         let navigationViewWidth = navigationController.view.width
         let navigationSafeAreaInsets = navigationController.view.safeAreaInsets
 
-        let isMissingSafeAreaInsets = (viewSafeAreaInsets == .zero &&
-                                        navigationSafeAreaInsets != .zero)
-        let hasInvalidWidth = (collectionViewWidth > navigationViewWidth ||
-                                rootViewWidth > navigationViewWidth)
+        let isMissingSafeAreaInsets = (
+            viewSafeAreaInsets == .zero &&
+                navigationSafeAreaInsets != .zero,
+        )
+        let hasInvalidWidth = (
+            collectionViewWidth > navigationViewWidth ||
+                rootViewWidth > navigationViewWidth,
+        )
         let hasValidStyle = !isMissingSafeAreaInsets && !hasInvalidWidth
         if hasValidStyle {
             // No need to rewrite style; style is already valid.
@@ -769,7 +822,7 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
     }
 
     @discardableResult
-    public func updateConversationStyle() -> Bool {
+    func updateConversationStyle() -> Bool {
         AssertIsOnMainThread()
 
         let newConversationStyle = buildConversationStyle()
@@ -789,38 +842,34 @@ extension ConversationViewController: CVLoadCoordinatorDelegate {
 
         return true
     }
-}
 
-// MARK: -
+    // MARK: - CVViewStateDelegate
 
-extension ConversationViewController: CVViewStateDelegate {
-    public func viewStateUIModeDidChange(oldValue: ConversationUIMode) {
+    func viewStateUIModeDidChange(oldValue: ConversationUIMode) {
 
-        if oldValue != uiMode && (oldValue == .selection || uiMode == .selection) {
+        if oldValue != uiMode, oldValue == .selection || uiMode == .selection {
 
             // Proactively update bottom bar before load lands
             ensureBottomViewType()
 
-             // Block loads while things animate.
+            // Block loads while things animate.
             viewState.selectionAnimationState = .willAnimate
             loadCoordinator.enqueueReload()
 
-             DispatchQueue.main.asyncAfter(deadline: .now() + CVComponentMessage.selectionAnimationDuration) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + CVComponentMessage.selectionAnimationDuration) {
                 self.viewState.selectionAnimationState = .idle
-                 // Enqueue a new load after animation so the "wasShowingSelectionUI" state is updated.
-                 self.loadCoordinator.enqueueReload()
-             }
+                // Enqueue a new load after animation so the "wasShowingSelectionUI" state is updated.
+                self.loadCoordinator.enqueueReload()
+            }
         } else {
             loadCoordinator.enqueueReload()
         }
     }
-}
 
-// MARK: - Load More
+    // MARK: - Load More
 
-extension ConversationViewController {
     @discardableResult
-    public func autoLoadMoreIfNecessary() -> Bool {
+    func autoLoadMoreIfNecessary() -> Bool {
         AssertIsOnMainThread()
 
         guard hasAppearedAndHasAppliedFirstLoad else {
@@ -833,7 +882,7 @@ extension ConversationViewController {
         guard showLoadOlderHeader || showLoadNewerHeader else {
             return false
         }
-        guard let navigationController = navigationController else {
+        guard let navigationController else {
             return false
         }
         navigationController.view.layoutIfNeeded()
@@ -871,7 +920,11 @@ extension ConversationViewController {
         return false
     }
 
-    public var showLoadOlderHeader: Bool { loadCoordinator.showLoadOlderHeader }
+    var showLoadOlderHeader: Bool { loadCoordinator.showLoadOlderHeader }
 
-    public var showLoadNewerHeader: Bool { loadCoordinator.showLoadNewerHeader }
+    var showLoadNewerHeader: Bool { loadCoordinator.showLoadNewerHeader }
+
+    // MARK: - MemberLabelViewControllerPresenter
+
+    func reloadMemberLabelIfNeeded() { /* handled in updateWithNewRenderState */ }
 }

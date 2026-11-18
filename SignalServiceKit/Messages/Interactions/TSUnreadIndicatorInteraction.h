@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithCustomUniqueId:(NSString *)uniqueId
                              timestamp:(uint64_t)timestamp
                    receivedAtTimestamp:(uint64_t)receivedAtTimestamp
-                                thread:(TSThread *)thread NS_UNAVAILABLE;
+                        threadUniqueId:(NSString *)threadUniqueId NS_UNAVAILABLE;
 - (instancetype)initWithTimestamp:(uint64_t)timestamp
               receivedAtTimestamp:(uint64_t)receivedAtTimestamp
                            thread:(TSThread *)thread NS_UNAVAILABLE;
@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
                      timestamp:(uint64_t)timestamp
                 uniqueThreadId:(NSString *)uniqueThreadId NS_DESIGNATED_INITIALIZER;
 
-- (nullable instancetype)initWithCoder:(NSCoder *)coder NS_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder *)coder NS_UNAVAILABLE;
 
 // --- CODE GENERATION MARKER
 

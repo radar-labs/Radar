@@ -6,19 +6,15 @@
 public protocol BackupAttachmentDownloadScheduler {
     /// "Enqueue" an attachment from a backup for download, if needed and eligible, otherwise do nothing.
     ///
-    /// If the same attachment pointed to by the reference is already enqueued, updates it to the greater
-    /// of the existing and new reference's timestamp.
-    ///
-    /// Doesn't actually trigger a download; callers must later call ``BackupAttachmentDownloadQueueRunner/restoreAttachmentsIfNeeded``
-    /// to insert rows into the normal AttachmentDownloadQueue and download.
+    /// See `BackupAttachmentDownloadStore/enqueue(...)` for more details.
     func enqueueFromBackupIfNeeded(
         _ referencedAttachment: ReferencedAttachment,
         restoreStartTimestampMs: UInt64,
         backupPlan: BackupPlan,
         remoteConfig: RemoteConfig,
         isPrimaryDevice: Bool,
-        tx: DBWriteTransaction
-    ) throws
+        tx: DBWriteTransaction,
+    )
 }
 
 public class BackupAttachmentDownloadSchedulerImpl: BackupAttachmentDownloadScheduler {
@@ -37,22 +33,22 @@ public class BackupAttachmentDownloadSchedulerImpl: BackupAttachmentDownloadSche
         backupPlan: BackupPlan,
         remoteConfig: RemoteConfig,
         isPrimaryDevice: Bool,
-        tx: DBWriteTransaction
-    ) throws {
+        tx: DBWriteTransaction,
+    ) {
         let eligibility = BackupAttachmentDownloadEligibility.forAttachment(
             referencedAttachment.attachment,
-            reference: referencedAttachment.reference,
+            mostRecentReference: referencedAttachment.reference,
             currentTimestamp: restoreStartTimestampMs,
             backupPlan: backupPlan,
             remoteConfig: remoteConfig,
-            isPrimaryDevice: isPrimaryDevice
+            isPrimaryDevice: isPrimaryDevice,
         )
 
         if
             let state = eligibility.thumbnailMediaTierState,
             state != .done
         {
-            try backupAttachmentDownloadStore.enqueue(
+            backupAttachmentDownloadStore.enqueue(
                 referencedAttachment,
                 thumbnail: true,
                 // Thumbnails are always media tier
@@ -63,14 +59,14 @@ public class BackupAttachmentDownloadSchedulerImpl: BackupAttachmentDownloadSche
                 // Don't trigger per-item logs from backups; too noisy
                 file: nil,
                 function: nil,
-                line: nil
+                line: nil,
             )
         }
         if
             let state = eligibility.fullsizeState,
             state != .done
         {
-            try backupAttachmentDownloadStore.enqueue(
+            backupAttachmentDownloadStore.enqueue(
                 referencedAttachment,
                 thumbnail: false,
                 canDownloadFromMediaTier: eligibility.canDownloadMediaTierFullsize,
@@ -80,7 +76,7 @@ public class BackupAttachmentDownloadSchedulerImpl: BackupAttachmentDownloadSche
                 // Don't trigger per-item logs from backups; too noisy
                 file: nil,
                 function: nil,
-                line: nil
+                line: nil,
             )
         }
     }
@@ -98,8 +94,8 @@ open class BackupAttachmentDownloadSchedulerMock: BackupAttachmentDownloadSchedu
         backupPlan: BackupPlan,
         remoteConfig: RemoteConfig,
         isPrimaryDevice: Bool,
-        tx: DBWriteTransaction
-    ) throws {
+        tx: DBWriteTransaction,
+    ) {
         // Do nothing
     }
 }

@@ -8,7 +8,8 @@ import ObjectiveC
 
 // Stills should be loaded before full GIFs.
 public enum ProxiedContentRequestPriority {
-    case low, high
+    case low
+    case high
 }
 
 protocol ProxiedContentDownloaderDelegate: AnyObject {
@@ -19,24 +20,9 @@ protocol ProxiedContentDownloaderDelegate: AnyObject {
 
 // MARK: -
 
-open class ProxiedContentAssetDescription {
+public struct ProxiedContentAssetDescription {
     public let url: NSURL
     public let fileExtension: String
-
-    public init?(url: NSURL,
-                 fileExtension: String? = nil) {
-        self.url = url
-
-        if let fileExtension = fileExtension {
-            self.fileExtension = fileExtension
-        } else {
-            guard let pathExtension = url.pathExtension else {
-                owsFailDebug("URL has not path extension.")
-                return nil
-            }
-            self.fileExtension = pathExtension
-        }
-    }
 }
 
 // MARK: -
@@ -55,7 +41,7 @@ public class ProxiedContentAssetSegment: NSObject {
     public let index: UInt
     public let segmentStart: UInt
     public let segmentLength: UInt
-    // The amount of the segment that is overlap.  
+    // The amount of the segment that is overlap.
     // The overlap lies in the _first_ n bytes of the segment data.
     public let redundantLength: UInt
 
@@ -69,16 +55,18 @@ public class ProxiedContentAssetSegment: NSObject {
     // This state is accessed off the main thread.
     //
     // * During downloads it will be accessed on the task delegate queue.
-    // * After downloads it will be accessed on a worker queue. 
+    // * After downloads it will be accessed on a worker queue.
     private var segmentData = Data()
 
     // This state should only be accessed on the main thread.
     public weak var task: URLSessionDataTask?
 
-    init(index: UInt,
-         segmentStart: UInt,
-         segmentLength: UInt,
-         redundantLength: UInt) {
+    init(
+        index: UInt,
+        segmentStart: UInt,
+        segmentLength: UInt,
+        redundantLength: UInt,
+    ) {
         self.index = index
         self.segmentStart = segmentStart
         self.segmentLength = segmentLength
@@ -103,7 +91,7 @@ public class ProxiedContentAssetSegment: NSObject {
             owsFailDebug("merging data in invalid state: \(state)")
             return false
         }
-        guard UInt(segmentData.count) == segmentLength else {
+        guard segmentData.count == segmentLength else {
             owsFailDebug("segment data length: \(segmentData.count) doesn't match expected length: \(segmentLength)")
             return false
         }
@@ -111,13 +99,7 @@ public class ProxiedContentAssetSegment: NSObject {
         // In some cases the last two segments will overlap.
         // In that case, we only want to append the non-overlapping
         // tail of the segment data.
-        let bytesToIgnore = Int(redundantLength)
-        if bytesToIgnore > 0 {
-            let subdata = segmentData.subdata(in: bytesToIgnore..<Int(segmentLength))
-            assetData.append(subdata)
-        } else {
-            assetData.append(segmentData)
-        }
+        assetData.append(segmentData.dropFirst(Int(redundantLength)))
         return true
     }
 }
@@ -167,12 +149,15 @@ public class ProxiedContentAssetRequest: NSObject {
             assert(contentLength > 0)
         }
     }
+
     public weak var contentLengthTask: URLSessionDataTask?
 
-    init(assetDescription: ProxiedContentAssetDescription,
-         priority: ProxiedContentRequestPriority,
-         success: @escaping ((ProxiedContentAssetRequest?, ProxiedContentAsset) -> Void),
-         failure: @escaping ((ProxiedContentAssetRequest) -> Void)) {
+    init(
+        assetDescription: ProxiedContentAssetDescription,
+        priority: ProxiedContentRequestPriority,
+        success: @escaping ((ProxiedContentAssetRequest?, ProxiedContentAsset) -> Void),
+        failure: @escaping ((ProxiedContentAssetRequest) -> Void),
+    ) {
         self.assetDescription = assetDescription
         self.priority = priority
         self.success = success
@@ -197,7 +182,7 @@ public class ProxiedContentAssetRequest: NSObject {
         let k50KB: UInt = 50 * 1024
         let k10KB: UInt = 10 * 1024
         let k1KB: UInt = 1 * 1024
-        for segmentSize in [k1MB, k500KB, k100KB, k50KB, k10KB, k1KB ] {
+        for segmentSize in [k1MB, k500KB, k100KB, k50KB, k10KB, k1KB] {
             if contentLength >= segmentSize {
                 return segmentSize
             }
@@ -215,10 +200,12 @@ public class ProxiedContentAssetRequest: NSObject {
         let contentLength = UInt(self.contentLength)
 
         // Make the initial segment.
-        let assetSegment = ProxiedContentAssetSegment(index: 0,
-                                                      segmentStart: 0,
-                                                      segmentLength: UInt(initialData.count),
-                                                      redundantLength: 0)
+        let assetSegment = ProxiedContentAssetSegment(
+            index: 0,
+            segmentStart: 0,
+            segmentLength: UInt(initialData.count),
+            redundantLength: 0,
+        )
         // "Download" the initial segment using the initialData.
         assetSegment.state = .downloading
         assetSegment.append(data: initialData)
@@ -237,10 +224,12 @@ public class ProxiedContentAssetRequest: NSObject {
                 redundantLength = segmentStart + segmentLength - contentLength
                 segmentStart = contentLength - segmentLength
             }
-            let assetSegment = ProxiedContentAssetSegment(index: index,
-                                                 segmentStart: segmentStart,
-                                                 segmentLength: segmentLength,
-                                                 redundantLength: redundantLength)
+            let assetSegment = ProxiedContentAssetSegment(
+                index: index,
+                segmentStart: segmentStart,
+                segmentLength: segmentLength,
+                redundantLength: redundantLength,
+            )
             segments.append(assetSegment)
             nextSegmentStart = segmentStart + segmentLength
             index += 1
@@ -390,8 +379,10 @@ public class ProxiedContentAsset: NSObject {
     public let assetDescription: ProxiedContentAssetDescription
     public let filePath: String
 
-    init(assetDescription: ProxiedContentAssetDescription,
-         filePath: String) {
+    init(
+        assetDescription: ProxiedContentAssetDescription,
+        filePath: String,
+    ) {
         self.assetDescription = assetDescription
         self.filePath = filePath
     }
@@ -425,6 +416,7 @@ extension URLSessionTask {
             objc_setAssociatedObject(self, &URLSessionTaskProxiedContentAssetRequest, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
+
     var assetSegment: ProxiedContentAssetSegment {
         get {
             return objc_getAssociatedObject(self, &URLSessionTaskProxiedContentAssetSegment) as! ProxiedContentAssetSegment
@@ -454,8 +446,6 @@ open class ProxiedContentDownloader: NSObject, URLSessionTaskDelegate, URLSessio
 
         super.init()
 
-        SwiftSingletons.register(self)
-
         ensureDownloadFolder()
     }
 
@@ -469,9 +459,11 @@ open class ProxiedContentDownloader: NSObject, URLSessionTaskDelegate, URLSessio
         configuration.requestCachePolicy = .reloadIgnoringCacheData
 
         configuration.httpMaximumConnectionsPerHost = 10
-        let session = URLSession(configuration: configuration,
-                                 delegate: self,
-                                 delegateQueue: nil)
+        let session = URLSession(
+            configuration: configuration,
+            delegate: self,
+            delegateQueue: nil,
+        )
         return session
     }()
 
@@ -494,7 +486,7 @@ open class ProxiedContentDownloader: NSObject, URLSessionTaskDelegate, URLSessio
     @MainActor
     public func requestAsset(
         assetDescription: ProxiedContentAssetDescription,
-        priority: ProxiedContentRequestPriority
+        priority: ProxiedContentRequestPriority,
     ) async throws(RequestAssetError) -> ProxiedContentAsset {
         return try await withCheckedContinuation { continuation in
             _ = self.requestAsset(assetDescription: assetDescription, priority: priority) { request, asset in
@@ -514,7 +506,7 @@ open class ProxiedContentDownloader: NSObject, URLSessionTaskDelegate, URLSessio
         assetDescription: ProxiedContentAssetDescription,
         priority: ProxiedContentRequestPriority,
         success: @escaping ((ProxiedContentAssetRequest?, ProxiedContentAsset) -> Void),
-        failure: @escaping ((ProxiedContentAssetRequest) -> Void)
+        failure: @escaping ((ProxiedContentAssetRequest) -> Void),
     ) -> ProxiedContentAssetRequest? {
         AssertIsOnMainThread()
 
@@ -531,7 +523,7 @@ open class ProxiedContentDownloader: NSObject, URLSessionTaskDelegate, URLSessio
             assetDescription: assetDescription,
             priority: priority,
             success: success,
-            failure: failure
+            failure: failure,
         )
         assetRequestQueue.append(assetRequest)
         // Process the queue (which may start this request)
@@ -596,7 +588,7 @@ open class ProxiedContentDownloader: NSObject, URLSessionTaskDelegate, URLSessio
 
     private func segmentRequestDidFail(assetRequest: ProxiedContentAssetRequest, assetSegment: ProxiedContentAssetSegment? = nil) {
         DispatchQueue.main.async {
-            if let assetSegment = assetSegment {
+            if let assetSegment {
                 assetSegment.state = .failed
 
                 // TODO: If we wanted to implement segment retry, we'd do so here.
@@ -730,8 +722,10 @@ open class ProxiedContentDownloader: NSObject, URLSessionTaskDelegate, URLSessio
             self.assetRequestDidFail(assetRequest: assetRequest)
             return
         }
-        guard let data = data,
-        data.count > 0 else {
+        guard
+            let data,
+            data.count > 0
+        else {
             owsFailDebug("Asset size response missing data.")
             assetRequest.state = .failed
             self.assetRequestDidFail(assetRequest: assetRequest)
@@ -743,7 +737,7 @@ open class ProxiedContentDownloader: NSObject, URLSessionTaskDelegate, URLSessio
             self.assetRequestDidFail(assetRequest: assetRequest)
             return
         }
-        guard httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 else {
+        guard httpResponse.statusCode >= 200, httpResponse.statusCode < 300 else {
             Logger.warn("invalid httpResponse.statusCode: \(httpResponse.statusCode)")
             assetRequest.state = .failed
             self.assetRequestDidFail(assetRequest: assetRequest)
@@ -767,12 +761,16 @@ open class ProxiedContentDownloader: NSObject, URLSessionTaskDelegate, URLSessio
         }
 
         // Example: content-range: bytes 0-1023/7630
-        guard let contentLengthString = NSRegularExpression.parseFirstMatch(pattern: "^bytes \\d+\\-\\d+/(\\d+)$",
-                                                              text: contentRangeString) else {
-                                                                owsFailDebug("Asset size response has invalid content range.")
-                                                                assetRequest.state = .failed
-                                                                self.assetRequestDidFail(assetRequest: assetRequest)
-                                                                return
+        guard
+            let contentLengthString = NSRegularExpression.parseFirstMatch(
+                pattern: "^bytes \\d+\\-\\d+/(\\d+)$",
+                text: contentRangeString,
+            )
+        else {
+            owsFailDebug("Asset size response has invalid content range.")
+            assetRequest.state = .failed
+            self.assetRequestDidFail(assetRequest: assetRequest)
+            return
         }
         guard
             !contentLengthString.isEmpty,
@@ -783,7 +781,10 @@ open class ProxiedContentDownloader: NSObject, URLSessionTaskDelegate, URLSessio
             self.assetRequestDidFail(assetRequest: assetRequest)
             return
         }
-        guard contentLength > 0 else {
+        guard
+            contentLength > 0,
+            contentLength < OutgoingAttachmentLimits.currentLimits().maxPlaintextBytes
+        else {
             owsFailDebug("Asset size response has invalid content length.")
             assetRequest.state = .failed
             self.assetRequestDidFail(assetRequest: assetRequest)
@@ -890,7 +891,7 @@ open class ProxiedContentDownloader: NSObject, URLSessionTaskDelegate, URLSessio
             segmentRequestDidFail(assetRequest: assetRequest, assetSegment: assetSegment)
             return
         }
-        if let error = error {
+        if let error {
             Logger.error("download failed with error: \(error.shortDescription)")
             segmentRequestDidFail(assetRequest: assetRequest, assetSegment: assetSegment)
             return
@@ -901,7 +902,7 @@ open class ProxiedContentDownloader: NSObject, URLSessionTaskDelegate, URLSessio
             return
         }
         let statusCode = httpResponse.statusCode
-        guard statusCode >= 200 && statusCode < 400 else {
+        guard statusCode >= 200, statusCode < 400 else {
             Logger.error("response has invalid status code: \(statusCode)")
             segmentRequestDidFail(assetRequest: assetRequest, assetSegment: assetSegment)
             return
@@ -915,9 +916,22 @@ open class ProxiedContentDownloader: NSObject, URLSessionTaskDelegate, URLSessio
         segmentRequestDidSucceed(assetRequest: assetRequest, assetSegment: assetSegment)
     }
 
+    public func urlSession(
+        _ session: URLSession,
+        task: URLSessionTask,
+        didReceive challenge: URLAuthenticationChallenge,
+        completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void,
+    ) {
+        OWSURLSession.validateServerTrust(
+            challenge: challenge,
+            securityPolicy: HttpSecurityPolicy.systemDefault,
+            completionHandler: completionHandler,
+        )
+    }
+
     weak var delegate: ProxiedContentDownloaderDelegate?
     public func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
-        guard let delegate = delegate else {
+        guard let delegate else {
             completionHandler(request)
             return
         }
@@ -928,27 +942,21 @@ open class ProxiedContentDownloader: NSObject, URLSessionTaskDelegate, URLSessio
 
     // MARK: Temp Directory
 
-    public func ensureDownloadFolder() {
+    private func ensureDownloadFolder() {
         // We write assets to the temporary directory so that iOS can clean them up.
         // We try to eagerly clean up these assets when they are no longer in use.
 
-        let tempDirPath = OWSTemporaryDirectory()
+        let tempDirPath = OWSFileSystem.temporaryFilePath(isAvailableWhileDeviceLocked: false)
         let dirPath = (tempDirPath as NSString).appendingPathComponent(downloadFolderName)
         do {
             let fileManager = FileManager.default
 
-            // Try to delete existing folder if necessary.
-            if fileManager.fileExists(atPath: dirPath) {
-                try fileManager.removeItem(atPath: dirPath)
-                downloadFolderPath = dirPath
-            }
-            // Try to create folder if necessary.
-            if !fileManager.fileExists(atPath: dirPath) {
-                try fileManager.createDirectory(atPath: dirPath,
-                                                withIntermediateDirectories: true,
-                                                attributes: nil)
-                downloadFolderPath = dirPath
-            }
+            try fileManager.createDirectory(
+                atPath: dirPath,
+                withIntermediateDirectories: true,
+                attributes: nil,
+            )
+            downloadFolderPath = dirPath
 
             // Don't back up ProxiedContent downloads.
             OWSFileSystem.protectFileOrFolder(atPath: dirPath)

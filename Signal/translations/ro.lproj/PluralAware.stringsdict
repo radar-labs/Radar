@@ -33,6 +33,24 @@
 			<string>%2$d secunde</string>
 		</dict>
 	</dict>
+	<key>ACCESSIBILITY_LABEL_MULTIPLE_ATTACHMENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d articol media</string>
+			<key>few</key>
+			<string>%1$d articole media</string>
+			<key>other</key>
+			<string>%1$d de articole media</string>
+		</dict>
+	</dict>
 	<key>ACCESSIBILITY_LABEL_SHORT_VOICE_MEMO_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -411,6 +429,78 @@
 			<string>Text + %1$d de zile de fișiere media</string>
 		</dict>
 	</dict>
+	<key>COLLAPSE_SET_CALL_EVENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld apel</string>
+			<key>few</key>
+			<string>%1$ld apeluri</string>
+			<key>other</key>
+			<string>%1$ld de apeluri</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_CHAT_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld actualizare a conversației</string>
+			<key>few</key>
+			<string>%1$ld actualizări ale conversației</string>
+			<key>other</key>
+			<string>%1$ld de actualizări ale conversației</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_GROUP_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld actualizare a grupului</string>
+			<key>few</key>
+			<string>%1$ld actualizări ale grupului</string>
+			<key>other</key>
+			<string>%1$ld de actualizări ale grupului</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_TIMER_CHANGES_WITH_FINAL_TIMER_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld schimbare a temporizatorului pentru mesaje temporare · %2$@</string>
+			<key>few</key>
+			<string>%1$ld schimbări ale temporizatorului pentru mesaje temporare · %2$@</string>
+			<key>other</key>
+			<string>%1$ld de schimbări ale temporizatorului pentru mesaje temporare · %2$@</string>
+		</dict>
+	</dict>
 	<key>CONVERSATION_DELETE_CONFIRMATIONS_ALERT_TITLE_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -494,6 +584,24 @@
 			<string>din %2$d rezultate</string>
 			<key>other</key>
 			<string>din %2$d de rezultate</string>
+		</dict>
+	</dict>
+	<key>CONVERSATION_SETTINGS_FORMER_MEMBERS_SECTION_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d fost membru</string>
+			<key>few</key>
+			<string>%1$d foști membri</string>
+			<key>other</key>
+			<string>%1$d de foști membri</string>
 		</dict>
 	</dict>
 	<key>CONVERSATION_SETTINGS_MEMBERS_SECTION_TITLE_%d</key>
@@ -633,11 +741,11 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Grupurile Signal funcționează cel mai bine cu %1$d membru sau mai puțin. Adăugarea mai multor membri va cauza întârzieri la trimiterea și primirea mesajelor.</string>
+			<string>Grupurile Radar funcționează cel mai bine cu %1$d membru sau mai puțin. Adăugarea mai multor membri va cauza întârzieri la trimiterea și primirea mesajelor.</string>
 			<key>few</key>
-			<string>Grupurile Signal funcționează cel mai bine cu %1$d membri sau mai puțin. Adăugarea mai multor membri va cauza întârzieri la trimiterea și primirea mesajelor.</string>
+			<string>Grupurile Radar funcționează cel mai bine cu %1$d membri sau mai puțin. Adăugarea mai multor membri va cauza întârzieri la trimiterea și primirea mesajelor.</string>
 			<key>other</key>
-			<string>Grupurile Signal funcționează cel mai bine cu %1$d de membri sau mai puțin. Adăugarea mai multor membri va cauza întârzieri la trimiterea și primirea mesajelor.</string>
+			<string>Grupurile Radar funcționează cel mai bine cu %1$d de membri sau mai puțin. Adăugarea mai multor membri va cauza întârzieri la trimiterea și primirea mesajelor.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -813,11 +921,11 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal va suna pe %2$@, %3$@, și %1$d altul</string>
+			<string>Radar va suna pe %2$@, %3$@, și %1$d altul</string>
 			<key>few</key>
-			<string>Signal va apela %2$@, %3$@, și încă %1$d</string>
+			<string>Radar va apela %2$@, %3$@, și încă %1$d</string>
 			<key>other</key>
-			<string>Signal va apela %2$@, %3$@, și încă %1$d</string>
+			<string>Radar va apela %2$@, %3$@, și încă %1$d</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1137,11 +1245,11 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Pentru a menține &quot;%2$@&quot; conectat, deschide Signal pe dispozitivul respectiv în termen de %1$d zi.</string>
+			<string>Pentru a menține &quot;%2$@&quot; conectat, deschide Radar pe dispozitivul respectiv în termen de %1$d zi.</string>
 			<key>few</key>
-			<string>Pentru a menține &quot;%2$@&quot; conectat, deschide Signal pe dispozitivul respectiv în termen de %1$d zile.</string>
+			<string>Pentru a menține &quot;%2$@&quot; conectat, deschide Radar pe dispozitivul respectiv în termen de %1$d zile.</string>
 			<key>other</key>
-			<string>Pentru a menține &quot;%2$@&quot; conectat, deschide Signal pe dispozitivul respectiv în termen de %1$d de zile.</string>
+			<string>Pentru a menține &quot;%2$@&quot; conectat, deschide Radar pe dispozitivul respectiv în termen de %1$d de zile.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1371,11 +1479,11 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Toate conexiunile Signal · %1$d spectator</string>
+			<string>Toate conexiunile Radar · %1$d spectator</string>
 			<key>few</key>
-			<string>Toate conexiunile Signal · %1$d spectatori</string>
+			<string>Toate conexiunile Radar · %1$d spectatori</string>
 			<key>other</key>
-			<string>Toate conexiunile Signal · %1$d de spectatori</string>
+			<string>Toate conexiunile Radar · %1$d de spectatori</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1389,11 +1497,11 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Toate conexiunile Signal · %1$d exclusă</string>
+			<string>Toate conexiunile Radar · %1$d exclusă</string>
 			<key>few</key>
-			<string>Toate conexiunile Signal · %1$d excluse</string>
+			<string>Toate conexiunile Radar · %1$d excluse</string>
 			<key>other</key>
-			<string>Toate conexiunile Signal · %1$d excluse</string>
+			<string>Toate conexiunile Radar · %1$d excluse</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>
@@ -1558,6 +1666,24 @@
 			<string>Anulezi %1$d de invitații trimise de „%2$@”?</string>
 		</dict>
 	</dict>
+	<key>PINNED_CONVERSATION_LIMIT</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Poți fixa până la %1$d conversație.</string>
+			<key>few</key>
+			<string>Poți fixa până la %1$d conversații.</string>
+			<key>other</key>
+			<string>Poți fixa până la %1$d de conversații.</string>
+		</dict>
+	</dict>
 	<key>POLL_VOTE_COUNT</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -1630,10 +1756,10 @@
 			<string>%1$d de încercări</string>
 		</dict>
 	</dict>
-	<key>STORIES_SHARESHEET_PARTIAL_SEND_SUBTITLE_%d</key>
+	<key>SETTINGS_CHANGE_PHONE_NUMBER_SPLASH_CANT_CHANGE_BODY</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%1$#@text@</string>
+		<string>%#@text@</string>
 		<key>text</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -1641,11 +1767,35 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Nu au putut fi trimise toate elementele către povestea pe care ai selectat-o pentru că tipul de fișier nu e acceptat.</string>
+			<string>Pentru că ai înregistrat recent acest cont, nu poți schimba numerele de telefon chiar acum. Există o perioadă scurtă de așteptare care ajută la protejarea contului.
+
+ Încearcă din nou în %1$d oră.</string>
 			<key>few</key>
-			<string>Nu au putut fi trimise toate elementele către poveștile pe care le-ai selectat pentru că tipul de fișier nu e acceptat.</string>
+			<string>Pentru că ai înregistrat recent acest cont, nu poți schimba numerele de telefon chiar acum. Există o perioadă scurtă de așteptare care ajută la protejarea contului.
+
+ Încearcă din nou în %1$d ore.</string>
 			<key>other</key>
-			<string>Nu au putut fi trimise toate elementele către poveștile pe care le-ai selectat pentru că tipul de fișier nu e acceptat.</string>
+			<string>Pentru că ai înregistrat recent acest cont, nu poți schimba numerele de telefon chiar acum. Există o perioadă scurtă de așteptare care ajută la protejarea contului.
+
+ Încearcă din nou în %1$d de ore.</string>
+		</dict>
+	</dict>
+	<key>STICKER_PACK_STICKER_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d autocolant</string>
+			<key>few</key>
+			<string>%1$d autocolante</string>
+			<key>other</key>
+			<string>%1$d de autocolante</string>
 		</dict>
 	</dict>
 	<key>STORY_REPLIES_COUNT_%d</key>
@@ -1754,6 +1904,24 @@
 			<string>&lt;bold&gt;%1$d&lt;/bold&gt; vizualizări</string>
 			<key>other</key>
 			<string>&lt;bold&gt;%1$d&lt;/bold&gt; de vizualizări</string>
+		</dict>
+	</dict>
+	<key>THREAD_DETAILS_MEMBERS_AND_INVITED_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%2$@ (+%1$ld invitat)</string>
+			<key>few</key>
+			<string>%2$@ (+%1$ld invitați)</string>
+			<key>other</key>
+			<string>%2$@ (+%1$ld de invitați)</string>
 		</dict>
 	</dict>
 	<key>THREAD_DETAILS_MORE_MUTUAL_GROUP_%3$ld</key>
@@ -1880,6 +2048,96 @@
 			<string>Numele de utilizator trebuie să înceapă cu cel puțin %1$d caractere</string>
 			<key>other</key>
 			<string>Numele de utilizator trebuie să înceapă cu cel puțin %1$d de caractere</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ și alte persoane te-au menționat o dată</string>
+			<key>few</key>
+			<string>%2$@ și alte persoane te-au menționat de %1$d ori</string>
+			<key>other</key>
+			<string>%2$@ și alte persoane te-au menționat de %1$d de ori</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ și %3$@ te-au menționat o dată</string>
+			<key>few</key>
+			<string>%2$@ și %3$@ te-au menționat de %1$d ori</string>
+			<key>other</key>
+			<string>%2$@ și %3$@ te-au menționat de %1$d de ori</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__messages</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d mesaj necitit</string>
+			<key>few</key>
+			<string>%1$d mesaje necitite</string>
+			<key>other</key>
+			<string>%1$d de mesaje necitite</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d răspuns de la %2$@ și alte persoane</string>
+			<key>few</key>
+			<string>%1$d răspunsuri de la %2$@ și alte persoane</string>
+			<key>other</key>
+			<string>%1$d de răspunsuri de la %2$@ și alte persoane</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d răspuns de la %2$@ și %3$@</string>
+			<key>few</key>
+			<string>%1$d răspunsuri de la %2$@ și %3$@</string>
+			<key>other</key>
+			<string>%1$d de răspunsuri de la %2$@ și %3$@</string>
 		</dict>
 	</dict>
 </dict>

@@ -12,58 +12,51 @@ public final class GroupCallInteractionFinder {
     /// callers for more info.
     ///
     /// This query is powered by a one-off index:
-    /// `index_model_TSInteraction_on_uniqueThreadId_and_eraId_and_recordType`.
-    /// Consequently, if we decide in the future that we can drop this query, we
-    /// can also drop the index.
+    /// `Interaction_groupCallEraId_partial`. Consequently, if we decide in the
+    /// future that we can drop this query, we can also drop the index.
     public func existsGroupCallMessageForEraId(
         _ eraId: String,
         thread: TSThread,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> Bool {
         let sql = """
-            SELECT 1
-            FROM \(InteractionRecord.databaseTableName)
-            \(DEBUG_INDEXED_BY("Interaction_groupCallEraId_partial", or: "index_model_TSInteraction_on_uniqueThreadId_and_eraId_and_recordType"))
-            WHERE \(interactionColumn: .recordType) IS \(SDSRecordType.groupCallMessage.rawValue)
-            AND \(interactionColumn: .threadUniqueId) = ?
-            AND \(interactionColumn: .eraId) = ?
-            LIMIT 1
-            """
+        SELECT 1
+        FROM \(InteractionRecord.databaseTableName)
+        \(DEBUG_INDEXED_BY("Interaction_groupCallEraId_partial"))
+        WHERE \(interactionColumn: .recordType) IS \(SDSRecordType.groupCallMessage.rawValue)
+        AND \(interactionColumn: .threadUniqueId) = ?
+        AND \(interactionColumn: .eraId) = ?
+        LIMIT 1
+        """
 
         let arguments: StatementArguments = [thread.uniqueId, eraId]
-        do {
+        return failIfThrows {
             return try Bool.fetchOne(
                 transaction.database,
                 sql: sql,
-                arguments: arguments
+                arguments: arguments,
             ) ?? false
-        } catch {
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(
-                userDefaults: CurrentAppContext().appUserDefaults(),
-                error: error
-            )
-            owsFail("Failed to find group call")
         }
     }
 
     public func unendedCallsForGroupThread(
         _ thread: TSThread,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> [OWSGroupCallMessage] {
         let sql: String = """
-            SELECT *
-            FROM \(InteractionRecord.databaseTableName)
-            \(DEBUG_INDEXED_BY("Interaction_unendedGroupCall_partial", or: "index_model_TSInteraction_on_uniqueThreadId_and_hasEnded_and_recordType"))
-            WHERE \(interactionColumn: .recordType) = \(SDSRecordType.groupCallMessage.rawValue)
-            AND \(interactionColumn: .hasEnded) = 0
-            AND \(interactionColumn: .threadUniqueId) = ?
-            """
+        SELECT *
+        FROM \(InteractionRecord.databaseTableName)
+        \(DEBUG_INDEXED_BY("Interaction_unendedGroupCall_partial"))
+        WHERE \(interactionColumn: .recordType) = \(SDSRecordType.groupCallMessage.rawValue)
+        AND \(interactionColumn: .hasEnded) = 0
+        AND \(interactionColumn: .threadUniqueId) = ?
+        """
 
         var groupCalls: [OWSGroupCallMessage] = []
         let cursor = OWSGroupCallMessage.grdbFetchCursor(
             sql: sql,
             arguments: [thread.uniqueId],
-            transaction: transaction
+            transaction: transaction,
         )
 
         do {

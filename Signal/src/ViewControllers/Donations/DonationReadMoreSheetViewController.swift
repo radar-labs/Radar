@@ -6,50 +6,55 @@
 import SignalServiceKit
 import SignalUI
 
-class DonationReadMoreSheetViewController: StackSheetViewController {
-    override var stackViewInsets: UIEdgeInsets {
-        UIEdgeInsets(hMargin: 24, vMargin: 24)
-    }
-    override var sheetBackgroundColor: UIColor { UIColor.Signal.groupedBackground }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        stackView.spacing = 32
-
-        let image = UIImage(named: "sustainer-heart")
-        let imageView = UIImageView(image: image)
-        imageView.contentMode = .scaleAspectFit
-        stackView.addArrangedSubview(imageView)
-
-        let titleLabel = UILabel.title2Label(text: OWSLocalizedString(
-            "DONATION_READ_MORE_SCREEN_TITLE",
-            comment: "There is a screen where users can read more about their donation to Signal. This is the title of that screen."
-        ))
-        stackView.addArrangedSubview(titleLabel)
-
-        let paragraphs: [String] = [
-            OWSLocalizedString(
-                "DONATION_READ_MORE_SCREEN_PARAGRAPH_1",
-                comment: "There is a screen where users can read more about their donation to Signal. This is the 1st paragraph of that screen."
-            ),
-            OWSLocalizedString(
-                "DONATION_READ_MORE_SCREEN_PARAGRAPH_2",
-                comment: "There is a screen where users can read more about their donation to Signal. This is the 2nd paragraph of that screen."
-            ),
-            OWSLocalizedString(
-                "DONATION_READ_MORE_SCREEN_PARAGRAPH_3",
-                comment: "There is a screen where users can read more about their donation to Signal. This is the 3rd paragraph of that screen."
-            )
-        ]
-        for paragraph in paragraphs {
-            let paragraphLabel = UILabel()
-            paragraphLabel.text = paragraph
-            paragraphLabel.textAlignment = .natural
-            paragraphLabel.font = .dynamicTypeBody
-            paragraphLabel.numberOfLines = 0
-            paragraphLabel.lineBreakMode = .byWordWrapping
-            stackView.addArrangedSubview(paragraphLabel)
-        }
+final class DonationReadMoreSheetViewController: HeroSheetViewController {
+    init() {
+        super.init(
+            hero: .image(.sustainerHeart),
+            title: nil,
+            body: HeroSheetViewController.Body([
+                .text(
+                    .plain(OWSLocalizedString(
+                        "DONATION_READ_MORE_SHEET_BODY",
+                        comment: "Body text for a sheet discussing donating to Signal.",
+                    )),
+                    alignment: .left,
+                    color: .Signal.label,
+                ),
+                .bullets(spacing: 32, [
+                    HeroSheetViewController.Body.BulletPoint(
+                        icon: .badgeMulti,
+                        text: OWSLocalizedString(
+                            "DONATION_READ_MORE_SHEET_BULLET_1",
+                            comment: "Bullet point for a sheet discussing donating to Signal.",
+                        ),
+                    ),
+                    HeroSheetViewController.Body.BulletPoint(
+                        icon: .lock,
+                        text: OWSLocalizedString(
+                            "DONATION_READ_MORE_SHEET_BULLET_2",
+                            comment: "Bullet point for a sheet discussing donating to Signal.",
+                        ),
+                    ),
+                    HeroSheetViewController.Body.BulletPoint(
+                        icon: .heart,
+                        text: OWSLocalizedString(
+                            "DONATION_READ_MORE_SHEET_BULLET_3",
+                            comment: "Bullet point for a sheet discussing donating to Signal. For non-English languages, skip the word 501c3, and skip the language about US donations being tax deductible.",
+                        ),
+                    ),
+                ]),
+            ]),
+            primary: nil,
+            secondary: nil,
+        )
     }
 }
+
+#if DEBUG
+
+@available(iOS 17, *)
+#Preview {
+    SheetPreviewViewController(sheet: DonationReadMoreSheetViewController())
+}
+
+#endif

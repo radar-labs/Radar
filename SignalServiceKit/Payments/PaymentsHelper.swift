@@ -12,15 +12,10 @@ public protocol PaymentsHelper: AnyObject {
 
     var keyValueStore: KeyValueStore { get }
 
-    var isKillSwitchActive: Bool { get }
-    var hasValidPhoneNumberForPayments: Bool { get }
-    var canEnablePayments: Bool { get }
+    func canUsePayments() -> Bool
 
     var isPaymentsVersionOutdated: Bool { get }
     func setPaymentsVersionOutdated(_ value: Bool)
-
-    func setArePaymentsEnabled(for serviceId: ServiceId, hasPaymentsEnabled: Bool, transaction: DBWriteTransaction)
-    func arePaymentsEnabled(for address: SignalServiceAddress, transaction: DBReadTransaction) -> Bool
 
     var arePaymentsEnabled: Bool { get }
     func arePaymentsEnabled(tx: DBReadTransaction) -> Bool
@@ -36,38 +31,39 @@ public protocol PaymentsHelper: AnyObject {
     func processIncomingPaymentSyncMessage(
         _ paymentProto: SSKProtoSyncMessageOutgoingPayment,
         messageTimestamp: UInt64,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     )
 
     func processIncomingPaymentNotification(
         thread: TSThread,
         paymentNotification: TSPaymentNotification,
         senderAci: Aci,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     )
 
     func processIncomingPaymentsActivationRequest(
         thread: TSThread,
         senderAci: Aci,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     )
 
     func processIncomingPaymentsActivatedMessage(
         thread: TSThread,
         senderAci: Aci,
-        transaction: DBWriteTransaction
+        localIdentifiers: LocalIdentifiers,
+        tx: DBWriteTransaction,
     )
 
     func processReceivedTranscriptPaymentNotification(
         thread: TSThread,
         paymentNotification: TSPaymentNotification,
         messageTimestamp: UInt64,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     )
 
     func tryToInsertPaymentModel(
         _ paymentModel: TSPaymentModel,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) throws
 }
 
@@ -76,9 +72,11 @@ public protocol PaymentsHelper: AnyObject {
 public protocol PaymentsHelperSwift: PaymentsHelper {
 
     var paymentsState: PaymentsState { get }
-    func setPaymentsState(_ value: PaymentsState,
-                          originatedLocally: Bool,
-                          transaction: DBWriteTransaction)
+    func setPaymentsState(
+        _ value: PaymentsState,
+        originatedLocally: Bool,
+        transaction: DBWriteTransaction,
+    )
     func clearState(transaction: DBWriteTransaction)
 }
 
@@ -96,9 +94,11 @@ public enum PaymentsState: Equatable {
     // * paymentsEntropy is not discarded.
     // * Payments are only enabled if paymentsEntropy is valid.
     // * Payments are only enabled if paymentsEntropy has valid length.
-    public static func build(arePaymentsEnabled: Bool,
-                             paymentsEntropy: Data?) -> PaymentsState {
-        guard let paymentsEntropy = paymentsEntropy else {
+    public static func build(
+        arePaymentsEnabled: Bool,
+        paymentsEntropy: Data?,
+    ) -> PaymentsState {
+        guard let paymentsEntropy else {
             return .disabled
         }
         guard PaymentsConstants.supportedPaymentsEntropyLengths.contains(paymentsEntropy.count) else {
@@ -134,9 +134,9 @@ public enum PaymentsState: Equatable {
 
     // MARK: Equatable
 
-    public static func == (lhs: PaymentsState, rhs: PaymentsState) -> Bool {
-        return (lhs.isEnabled == rhs.isEnabled &&
-                lhs.paymentsEntropy == rhs.paymentsEntropy)
+    public static func ==(lhs: PaymentsState, rhs: PaymentsState) -> Bool {
+        return lhs.isEnabled == rhs.isEnabled &&
+            lhs.paymentsEntropy == rhs.paymentsEntropy
     }
 }
 
@@ -148,25 +148,15 @@ public class MockPaymentsHelper {}
 
 extension MockPaymentsHelper: PaymentsHelperSwift, PaymentsHelper {
 
-    public var isKillSwitchActive: Bool { false }
-    public var hasValidPhoneNumberForPayments: Bool { false }
-    public var canEnablePayments: Bool { false }
+    public func canUsePayments() -> Bool { false }
 
     public var isPaymentsVersionOutdated: Bool { false }
     public func setPaymentsVersionOutdated(_ value: Bool) {}
 
     fileprivate static let keyValueStore = KeyValueStore(collection: "MockPayments")
-    public var keyValueStore: KeyValueStore { Self.keyValueStore}
+    public var keyValueStore: KeyValueStore { Self.keyValueStore }
 
     public func warmCaches() {}
-
-    public func setArePaymentsEnabled(for serviceId: ServiceId, hasPaymentsEnabled: Bool, transaction: DBWriteTransaction) {
-        // Do nothing.
-    }
-
-    public func arePaymentsEnabled(for address: SignalServiceAddress, transaction: DBReadTransaction) -> Bool {
-        owsFail("Not implemented.")
-    }
 
     public var arePaymentsEnabled: Bool {
         owsFail("Not implemented.")
@@ -198,9 +188,11 @@ extension MockPaymentsHelper: PaymentsHelperSwift, PaymentsHelper {
 
     public var paymentsState: PaymentsState { .disabled }
 
-    public func setPaymentsState(_ value: PaymentsState,
-                                 originatedLocally: Bool,
-                                 transaction: DBWriteTransaction) {
+    public func setPaymentsState(
+        _ value: PaymentsState,
+        originatedLocally: Bool,
+        transaction: DBWriteTransaction,
+    ) {
         owsFail("Not implemented.")
     }
 
@@ -220,7 +212,7 @@ extension MockPaymentsHelper: PaymentsHelperSwift, PaymentsHelper {
         thread: TSThread,
         paymentNotification: TSPaymentNotification,
         senderAci: Aci,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) {
         owsFail("Not implemented.")
     }
@@ -228,7 +220,7 @@ extension MockPaymentsHelper: PaymentsHelperSwift, PaymentsHelper {
     public func processIncomingPaymentsActivationRequest(
         thread: TSThread,
         senderAci: Aci,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) {
         owsFail("Not implemented.")
     }
@@ -236,26 +228,33 @@ extension MockPaymentsHelper: PaymentsHelperSwift, PaymentsHelper {
     public func processIncomingPaymentsActivatedMessage(
         thread: TSThread,
         senderAci: Aci,
-        transaction: DBWriteTransaction
+        localIdentifiers: LocalIdentifiers,
+        tx: DBWriteTransaction,
     ) {
         owsFail("Not implemented.")
     }
 
-    public func processReceivedTranscriptPaymentNotification(thread: TSThread,
-                                                             paymentNotification: TSPaymentNotification,
-                                                             messageTimestamp: UInt64,
-                                                             transaction: DBWriteTransaction) {
+    public func processReceivedTranscriptPaymentNotification(
+        thread: TSThread,
+        paymentNotification: TSPaymentNotification,
+        messageTimestamp: UInt64,
+        transaction: DBWriteTransaction,
+    ) {
         owsFail("Not implemented.")
     }
 
-    public func processIncomingPaymentSyncMessage(_ paymentProto: SSKProtoSyncMessageOutgoingPayment,
-                                                  messageTimestamp: UInt64,
-                                                  transaction: DBWriteTransaction) {
+    public func processIncomingPaymentSyncMessage(
+        _ paymentProto: SSKProtoSyncMessageOutgoingPayment,
+        messageTimestamp: UInt64,
+        transaction: DBWriteTransaction,
+    ) {
         owsFail("Not implemented.")
     }
 
-    public func tryToInsertPaymentModel(_ paymentModel: TSPaymentModel,
-                                        transaction: DBWriteTransaction) throws {
+    public func tryToInsertPaymentModel(
+        _ paymentModel: TSPaymentModel,
+        transaction: DBWriteTransaction,
+    ) throws {
         owsFail("Not implemented.")
     }
 }

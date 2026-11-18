@@ -4,7 +4,7 @@
 //
 
 import Foundation
-import libPhoneNumber_iOS
+import libPhoneNumber
 
 // MARK: -
 
@@ -14,17 +14,16 @@ public class PhoneNumberUtil: NSObject {
     private let parsedPhoneNumberCache = LRUCache<String, NBPhoneNumber>(
         maxSize: 256,
         nseMaxSize: 0,
-        shouldEvacuateInBackground: false
+        shouldEvacuateInBackground: false,
     )
     private let nationalPrefixTransformRuleCache = AtomicDictionary<String, String?>([:], lock: .init())
 
-    public override init() {
+    override public init() {
         self.nbMetadataHelper = NBMetadataHelper()
         self.nbPhoneNumberUtil = NBPhoneNumberUtil(metadataHelper: self.nbMetadataHelper)
 
         super.init()
 
-        SwiftSingletons.register(self)
     }
 
     // TODO: This function should use characters instead of UTF16 code units, but it's been translated as-is from ObjC for now.
@@ -51,22 +50,22 @@ public class PhoneNumberUtil: NSObject {
             // - Over-values digits relative to other characters, so they're "harder" to delete or insert
             let digitValue: UInt = 10
             var scores = Array(repeating: Array(repeating: UInt(0), count: m + 1), count: n + 1)
-            moves[0][0] = 0  // (match) move up and left
+            moves[0][0] = 0 // (match) move up and left
             scores[0][0] = 0
             if n > 0 {
                 for i in 1...n {
                     scores[i][0] = UInt(i)
-                    moves[i][0] = -1  // (deletion) move left
+                    moves[i][0] = -1 // (deletion) move left
                 }
             }
             if m > 0 {
                 for j in 1...m {
                     scores[0][j] = UInt(j)
-                    moves[0][j] = +1  // (insertion) move up
+                    moves[0][j] = +1 // (insertion) move up
                 }
             }
 
-            if n > 0 && m > 0 {
+            if n > 0, m > 0 {
                 let digits = CharacterSet.decimalDigits as NSCharacterSet
                 for i in 1...n {
                     let c1 = source.utf16[source.utf16.index(source.utf16.startIndex, offsetBy: i - 1)]
@@ -76,7 +75,7 @@ public class PhoneNumberUtil: NSObject {
                         let isDigit2 = digits.characterIsMember(c2)
                         if c1 == c2 {
                             scores[i][j] = scores[i - 1][j - 1]
-                            moves[i][j] = 0  // move up-and-left
+                            moves[i][j] = 0 // move up-and-left
                         } else {
                             let del = scores[i - 1][j] + (isDigit1 ? digitValue : UInt(1))
                             let ins = scores[i][j - 1] + (isDigit2 ? digitValue : UInt(1))
@@ -93,14 +92,14 @@ public class PhoneNumberUtil: NSObject {
         var i = n
         var j = m
         while true {
-            if i == offset && preferHigh {
+            if i == offset, preferHigh {
                 return UInt(j)
             }
             while moves[i][j] == +1 {
-                j -= 1  // zip upward
+                j -= 1 // zip upward
             }
             if i == offset {
-                return UInt(j)  // late exit
+                return UInt(j) // late exit
             }
             if moves[i][j] == 0 {
                 j -= 1
@@ -108,9 +107,7 @@ public class PhoneNumberUtil: NSObject {
             i -= 1
         }
     }
-}
 
-extension PhoneNumberUtil {
     /// Returns calling codes for libPhoneNumber-unsupported country codes.
     ///
     /// These are country codes that NSLocale.isoCountryCodes contains but
@@ -235,7 +232,7 @@ extension PhoneNumberUtil {
     public static func countryName(fromCountryCode countryCode: String) -> String {
         lazy var unknownValue = OWSLocalizedString(
             "UNKNOWN_VALUE",
-            comment: "Indicates an unknown or unrecognizable value."
+            comment: "Indicates an unknown or unrecognizable value.",
         )
 
         if countryCode.isEmpty {
@@ -243,6 +240,18 @@ extension PhoneNumberUtil {
         }
 
         return Locale.current.localizedString(forRegionCode: countryCode)?.nilIfEmpty ?? unknownValue
+    }
+
+    public enum LocalCallingCode {
+        case phoneNumberfull(Int?)
+        case phoneNumberless
+    }
+
+    public func localCallingCode(localIdentifiers: LocalIdentifiers) -> LocalCallingCode {
+        guard let phoneNumber = localIdentifiers.phoneNumber else {
+            return .phoneNumberless
+        }
+        return .phoneNumberfull(parseE164(phoneNumber)?.getCallingCode())
     }
 
     private func _parsePhoneNumber(filteredValue: String, countryCode: String = defaultCountryCode()) -> PhoneNumber? {
@@ -276,7 +285,7 @@ extension PhoneNumberUtil {
     public func parsePhoneNumber(countryCode: String, nationalNumber: String) -> PhoneNumber? {
         return _parsePhoneNumber(
             filteredValue: nationalNumber.filteredAsE164,
-            countryCode: countryCodeForParsing(fromCountryCode: countryCode)
+            countryCode: countryCodeForParsing(fromCountryCode: countryCode),
         )
     }
 
@@ -300,7 +309,7 @@ extension PhoneNumberUtil {
             localPhoneNumber
                 .flatMap { parseE164($0)?.getCallingCode() }
                 .flatMap { getFilteredRegionCodeForCallingCode($0) },
-        ].compacted().removingDuplicates(uniquingElementsBy: { $0 })
+        ].compacted().removingDuplicates()
 
         for countryCode in countryCodes {
             guard let transformRule = nationalPrefixTransformRule(countryCode: countryCode) else {
@@ -315,7 +324,7 @@ extension PhoneNumberUtil {
             }
             results.append(contentsOf: parsePhoneNumbers(
                 normalizedText: normalizedText,
-                localPhoneNumber: localPhoneNumber
+                localPhoneNumber: localPhoneNumber,
             ))
         }
 
@@ -357,34 +366,30 @@ extension PhoneNumberUtil {
 
         // Order matters; better results should appear first so prefer
         // matches with the same country code as this client's phone number.
-        guard let localPhoneNumber else {
-            owsFailDebug("localPhoneNumber is missing")
-            return results
-        }
+        if let localPhoneNumber {
+            let callingCodeForLocalNumber = parseE164(localPhoneNumber)?.getCallingCode()
+            owsAssertDebug(callingCodeForLocalNumber != nil, "callingCodeForLocalNumber is missing")
+            if let callingCodeForLocalNumber {
+                // Parse the number as a national number with the same calling code as the
+                // local user's phone number.
+                //
+                // For example, a French person living in Italy might have an Italian phone
+                // number but use French region/language for their phone. They're likely to
+                // have both Italian and French contacts (though I don't know why they
+                // wouldn't prepend the correct international prefix...).
+                let callingCodePrefix = "+\(callingCodeForLocalNumber)"
+                tryParsing(callingCodePrefix + text)
 
-        guard let callingCodeForLocalNumber = parseE164(localPhoneNumber)?.getCallingCode() else {
-            owsFailDebug("callingCodeForLocalNumber is missing")
-            return results
-        }
-
-        // Parse the number as a national number with the same calling code as the
-        // local user's phone number.
-        //
-        // For example, a French person living in Italy might have an Italian phone
-        // number but use French region/language for their phone. They're likely to
-        // have both Italian and French contacts (though I don't know why they
-        // wouldn't prepend the correct international prefix...).
-        let callingCodePrefix = "+\(callingCodeForLocalNumber)"
-        tryParsing(callingCodePrefix + text)
-
-        let phoneNumberWithAreaCodeIfMissing = Self.phoneNumberWithAreaCodeIfMissing(
-            normalizedText: text,
-            localCallingCode: callingCodeForLocalNumber,
-            localPhoneNumber: localPhoneNumber
-        )
-        if let phoneNumberWithAreaCodeIfMissing {
-            owsAssertDebug(phoneNumberWithAreaCodeIfMissing.hasPrefix("+"))
-            tryParsing(phoneNumberWithAreaCodeIfMissing)
+                let phoneNumberWithAreaCodeIfMissing = Self.phoneNumberWithAreaCodeIfMissing(
+                    normalizedText: text,
+                    localCallingCode: callingCodeForLocalNumber,
+                    localPhoneNumber: localPhoneNumber,
+                )
+                if let phoneNumberWithAreaCodeIfMissing {
+                    owsAssertDebug(phoneNumberWithAreaCodeIfMissing.hasPrefix("+"))
+                    tryParsing(phoneNumberWithAreaCodeIfMissing)
+                }
+            }
         }
 
         return results
@@ -394,7 +399,7 @@ extension PhoneNumberUtil {
     private static func phoneNumberWithAreaCodeIfMissing(
         normalizedText: String,
         localCallingCode: Int,
-        localPhoneNumber: String
+        localPhoneNumber: String,
     ) -> String? {
         switch localCallingCode {
         case 1:
@@ -403,7 +408,7 @@ extension PhoneNumberUtil {
                 localCallingCode: localCallingCode,
                 localPhoneNumber: localPhoneNumber,
                 missingAreaCodeRegex: Self.missingUSAreaCodeRegex,
-                areaCodeRegex: Self.usAreaCodeRegex
+                areaCodeRegex: Self.usAreaCodeRegex,
             )
         case 55:
             return addMissingAreaCode(
@@ -411,7 +416,7 @@ extension PhoneNumberUtil {
                 localCallingCode: localCallingCode,
                 localPhoneNumber: localPhoneNumber,
                 missingAreaCodeRegex: Self.missingBRAreaCodeRegex,
-                areaCodeRegex: Self.brAreaCodeRegex
+                areaCodeRegex: Self.brAreaCodeRegex,
             )
         default:
             return nil
@@ -439,7 +444,7 @@ extension PhoneNumberUtil {
         localCallingCode: Int,
         localPhoneNumber: String,
         missingAreaCodeRegex: NSRegularExpression,
-        areaCodeRegex: NSRegularExpression
+        areaCodeRegex: NSRegularExpression,
     ) -> String? {
         let match = missingAreaCodeRegex.firstMatch(in: normalizedText, range: normalizedText.entireRange)
         if match == nil {
@@ -447,7 +452,7 @@ extension PhoneNumberUtil {
         }
         let localAreaCodeNSRange = areaCodeRegex.matches(
             in: localPhoneNumber,
-            range: NSRange(localPhoneNumber.startIndex..., in: localPhoneNumber)
+            range: NSRange(localPhoneNumber.startIndex..., in: localPhoneNumber),
         ).first?.range(at: 1)
         guard
             let localAreaCodeNSRange,

@@ -8,40 +8,15 @@ public import LibSignalClient
 
 extension SentMessageTranscriptReceiverImpl {
     public enum Shims {
-        public typealias DisappearingMessagesJob = _SentMessageTranscriptReceiver_DisappearingMessagesJobShim
         public typealias EarlyMessageManager = _SentMessageTranscriptReceiver_EarlyMessageManagerShim
         public typealias GroupManager = _SentMessageTranscriptReceiver_GroupManagerShim
         public typealias ViewOnceMessages = _SentMessageTranscriptReceiver_ViewOnceMessagesShim
     }
+
     public enum Wrappers {
-        public typealias DisappearingMessagesJob = _SentMessageTranscriptReceiver_DisappearingMessagesJobWrapper
         public typealias EarlyMessageManager = _SentMessageTranscriptReceiver_EarlyMessageManagerWrapper
         public typealias GroupManager = _SentMessageTranscriptReceiver_GroupManagerWrapper
         public typealias ViewOnceMessages = _SentMessageTranscriptReceiver_ViewOnceMessagesWrapper
-    }
-}
-
-// MARK: - DisappearingMessagesJob
-
-public protocol _SentMessageTranscriptReceiver_DisappearingMessagesJobShim {
-
-    func startExpiration(
-        for message: TSMessage,
-        expirationStartedAt: UInt64,
-        tx: DBWriteTransaction
-    )
-}
-
-public class _SentMessageTranscriptReceiver_DisappearingMessagesJobWrapper: _SentMessageTranscriptReceiver_DisappearingMessagesJobShim {
-
-    public init() {}
-
-    public func startExpiration(for message: TSMessage, expirationStartedAt: UInt64, tx: DBWriteTransaction) {
-        SSKEnvironment.shared.disappearingMessagesJobRef.startAnyExpiration(
-            for: message,
-            expirationStartedAt: expirationStartedAt,
-            transaction: tx
-        )
     }
 }
 
@@ -51,8 +26,8 @@ public protocol _SentMessageTranscriptReceiver_EarlyMessageManagerShim {
 
     func applyPendingMessages(
         for message: TSMessage,
-        localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        registeredState: RegisteredState,
+        tx: DBWriteTransaction,
     )
 }
 
@@ -64,8 +39,8 @@ public class _SentMessageTranscriptReceiver_EarlyMessageManagerWrapper: _SentMes
         self.earlyMessageManager = earlyMessageManager
     }
 
-    public func applyPendingMessages(for message: TSMessage, localIdentifiers: LocalIdentifiers, tx: DBWriteTransaction) {
-        earlyMessageManager.applyPendingMessages(for: message, localIdentifiers: localIdentifiers, transaction: tx)
+    public func applyPendingMessages(for message: TSMessage, registeredState: RegisteredState, tx: DBWriteTransaction) {
+        earlyMessageManager.applyPendingMessages(for: message, registeredState: registeredState, transaction: tx)
     }
 }
 
@@ -78,7 +53,7 @@ public protocol _SentMessageTranscriptReceiver_GroupManagerShim {
         disappearingMessageToken: VersionedDisappearingMessageToken,
         changeAuthor: Aci,
         localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 }
 
@@ -91,14 +66,14 @@ public class _SentMessageTranscriptReceiver_GroupManagerWrapper: _SentMessageTra
         disappearingMessageToken: VersionedDisappearingMessageToken,
         changeAuthor: Aci,
         localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         GroupManager.remoteUpdateDisappearingMessages(
             contactThread: thread,
             disappearingMessageToken: disappearingMessageToken,
             changeAuthor: changeAuthor,
             localIdentifiers: localIdentifiers,
-            transaction: tx
+            transaction: tx,
         )
     }
 }
@@ -110,7 +85,7 @@ public protocol _SentMessageTranscriptReceiver_ViewOnceMessagesShim {
     func markAsComplete(
         message: TSMessage,
         sendSyncMessages: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 }
 

@@ -29,9 +29,10 @@ final class GroupCallRecordRingUpdateDelegateTest: XCTestCase {
 
         self.ringUpdateHandler = GroupCallRecordRingUpdateHandler(
             callRecordStore: mockCallRecordStore,
+            disappearingMessagesConfigurationStore: MockDisappearingMessagesConfigurationStore(),
             groupCallRecordManager: mockGroupCallRecordManager,
             interactionStore: mockInteractionStore,
-            threadStore: mockThreadStore
+            threadStore: mockThreadStore,
         )
     }
 
@@ -43,7 +44,7 @@ final class GroupCallRecordRingUpdateDelegateTest: XCTestCase {
     /// case "premise", then simulates those ring updates to potentially
     /// "result" in a call record update and verifies the result is as expected.
     func testReceivedRingUpdateForExisting() {
-        let groupThread: TSGroupThread = .forUnitTest()
+        let groupThread: TSGroupThread = .forUnitTest(groupId: Randomness.generateRandomBytes(32))
         mockThreadStore.insertThread(groupThread)
 
         struct Premise: Hashable {
@@ -52,7 +53,7 @@ final class GroupCallRecordRingUpdateDelegateTest: XCTestCase {
 
             init(
                 _ ringUpdate: RingUpdate,
-                _ existingGroupCallStatus: GroupCallStatus
+                _ existingGroupCallStatus: GroupCallStatus,
             ) {
                 self.ringUpdate = ringUpdate
                 self.existingGroupCallStatus = existingGroupCallStatus
@@ -112,7 +113,7 @@ final class GroupCallRecordRingUpdateDelegateTest: XCTestCase {
 
                     allPossiblePremises.append((
                         ringId,
-                        Premise(ringUpdate, groupCallStatus)
+                        Premise(ringUpdate, groupCallStatus),
                     ))
 
                     mockCallRecordStore.insert(
@@ -124,9 +125,9 @@ final class GroupCallRecordRingUpdateDelegateTest: XCTestCase {
                             callDirection: .incoming,
                             callStatus: .group(groupCallStatus),
                             groupCallRingerAci: nil,
-                            callBeganTimestamp: .maxRandom
+                            callBeganTimestamp: .maxRandom,
                         ),
-                        tx: tx
+                        tx: tx,
                     )
                 }
             }
@@ -137,7 +138,7 @@ final class GroupCallRecordRingUpdateDelegateTest: XCTestCase {
                 mockGroupCallRecordManager.updateStub = { newGroupCallStatus, newGroupCallRingerAci in
                     XCTAssertEqual(
                         newGroupCallStatus,
-                        expectedResult.expectedGroupCallStatus
+                        expectedResult.expectedGroupCallStatus,
                     )
 
                     if expectedResult.shouldExpectRingerAci {
@@ -147,18 +148,18 @@ final class GroupCallRecordRingUpdateDelegateTest: XCTestCase {
                     }
                 }
             } else {
-                mockGroupCallRecordManager.updateStub = { (_, _) in
+                mockGroupCallRecordManager.updateStub = { _, _ in
                     XCTFail("Shouldn't have tried to update for premise: \(premise)!")
                 }
             }
 
             mockDB.write { tx in
                 ringUpdateHandler.didReceiveRingUpdate(
-                    groupId: groupThread.groupId,
+                    groupId: try! GroupIdentifier(contents: groupThread.groupId),
                     ringId: ringId,
                     ringUpdate: premise.ringUpdate,
                     ringUpdateSender: .randomForTesting(),
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
@@ -167,7 +168,7 @@ final class GroupCallRecordRingUpdateDelegateTest: XCTestCase {
     func testReceivedRingUpdateForExistingOutgoingCallDoesNotUpdate() {
         let ringId: Int64 = .maxRandom
 
-        let groupThread: TSGroupThread = .forUnitTest()
+        let groupThread: TSGroupThread = .forUnitTest(groupId: Data(repeating: 0, count: 32))
         mockThreadStore.insertThread(groupThread)
 
         mockDB.write { tx in
@@ -179,23 +180,23 @@ final class GroupCallRecordRingUpdateDelegateTest: XCTestCase {
                     callType: .groupCall,
                     callDirection: .outgoing,
                     callStatus: .group(.ringingAccepted),
-                    callBeganTimestamp: .maxRandom
+                    callBeganTimestamp: .maxRandom,
                 ),
-                tx: tx
+                tx: tx,
             )
         }
 
-        mockGroupCallRecordManager.updateStub = { (_, _) in
+        mockGroupCallRecordManager.updateStub = { _, _ in
             XCTFail("Shouldn't be trying to update for outgoing call record!")
         }
 
         mockDB.write { tx in
             ringUpdateHandler.didReceiveRingUpdate(
-                groupId: groupThread.groupId,
+                groupId: try! GroupIdentifier(contents: groupThread.groupId),
                 ringId: ringId,
                 ringUpdate: .expiredRing,
                 ringUpdateSender: .randomForTesting(),
-                tx: tx
+                tx: tx,
             )
         }
     }
@@ -203,7 +204,7 @@ final class GroupCallRecordRingUpdateDelegateTest: XCTestCase {
     // MARK: - Creating new call records
 
     func testReceivedRingUpdateForNewCallRecord() {
-        let groupThread: TSGroupThread = .forUnitTest()
+        let groupThread: TSGroupThread = .forUnitTest(groupId: Data(repeating: 0, count: 32))
         mockThreadStore.insertThread(groupThread)
 
         struct Result {
@@ -223,7 +224,7 @@ final class GroupCallRecordRingUpdateDelegateTest: XCTestCase {
             .busyLocally: Result(.ringingMissed, true),
             .busyOnAnotherDevice: Result(.ringingMissed, false),
             .acceptedOnAnotherDevice: Result(.ringingAccepted, false),
-            .declinedOnAnotherDevice: Result(.ringingDeclined, false)
+            .declinedOnAnotherDevice: Result(.ringingDeclined, false),
         ]
 
         for (idx, ringUpdate) in allRingUpdateCases.enumerated() {
@@ -241,11 +242,11 @@ final class GroupCallRecordRingUpdateDelegateTest: XCTestCase {
 
             mockDB.write { tx in
                 ringUpdateHandler.didReceiveRingUpdate(
-                    groupId: groupThread.groupId,
+                    groupId: try! GroupIdentifier(contents: groupThread.groupId),
                     ringId: .maxRandom,
                     ringUpdate: ringUpdate,
                     ringUpdateSender: .randomForTesting(),
-                    tx: tx
+                    tx: tx,
                 )
             }
 
@@ -258,20 +259,20 @@ final class GroupCallRecordRingUpdateDelegateTest: XCTestCase {
     func testReceivedRingUpdateForDeletedCallRecordDoesNothing() {
         mockCallRecordStore.fetchMock = { .matchDeleted }
 
-        let groupThread: TSGroupThread = .forUnitTest()
+        let groupThread: TSGroupThread = .forUnitTest(groupId: Data(repeating: 0, count: 32))
         mockThreadStore.insertThread(groupThread)
 
-        mockGroupCallRecordManager.updateStub = { (_, _) in
+        mockGroupCallRecordManager.updateStub = { _, _ in
             XCTFail("Shouldn't be trying to update for outgoing call record!")
         }
 
         mockDB.write { tx in
             ringUpdateHandler.didReceiveRingUpdate(
-                groupId: groupThread.groupId,
+                groupId: try! GroupIdentifier(contents: groupThread.groupId),
                 ringId: .maxRandom,
                 ringUpdate: .expiredRing,
                 ringUpdateSender: .randomForTesting(),
-                tx: tx
+                tx: tx,
             )
         }
     }
@@ -300,7 +301,7 @@ private func notImplemented() -> Never { return owsFail("Not implemented!") }
 private class MockGroupCallRecordManager: GroupCallRecordManager {
     var createStub: ((
         _ groupCallStatus: GroupCallStatus,
-        _ groupCallRingerAci: Aci?
+        _ groupCallRingerAci: Aci?,
     ) -> Void)?
     func createGroupCallRecord(callId: UInt64, groupCallInteraction: OWSGroupCallMessage, groupCallInteractionRowId: Int64, groupThreadRowId: Int64, callDirection: CallRecord.CallDirection, groupCallStatus: CallRecord.CallStatus.GroupCallStatus, groupCallRingerAci: Aci?, callEventTimestamp: UInt64, shouldSendSyncMessage: Bool, tx: DBWriteTransaction) -> CallRecord {
         createStub!(groupCallStatus, groupCallRingerAci)
@@ -309,7 +310,7 @@ private class MockGroupCallRecordManager: GroupCallRecordManager {
 
     var updateStub: ((
         _ newGroupCallStatus: GroupCallStatus,
-        _ newGroupCallRingerAci: Aci?
+        _ newGroupCallRingerAci: Aci?,
     ) -> Void)?
     func updateGroupCallRecord(existingCallRecord: CallRecord, newCallDirection: CallRecord.CallDirection, newGroupCallStatus: CallRecord.CallStatus.GroupCallStatus, newGroupCallRingerAci: Aci?, callEventTimestamp: UInt64, shouldSendSyncMessage: Bool, tx: DBWriteTransaction) {
         updateStub!(newGroupCallStatus, newGroupCallRingerAci)

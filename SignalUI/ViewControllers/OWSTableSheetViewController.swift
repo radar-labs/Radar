@@ -8,11 +8,9 @@ import UIKit
 
 open class OWSTableSheetViewController: InteractiveSheetViewController {
     open var tableViewController = OWSTableViewController2()
-    open override var interactiveScrollViews: [UIScrollView] { [tableViewController.tableView] }
+    override open var interactiveScrollViews: [UIScrollView] { [tableViewController.tableView] }
 
-    open override var sheetBackgroundColor: UIColor {
-        OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: true, forceDarkMode: tableViewController.forceDarkMode)
-    }
+    override open var sheetBackgroundColor: UIColor { OWSTableViewController2.tableBackgroundColor }
 
     open var bottomSafeAreaContentPadding: CGFloat {
         var padding = view.safeAreaInsets.bottom
@@ -36,11 +34,11 @@ open class OWSTableSheetViewController: InteractiveSheetViewController {
         // `maximumHeight` prevents the view's height from extending into top safe area.)
         return tableView.contentSize.height
             + tableView.contentInset.totalHeight
-            + (tableViewController.bottomFooter?.height ?? 0)
+            + tableViewController.bottomFooterHeight
             + bottomSafeAreaContentPadding
     }
 
-    public override init(visualEffect: UIVisualEffect? = nil) {
+    override public init(visualEffect: UIVisualEffect? = nil) {
         super.init(visualEffect: visualEffect)
 
         tableViewController.shouldDeferInitialLoad = false
@@ -52,7 +50,7 @@ open class OWSTableSheetViewController: InteractiveSheetViewController {
         self.minimizedHeight = self.contentSizeHeight
     }
 
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
 
         addChild(tableViewController)
@@ -70,7 +68,7 @@ open class OWSTableSheetViewController: InteractiveSheetViewController {
         updateTableContents(shouldReload: true)
     }
 
-    public override func viewDidLayoutSubviews() {
+    override public func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
         // The table view might not have its final size when this method is called.

@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import SignalUI
 import SignalServiceKit
+import SignalUI
 import SwiftUI
 
 class QRCodeView: UIView {
@@ -18,41 +18,75 @@ class QRCodeView: UIView {
         qrCodeTintColor: QRCodeColor = .blue,
         contentInset: CGFloat = 20,
         cornerRadius: CGFloat = 12,
-        borderWidth: CGFloat = 2
+        borderWidth: CGFloat = 2,
     ) {
         self.qrCodeTintColor = qrCodeTintColor
 
         super.init(frame: .zero)
 
-        // MARK: View properties
+        overrideUserInterfaceStyle = .light
+        backgroundColor = .Signal.background
+        directionalLayoutMargins = .init(margin: contentInset)
 
-        backgroundColor = .white
-        layoutMargins = UIEdgeInsets(margin: contentInset)
         layer.cornerRadius = cornerRadius
         layer.borderWidth = borderWidth
         layer.borderColor = qrCodeTintColor.paddingBorder.cgColor
 
+        //
+        // Spinner
+        //
         loadingSpinner.style = .large
-        loadingSpinner.color = Theme.lightThemePrimaryColor
+        loadingSpinner.color = .Signal.label
         loadingSpinner.hidesWhenStopped = true
+        addSubview(loadingSpinner)
+        loadingSpinner.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            loadingSpinner.widthAnchor.constraint(equalToConstant: 40),
+            loadingSpinner.heightAnchor.constraint(equalTo: widthAnchor),
 
+            // Make sure spinner is within QRCodeView's layout margins.
+            loadingSpinner.topAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.topAnchor),
+            loadingSpinner.centerYAnchor.constraint(equalTo: layoutMarginsGuide.centerYAnchor),
+
+            // Centers spinner in `QRCodeView`.
+            loadingSpinner.leadingAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.leadingAnchor),
+            loadingSpinner.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor),
+        ])
+
+        //
+        // QR Code image
+        //
         // Don't antialias QR codes
         qrCodeImageView.layer.magnificationFilter = .nearest
         qrCodeImageView.layer.minificationFilter = .nearest
-
-        // MARK: Layout
-
-        addSubview(loadingSpinner)
-        loadingSpinner.autoSetDimensions(to: .square(40))
-        loadingSpinner.autoPinEdgesToSuperviewMargins()
-
-        addSubview(qrCodeImageView)
-        qrCodeImageView.autoPinEdgesToSuperviewMargins()
         qrCodeImageView.contentMode = .scaleAspectFit
+        addSubview(qrCodeImageView)
+        qrCodeImageView.translatesAutoresizingMaskIntoConstraints = false
+        // Constrain image to QRCodeView's layout margins.
+        NSLayoutConstraint.activate([
+            qrCodeImageView.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
+            qrCodeImageView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
+            qrCodeImageView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
+            qrCodeImageView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
+        ])
 
+        //
+        // Error image
+        //
         addSubview(errorImageView)
-        errorImageView.autoSetDimensions(to: .square(40))
-        errorImageView.autoCenterInSuperviewMargins()
+        errorImageView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            errorImageView.widthAnchor.constraint(equalToConstant: 40),
+            errorImageView.heightAnchor.constraint(equalTo: widthAnchor),
+
+            // Make sure `errorImageView` is within QRCodeView's layout margins.
+            errorImageView.topAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.topAnchor),
+            errorImageView.centerYAnchor.constraint(equalTo: layoutMarginsGuide.centerYAnchor),
+
+            // Centers `errorImageView` in `QRCodeView`.
+            errorImageView.leadingAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.leadingAnchor),
+            errorImageView.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor),
+        ])
 
         setLoading()
     }
@@ -104,11 +138,11 @@ class QRCodeView: UIView {
 
     func setQRCode(
         url: URL,
-        stylingMode: QRCodeGenerator.StylingMode = .brandedWithLogo
+        stylingMode: QRCodeGenerator.StylingMode = .brandedWithLogo,
     ) {
         let qrCodeImage = QRCodeGenerator().generateQRCode(
             url: url,
-            stylingMode: stylingMode
+            stylingMode: stylingMode,
         )
 
         if let qrCodeImage {
@@ -145,7 +179,7 @@ struct QRCodeViewRepresentable: UIViewRepresentable {
         qrCodeTintColor: QRCodeColor = .blue,
         contentInset: CGFloat = 20,
         cornerRadius: CGFloat = 12,
-        borderWidth: CGFloat = 2
+        borderWidth: CGFloat = 2,
     ) {
         self.model = model
         self.qrCodeStylingMode = qrCodeStylingMode
@@ -164,7 +198,7 @@ struct QRCodeViewRepresentable: UIViewRepresentable {
             qrCodeTintColor: qrCodeTintColor,
             contentInset: contentInset,
             cornerRadius: cornerRadius,
-            borderWidth: borderWidth
+            borderWidth: borderWidth,
         )
 
         updateUIView(qrCodeView, context: context)
@@ -175,7 +209,7 @@ struct QRCodeViewRepresentable: UIViewRepresentable {
         if let url = model.qrCodeURL {
             qrCodeView.setQRCode(
                 url: url,
-                stylingMode: qrCodeStylingMode
+                stylingMode: qrCodeStylingMode,
             )
         } else {
             qrCodeView.setLoading()
@@ -220,7 +254,7 @@ struct RotatingQRCodeView: View {
     var body: some View {
         GeometryReader { qrCodeGeometry in
             ZStack {
-                Color(UIColor.ows_gray02)
+                Color.Signal.ultramarine
                     .cornerRadius(24)
 
                 switch model.urlDisplayMode {
@@ -234,7 +268,7 @@ struct RotatingQRCodeView: View {
 
                             Text(OWSLocalizedString(
                                 "SECONDARY_ONBOARDING_SCAN_CODE_REFRESH_CODE_BUTTON",
-                                comment: "Text for a button offering to refresh the QR code to link an iPad."
+                                comment: "Text for a button offering to refresh the QR code to link an iPad.",
                             ))
                             .font(.body)
                             .fontWeight(.bold)
@@ -259,7 +293,7 @@ struct RotatingQRCodeView: View {
     VStack {
         RotatingQRCodeView(model: .init(
             urlDisplayMode: .loaded(URL(string: "https://signal.org")!),
-            onRefreshButtonPressed: {}
+            onRefreshButtonPressed: {},
         ))
 
         RotatingQRCodeView(model: .init(urlDisplayMode: .loading, onRefreshButtonPressed: {}))

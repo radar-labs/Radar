@@ -4,25 +4,26 @@
 //
 
 import Foundation
+import LibSignalClient
 
-internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamWriter {
-    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError<BackupArchive.InteractionUniqueId>
+class BackupArchiveContactAttachmentArchiver {
+    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError
     typealias RestoreInteractionResult = BackupArchive.RestoreInteractionResult
-    private typealias RestoreFrameError = BackupArchive.RestoreFrameError<BackupArchive.ChatItemId>
+    private typealias RestoreFrameError = BackupArchive.RestoreFrameError
 
     private let attachmentsArchiver: BackupArchiveMessageAttachmentArchiver
 
     init(
-        attachmentsArchiver: BackupArchiveMessageAttachmentArchiver
+        attachmentsArchiver: BackupArchiveMessageAttachmentArchiver,
     ) {
         self.attachmentsArchiver = attachmentsArchiver
     }
 
     func archiveContact(
         _ contact: OWSContact,
+        contactAvatarReferencedAttachment: ReferencedAttachment?,
         uniqueInteractionId: BackupArchive.InteractionUniqueId,
-        messageRowId: Int64,
-        context: BackupArchive.ArchivingContext
+        context: BackupArchive.ArchivingContext,
     ) -> BackupArchive.ArchiveInteractionResult<BackupProto_ContactAttachment> {
         let resultType = BackupProto_ContactAttachment.self
         var partialErrors = [ArchiveFrameError]()
@@ -40,7 +41,7 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
         for phoneNumber in contact.phoneNumbers {
             switch archiveContactPhoneNumber(phoneNumber).bubbleUp(resultType, partialErrors: &partialErrors) {
             case .continue(let phoneNumberProto):
-                phoneNumberProtos.append(phoneNumberProto)
+                phoneNumberProto.map { phoneNumberProtos.append($0) }
             case .bubbleUpError(let errorResult):
                 return errorResult
             }
@@ -51,7 +52,7 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
         for email in contact.emails {
             switch archiveContactEmail(email).bubbleUp(resultType, partialErrors: &partialErrors) {
             case .continue(let emailProto):
-                emailProtos.append(emailProto)
+                emailProto.map { emailProtos.append($0) }
             case .bubbleUpError(let errorResult):
                 return errorResult
             }
@@ -62,7 +63,7 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
         for address in contact.addresses {
             switch archiveContactAddress(address).bubbleUp(resultType, partialErrors: &partialErrors) {
             case .continue(let addressProto):
-                addressProtos.append(addressProto)
+                addressProto.map { addressProtos.append($0) }
             case .bubbleUpError(let errorResult):
                 return errorResult
             }
@@ -73,17 +74,33 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
             contactProto.organization = organization
         }
 
-        // Returns nil if no avatar; this is both how we check existence and how we archive.
-        let avatarResult = attachmentsArchiver.archiveContactShareAvatarAttachment(
-            messageId: uniqueInteractionId,
-            messageRowId: messageRowId,
-            context: context
-        )
-        switch avatarResult.bubbleUp(BackupProto_ContactAttachment.self, partialErrors: &partialErrors) {
-        case .continue(let avatarPointerProto):
-            avatarPointerProto.map { contactProto.avatar = $0 }
-        case .bubbleUpError(let errorResult):
-            return errorResult
+        if let aci = contact.aci {
+            contactProto.aci = aci.serviceIdBinary
+        }
+
+        if
+            let nickname = contact.nickname,
+            let profileName = ProfileName(givenName: nickname.givenName, familyName: nickname.familyName)
+        {
+            var nicknameProto = BackupProto_ContactAttachment.SignalNickname()
+            if let givenName = profileName.givenName {
+                nicknameProto.given = givenName
+            }
+            if let familyName = profileName.familyName {
+                nicknameProto.family = familyName
+            }
+            contactProto.nickname = nicknameProto
+        }
+
+        if let note = contact.note?.strippedOrNil {
+            contactProto.note = note
+        }
+
+        if let contactAvatarReferencedAttachment {
+            contactProto.avatar = attachmentsArchiver.archiveContactAvatar(
+                referencedAttachment: contactAvatarReferencedAttachment,
+                context: context,
+            )
         }
 
         if partialErrors.isEmpty {
@@ -94,7 +111,7 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
     }
 
     private func archiveContactName(
-        _ contactName: OWSContactName
+        _ contactName: OWSContactName,
     ) -> BackupArchive.ArchiveInteractionResult<BackupProto_ContactAttachment.Name?> {
         var nameProto = BackupProto_ContactAttachment.Name()
         var setSomeName = false
@@ -132,10 +149,13 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
     }
 
     private func archiveContactPhoneNumber(
-        _ contactPhoneNumber: OWSContactPhoneNumber
-    ) -> BackupArchive.ArchiveInteractionResult<BackupProto_ContactAttachment.Phone> {
+        _ contactPhoneNumber: OWSContactPhoneNumber,
+    ) -> BackupArchive.ArchiveInteractionResult<BackupProto_ContactAttachment.Phone?> {
         var phoneProto = BackupProto_ContactAttachment.Phone()
-        phoneProto.value = contactPhoneNumber.phoneNumber
+        guard let phoneNumber = contactPhoneNumber.phoneNumber.nilIfEmpty else {
+            return .success(nil)
+        }
+        phoneProto.value = phoneNumber
         if let label = contactPhoneNumber.label {
             phoneProto.label = label
         }
@@ -153,10 +173,13 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
     }
 
     private func archiveContactEmail(
-        _ contactEmail: OWSContactEmail
-    ) -> BackupArchive.ArchiveInteractionResult<BackupProto_ContactAttachment.Email> {
+        _ contactEmail: OWSContactEmail,
+    ) -> BackupArchive.ArchiveInteractionResult<BackupProto_ContactAttachment.Email?> {
         var emailProto = BackupProto_ContactAttachment.Email()
-        emailProto.value = contactEmail.email
+        guard let email = contactEmail.email.nilIfEmpty else {
+            return .success(nil)
+        }
+        emailProto.value = email
         if let label = contactEmail.label {
             emailProto.label = label
         }
@@ -174,31 +197,35 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
     }
 
     private func archiveContactAddress(
-        _ contactAddress: OWSContactAddress
-    ) -> BackupArchive.ArchiveInteractionResult<BackupProto_ContactAttachment.PostalAddress> {
+        _ contactAddress: OWSContactAddress,
+    ) -> BackupArchive.ArchiveInteractionResult<BackupProto_ContactAttachment.PostalAddress?> {
+        guard contactAddress.isValid else {
+            return .success(nil)
+        }
+
         var addressProto = BackupProto_ContactAttachment.PostalAddress()
-        if let label = contactAddress.label {
+        if let label = contactAddress.label?.strippedOrNil {
             addressProto.label = label
         }
-        if let street = contactAddress.street {
+        if let street = contactAddress.street?.strippedOrNil {
             addressProto.street = street
         }
-        if let pobox = contactAddress.pobox {
+        if let pobox = contactAddress.pobox?.strippedOrNil {
             addressProto.pobox = pobox
         }
-        if let neighborhood = contactAddress.neighborhood {
+        if let neighborhood = contactAddress.neighborhood?.strippedOrNil {
             addressProto.neighborhood = neighborhood
         }
-        if let city = contactAddress.city {
+        if let city = contactAddress.city?.strippedOrNil {
             addressProto.city = city
         }
-        if let region = contactAddress.region {
+        if let region = contactAddress.region?.strippedOrNil {
             addressProto.region = region
         }
-        if let postcode = contactAddress.postcode {
+        if let postcode = contactAddress.postcode?.strippedOrNil {
             addressProto.postcode = postcode
         }
-        if let country = contactAddress.country {
+        if let country = contactAddress.country?.strippedOrNil {
             addressProto.country = country
         }
         addressProto.type = switch contactAddress.type {
@@ -216,7 +243,6 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
 
     func restoreContact(
         _ contactProto: BackupProto_ContactAttachment,
-        chatItemId: BackupArchive.ChatItemId
     ) -> RestoreInteractionResult<OWSContact> {
         var partialErrors = [RestoreFrameError]()
 
@@ -244,7 +270,7 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
             nameSuffix: nameSuffix,
             middleName: middleName,
             nickname: nickname,
-            organizationName: organizationName
+            organizationName: organizationName,
         )
 
         contactName.ensureDisplayName()
@@ -255,7 +281,6 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
             switch self
                 .restoreContactPhoneNumber(
                     proto: phoneNumberProto,
-                    chatItemId: chatItemId
                 )
                 .bubbleUp(OWSContact.self, partialErrors: &partialErrors)
             {
@@ -271,7 +296,6 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
             switch self
                 .restoreContactEmail(
                     proto: emailProto,
-                    chatItemId: chatItemId
                 )
                 .bubbleUp(OWSContact.self, partialErrors: &partialErrors)
             {
@@ -287,7 +311,6 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
             switch self
                 .restoreContactAddress(
                     proto: addressProto,
-                    chatItemId: chatItemId
                 )
                 .bubbleUp(OWSContact.self, partialErrors: &partialErrors)
             {
@@ -300,6 +323,33 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
             }
         }
 
+        if !contactProto.aci.isEmpty {
+            if let aci = try? Aci.parseFrom(serviceIdBinary: contactProto.aci) {
+                contact.aci = aci
+            } else {
+                partialErrors.append(.restoreFrameError(
+                    .invalidProtoData(.invalidAci(protoClass: BackupProto_ContactAttachment.self)),
+                ))
+            }
+        }
+
+        if contactProto.hasNickname {
+            if
+                let nickname = ProfileName(
+                    givenName: contactProto.nickname.given,
+                    familyName: contactProto.nickname.family,
+                )
+            {
+                contact.nickname = nickname.nameComponents
+            } else {
+                partialErrors.append(.restoreFrameError(
+                    .invalidProtoData(.contactAttachmentInvalidNickname),
+                ))
+            }
+        }
+
+        contact.note = contactProto.note.strippedOrNil
+
         // Note: the contact attachment's avatar is restored later (if any is set).
 
         if partialErrors.isEmpty {
@@ -311,12 +361,10 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
 
     private func restoreContactPhoneNumber(
         proto: BackupProto_ContactAttachment.Phone,
-        chatItemId: BackupArchive.ChatItemId
     ) -> RestoreInteractionResult<OWSContactPhoneNumber?> {
         guard let phoneNumber = proto.value.strippedOrNil else {
             return .partialRestore(nil, [.restoreFrameError(
                 .invalidProtoData(.contactAttachmentPhoneNumberMissingValue),
-                chatItemId
             )])
         }
 
@@ -330,26 +378,22 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
             type = .work
         case .custom:
             type = .custom
-        case .unknown, .UNRECOGNIZED(_):
+        case .unknown, .UNRECOGNIZED:
             type = .home
         }
 
         return .success(OWSContactPhoneNumber(
             type: type,
             label: proto.label.strippedOrNil,
-            phoneNumber: phoneNumber
+            phoneNumber: phoneNumber,
         ))
     }
 
     private func restoreContactEmail(
         proto: BackupProto_ContactAttachment.Email,
-        chatItemId: BackupArchive.ChatItemId
     ) -> RestoreInteractionResult<OWSContactEmail?> {
         guard let email = proto.value.strippedOrNil else {
-            return .partialRestore(nil, [.restoreFrameError(
-                .invalidProtoData(.contactAttachmentEmailMissingValue),
-                chatItemId
-            )])
+            return .partialRestore(nil, [.restoreFrameError(.invalidProtoData(.contactAttachmentEmailMissingValue))])
         }
 
         let type: OWSContactEmail.`Type`
@@ -362,20 +406,19 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
             type = .work
         case .custom:
             type = .custom
-        case .unknown, .UNRECOGNIZED(_):
+        case .unknown, .UNRECOGNIZED:
             type = .home
         }
 
         return .success(OWSContactEmail(
             type: type,
             label: proto.label.strippedOrNil,
-            email: email
+            email: email,
         ))
     }
 
     private func restoreContactAddress(
         proto: BackupProto_ContactAttachment.PostalAddress,
-        chatItemId: BackupArchive.ChatItemId
     ) -> RestoreInteractionResult<OWSContactAddress?> {
         let type: OWSContactAddress.`Type`
         switch proto.type {
@@ -385,7 +428,7 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
             type = .work
         case .custom:
             type = .custom
-        case .unknown, .UNRECOGNIZED(_):
+        case .unknown, .UNRECOGNIZED:
             type = .home
         }
 
@@ -398,7 +441,7 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
             city: proto.city.strippedOrNil,
             region: proto.region.strippedOrNil,
             postcode: proto.postcode.strippedOrNil,
-            country: proto.country.strippedOrNil
+            country: proto.country.strippedOrNil,
         )
 
         guard
@@ -410,10 +453,7 @@ internal class BackupArchiveContactAttachmentArchiver: BackupArchiveProtoStreamW
             || address.postcode?.isEmpty == false
             || address.country?.isEmpty == false
         else {
-            return .partialRestore(nil, [.restoreFrameError(
-                .invalidProtoData(.contactAttachmentEmptyAddress),
-                chatItemId
-            )])
+            return .partialRestore(nil, [.restoreFrameError(.invalidProtoData(.contactAttachmentEmptyAddress))])
         }
 
         return .success(address)

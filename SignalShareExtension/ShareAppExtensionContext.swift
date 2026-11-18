@@ -4,6 +4,7 @@
 //
 
 import SignalServiceKit
+import UIKit
 
 // This is _NOT_ a singleton and will be instantiated each time that the SAE is used.
 final class ShareAppExtensionContext: NSObject {
@@ -18,7 +19,7 @@ final class ShareAppExtensionContext: NSObject {
 
     private var notificationCenterObservers = [NSObjectProtocol]()
 
-    static private let isRTL: Bool = {
+    private static let isRTL: Bool = {
         // Borrowed from PureLayout's AppExtension compatible RTL support.
         // App Extensions may not access UIApplication.sharedApplication.
         // Fall back to checking the bundle's preferred localization character direction
@@ -32,61 +33,73 @@ final class ShareAppExtensionContext: NSObject {
         super.init()
 
         let mainQueue = OperationQueue.main
-        notificationCenterObservers.append(NotificationCenter.default.addObserver(
-            forName: NSNotification.Name.NSExtensionHostDidBecomeActive,
-            object: nil,
-            queue: mainQueue) { [weak self] notification in
+        notificationCenterObservers.append(
+            NotificationCenter.default.addObserver(
+                forName: NSNotification.Name.NSExtensionHostDidBecomeActive,
+                object: nil,
+                queue: mainQueue,
+            ) { [weak self] notification in
                 Logger.info("NSExtensionHostDidBecomeActive")
                 self?.internalReportedApplicationState = .active
                 BenchManager.bench(
                     title: "Slow post DidBecomeActive",
                     logIfLongerThan: 0.01,
-                    logInProduction: true) {
-                        NotificationCenter.default.post(name: NSNotification.Name.OWSApplicationDidBecomeActive, object: nil)
-                    }
-            }
+                    logInProduction: true,
+                ) {
+                    NotificationCenter.default.post(name: NSNotification.Name.OWSApplicationDidBecomeActive, object: nil)
+                }
+            },
         )
-        notificationCenterObservers.append(NotificationCenter.default.addObserver(
-            forName: NSNotification.Name.NSExtensionHostWillResignActive,
-            object: nil,
-            queue: mainQueue) { [weak self] notification in
+        notificationCenterObservers.append(
+            NotificationCenter.default.addObserver(
+                forName: NSNotification.Name.NSExtensionHostWillResignActive,
+                object: nil,
+                queue: mainQueue,
+            ) { [weak self] notification in
                 Logger.info("NSExtensionHostWillResignActive")
                 self?.internalReportedApplicationState = .inactive
                 BenchManager.bench(
                     title: "Slow post WillResignActive",
                     logIfLongerThan: 0.01,
-                    logInProduction: true) {
-                        NotificationCenter.default.post(name: NSNotification.Name.OWSApplicationWillResignActive, object: nil)
-                    }
-            }
+                    logInProduction: true,
+                ) {
+                    NotificationCenter.default.post(name: NSNotification.Name.OWSApplicationWillResignActive, object: nil)
+                }
+            },
         )
-        notificationCenterObservers.append(NotificationCenter.default.addObserver(
-            forName: NSNotification.Name.NSExtensionHostDidEnterBackground,
-            object: nil,
-            queue: mainQueue) { [weak self] notification in
+        notificationCenterObservers.append(
+            NotificationCenter.default.addObserver(
+                forName: NSNotification.Name.NSExtensionHostDidEnterBackground,
+                object: nil,
+                queue: mainQueue,
+            ) { [weak self] notification in
                 Logger.info("NSExtensionHostDidEnterBackground")
                 self?.internalReportedApplicationState = .background
                 BenchManager.bench(
                     title: "Slow post DidEnterBackground",
                     logIfLongerThan: 0.01,
-                    logInProduction: true) {
-                        NotificationCenter.default.post(name: NSNotification.Name.OWSApplicationDidEnterBackground, object: nil)
-                    }
-            }
+                    logInProduction: true,
+                ) {
+                    NotificationCenter.default.post(name: NSNotification.Name.OWSApplicationDidEnterBackground, object: nil)
+                }
+            },
         )
-        notificationCenterObservers.append(NotificationCenter.default.addObserver(
-            forName: NSNotification.Name.NSExtensionHostWillEnterForeground,
-            object: nil,
-            queue: mainQueue) { [weak self] notification in
+        notificationCenterObservers.append(
+            NotificationCenter.default.addObserver(
+                forName: NSNotification.Name.NSExtensionHostWillEnterForeground,
+                object: nil,
+                queue: mainQueue,
+            ) { [weak self] notification in
                 Logger.info("NSExtensionHostWillEnterForeground")
                 self?.internalReportedApplicationState = .inactive
                 BenchManager.bench(
                     title: "Slow post WillEnterForeground",
                     logIfLongerThan: 0.01,
-                    logInProduction: true) {
-                        NotificationCenter.default.post(name: NSNotification.Name.OWSApplicationWillEnterForeground, object: nil)
-                    }
-            }
+                    logInProduction: true,
+                ) {
+                    NotificationCenter.default.post(name: NSNotification.Name.OWSApplicationWillEnterForeground, object: nil)
+                }
+            },
         )
     }
 
@@ -141,10 +154,11 @@ extension ShareAppExtensionContext: AppContext {
     }
 
     func appDocumentDirectoryPath() -> String {
-        guard let documentDirectoryURL = FileManager.default.urls(
-            for: .documentDirectory,
-            in: .userDomainMask
-        ).last
+        guard
+            let documentDirectoryURL = FileManager.default.urls(
+                for: .documentDirectory,
+                in: .userDomainMask,
+            ).last
         else {
             owsFail("Could not find documents directory.")
         }
@@ -152,9 +166,10 @@ extension ShareAppExtensionContext: AppContext {
     }
 
     func appSharedDataDirectoryPath() -> String {
-        guard let groupContainerDirectoryURL = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: TSConstants.applicationGroup
-        )
+        guard
+            let groupContainerDirectoryURL = FileManager.default.containerURL(
+                forSecurityApplicationGroupIdentifier: TSConstants.applicationGroup,
+            )
         else {
             owsFail("Could not find application group directory.")
         }
@@ -167,11 +182,6 @@ extension ShareAppExtensionContext: AppContext {
 
     func appUserDefaults() -> UserDefaults {
         return UserDefaults(suiteName: TSConstants.applicationGroup)!
-    }
-
-    func mainApplicationStateOnLaunch() -> UIApplication.State {
-        owsFailBeta("Not main app.")
-        return .inactive
     }
 
     func canPresentNotifications() -> Bool { false }

@@ -16,8 +16,7 @@ protocol VideoEditorViewControllerProviding: AnyObject {
     func viewController(forVideoEditorView videoEditorView: VideoEditorView) -> UIViewController
 }
 
-// A view for editing outgoing video attachments.
-class VideoEditorView: UIView {
+class VideoEditorView: UIView, AttachmentPrepContentView, VideoPlaybackState, VideoPlayerViewDelegate {
 
     weak var delegate: VideoEditorViewDelegate?
     weak var dataSource: VideoEditorDataSource?
@@ -33,22 +32,31 @@ class VideoEditorView: UIView {
         playerView.delegate = self
         return playerView
     }()
+
     private lazy var playButton: UIButton = {
-        let playButton = RoundMediaButton(image: UIImage(imageLiteralResourceName: "play-fill-32"), backgroundStyle: .blur)
-        playButton.accessibilityLabel = OWSLocalizedString("PLAY_BUTTON_ACCESSABILITY_LABEL",
-                                                           comment: "Accessibility label for button to start media playback")
-        // this makes the blur circle 72 pts in diameter
-        playButton.ows_contentEdgeInsets = UIEdgeInsets(margin: 26)
-        // play button must be slightly off-center to appear centered
-        playButton.ows_imageEdgeInsets = UIEdgeInsets(top: 0, leading: 3, bottom: 0, trailing: -3)
-        playButton.addTarget(self, action: #selector(playButtonTapped), for: .touchUpInside)
+        var playButtonConfig = UIButton.Configuration.roundMedia(
+            image: UIImage(imageLiteralResourceName: "play-fill-40"),
+            size: 72,
+        )
+        let playButton = UIButton(
+            configuration: playButtonConfig,
+            primaryAction: UIAction { [weak self] _ in
+                self?.playButtonTapped()
+            },
+        )
+        playButton.accessibilityLabel = OWSLocalizedString(
+            "PLAY_BUTTON_ACCESSABILITY_LABEL",
+            comment: "Accessibility label for button to start media playback",
+        )
         return playButton
     }()
 
-    init(model: VideoEditorModel,
-         delegate: VideoEditorViewDelegate,
-         dataSource: VideoEditorDataSource,
-         viewControllerProvider: VideoEditorViewControllerProviding) {
+    init(
+        model: VideoEditorModel,
+        delegate: VideoEditorViewDelegate,
+        dataSource: VideoEditorDataSource,
+        viewControllerProvider: VideoEditorViewControllerProviding,
+    ) {
 
         self.model = model
         self.delegate = delegate
@@ -57,10 +65,10 @@ class VideoEditorView: UIView {
 
         super.init(frame: .zero)
 
-        backgroundColor = .black
+        backgroundColor = .Signal.mediaBackground
+        clipsToBounds = true
     }
 
-    @available(*, unavailable, message: "use other init() instead.")
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -68,36 +76,49 @@ class VideoEditorView: UIView {
     // MARK: - Views
 
     func configureSubviews() {
-        let aspectRatio: CGFloat = model.displaySize.width / model.displaySize.height
-        addSubviewWithScaleAspectFitLayout(view: playerView, aspectRatio: aspectRatio)
+        let displaySize = model.displaySize
+        let aspectRatio = displaySize.width / displaySize.height
         playerView.setContentHuggingLow()
         playerView.setCompressionResistanceLow()
         playerView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapPlayerView(_:))))
-
-        addSubview(playButton)
-        playButton.autoAlignAxis(.horizontal, toSameAxisOf: playerView)
-        playButton.autoAlignAxis(.vertical, toSameAxisOf: playerView)
-
-        ensureSeekReflectsTrimming()
-    }
-
-    private func addSubviewWithScaleAspectFitLayout(view: UIView, aspectRatio: CGFloat) {
-        addSubview(view)
+        playerView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(playerView)
         // This emulates the behavior of contentMode = .scaleAspectFit using iOS auto layout constraints.
-        addConstraints({
-            let constraints = [ view.centerXAnchor.constraint(equalTo: centerXAnchor),
-                                view.centerYAnchor.constraint(equalTo: centerYAnchor) ]
-            constraints.forEach { $0.priority = .defaultHigh - 100 }
+        NSLayoutConstraint.activate([
+            playerView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            playerView.centerYAnchor.constraint(equalTo: centerYAnchor),
+
+            playerView.widthAnchor.constraint(equalTo: playerView.heightAnchor, multiplier: aspectRatio),
+            playerView.widthAnchor.constraint(lessThanOrEqualTo: widthAnchor),
+            playerView.heightAnchor.constraint(lessThanOrEqualTo: heightAnchor),
+        ])
+        // Hug `playerView` as much as possible.
+        NSLayoutConstraint.activate({
+            let constraints = [
+                playerView.widthAnchor.constraint(equalTo: widthAnchor),
+                playerView.heightAnchor.constraint(equalTo: heightAnchor),
+            ]
+            constraints.forEach { $0.priority = .defaultHigh }
             return constraints
         }())
-        addConstraint(view.topAnchor.constraint(greaterThanOrEqualTo: topAnchor))
-        view.autoPin(toAspectRatio: aspectRatio)
-        view.autoMatch(.width, to: .width, of: self, withMultiplier: 1.0, relation: .lessThanOrEqual)
-        view.autoMatch(.height, to: .height, of: self, withMultiplier: 1.0, relation: .lessThanOrEqual)
-        NSLayoutConstraint.autoSetPriority(.defaultHigh) {
-            view.autoMatch(.width, to: .width, of: self, withMultiplier: 1.0, relation: .equal)
-            view.autoMatch(.height, to: .height, of: self, withMultiplier: 1.0, relation: .equal)
-        }
+        // Preferred size.
+        NSLayoutConstraint.activate({
+            let constraints = [
+                playerView.widthAnchor.constraint(equalToConstant: displaySize.width),
+                playerView.heightAnchor.constraint(equalToConstant: displaySize.height),
+            ]
+            constraints.forEach { $0.priority = .defaultLow }
+            return constraints
+        }())
+
+        playButton.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(playButton)
+        NSLayoutConstraint.activate([
+            playButton.centerXAnchor.constraint(equalTo: playerView.centerXAnchor),
+            playButton.centerYAnchor.constraint(equalTo: playerView.centerYAnchor),
+        ])
+
+        ensureSeekReflectsTrimming()
     }
 
     // MARK: - Event Handlers
@@ -107,7 +128,6 @@ class VideoEditorView: UIView {
         togglePlayback()
     }
 
-    @objc
     private func playButtonTapped() {
         togglePlayback()
     }
@@ -118,6 +138,38 @@ class VideoEditorView: UIView {
         } else {
             playVideo()
         }
+    }
+
+    // MARK: - Corner Radius
+
+    private static let defaultCornerRadius: CGFloat = if #available(iOS 26, *) { 26 } else { 18 }
+
+    private var _hasRoundedCorners: Bool = false
+
+    var hasRoundedCorners: Bool {
+        get { _hasRoundedCorners }
+        set { setHasRoundedCorners(newValue, animationDuration: 0) }
+    }
+
+    func setHasRoundedCorners(_ hasRoundedCorners: Bool, animationDuration: TimeInterval) {
+        guard _hasRoundedCorners != hasRoundedCorners else { return }
+
+        _hasRoundedCorners = hasRoundedCorners
+        setCornerRadius(
+            hasRoundedCorners ? Self.defaultCornerRadius : 0,
+            animationDuration: animationDuration,
+        )
+    }
+
+    private func setCornerRadius(_ cornerRadius: CGFloat, animationDuration: TimeInterval = 0) {
+        if animationDuration > 0 {
+            let animation = CABasicAnimation(keyPath: #keyPath(CALayer.cornerRadius))
+            animation.fromValue = layer.cornerRadius
+            animation.toValue = cornerRadius
+            animation.duration = animationDuration
+            layer.add(animation, forKey: "cornerRadius")
+        }
+        layer.cornerRadius = cornerRadius
     }
 
     // MARK: - Video
@@ -185,8 +237,6 @@ class VideoEditorView: UIView {
     private var isShowingPlayButton = true
 
     private func updateControls() {
-        AssertIsOnMainThread()
-
         if isPlaying {
             if isShowingPlayButton {
                 isShowingPlayButton = false
@@ -203,16 +253,14 @@ class VideoEditorView: UIView {
             }
         }
     }
-}
 
-extension VideoEditorView: VideoPlaybackState {
+    // MARK: - VideoPlaybackState
 
     var isPlaying: Bool { playerView.isPlaying }
 
     var currentTimeSeconds: TimeInterval { playerView.currentTimeSeconds }
-}
 
-extension VideoEditorView: VideoPlayerViewDelegate {
+    // MARK: - VideoPlayerViewDelegate
 
     func videoPlayerViewStatusDidChange(_ view: VideoPlayerView) {
         updateControls()

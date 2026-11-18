@@ -29,6 +29,22 @@
 			<string>%2$d sekuntia</string>
 		</dict>
 	</dict>
+	<key>ACCESSIBILITY_LABEL_MULTIPLE_ATTACHMENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d mediakohde</string>
+			<key>other</key>
+			<string>%1$d mediakohdetta</string>
+		</dict>
+	</dict>
 	<key>ACCESSIBILITY_LABEL_SHORT_VOICE_MEMO_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -365,6 +381,70 @@
 			<string>Teksti ja mediasisältö viimeisten %1$d päivän ajalta</string>
 		</dict>
 	</dict>
+	<key>COLLAPSE_SET_CALL_EVENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld puhelu</string>
+			<key>other</key>
+			<string>%1$ld puhelua</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_CHAT_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld päivitys keskusteluissa</string>
+			<key>other</key>
+			<string>%1$ld päivitystä keskusteluissa</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_GROUP_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld päivitys ryhmissä</string>
+			<key>other</key>
+			<string>%1$ld päivitystä ryhmissä</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_TIMER_CHANGES_WITH_FINAL_TIMER_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld muutos katoavien viestien ajastimessa · %2$@</string>
+			<key>other</key>
+			<string>%1$ld muutosta katoavien viestien ajastimessa · %2$@</string>
+		</dict>
+	</dict>
 	<key>CONVERSATION_DELETE_CONFIRMATIONS_ALERT_TITLE_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -438,6 +518,22 @@
 			<string>osuma</string>
 			<key>other</key>
 			<string>yhteensä %2$d osumasta</string>
+		</dict>
+	</dict>
+	<key>CONVERSATION_SETTINGS_FORMER_MEMBERS_SECTION_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d aiempi jäsen</string>
+			<key>other</key>
+			<string>%1$d aiempaa jäsentä</string>
 		</dict>
 	</dict>
 	<key>CONVERSATION_SETTINGS_MEMBERS_SECTION_TITLE_%d</key>
@@ -563,9 +659,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal-ryhmät toimivat parhaiten, kun niissä on enintään %1$d jäsen. Korkeampi jäsenmäärä viivästyttää viestien kulkua.</string>
+			<string>Radar-ryhmät toimivat parhaiten, kun niissä on enintään %1$d jäsen. Korkeampi jäsenmäärä viivästyttää viestien kulkua.</string>
 			<key>other</key>
-			<string>Signal-ryhmät toimivat parhaiten, kun niissä on enintään %1$d jäsentä. Korkeampi jäsenmäärä viivästyttää viestien kulkua.</string>
+			<string>Radar-ryhmät toimivat parhaiten, kun niissä on enintään %1$d jäsentä. Korkeampi jäsenmäärä viivästyttää viestien kulkua.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -723,9 +819,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal soittaa käyttäjille %2$@, %3$@ ja %1$d muulle</string>
+			<string>Radar soittaa käyttäjille %2$@, %3$@ ja %1$d muulle</string>
 			<key>other</key>
-			<string>Signal soittaa käyttäjille %2$@, %3$@ ja %1$d muulle</string>
+			<string>Radar soittaa käyttäjille %2$@, %3$@ ja %1$d muulle</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1011,9 +1107,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Jos haluat pitää laitteen %2$@ yhdistettynä, avaa Signal kyseisellä laitteella %1$d päivän kuluessa.</string>
+			<string>Jos haluat pitää laitteen %2$@ yhdistettynä, avaa Radar kyseisellä laitteella %1$d päivän kuluessa.</string>
 			<key>other</key>
-			<string>Jos haluat pitää laitteen %2$@ yhdistettynä, avaa Signal kyseisellä laitteella %1$d päivän kuluessa.</string>
+			<string>Jos haluat pitää laitteen %2$@ yhdistettynä, avaa Radar kyseisellä laitteella %1$d päivän kuluessa.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1219,9 +1315,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Kaikki Signal-kontaktit · %1$d katsoja</string>
+			<string>Kaikki Radar-kontaktit · %1$d katsoja</string>
 			<key>other</key>
-			<string>Kaikki Signal-kontaktit · %1$d katsojaa</string>
+			<string>Kaikki Radar-kontaktit · %1$d katsojaa</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1235,9 +1331,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Kaikki Signal-kontaktit · %1$d suljettu pois</string>
+			<string>Kaikki Radar-kontaktit · %1$d suljettu pois</string>
 			<key>other</key>
-			<string>Kaikki Signal-kontaktit · %1$d suljettu pois</string>
+			<string>Kaikki Radar-kontaktit · %1$d suljettu pois</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>
@@ -1384,6 +1480,22 @@
 			<string>Peruutetaanko %1$d kutsua, jotka %2$@ lähetti?</string>
 		</dict>
 	</dict>
+	<key>PINNED_CONVERSATION_LIMIT</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Voit kiinnittää enintään %1$d keskustelun.</string>
+			<key>other</key>
+			<string>Voit kiinnittää enintään %1$d keskustelua.</string>
+		</dict>
+	</dict>
 	<key>POLL_VOTE_COUNT</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -1448,10 +1560,10 @@
 			<string>%1$d yritystä</string>
 		</dict>
 	</dict>
-	<key>STORIES_SHARESHEET_PARTIAL_SEND_SUBTITLE_%d</key>
+	<key>SETTINGS_CHANGE_PHONE_NUMBER_SPLASH_CANT_CHANGE_BODY</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%1$#@text@</string>
+		<string>%#@text@</string>
 		<key>text</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -1459,9 +1571,29 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Kaikkia kohteita ei voitu lähettää valitsemaasi tarinaan, koska tiedostotyyppiä ei tueta.</string>
+			<string>Et voi vaihtaa puhelinnumeroa juuri nyt, koska olet rekisteröinyt tilin äskettäin. Lyhyt odotusaika on suunniteltu suojaamaan tiliäsi.
+
+Yritä uudelleen %1$d tunnin kuluttua.</string>
 			<key>other</key>
-			<string>Kaikkia kohteita ei voitu lähettää valitsemiisi tarinoihin, koska tiedostotyyppiä ei tueta.</string>
+			<string>Et voi vaihtaa puhelinnumeroa juuri nyt, koska olet rekisteröinyt tilin äskettäin. Lyhyt odotusaika on suunniteltu suojaamaan tiliäsi.
+
+Yritä uudelleen %1$d tunnin kuluttua.</string>
+		</dict>
+	</dict>
+	<key>STICKER_PACK_STICKER_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d tarra</string>
+			<key>other</key>
+			<string>%1$d tarraa</string>
 		</dict>
 	</dict>
 	<key>STORY_REPLIES_COUNT_%d</key>
@@ -1558,6 +1690,22 @@
 			<string>&lt;bold&gt;%1$d&lt;/bold&gt; katselukerta</string>
 			<key>other</key>
 			<string>&lt;bold&gt;%1$d&lt;/bold&gt; katselukertaa</string>
+		</dict>
+	</dict>
+	<key>THREAD_DETAILS_MEMBERS_AND_INVITED_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%2$@ (+%1$ld kutsuttu)</string>
+			<key>other</key>
+			<string>%2$@ (+%1$ld kutsuttua)</string>
 		</dict>
 	</dict>
 	<key>THREAD_DETAILS_MORE_MUTUAL_GROUP_%3$ld</key>
@@ -1670,6 +1818,86 @@
 			<string>Käyttäjänimessä on oltava vähintään %1$d merkki</string>
 			<key>other</key>
 			<string>Käyttäjänimessä on oltava vähintään %1$d merkkiä</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d maininta sinusta käyttäjältä %2$@ ja muilta</string>
+			<key>other</key>
+			<string>%1$d mainintaa sinusta käyttäjältä %2$@ ja muilta</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d maininta sinusta käyttäjiltä %2$@ ja %3$@</string>
+			<key>other</key>
+			<string>%1$d mainintaa sinusta käyttäjiltä %2$@ ja %3$@</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__messages</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d lukematon viesti</string>
+			<key>other</key>
+			<string>%1$d lukematonta viestiä</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d vastaus käyttäjiltä %2$@ ja muilta</string>
+			<key>other</key>
+			<string>%1$d vastausta käyttäjiltä %2$@ ja muilta</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d vastaus käyttäjiltä %2$@ ja %3$@</string>
+			<key>other</key>
+			<string>%1$d vastausta käyttäjiltä %2$@ ja %3$@</string>
 		</dict>
 	</dict>
 </dict>

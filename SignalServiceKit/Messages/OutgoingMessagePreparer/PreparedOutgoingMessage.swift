@@ -19,11 +19,11 @@ public class PreparedOutgoingMessage {
     /// No insertion or attachment prep is done; attachments should be inserted (but maybe not uploaded).
     public static func preprepared(
         forResending message: TSOutgoingMessage,
-        messageRowId: Int64
+        messageRowId: Int64,
     ) -> PreparedOutgoingMessage {
         let messageType = MessageType.persisted(MessageType.Persisted(
             rowId: messageRowId,
-            message: message
+            message: message,
         ))
         return PreparedOutgoingMessage(messageType: messageType)
     }
@@ -31,10 +31,10 @@ public class PreparedOutgoingMessage {
     /// Use this _only_ to "prepare" outgoing story messages that already created their attachments.
     /// Instantly prepares because...these messages don't need any preparing.
     public static func preprepared(
-        outgoingStoryMessage: OutgoingStoryMessage
+        outgoingStoryMessage: OutgoingStoryMessage,
     ) -> PreparedOutgoingMessage {
         let messageType = MessageType.story(MessageType.Story(
-            message: outgoingStoryMessage
+            message: outgoingStoryMessage,
         ))
         return PreparedOutgoingMessage(messageType: messageType)
     }
@@ -42,7 +42,7 @@ public class PreparedOutgoingMessage {
     /// Use this _only_ to "prepare" outgoing contact sync that, by definition, already uploaded their attachment.
     /// Instantly prepares because...these messages don't need any preparing.
     public static func preprepared(
-        contactSyncMessage: OWSSyncContactsMessage
+        contactSyncMessage: OWSSyncContactsMessage,
     ) -> PreparedOutgoingMessage {
         return _preprepared(transientMessage: contactSyncMessage)
     }
@@ -53,7 +53,7 @@ public class PreparedOutgoingMessage {
     /// (2) don't have any attachments associated with them
     /// Instantly prepares because...these messages don't need any preparing.
     public static func preprepared(
-        transientMessageWithoutAttachments: TSOutgoingMessage
+        transientMessageWithoutAttachments: TransientOutgoingMessage,
     ) -> PreparedOutgoingMessage {
         UnpreparedOutgoingMessage.assertIsAllowedTransientMessage(transientMessageWithoutAttachments)
         return _preprepared(transientMessage: transientMessageWithoutAttachments)
@@ -64,7 +64,7 @@ public class PreparedOutgoingMessage {
     /// (2) don't have any attachments that need to be uploaded
     /// Instantly prepares because...these messages don't need any preparing.
     private static func _preprepared(
-        transientMessage: TSOutgoingMessage
+        transientMessage: TransientOutgoingMessage,
     ) -> PreparedOutgoingMessage {
         let messageType = MessageType.transient(transientMessage)
         return PreparedOutgoingMessage(messageType: messageType)
@@ -76,12 +76,12 @@ public class PreparedOutgoingMessage {
     /// Returns nil if the message no longer exists; records keep a pointer to a message which may be since deleted.
     public static func restore(
         from jobRecord: MessageSenderJobRecord,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> PreparedOutgoingMessage? {
         switch jobRecord.messageType {
         case .persisted(let messageId, _):
             guard
-                let interaction = TSOutgoingMessage.anyFetch(uniqueId: messageId, transaction: tx),
+                let interaction = TSOutgoingMessage.fetchViaCache(uniqueId: messageId, transaction: tx),
                 let message = interaction as? TSOutgoingMessage
             else {
                 return nil
@@ -89,7 +89,7 @@ public class PreparedOutgoingMessage {
             return .init(messageType: .persisted(.init(rowId: message.sqliteRowId!, message: message)))
         case .editMessage(let editedMessageId, let messageForSending, _):
             guard
-                let interaction = TSOutgoingMessage.anyFetch(uniqueId: editedMessageId, transaction: tx),
+                let interaction = TSOutgoingMessage.fetchViaCache(uniqueId: editedMessageId, transaction: tx),
                 let editedMessage = interaction as? TSOutgoingMessage
             else {
                 return nil
@@ -97,17 +97,10 @@ public class PreparedOutgoingMessage {
             return .init(messageType: .editMessage(.init(
                 editedMessageRowId: editedMessage.sqliteRowId!,
                 editedMessage: editedMessage,
-                messageForSending: messageForSending
+                messageForSending: messageForSending,
             )))
         case .transient(let message):
             if let storyMessage = message as? OutgoingStoryMessage {
-                guard storyMessage.storyMessageRowId != nil else {
-                    /// This field was, in the past, inadvertently not exposed
-                    /// to ObjC. If we deserialize one of these as `nil`, drop
-                    /// it.
-                    return nil
-                }
-
                 return .init(messageType: .story(.init(message: storyMessage)))
             }
             return .init(messageType: .transient(message))
@@ -134,7 +127,7 @@ public class PreparedOutgoingMessage {
         /// Catch-all for messages not persisted to the Interactions table. The
         /// MessageSender will not upload any attachments contained within these
         /// messages; callers are responsible for uploading them.
-        case transient(TSOutgoingMessage)
+        case transient(TransientOutgoingMessage)
 
         public struct Persisted {
             public let rowId: Int64
@@ -165,18 +158,19 @@ public class PreparedOutgoingMessage {
     }
 
     public func attachmentIdsForUpload(tx: DBReadTransaction) -> [Attachment.IDType] {
+        let attachmentStore = DependenciesBridge.shared.attachmentStore
+
         switch messageType {
         case .persisted(let persisted):
-            let attachmentIds = DependenciesBridge.shared.attachmentStore.allAttachments(
-                forMessageWithRowId: persisted.rowId,
-                tx: tx
-            ).map(\.attachmentRowId)
-            return attachmentIds
+            return attachmentStore.fetchReferencedAttachmentsOwnedByMessage(
+                messageRowId: persisted.rowId,
+                tx: tx,
+            ).map(\.attachment.id)
         case .editMessage(let editMessage):
-            return DependenciesBridge.shared.attachmentStore.allAttachments(
-                forMessageWithRowId: editMessage.editedMessageRowId,
-                tx: tx
-            ).map(\.attachmentRowId)
+            return attachmentStore.fetchReferencedAttachmentsOwnedByMessage(
+                messageRowId: editMessage.editedMessageRowId,
+                tx: tx,
+            ).map(\.attachment.id)
         case .story(let story):
             guard let storyMessage = StoryMessage.anyFetch(uniqueId: story.message.storyMessageId, transaction: tx) else {
                 return []
@@ -184,17 +178,17 @@ public class PreparedOutgoingMessage {
             switch storyMessage.attachment {
             case .media:
                 return [
-                    DependenciesBridge.shared.attachmentStore.fetchFirstReference(
+                    DependenciesBridge.shared.attachmentStore.fetchAnyReference(
                         owner: .storyMessageMedia(storyMessageRowId: story.storyMessageRowId),
-                        tx: tx
-                    )?.attachmentRowId
+                        tx: tx,
+                    )?.attachmentRowId,
                 ].compacted()
             case .text:
                 return [
-                    DependenciesBridge.shared.attachmentStore.fetchFirstReference(
+                    DependenciesBridge.shared.attachmentStore.fetchAnyReference(
                         owner: .storyMessageLinkPreview(storyMessageRowId: story.storyMessageRowId),
-                        tx: tx
-                    )?.attachmentRowId
+                        tx: tx,
+                    )?.attachmentRowId,
                 ].compacted()
             }
         case .transient:
@@ -232,7 +226,7 @@ public class PreparedOutgoingMessage {
             // We don't donate story message intents.
             return nil
         case .transient(let message):
-            if message is OWSOutgoingReactionMessage {
+            if message is OutgoingReactionMessage {
                 return message
             } else {
                 return nil
@@ -247,11 +241,10 @@ public class PreparedOutgoingMessage {
     }
 
     public func attachmentUploadOperations(tx: DBReadTransaction) -> [() async throws -> Void] {
+        let attachmentUploadManager = DependenciesBridge.shared.attachmentUploadManager
         return attachmentIdsForUpload(tx: tx).map { attachmentId in
             return {
-                try await DependenciesBridge.shared.attachmentUploadManager.uploadTransitTierAttachment(
-                    attachmentId: attachmentId
-                )
+                try await attachmentUploadManager.uploadTransitTierAttachment(attachmentId: attachmentId)
             }
         }
     }
@@ -264,11 +257,11 @@ public class PreparedOutgoingMessage {
 
     public func updateWithAllSendingRecipientsMarkedAsFailed(
         error: (any Error)? = nil,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         messageForSendStateUpdates.updateWithAllSendingRecipientsMarkedAsFailed(
             error: error,
-            transaction: tx
+            transaction: tx,
         )
     }
 
@@ -280,7 +273,7 @@ public class PreparedOutgoingMessage {
 
     public func asMessageSenderJobRecord(
         isHighPriority: Bool,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> MessageSenderJobRecord {
         switch messageType {
         case .persisted(let persisted):
@@ -300,7 +293,7 @@ public class PreparedOutgoingMessage {
 
     // Can effectively only be called by UnpreparedOutgoingMessage, as only
     // that class can instantiate a builder.
-    internal convenience init(_ builder: UnpreparedOutgoingMessage.PreparedMessageBuilder) {
+    convenience init(_ builder: UnpreparedOutgoingMessage.PreparedMessageBuilder) {
         self.init(messageType: builder.messageType)
     }
 
@@ -353,7 +346,17 @@ public class PreparedOutgoingMessage {
             return storyMessage.message
         case .transient(let message):
             // Do send states even matter for transient messages?
+            // Yes.
             return message
+        }
+    }
+
+    public var isPinChange: Bool {
+        switch messageType {
+        case .persisted, .editMessage, .story:
+            return false
+        case .transient(let message):
+            return message is OutgoingPinMessage || message is OutgoingUnpinMessage
         }
     }
 }
@@ -393,7 +396,7 @@ extension PreparedOutgoingMessage: CustomStringConvertible {
 }
 
 extension PreparedOutgoingMessage: Equatable {
-    public static func == (lhs: PreparedOutgoingMessage, rhs: PreparedOutgoingMessage) -> Bool {
+    public static func ==(lhs: PreparedOutgoingMessage, rhs: PreparedOutgoingMessage) -> Bool {
         return lhs.messageForSending.uniqueId == rhs.messageForSending.uniqueId
     }
 }

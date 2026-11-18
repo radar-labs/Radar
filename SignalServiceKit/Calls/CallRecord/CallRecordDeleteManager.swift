@@ -12,7 +12,7 @@ import LibSignalClient
 /// the necessary additional tasks related to deleting a ``CallRecord``.
 ///
 /// - SeeAlso ``DeletedCallRecord``
-/// - SeeAlso ``DeletedCallRecordCleanupManager``
+/// - SeeAlso ``DeletedCallRecordExpirationJob``
 /// - SeeAlso ``CallRecordStore/delete(callRecords:tx:)``
 public protocol CallRecordDeleteManager {
     /// Delete the given call record.
@@ -28,7 +28,7 @@ public protocol CallRecordDeleteManager {
     func deleteCallRecords(
         _ callRecords: [CallRecord],
         sendSyncMessageOnDelete: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 
     /// Mark the call with the given identifiers, for which we do not have a
@@ -47,7 +47,7 @@ public protocol CallRecordDeleteManager {
     func markCallAsDeleted(
         callId: UInt64,
         conversationId: CallRecord.ConversationID,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 }
 
@@ -56,44 +56,44 @@ public protocol CallRecordDeleteManager {
 final class CallRecordDeleteManagerImpl: CallRecordDeleteManager {
     private let callRecordStore: CallRecordStore
     private let outgoingCallEventSyncMessageManager: OutgoingCallEventSyncMessageManager
-    private let deletedCallRecordCleanupManager: DeletedCallRecordCleanupManager
+    private let deletedCallRecordExpirationJob: DeletedCallRecordExpirationJob
     private let deletedCallRecordStore: DeletedCallRecordStore
     private let threadStore: ThreadStore
 
     init(
         callRecordStore: CallRecordStore,
         outgoingCallEventSyncMessageManager: OutgoingCallEventSyncMessageManager,
-        deletedCallRecordCleanupManager: DeletedCallRecordCleanupManager,
+        deletedCallRecordExpirationJob: DeletedCallRecordExpirationJob,
         deletedCallRecordStore: DeletedCallRecordStore,
-        threadStore: ThreadStore
+        threadStore: ThreadStore,
     ) {
         self.callRecordStore = callRecordStore
         self.outgoingCallEventSyncMessageManager = outgoingCallEventSyncMessageManager
-        self.deletedCallRecordCleanupManager = deletedCallRecordCleanupManager
+        self.deletedCallRecordExpirationJob = deletedCallRecordExpirationJob
         self.deletedCallRecordStore = deletedCallRecordStore
         self.threadStore = threadStore
     }
 
-    public func markCallAsDeleted(
+    func markCallAsDeleted(
         callId: UInt64,
         conversationId: CallRecord.ConversationID,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         insertDeletedCallRecords(
             deletedCallRecords: [
                 DeletedCallRecord(
                     callId: callId,
-                    conversationId: conversationId
-                )
+                    conversationId: conversationId,
+                ),
             ],
-            tx: tx
+            tx: tx,
         )
     }
 
-    public func deleteCallRecords(
+    func deleteCallRecords(
         _ callRecords: [CallRecord],
         sendSyncMessageOnDelete: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         callRecordStore.delete(callRecords: callRecords, tx: tx)
 
@@ -101,7 +101,7 @@ final class CallRecordDeleteManagerImpl: CallRecordDeleteManager {
             deletedCallRecords: callRecords.map {
                 DeletedCallRecord(callRecord: $0)
             },
-            tx: tx
+            tx: tx,
         )
 
         if sendSyncMessageOnDelete {
@@ -131,7 +131,7 @@ final class CallRecordDeleteManagerImpl: CallRecordDeleteManager {
                     callRecord: callRecord,
                     callEvent: .callDeleted,
                     callEventTimestamp: callEventTimestamp,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
@@ -139,14 +139,16 @@ final class CallRecordDeleteManagerImpl: CallRecordDeleteManager {
 
     private func insertDeletedCallRecords(
         deletedCallRecords: [DeletedCallRecord],
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         for deletedCallRecord in deletedCallRecords {
             deletedCallRecordStore.insert(deletedCallRecord: deletedCallRecord, tx: tx)
         }
 
-        Task {
-            await deletedCallRecordCleanupManager.startCleanupIfNecessary()
+        // We've added a new DeletedCallRecord to expire, so let the expiration
+        // job know.
+        tx.addSyncCompletion { [deletedCallRecordExpirationJob] in
+            deletedCallRecordExpirationJob.restart()
         }
     }
 }

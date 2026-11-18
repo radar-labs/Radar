@@ -36,7 +36,7 @@ public struct RemoteMegaphoneModel: Codable {
     /// been fetched and cached for this megaphone it is immutable - if this
     /// changes in the future, ensure that previously-fetched images are handled
     /// appropriately.
-    mutating func update(withRefetched newMegaphone: RemoteMegaphoneModel) {
+    mutating func updateSelectively(newRemoteMegaphoneModel newMegaphone: RemoteMegaphoneModel) {
         guard id == newMegaphone.id else {
             owsFailDebug("Attempting to update remote megaphone, but IDs do not match! Current: \(id), new: \(newMegaphone.id)")
             return
@@ -87,11 +87,11 @@ extension RemoteMegaphoneModel {
 
         /// Priority of this megaphone relative to other remote megaphones.
         /// Higher numbers indicate greater priority.
-        fileprivate(set) var priority: Int
+        public fileprivate(set) var priority: Int
 
         /// Version string representing the minimum app version for which this
         /// upgrade should be shown.
-        let minAppVersion: String
+        public let minAppVersion: String
 
         /// A CSV string of `<country-code>:<parts-per-million>` pairs
         /// representing the fraction of users to which this megaphone should
@@ -99,21 +99,21 @@ extension RemoteMegaphoneModel {
         ///
         /// This is the same format used in remote-config country-code
         /// restrictions.
-        fileprivate(set) var countries: String
+        public fileprivate(set) var countries: String
 
         /// Epoch time before which this megaphone should not be shown.
-        let dontShowBefore: EpochSeconds
+        public let dontShowBefore: EpochSeconds
 
         /// Epoch time after which this megaphone should not be shown.
-        let dontShowAfter: EpochSeconds
+        public let dontShowAfter: EpochSeconds
 
         /// Number of days after this megaphone is first presented that it
         /// should continue to be shown, if the user does not interact with it.
-        let showForNumberOfDays: Int
+        public let showForNumberOfDays: Int
 
         /// Represents a condition that must be satisfied in order for this
         /// megaphone to be presented.
-        fileprivate(set) var conditionalCheck: ConditionalCheck?
+        public fileprivate(set) var conditionalCheck: ConditionalCheck?
 
         /// Represents an action to be performed in response to user selection
         /// of the "primary" call-to-action in the presented megaphone.
@@ -121,7 +121,7 @@ extension RemoteMegaphoneModel {
 
         /// Represents data associated with the performance of the primary
         /// action.
-        fileprivate(set) var primaryActionData: ActionData?
+        public fileprivate(set) var primaryActionData: ActionData?
 
         /// Represents an action to be performed in response to user selection
         /// of the "secondary" call-to-action in the presented megaphone.
@@ -129,7 +129,7 @@ extension RemoteMegaphoneModel {
 
         /// Represents data associated with the performance of the seocndary
         /// action.
-        fileprivate(set) var secondaryActionData: ActionData?
+        public fileprivate(set) var secondaryActionData: ActionData?
 
         public init(
             id: String,
@@ -143,7 +143,7 @@ extension RemoteMegaphoneModel {
             primaryAction: Action?,
             primaryActionData: ActionData?,
             secondaryAction: Action?,
-            secondaryActionData: ActionData?
+            secondaryActionData: ActionData?,
         ) {
             self.id = id
             self.priority = priority
@@ -205,23 +205,23 @@ extension RemoteMegaphoneModel {
             try container.encode(dontShowAfter, forKey: .dontShowAfter)
             try container.encode(showForNumberOfDays, forKey: .showForNumberOfDays)
 
-            if let conditionalCheck = conditionalCheck {
+            if let conditionalCheck {
                 try container.encode(conditionalCheck, forKey: .conditionalCheck)
             }
 
-            if let primaryAction = primaryAction {
+            if let primaryAction {
                 try container.encode(primaryAction, forKey: .primaryAction)
             }
 
-            if let primaryActionData = primaryActionData {
+            if let primaryActionData {
                 try container.encode(primaryActionData, forKey: .primaryActionData)
             }
 
-            if let secondaryAction = secondaryAction {
+            if let secondaryAction {
                 try container.encode(secondaryAction, forKey: .secondaryAction)
             }
 
-            if let secondaryActionData = secondaryActionData {
+            if let secondaryActionData {
                 try container.encode(secondaryActionData, forKey: .secondaryActionData)
             }
         }
@@ -293,7 +293,7 @@ extension RemoteMegaphoneModel.Manifest {
         case donateFriend
         case unrecognized(actionId: String)
 
-        var actionId: String {
+        public var actionId: String {
             switch self {
             case .finish:
                 return "finish"
@@ -402,7 +402,7 @@ extension RemoteMegaphoneModel.Manifest {
 
             try container.encode(actionDataId, forKey: .actionDataId)
 
-            if let associatedData = associatedData {
+            if let associatedData {
                 try container.encode(associatedData, forKey: .associatedData)
             }
         }
@@ -445,14 +445,14 @@ extension RemoteMegaphoneModel {
         /// megaphone is presented.
         public fileprivate(set) var secondaryActionText: String?
 
-        private init(
+        init(
             id: String,
             title: String,
             body: String,
             imageRemoteUrlPath: String?,
             hasImage: Bool,
             primaryActionText: String?,
-            secondaryActionText: String?
+            secondaryActionText: String?,
         ) {
             self.id = id
             self.title = title
@@ -475,7 +475,7 @@ extension RemoteMegaphoneModel {
             body: String,
             imageRemoteUrlPath: String?,
             primaryActionText: String?,
-            secondaryActionText: String?
+            secondaryActionText: String?,
         ) -> Translation {
             Translation(
                 id: id,
@@ -484,7 +484,7 @@ extension RemoteMegaphoneModel {
                 imageRemoteUrlPath: imageRemoteUrlPath,
                 hasImage: false,
                 primaryActionText: primaryActionText,
-                secondaryActionText: secondaryActionText
+                secondaryActionText: secondaryActionText,
             )
         }
 
@@ -521,19 +521,135 @@ extension RemoteMegaphoneModel {
             try container.encode(title, forKey: .title)
             try container.encode(body, forKey: .body)
 
-            if let imageRemoteUrlPath = imageRemoteUrlPath {
+            if let imageRemoteUrlPath {
                 try container.encode(imageRemoteUrlPath, forKey: .imageRemoteUrlPath)
             }
 
             try container.encode(hasImage, forKey: .hasImage)
 
-            if let primaryActionText = primaryActionText {
+            if let primaryActionText {
                 try container.encode(primaryActionText, forKey: .primaryActionText)
             }
 
-            if let secondaryActionText = secondaryActionText {
+            if let secondaryActionText {
                 try container.encode(secondaryActionText, forKey: .secondaryActionText)
             }
         }
+    }
+}
+
+// MARK: - Parsing manifests
+
+public extension RemoteMegaphoneModel.Manifest {
+    private static let megaphonesKey = "megaphones"
+    private static let uuidKey = "uuid"
+    private static let priorityKey = "priority"
+    private static let iosMinVersionKey = "iosMinVersion"
+    private static let countriesKey = "countries"
+    private static let dontShowBeforeEpochSecondsKey = "dontShowBeforeEpochSeconds"
+    private static let dontShowAfterEpochSecondsKey = "dontShowAfterEpochSeconds"
+    private static let showForNumberOfDaysKey = "showForNumberOfDays"
+    private static let conditionalIdKey = "conditionalId"
+    private static let primaryCtaIdKey = "primaryCtaId"
+    private static let primaryCtaDataKey = "primaryCtaData"
+    private static let secondaryCtaIdKey = "secondaryCtaId"
+    private static let secondaryCtaDataKey = "secondaryCtaData"
+
+    static func parseFrom(parser megaphonesArrayParser: ParamParser) throws -> [Self] {
+        let individualMegaphones: [[String: Any]] = try megaphonesArrayParser.required(key: Self.megaphonesKey)
+
+        return try individualMegaphones.compactMap { megaphoneObject throws -> Self? in
+            let megaphoneParser = ParamParser(megaphoneObject)
+
+            guard let iosMinVersion: String = try megaphoneParser.optional(key: Self.iosMinVersionKey) else {
+                return nil
+            }
+
+            let uuid: String = try megaphoneParser.required(key: Self.uuidKey)
+            let priority: Int = try megaphoneParser.required(key: Self.priorityKey)
+            let countries: String = try megaphoneParser.required(key: Self.countriesKey)
+            let dontShowBeforeEpochSeconds: UInt64 = try megaphoneParser.required(key: Self.dontShowBeforeEpochSecondsKey)
+            let dontShowAfterEpochSeconds: UInt64 = try megaphoneParser.required(key: Self.dontShowAfterEpochSecondsKey)
+            let showForNumberOfDays: Int = try megaphoneParser.required(key: Self.showForNumberOfDaysKey)
+
+            let conditionalId: String? = try megaphoneParser.optional(key: Self.conditionalIdKey)
+            let primaryCtaId: String? = try megaphoneParser.optional(key: Self.primaryCtaIdKey)
+            let primaryCtaDataJson: [String: Any]? = try megaphoneParser.optional(key: Self.primaryCtaDataKey)
+            let secondaryCtaId: String? = try megaphoneParser.optional(key: Self.secondaryCtaIdKey)
+            let secondaryCtaDataJson: [String: Any]? = try megaphoneParser.optional(key: Self.secondaryCtaDataKey)
+
+            var conditionalCheck: ConditionalCheck?
+            if let conditionalId {
+                conditionalCheck = ConditionalCheck(fromConditionalId: conditionalId)
+            }
+
+            var primaryAction: Action?
+            if let primaryCtaId {
+                primaryAction = Action(fromActionId: primaryCtaId)
+            }
+
+            var primaryActionData: ActionData?
+            if let primaryCtaDataJson {
+                primaryActionData = try ActionData.parse(fromJson: primaryCtaDataJson)
+            }
+
+            var secondaryAction: Action?
+            if let secondaryCtaId {
+                secondaryAction = Action(fromActionId: secondaryCtaId)
+            }
+
+            var secondaryActionData: ActionData?
+            if let secondaryCtaDataJson {
+                secondaryActionData = try ActionData.parse(fromJson: secondaryCtaDataJson)
+            }
+
+            return RemoteMegaphoneModel.Manifest(
+                id: uuid,
+                priority: priority,
+                minAppVersion: iosMinVersion,
+                countries: countries,
+                dontShowBefore: dontShowBeforeEpochSeconds,
+                dontShowAfter: dontShowAfterEpochSeconds,
+                showForNumberOfDays: showForNumberOfDays,
+                conditionalCheck: conditionalCheck,
+                primaryAction: primaryAction,
+                primaryActionData: primaryActionData,
+                secondaryAction: secondaryAction,
+                secondaryActionData: secondaryActionData,
+            )
+        }
+    }
+}
+
+// MARK: - Parsing translations
+
+public extension RemoteMegaphoneModel.Translation {
+    private static let uuidKey = "uuid"
+    private static let imageUrlKey = "image"
+    private static let titleKey = "title"
+    private static let bodyKey = "body"
+    private static let primaryCtaTextKey = "primaryCtaText"
+    private static let secondaryCtaTextKey = "secondaryCtaText"
+
+    static func parseFrom(parser: ParamParser) throws -> Self {
+        let uuid: String = try parser.required(key: Self.uuidKey)
+        let imageUrl: String? = try parser.optional(key: Self.imageUrlKey)
+        let title: String = try parser.required(key: Self.titleKey)
+        let body: String = try parser.required(key: Self.bodyKey)
+        let primaryCtaText: String? = try parser.optional(key: Self.primaryCtaTextKey)
+        let secondaryCtaText: String? = try parser.optional(key: Self.secondaryCtaTextKey)
+
+        guard uuid.isPermissibleAsFilename else {
+            throw OWSAssertionError("Translation had UUID that is illegal filename: \(uuid)")
+        }
+
+        return RemoteMegaphoneModel.Translation.makeWithoutLocalImage(
+            id: uuid,
+            title: title,
+            body: body,
+            imageRemoteUrlPath: imageUrl,
+            primaryActionText: primaryCtaText,
+            secondaryActionText: secondaryCtaText,
+        )
     }
 }

@@ -53,7 +53,7 @@ public class TypingIndicatorsImpl: NSObject, TypingIndicators {
             self.keyValueStore.getBool(
                 self.kDatabaseKey_TypingIndicatorsEnabled,
                 defaultValue: true,
-                transaction: transaction
+                transaction: transaction,
             )
         }
 
@@ -61,18 +61,24 @@ public class TypingIndicatorsImpl: NSObject, TypingIndicators {
     }
 
     public func setTypingIndicatorsEnabledAndSendSyncMessage(value: Bool) {
+        let db = DependenciesBridge.shared.db
+        let storageServiceManager = SSKEnvironment.shared.storageServiceManagerRef
+        let syncManager = SSKEnvironment.shared.syncManagerRef
+
         Logger.info("\(_areTypingIndicatorsEnabled.get()) -> \(value)")
         _areTypingIndicatorsEnabled.set(value)
 
-        SSKEnvironment.shared.databaseStorageRef.write { transaction in
-            self.keyValueStore.setBool(value,
-                                       key: self.kDatabaseKey_TypingIndicatorsEnabled,
-                                       transaction: transaction)
+        db.write { tx in
+            self.keyValueStore.setBool(
+                value,
+                key: self.kDatabaseKey_TypingIndicatorsEnabled,
+                transaction: tx,
+            )
+
+            syncManager.sendConfigurationSyncMessage(tx: tx)
         }
 
-        SSKEnvironment.shared.syncManagerRef.sendConfigurationSyncMessage()
-
-        SSKEnvironment.shared.storageServiceManagerRef.recordPendingLocalAccountUpdates()
+        storageServiceManager.recordPendingLocalAccountUpdates()
 
         NotificationCenter.default.postOnMainThread(name: TypingIndicatorsImpl.typingIndicatorStateDidChange, object: nil)
     }
@@ -81,9 +87,11 @@ public class TypingIndicatorsImpl: NSObject, TypingIndicators {
         Logger.info("\(_areTypingIndicatorsEnabled.get()) -> \(value)")
         _areTypingIndicatorsEnabled.set(value)
 
-        keyValueStore.setBool(value,
-                              key: kDatabaseKey_TypingIndicatorsEnabled,
-                              transaction: transaction)
+        keyValueStore.setBool(
+            value,
+            key: kDatabaseKey_TypingIndicatorsEnabled,
+            transaction: transaction,
+        )
 
         NotificationCenter.default.postOnMainThread(name: TypingIndicatorsImpl.typingIndicatorStateDidChange, object: nil)
     }
@@ -153,8 +161,10 @@ public class TypingIndicatorsImpl: NSObject, TypingIndicators {
                 owsFailDebug("Typing device is missing start timestamp.")
                 continue
             }
-            if let firstTimestamp = firstTimestamp,
-                firstTimestamp < startedTypingTimestamp {
+            if
+                let firstTimestamp,
+                firstTimestamp < startedTypingTimestamp
+            {
                 // More than one recipient/device is typing in this conversation;
                 // prefer the one that started typing first.
                 continue
@@ -252,7 +262,7 @@ public class TypingIndicatorsImpl: NSObject, TypingIndicators {
         }
 
         private func sendTypingMessageIfNecessary(for threadUniqueId: String, action: TypingIndicatorAction) {
-            guard let delegate = delegate else {
+            guard let delegate else {
                 return owsFailDebug("Missing delegate.")
             }
             // `areTypingIndicatorsEnabled` reflects the user-facing setting in the app preferences.
@@ -264,20 +274,20 @@ public class TypingIndicatorsImpl: NSObject, TypingIndicators {
                 do {
                     let databaseStorage = SSKEnvironment.shared.databaseStorageRef
                     let sendMessagePromise = await databaseStorage.awaitableWrite { transaction -> Promise<Void> in
-                        guard let thread = TSThread.anyFetch(uniqueId: threadUniqueId, transaction: transaction) else {
+                        guard let thread = TSThread.fetchViaCache(uniqueId: threadUniqueId, transaction: transaction) else {
                             return .value(())
                         }
 
                         let message = TypingIndicatorMessage(thread: thread, action: action, transaction: transaction)
                         let preparedMessage = PreparedOutgoingMessage.preprepared(
-                            transientMessageWithoutAttachments: message
+                            transientMessageWithoutAttachments: message,
                         )
 
                         return SSKEnvironment.shared.messageSenderJobQueueRef.add(
                             .promise,
                             message: preparedMessage,
                             limitToCurrentProcessLifetime: true,
-                            transaction: transaction
+                            transaction: transaction,
                         )
                     }
                     try await sendMessagePromise.awaitable()
@@ -393,7 +403,7 @@ public class TypingIndicatorsImpl: NSObject, TypingIndicators {
         }
 
         private func notifyIfNecessary() {
-            guard let delegate = delegate else {
+            guard let delegate else {
                 owsFailDebug("Missing delegate.")
                 return
             }

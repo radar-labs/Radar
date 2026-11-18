@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import XCTest
 import Foundation
 import LibSignalClient
+import XCTest
 @testable import SignalServiceKit
 
 class OWSUDManagerTest: SSKBaseTest {
@@ -24,7 +24,7 @@ class OWSUDManagerTest: SSKBaseTest {
         SSKEnvironment.shared.databaseStorageRef.write { tx in
             (DependenciesBridge.shared.registrationStateChangeManager as! RegistrationStateChangeManagerImpl).registerForTests(
                 localIdentifiers: localIdentifiers,
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -80,12 +80,10 @@ class OWSUDManagerTest: SSKBaseTest {
         }
     }
 
-    func testMode_withProfileKey() {
-        XCTAssert(DependenciesBridge.shared.tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered)
-        guard let localAddress = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.aciAddress else {
-            XCTFail("localAddress was unexpectedly nil")
-            return
-        }
+    func testMode_withProfileKey() throws {
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        let registeredState = try tsAccountManager.registeredStateWithMaybeSneakyTransaction()
+        let localAddress = registeredState.localIdentifiers.aciAddress
         XCTAssert(localAddress.isValid)
 
         // Ensure UD is enabled by setting our own access level to enabled.

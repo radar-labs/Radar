@@ -35,7 +35,7 @@ extension NameCollision {
         blockingManager: BlockingManager,
         contactsManager: any ContactManager,
         viewControllerForPresentation: UIViewController,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> [NameCollisionCellModel] {
         elements.map {
             return NameCollisionCellModel(
@@ -45,13 +45,13 @@ extension NameCollision {
                 profileNameChange: $0.profileNameChange,
                 updateTimestamp: $0.latestUpdateTimestamp,
                 thread: thread,
-                mutualGroups: TSGroupThread.groupThreads(with: $0.address, transaction: tx),
+                mutualGroups: TSGroupThread.groupThreads(withFullMember: $0.address, tx: tx),
                 isVerified: identityManager.verificationState(for: $0.address, tx: tx) == .verified,
                 isConnection: profileManager.isUser(inProfileWhitelist: $0.address, transaction: tx),
                 isBlocked: blockingManager.isAddressBlocked($0.address, transaction: tx),
                 hasPendingRequest: ContactThreadFinder().contactThread(for: $0.address, tx: tx)?.hasPendingMessageRequest(transaction: tx) ?? false,
                 isSystemContact: contactsManager.fetchSignalAccount(for: $0.address, transaction: tx) != nil,
-                viewControllerForPresentation: viewControllerForPresentation
+                viewControllerForPresentation: viewControllerForPresentation,
             )
         }
     }
@@ -61,8 +61,7 @@ final class NameCollisionCell: UITableViewCell {
     let avatarView = ConversationAvatarView(sizeClass: .fiftySix, localUserDisplayMode: .asUser)
     let nameLabel: UILabel = {
         let label = UILabel()
-
-        label.textColor = Theme.primaryTextColor
+        label.textColor = .Signal.label
         label.font = UIFont.dynamicTypeHeadline
         label.adjustsFontForContentSizeCategory = true
         label.numberOfLines = 0
@@ -72,8 +71,8 @@ final class NameCollisionCell: UITableViewCell {
 
     let separatorView: UIView = {
         let hairline = UIView()
-        hairline.backgroundColor = Theme.tableView2SeparatorColor
-        hairline.autoSetDimension(.height, toSize: .hairlineWidth)
+        hairline.backgroundColor = .Signal.opaqueSeparator
+        hairline.autoSetDimension(.height, toSize: UITraitCollection.current.hairlineWidth)
         let separator = UIView()
         separator.addSubview(hairline)
         hairline.autoPinEdgesToSuperviewEdges(with: .init(top: 8, leading: 0, bottom: 0, trailing: 0))
@@ -91,7 +90,8 @@ final class NameCollisionCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
 
         let horizontalStack = UIStackView(arrangedSubviews: [
-            avatarView, verticalStack
+            avatarView,
+            verticalStack,
         ])
 
         horizontalStack.axis = .horizontal
@@ -108,7 +108,7 @@ final class NameCollisionCell: UITableViewCell {
 
     static func createWithModel(
         _ model: NameCollisionCellModel,
-        action: NameCollisionCell.Action?
+        action: NameCollisionCell.Action?,
     ) -> Self {
         let cell = self.init(style: .default, reuseIdentifier: nil)
         cell.configure(model: model, action: action)
@@ -148,17 +148,17 @@ final class NameCollisionCell: UITableViewCell {
         if let profileNameChange = model.profileNameChange {
             let formatString = OWSLocalizedString(
                 "NAME_COLLISION_RECENT_CHANGE_FORMAT_STRING",
-                comment: "Format string describing a recent profile name change that led to a name collision. Embeds {{ %1$@ current name, which may be a profile name or an address book name }}, {{ %2$@ old profile name }}, and {{ %3$@ current profile name }}"
+                comment: "Format string describing a recent profile name change that led to a name collision. Embeds {{ %1$@ current name, which may be a profile name or an address book name }}, {{ %2$@ old profile name }}, and {{ %3$@ current profile name }}",
             )
-            let string = String(
-                format: formatString,
+            let string = String.nonPluralLocalizedStringWithFormat(
+                formatString,
                 model.shortName,
                 profileNameChange.oldestProfileName,
-                profileNameChange.newestProfileName
+                profileNameChange.newestProfileName,
             )
             verticalStack.addArrangedSubview(ProfileDetailLabel.profile(
                 displayName: string,
-                font: detailFont
+                font: detailFont,
             ))
         }
 
@@ -167,22 +167,22 @@ final class NameCollisionCell: UITableViewCell {
             verticalStack.addArrangedSubview(ProfileDetailLabel.signalConnectionLink(
                 font: detailFont,
                 shouldDismissOnNavigation: false,
-                presentEducationFrom: model.viewControllerForPresentation
+                presentEducationFrom: model.viewControllerForPresentation,
             ))
         } else if model.isBlocked {
             verticalStack.addArrangedSubview(ProfileDetailLabel.blocked(
                 name: model.shortName,
-                font: detailFont
+                font: detailFont,
             ))
         } else if model.hasPendingRequest {
             verticalStack.addArrangedSubview(ProfileDetailLabel.pendingRequest(
                 name: model.shortName,
-                font: detailFont
+                font: detailFont,
             ))
         } else {
             verticalStack.addArrangedSubview(ProfileDetailLabel.noDirectChat(
                 name: model.shortName,
-                font: detailFont
+                font: detailFont,
             ))
         }
 
@@ -190,7 +190,7 @@ final class NameCollisionCell: UITableViewCell {
         if model.isSystemContact {
             verticalStack.addArrangedSubview(ProfileDetailLabel.inSystemContacts(
                 name: model.shortName,
-                font: detailFont
+                font: detailFont,
             ))
         }
 
@@ -199,7 +199,7 @@ final class NameCollisionCell: UITableViewCell {
             verticalStack.addArrangedSubview(ProfileDetailLabel.phoneNumber(
                 phoneNumber,
                 font: detailFont,
-                presentSuccessToastFrom: model.viewControllerForPresentation
+                presentSuccessToastFrom: model.viewControllerForPresentation,
             ))
         }
 
@@ -207,7 +207,7 @@ final class NameCollisionCell: UITableViewCell {
         verticalStack.addArrangedSubview(ProfileDetailLabel.mutualGroups(
             for: model.thread,
             mutualGroups: model.mutualGroups,
-            font: detailFont
+            font: detailFont,
         ))
 
         separatorView.isHidden = action == nil
@@ -226,9 +226,9 @@ final class NameCollisionCell: UITableViewCell {
             var color: UIColor {
                 switch self {
                 case .normal:
-                    return Theme.primaryTextColor
+                    return .Signal.label
                 case .destructive:
-                    return .ows_accentRed
+                    return .Signal.red
                 }
             }
         }
@@ -243,7 +243,7 @@ final class NameCollisionCell: UITableViewCell {
                 title: MessageRequestView.LocalizedStrings.block,
                 icon: .chatSettingsBlock,
                 role: .destructive,
-                action: action
+                action: action,
             )
         }
 
@@ -252,7 +252,7 @@ final class NameCollisionCell: UITableViewCell {
                 title: MessageRequestView.LocalizedStrings.unblock,
                 icon: .chatSettingsBlock,
                 role: .normal,
-                action: action
+                action: action,
             )
         }
 
@@ -260,11 +260,11 @@ final class NameCollisionCell: UITableViewCell {
             Action(
                 title: OWSLocalizedString(
                     "CONVERSATION_SETTINGS_REMOVE_FROM_GROUP_BUTTON",
-                    comment: "Label for 'remove from group' button in conversation settings view."
+                    comment: "Label for 'remove from group' button in conversation settings view.",
                 ),
                 icon: .groupMemberRemoveFromGroup,
                 role: .destructive,
-                action: action
+                action: action,
             )
         }
 
@@ -272,35 +272,28 @@ final class NameCollisionCell: UITableViewCell {
             Action(
                 title: OWSLocalizedString(
                     "MESSAGE_REQUEST_NAME_COLLISON_UPDATE_CONTACT_ACTION",
-                    comment: "A button that updates a known contact's information to resolve a name collision"
+                    comment: "A button that updates a known contact's information to resolve a name collision",
                 ),
                 icon: .profileAbout,
                 role: .normal,
-                action: action
+                action: action,
             )
         }
     }
 
     private func createButton(for action: Action) -> UIButton {
-        let button = OWSButton(
-            title: action.title,
-            imageName: Theme.iconName(action.icon),
-            tintColor: action.role.color,
-            spacing: 12,
-            block: action.action
+        let button = UIButton(
+            configuration: .plain(),
+            primaryAction: UIAction { _ in
+                action.action()
+            },
         )
-
-        button.setTitleColor(action.role.color, for: .normal)
-        button.setTitleColor(action.role.color.withAlphaComponent(0.7), for: .highlighted)
-
-        button.titleLabel?.font = UIFont.dynamicTypeBody
-        button.titleLabel?.adjustsFontForContentSizeCategory = true
-        button.titleLabel?.numberOfLines = 0
+        button.configuration?.title = action.title
+        button.configuration?.baseForegroundColor = action.role.color
+        button.configuration?.image = Theme.iconImage(action.icon)
+        button.configuration?.imagePadding = 12
+        button.configuration?.contentInsets = .init(hMargin: 0, vMargin: 4)
         button.contentHorizontalAlignment = .leading
-
-        // By default, a button's label will grow outside of the buttons bounds
-        button.titleLabel?.autoMatch(.height, to: .height, of: button, withMultiplier: 1, relation: .lessThanOrEqual)
-        button.setContentHuggingHorizontalHigh()
         return button
     }
 }

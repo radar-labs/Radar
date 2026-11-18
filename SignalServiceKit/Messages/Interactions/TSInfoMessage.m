@@ -36,15 +36,14 @@ const InfoMessageUserInfoKey InfoMessageUserInfoKeyPhoneNumberDisplayNameBeforeL
     = @"InfoMessageUserInfoKeyPhoneNumberDisplayNameBeforeLearningProfileName";
 const InfoMessageUserInfoKey InfoMessageUserInfoKeyUsernameDisplayNameBeforeLearningProfileName
     = @"InfoMessageUserInfoKeyUsernameDisplayNameBeforeLearningProfileName";
+const InfoMessageUserInfoKey InfoMessageUserInfoKeySharedNameDisplayNameBeforeLearningProfileName
+    = @"InfoMessageUserInfoKeySharedNameDisplayNameBeforeLearningProfileName";
 const InfoMessageUserInfoKey InfoMessageUserInfoKeyEndPoll = @"InfoMessageUserInfoKeyEndPoll";
-
-NSUInteger TSInfoMessageSchemaVersion = 2;
+const InfoMessageUserInfoKey InfoMessageUserInfoKeyPinnedMessage = @"InfoMessageUserInfoKeyPinnedMessage";
 
 @interface TSInfoMessage ()
 
 @property (nonatomic, getter=wasRead) BOOL read;
-
-@property (nonatomic, readonly) NSUInteger infoMessageSchemaVersion;
 
 @end
 
@@ -52,31 +51,61 @@ NSUInteger TSInfoMessageSchemaVersion = 2;
 
 @implementation TSInfoMessage
 
-- (nullable instancetype)initWithCoder:(NSCoder *)coder
++ (NSArray<Class> *)infoMessageUserInfoObjectClasses
 {
-    self = [super initWithCoder:coder];
-    if (!self) {
-        return self;
+    return @[
+        [DisappearingMessageToken class],
+        [NSDictionary class],
+        [NSNull class],
+        [NSNumber class],
+        [NSString class],
+        [PersistableEndPollItem class],
+        [PersistablePinnedMessageItem class],
+        [ProfileChanges class],
+        [SignalServiceAddress class],
+        [TSGroupModel class],
+        [TSInfoMessageUpdateMessages class],
+        [TSInfoMessageUpdateMessagesV2 class]
+    ];
+}
+
+- (NSUInteger)hash
+{
+    NSUInteger result = [super hash];
+    result ^= self.customMessage.hash;
+    result ^= self.infoMessageUserInfo.hash;
+    result ^= (NSUInteger)self.messageType;
+    result ^= self.read;
+    result ^= self.serverGuid.hash;
+    result ^= self.unregisteredAddress.hash;
+    return result;
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (![super isEqual:other]) {
+        return NO;
     }
-
-    if (self.infoMessageSchemaVersion < 1) {
-        _read = YES;
+    TSInfoMessage *typedOther = (TSInfoMessage *)other;
+    if (![NSObject isObject:self.customMessage equalToObject:typedOther.customMessage]) {
+        return NO;
     }
-
-    if (self.infoMessageSchemaVersion < 2) {
-        NSString *_Nullable phoneNumber = [coder decodeObjectForKey:@"unregisteredRecipientId"];
-        if (phoneNumber) {
-            _unregisteredAddress = [SignalServiceAddress legacyAddressWithServiceIdString:nil phoneNumber:phoneNumber];
-        }
+    if (![NSObject isObject:self.infoMessageUserInfo equalToObject:typedOther.infoMessageUserInfo]) {
+        return NO;
     }
-
-    _infoMessageSchemaVersion = TSInfoMessageSchemaVersion;
-
-    if (self.isDynamicInteraction) {
-        self.read = YES;
+    if (self.messageType != typedOther.messageType) {
+        return NO;
     }
-
-    return self;
+    if (self.read != typedOther.read) {
+        return NO;
+    }
+    if (![NSObject isObject:self.serverGuid equalToObject:typedOther.serverGuid]) {
+        return NO;
+    }
+    if (![NSObject isObject:self.unregisteredAddress equalToObject:typedOther.unregisteredAddress]) {
+        return NO;
+    }
+    return YES;
 }
 
 - (instancetype)initWithThread:(TSThread *)thread
@@ -85,6 +114,7 @@ NSUInteger TSInfoMessageSchemaVersion = 2;
                    messageType:(TSInfoMessageType)messageType
             expireTimerVersion:(nullable NSNumber *)expireTimerVersion
               expiresInSeconds:(unsigned int)expiresInSeconds
+               expireStartedAt:(uint64_t)expireStartedAt
            infoMessageUserInfo:(nullable NSDictionary<InfoMessageUserInfoKey, id> *)infoMessageUserInfo
 {
     TSMessageBuilder *builder;
@@ -94,10 +124,9 @@ NSUInteger TSInfoMessageSchemaVersion = 2;
         builder = [TSMessageBuilder messageBuilderWithThread:thread];
     }
 
-    if (expiresInSeconds > 0 && expireTimerVersion != nil) {
-        builder.expiresInSeconds = expiresInSeconds;
-        builder.expireTimerVersion = expireTimerVersion;
-    }
+    builder.expireTimerVersion = expireTimerVersion;
+    builder.expiresInSeconds = expiresInSeconds;
+    builder.expireStartedAt = expireStartedAt;
 
     self = [super initMessageWithBuilder:builder];
     if (!self) {
@@ -107,7 +136,6 @@ NSUInteger TSInfoMessageSchemaVersion = 2;
     _serverGuid = serverGuid;
     _messageType = messageType;
     _infoMessageUserInfo = infoMessageUserInfo;
-    _infoMessageSchemaVersion = TSInfoMessageSchemaVersion;
 
     if (self.isDynamicInteraction) {
         self.read = YES;
@@ -146,7 +174,6 @@ NSUInteger TSInfoMessageSchemaVersion = 2;
                isGroupStoryReply:(BOOL)isGroupStoryReply
                           isPoll:(BOOL)isPoll
   isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
-                       isStarred:(BOOL)isStarred
               isViewOnceComplete:(BOOL)isViewOnceComplete
                isViewOnceMessage:(BOOL)isViewOnceMessage
                      linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -183,7 +210,6 @@ NSUInteger TSInfoMessageSchemaVersion = 2;
                  isGroupStoryReply:isGroupStoryReply
                             isPoll:isPoll
     isSmsMessageRestoredFromBackup:isSmsMessageRestoredFromBackup
-                         isStarred:isStarred
                 isViewOnceComplete:isViewOnceComplete
                  isViewOnceMessage:isViewOnceMessage
                        linkPreview:linkPreview
@@ -235,124 +261,7 @@ NSUInteger TSInfoMessageSchemaVersion = 2;
 
 - (NSString *)infoMessagePreviewTextWithTransaction:(DBReadTransaction *)transaction
 {
-    switch (_messageType) {
-        case TSInfoMessageTypeLocalUserEndedSession:
-        case TSInfoMessageTypeRemoteUserEndedSession:
-            return OWSLocalizedString(@"SECURE_SESSION_RESET", nil);
-        case TSInfoMessageTypeUnsupportedMessage:
-            return OWSLocalizedString(@"UNSUPPORTED_ATTACHMENT", nil);
-        case TSInfoMessageUserNotRegistered:
-            if (self.unregisteredAddress.isValid) {
-                NSString *recipientName =
-                    [SSKEnvironment.shared.contactManagerObjcRef displayNameStringForAddress:self.unregisteredAddress
-                                                                                 transaction:transaction];
-                return [NSString stringWithFormat:OWSLocalizedString(@"ERROR_UNREGISTERED_USER_FORMAT",
-                                                      @"Format string for 'unregistered user' error. Embeds {{the "
-                                                      @"unregistered user's name or signal id}}."),
-                    recipientName];
-            } else {
-                return OWSLocalizedString(@"CONTACT_DETAIL_COMM_TYPE_INSECURE", nil);
-            }
-        case TSInfoMessageTypeGroupQuit:
-            return OWSLocalizedString(@"GROUP_YOU_LEFT", nil);
-        case TSInfoMessageTypeGroupUpdate:
-            return [self groupUpdateDescriptionWithTransaction:transaction].string;
-        case TSInfoMessageAddToContactsOffer:
-            return OWSLocalizedString(@"ADD_TO_CONTACTS_OFFER",
-                @"Message shown in conversation view that offers to add an unknown user to your phone's contacts.");
-        case TSInfoMessageVerificationStateChange:
-            return OWSLocalizedString(@"VERIFICATION_STATE_CHANGE_GENERIC",
-                @"Generic message indicating that verification state changed for a given user.");
-        case TSInfoMessageAddUserToProfileWhitelistOffer:
-            return OWSLocalizedString(@"ADD_USER_TO_PROFILE_WHITELIST_OFFER",
-                @"Message shown in conversation view that offers to share your profile with a user.");
-        case TSInfoMessageAddGroupToProfileWhitelistOffer:
-            return OWSLocalizedString(@"ADD_GROUP_TO_PROFILE_WHITELIST_OFFER",
-                @"Message shown in conversation view that offers to share your profile with a group.");
-        case TSInfoMessageTypeDisappearingMessagesUpdate:
-            break;
-        case TSInfoMessageUnknownProtocolVersion:
-            break;
-        case TSInfoMessageUserJoinedSignal: {
-            SignalServiceAddress *address = [TSContactThread contactAddressFromThreadId:self.uniqueThreadId
-                                                                            transaction:transaction];
-            NSString *recipientName =
-                [SSKEnvironment.shared.contactManagerObjcRef displayNameStringForAddress:address
-                                                                             transaction:transaction];
-            NSString *format = OWSLocalizedString(@"INFO_MESSAGE_USER_JOINED_SIGNAL_BODY_FORMAT",
-                @"Shown in inbox and conversation when a user joins Signal, embeds the new user's {{contact "
-                @"name}}");
-            return [NSString stringWithFormat:format, recipientName];
-        }
-        case TSInfoMessageSyncedThread:
-            return @"";
-        case TSInfoMessageProfileUpdate:
-            return [self profileChangeDescriptionWithTransaction:transaction];
-        case TSInfoMessagePhoneNumberChange: {
-            AciObjC *_Nullable aci = [self phoneNumberChangeInfoAci];
-            if (aci == nil) {
-                OWSFailDebug(@"Invalid info message");
-                return @"";
-            }
-            SignalServiceAddress *address = [[SignalServiceAddress alloc] initWithServiceIdObjC:aci];
-            NSString *userName = [SSKEnvironment.shared.contactManagerObjcRef displayNameStringForAddress:address
-                                                                                              transaction:transaction];
-
-            NSString *format = OWSLocalizedString(@"INFO_MESSAGE_USER_CHANGED_PHONE_NUMBER_FORMAT",
-                @"Indicates that another user has changed their phone number. Embeds: {{ the user's name}}".);
-            return [NSString stringWithFormat:format, userName];
-        }
-        case TSInfoMessageRecipientHidden: {
-            /// This does not control whether to show the info message in the chat
-            /// preview. To control that, see ``TSInteraction.shouldAppearInInbox``.
-            SignalServiceAddress *address = [TSContactThread contactAddressFromThreadId:self.uniqueThreadId
-                                                                            transaction:transaction];
-            if ([RecipientHidingManagerObjcBridge isHiddenAddress:address tx:transaction]) {
-                return OWSLocalizedString(@"INFO_MESSAGE_CONTACT_REMOVED",
-                    @"Indicates that the recipient has been removed from the current user's contacts and that "
-                    @"messaging them will re-add them.");
-            } else {
-                return OWSLocalizedString(@"INFO_MESSAGE_CONTACT_REINSTATED",
-                    @"Indicates that a previously-removed recipient has been added back to the current user's "
-                    @"contacts.");
-            }
-        }
-        case TSInfoMessagePaymentsActivationRequest:
-            return [self paymentsActivationRequestDescriptionWithTransaction:transaction];
-        case TSInfoMessagePaymentsActivated:
-            return [self paymentsActivatedDescriptionWithTransaction:transaction];
-        case TSInfoMessageThreadMerge:
-            return [self threadMergeDescriptionWithTx:transaction];
-        case TSInfoMessageSessionSwitchover:
-            return [self sessionSwitchoverDescriptionWithTx:transaction];
-        case TSInfoMessageReportedSpam:
-            return OWSLocalizedString(
-                @"INFO_MESSAGE_REPORTED_SPAM", @"Shown when a user reports a conversation as spam.");
-        case TSInfoMessageLearnedProfileName:
-            return [self learnedProfileNameDescriptionWithTx:transaction];
-        case TSInfoMessageBlockedOtherUser:
-            return OWSLocalizedString(@"INFO_MESSAGE_BLOCKED_OTHER_USER",
-                @"An info message inserted into a 1:1 chat when you block another user.");
-        case TSInfoMessageBlockedGroup:
-            return OWSLocalizedString(
-                @"INFO_MESSAGE_BLOCKED_GROUP", @"An info message inserted into a group chat when you block the group.");
-        case TSInfoMessageUnblockedOtherUser:
-            return OWSLocalizedString(@"INFO_MESSAGE_UNBLOCKED_OTHER_USER",
-                @"An info message inserted into a 1:1 chat when you unblock another user.");
-        case TSInfoMessageUnblockedGroup:
-            return OWSLocalizedString(@"INFO_MESSAGE_UNBLOCKED_GROUP",
-                @"An info message inserted into a group chat when you unblock the group.");
-        case TSInfoMessageAcceptedMessageRequest:
-            return OWSLocalizedString(@"INFO_MESSAGE_ACCEPTED_MESSAGE_REQUEST",
-                @"An info message inserted into the chat when you accept a message request, in a 1:1 or group "
-                @"chat.");
-        case TSInfoMessageTypeEndPoll: {
-            return [self endPollDescriptionWithTransaction:transaction];
-        }
-    }
-
-    OWSFailDebug(@"Unknown info message type");
-    return @"";
+    return [self _infoMessagePreviewTextWithTx:transaction];
 }
 
 #pragma mark - OWSReadTracking

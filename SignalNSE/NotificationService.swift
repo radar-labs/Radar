@@ -3,8 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-@preconcurrency import UserNotifications
 import SignalServiceKit
+import UIKit
+@preconcurrency import UserNotifications
 
 // The lifecycle of the NSE looks something like the following:
 //  1)  App receives notification
@@ -29,16 +30,14 @@ import SignalServiceKit
 // database, logging, etc. are only ever setup once per *process*
 private let globalEnvironment = NSEEnvironment()
 
-@MainActor private var hasShownFirstUnlockError = false
-
 class NotificationService: UNNotificationServiceExtension {
     private typealias ContentHandler = (UNNotificationContent) -> Void
     private let contentHandler = AtomicOptional<ContentHandler>(nil, lock: .init())
     private let fetchQueue = SerialTaskQueue()
 
-    /// Captured from the incoming request so `serviceExtensionTimeWillExpire`
-    /// can mirror the sender's interruption level onto the timeout content
-    /// and clean the passive placeholder out of notification center.
+    /// Radar: captured from the incoming request so `serviceExtensionTimeWillExpire`
+    /// can mirror the sender's interruption level onto the timeout content and
+    /// clean the push relay's passive placeholder out of notification center.
     private let pendingRequest = AtomicOptional<UNNotificationRequest>(nil, lock: .init())
 
     // MARK: -
@@ -88,7 +87,7 @@ class NotificationService: UNNotificationServiceExtension {
 
     override func didReceive(
         _ request: UNNotificationRequest,
-        withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void
+        withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void,
     ) {
         let logger = NSELogger()
         _ = Self.nseDidStart()
@@ -96,28 +95,28 @@ class NotificationService: UNNotificationServiceExtension {
         self.pendingRequest.set(request)
         self.fetchQueue.enqueueCancellingPrevious {
             let content = await self._didReceive(request, logger: logger)
-            // Mirror the original push's interruption level onto our modified
-            // content — a passive wake-up (e.g. the relay's empty ping) should
-            // not be surfaced as an active empty banner. Real per-message
-            // notifications are scheduled separately with their own level.
+            // Radar: mirror the original push's interruption level onto our modified
+            // content, so a passive wake-up (the push relay's empty ping) isn't
+            // surfaced as an active empty banner. Real per-message notifications are
+            // scheduled separately with their own level.
             let final = content.mirroringInterruptionLevel(of: request.content)
             self.completeSilently(content: final, logger: logger)
             await Self.removePlaceholderIfPassive(request: request, badge: final.badge)
         }
     }
 
-    /// After a passive wake-up has been "consumed" by the NSE, the modified
-    /// placeholder still sits in notification center as an empty entry.
-    /// Strip it. Real per-message notifications are scheduled by the message
-    /// fetcher with distinct identifiers and are not affected.
+    /// Radar: after a passive wake-up has been "consumed" by the NSE, the modified
+    /// placeholder still sits in notification center as an empty entry. Strip it.
+    /// Real per-message notifications are scheduled by the message fetcher with
+    /// distinct identifiers and are not affected.
     ///
     /// We poll for the notification to actually appear in the delivered list
-    /// before removing it — iOS adds it asynchronously after `contentHandler`
-    /// returns, and removing-before-add is a silent no-op.
+    /// before removing it: iOS adds it asynchronously after `contentHandler`
+    /// returns, and removing it before it's added is a silent no-op.
     ///
-    /// `badge` is the value we put on the modified content; iOS cancels the
-    /// badge update along with the notification when we remove it, so we
-    /// re-apply it explicitly via `setBadgeCount`.
+    /// `badge` is the value we put on the modified content; iOS cancels the badge
+    /// update along with the notification when we remove it, so we re-apply it
+    /// explicitly via `setBadgeCount`.
     fileprivate static func removePlaceholderIfPassive(request: UNNotificationRequest, badge: NSNumber?) async {
         guard request.content.interruptionLevel == .passive else { return }
         let center = UNUserNotificationCenter.current()
@@ -133,7 +132,7 @@ class NotificationService: UNNotificationServiceExtension {
                 break
             }
         }
-        // Fallback if we never saw it in the delivered list — fire anyway.
+        // Fallback if we never saw it in the delivered list: remove it anyway.
         center.removeDeliveredNotifications(withIdentifiers: [request.identifier])
 
         if #available(iOS 16.0, *), let badge {
@@ -141,33 +140,47 @@ class NotificationService: UNNotificationServiceExtension {
         }
     }
 
+    private func verificationCodeRequestTimestampMs(userInfo: [AnyHashable: Any]) -> UInt64? {
+        return (userInfo["verificationCodeRequested"] as? [String: Any])?["timestamp"] as? UInt64
+    }
+
     @MainActor
     private func _didReceive(_ request: UNNotificationRequest, logger: NSELogger) async -> UNNotificationContent {
-        globalEnvironment.setUp(logger: logger)
+        globalEnvironment.setUpLogging(logger: logger)
+
+        if LowDiskSpaceManager.additionalBytesRequiredToLaunch() == nil {
+            hasShownLowDiskSpaceWarning = false
+        } else {
+            if hasShownLowDiskSpaceWarning {
+                logger.warn("Not enough disk space; skipping fetch, already shown notification.")
+                logger.flush()
+            } else {
+                logger.warn("Not enough disk space; skipping fetch, showing notification.")
+                logger.flush()
+
+                await postLowDiskSpaceNotification()
+                hasShownLowDiskSpaceWarning = true
+            }
+
+            return UNNotificationContent()
+        }
+
         let finalContinuation: AppSetup.FinalContinuation
         do {
             finalContinuation = try await globalEnvironment.setUpDatabase(logger: logger)
         } catch KeychainError.notAllowed {
-            // Detect and handle "no GRDB file" and "no keychain access".
-            if !hasShownFirstUnlockError {
-                hasShownFirstUnlockError = true
-                logger.error("DB Keys not accessible; showing error.")
+            if hasShownDBNotAvailableWarning {
+                logger.warn("DB not available; skipping fetch, already shown notification.")
                 logger.flush()
-                let content = UNMutableNotificationContent()
-                let notificationFormat = OWSLocalizedString(
-                    "NOTIFICATION_BODY_PHONE_LOCKED_FORMAT",
-                    comment: "Lock screen notification text presented after user powers on their device without unlocking. Embeds {{device model}} (either 'iPad' or 'iPhone')"
-                )
-                content.body = String(format: notificationFormat, UIDevice.current.localizedModel)
-                return content
             } else {
-                // Only show a single error if we receive multiple pushes
-                // before first device unlock.
-                logger.error("DB Keys not accessible; completing silently.")
+                logger.warn("Showing DB-not-available notification.")
                 logger.flush()
-                let emptyContent = UNMutableNotificationContent()
-                return emptyContent
+
+                await postDBNotAvailableNotification()
+                hasShownDBNotAvailableWarning = true
             }
+
+            return UNNotificationContent()
         } catch {
             owsFail("Couldn't load database: \(error.grdbErrorForLogging)")
         }
@@ -177,13 +190,27 @@ class NotificationService: UNNotificationServiceExtension {
         // Re-set up the local identifiers to ensure they're propagated throughout the system.
         switch finalContinuation.setUpLocalIdentifiers(
             willResumeInProgressRegistration: false,
-            canInitiateRegistration: false
+            canInitiateRegistration: false,
         ) {
         case .corruptRegistrationState:
             Logger.warn("Ignoring request to process notifications when the user isn't registered.")
             return UNNotificationContent()
         case nil:
             globalEnvironment.setAppIsReady()
+        }
+
+        if let timestamp = verificationCodeRequestTimestampMs(userInfo: request.content.userInfo) {
+            await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
+                guard DependenciesBridge.shared.tsAccountManager.registrationState(tx: transaction).isPrimaryDevice == true else {
+                    Logger.info("Received verification code push on non-primary device; ignoring.")
+                    return
+                }
+
+                let kvStore = SafetyTipsManager()
+                kvStore.setLastVerificationCodeRequestedTimestampMs(value: timestamp, transaction: transaction)
+            }
+            Logger.info("Skipping fetch for verification code requested push")
+            return UNNotificationContent()
         }
 
         // Mark down that the APNS token is working since we got a push.
@@ -200,38 +227,39 @@ class NotificationService: UNNotificationServiceExtension {
 
     // Called just before the extension will be terminated by the system.
     override func serviceExtensionTimeWillExpire() {
-        Logger.warn("Canceling fetchingQueue tasks because we ran out of time.")
+        let logger: NSELogger = .uncorrelated
+
+        logger.warn("Canceling fetchingQueue tasks because we ran out of time.")
 
         self.fetchQueue.cancelAll()
 
         // We complete silently here so that nothing is presented to the user.
         // By default the OS will present whatever the raw content of the original
         // notification is to the user otherwise.
+        // Radar: keep the original interruption level and remove the relay's
+        // placeholder (it has been delivered for ~30s by now, so no polling needed).
         let content = UNMutableNotificationContent()
         let request = pendingRequest.swap(nil)
         if let request {
             content.interruptionLevel = request.content.interruptionLevel
         }
-        completeSilently(content: content, logger: .uncorrelated)
+        completeSilently(content: content, logger: logger)
         if let request {
-            // Fire-and-forget — by the time we're in timeWillExpire, the
-            // notification has been in the delivered list for ~30s, so this
-            // path doesn't need the polling loop.
             UNUserNotificationCenter.current().removeDeliveredNotifications(
-                withIdentifiers: [request.identifier]
+                withIdentifiers: [request.identifier],
             )
         }
     }
 
-    private func startProxyIfEnabled() async throws(CancellationError) {
+    private func startProxyIfEnabled(logger: NSELogger) async throws(CancellationError) {
         if SignalProxy.isEnabled {
-            Logger.info("Waiting for signal proxy to become ready for message fetch.")
+            logger.info("Waiting for signal proxy to become ready for message fetch.")
             SignalProxy.startRelayServer()
             try await Preconditions([
                 NotificationPrecondition(
                     notificationName: .isSignalProxyReadyDidChange,
-                    isSatisfied: { SignalProxy.isEnabledAndReady }
-                )
+                    isSatisfied: { SignalProxy.isEnabledAndReady },
+                ),
             ]).waitUntilSatisfied()
         }
     }
@@ -239,30 +267,58 @@ class NotificationService: UNNotificationServiceExtension {
     @MainActor
     private func fetchAndProcessMessages(logger: NSELogger) async -> UNNotificationContent {
         if DependenciesBridge.shared.appExpiry.isExpired(now: Date()) {
-            Logger.warn("Not processing notifications for expired application.")
+            logger.warn("Not processing notifications for expired application.")
             return UNMutableNotificationContent()
         }
 
+        let cron = DependenciesBridge.shared.cron
+        let cronCtx = CronContext(
+            chatConnectionManager: DependenciesBridge.shared.chatConnectionManager,
+            tsAccountManager: DependenciesBridge.shared.tsAccountManager,
+        )
+
         do {
-            try await startProxyIfEnabled()
+            try await startProxyIfEnabled(logger: logger)
             defer { SignalProxy.stopRelayServer() }
 
             let backgroundMessageFetcher = DependenciesBridge.shared.backgroundMessageFetcherFactory.buildFetcher()
 
+            await backgroundMessageFetcher.start()
+            // Start Cron after we request a socket.
+            async let cronResult: Void = cron.runOnce(ctx: cronCtx)
             let fetchResult = await Result(catching: {
-                await backgroundMessageFetcher.start()
                 try await backgroundMessageFetcher.waitForFetchingProcessingAndSideEffects()
             })
+            // Wait for Cron to finish executing before we release the socket.
+            await cronResult
             await backgroundMessageFetcher.stopAndWaitBeforeSuspending()
             try fetchResult.get()
         } catch is CancellationError {
-            Logger.warn("Message fetching & processing canceled.")
+            logger.warn("Message fetching & processing canceled.")
             return UNMutableNotificationContent()
         } catch {
-            Logger.warn("\(error)")
+            logger.warn("\(error)")
         }
 
         logger.info("Message fetching & processing completed.")
+
+        // If the device's clock is too skewed, we won't have been able to fetch
+        // messages. Warn the user so they can correct it.
+        let clockSkewManager = DependenciesBridge.shared.clockSkewManager
+        if clockSkewManager.isClockSkewed {
+            if hasShownClockSkewWarning {
+                logger.warn("Skipping clock-skew notification, already shown notification.")
+                logger.flush()
+            } else {
+                logger.warn("Showing clock-skew notification.")
+                logger.flush()
+
+                await postClockSkewNotification(logger: logger)
+                hasShownClockSkewWarning = true
+            }
+        } else {
+            hasShownClockSkewWarning = false
+        }
 
         // If we're completing normally, try to update the badge on the app icon.
         let badgeCount: BadgeCount = SSKEnvironment.shared.databaseStorageRef.read { tx in
@@ -275,10 +331,97 @@ class NotificationService: UNNotificationServiceExtension {
     }
 }
 
+// MARK: -
+
+@MainActor private var hasShownLowDiskSpaceWarning = false
+
+/// Posts a notification explaining that we can't fetch messages because the
+/// device is critically low on storage space.
+@MainActor
+private func postLowDiskSpaceNotification() async {
+    // Fixed identifier avoids re-posting duplicate notifications.
+    await postNotification(
+        category: .nse_lowDiskSpace,
+        body: OWSLocalizedString(
+            "NOTIFICATION_BODY_LOW_STORAGE_SPACE",
+            comment: "Body for a notification shown when Signal can't fetch messages because the device is low on storage space.",
+        ),
+        identifier: "Signal.LowDiskSpaceNotification",
+    )
+}
+
+// MARK: -
+
+@MainActor private var hasShownDBNotAvailableWarning = false
+
+/// Posts a notification explaining that we can't fetch messages because the
+/// DB is not available (because the device is locked).
+@MainActor
+private func postDBNotAvailableNotification() async {
+    // Fixed identifier avoids re-posting duplicate notifications.
+    await postNotification(
+        category: .nse_dbNotAvailable,
+        body: String.nonPluralLocalizedStringWithFormat(
+            OWSLocalizedString(
+                "NOTIFICATION_BODY_PHONE_LOCKED_FORMAT",
+                comment: "Lock screen notification text presented after user powers on their device without unlocking. Embeds {{device model}} (either 'iPad' or 'iPhone')",
+            ),
+            UIDevice.current.localizedModel,
+        ),
+        identifier: "Signal.DBNotAvailableNotification",
+    )
+}
+
+// MARK: -
+
+@MainActor private var hasShownClockSkewWarning = false
+
+/// Posts a notification explaining that we can't fetch messages because the
+/// device's clock is too inaccurate.
+@MainActor
+private func postClockSkewNotification(logger: NSELogger) async {
+    // Fixed identifier avoids re-posting duplicate notifications.
+    await postNotification(
+        category: .nse_clockSkew,
+        body: OWSLocalizedString(
+            "NOTIFICATION_BODY_CLOCK_SKEW",
+            comment: "Body for a notification shown when Signal can't fetch messages because the device's date and time are incorrect.",
+        ),
+        identifier: "Signal.ClockSkewNotification",
+    )
+}
+
+// MARK: - Ad-hoc notifications
+
+/// Post a notification with the given inputs.
+/// - Note: circumvents `NotificationPresenter`, since we may be posting a
+/// notification before singletons are available.
+private func postNotification(
+    category: AppNotificationCategory,
+    body: String,
+    identifier: String,
+) async {
+    let content = UNMutableNotificationContent()
+    content.categoryIdentifier = category.rawValue
+    content.body = body
+    let request = UNNotificationRequest(
+        identifier: identifier,
+        content: content,
+        trigger: nil,
+    )
+    do {
+        try await UNUserNotificationCenter.current().add(request)
+    } catch {
+        owsFailDebug("Failed to post notification! \(error)")
+    }
+}
+
+// MARK: - Radar
+
 private extension UNNotificationContent {
-    /// Returns a copy of `self` whose `interruptionLevel` matches `original`.
-    /// If `self` can't be made mutable (shouldn't happen for our return paths)
-    /// we fall through unchanged.
+    /// Returns a copy of `self` whose `interruptionLevel` matches `original`. If
+    /// `self` can't be made mutable (shouldn't happen for our return paths) it is
+    /// returned unchanged.
     func mirroringInterruptionLevel(of original: UNNotificationContent) -> UNNotificationContent {
         guard let mutable = self.mutableCopy() as? UNMutableNotificationContent else {
             return self

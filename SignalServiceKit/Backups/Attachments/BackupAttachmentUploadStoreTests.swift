@@ -20,32 +20,30 @@ class BackupAttachmentUploadStoreTests: XCTestCase {
         store = BackupAttachmentUploadStore()
     }
 
-    func testEnqueue() throws {
+    func testEnqueue() {
         // Create an attachment and reference.
-        var attachmentRecord = Attachment.Record(params: .mockStream())
+        var attachmentRecord = Attachment.Record.mockStream()
 
         let (threadRowId, messageRowId) = insertThreadAndInteraction()
 
-        try db.write { tx in
-            try attachmentRecord.insert(
-                tx.database
-            )
-            let reference = try insertMessageAttachmentReferenceRecord(
-                attachmentRowId: attachmentRecord.sqliteId!,
+        db.write { tx in
+            try! attachmentRecord.insert(tx.database)
+            let reference = insertMessageAttachmentReferenceRecord(
+                attachmentRecord: attachmentRecord,
                 messageRowId: messageRowId,
                 threadRowId: threadRowId,
                 timestamp: 1234,
-                tx: tx
+                tx: tx,
             )
-            try store.enqueue(
+            store.enqueue(
                 Attachment(record: attachmentRecord).asStream()!,
                 owner: reference.owner.asEligibleUploadOwnerType,
                 fullsize: true,
-                tx: tx
+                tx: tx,
             )
 
             // Ensure the row exists.
-            let row = try QueuedBackupAttachmentUpload.fetchOne(tx.database)
+            let row = try! QueuedBackupAttachmentUpload.fetchOne(tx.database)
             XCTAssertNotNil(row)
             XCTAssertEqual(row?.attachmentRowId, attachmentRecord.sqliteId)
             switch row!.highestPriorityOwnerType {
@@ -57,22 +55,22 @@ class BackupAttachmentUploadStoreTests: XCTestCase {
         }
 
         // Re enqueue at a higher timestamp.
-        try db.write { tx in
-            let reference = try insertMessageAttachmentReferenceRecord(
-                attachmentRowId: attachmentRecord.sqliteId!,
+        db.write { tx in
+            let reference = insertMessageAttachmentReferenceRecord(
+                attachmentRecord: attachmentRecord,
                 messageRowId: messageRowId,
                 threadRowId: threadRowId,
                 timestamp: 5678,
-                tx: tx
+                tx: tx,
             )
-            try store.enqueue(
+            store.enqueue(
                 Attachment(record: attachmentRecord).asStream()!,
                 owner: reference.owner.asEligibleUploadOwnerType,
                 fullsize: true,
-                tx: tx
+                tx: tx,
             )
 
-            let row = try QueuedBackupAttachmentUpload.fetchOne(tx.database)
+            let row = try! QueuedBackupAttachmentUpload.fetchOne(tx.database)
             XCTAssertNotNil(row)
             XCTAssertEqual(row?.attachmentRowId, attachmentRecord.sqliteId)
             switch row!.highestPriorityOwnerType {
@@ -84,22 +82,22 @@ class BackupAttachmentUploadStoreTests: XCTestCase {
         }
 
         // Re enqueue with a nil timestamp
-        try db.write { tx in
-            let referenceRecord = AttachmentReference.ThreadAttachmentReferenceRecord.init(
+        db.write { tx in
+            let referenceRecord = AttachmentReference.ThreadAttachmentReferenceRecord(
                 attachmentRowId: attachmentRecord.sqliteId!,
                 // Confusingly, this owner _has_ a timestamp; we just don't use it
                 // for the backup attachment upload queue.
-                threadSource: .globalThreadWallpaperImage(creationTimestamp: 1)
+                threadSource: .globalThreadWallpaperImage(creationTimestamp: 1),
             )
-            try referenceRecord.insert(tx.database)
-            try store.enqueue(
+            try! referenceRecord.insert(tx.database)
+            store.enqueue(
                 Attachment(record: attachmentRecord).asStream()!,
-                owner: AttachmentReference(record: referenceRecord).owner.asEligibleUploadOwnerType,
+                owner: try! AttachmentReference(record: referenceRecord).owner.asEligibleUploadOwnerType,
                 fullsize: true,
-                tx: tx
+                tx: tx,
             )
 
-            let row = try QueuedBackupAttachmentUpload.fetchOne(tx.database)
+            let row = try! QueuedBackupAttachmentUpload.fetchOne(tx.database)
             XCTAssertNotNil(row)
             XCTAssertEqual(row?.attachmentRowId, attachmentRecord.sqliteId)
             switch row!.highestPriorityOwnerType {
@@ -111,22 +109,22 @@ class BackupAttachmentUploadStoreTests: XCTestCase {
         }
 
         // Re enqueue at an even higher timestamp.
-        try db.write { tx in
-            let reference = try insertMessageAttachmentReferenceRecord(
-                attachmentRowId: attachmentRecord.sqliteId!,
+        db.write { tx in
+            let reference = insertMessageAttachmentReferenceRecord(
+                attachmentRecord: attachmentRecord,
                 messageRowId: messageRowId,
                 threadRowId: threadRowId,
                 timestamp: 9999,
-                tx: tx
+                tx: tx,
             )
-            try store.enqueue(
+            store.enqueue(
                 Attachment(record: attachmentRecord).asStream()!,
                 owner: reference.owner.asEligibleUploadOwnerType,
                 fullsize: true,
-                tx: tx
+                tx: tx,
             )
 
-            let row = try QueuedBackupAttachmentUpload.fetchOne(tx.database)
+            let row = try! QueuedBackupAttachmentUpload.fetchOne(tx.database)
             XCTAssertNotNil(row)
             XCTAssertEqual(row?.attachmentRowId, attachmentRecord.sqliteId)
             // should not have overriden the nil timestamp
@@ -139,56 +137,54 @@ class BackupAttachmentUploadStoreTests: XCTestCase {
         }
     }
 
-    func testDequeue() throws {
+    func testDequeue() {
         let timestamps: [UInt64?] = [1111, nil, 4444, 3333, 2222]
         for timestamp in timestamps {
-            var attachmentRecord = Attachment.Record(params: .mockStream())
+            var attachmentRecord = Attachment.Record.mockStream()
             let (threadRowId, messageRowId) = insertThreadAndInteraction()
 
-            try db.write { tx in
-                try attachmentRecord.insert(
-                    tx.database
-                )
-                let reference: AttachmentReference = try {
+            db.write { tx in
+                try! attachmentRecord.insert(tx.database)
+                let reference: AttachmentReference = {
                     if let timestamp {
-                        return try insertMessageAttachmentReferenceRecord(
-                            attachmentRowId: attachmentRecord.sqliteId!,
+                        return insertMessageAttachmentReferenceRecord(
+                            attachmentRecord: attachmentRecord,
                             messageRowId: messageRowId,
                             threadRowId: threadRowId,
                             timestamp: timestamp,
-                            tx: tx
+                            tx: tx,
                         )
                     } else {
-                        let referenceRecord = AttachmentReference.ThreadAttachmentReferenceRecord.init(
+                        let referenceRecord = AttachmentReference.ThreadAttachmentReferenceRecord(
                             attachmentRowId: attachmentRecord.sqliteId!,
                             // Confusingly, this owner _has_ a timestamp; we just don't use it
                             // for the backup attachment upload queue.
-                            threadSource: .globalThreadWallpaperImage(creationTimestamp: 1)
+                            threadSource: .globalThreadWallpaperImage(creationTimestamp: 1),
                         )
-                        try referenceRecord.insert(tx.database)
-                        return try AttachmentReference(record: referenceRecord)
+                        try! referenceRecord.insert(tx.database)
+                        return try! AttachmentReference(record: referenceRecord)
                     }
                 }()
-                try store.enqueue(
+                store.enqueue(
                     Attachment(record: attachmentRecord).asStream()!,
                     owner: reference.owner.asEligibleUploadOwnerType,
                     fullsize: true,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
 
         var dequeuedRecords = [QueuedBackupAttachmentUpload]()
-        try db.read { tx in
+        db.read { tx in
             XCTAssertEqual(
                 timestamps.count,
-                try QueuedBackupAttachmentUpload.fetchCount(tx.database)
+                try! QueuedBackupAttachmentUpload.fetchCount(tx.database),
             )
 
-            dequeuedRecords = try store.fetchNextUploads(
+            dequeuedRecords = store.fetchNextUploads(
                 count: UInt(timestamps.count),
                 isFullsize: true,
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -205,39 +201,39 @@ class BackupAttachmentUploadStoreTests: XCTestCase {
         // We should have gotten entries in timestamp order
         XCTAssertEqual(dequeuedTimestamps, Array(sortedTimestamps.prefix(sortedTimestamps.count)))
 
-        try db.write { tx in
+        db.write { tx in
             // Finish all but one
-            try dequeuedRecords.prefix(timestamps.count - 1).forEach { record in
-                try store.markUploadDone(
+            dequeuedRecords.prefix(timestamps.count - 1).forEach { record in
+                store.markUploadDone(
                     for: record.attachmentRowId,
                     fullsize: true,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
 
-        try db.read { tx in
+        db.read { tx in
             // Since not all rows are done, they should all stick around.
-            let records = try QueuedBackupAttachmentUpload.fetchAll(tx.database)
+            let records = try! QueuedBackupAttachmentUpload.fetchAll(tx.database)
             XCTAssertEqual(5, records.count)
             XCTAssertEqual(4, records.filter({ $0.state == .done }).count)
             XCTAssertEqual(1, records.filter({ $0.state == .ready }).count)
         }
 
-        try db.write { tx in
+        db.write { tx in
             // Finish the last one
-            _ = try store.markUploadDone(
+            _ = store.markUploadDone(
                 for: dequeuedRecords.last!.attachmentRowId,
                 fullsize: true,
-                tx: tx
+                tx: tx,
             )
         }
 
-        try db.read { tx in
+        db.read { tx in
             // all rows but one should now be deleted.
             XCTAssertEqual(
                 0,
-                try QueuedBackupAttachmentUpload.fetchCount(tx.database)
+                try! QueuedBackupAttachmentUpload.fetchCount(tx.database),
             )
         }
     }
@@ -245,47 +241,45 @@ class BackupAttachmentUploadStoreTests: XCTestCase {
     func testDequeue_thumbnail() throws {
         let timestamps: [UInt64] = [1111, 4444, 3333, 2222]
         for timestamp in timestamps {
-            var attachmentRecord = Attachment.Record(params: .mockStream())
+            var attachmentRecord = Attachment.Record.mockStream()
             let (threadRowId, messageRowId) = insertThreadAndInteraction()
 
-            try db.write { tx in
-                try attachmentRecord.insert(
-                    tx.database
-                )
-                let reference: AttachmentReference = try insertMessageAttachmentReferenceRecord(
-                    attachmentRowId: attachmentRecord.sqliteId!,
+            db.write { tx in
+                try! attachmentRecord.insert(tx.database)
+                let reference: AttachmentReference = insertMessageAttachmentReferenceRecord(
+                    attachmentRecord: attachmentRecord,
                     messageRowId: messageRowId,
                     threadRowId: threadRowId,
                     timestamp: timestamp,
-                    tx: tx
+                    tx: tx,
                 )
                 // Enqueue both fullsize and thumbnail
-                try store.enqueue(
+                store.enqueue(
                     Attachment(record: attachmentRecord).asStream()!,
                     owner: reference.owner.asEligibleUploadOwnerType,
                     fullsize: true,
-                    tx: tx
+                    tx: tx,
                 )
-                try store.enqueue(
+                store.enqueue(
                     Attachment(record: attachmentRecord).asStream()!,
                     owner: reference.owner.asEligibleUploadOwnerType,
                     fullsize: false,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
 
         var dequeuedRecords = [QueuedBackupAttachmentUpload]()
-        try db.read { tx in
+        db.read { tx in
             XCTAssertEqual(
                 timestamps.count * 2,
-                try QueuedBackupAttachmentUpload.fetchCount(tx.database)
+                try! QueuedBackupAttachmentUpload.fetchCount(tx.database),
             )
 
-            dequeuedRecords = try store.fetchNextUploads(
+            dequeuedRecords = store.fetchNextUploads(
                 count: UInt(timestamps.count * 2),
                 isFullsize: true,
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -301,21 +295,21 @@ class BackupAttachmentUploadStoreTests: XCTestCase {
             index += 1
         }
 
-        try db.write { tx in
-            try dequeuedRecords.forEach { record in
-                try store.markUploadDone(
+        db.write { tx in
+            dequeuedRecords.forEach { record in
+                store.markUploadDone(
                     for: record.attachmentRowId,
                     fullsize: record.isFullsize,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
 
-        try db.read { tx in
+        db.read { tx in
             // All fullsize rows should be done
-            let records = try QueuedBackupAttachmentUpload.fetchAll(tx.database)
+            let records = try! QueuedBackupAttachmentUpload.fetchAll(tx.database)
             XCTAssertEqual(8, records.count)
-            XCTAssertEqual(4, records.filter(\.isFullsize.negated).count)
+            XCTAssertEqual(4, records.filter { !$0.isFullsize }.count)
             XCTAssertEqual(4, records.filter(\.isFullsize).count)
             XCTAssertEqual(4, records.filter({ $0.isFullsize && $0.state == .done }).count)
         }
@@ -333,7 +327,7 @@ class BackupAttachmentUploadStoreTests: XCTestCase {
 
     private func insertThread(tx: DBWriteTransaction) -> TSThread {
         let thread = TSThread(uniqueId: UUID().uuidString)
-        try! thread.asRecord().insert(tx.database)
+        try! thread.insert(tx.database)
         return thread
     }
 
@@ -344,14 +338,14 @@ class BackupAttachmentUploadStoreTests: XCTestCase {
     }
 
     private func insertMessageAttachmentReferenceRecord(
-        attachmentRowId: Int64,
+        attachmentRecord: Attachment.Record,
         messageRowId: Int64,
         threadRowId: Int64,
         timestamp: UInt64,
-        tx: DBWriteTransaction
-    ) throws -> AttachmentReference {
-        let record = AttachmentReference.MessageAttachmentReferenceRecord.init(
-            attachmentRowId: attachmentRowId,
+        tx: DBWriteTransaction,
+    ) -> AttachmentReference {
+        let record = AttachmentReference.MessageAttachmentReferenceRecord(
+            attachmentRowId: attachmentRecord.sqliteId!,
             sourceFilename: nil,
             sourceUnencryptedByteCount: nil,
             sourceMediaSizePixels: nil,
@@ -359,16 +353,17 @@ class BackupAttachmentUploadStoreTests: XCTestCase {
                 messageRowId: messageRowId,
                 receivedAtTimestamp: timestamp,
                 threadRowId: threadRowId,
-                contentType: nil,
-                isPastEditRevision: false
-            ))
+                contentType: attachmentRecord.contentType,
+                mimeType: attachmentRecord.mimeType,
+                isPastEditRevision: false,
+            )),
         )
-        try record.insert(tx.database)
-        return try AttachmentReference(record: record)
+        try! record.insert(tx.database)
+        return try! AttachmentReference(record: record)
     }
 }
 
-fileprivate extension AttachmentReference.Owner {
+private extension AttachmentReference.Owner {
 
     var asEligibleUploadOwnerType: QueuedBackupAttachmentUpload.OwnerType! {
         switch self {

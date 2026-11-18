@@ -9,7 +9,7 @@ public import LibSignalClient
 /// MessageBody is a container for a message's body as well as the `MessageBodyRanges` that
 /// apply to it.
 /// Most of the work is done by `MessageBodyRanges`; this is just a container for the text too.
-public class MessageBody: NSObject, NSCopying, NSSecureCoding {
+public final class MessageBody: NSObject, NSSecureCoding {
     typealias Style = MessageBodyRanges.Style
     typealias CollapsedStyle = MessageBodyRanges.CollapsedStyle
 
@@ -20,10 +20,8 @@ public class MessageBody: NSObject, NSCopying, NSSecureCoding {
     public static var supportsSecureCoding = true
     public static let mentionPlaceholder = "\u{FFFC}" // Object Replacement Character
 
-    @objc
     public let text: String
 
-    @objc
     public let ranges: MessageBodyRanges
 
     public var hasRanges: Bool {
@@ -58,10 +56,6 @@ public class MessageBody: NSObject, NSCopying, NSSecureCoding {
         self.ranges = ranges
     }
 
-    public func copy(with zone: NSZone? = nil) -> Any {
-        return MessageBody(text: text, ranges: ranges)
-    }
-
     public func encode(with coder: NSCoder) {
         coder.encode(text, forKey: "text")
         coder.encode(ranges, forKey: "ranges")
@@ -70,75 +64,40 @@ public class MessageBody: NSObject, NSCopying, NSSecureCoding {
     public func hydrating(
         mentionHydrator: MentionHydrator,
         filterStringForDisplay: Bool = true,
-        isRTL: Bool = CurrentAppContext().isRTL
+        isRTL: Bool = CurrentAppContext().isRTL,
     ) -> HydratedMessageBody {
         let body = filterStringForDisplay ? self.filterStringForDisplay() : self
         return HydratedMessageBody(
             messageBody: body,
             mentionHydrator: mentionHydrator,
-            isRTL: isRTL
+            isRTL: isRTL,
         )
     }
 
     // Strip leading and trailing whitespace and other non-printed characters,
     // preserving ranges.
     public func filterStringForDisplay() -> MessageBody {
-        let originalText = text as NSString
-        let filteredText = text.filterStringForDisplay() as NSString
+        let originalText = self.text
+        let filteredText = self.text.filterStringForDisplay()
 
-        guard filteredText.length != originalText.length else {
+        if filteredText == originalText {
             // if we didn't strip anything, nothing needs to change.
             return self
         }
         // We filtered things, we need to adjust ranges.
 
-        // NOTE that we only handle leading characters getting stripped;
-        // if characters in the middle of the string get stripped that
-        // will mess up all the ranges. That never has been handled by the app.
-
-        let strippedPrefixLength = originalText.range(of: filteredText as String).location
-        let filteredStringEntireRange = NSRange(location: 0, length: filteredText.length)
-
-        var adjustedMentions = [NSRange: Aci]()
-        let orderedAdjustedMentions: [NSRangedValue<Aci>] = ranges.orderedMentions.compactMap { mention in
-            guard
-                let newRange = NSRange(
-                    location: mention.range.location - strippedPrefixLength,
-                    length: mention.range.length
-                ).intersection(filteredStringEntireRange),
-                  newRange.length > 0
-            else {
-                return nil
-            }
-            adjustedMentions[newRange] = mention.value
-            return .init(mention.value, range: newRange)
+        let filteredTextRange = (originalText as NSString).range(of: filteredText)
+        if filteredTextRange.location == NSNotFound {
+            // NOTE that we only handle leading/trailing characters being stripped; if
+            // characters in the middle of the string are modified, that will mess up
+            // all the ranges, and we (currently) throw them all away.
+            return Self(text: filteredText, ranges: .empty)
         }
-        let adjustedStyles: [NSRangedValue<CollapsedStyle>] = ranges.collapsedStyles.compactMap { style in
-            guard
-                let newRange = NSRange(
-                    location: style.range.location - strippedPrefixLength,
-                    length: style.range.length
-                ).intersection(filteredStringEntireRange),
-                newRange.length > 0
-            else {
-                return nil
-            }
-            return .init(
-                style.value,
-                range: newRange
-            )
-        }
-        return MessageBody(
-            text: filteredText as String,
-            ranges: MessageBodyRanges(
-                mentions: adjustedMentions,
-                orderedMentions: orderedAdjustedMentions,
-                collapsedStyles: adjustedStyles
-            )
-        )
+
+        return self.substring(with: filteredTextRange)
     }
 
-    public override func isEqual(_ object: Any?) -> Bool {
+    override public func isEqual(_ object: Any?) -> Bool {
         guard let other = object as? MessageBody else {
             return false
         }
@@ -151,20 +110,39 @@ public class MessageBody: NSObject, NSCopying, NSSecureCoding {
         return true
     }
 
-    public override var hash: Int {
+    override public var hash: Int {
         var hasher = Hasher()
         hasher.combine(text)
         hasher.combine(ranges)
         return hasher.finalize()
     }
-}
 
-extension MessageBody {
+    private func substring(with range: NSRange) -> Self {
+        return Self(
+            text: self.text.substring(withRange: range),
+            ranges: self.ranges.clamped(to: range).offset(by: -range.location),
+        )
+    }
+
+    public func prepending(_ value: String) -> Self {
+        return Self(
+            text: value + self.text,
+            ranges: self.ranges.offset(by: (value as NSString).length),
+        )
+    }
+
+    private func addingStyles(_ styles: [NSRangedValue<MessageBodyRanges.Style>]) -> Self {
+        return Self(
+            text: self.text,
+            ranges: self.ranges.addingStyles(styles),
+        )
+    }
+
     /// Convenience method to hydrate a MessageBody for forwarding to a thread destination.
     public func forForwarding(
         to context: TSThread,
         transaction: DBReadTransaction,
-        isRTL: Bool = CurrentAppContext().isRTL
+        isRTL: Bool = CurrentAppContext().isRTL,
     ) -> HydratedMessageBody {
         guard hasMentions else {
             return hydrating(mentionHydrator: { _ in return .preserveMention }, isRTL: isRTL)
@@ -182,7 +160,7 @@ extension MessageBody {
         // not be known to everyone so we need to hydrate them out.
         let mentionHydrator = ContactsMentionHydrator.mentionHydrator(
             excludedAcis: groupMemberAcis,
-            transaction: transaction
+            transaction: transaction,
         )
 
         return hydrating(mentionHydrator: mentionHydrator, isRTL: isRTL)
@@ -197,46 +175,38 @@ extension MessageBody {
     public func forPasting(
         intoContextWithPossibleAcis possibleAcis: [Aci],
         transaction: DBReadTransaction,
-        isRTL: Bool = CurrentAppContext().isRTL
+        isRTL: Bool = CurrentAppContext().isRTL,
     ) -> MessageBody {
         guard hasMentions else {
             return self
         }
         let mentionHydrator = ContactsMentionHydrator.mentionHydrator(
             excludedAcis: Set(possibleAcis),
-            transaction: transaction
+            transaction: transaction,
         )
         return hydrating(mentionHydrator: mentionHydrator, isRTL: isRTL).asMessageBodyForForwarding()
     }
 
     // MARK: Merging
 
-    /// Given a substring and set of styles _within that substring_, returns the same
-    /// substring if found with provided styles merged with the overall styles from
-    /// the entire message body.
+    /// Given a substring and set of styles _within that substring_, returns the
+    /// same substring if found with provided styles merged with the overall
+    /// styles from the entire message body.
     ///
     /// If the substring is not found, returns self.
     ///
-    /// The provided styles should have their locations in the substring's local coordinates,
-    /// e.g. 0 being the first character of the substring.
+    /// The provided styles should have their locations in the substring's local
+    /// coordinates, e.g. 0 being the first character of the substring.
     public func mergeIntoFirstMatchOfStyledSubstring(
         _ substring: String,
-        styles: [NSRangedValue<MessageBodyRanges.Style>]
-    ) -> MessageBody {
+        styles: [NSRangedValue<MessageBodyRanges.Style>],
+    ) -> Self {
         // First find the offset.
         let substringRange = (text as NSString).range(of: substring)
         guard substringRange.location != NSNotFound else {
             return self
         }
-        let subrangeStyles = MessageBodyRanges.SubrangeStyles(
-            substringRange: substringRange,
-            stylesInSubstring: styles
-        )
-        let newRanges = self.ranges.mergingStyles(subrangeStyles)
-        return MessageBody(
-            text: substring,
-            ranges: newRanges
-        )
+        return self.substring(with: substringRange).addingStyles(styles)
     }
 }
 

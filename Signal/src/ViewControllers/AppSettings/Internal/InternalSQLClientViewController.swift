@@ -38,7 +38,7 @@ class InternalSQLClientViewController: UIViewController {
         button.setTitle("Run Query", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 20)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(runQuery), for: .touchUpInside)
+        button.addAction(UIAction { [weak self] _ in self?.runQuery() }, for: .primaryActionTriggered)
         return button
     }()
 
@@ -47,7 +47,7 @@ class InternalSQLClientViewController: UIViewController {
         button.setTitle("Copy Output", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 20)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(copyOutput), for: .touchUpInside)
+        button.addAction(UIAction { [weak self] _ in self?.copyOutput() }, for: .primaryActionTriggered)
         return button
     }()
 
@@ -86,11 +86,12 @@ class InternalSQLClientViewController: UIViewController {
         ])
     }
 
-    @objc private func didTapView() {
+    @objc
+    private func didTapView() {
         queryTextField.resignFirstResponder()
     }
 
-    @objc private func runQuery() {
+    private func runQuery() {
         queryTextField.resignFirstResponder()
 
         guard let query = queryTextField.text, !query.isEmpty else {
@@ -127,7 +128,7 @@ class InternalSQLClientViewController: UIViewController {
         outputTextView.text = output
     }
 
-    @objc private func copyOutput() {
+    private func copyOutput() {
         queryTextField.resignFirstResponder()
         guard let output = outputTextView.text, !output.isEmpty else {
             return
@@ -135,7 +136,7 @@ class InternalSQLClientViewController: UIViewController {
         // Copy output text to clipboard
         UIPasteboard.general.string = output
 
-        presentToast(text: "Copied!")
+        presentToast(text: "Copied!", image: .copy)
     }
 }
 

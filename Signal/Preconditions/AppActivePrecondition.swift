@@ -5,13 +5,14 @@
 
 import Foundation
 import SignalServiceKit
+import UIKit
 
 struct AppActivePrecondition: Precondition {
     private let _precondition: NotificationPrecondition
 
     init(appContext: AppContext) {
         self._precondition = NotificationPrecondition(
-            notificationName: UIApplication.didBecomeActiveNotification,
+            notificationName: .OWSApplicationDidBecomeActive,
             isSatisfied: { appContext.isAppForegroundAndActive() },
         )
     }

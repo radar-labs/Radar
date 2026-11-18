@@ -10,39 +10,31 @@ public extension GroupsV2Impl {
 
     // MARK: - Restore Groups
 
-    // A list of all groups we've learned of from the storage service.
-    //
-    // Values are irrelevant (bools).
-    private static let allStorageServiceGroupMasterKeys = KeyValueStore(collection: "GroupsV2Impl.groupsFromStorageService_All")
-
     // A list of the groups we need to try to restore. Values are serialized GroupV2Records.
-    private static let storageServiceGroupsToRestore = KeyValueStore(collection: "GroupsV2Impl.groupsFromStorageService_EnqueuedRecordForRestore")
+    private static let storageServiceGroupsToRestore = NewKeyValueStore(collection: "GroupsV2Impl.groupsFromStorageService_EnqueuedRecordForRestore")
 
     // A deprecated list of the groups we need to restore. Values are master keys.
-    private static let legacyStorageServiceGroupsToRestore = KeyValueStore(collection: "GroupsV2Impl.groupsFromStorageService_EnqueuedForRestore")
+    private static let legacyStorageServiceGroupsToRestore = NewKeyValueStore(collection: "GroupsV2Impl.groupsFromStorageService_EnqueuedForRestore")
 
     // A list of the groups we failed to restore.
     //
     // Values are irrelevant (bools).
-    private static let failedStorageServiceGroupMasterKeys = KeyValueStore(collection: "GroupsV2Impl.groupsFromStorageService_Failed")
+    private static let failedStorageServiceGroupMasterKeys = NewKeyValueStore(collection: "GroupsV2Impl.groupsFromStorageService_Failed")
 
-    static func isGroupKnownToStorageService(groupModel: TSGroupModelV2, transaction: DBReadTransaction) -> Bool {
-        do {
-            let masterKeyData = try groupModel.masterKey().serialize()
-            let key = restoreGroupKey(forMasterKeyData: masterKeyData)
-            return allStorageServiceGroupMasterKeys.hasValue(key, transaction: transaction)
-        } catch {
-            owsFailDebug("Error: \(error)")
-            return false
+    internal static func isGroupEnqueuedForRestore(masterKey: GroupMasterKey, tx: DBReadTransaction) -> Bool {
+        let key = restoreGroupKey(forMasterKeyData: masterKey.serialize())
+        if storageServiceGroupsToRestore.fetchValue(Data.self, forKey: key, tx: tx) != nil {
+            return true
         }
+        return legacyStorageServiceGroupsToRestore.fetchValue(Data.self, forKey: key, tx: tx) != nil
     }
 
     static func enqueuedGroupRecordForRestore(
         masterKeyData: Data,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> StorageServiceProtoGroupV2Record? {
         let key = restoreGroupKey(forMasterKeyData: masterKeyData)
-        guard let recordData = storageServiceGroupsToRestore.getData(key, transaction: transaction) else {
+        guard let recordData = storageServiceGroupsToRestore.fetchValue(Data.self, forKey: key, tx: transaction) else {
             return nil
         }
         return try? .init(serializedData: recordData)
@@ -50,8 +42,7 @@ public extension GroupsV2Impl {
 
     static func enqueueGroupRestore(
         groupRecord: StorageServiceProtoGroupV2Record,
-        account: AuthedAccount,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) {
         guard GroupMasterKey.isValid(groupRecord.masterKey) else {
             owsFailDebug("Invalid master key.")
@@ -60,11 +51,7 @@ public extension GroupsV2Impl {
 
         let key = restoreGroupKey(forMasterKeyData: groupRecord.masterKey)
 
-        if !allStorageServiceGroupMasterKeys.hasValue(key, transaction: transaction) {
-            allStorageServiceGroupMasterKeys.setBool(true, key: key, transaction: transaction)
-        }
-
-        guard !failedStorageServiceGroupMasterKeys.hasValue(key, transaction: transaction) else {
+        guard failedStorageServiceGroupMasterKeys.fetchValue(Bool.self, forKey: key, tx: transaction) == nil else {
             // Past restore attempts failed in an unrecoverable way.
             return
         }
@@ -75,13 +62,13 @@ public extension GroupsV2Impl {
         }
 
         // Clear any legacy restore info.
-        legacyStorageServiceGroupsToRestore.removeValue(forKey: key, transaction: transaction)
+        legacyStorageServiceGroupsToRestore.removeValue(forKey: key, tx: transaction)
 
         // Store the record for restoration.
-        storageServiceGroupsToRestore.setData(serializedData, key: key, transaction: transaction)
+        storageServiceGroupsToRestore.writeValue(serializedData, forKey: key, tx: transaction)
 
         transaction.addSyncCompletion {
-            self.enqueueRestoreGroupPass(authedAccount: account)
+            self.enqueueRestoreGroupPass()
         }
     }
 
@@ -89,72 +76,37 @@ public extension GroupsV2Impl {
         return masterKeyData.hexadecimalString
     }
 
-    private static func canProcessGroupRestore(authedAccount: AuthedAccount) async -> Bool {
-        return await (
-            self.isMainAppAndActive()
-            && SSKEnvironment.shared.reachabilityManagerRef.isReachable
-            && isRegisteredWithSneakyTransaction(authedAccount: authedAccount)
+    private static func canProcessGroupRestore() async -> Bool {
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        let reachabilityManager = SSKEnvironment.shared.reachabilityManagerRef
+
+        let isMainAppAndActive = await CurrentAppContext().isMainAppAndActiveIsolated
+        let isReachable = reachabilityManager.isReachable
+        let isRegistered = tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered
+
+        return (
+            isMainAppAndActive
+                && isReachable
+                && isRegistered,
         )
     }
 
-    @MainActor
-    private static func isMainAppAndActive() -> Bool {
-        return CurrentAppContext().isMainAppAndActive
-    }
+    private static let restoreTaskQueue = SerialTaskQueue()
 
-    private static func isRegisteredWithSneakyTransaction(authedAccount: AuthedAccount) -> Bool {
-        switch authedAccount.info {
-        case .explicit:
-            return false
-        case .implicit:
-            return DependenciesBridge.shared.tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered
-        }
-    }
-
-    private struct State {
-        var inProgress = false
-        var pendingAuthedAccount: AuthedAccount?
-
-        mutating func startIfNeeded(authedAccount: AuthedAccount) -> AuthedAccount? {
-            if self.inProgress {
-                // Already started, so queue up the next one for whenever it finishes.
-                self.pendingAuthedAccount = self.pendingAuthedAccount?.orIfImplicitUse(authedAccount) ?? authedAccount
-                return nil
-            } else {
-                self.inProgress = true
-                return authedAccount
+    static func enqueueRestoreGroupPass() {
+        restoreTaskQueue.enqueue {
+            let shouldContinue = await tryToRestoreNextGroup()
+            if shouldContinue {
+                enqueueRestoreGroupPass()
             }
-        }
-
-        mutating func continueIfNeeded(hasMore: Bool, authedAccount: AuthedAccount) -> AuthedAccount? {
-            assert(self.inProgress)
-            if hasMore {
-                self.pendingAuthedAccount = self.pendingAuthedAccount?.orIfImplicitUse(authedAccount) ?? authedAccount
-            }
-            let result = self.pendingAuthedAccount
-            self.pendingAuthedAccount = nil
-            self.inProgress = (result != nil)
-            return result
-        }
-    }
-
-    private static let state = AtomicValue<State>(State(), lock: .init())
-
-    static func enqueueRestoreGroupPass(authedAccount: AuthedAccount) {
-        let authedAccountToStart = self.state.update { $0.startIfNeeded(authedAccount: authedAccount) }
-        Task { await startRestoreGroupPass(authedAccount: authedAccountToStart) }
-    }
-
-    private static func startRestoreGroupPass(authedAccount initialAuthedAccount: AuthedAccount?) async {
-        var nextAuthedAccount = initialAuthedAccount
-        while let currentAuthedAccount = nextAuthedAccount {
-            let hasMore = await tryToRestoreNextGroup(authedAccount: currentAuthedAccount)
-            nextAuthedAccount = self.state.update { $0.continueIfNeeded(hasMore: hasMore, authedAccount: currentAuthedAccount) }
         }
     }
 
     private static func anyEnqueuedGroupRecord(transaction: DBReadTransaction) -> StorageServiceProtoGroupV2Record? {
-        guard let serializedData = storageServiceGroupsToRestore.anyDataValue(transaction: transaction) else {
+        guard
+            let randomKey = storageServiceGroupsToRestore.fetchKeys(tx: transaction).randomElement(),
+            let serializedData = storageServiceGroupsToRestore.fetchValue(Data.self, forKey: randomKey, tx: transaction)
+        else {
             return nil
         }
         return try? .init(serializedData: serializedData)
@@ -165,17 +117,22 @@ public extension GroupsV2Impl {
     /// - Returns: True if there is another group to process immediately. False
     /// if there are no more groups to process or the app can't process updates
     /// (eg because the device is in Airplane Mode).
-    private static func tryToRestoreNextGroup(authedAccount: AuthedAccount) async -> Bool {
-        guard await canProcessGroupRestore(authedAccount: authedAccount) else {
+    private static func tryToRestoreNextGroup() async -> Bool {
+        guard await canProcessGroupRestore() else {
             return false
         }
 
         let (masterKeyData, groupRecord) = SSKEnvironment.shared.databaseStorageRef.read { transaction -> (Data?, StorageServiceProtoGroupV2Record?) in
             if let groupRecord = self.anyEnqueuedGroupRecord(transaction: transaction) {
                 return (groupRecord.masterKey, groupRecord)
-            } else {
+            } else if
                 // Make sure we don't have any legacy master key only enqueued groups
-                return (legacyStorageServiceGroupsToRestore.anyDataValue(transaction: transaction), nil)
+                let randomKey = legacyStorageServiceGroupsToRestore.fetchKeys(tx: transaction).randomElement(),
+                let legacyMasterKey = legacyStorageServiceGroupsToRestore.fetchValue(Data.self, forKey: randomKey, tx: transaction)
+            {
+                return (legacyMasterKey, nil)
+            } else {
+                return (nil, nil)
             }
         }
 
@@ -189,9 +146,9 @@ public extension GroupsV2Impl {
         // that we stop retrying until storage service asks us to try again.
         let markAsFailed = {
             await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
-                self.storageServiceGroupsToRestore.removeValue(forKey: key, transaction: transaction)
-                self.legacyStorageServiceGroupsToRestore.removeValue(forKey: key, transaction: transaction)
-                self.failedStorageServiceGroupMasterKeys.setBool(true, key: key, transaction: transaction)
+                self.storageServiceGroupsToRestore.removeValue(forKey: key, tx: transaction)
+                self.legacyStorageServiceGroupsToRestore.removeValue(forKey: key, tx: transaction)
+                self.failedStorageServiceGroupMasterKeys.writeValue(true, forKey: key, tx: transaction)
             }
         }
 
@@ -202,28 +159,34 @@ public extension GroupsV2Impl {
 
                 // Now that the thread exists, re-apply the pending group record from
                 // storage service.
-                if var groupRecord {
-                    // First apply any migrations
-                    if StorageServiceUnknownFieldMigrator.shouldInterceptRemoteManifestBeforeMerging(tx: tx) {
-                        groupRecord = StorageServiceUnknownFieldMigrator.interceptRemoteManifestBeforeMerging(
-                            record: groupRecord,
-                            tx: tx
-                        )
-                    }
-
+                if let groupRecord {
                     let recordUpdater = StorageServiceGroupV2RecordUpdater(
-                        authedAccount: authedAccount,
+                        authedAccount: .implicit,
                         isPrimaryDevice: isPrimaryDevice,
                         avatarDefaultColorManager: DependenciesBridge.shared.avatarDefaultColorManager,
                         blockingManager: SSKEnvironment.shared.blockingManagerRef,
                         groupsV2: SSKEnvironment.shared.groupsV2Ref,
-                        profileManager: SSKEnvironment.shared.profileManagerRef
+                        profileManager: SSKEnvironment.shared.profileManagerRef,
+                        threadMuteManager: DependenciesBridge.shared.threadMuteManager,
+                        unreadReminderManager: DependenciesBridge.shared.unreadReminderManager,
                     )
-                    _ = recordUpdater.mergeRecord(groupRecord, transaction: tx)
+                    switch recordUpdater.mergeRecord(groupRecord, transaction: tx) {
+                    case .merged(needsUpdate: true, let mergedMasterKeyData):
+                        do {
+                            let mergedMasterKey = try GroupMasterKey(contents: mergedMasterKeyData)
+                            SSKEnvironment.shared.storageServiceManagerRef.recordPendingUpdates(
+                                updatedGroupV2MasterKeys: [mergedMasterKey],
+                            )
+                        } catch {
+                            owsFailDebug("invalid master key: \(error)")
+                        }
+                    case .merged(needsUpdate: false, _), .invalid:
+                        break
+                    }
                 }
 
-                self.storageServiceGroupsToRestore.removeValue(forKey: key, transaction: tx)
-                self.legacyStorageServiceGroupsToRestore.removeValue(forKey: key, transaction: tx)
+                self.storageServiceGroupsToRestore.removeValue(forKey: key, tx: tx)
+                self.legacyStorageServiceGroupsToRestore.removeValue(forKey: key, tx: tx)
             }
         }
 
@@ -237,7 +200,7 @@ public extension GroupsV2Impl {
         }
 
         let isGroupInDatabase = SSKEnvironment.shared.databaseStorageRef.read { transaction in
-            TSGroupThread.fetch(forGroupId: groupContextInfo.groupId, tx: transaction) != nil
+            return TSGroupThread.fetchThread(forGroupId: groupContextInfo.groupId, tx: transaction) != nil
         }
         if isGroupInDatabase {
             // No work to be done, group already in database.
@@ -245,12 +208,21 @@ public extension GroupsV2Impl {
             return true
         }
 
-        // This will try to update the group using incremental "changes" but
-        // failover to using a "snapshot".
+        let isGroupBlocked = SSKEnvironment.shared.databaseStorageRef.read { tx in
+            return SSKEnvironment.shared.blockingManagerRef.isGroupIdBlocked(groupContextInfo.groupId, transaction: tx)
+        }
+        if isGroupBlocked {
+            Logger.warn("Failing because group is blocked")
+            await markAsFailed()
+            return true
+        }
+
         do {
-            try await SSKEnvironment.shared.groupV2UpdatesRef.refreshGroup(
+            try await SSKEnvironment.shared.groupV2UpdatesRef.fetchAndApplyCurrentGroupV2SnapshotFromService(
                 secretParams: groupContextInfo.groupSecretParams,
-                options: [.throttle]
+                spamReportingMetadata: .learnedByLocallyInitatedRefresh,
+                options: [.throttle],
+                skipTerminatedGroup: true,
             )
             await markAsComplete()
             return true
@@ -261,8 +233,12 @@ public extension GroupsV2Impl {
             Logger.warn("Failing because we're not a group member")
             await markAsFailed()
             return true
+        } catch GroupsV2Error.skipRestoringTerminatedGroup {
+            Logger.warn("Failing because group has terminated")
+            await markAsFailed()
+            return true
         } catch {
-            owsFailDebug("Error: \(error)")
+            Logger.warn("Failed to restore group! \(error)")
             await markAsFailed()
             return true
         }

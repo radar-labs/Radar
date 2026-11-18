@@ -54,7 +54,7 @@ final class BadgeConfigurationViewController: OWSTableViewController2, BadgeColl
         }
     }
 
-    public var showDismissalActivity = false {
+    var showDismissalActivity = false {
         didSet {
             updateNavigation()
         }
@@ -62,7 +62,7 @@ final class BadgeConfigurationViewController: OWSTableViewController2, BadgeColl
 
     static func load(delegate: BadgeConfigurationDelegate, tx: DBReadTransaction) -> Self {
         let badges = SSKEnvironment.shared.profileManagerRef.localUserProfile(tx: tx)?.badges ?? []
-        let shouldDisplayOnProfile = DonationSubscriptionManager.displayBadgesOnProfile(transaction: tx)
+        let shouldDisplayOnProfile = DependenciesBridge.shared.donationSubscriptionManager.displayBadgesOnProfile(tx: tx)
         return Self(availableBadges: badges, shouldDisplayOnProfile: shouldDisplayOnProfile, delegate: delegate)
     }
 
@@ -99,13 +99,9 @@ final class BadgeConfigurationViewController: OWSTableViewController2, BadgeColl
             spinner.startAnimating()
             navigationItem.rightBarButtonItem = UIBarButtonItem(customView: spinner)
         } else if hasUnsavedChanges, !showDismissalActivity {
-            navigationItem.rightBarButtonItem = .button(
-                title: CommonStrings.setButton,
-                style: .done,
-                action: { [weak self] in
-                    self?.didTapDone()
-                }
-            )
+            navigationItem.rightBarButtonItem = .setButton { [weak self] in
+                self?.didTapDone()
+            }
         } else {
             navigationItem.rightBarButtonItem = nil
         }
@@ -113,7 +109,7 @@ final class BadgeConfigurationViewController: OWSTableViewController2, BadgeColl
 
     private func didTapCancel() {
         let requestDismissal: () -> Void = { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.badgeConfigDelegate?.badgeConfirmationDidCancel(self)
         }
 
@@ -125,7 +121,7 @@ final class BadgeConfigurationViewController: OWSTableViewController2, BadgeColl
     }
 
     private func didTapDone() {
-        if displayBadgeOnProfile, let selectedPrimaryBadge = selectedPrimaryBadge {
+        if displayBadgeOnProfile, let selectedPrimaryBadge {
             badgeConfigDelegate?.badgeConfiguration(self, didCompleteWithBadgeSetting: .display(featuredBadge: selectedPrimaryBadge))
         } else {
             badgeConfigDelegate?.badgeConfiguration(self, didCompleteWithBadgeSetting: .doNotDisplayPublicly)
@@ -146,11 +142,12 @@ final class BadgeConfigurationViewController: OWSTableViewController2, BadgeColl
                 OWSTableSection(
                     title: OWSLocalizedString(
                         "BADGE_CONFIGURATION_BADGE_SECTION_TITLE",
-                        comment: "Section header for badge view section in the badge configuration page"),
+                        comment: "Section header for badge view section in the badge configuration page",
+                    ),
                     items: [
                         OWSTableItem(customCellBlock: { [weak self] in
                             let cell = OWSTableItem.newCell()
-                            guard let self = self else { return cell }
+                            guard let self else { return cell }
                             let collectionView = BadgeCollectionView(dataSource: self)
 
                             if let localAddress = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.aciAddress {
@@ -170,38 +167,44 @@ final class BadgeConfigurationViewController: OWSTableViewController2, BadgeColl
                             collectionView.layoutIfNeeded()
 
                             return cell
-                        }, actionBlock: nil)
-                ]),
+                        }, actionBlock: nil),
+                    ],
+                ),
 
                 OWSTableSection(title: nil, items: [
                     .switch(
                         withText: OWSLocalizedString(
                             "DISPLAY_BADGES_ON_PROFILE_SETTING",
-                            comment: "Title for switch to enable sharing of badges publicly"),
+                            comment: "Title for switch to enable sharing of badges publicly",
+                        ),
                         isOn: { [weak self] in self?.displayBadgeOnProfile ?? false },
-                        target: self,
-                        selector: #selector(didTogglePublicDisplaySetting(_:))),
+                        actionBlock: { [weak self] uiSwitch in
+                            self?.didTogglePublicDisplaySetting(uiSwitch)
+                        },
+                    ),
 
                     .item(
                         name: OWSLocalizedString(
                             "FEATURED_BADGE_SETTINGS_TITLE",
-                            comment: "The title for the featured badge settings page"),
+                            comment: "The title for the featured badge settings page",
+                        ),
                         textColor: displayBadgeOnProfile ? nil : .ows_gray45,
                         accessoryText: selectedPrimaryBadge?.badge?.localizedName,
                         accessoryType: .disclosureIndicator,
                         accessibilityIdentifier: "badge_configuration_row",
                         actionBlock: { [weak self] in
-                            guard let self = self, let navController = self.navigationController else { return }
+                            guard let self, let navController = self.navigationController else { return }
                             guard self.displayBadgeOnProfile else { return }
 
                             let featuredBadgeSettings = FeaturedBadgeViewController(avatarImage: self.avatarImage, badgeDataSource: self)
                             navController.pushViewController(featuredBadgeSettings, animated: true)
-                        })
-                ])
-        ])
+                        },
+                    ),
+                ]),
+            ],
+        )
     }
 
-    @objc
     private func didTogglePublicDisplaySetting(_ sender: UISwitch) {
         displayBadgeOnProfile = sender.isOn
     }

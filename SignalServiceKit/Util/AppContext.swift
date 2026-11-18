@@ -5,7 +5,7 @@
 
 import CoreGraphics
 import Foundation
-import UIKit
+public import UIKit
 
 public typealias BackgroundTaskExpirationHandler = () -> Void
 public typealias AppActiveBlock = () -> Void
@@ -31,11 +31,9 @@ public enum AppContextType: CaseIterable, CustomStringConvertible {
 
 public protocol AppContext {
     var type: AppContextType { get }
-    var isMainApp: Bool { get }
     var isMainAppAndActive: Bool { get }
     @MainActor
     var isMainAppAndActiveIsolated: Bool { get }
-    var isNSE: Bool { get }
     /// Whether the user is using a right-to-left language like Arabic.
     var isRTL: Bool { get }
     var isRunningTests: Bool { get }
@@ -91,13 +89,36 @@ public protocol AppContext {
     func appDatabaseBaseDirectoryPath() -> String
     func appUserDefaults() -> UserDefaults
 
-    /// This method should only be called by the main app.
-    func mainApplicationStateOnLaunch() -> UIApplication.State
     func canPresentNotifications() -> Bool
     var shouldProcessIncomingMessages: Bool { get }
     var hasUI: Bool { get }
     var debugLogsDirPath: String { get }
 }
+
+extension AppContext {
+    public var isMainApp: Bool {
+        return switch type {
+        case .main: true
+        case .nse, .share: false
+        }
+    }
+
+    public var isNSE: Bool {
+        switch type {
+        case .nse: true
+        case .main, .share: false
+        }
+    }
+
+    public var isShareExtension: Bool {
+        switch type {
+        case .share: true
+        case .main, .nse: false
+        }
+    }
+}
+
+// MARK: -
 
 public final class AppContextObjCBridge: NSObject {
     @objc
@@ -108,13 +129,15 @@ public final class AppContextObjCBridge: NSObject {
         SignalServiceKit.CurrentAppContext()
     }
 
-    private override init() {}
+    override private init() {}
 
     @objc
     public var isRunningTests: Bool {
         appContext.isRunningTests
     }
 }
+
+// MARK: -
 
 // These are fired whenever the corresponding "main app" or "app extension"
 // notification is fired.
@@ -130,6 +153,8 @@ public extension Notification.Name {
     static let OWSApplicationDidBecomeActive = Notification.Name("OWSApplicationDidBecomeActiveNotification")
 }
 
+// MARK: -
+
 private var currentAppContext: (any AppContext)?
 
 public func CurrentAppContext() -> any AppContext {
@@ -142,14 +167,4 @@ public func CurrentAppContext() -> any AppContext {
 public func SetCurrentAppContext(_ appContext: any AppContext, isRunningTests: Bool) {
     owsPrecondition(currentAppContext == nil || isRunningTests)
     currentAppContext = appContext
-}
-
-extension AppContext {
-    public var isMainApp: Bool {
-        type == .main
-    }
-
-    public var isNSE: Bool {
-        type == .nse
-    }
 }

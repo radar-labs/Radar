@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import SignalServiceKit
-public import SignalUI
+import SignalServiceKit
+import SignalUI
 
-public class PaymentsRestoreWalletWordViewController: OWSViewController {
+class PaymentsRestoreWalletWordViewController: OWSViewController, UITextFieldDelegate {
 
     private weak var restoreWalletDelegate: PaymentsRestoreWalletDelegate?
 
@@ -14,199 +14,174 @@ public class PaymentsRestoreWalletWordViewController: OWSViewController {
 
     private let wordIndex: Int
 
-    private let textfield = UITextField()
-
-    private var wordText: String? {
-        textfield.text?.strippedOrNil?.lowercased()
-    }
-    private var hasValidWord: Bool {
-        isValidWord(wordText)
-    }
-    private func isValidWord(_ wordText: String?) -> Bool {
-        guard let wordText = wordText,
-              !wordText.isEmpty else {
-            return false
-        }
-        return SUIEnvironment.shared.paymentsSwiftRef.isValidPassphraseWord(wordText)
-    }
-
-    private let warningLabel = UILabel()
-
-    private static let switcherAccentBlue = UIColor(red: 0, green: 105/255, blue: 254/255, alpha: 1)
-    private static let switcherContainerFill = UIColor(red: 233/255, green: 233/255, blue: 234/255, alpha: 1)
+    // Radar: the first word page lets the user pick a 12-word (Breez) or 24-word phrase.
+    private static let switcherAccentBlue = UIColor(red: 0, green: 105 / 255, blue: 254 / 255, alpha: 1)
+    private static let switcherContainerFill = UIColor(red: 233 / 255, green: 233 / 255, blue: 234 / 255, alpha: 1)
 
     private var twelveWordTabButton: UIButton?
     private var twentyFourWordTabButton: UIButton?
 
-    public init(restoreWalletDelegate: PaymentsRestoreWalletDelegate,
-                partialPassphrase: PartialPaymentsPassphrase,
-                wordIndex: Int) {
+    private lazy var textField: UITextField = {
+        let textField = UITextField()
+        textField.textColor = .Signal.label
+        textField.tintColor = .Signal.label // caret color
+        textField.font = .dynamicTypeBodyClamped
+        textField.autocapitalizationType = .none
+        textField.autocorrectionType = .no
+        textField.spellCheckingType = .no
+        textField.smartQuotesType = .no
+        textField.smartDashesType = .no
+        textField.returnKeyType = .done
+        textField.delegate = self
+        textField.addAction(
+            UIAction { [weak self] _ in self?.textFieldDidChange() },
+            for: .editingChanged,
+        )
+        return textField
+    }()
+
+    private lazy var warningLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.font = .dynamicTypeCaption1
+        label.adjustsFontForContentSizeCategory = true
+        label.textColor = .Signal.red
+        label.text = OWSLocalizedString(
+            "SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_INVALID_WORD",
+            comment: "Error indicating that the user has entered an invalid word in the 'enter word' step of the 'restore payments wallet' views.",
+        )
+        label.alpha = 0
+        return label
+    }()
+
+    private var wordText: String? {
+        textField.text?.strippedOrNil?.lowercased()
+    }
+
+    private var hasValidWord: Bool {
+        isValidWord(wordText)
+    }
+
+    private func isValidWord(_ wordText: String?) -> Bool {
+        guard let wordText, !wordText.isEmpty else { return false }
+        return SUIEnvironment.shared.paymentsSwiftRef.isValidPassphraseWord(wordText)
+    }
+
+    func clearInput() {
+        partialPassphrase.reset()
+        textField.text = ""
+    }
+
+    init(
+        restoreWalletDelegate: PaymentsRestoreWalletDelegate,
+        partialPassphrase: PartialPaymentsPassphrase,
+        wordIndex: Int,
+    ) {
         self.restoreWalletDelegate = restoreWalletDelegate
         self.partialPassphrase = partialPassphrase
         self.wordIndex = wordIndex
 
         super.init()
 
-        textfield.text = partialPassphrase.getWord(atIndex: wordIndex)
+        textField.text = partialPassphrase.getWord(atIndex: wordIndex)
     }
 
-    public func clearInput() {
-        partialPassphrase.reset()
-        textfield.text = nil
-    }
-
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
 
-        title = OWSLocalizedString("SETTINGS_PAYMENTS_RESTORE_WALLET_TITLE",
-                                  comment: "Title for the 'restore payments wallet' view of the app settings.")
+        title = OWSLocalizedString(
+            "SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_TITLE",
+            comment: "Title for the 'enter word' step of the 'restore payments wallet' views.",
+        )
 
-        OWSTableViewController2.removeBackButtonText(viewController: self)
+        view.backgroundColor = .Signal.groupedBackground
 
-        rootView.axis = .vertical
-        rootView.alignment = .fill
-        rootView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(rootView)
+        let instructionsFormat = OWSLocalizedString(
+            "SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_INSTRUCTIONS_FORMAT",
+            comment: "Format for the instructions for the 'enter word' step of the 'restore payments wallet' views. Embeds {{ the index of the current word }}.",
+        )
+        let instructions = String.nonPluralLocalizedStringWithFormat(instructionsFormat, OWSFormat.formatInt(wordIndex + 1))
+        let instructionsLabel = UILabel.explanationTextLabel(text: instructions)
+
+        let placeholderFormat = OWSLocalizedString(
+            "SETTINGS_PAYMENTS_VIEW_PASSPHRASE_CONFIRM_PLACEHOLDER_FORMAT",
+            comment: "Format for the placeholder text in the 'confirm payments passphrase' view of the app settings. Embeds: {{ the index of the word }}.",
+        )
+        textField.placeholder = String.nonPluralLocalizedStringWithFormat(
+            placeholderFormat,
+            OWSFormat.formatInt(wordIndex + 1),
+        )
+
+        let textFieldContainer = UIView()
+        textFieldContainer.backgroundColor = .Signal.secondaryGroupedBackground
+        textFieldContainer.directionalLayoutMargins = .init(
+            hMargin: OWSTableViewController2.cellHInnerMargin,
+            vMargin: OWSTableViewController2.cellVInnerMargin,
+        )
+        if #available(iOS 26, *) {
+            textFieldContainer.cornerConfiguration = .capsule(maximumRadius: 26)
+        } else {
+            textFieldContainer.layer.cornerRadius = 10
+        }
+        textFieldContainer.addSubview(textField)
+        textField.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            rootView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            rootView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            rootView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            rootView.bottomAnchor.constraint(equalTo: keyboardLayoutGuide.topAnchor),
+            textField.topAnchor.constraint(equalTo: textFieldContainer.layoutMarginsGuide.topAnchor),
+            textField.leadingAnchor.constraint(equalTo: textFieldContainer.layoutMarginsGuide.leadingAnchor),
+            textField.trailingAnchor.constraint(equalTo: textFieldContainer.layoutMarginsGuide.trailingAnchor),
+            textField.bottomAnchor.constraint(equalTo: textFieldContainer.layoutMarginsGuide.bottomAnchor),
         ])
 
-        updateContents()
-    }
+        let nextButton = UIButton(
+            configuration: .largePrimary(title: CommonStrings.nextButton),
+            primaryAction: UIAction { [weak self] _ in
+                self?.didTapNextButton()
+            },
+        )
 
-    public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-
-        textfield.becomeFirstResponder()
-    }
-
-    public override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-
-        textfield.becomeFirstResponder()
-    }
-
-    public override func themeDidChange() {
-        super.themeDidChange()
-
-        updateContents()
-    }
-
-    private let rootView = UIStackView()
-
-    private func updateContents() {
-
-        view.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: true)
-
-        let titleLabel = UILabel()
-        titleLabel.text = OWSLocalizedString("SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_TITLE",
-                                            comment: "Title for the 'enter word' step of the 'restore payments wallet' views.")
-        titleLabel.font = UIFont.dynamicTypeTitle2Clamped.semibold()
-        titleLabel.textColor = Theme.primaryTextColor
-        titleLabel.textAlignment = .center
-
-        let instructionsFormat = OWSLocalizedString("SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_INSTRUCTIONS_FORMAT",
-                                                   comment: "Format for the instructions for the 'enter word' step of the 'restore payments wallet' views. Embeds {{ the index of the current word }}.")
-        let instructions = String(format: instructionsFormat, OWSFormat.formatInt(wordIndex + 1))
-
-        let instructionsLabel = UILabel()
-        instructionsLabel.text = instructions
-        instructionsLabel.textAlignment = .center
-        instructionsLabel.numberOfLines = 0
-        instructionsLabel.lineBreakMode = .byWordWrapping
-
-        let topStack = UIStackView(arrangedSubviews: [
-            titleLabel,
-            UIView.spacer(withHeight: 10),
-            instructionsLabel
-        ])
-        topStack.axis = .vertical
-        topStack.alignment = .center
-        topStack.isLayoutMarginsRelativeArrangement = true
-        topStack.layoutMargins = UIEdgeInsets(hMargin: 20, vMargin: 0)
-
-        textfield.textColor = Theme.primaryTextColor
-        textfield.font = .dynamicTypeBodyClamped
-        textfield.keyboardAppearance = Theme.keyboardAppearance
-        textfield.autocapitalizationType = .none
-        textfield.autocorrectionType = .no
-        textfield.spellCheckingType = .no
-        textfield.smartQuotesType = .no
-        textfield.smartDashesType = .no
-        textfield.returnKeyType = .done
-        textfield.accessibilityIdentifier = "payments.passphrase.restore.\(wordIndex)"
-        textfield.addTarget(self, action: #selector(textfieldDidChange), for: .editingChanged)
-        textfield.delegate = self
-
-        let placeholderFormat = OWSLocalizedString("SETTINGS_PAYMENTS_VIEW_PASSPHRASE_CONFIRM_PLACEHOLDER_FORMAT",
-                                                  comment: "Format for the placeholder text in the 'confirm payments passphrase' view of the app settings. Embeds: {{ the index of the word }}.")
-        let placeholder = NSAttributedString(string: String(format: placeholderFormat,
-                                                            OWSFormat.formatInt(wordIndex + 1)),
-                                             attributes: [
-                                                .foregroundColor: Theme.secondaryTextAndIconColor
-                                             ])
-        textfield.attributedPlaceholder = placeholder
-
-        let textfieldStack = UIStackView(arrangedSubviews: [ textfield ])
-        textfieldStack.axis = .vertical
-        textfieldStack.alignment = .fill
-        textfieldStack.isLayoutMarginsRelativeArrangement = true
-        textfieldStack.layoutMargins = UIEdgeInsets(hMargin: OWSTableViewController2.cellHInnerMargin,
-                                                    vMargin: OWSTableViewController2.cellVInnerMargin)
-        let backgroundColor = OWSTableViewController2.cellBackgroundColor(isUsingPresentedStyle: true)
-        textfieldStack.addBackgroundView(withBackgroundColor: backgroundColor,
-                                         cornerRadius: 10)
-
-        warningLabel.text = " "
-        warningLabel.font = .dynamicTypeCaption1
-        warningLabel.textColor = .ows_accentRed
-
-        let warningStack = UIStackView(arrangedSubviews: [ warningLabel ])
-        warningStack.axis = .vertical
-        warningStack.alignment = .fill
-        warningStack.isLayoutMarginsRelativeArrangement = true
-        warningStack.layoutMargins = UIEdgeInsets(hMargin: OWSTableViewController2.cellHInnerMargin,
-                                                  vMargin: 0)
-
-        let nextButton = OWSFlatButton.button(title: CommonStrings.nextButton,
-                                              font: UIFont.dynamicTypeHeadline,
-                                              titleColor: .white,
-                                              backgroundColor: .ows_accentBlue,
-                                              target: self,
-                                              selector: #selector(didTapNextButton))
-        nextButton.autoSetHeightUsingFont()
-
-        rootView.removeAllSubviews()
-        var arrangedSubviews: [UIView] = [
-            UIView.spacer(withHeight: 20),
-        ]
+        var arrangedSubviews: [UIView] = [.spacer(withHeight: 16)]
         if wordIndex == 0 {
             arrangedSubviews.append(buildWordCountSwitcher())
-            arrangedSubviews.append(UIView.spacer(withHeight: 20))
+            arrangedSubviews.append(.spacer(withHeight: 20))
         }
         arrangedSubviews.append(contentsOf: [
-            topStack,
-            UIView.spacer(withHeight: 60),
-            textfieldStack,
-            UIView.spacer(withHeight: 8),
-            warningStack,
-            UIView.vStretchingSpacer(),
+            instructionsLabel,
+            textFieldContainer,
+            warningLabel,
+            .vStretchingSpacer(),
             nextButton,
-            UIView.spacer(withHeight: 8)
+            .spacer(withHeight: 16),
         ])
-        rootView.addArrangedSubviews(arrangedSubviews)
-   }
+        let stackView = addStaticContentStackView(
+            arrangedSubviews: arrangedSubviews,
+            shouldAvoidKeyboard: true,
+        )
+        stackView.setCustomSpacing(24, after: instructionsLabel)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        textField.becomeFirstResponder()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        textField.becomeFirstResponder()
+    }
+
+    // MARK: - Word count switcher (Radar)
 
     private func buildWordCountSwitcher() -> UIView {
         let twelveTitle = OWSLocalizedString(
             "SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_COUNT_12",
-            comment: "Switcher option for restoring a 12-word recovery phrase.")
+            comment: "Switcher option for restoring a 12-word recovery phrase.",
+        )
         let twentyFourTitle = OWSLocalizedString(
             "SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_COUNT_24",
-            comment: "Switcher option for restoring a 24-word recovery phrase.")
+            comment: "Switcher option for restoring a 24-word recovery phrase.",
+        )
 
         let twelveBtn = makeWordCountTabButton(title: twelveTitle)
         twelveBtn.addTarget(self, action: #selector(didTapTwelveWordTab), for: .touchUpInside)
@@ -243,7 +218,7 @@ public class PaymentsRestoreWalletWordViewController: OWSViewController {
         var cfg = UIButton.Configuration.plain()
         cfg.attributedTitle = AttributedString(
             title,
-            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 13, weight: .medium)])
+            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 13, weight: .medium)]),
         )
         cfg.contentInsets = NSDirectionalEdgeInsets(top: 6, leading: 18, bottom: 6, trailing: 18)
         cfg.background.cornerRadius = 20
@@ -269,8 +244,8 @@ public class PaymentsRestoreWalletWordViewController: OWSViewController {
     private func didTapTwelveWordTab() {
         guard partialPassphrase.wordCount != 12 else { return }
         partialPassphrase.reset(wordCount: 12)
-        textfield.text = nil
-        warningLabel.text = " "
+        textField.text = nil
+        warningLabel.alpha = 0
         applyWordCountTabStyling()
     }
 
@@ -278,70 +253,80 @@ public class PaymentsRestoreWalletWordViewController: OWSViewController {
     private func didTapTwentyFourWordTab() {
         guard partialPassphrase.wordCount != 24 else { return }
         partialPassphrase.reset(wordCount: 24)
-        textfield.text = nil
-        warningLabel.text = " "
+        textField.text = nil
+        warningLabel.alpha = 0
         applyWordCountTabStyling()
     }
 
     // MARK: - Events
 
-    @objc
     private func didTapNextButton() {
-        guard let restoreWalletDelegate = restoreWalletDelegate else {
+        guard let restoreWalletDelegate else {
             owsFailDebug("Missing restoreWalletDelegate.")
             dismiss(animated: true, completion: nil)
             return
         }
-        guard let wordText = self.wordText,
-              isValidWord(wordText) else {
-            warningLabel.text = OWSLocalizedString("SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_INVALID_WORD",
-                                                  comment: "Error indicating that the user has entered an invalid word in the 'enter word' step of the 'restore payments wallet' views.")
+        guard let wordText, isValidWord(wordText) else {
+            warningLabel.alpha = 1
             return
         }
         partialPassphrase.set(word: wordText, index: wordIndex)
         if partialPassphrase.isComplete {
             guard let paymentsPassphrase = partialPassphrase.asPaymentsPassphrase() else {
-                OWSActionSheets.showErrorAlert(message: OWSLocalizedString("SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_INVALID_PASSPHRASE",
-                                                                          comment: "Error indicating that the user has entered an invalid payments passphrase in the 'restore payments wallet' views."))
+                OWSActionSheets.showErrorAlert(message: OWSLocalizedString(
+                    "SETTINGS_PAYMENTS_RESTORE_WALLET_WORD_INVALID_PASSPHRASE",
+                    comment: "Error indicating that the user has entered an invalid payments passphrase in the 'restore payments wallet' views.",
+                ))
                 return
             }
-            let view = PaymentsRestoreWalletCompleteViewController(restoreWalletDelegate: restoreWalletDelegate,
-                                                                   passphrase: paymentsPassphrase)
+            let view = PaymentsRestoreWalletCompleteViewController(
+                restoreWalletDelegate: restoreWalletDelegate,
+                passphrase: paymentsPassphrase,
+            )
             navigationController?.pushViewController(view, animated: true)
         } else {
-            let view = PaymentsRestoreWalletWordViewController(restoreWalletDelegate: restoreWalletDelegate,
-                                                               partialPassphrase: partialPassphrase,
-                                                               wordIndex: wordIndex + 1)
+            let view = PaymentsRestoreWalletWordViewController(
+                restoreWalletDelegate: restoreWalletDelegate,
+                partialPassphrase: partialPassphrase,
+                wordIndex: wordIndex + 1,
+            )
             navigationController?.pushViewController(view, animated: true)
         }
     }
 
-    @objc
-    private func textfieldDidChange() {
+    private func textFieldDidChange() {
         // Clear any warning.
-        warningLabel.text = " "
+        warningLabel.alpha = 0
+    }
+
+    // MARK: - UITextFieldDelegate
+
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        didTapNextButton()
+        return false
     }
 }
 
 // MARK: -
 
-public class PartialPaymentsPassphrase {
+class PartialPaymentsPassphrase {
 
     private var wordMap = [Int: String]()
 
-    public private(set) var wordCount: Int
+    /// Radar: 12 (Breez seed) or 24 words.
+    private(set) var wordCount: Int
 
-    public var isComplete: Bool {
+    var isComplete: Bool {
         wordMap.count == wordCount
     }
 
-    public init(wordCount: Int = PaymentsConstants.passphraseWordCount) {
+    init(wordCount: Int = PaymentsConstants.passphraseWordCount) {
         self.wordCount = wordCount
     }
 
-    public static var empty: PartialPaymentsPassphrase { PartialPaymentsPassphrase() }
+    static var empty: PartialPaymentsPassphrase { PartialPaymentsPassphrase() }
 
-    public func set(word: String, index: Int) {
+    func set(word: String, index: Int) {
         let word = word.stripped
         guard !word.isEmpty else {
             owsFailDebug("Invalid word.")
@@ -350,11 +335,11 @@ public class PartialPaymentsPassphrase {
         wordMap[index] = word
     }
 
-    public func getWord(atIndex index: Int) -> String? {
+    func getWord(atIndex index: Int) -> String? {
         wordMap[index]
     }
 
-    public func asPaymentsPassphrase() -> PaymentsPassphrase? {
+    func asPaymentsPassphrase() -> PaymentsPassphrase? {
         var words = [String]()
 
         for index in 0..<wordCount {
@@ -373,21 +358,12 @@ public class PartialPaymentsPassphrase {
         }
     }
 
-    public func reset() {
+    func reset() {
         wordMap.removeAll()
     }
 
-    public func reset(wordCount: Int) {
+    func reset(wordCount: Int) {
         self.wordCount = wordCount
         wordMap.removeAll()
-    }
-}
-
-// MARK: -
-
-extension PaymentsRestoreWalletWordViewController: UITextFieldDelegate {
-    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        didTapNextButton()
-        return false
     }
 }

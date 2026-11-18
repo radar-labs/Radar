@@ -5,6 +5,7 @@
 
 import Foundation
 import SignalServiceKit
+import UIKit
 
 class GroupCallErrorView: UIView {
 
@@ -14,9 +15,9 @@ class GroupCallErrorView: UIView {
 
     var iconImage: UIImage? {
         didSet {
-            if let iconImage = iconImage {
-                iconView.setTemplateImage(iconImage, tintColor: .ows_white)
-                miniBlockIndicator.setTemplateImage(iconImage, tintColor: .ows_white)
+            if let iconImage {
+                iconView.setTemplateImage(iconImage, tintColor: .white)
+                miniBlockIndicator.setTemplateImage(iconImage, tintColor: .white)
             } else {
                 iconView.image = nil
                 miniBlockIndicator.image = nil
@@ -42,7 +43,7 @@ class GroupCallErrorView: UIView {
         label.font = UIFont.dynamicTypeSubheadline
         label.adjustsFontForContentSizeCategory = true
         label.textAlignment = .center
-        label.textColor = .ows_white
+        label.textColor = .white
         label.numberOfLines = 0
         return label
     }()
@@ -50,7 +51,8 @@ class GroupCallErrorView: UIView {
     private(set) lazy var button: UIButton = {
         let buttonLabel = OWSLocalizedString(
             "GROUP_CALL_ERROR_DETAILS",
-            comment: "A button to receive more info about not seeing a participant in group call grid")
+            comment: "A button to receive more info about not seeing a participant in group call grid",
+        )
 
         let button = UIButton()
         button.backgroundColor = .ows_gray75
@@ -63,7 +65,10 @@ class GroupCallErrorView: UIView {
         button.titleLabel?.font = UIFont.dynamicTypeSubheadline.semibold()
         button.setTitle(buttonLabel, for: .normal)
 
-        button.addTarget(self, action: #selector(didTapButton), for: .touchUpInside)
+        button.addAction(
+            UIAction { [weak self] _ in self?.didTapButton() },
+            for: .primaryActionTriggered,
+        )
         return button
     }()
 
@@ -76,7 +81,7 @@ class GroupCallErrorView: UIView {
         let stackView = UIStackView(arrangedSubviews: [
             iconView,
             label,
-            button
+            button,
         ])
         stackView.axis = .vertical
         stackView.alignment = .center
@@ -147,7 +152,6 @@ class GroupCallErrorView: UIView {
         self.forceCompactAppearance = isCallMinimized
     }
 
-    @objc
     private func didTapButton() {
         userTapAction?(self)
     }

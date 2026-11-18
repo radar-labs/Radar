@@ -31,12 +31,16 @@ class ProvisioningPrepViewController: ProvisioningBaseViewController {
 
         let titleText: String
         if isTransferring {
-            titleText = OWSLocalizedString("SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD",
-                                          comment: "header text before the user can transfer to this device")
+            titleText = OWSLocalizedString(
+                "SECONDARY_TRANSFER_GET_STARTED_BY_OPENING_IPAD",
+                comment: "header text before the user can transfer to this device",
+            )
 
         } else {
-            titleText = OWSLocalizedString("SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY",
-                                          comment: "header text before the user can link this device")
+            titleText = OWSLocalizedString(
+                "SECONDARY_ONBOARDING_GET_STARTED_BY_OPENING_PRIMARY",
+                comment: "header text before the user can link this device",
+            )
         }
         let titleLabel = UILabel.titleLabelForRegistration(text: titleText)
         titleLabel.setCompressionResistanceHigh()
@@ -55,11 +59,11 @@ class ProvisioningPrepViewController: ProvisioningBaseViewController {
         let dontHaveSignalButton = UIButton(
             configuration: .mediumBorderless(title: OWSLocalizedString(
                 "SECONDARY_ONBOARDING_GET_STARTED_DO_NOT_HAVE_PRIMARY",
-                comment: "Link explaining what to do when trying to link a device before having a primary device."
+                comment: "Link explaining what to do when trying to link a device before having a primary device.",
             )),
             primaryAction: UIAction { [weak self] _ in
                 self?.didTapNoSignalApp()
-            }
+            },
         )
         dontHaveSignalButton.enableMultilineLabel()
         dontHaveSignalButton.accessibilityIdentifier = "onboarding.prelink.explanationLabel"
@@ -69,7 +73,7 @@ class ProvisioningPrepViewController: ProvisioningBaseViewController {
             configuration: .largePrimary(title: CommonStrings.nextButton),
             primaryAction: UIAction { [weak self] _ in
                 self?.didPressNext()
-            }
+            },
         )
         nextButton.accessibilityIdentifier = "onboarding.prelink.nextButton"
 
@@ -113,10 +117,12 @@ class ProvisioningPrepViewController: ProvisioningBaseViewController {
     func didPressNext() {
         Logger.info("")
 
-        if isTransferring {
-            provisioningController.transferAccount(fromViewController: self)
-        } else {
-            provisioningController.didConfirmSecondaryDevice(from: self)
+        Task {
+            if isTransferring {
+                await provisioningController.transferAccount(fromViewController: self)
+            } else {
+                await provisioningController.didConfirmSecondaryDevice(from: self)
+            }
         }
     }
 }

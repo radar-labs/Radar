@@ -5,13 +5,30 @@
 
 import SignalServiceKit
 
-// MARK: - Sticker
+// MARK: - Stickers
 
 extension ImageEditorViewController {
+
     func selectStickerItem(_ stickerItem: ImageEditorStickerItem) {
         mode = .sticker
         model.append(item: stickerItem)
         imageEditorView.selectedTransformableItemID = stickerItem.itemId
+    }
+
+    // MARK: - StoryStickerPickerDelegate
+
+    func didSelect(storySticker: EditorSticker.StorySticker) {
+        let stickerItem = imageEditorView.createNewStickerItem(with: .story(storySticker))
+        selectStickerItem(stickerItem)
+        dismiss(animated: true)
+    }
+
+    // MARK: - StickerPickerDelegate
+
+    func didSelectSticker(_ stickerMetadata: any StickerMetadata) {
+        let stickerItem = imageEditorView.createNewStickerItem(with: .regular(stickerMetadata.stickerInfo))
+        selectStickerItem(stickerItem)
+        dismiss(animated: true)
     }
 }
 
@@ -23,7 +40,7 @@ extension ImageEditorViewController {
         mode = .text
         currentTextItem = (textItem, isNewItem)
         imageEditorView.selectedTransformableItemID = textItem.itemId
-        if startEditing && isViewLoaded && view.window != nil {
+        if startEditing, isViewLoaded, view.window != nil {
             beginTextEditing()
         } else {
             startEditingTextOnViewAppear = startEditing
@@ -40,9 +57,11 @@ extension ImageEditorViewController {
     private func initializeTextUIIfNecessary() {
         guard !textUIInitialized else { return }
 
-        let toolbarSize = textViewAccessoryToolbar.systemLayoutSizeFitting(CGSize(width: view.width, height: .greatestFiniteMagnitude),
-                                                                           withHorizontalFittingPriority: .required,
-                                                                           verticalFittingPriority: .fittingSizeLevel)
+        let toolbarSize = textViewAccessoryToolbar.systemLayoutSizeFitting(
+            CGSize(width: view.width, height: .greatestFiniteMagnitude),
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .fittingSizeLevel,
+        )
         textViewAccessoryToolbar.bounds.size = toolbarSize
         textView.inputAccessoryView = textViewAccessoryToolbar
 
@@ -81,8 +100,14 @@ extension ImageEditorViewController {
             textViewContainer.bottomAnchor.constraint(equalTo: keyboardLayoutGuide.topAnchor),
         ])
 
-        textViewContainer.addGestureRecognizer(ImageEditorPinchGestureRecognizer(target: self, action: #selector(handleTextPinchGesture(_:))))
-        textViewContainer.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapDimmerView(_:))))
+        textViewContainer.addGestureRecognizer(ImageEditorPinchGestureRecognizer(
+            target: self,
+            action: #selector(handleTextPinchGesture(_:)),
+        ))
+        textViewContainer.addGestureRecognizer(UITapGestureRecognizer(
+            target: self,
+            action: #selector(didTapDimmerView(_:)),
+        ))
 
         UIView.performWithoutAnimation {
             self.view.setNeedsLayout()
@@ -101,11 +126,13 @@ extension ImageEditorViewController {
      * This method needs to be called when text item editing is about to begin.
      */
     private func updateTextViewAttributes(using textItem: ImageEditorTextItem) {
-        textView.updateWith(textForegroundColor: textItem.textForegroundColor,
-                            font: textItem.font,
-                            textAlignment: .center,
-                            textDecorationColor: textItem.textDecorationColor,
-                            decorationStyle: textItem.decorationStyle)
+        textView.updateWith(
+            textForegroundColor: textItem.textForegroundColor,
+            font: textItem.font,
+            textAlignment: .center,
+            textDecorationColor: textItem.textDecorationColor,
+            decorationStyle: textItem.decorationStyle,
+        )
         textViewBackgroundView.backgroundColor = textItem.textBackgroundColor
     }
 
@@ -169,32 +196,36 @@ extension ImageEditorViewController {
         // Update text's width.
         let view = imageEditorView.gestureReferenceView
         let viewBounds = view.bounds
-        let imageFrame = ImageEditorCanvasView.imageFrame(forViewSize: viewBounds.size,
-                                                          imageSize: model.srcImageSizePixels,
-                                                          transform: model.currentTransform())
+        let imageFrame = ImageEditorCanvasView.imageFrame(
+            forViewSize: viewBounds.size,
+            imageSize: model.srcImageSizePixels,
+            transform: model.currentTransform(),
+        )
         // 12 is the sum of horizontal insets around textView as set in `initializeTextUIIfNecessary`.
         let unitWidth = (textViewWrapperView.width - 12) / imageFrame.width
-        textItem = textItem.copy(unitWidth: unitWidth)
+        textItem = textItem.with(unitWidth: unitWidth)
 
         // Ensure continuity of the new text item's location with its apparent location in this text editor.
         if currentTextItem.isNewItem {
             let locationInView = view.convert(textView.bounds.center, from: textView).clamp(view.bounds)
-            let textCenterImageUnit = ImageEditorCanvasView.locationImageUnit(forLocationInView: locationInView,
-                                                                              viewBounds: viewBounds,
-                                                                              model: model,
-                                                                              transform: model.currentTransform())
-            textItem = textItem.copy(unitCenter: textCenterImageUnit)
+            let textCenterImageUnit = ImageEditorCanvasView.locationImageUnit(
+                forLocationInView: locationInView,
+                viewBounds: viewBounds,
+                model: model,
+                transform: model.currentTransform(),
+            )
+            textItem = textItem.with(unitCenter: textCenterImageUnit)
         }
 
         // Update font size.
         if let textViewFont = textView.font {
-            textItem = textItem.copy(fontSize: textViewFont.pointSize)
+            textItem = textItem.with(fontSize: textViewFont.pointSize)
         }
 
         // Update text and decoration style.
-        textItem = textItem.copy(
+        textItem = textItem.with(
             textStyle: textViewAccessoryToolbar.textStyle,
-            decorationStyle: textViewAccessoryToolbar.decorationStyle
+            decorationStyle: textViewAccessoryToolbar.decorationStyle,
         )
 
         // Deleting all text results in text object being deleted.
@@ -206,7 +237,7 @@ extension ImageEditorViewController {
         }
 
         // Update text.
-        textItem = textItem.copy(withText: text, color: textViewAccessoryToolbar.currentColorPickerValue)
+        textItem = textItem.with(text: text, color: textViewAccessoryToolbar.currentColorPickerValue)
 
         guard currentTextItem.textItem != textItem else {
             // No changes were made.  Cancel to avoid dirtying the undo stack.
@@ -258,15 +289,13 @@ extension ImageEditorViewController {
         finishTextEditing()
     }
 
-    @objc
-    func didTapTextStyleButton(sender: UIButton) {
+    func didTapTextStyleButton() {
         let textStyle = textViewAccessoryToolbar.textStyle.next()
         textViewAccessoryToolbar.textStyle = textStyle
         updateTextViewAttributes(using: textViewAccessoryToolbar)
     }
 
-    @objc
-    func didTapDecorationStyleButton(sender: UIButton) {
+    func didTapDecorationStyleButton() {
         var decorationStyle = textViewAccessoryToolbar.decorationStyle.next()
         if decorationStyle == .outline {
             decorationStyle = .none
@@ -275,15 +304,18 @@ extension ImageEditorViewController {
         updateTextViewAttributes(using: textViewAccessoryToolbar)
     }
 
-    @objc
-    func didTapTextEditingDoneButton(sender: UIButton) {
+    func didTapTextEditingDoneButton() {
         finishTextEditing()
     }
-}
 
-// MARK: - UITextViewDelegate
+    func textColorDidChange(newColor: ColorPickerBarColor) {
+        imageEditorView.updateSelectedTextItem(withColor: newColor)
+        if textView.isFirstResponder {
+            updateTextViewAttributes(using: textViewAccessoryToolbar)
+        }
+    }
 
-extension ImageEditorViewController: UITextViewDelegate {
+    // MARK: - UITextViewDelegate
 
     func textViewDidBeginEditing(_ textView: UITextView) {
         // Reset each time user starts editing text.
@@ -307,11 +339,10 @@ extension ImageEditorViewController: UITextViewDelegate {
 
         currentTextItem = nil
     }
-}
 
-// MARK: - ImageEditorViewDelegate
+    // MARK: - ImageEditorViewDelegate
 
-extension ImageEditorViewController: ImageEditorViewDelegate {
+    func imageEditorViewModelDidChange(_ imageEditorView: ImageEditorView) { }
 
     func imageEditorView(_ imageEditorView: ImageEditorView, didRequestAddTextItem textItem: ImageEditorTextItem) {
         // No adding text via tap on image in this view controller.
@@ -325,9 +356,7 @@ extension ImageEditorViewController: ImageEditorViewDelegate {
         beginTextEditing()
     }
 
-    func imageEditorView(_ imageEditorView: ImageEditorView, didMoveTextItem textItem: ImageEditorTextItem) {
-
-    }
+    func imageEditorView(_ imageEditorView: ImageEditorView, didMoveTextItem textItem: ImageEditorTextItem) { }
 
     func imageEditorViewDidUpdateSelection(_ imageEditorView: ImageEditorView) {
         switch imageEditorView.selectedTransformableItemID {

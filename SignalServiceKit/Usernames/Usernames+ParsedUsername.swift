@@ -3,55 +3,29 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public extension Usernames {
-    /// Represents a username parsed into its user-generated nickname and
-    /// programmatically-generated numeric discriminator.
-    struct ParsedUsername: Equatable {
-        public static let separator: Character = "."
+public import LibSignalClient
 
-        public let nickname: String
-        public let discriminator: String
+extension LibSignalClient.Username {
+    public func components() -> UsernameComponents { UsernameComponents(self) }
+}
 
-        public init?(rawUsername: String?) {
-            guard let rawUsername else {
-                return nil
-            }
+public struct UsernameComponents {
+    public let nickname: String
+    public let discriminator: String
+    public let originalValue: LibSignalClient.Username
 
-            let components = rawUsername.split(separator: Self.separator)
+    fileprivate init(_ username: LibSignalClient.Username) {
+        let components = username.value.split(separator: ".")
+        self.nickname = String(components.first.owsFailUnwrap("must be valid"))
+        self.discriminator = String(components.last.owsFailUnwrap("must be valid"))
+        self.originalValue = username
+    }
 
-            guard components.count == 2 else {
-                owsFailDebug("Unexpected component count!")
-                return nil
-            }
-
-            guard
-                let nickname = String(components.first!).nilIfEmpty,
-                let discriminator = String(components.last!).nilIfEmpty
-            else {
-                owsFailDebug("Nickname or discriminator was empty!")
-                return nil
-            }
-
-            self.nickname = nickname
-            self.discriminator = discriminator
+    public func adjustingCase(_ nickname: String) -> LibSignalClient.Username? {
+        guard nickname.lowercased() == self.nickname.lowercased() else {
+            return nil
         }
-
-        init(nickname: String, discriminator: String) {
-            self.nickname = nickname
-            self.discriminator = discriminator
-        }
-
-        public var reassembled: String {
-            "\(nickname)\(Self.separator)\(discriminator)"
-        }
-
-        public func updatingNickame(
-            newNickname: String
-        ) -> ParsedUsername {
-            return ParsedUsername(
-                nickname: newNickname,
-                discriminator: discriminator
-            )
-        }
+        // This parsing may fail if a case-folded matching value isn't valid.
+        return try? LibSignalClient.Username("\(nickname).\(self.discriminator)")
     }
 }

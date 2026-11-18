@@ -15,9 +15,7 @@ public struct ConversationSortKey: Comparable {
     let creationDate: Date?
     let lastInteractionRowId: UInt64
 
-    // MARK: Comparable
-
-    public static func < (lhs: ConversationSortKey, rhs: ConversationSortKey) -> Bool {
+    public static func <(lhs: ConversationSortKey, rhs: ConversationSortKey) -> Bool {
         // always show matching contact results first
         if lhs.isContactThread != rhs.isContactThread {
             return lhs.isContactThread
@@ -53,26 +51,19 @@ public class ConversationSearchResult<SortKey>: Comparable where SortKey: Compar
         self.snippet = snippet
     }
 
-    // MARK: Comparable
-
-    public static func < (lhs: ConversationSearchResult, rhs: ConversationSearchResult) -> Bool {
-        return lhs.sortKey < rhs.sortKey
+    public static func <(lhs: ConversationSearchResult, rhs: ConversationSearchResult) -> Bool {
+        lhs.sortKey < rhs.sortKey
     }
 
-    // MARK: Equatable
-
-    public static func == (lhs: ConversationSearchResult, rhs: ConversationSearchResult) -> Bool {
-        return (
-            lhs.threadViewModel.threadRecord.uniqueId == rhs.threadViewModel.threadRecord.uniqueId
-            && lhs.messageId == rhs.messageId
-        )
+    public static func ==(lhs: ConversationSearchResult, rhs: ConversationSearchResult) -> Bool {
+        lhs.threadViewModel.threadRecord.uniqueId == rhs.threadViewModel.threadRecord.uniqueId &&
+            lhs.messageId == rhs.messageId
     }
 }
 
 // MARK: -
 
-public class ContactSearchResult: Comparable {
-
+public struct ContactSearchResult: Comparable {
     public let recipientAddress: SignalServiceAddress
     private let comparableName: ComparableDisplayName
     private let lastInteractionRowID: UInt64?
@@ -82,117 +73,96 @@ public class ContactSearchResult: Comparable {
         self.comparableName = ComparableDisplayName(
             address: recipientAddress,
             displayName: SSKEnvironment.shared.contactManagerRef.displayName(for: recipientAddress, tx: transaction),
-            config: .current()
+            config: .current(),
         )
         let thread = ContactThreadFinder().contactThread(for: recipientAddress, tx: transaction)
         lastInteractionRowID = thread?.lastInteractionRowId
     }
 
-    // MARK: Comparable
-
-    public static func < (lhs: ContactSearchResult, rhs: ContactSearchResult) -> Bool {
+    public static func <(lhs: ContactSearchResult, rhs: ContactSearchResult) -> Bool {
         // Sort contacts by most recent chat, falling back to alphabetical
         switch (lhs.lastInteractionRowID, rhs.lastInteractionRowID) {
         case (.some, .none):
-            return true
+            true
         case (.none, .some):
-            return false
+            false
         case let (.some(lhsRowID), .some(rhsRowID)):
-            return lhsRowID > rhsRowID
+            lhsRowID > rhsRowID
         case (.none, .none):
-            return lhs.comparableName < rhs.comparableName
+            lhs.comparableName < rhs.comparableName
         }
     }
 
-    // MARK: Equatable
-
-    public static func == (lhs: ContactSearchResult, rhs: ContactSearchResult) -> Bool {
-        return lhs.recipientAddress == rhs.recipientAddress
+    public static func ==(lhs: ContactSearchResult, rhs: ContactSearchResult) -> Bool {
+        lhs.recipientAddress == rhs.recipientAddress
     }
 }
 
 // MARK: -
 
 /// Can represent either a group thread with stories, or a private story thread.
-public class StorySearchResult: Comparable {
-
+public struct StorySearchResult: Comparable {
     public let thread: TSThread
+    public let sortKey: ConversationSortKey
 
-    private let sortKey: ConversationSortKey
-
-    init(thread: TSThread, sortKey: ConversationSortKey) {
-        self.thread = thread
-        self.sortKey = sortKey
+    public static func <(lhs: StorySearchResult, rhs: StorySearchResult) -> Bool {
+        lhs.sortKey < rhs.sortKey
     }
 
-    // MARK: Comparable
-
-    public static func < (lhs: StorySearchResult, rhs: StorySearchResult) -> Bool {
-        return lhs.sortKey < rhs.sortKey
-    }
-
-    // MARK: Equatable
-
-    public static func == (lhs: StorySearchResult, rhs: StorySearchResult) -> Bool {
-        return lhs.thread.uniqueId == rhs.thread.uniqueId
+    public static func ==(lhs: StorySearchResult, rhs: StorySearchResult) -> Bool {
+        lhs.thread.uniqueId == rhs.thread.uniqueId
     }
 }
 
 // MARK: -
 
-public class HomeScreenSearchResultSet: NSObject {
+public struct HomeScreenSearchResultSet {
     public let searchText: String
     public let contactThreadResults: [ConversationSearchResult<ConversationSortKey>]
     public let groupThreadResults: [GroupSearchResult]
     public let contactResults: [ContactSearchResult]
     public let messageResults: [ConversationSearchResult<MessageSortKey>]
 
-    public init(
-        searchText: String,
-        contactThreadResults: [ConversationSearchResult<ConversationSortKey>],
-        groupThreadResults: [GroupSearchResult],
-        contactResults: [ContactSearchResult],
-        messageResults: [ConversationSearchResult<MessageSortKey>]
-    ) {
-        self.searchText = searchText
-        self.contactThreadResults = contactThreadResults
-        self.groupThreadResults = groupThreadResults
-        self.contactResults = contactResults
-        self.messageResults = messageResults
-    }
-
-    public class var empty: HomeScreenSearchResultSet {
-        return HomeScreenSearchResultSet(searchText: "", contactThreadResults: [], groupThreadResults: [], contactResults: [], messageResults: [])
+    public static var empty: HomeScreenSearchResultSet {
+        HomeScreenSearchResultSet(
+            searchText: "",
+            contactThreadResults: [],
+            groupThreadResults: [],
+            contactResults: [],
+            messageResults: [],
+        )
     }
 
     public var isEmpty: Bool {
-        return contactThreadResults.isEmpty && groupThreadResults.isEmpty && contactResults.isEmpty && messageResults.isEmpty
+        contactThreadResults.isEmpty &&
+            groupThreadResults.isEmpty &&
+            contactResults.isEmpty &&
+            messageResults.isEmpty
     }
 }
 
 // MARK: -
 
-public class GroupSearchResult: Comparable {
-
+public struct GroupSearchResult: Comparable {
     public let threadViewModel: ThreadViewModel
     public let matchedMembersSnippet: String?
 
     private let sortKey: ConversationSortKey
 
-    class func withMatchedMembersSnippet(
+    static func withMatchedMembersSnippet(
         groupThread: TSGroupThread,
         threadViewModel: ThreadViewModel,
         sortKey: ConversationSortKey,
         searchText: String,
         nameResolver: NameResolver,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> GroupSearchResult {
         owsAssertDebug(threadViewModel.threadRecord === groupThread)
         let matchedMembers = groupThread.sortedMemberNames(
             searchText: searchText,
             includingBlocked: true,
             nameResolver: nameResolver,
-            transaction: transaction
+            transaction: transaction,
         )
         let matchedMembersSnippet = matchedMembers.joined(separator: ", ")
         return GroupSearchResult(threadViewModel: threadViewModel, sortKey: sortKey, matchedMembersSnippet: matchedMembersSnippet)
@@ -204,16 +174,12 @@ public class GroupSearchResult: Comparable {
         self.matchedMembersSnippet = matchedMembersSnippet
     }
 
-    // MARK: Comparable
-
-    public static func < (lhs: GroupSearchResult, rhs: GroupSearchResult) -> Bool {
-        return lhs.sortKey < rhs.sortKey
+    public static func <(lhs: GroupSearchResult, rhs: GroupSearchResult) -> Bool {
+        lhs.sortKey < rhs.sortKey
     }
 
-    // MARK: Equatable
-
-    public static func == (lhs: GroupSearchResult, rhs: GroupSearchResult) -> Bool {
-        return lhs.threadViewModel.threadRecord.uniqueId == rhs.threadViewModel.threadRecord.uniqueId
+    public static func ==(lhs: GroupSearchResult, rhs: GroupSearchResult) -> Bool {
+        lhs.threadViewModel.threadRecord.uniqueId == rhs.threadViewModel.threadRecord.uniqueId
     }
 }
 
@@ -226,7 +192,7 @@ public struct RecipientSearchResultSet {
     public let storyResults: [StorySearchResult]
 
     public var groupThreads: [TSGroupThread] {
-        return groupResults.compactMap { $0.threadViewModel.threadRecord as? TSGroupThread }
+        groupResults.compactMap { $0.threadViewModel.threadRecord as? TSGroupThread }
     }
 
     public var storyThreads: [TSThread] { storyResults.map(\.thread) }
@@ -234,56 +200,40 @@ public struct RecipientSearchResultSet {
 
 // MARK: -
 
-public class MessageSearchResult: NSObject, Comparable {
-
+public struct MessageSearchResult: Comparable {
     public let messageId: String
     public let sortId: UInt64
 
-    init(messageId: String, sortId: UInt64) {
-        self.messageId = messageId
-        self.sortId = sortId
-    }
-
-    // MARK: - Comparable
-
-    public static func < (lhs: MessageSearchResult, rhs: MessageSearchResult) -> Bool {
-        return lhs.sortId < rhs.sortId
+    public static func <(lhs: MessageSearchResult, rhs: MessageSearchResult) -> Bool {
+        lhs.sortId < rhs.sortId
     }
 }
 
 // MARK: -
 
-public class ConversationScreenSearchResultSet: NSObject {
-
+public class ConversationScreenSearchResultSet: CustomStringConvertible {
     public let searchText: String
-
     public let messages: [MessageSearchResult]
 
     public lazy var messageSortIds: [UInt64] = {
-        return messages.map { $0.sortId }
+        messages.map { $0.sortId }
     }()
 
-    // MARK: Static members
-
-    public static let empty: ConversationScreenSearchResultSet = ConversationScreenSearchResultSet(searchText: "", messages: [])
-
-    // MARK: Init
+    public static let empty = ConversationScreenSearchResultSet(searchText: "", messages: [])
 
     public init(searchText: String, messages: [MessageSearchResult]) {
         self.searchText = searchText
         self.messages = messages
     }
 
-    // MARK: - CustomDebugStringConvertible
-
-    override public var debugDescription: String {
-        return "ConversationScreenSearchResultSet(searchText: \(searchText), messages: [\(messages.count) matches])"
+    public var description: String {
+        "ConversationScreenSearchResultSet(searchText: \(searchText), messages: [\(messages.count) matches])"
     }
 }
 
 // MARK: -
 
-public class FullTextSearcher: NSObject {
+public class FullTextSearcher {
 
     public static let kDefaultMaxResults: Int = 500
 
@@ -294,7 +244,7 @@ public class FullTextSearcher: NSObject {
         includeLocalUser: Bool,
         includeStories: Bool,
         maxResults: Int = kDefaultMaxResults,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws(CancellationError) -> RecipientSearchResultSet {
         var groupResults = [GroupSearchResult]()
         var storyResults = [StorySearchResult]()
@@ -308,7 +258,7 @@ public class FullTextSearcher: NSObject {
             contactManager: SSKEnvironment.shared.contactManagerRef,
             searchableNameIndexer: DependenciesBridge.shared.searchableNameIndexer,
             phoneNumberVisibilityFetcher: DependenciesBridge.shared.phoneNumberVisibilityFetcher,
-            recipientDatabaseTable: DependenciesBridge.shared.recipientDatabaseTable
+            recipientDatabaseTable: DependenciesBridge.shared.recipientDatabaseTable,
         ).searchNames(
             for: searchText,
             maxResults: maxResults,
@@ -318,12 +268,12 @@ public class FullTextSearcher: NSObject {
                 let sortKey = ConversationSortKey(
                     isContactThread: false,
                     creationDate: groupThread.creationDate,
-                    lastInteractionRowId: groupThread.lastInteractionRowId
+                    lastInteractionRowId: groupThread.lastInteractionRowId,
                 )
                 let threadViewModel = ThreadViewModel(
                     thread: groupThread,
                     forChatList: true,
-                    transaction: tx
+                    transaction: tx,
                 )
                 let searchResult = GroupSearchResult(threadViewModel: threadViewModel, sortKey: sortKey)
                 groupResults.append(searchResult)
@@ -340,12 +290,12 @@ public class FullTextSearcher: NSObject {
                     let sortKey = ConversationSortKey(
                         isContactThread: false,
                         creationDate: storyThread.creationDate,
-                        lastInteractionRowId: storyThread.lastInteractionRowId
+                        lastInteractionRowId: storyThread.lastInteractionRowId,
                     )
                     let searchResult = StorySearchResult(thread: storyThread, sortKey: sortKey)
                     storyResults.append(searchResult)
                 }
-            }
+            },
         )
 
         var contactResults: [ContactSearchResult] = []
@@ -365,7 +315,7 @@ public class FullTextSearcher: NSObject {
             searchText: searchText,
             contactResults: contactResults.sorted(),
             groupResults: groupResults.sorted(by: >),
-            storyResults: storyResults.sorted(by: >)
+            storyResults: storyResults.sorted(by: >),
         )
     }
 
@@ -377,7 +327,10 @@ public class FullTextSearcher: NSObject {
 
     private func noteToSelfMatch(searchText: String, localIdentifiers: LocalIdentifiers, tx: DBReadTransaction) -> NoteToSelfMatch {
         let searchTerms = searchText.split(separator: " ")
-        if searchTerms.contains(where: { localIdentifiers.phoneNumber.contains($0) }) {
+        if
+            let phoneNumber = localIdentifiers.phoneNumber,
+            searchTerms.contains(where: { phoneNumber.contains($0) })
+        {
             return .nameOrNumber
         }
         let displayName = SSKEnvironment.shared.contactManagerRef.displayName(for: localIdentifiers.aciAddress, tx: tx).resolvedValue()
@@ -393,24 +346,24 @@ public class FullTextSearcher: NSObject {
     public func searchForHomeScreen(
         searchText: String,
         maxResults: Int = kDefaultMaxResults,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws(CancellationError) -> HomeScreenSearchResultSet {
         return try _searchForHomeScreen(
             searchText: searchText,
             maxResults: maxResults,
-            transaction: tx
+            transaction: tx,
         )
     }
 
     private func _searchForHomeScreen(
         searchText: String,
         maxResults: Int,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) throws(CancellationError) -> HomeScreenSearchResultSet {
         var contactResults = [ContactSearchResult]()
         var contactThreadResults = [ConversationSearchResult<ConversationSortKey>]()
         var groupResults: [GroupSearchResult] = []
-        var groupThreadIds = Set<String>()
+        var groupThreadUniqueIds = Set<String>()
         var messages: [UInt64: ConversationSearchResult<MessageSortKey>] = [:]
 
         let nameResolver = NameResolverImpl(contactsManager: SSKEnvironment.shared.contactManagerRef)
@@ -420,7 +373,7 @@ public class FullTextSearcher: NSObject {
             if let thread = threadCache[threadUniqueId] {
                 return thread as? T
             }
-            let thread = TSThread.anyFetch(uniqueId: threadUniqueId, transaction: transaction)
+            let thread = TSThread.fetchViaCache(uniqueId: threadUniqueId, transaction: transaction)
             threadCache[threadUniqueId] = thread
             return thread as? T
         }
@@ -433,14 +386,14 @@ public class FullTextSearcher: NSObject {
             let threadViewModel = ThreadViewModel(
                 thread: thread,
                 forChatList: true,
-                transaction: transaction
+                transaction: transaction,
             )
             threadViewModelCache[thread.uniqueId] = threadViewModel
             return threadViewModel
         }
 
-        func fetchGroupThreadIds(for address: SignalServiceAddress) -> [String] {
-            return TSGroupThread.groupThreadIds(with: address, transaction: transaction)
+        func fetchGroupThreadUniqueIds(for address: SignalServiceAddress) -> [String] {
+            return TSGroupThread.groupThreadUniqueIds(withFullMember: address, tx: transaction)
         }
 
         func fetchMentionedMessages(for address: SignalServiceAddress) -> [TSMessage] {
@@ -454,7 +407,7 @@ public class FullTextSearcher: NSObject {
 
         func appendGroup(threadUniqueId: String, groupThread: @autoclosure () -> TSGroupThread?) {
             // Don't add threads multiple times.
-            guard groupThreadIds.insert(threadUniqueId).inserted else {
+            guard groupThreadUniqueIds.insert(threadUniqueId).inserted else {
                 return
             }
             // Don't fetch the thread unless necessary.
@@ -470,7 +423,7 @@ public class FullTextSearcher: NSObject {
             let sortKey = ConversationSortKey(
                 isContactThread: false,
                 creationDate: groupThread.creationDate,
-                lastInteractionRowId: groupThread.lastInteractionRowId
+                lastInteractionRowId: groupThread.lastInteractionRowId,
             )
 
             let searchResult = GroupSearchResult.withMatchedMembersSnippet(
@@ -479,7 +432,7 @@ public class FullTextSearcher: NSObject {
                 sortKey: sortKey,
                 searchText: searchText,
                 nameResolver: nameResolver,
-                transaction: transaction
+                transaction: transaction,
             )
             groupResults.append(searchResult)
         }
@@ -497,7 +450,7 @@ public class FullTextSearcher: NSObject {
                 sortKey: sortKey,
                 messageId: message.uniqueId,
                 messageDate: Date(millisecondsSince1970: message.timestamp),
-                snippet: snippet
+                snippet: snippet,
             )
             guard messages[sortKey] == nil else { return }
             messages[sortKey] = searchResult
@@ -507,7 +460,7 @@ public class FullTextSearcher: NSObject {
             _ address: SignalServiceAddress,
             isInWhitelist: @autoclosure () -> Bool,
             fetchGroups: Bool,
-            fetchMentions: Bool
+            fetchMentions: Bool,
         ) {
             if
                 let contactThread = TSContactThread.getWithContactAddress(address, transaction: transaction),
@@ -518,18 +471,18 @@ public class FullTextSearcher: NSObject {
                     sortKey: ConversationSortKey(
                         isContactThread: true,
                         creationDate: contactThread.creationDate,
-                        lastInteractionRowId: contactThread.lastInteractionRowId
-                    )
+                        lastInteractionRowId: contactThread.lastInteractionRowId,
+                    ),
                 ))
             } else if isInWhitelist() {
                 contactResults.append(ContactSearchResult(recipientAddress: address, transaction: transaction))
             }
 
             if fetchGroups {
-                fetchGroupThreadIds(for: address).forEach { groupThreadId in
+                fetchGroupThreadUniqueIds(for: address).forEach { groupThreadId in
                     appendGroup(
                         threadUniqueId: groupThreadId,
-                        groupThread: fetchThread(threadUniqueId: groupThreadId)
+                        groupThread: fetchThread(threadUniqueId: groupThreadId),
                     )
                 }
             }
@@ -567,7 +520,7 @@ public class FullTextSearcher: NSObject {
             contactManager: SSKEnvironment.shared.contactManagerRef,
             searchableNameIndexer: DependenciesBridge.shared.searchableNameIndexer,
             phoneNumberVisibilityFetcher: DependenciesBridge.shared.phoneNumberVisibilityFetcher,
-            recipientDatabaseTable: DependenciesBridge.shared.recipientDatabaseTable
+            recipientDatabaseTable: DependenciesBridge.shared.recipientDatabaseTable,
         ).searchNames(
             for: searchText,
             maxResults: remainingResultCount(),
@@ -577,7 +530,7 @@ public class FullTextSearcher: NSObject {
                 appendGroup(threadUniqueId: groupThread.uniqueId, groupThread: groupThread)
             },
             addStoryThread: { _ in
-            }
+            },
         )
 
         if Task.isCancelled {
@@ -603,7 +556,7 @@ public class FullTextSearcher: NSObject {
                 address,
                 isInWhitelist: SSKEnvironment.shared.profileManagerRef.isUser(inProfileWhitelist: address, transaction: transaction),
                 fetchGroups: true,
-                fetchMentions: true
+                fetchMentions: true,
             )
         }
 
@@ -614,7 +567,7 @@ public class FullTextSearcher: NSObject {
         FullTextSearchIndexer.search(
             for: searchText,
             maxResults: remainingResultCount(),
-            tx: transaction
+            tx: transaction,
         ) { (message: TSMessage, snippet: String?, stop) in
             if Task.isCancelled || remainingResultCount() == 0 {
                 stop = true
@@ -627,8 +580,8 @@ public class FullTextSearcher: NSObject {
                 let attributeKey = NSAttributedString.Key("OWSSearchMatch")
                 let matchStyle = BonMot.StringStyle(
                     .xmlRules([
-                        .style(FullTextSearchIndexer.matchTag, StringStyle(.extraAttributes([attributeKey: 0])))
-                    ])
+                        .style(FullTextSearchIndexer.matchTag, StringStyle(.extraAttributes([attributeKey: 0]))),
+                    ]),
                 )
                 let matchStyleApplied = snippet.styled(with: matchStyle)
                 var styles = [NSRangedValue<MessageBodyRanges.Style>]()
@@ -647,16 +600,34 @@ public class FullTextSearcher: NSObject {
                             return NSRangedValue($0, range: style.range)
                         }
                     }
-                    mergedMessageBody = MessageBody(text: matchStyleApplied.string, ranges: .init(mentions: [:], styles: singleStyles))
+                    mergedMessageBody = MessageBody(text: matchStyleApplied.string, ranges: .init(mentions: [], styles: singleStyles))
                 }
-                return .messageBody(mergedMessageBody
-                    .hydrating(mentionHydrator: ContactsMentionHydrator.mentionHydrator(transaction: transaction)))
+                return .messageBody(
+                    mergedMessageBody
+                        .hydrating(mentionHydrator: ContactsMentionHydrator.mentionHydrator(transaction: transaction)),
+                )
             }()
             appendMessage(message, snippet: styledSnippet)
         }
 
         if Task.isCancelled {
             throw CancellationError()
+        }
+
+        if
+            DebugFlags.internalLogging,
+            searchText.count == 13,
+            let timestamp = UInt64(searchText),
+            let interactions = try? DependenciesBridge.shared.interactionStore.fetchInteractions(
+                timestamp: timestamp,
+                tx: transaction,
+            )
+        {
+            for interaction in interactions {
+                if let message = interaction as? TSMessage {
+                    appendMessage(message, snippet: nil)
+                }
+            }
         }
 
         // Order the conversation and message results in reverse chronological order.
@@ -667,7 +638,7 @@ public class FullTextSearcher: NSObject {
             contactThreadResults: contactThreadResults.sorted(by: >),
             groupThreadResults: groupResults.sorted(by: >),
             contactResults: contactResults.sorted(by: <),
-            messageResults: messages.values.sorted(by: >)
+            messageResults: messages.values.sorted(by: >),
         )
     }
 
@@ -676,7 +647,7 @@ public class FullTextSearcher: NSObject {
         isGroupThread: Bool,
         searchText: String,
         maxResults: Int = kDefaultMaxResults,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) throws(CancellationError) -> ConversationScreenSearchResultSet {
         var messages: [UInt64: MessageSearchResult] = [:]
 
@@ -689,7 +660,7 @@ public class FullTextSearcher: NSObject {
         FullTextSearchIndexer.search(
             for: searchText,
             maxResults: maxResults,
-            tx: transaction
+            tx: transaction,
         ) { message, _, stop in
             guard messages.count < maxResults else {
                 stop = true
@@ -710,14 +681,14 @@ public class FullTextSearcher: NSObject {
                 contactManager: SSKEnvironment.shared.contactManagerRef,
                 searchableNameIndexer: DependenciesBridge.shared.searchableNameIndexer,
                 phoneNumberVisibilityFetcher: DependenciesBridge.shared.phoneNumberVisibilityFetcher,
-                recipientDatabaseTable: DependenciesBridge.shared.recipientDatabaseTable
+                recipientDatabaseTable: DependenciesBridge.shared.recipientDatabaseTable,
             ).searchNames(
                 for: searchText,
                 maxResults: maxResults - messages.count,
                 localIdentifiers: localIdentifiers,
                 tx: transaction,
                 addGroupThread: { _ in },
-                addStoryThread: { _ in }
+                addStoryThread: { _ in },
             )
             for address in addresses {
                 guard let aci = address.serviceId as? Aci else {

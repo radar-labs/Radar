@@ -6,15 +6,16 @@
 import SignalServiceKit
 import SignalUI
 
-class PaymentsSendRecipientViewController: RecipientPickerContainerViewController {
-
+class PaymentsSendRecipientViewController: RecipientPickerContainerViewController, SendPaymentViewDelegate,
+    RecipientPickerDelegate, UsernameLinkScanDelegate
+{
     private let isOutgoingTransfer: Bool
 
-    public init(isOutgoingTransfer: Bool) {
+    init(isOutgoingTransfer: Bool) {
         self.isOutgoingTransfer = isOutgoingTransfer
     }
 
-    public static func presentAsFormSheet(fromViewController: UIViewController, isOutgoingTransfer: Bool) {
+    static func presentAsFormSheet(fromViewController: UIViewController, isOutgoingTransfer: Bool) {
         let view = PaymentsSendRecipientViewController(isOutgoingTransfer: isOutgoingTransfer)
         let navigationController = OWSNavigationController(rootViewController: view)
         fromViewController.presentFormSheet(navigationController, animated: true)
@@ -23,10 +24,12 @@ class PaymentsSendRecipientViewController: RecipientPickerContainerViewControlle
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        title = OWSLocalizedString("SETTINGS_PAYMENTS_SEND_TO_RECIPIENT_TITLE",
-                                  comment: "Label for the 'send payment to recipient' view in the payment settings.")
+        title = OWSLocalizedString(
+            "SETTINGS_PAYMENTS_SEND_TO_RECIPIENT_TITLE",
+            comment: "Label for the 'send payment to recipient' view in the payment settings.",
+        )
 
-        view.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: true)
+        view.backgroundColor = .Signal.groupedBackground
 
         recipientPicker.allowsAddByAddress = false
         recipientPicker.shouldHideLocalRecipient = true
@@ -35,35 +38,35 @@ class PaymentsSendRecipientViewController: RecipientPickerContainerViewControlle
 
         addRecipientPicker()
 
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(didTapDismiss))
+        navigationItem.rightBarButtonItem = .doneButton { [weak self] in
+            self?.didTapDismiss()
+        }
     }
 
-    @objc
     private func didTapDismiss() {
         dismiss(animated: true)
     }
 
     private func showSendPayment(address: SignalServiceAddress) {
-        guard let navigationController = self.navigationController else {
+        guard let navigationController else {
             owsFailDebug("Missing navigationController.")
             return
         }
-        SendPaymentViewController.present(inNavigationController: navigationController,
-                                          delegate: self,
-                                          recipientAddress: address,
-                                          isOutgoingTransfer: isOutgoingTransfer,
-                                          mode: .fromPaymentSettings)
+        SendPaymentViewController.present(
+            inNavigationController: navigationController,
+            delegate: self,
+            recipientAddress: address,
+            isOutgoingTransfer: isOutgoingTransfer,
+            mode: .fromPaymentSettings,
+        )
     }
-}
 
-// MARK: -
-
-extension PaymentsSendRecipientViewController: RecipientPickerDelegate, UsernameLinkScanDelegate {
+    // MARK: - RecipientPickerDelegate
 
     func recipientPicker(
         _ recipientPickerViewController: RecipientPickerViewController,
         selectionStyleForRecipient recipient: PickedRecipient,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> UITableViewCell.SelectionStyle {
         // TODO: Nice-to-have: filter out recipients that do not support payments.
         return .default
@@ -71,7 +74,7 @@ extension PaymentsSendRecipientViewController: RecipientPickerDelegate, Username
 
     func recipientPicker(
         _ recipientPickerViewController: RecipientPickerViewController,
-        didSelectRecipient recipient: PickedRecipient
+        didSelectRecipient recipient: PickedRecipient,
     ) {
         switch recipient.identifier {
         case .address(let address):
@@ -82,9 +85,11 @@ extension PaymentsSendRecipientViewController: RecipientPickerDelegate, Username
         }
     }
 
-    func recipientPicker(_ recipientPickerViewController: RecipientPickerViewController,
-                         attributedSubtitleForRecipient recipient: PickedRecipient,
-                         transaction: DBReadTransaction) -> NSAttributedString? {
+    func recipientPicker(
+        _ recipientPickerViewController: RecipientPickerViewController,
+        attributedSubtitleForRecipient recipient: PickedRecipient,
+        transaction: DBReadTransaction,
+    ) -> NSAttributedString? {
         // TODO: Nice-to-have: filter out recipients that do not support payments.
         switch recipient.identifier {
         case .address(let address):
@@ -99,11 +104,8 @@ extension PaymentsSendRecipientViewController: RecipientPickerDelegate, Username
             return nil
         }
     }
-}
 
-// MARK: -
-
-extension PaymentsSendRecipientViewController: SendPaymentViewDelegate {
+    // MARK: - SendPaymentViewDelegate
 
     func didSendPayment(success: Bool) {
         dismiss(animated: true) {

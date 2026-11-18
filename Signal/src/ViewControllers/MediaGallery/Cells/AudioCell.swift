@@ -14,16 +14,9 @@ class AudioCell: MediaTileListModeCell {
 
     private var audioItem: MediaGalleryCellItemAudio? {
         didSet {
-            guard let audioItem else {
+            if audioItem == nil {
                 audioAttachment = nil
-                return
             }
-            audioAttachment = AudioAttachment(
-                attachmentStream: audioItem.attachmentStream,
-                owningMessage: audioItem.message,
-                metadata: audioItem.metadata,
-                receivedAtDate: audioItem.receivedAtDate
-            )
         }
     }
 
@@ -45,8 +38,8 @@ class AudioCell: MediaTileListModeCell {
 
         let currentContentSizeCategory = UITraitCollection.current.preferredContentSizeCategory
         let displaysTopLabel = AudioAllMediaPresenter.hasAttachmentLabel(
-            attachment: audioItem.attachmentStream.attachment,
-            isVoiceMessage: audioItem.isVoiceMessage
+            attachment: audioItem.referencedAttachment.attachment,
+            isVoiceMessage: audioItem.isVoiceMessage,
         )
 
         if let cellHeight: CGFloat = {
@@ -59,27 +52,43 @@ class AudioCell: MediaTileListModeCell {
             return cellHeight
         }
 
-        guard let audioAttachment = AudioAttachment(
-            attachmentStream: audioItem.attachmentStream,
-            owningMessage: audioItem.message,
-            metadata: audioItem.metadata,
-            receivedAtDate: audioItem.receivedAtDate
-        ) else {
+        let audioAttachment: AudioAttachment?
+        if let stream = audioItem.referencedAttachment.asReferencedStream {
+            audioAttachment = AudioAttachment(
+                attachmentStream: stream,
+                owningMessage: audioItem.message,
+                metadata: audioItem.metadata,
+                receivedAtDate: audioItem.receivedAtDate,
+            )
+        } else if let pointer = audioItem.referencedAttachment.asReferencedAnyPointer {
+            audioAttachment = AudioAttachment(
+                attachmentPointer: pointer,
+                owningMessage: audioItem.message,
+                metadata: audioItem.metadata,
+                receivedAtDate: audioItem.receivedAtDate,
+                downloadState: .none, // For cell height, this state shouldn't matter.
+            )
+        } else {
+            audioAttachment = nil
+        }
+
+        guard let audioAttachment else {
             return defaultCellHeight
         }
+
         let presenter = AudioAllMediaPresenter(
             sender: "",
             audioAttachment: audioAttachment,
             threadUniqueId: audioItem.thread.uniqueId,
-            playbackRate: .normal
+            playbackRate: .normal,
         )
         let audioMessageViewSize = AudioMessageView.measure(
             maxWidth: maxWidth,
             measurementBuilder: CVCellMeasurement.Builder(),
-            presentation: presenter
+            presentation: presenter,
         )
 
-        let cellHeight = audioMessageViewSize.height + AudioCell.contentInset.totalHeight + 2*Self.contentCardVerticalInset
+        let cellHeight = audioMessageViewSize.height + AudioCell.contentInset.totalHeight + 2 * Self.contentCardVerticalInset
         if displaysTopLabel {
             cellHeightsWithTopLabel[currentContentSizeCategory] = cellHeight
         } else {
@@ -107,7 +116,7 @@ class AudioCell: MediaTileListModeCell {
 
     private let audioMessageContainerView: UIView = {
         let view = UIView.container()
-        view.backgroundColor = UIColor(dynamicProvider: { _ in Theme.tableCell2PresentedBackgroundColor })
+        view.backgroundColor = .Signal.tertiaryBackground
         view.translatesAutoresizingMaskIntoConstraints = false
         view.layer.cornerRadius = 10
         view.layer.masksToBounds = true
@@ -127,26 +136,25 @@ class AudioCell: MediaTileListModeCell {
             return
         }
 
-        let threadAssociatedData = ThreadAssociatedData.fetchOrDefault(for: audioItem.thread, transaction: transaction)
         // Make an itemModel which is needed to play the audio file.
         // This is only used to save the playback rate, which is kind of nuts.
         let threadViewModel = ThreadViewModel(
             thread: audioItem.thread,
             forChatList: false,
-            transaction: transaction
+            transaction: transaction,
         )
         let conversationStyle = ConversationStyle(
             type: .default,
             thread: audioItem.thread,
             viewWidth: contentView.bounds.width,
             hasWallpaper: false,
-            isWallpaperPhoto: false,
-            chatColor: ChatColorSettingStore.Constants.defaultColor.colorSetting
+            shouldDimWallpaperInDarkMode: false,
+            chatColor: ChatColorSettingStore.Constants.defaultColor.colorSetting,
         )
         let coreState = CVCoreState(conversationStyle: conversationStyle, mediaCache: audioItem.mediaCache)
         let viewStateSnapshot = CVViewStateSnapshot.mockSnapshotForStandaloneItems(
             coreState: coreState,
-            spoilerReveal: spoilerState.revealState
+            spoilerReveal: spoilerState.revealState,
         )
         let itemBuildingContext = CVItemBuildingContextImpl(
             prevRenderState: nil,
@@ -154,34 +162,35 @@ class AudioCell: MediaTileListModeCell {
             viewStateSnapshot: viewStateSnapshot,
             transaction: transaction,
             avatarBuilder: CVAvatarBuilder(transaction: transaction),
-            localAci: localAci
+            localAci: localAci,
         )
-        guard let componentState = try? CVComponentState.build(
-            interaction: audioItem.interaction,
-            itemBuildingContext: itemBuildingContext
-        ) else {
+        guard
+            let componentState = try? CVComponentState.build(
+                interaction: audioItem.interaction,
+                itemBuildingContext: itemBuildingContext,
+            )
+        else {
             return
         }
         let itemViewState = CVItemViewState.Builder()
-        itemViewState.audioPlaybackRate = threadAssociatedData.audioPlaybackRate
+        itemViewState.audioPlaybackRate = audioItem.thread.audioPlaybackRate
         let itemModel = CVItemModel(
             interaction: audioItem.interaction,
             thread: audioItem.thread,
-            threadAssociatedData: threadAssociatedData,
             componentState: componentState,
             itemViewState: itemViewState.build(),
-            coreState: coreState
+            coreState: coreState,
         )
         let presentation = AudioAllMediaPresenter(
             sender: audioItem.metadata.abbreviatedSender,
             audioAttachment: audioAttachment,
             threadUniqueId: audioItem.thread.uniqueId,
-            playbackRate: AudioPlaybackRate(rawValue: itemModel.itemViewState.audioPlaybackRate)
+            playbackRate: AudioPlaybackRate(rawValue: itemModel.itemViewState.audioPlaybackRate),
         )
         let view = AudioMessageView(
             presentation: presentation,
             audioMessageViewDelegate: self,
-            mediaCache: audioItem.mediaCache
+            mediaCache: audioItem.mediaCache,
         )
         view.translatesAutoresizingMaskIntoConstraints = false
         if let incomingMessage = audioItem.interaction as? TSIncomingMessage {
@@ -194,7 +203,7 @@ class AudioCell: MediaTileListModeCell {
         measurementBuilder.cellSize = AudioMessageView.measure(
             maxWidth: contentView.bounds.width, // actual max width doesn't matter because there's no multiline text
             measurementBuilder: measurementBuilder,
-            presentation: presentation
+            presentation: presentation,
         )
         let cellMeasurement = measurementBuilder.build()
         view.configureForRendering(cellMeasurement: cellMeasurement, conversationStyle: conversationStyle)
@@ -219,29 +228,34 @@ class AudioCell: MediaTileListModeCell {
         NSLayoutConstraint.activate([
             audioMessageContainerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: Self.contentCardVerticalInset),
             audioMessageContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -Self.contentCardVerticalInset),
-            audioMessageContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -OWSTableViewController2.defaultHOuterMargin)
+            audioMessageContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -OWSTableViewController2.defaultHOuterMargin),
         ])
 
         let constraintWithSelectionButton = audioMessageContainerView.leadingAnchor.constraint(
             equalTo: selectionButton.trailingAnchor,
-            constant: 12
+            constant: 12,
         )
         let constraintWithoutSelectionButton = audioMessageContainerView.leadingAnchor.constraint(
             equalTo: contentView.leadingAnchor,
-            constant: OWSTableViewController2.defaultHOuterMargin
+            constant: OWSTableViewController2.defaultHOuterMargin,
         )
 
         addGestureRecognizer(tapGestureRecognizer)
         addGestureRecognizer(panGestureRecognizer)
         tapGestureRecognizer.require(toFail: panGestureRecognizer)
 
-        super.setupViews(constraintWithSelectionButton: constraintWithSelectionButton,
-                         constraintWithoutSelectionButton: constraintWithoutSelectionButton)
+        super.setupViews(
+            constraintWithSelectionButton: constraintWithSelectionButton,
+            constraintWithoutSelectionButton: constraintWithoutSelectionButton,
+        )
     }
 
     @objc
     private func handlePanGesture(_ sender: UIPanGestureRecognizer) {
-        guard let audioMessageView, let audioItem else { return }
+        guard
+            let audioMessageView,
+            let audioAttachment
+        else { return }
 
         let location = panGestureRecognizer.location(in: audioMessageView)
         switch panGestureRecognizer.state {
@@ -258,8 +272,8 @@ class AudioCell: MediaTileListModeCell {
             let scrubbedTime = audioMessageView.scrubToLocation(location)
             let cvAudioPlayer = AppEnvironment.shared.cvAudioPlayerRef
             cvAudioPlayer.setPlaybackProgress(
-                progress: scrubbedTime,
-                forAttachmentStream: audioItem.attachmentStream.attachmentStream
+                scrubbedTime,
+                playbackID: CVAudioPlaybackID(audioAttachment: audioAttachment),
             )
         case .possible, .failed, .cancelled:
             audioMessageView.clearOverrideProgress(animated: false)
@@ -271,17 +285,25 @@ class AudioCell: MediaTileListModeCell {
 
     @objc
     private func handleTapGesture(_ sender: UITapGestureRecognizer) {
-        // TODO: When adding support for undownloaded attachments, tapping should cancel or retry downloading.
-        // See the logic in CVComponentAudioAttachment.handleTap(sender:,componentDelegate:,componentView:,renderItem:)
         guard let itemModel, let audioMessageView, let audioItem, let audioAttachment else {
             return
         }
-        if audioMessageView.handleTap(sender: sender, itemModel: itemModel) {
-            return
+        if case .attachmentStream = audioAttachment.state {
+            if audioMessageView.handleTap(sender: sender, itemModel: itemModel) {
+                return
+            }
+            let cvAudioPlayer = AppEnvironment.shared.cvAudioPlayerRef
+            cvAudioPlayer.setPlaybackRate(itemModel.itemViewState.audioPlaybackRate, forThreadUniqueId: audioItem.thread.uniqueId)
+            cvAudioPlayer.togglePlayState(forAudioAttachment: audioAttachment)
+        } else if
+            let downloadTask,
+            !downloadTask.isCancelled
+        {
+            downloadTask.cancel()
+            self.downloadTask = nil
+        } else {
+            downloadItemIfNeeded()
         }
-        let cvAudioPlayer = AppEnvironment.shared.cvAudioPlayerRef
-        cvAudioPlayer.setPlaybackRate(itemModel.itemViewState.audioPlaybackRate, forThreadUniqueId: audioItem.thread.uniqueId)
-        cvAudioPlayer.togglePlayState(forAudioAttachment: audioAttachment)
     }
 
     private func setUpAccessibility(item: MediaGalleryCellItemAudio?) {
@@ -290,10 +312,10 @@ class AudioCell: MediaTileListModeCell {
         if let audioItem {
             accessibilityLabel = [
                 audioItem.localizedString,
-                MediaTileDateFormatter.formattedDateString(for: audioItem.receivedAtDate)
+                MediaTileDateFormatter.formattedDateString(for: audioItem.receivedAtDate),
             ]
-                .compactMap { $0 }
-                .joined(separator: ", ")
+            .compactMap { $0 }
+            .joined(separator: ", ")
         } else {
             accessibilityLabel = ""
         }
@@ -310,7 +332,6 @@ class AudioCell: MediaTileListModeCell {
             owsFailDebug("Unexpected item type")
             return
         }
-        self.audioItem = audioItem
         self.spoilerState = spoilerState
 
         if let audioMessageView {
@@ -318,7 +339,24 @@ class AudioCell: MediaTileListModeCell {
             self.audioMessageView = nil
         }
 
+        self.audioItem = audioItem
         SSKEnvironment.shared.databaseStorageRef.read { transaction in
+            if let referencedStream = audioItem.referencedAttachment.asReferencedStream {
+                audioAttachment = AudioAttachment(
+                    attachmentStream: referencedStream,
+                    owningMessage: audioItem.message,
+                    metadata: audioItem.metadata,
+                    receivedAtDate: audioItem.receivedAtDate,
+                )
+            } else if let pointer = audioItem.referencedAttachment.asReferencedAnyPointer {
+                audioAttachment = AudioAttachment(
+                    attachmentPointer: pointer,
+                    owningMessage: audioItem.message,
+                    metadata: audioItem.metadata,
+                    receivedAtDate: audioItem.receivedAtDate,
+                    downloadState: pointer.attachmentPointer.downloadState(tx: transaction),
+                )
+            }
             createAudioMessageView(transaction: transaction)
         }
     }

@@ -21,11 +21,12 @@ public protocol BackupAttachmentDownloadQueueRunner {
     func restoreAttachmentsIfNeeded(mode: BackupAttachmentDownloadQueueMode) async throws
 }
 
-public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQueueRunner {
+class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQueueRunner {
 
     private let appContext: AppContext
     private let attachmentStore: AttachmentStore
     private let backupAttachmentDownloadStore: BackupAttachmentDownloadStore
+    private let backupMediaErrorNotificationPresenter: BackupMediaErrorNotificationPresenter
     private let backupSettingsStore: BackupSettingsStore
     private let dateProvider: DateProvider
     private let db: any DB
@@ -39,13 +40,14 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
     private let fullsizeTaskQueue: TaskQueueLoader<TaskRunner>
     private let thumbnailTaskQueue: TaskQueueLoader<TaskRunner>
 
-    public init(
+    init(
         appContext: AppContext,
         attachmentStore: AttachmentStore,
         attachmentDownloadManager: AttachmentDownloadManager,
         attachmentUploadStore: AttachmentUploadStore,
         backupAttachmentDownloadStore: BackupAttachmentDownloadStore,
         backupAttachmentUploadScheduler: BackupAttachmentUploadScheduler,
+        backupMediaErrorNotificationPresenter: BackupMediaErrorNotificationPresenter,
         backupListMediaManager: BackupListMediaManager,
         backupSettingsStore: BackupSettingsStore,
         dateProvider: @escaping DateProvider,
@@ -54,12 +56,14 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
         progress: BackupAttachmentDownloadProgress,
         remoteConfigProvider: RemoteConfigProvider,
         statusManager: BackupAttachmentDownloadQueueStatusManager,
-        tsAccountManager: TSAccountManager
+        tsAccountManager: TSAccountManager,
     ) {
+        let logger = PrefixedLogger(prefix: "[Backups]")
+
         self.appContext = appContext
         self.attachmentStore = attachmentStore
         self.backupAttachmentDownloadStore = backupAttachmentDownloadStore
-        let logger = PrefixedLogger(prefix: "[Backups]")
+        self.backupMediaErrorNotificationPresenter = backupMediaErrorNotificationPresenter
         self.logger = logger
         self.backupSettingsStore = backupSettingsStore
         self.dateProvider = dateProvider
@@ -78,6 +82,7 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
                 attachmentUploadStore: attachmentUploadStore,
                 backupAttachmentDownloadStore: backupAttachmentDownloadStore,
                 backupAttachmentUploadScheduler: backupAttachmentUploadScheduler,
+                backupMediaErrorNotificationPresenter: backupMediaErrorNotificationPresenter,
                 backupSettingsStore: backupSettingsStore,
                 dateProvider: dateProvider,
                 db: db,
@@ -87,7 +92,7 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
                 progress: progress,
                 remoteConfigProvider: remoteConfigProvider,
                 statusManager: statusManager,
-                tsAccountManager: tsAccountManager
+                tsAccountManager: tsAccountManager,
             )
             return TaskQueueLoader(
                 maxConcurrentTasks: {
@@ -98,7 +103,7 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
                 }(),
                 dateProvider: dateProvider,
                 db: db,
-                runner: taskRunner
+                runner: taskRunner,
             )
         }
 
@@ -106,7 +111,7 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
         self.thumbnailTaskQueue = taskQueue(mode: .thumbnail)
     }
 
-    public func restoreAttachmentsIfNeeded(mode: BackupAttachmentDownloadQueueMode) async throws {
+    func restoreAttachmentsIfNeeded(mode: BackupAttachmentDownloadQueueMode) async throws {
         guard appContext.isMainApp else { return }
 
         let taskQueue: TaskQueueLoader<TaskRunner>
@@ -132,47 +137,43 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
             logger.info("\(logString) backup attachment download queue empty!")
             return
         case .notRegisteredAndReady:
-            try await taskQueue.stop()
+            await taskQueue.stop()
             return
         case .noWifiReachability:
             logger.info("Skipping \(logString) backup attachment downloads while not reachable by wifi")
-            try await taskQueue.stop()
+            await taskQueue.stop()
             return
         case .noReachability:
             logger.info("Skipping \(logString) backup attachment downloads while not reachable at all")
-            try await taskQueue.stop()
+            await taskQueue.stop()
             return
         case .lowBattery:
             logger.info("Skipping \(logString) backup attachment downloads while low battery")
-            try await taskQueue.stop()
+            await taskQueue.stop()
             return
         case .lowPowerMode:
             logger.info("Skipping \(logString) backup attachment downloads while low power mode")
-            try await taskQueue.stop()
+            await taskQueue.stop()
             return
         case .lowDiskSpace:
             logger.info("Skipping \(logString) backup attachment downloads while low on disk space")
-            try await taskQueue.stop()
+            await taskQueue.stop()
             return
         case .appBackgrounded:
             logger.info("Skipping \(logString) backup attachment downloads while backgrounded")
-            try await taskQueue.stop()
+            await taskQueue.stop()
             return
         }
 
-        do {
-            try await progress.beginObserving()
-        } catch {
-            owsFailDebug("Unable to observe \(logString) download progres \(error.grdbErrorForLogging)")
-        }
+        progress.beginObserving()
 
         let backgroundTask = OWSBackgroundTask(
-            label: #function + logString
+            label: #function + logString,
         ) { [weak taskQueue] status in
             switch status {
             case .expired:
                 Task {
-                    try? await taskQueue?.stop()
+                    await taskQueue?.stop()
                 }
             case .couldNotStart, .success:
                 break
@@ -194,6 +195,7 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
         private let attachmentUploadStore: AttachmentUploadStore
         private let backupAttachmentDownloadStore: BackupAttachmentDownloadStore
         private let backupAttachmentUploadScheduler: BackupAttachmentUploadScheduler
+        private let backupMediaErrorNotificationPresenter: BackupMediaErrorNotificationPresenter
         private let backupSettingsStore: BackupSettingsStore
         private let dateProvider: DateProvider
         private let db: any DB
@@ -204,6 +206,17 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
         private let remoteConfigProvider: RemoteConfigProvider
         private let statusManager: BackupAttachmentDownloadQueueStatusManager
         private let tsAccountManager: TSAccountManager
+
+        private lazy var availableDiskSpaceCheck = DebouncedEvents.build(
+            mode: .lastOnly,
+            maxFrequencySeconds: 1.0,
+            onQueue: .sharedUserInitiated,
+            notifyBlock: { [weak self] in
+                Task {
+                    await self?.statusManager.checkAvailableDiskSpace(clearPreviousOutOfSpaceErrors: false)
+                }
+            },
+        )
 
         let store: TaskStore
 
@@ -216,6 +229,7 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
             attachmentUploadStore: AttachmentUploadStore,
             backupAttachmentDownloadStore: BackupAttachmentDownloadStore,
             backupAttachmentUploadScheduler: BackupAttachmentUploadScheduler,
+            backupMediaErrorNotificationPresenter: BackupMediaErrorNotificationPresenter,
             backupSettingsStore: BackupSettingsStore,
             dateProvider: @escaping DateProvider,
             db: any DB,
@@ -225,7 +239,7 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
             progress: BackupAttachmentDownloadProgress,
             remoteConfigProvider: RemoteConfigProvider,
             statusManager: BackupAttachmentDownloadQueueStatusManager,
-            tsAccountManager: TSAccountManager
+            tsAccountManager: TSAccountManager,
         ) {
             self.mode = mode
             self.attachmentStore = attachmentStore
@@ -233,6 +247,7 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
             self.attachmentUploadStore = attachmentUploadStore
             self.backupAttachmentDownloadStore = backupAttachmentDownloadStore
             self.backupAttachmentUploadScheduler = backupAttachmentUploadScheduler
+            self.backupMediaErrorNotificationPresenter = backupMediaErrorNotificationPresenter
             self.backupSettingsStore = backupSettingsStore
             self.dateProvider = dateProvider
             self.db = db
@@ -250,7 +265,10 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
             )
         }
 
-        func runTask(record: Store.Record, loader: TaskQueueLoader<TaskRunner>) async -> TaskRecordResult {
+        func runTask(
+            recordId: TaskRecord.ID,
+            loader: TaskQueueLoader<TaskRunner>,
+        ) async -> TaskRecordResult {
             struct SuspendedError: Error {}
             struct NeedsDiskSpaceError: Error {}
             struct NeedsBatteryError: Error {}
@@ -258,10 +276,9 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
             struct NeedsInternetError: Error {}
             struct NeedsToBeRegisteredError: Error {}
 
-            await statusManager.quickCheckDiskSpaceForDownloads()
+            availableDiskSpaceCheck.requestNotify()
 
             let (status, statusToken) = await statusManager.currentStatusAndToken(for: mode)
-
             switch status {
             case .running:
                 break
@@ -269,33 +286,41 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
                 // The queue will stop on its own, finish this task.
                 break
             case .suspended:
-                try? await loader.stop()
+                await loader.stop()
                 return .retryableError(SuspendedError())
             case .lowDiskSpace:
-                try? await loader.stop()
+                await loader.stop()
                 return .retryableError(NeedsDiskSpaceError())
             case .lowBattery, .lowPowerMode:
-                try? await loader.stop()
+                await loader.stop()
                 return .retryableError(NeedsBatteryError())
             case .appBackgrounded:
-                try? await loader.stop()
+                await loader.stop()
                 return .retryableError(AppBackgroundedError())
             case .noWifiReachability, .noReachability:
-                try? await loader.stop()
+                await loader.stop()
                 return .retryableError(NeedsInternetError())
             case .notRegisteredAndReady:
-                try? await loader.stop()
+                await loader.stop()
                 return .retryableError(NeedsToBeRegisteredError())
             }
 
             let (
+                downloadRecord,
                 attachment,
                 backupPlan,
                 registrationState,
-                needsListMedia
-            ) = db.read { (tx) -> (Attachment?, BackupPlan, TSRegistrationState, Bool) in
+                needsListMedia,
+            ) = db.read { tx -> (
+                QueuedBackupAttachmentDownload?,
+                Attachment?,
+                BackupPlan,
+                TSRegistrationState,
+                Bool
+            ) in
                 return (
-                    attachmentStore.fetch(id: record.record.attachmentRowId, tx: tx),
+                    store.fetchRecord(recordId: recordId, tx: tx),
+                    attachmentStore.fetch(id: recordId.attachmentRowId, tx: tx),
                     backupSettingsStore.backupPlan(tx: tx),
                     tsAccountManager.registrationState(tx: tx),
                     self.listMediaManager.getNeedsQueryListMedia(tx: tx),
@@ -304,20 +329,20 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
 
             if needsListMedia {
                 // If we need to list media, quit out early so we can do that.
-                try? await loader.stop(reason: NeedsListMediaError())
+                await loader.stop(reason: NeedsListMediaError())
                 return .retryableError(NeedsListMediaError())
             }
 
-            guard let attachment else {
-                return .cancelled
+            guard let downloadRecord, let attachment else {
+                return .obsolete
             }
 
             let progressSink: OWSProgressSink?
-            if record.record.isThumbnail {
+            if downloadRecord.isThumbnail {
                 progressSink = nil
             } else {
-                progressSink = await progress.willBeginDownloadingFullsizeAttachment(
-                    withId: record.record.attachmentRowId
+                progressSink = progress.willBeginDownloadingFullsizeAttachment(
+                    withId: downloadRecord.attachmentRowId,
                 )
             }
 
@@ -325,16 +350,16 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
             let remoteConfig = remoteConfigProvider.currentConfig()
             let eligibility = BackupAttachmentDownloadEligibility.forAttachment(
                 attachment,
-                downloadRecord: record.record,
+                downloadRecord: downloadRecord,
                 currentTimestamp: nowMs,
                 backupPlan: backupPlan,
                 remoteConfig: remoteConfig,
-                isPrimaryDevice: registrationState.isRegisteredPrimaryDevice
+                isPrimaryDevice: registrationState.isRegisteredPrimaryDevice,
             )
 
             struct NoLongerEligibleError: Error {}
             let relevantEligibilityState: QueuedBackupAttachmentDownload.State? = {
-                if record.record.isThumbnail {
+                if downloadRecord.isThumbnail {
                     return eligibility.thumbnailMediaTierState
                 } else {
                     return eligibility.fullsizeState
@@ -346,24 +371,24 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
             case nil:
                 // No longer at all eligible to download from this source.
                 // count this as having completed the download for progress tracking purposes.
-                if !record.record.isThumbnail {
-                    await progress.didFinishDownloadOfFullsizeAttachment(
-                        withId: record.record.attachmentRowId,
-                        byteCount: UInt64(record.record.estimatedByteCount)
+                if !downloadRecord.isThumbnail {
+                    progress.didFinishDownloadOfFullsizeAttachment(
+                        withId: downloadRecord.attachmentRowId,
+                        byteCount: UInt64(downloadRecord.estimatedByteCount),
                     )
                 }
-                return .cancelled
+                return .obsolete
             case .ineligible:
                 // Current state prevents running this row; unclear how we
                 // got here but mark it ineligible in the queue now and return
                 // a a "retryable" error so we don't wipe this row from the queue.
                 // Since its now ineligible it will be skipped going forward.
                 Logger.info("Marking \(attachment.id) ineligible and skipping download")
-                try? await db.awaitableWrite { tx in
-                    try backupAttachmentDownloadStore.markIneligible(
+                await db.awaitableWrite { tx in
+                    backupAttachmentDownloadStore.markIneligible(
                         attachmentId: attachment.id,
-                        thumbnail: record.record.isThumbnail,
-                        tx: tx
+                        thumbnail: downloadRecord.isThumbnail,
+                        tx: tx,
                     )
                 }
                 return .retryableError(NoLongerEligibleError())
@@ -371,37 +396,37 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
                 // All done! Mark done and treat it as a "retryable" error
                 // so we don't wipe this row from the queue. Since its now
                 // done it will be skipped going forward.
-                try? await db.awaitableWrite { tx in
-                    try backupAttachmentDownloadStore.markDone(
+                await db.awaitableWrite { tx in
+                    backupAttachmentDownloadStore.markDone(
                         attachmentId: attachment.id,
-                        thumbnail: record.record.isThumbnail,
-                        tx: tx
+                        thumbnail: downloadRecord.isThumbnail,
+                        tx: tx,
                     )
                 }
                 // count this as having completed the download.
-                if !record.record.isThumbnail {
-                    await progress.didFinishDownloadOfFullsizeAttachment(
-                        withId: record.record.attachmentRowId,
-                        byteCount: UInt64(record.record.estimatedByteCount)
+                if !downloadRecord.isThumbnail {
+                    progress.didFinishDownloadOfFullsizeAttachment(
+                        withId: downloadRecord.attachmentRowId,
+                        byteCount: UInt64(downloadRecord.estimatedByteCount),
                     )
                 }
                 return .retryableError(NoLongerEligibleError())
             }
 
             let source: DownloadSource = {
-                if record.record.isThumbnail {
+                if downloadRecord.isThumbnail {
                     return .mediaTierThumbnail
                 }
                 if
                     eligibility.fullsizeMediaTierState == .ready,
                     // Try media tier once first if available
-                    record.record.numRetries == 0
+                    downloadRecord.numRetries == 0
                 {
                     return .mediaTierFullsize
                 } else if
                     let transitTierInfo = attachment.latestTransitTierInfo,
                     eligibility.fullsizeMediaTierState != .ready
-                        || record.record.numRetries == 1,
+                    || downloadRecord.numRetries == 1,
                     eligibility.fullsizeTransitTierState == .ready
                 {
                     // Otherwise try transit tier if media tier has failed once before.
@@ -414,15 +439,15 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
 
             do {
                 try await self.attachmentDownloadManager.downloadAttachment(
-                    id: record.record.attachmentRowId,
+                    id: downloadRecord.attachmentRowId,
                     priority: .backupRestore,
                     source: source.asSourceType,
-                    progress: progressSink
+                    progress: progressSink,
                 )
             } catch let error {
                 if Task.isCancelled {
                     logger.info("Cancelled; stopping the queue")
-                    try? await loader.stop(reason: CancellationError())
+                    await loader.stop(reason: CancellationError())
                     return .retryableError(CancellationError())
                 }
 
@@ -437,22 +462,24 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
                     break
                 case .suspended, .lowDiskSpace, .lowBattery, .lowPowerMode, .noWifiReachability, .noReachability, .appBackgrounded, .notRegisteredAndReady:
                     // Stop the queue now proactively.
-                    try? await loader.stop()
+                    await loader.stop()
                 }
 
-                switch (error as? AttachmentDownloads.Error) {
+                switch error as? AttachmentDownloads.Error {
                 case nil, .expiredCredentials:
                     break
                 case .blockedByAutoDownloadSettings:
-                    owsFailDebug("Backup downloads should never by blocked by auto download settings!")
+                    owsFailDebug("Backup downloads should never be blocked by auto download settings!")
                     // This should be impossible. Stop the queue, it can start up again later
                     // on whatever the next trigger is.
-                    try? await loader.stop()
+                    await backupMediaErrorNotificationPresenter.notifyIfNecessary()
+                    await loader.stop()
                     return .retryableError(error)
                 case .blockedByActiveCall:
                     // TODO: [Backups] suspend downloads during calls and resume after
-                    owsFailDebug("Backup downloads are currently not blocked by active calls!")
-                    try? await loader.stop()
+                    owsFailDebug("Backup downloads should never be blocked by active calls!")
+                    await backupMediaErrorNotificationPresenter.notifyIfNecessary()
+                    await loader.stop()
                     return .retryableError(error)
                 case .blockedByPendingMessageRequest:
                     switch source {
@@ -464,10 +491,11 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
                         // should not auto-download stuff in message request state.
                         return .unretryableError(error)
                     case .mediaTierFullsize, .mediaTierThumbnail:
-                        owsFailDebug("Media tier downloads should never by blocked by message request state!")
+                        owsFailDebug("Media tier downloads should never be blocked by message request state!")
+                        await backupMediaErrorNotificationPresenter.notifyIfNecessary()
                         // This should be impossible. Stop the queue, it can start up again later
                         // on whatever the next trigger is.
-                        try? await loader.stop()
+                        await loader.stop()
                         return .retryableError(error)
                     }
                 case .blockedByNetworkState:
@@ -475,7 +503,7 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
                     // (e.g. we need wifi and aren't connected). Stop the queue; the status should
                     // catch up momentarily and notify when reachability state changes.
                     Logger.warn("Download failed due to reachability; proactively stopping the queue")
-                    try? await loader.stop()
+                    await loader.stop()
                     return .retryableError(error)
                 }
 
@@ -497,7 +525,7 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
                         case .paid, .paidExpiringSoon, .paidAsTester:
                             break
                         }
-                        guard let attachment = attachmentStore.fetch(id: record.record.attachmentRowId, tx: tx) else {
+                        guard let attachment = attachmentStore.fetch(id: downloadRecord.attachmentRowId, tx: tx) else {
                             return false
                         }
                         return attachment.mediaTierInfo != nil
@@ -509,29 +537,29 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
                 }
 
                 if
-                    !record.record.isThumbnail,
-                    record.record.numRetries == 0,
+                    !downloadRecord.isThumbnail,
+                    downloadRecord.numRetries == 0,
                     eligibility.fullsizeTransitTierState == .ready,
                     source == .mediaTierFullsize
                 {
                     // Retry as transit tier. If we wouldn't have retried as media tier anyway,
                     // wipe the media tier info so that we reupload in the future.
                     return .retryableError(RetryAsTransitTierError(
-                        shouldWipeMediaTierInfo: error.httpStatusCode == 404 && !canRetryMediaTier404()
+                        shouldWipeMediaTierInfo: error.httpStatusCode == 404 && !canRetryMediaTier404(),
                     ))
                 } else if
                     error.httpStatusCode == 404,
-                    !record.record.isThumbnail,
-                    record.record.canDownloadFromMediaTier,
+                    !downloadRecord.isThumbnail,
+                    downloadRecord.canDownloadFromMediaTier,
                     canRetryMediaTier404(),
                     let nextRetryTimestamp = { () -> UInt64? in
-                        guard record.record.numRetries < 32 else {
+                        guard downloadRecord.numRetries < 32 else {
                             owsFailDebug("Too many retries!")
                             return nil
                         }
                         // Exponential backoff, starting at 1 day.
                         let delay = OWSOperation.retryIntervalForExponentialBackoff(
-                            failureCount: record.record.numRetries,
+                            failureCount: downloadRecord.numRetries,
                             minAverageBackoff: .day,
                             maxAverageBackoff: .day * 30,
                         )
@@ -551,24 +579,24 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
 
             await statusManager.jobDidSucceed(token: statusToken, mode: mode)
 
-            if !record.record.isThumbnail {
-                await progress.didFinishDownloadOfFullsizeAttachment(
-                    withId: record.record.attachmentRowId,
-                    byteCount: UInt64(record.record.estimatedByteCount)
+            if !downloadRecord.isThumbnail {
+                progress.didFinishDownloadOfFullsizeAttachment(
+                    withId: downloadRecord.attachmentRowId,
+                    byteCount: UInt64(downloadRecord.estimatedByteCount),
                 )
             }
 
             return .success
         }
 
-        func didSucceed(record: Store.Record, tx: DBWriteTransaction) throws {
-            logger.info("Finished restoring attachment \(record.record.attachmentRowId), download \(record.id), isThumbnail: \(record.record.isThumbnail)")
+        func didSucceed(recordId: TaskRecord.ID, tx: DBWriteTransaction) {
+            logger.info("Finished restoring attachment \(recordId.attachmentRowId), download \(recordId.rowId), isThumbnail: \(recordId.isThumbnail)")
             // Mark the record done when we succeed; this will filter it out
             // from future queue pop/peek operations.
-            try backupAttachmentDownloadStore.markDone(
-                attachmentId: record.record.attachmentRowId,
-                thumbnail: record.record.isThumbnail,
-                tx: tx
+            backupAttachmentDownloadStore.markDone(
+                attachmentId: recordId.attachmentRowId,
+                thumbnail: recordId.isThumbnail,
+                tx: tx,
             )
         }
 
@@ -602,90 +630,100 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
             let source: DownloadSource
         }
 
-        func didFail(record: Store.Record, error: any Error, isRetryable: Bool, tx: DBWriteTransaction) throws {
-            logger.warn("Failed restoring attachment \(record.id), isRetryable: \(isRetryable), isThumbnail: \(record.record.isThumbnail), error: \(error)")
+        func didFail(
+            recordId: TaskRecord.ID,
+            error: any Error,
+            isRetryable: Bool,
+            tx: DBWriteTransaction,
+        ) {
+            logger.warn("Failed restoring attachment \(recordId.attachmentRowId), download \(recordId.rowId), isRetryable: \(isRetryable), isThumbnail: \(recordId.isThumbnail), error: \(error)")
 
             if
                 isRetryable,
                 let nextRetryTimestamp =
-                    (error as? RetryMediaTierError)?.nextRetryTimestamp
+                (error as? RetryMediaTierError)?.nextRetryTimestamp
                     ?? (error as? Retry5xxError)?.nextRetryTimestamp
             {
-                var downloadRecord = record.record
-                downloadRecord.minRetryTimestamp = nextRetryTimestamp
-                downloadRecord.numRetries += 1
-                try downloadRecord.update(tx.database)
+                if var downloadRecord = store.fetchRecord(recordId: recordId, tx: tx) {
+                    downloadRecord.minRetryTimestamp = nextRetryTimestamp
+                    downloadRecord.numRetries += 1
+                    failIfThrows {
+                        try downloadRecord.update(tx.database)
+                    }
+                }
             } else if
                 isRetryable,
                 let error = error as? RetryAsTransitTierError
             {
                 // Just increment the retry count by 1 but don't update
                 // the retry timestamp so we retry immediately as transit tier.
-                var downloadRecord = record.record
-                downloadRecord.numRetries += 1
-                try downloadRecord.update(tx.database)
-
-                if error.shouldWipeMediaTierInfo {
-                    try attachmentStore.removeMediaTierInfo(
-                        forAttachmentId: record.record.attachmentRowId,
-                        tx: tx
-                    )
-                    if
-                        let stream = attachmentStore.fetch(id: record.record.attachmentRowId, tx: tx)?.asStream()
-                    {
-                        try backupAttachmentUploadScheduler.enqueueUsingHighestPriorityOwnerIfNeeded(
-                            stream.attachment,
-                            mode: .fullsizeOnly,
-                            tx: tx
-                        )
+                if var downloadRecord = store.fetchRecord(recordId: recordId, tx: tx) {
+                    downloadRecord.numRetries += 1
+                    failIfThrows {
+                        try downloadRecord.update(tx.database)
                     }
                 }
+
+                if
+                    error.shouldWipeMediaTierInfo,
+                    let attachment = attachmentStore.fetch(id: recordId.attachmentRowId, tx: tx)
+                {
+                    attachmentStore.removeMediaTierInfo(
+                        attachment: attachment,
+                        tx: tx,
+                    )
+                    backupAttachmentUploadScheduler.enqueueUsingHighestPriorityOwnerIfNeeded(
+                        attachment,
+                        mode: .fullsize,
+                        tx: tx,
+                    )
+                }
             } else if !isRetryable {
-                try backupAttachmentDownloadStore.remove(
-                    attachmentId: record.record.attachmentRowId,
-                    thumbnail: record.record.isThumbnail,
-                    tx: tx
+                backupAttachmentDownloadStore.remove(
+                    attachmentId: recordId.attachmentRowId,
+                    thumbnail: recordId.isThumbnail,
+                    tx: tx,
                 )
                 // For non-retryable 404 errors, go ahead and wipe the relevant cdn
                 // info from the attachment, as download failed.
                 if let error = error as? Unretryable404Error {
+                    guard
+                        let attachment = attachmentStore.fetch(
+                            id: recordId.attachmentRowId,
+                            tx: tx,
+                        )
+                    else {
+                        owsFailDebug("Missing attachment!")
+                        return
+                    }
+
                     switch error.source {
                     case .mediaTierThumbnail:
-                        try attachmentStore.removeThumbnailMediaTierInfo(
-                            forAttachmentId: record.record.attachmentRowId,
-                            tx: tx
+                        attachmentStore.removeThumbnailMediaTierInfo(
+                            attachment: attachment,
+                            tx: tx,
                         )
-                        if
-                            let stream = attachmentStore.fetch(id: record.record.attachmentRowId, tx: tx)?.asStream()
-                        {
-                            try backupAttachmentUploadScheduler.enqueueUsingHighestPriorityOwnerIfNeeded(
-                                stream.attachment,
-                                mode: .thumbnailOnly,
-                                tx: tx
-                            )
-                        }
+                        backupAttachmentUploadScheduler.enqueueUsingHighestPriorityOwnerIfNeeded(
+                            attachment,
+                            mode: .thumbnail,
+                            tx: tx,
+                        )
                     case .mediaTierFullsize:
-                        try attachmentStore.removeMediaTierInfo(
-                            forAttachmentId: record.record.attachmentRowId,
-                            tx: tx
+                        attachmentStore.removeMediaTierInfo(
+                            attachment: attachment,
+                            tx: tx,
                         )
-                        if
-                            let stream = attachmentStore.fetch(id: record.record.attachmentRowId, tx: tx)?.asStream()
-                        {
-                            try backupAttachmentUploadScheduler.enqueueUsingHighestPriorityOwnerIfNeeded(
-                                stream.attachment,
-                                mode: .fullsizeOnly,
-                                tx: tx
-                            )
-                        }
+                        backupAttachmentUploadScheduler.enqueueUsingHighestPriorityOwnerIfNeeded(
+                            attachment,
+                            mode: .fullsize,
+                            tx: tx,
+                        )
                     case .transitTier(let transitTierInfo):
-                        if let attachment = attachmentStore.fetch(id: record.record.attachmentRowId, tx: tx) {
-                            try attachmentUploadStore.markTransitTierUploadExpired(
-                                attachment: attachment,
-                                info: transitTierInfo,
-                                tx: tx
-                            )
-                        }
+                        attachmentStore.removeTransitTierInfo(
+                            transitTierInfo,
+                            attachment: attachment,
+                            tx: tx,
+                        )
                     }
                 }
             } else {
@@ -693,12 +731,12 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
             }
         }
 
-        func didCancel(record: Store.Record, tx: DBWriteTransaction) throws {
-            logger.warn("Cancelled restoring attachment \(record.record.attachmentRowId), download \(record.id), isThumbnail: \(record.record.isThumbnail)")
-            try backupAttachmentDownloadStore.remove(
-                attachmentId: record.record.attachmentRowId,
-                thumbnail: record.record.isThumbnail,
-                tx: tx
+        func didObsolete(recordId: TaskRecord.ID, tx: DBWriteTransaction) {
+            logger.warn("Obsoleted restoring attachment \(recordId.attachmentRowId), download \(recordId.rowId), isThumbnail: \(recordId.isThumbnail)")
+            backupAttachmentDownloadStore.remove(
+                attachmentId: recordId.attachmentRowId,
+                thumbnail: recordId.isThumbnail,
+                tx: tx,
             )
         }
 
@@ -708,7 +746,7 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
                 Logger.info("Did drain thumbnail queue")
             case .fullsize:
                 Logger.info("Did drain fullsize queue")
-                await progress.didEmptyFullsizeDownloadQueue()
+                progress.didEmptyFullsizeDownloadQueue()
             }
             await statusManager.didEmptyQueue(for: mode)
             switch mode {
@@ -720,7 +758,7 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
                     // This isn't load-bearing, but its nice to do just in case
                     // some new download gets added it can just count up to its own
                     // total.
-                    try? backupAttachmentDownloadStore.deleteAllDone(tx: tx)
+                    backupAttachmentDownloadStore.deleteAllDone(tx: tx)
                 }
             }
         }
@@ -729,8 +767,13 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
     // MARK: - TaskRecordStore
 
     struct TaskRecord: SignalServiceKit.TaskRecord {
-        let id: QueuedBackupAttachmentDownload.IDType
-        let record: QueuedBackupAttachmentDownload
+        struct ID: Hashable {
+            let rowId: QueuedBackupAttachmentDownload.IDType
+            let attachmentRowId: Attachment.IDType
+            let isThumbnail: Bool
+        }
+
+        let id: ID
         let nextRetryTimestamp: UInt64?
     }
 
@@ -748,25 +791,37 @@ public class BackupAttachmentDownloadQueueRunnerImpl: BackupAttachmentDownloadQu
             self.mode = mode
         }
 
-        func peek(count: UInt, tx: DBReadTransaction) throws -> [TaskRecord] {
+        func peek(count: UInt, tx: DBReadTransaction) -> [TaskRecord] {
             let forThumbnailDownloads = switch mode {
             case .thumbnail: true
             case .fullsize: false
             }
-            return try backupAttachmentDownloadStore.peek(
+            return backupAttachmentDownloadStore.peek(
                 count: count,
                 isThumbnail: forThumbnailDownloads,
-                tx: tx
+                tx: tx,
             ).map { record in
                 return TaskRecord(
-                    id: record.id!,
-                    record: record,
-                    nextRetryTimestamp: record.minRetryTimestamp
+                    id: TaskRecord.ID(
+                        rowId: record.id!,
+                        attachmentRowId: record.attachmentRowId,
+                        isThumbnail: record.isThumbnail,
+                    ),
+                    nextRetryTimestamp: record.minRetryTimestamp,
                 )
             }
         }
 
-        func removeRecord(_ record: TaskRecord, tx: DBWriteTransaction) throws {
+        func fetchRecord(
+            recordId: TaskRecord.ID,
+            tx: DBReadTransaction,
+        ) -> QueuedBackupAttachmentDownload? {
+            return failIfThrows {
+                try QueuedBackupAttachmentDownload.fetchOne(tx.database, key: recordId.rowId)
+            }
+        }
+
+        func removeRecord(recordId: TaskRecord.ID, tx: DBWriteTransaction) {
             // Rather than remove when we finish running a record, we mark it done
             // instead in the success callback, and delete it in failure callbacks.
             // So we do nothing here on purpose.
@@ -794,7 +849,7 @@ open class BackupAttachmentDownloadQueueRunnerMock: BackupAttachmentDownloadQueu
     public func backupPlanDidChange(
         from oldPlan: BackupPlan,
         to newPlan: BackupPlan,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws {
         // Do nothing
     }

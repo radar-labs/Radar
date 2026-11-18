@@ -15,12 +15,15 @@ class MockClient {
         try! SealedSenderAddress(
             e164: phoneNumber.stringValue,
             uuidString: aci.serviceIdString,
-            deviceId: deviceId.uint32Value
+            deviceId: deviceId.uint32Value,
         )
     }
 
     var localIdentifiers: LocalIdentifiers {
-        LocalIdentifiers(aci: aci, pni: nil, phoneNumber: phoneNumber.stringValue)
+        LocalIdentifiers(aci: aci, accountType: .phoneNumberfull(
+            phoneNumber: phoneNumber.stringValue,
+            pni: nil,
+        ))
     }
 
     let aci: Aci
@@ -44,8 +47,10 @@ class MockClient {
         self.registrationId = registrationId
         self.identityKeyPair = IdentityKeyPair.generate()
 
-        let protocolStore = InMemorySignalProtocolStore(identity: identityKeyPair,
-                                                        registrationId: UInt32(registrationId))
+        let protocolStore = InMemorySignalProtocolStore(
+            identity: identityKeyPair,
+            registrationId: UInt32(registrationId),
+        )
 
         sessionStore = protocolStore
         preKeyStore = protocolStore
@@ -62,13 +67,13 @@ class MockClient {
             signedPreKeyStore: signedPreKeyStore,
             kyberPreKeyStore: kyberPreKeyStore,
             identityStore: identityStore,
-            senderKeyStore: senderKeyStore
+            senderKeyStore: senderKeyStore,
         )
     }
 
     func generateMockPreKey() -> LibSignalClient.PreKeyRecord {
         let preKeyId = UInt32(Int32.random(in: 0...Int32.max))
-        let preKey = try! PreKeyRecord(id: preKeyId, privateKey: PrivateKey.generate())
+        let preKey = try! LibSignalClient.PreKeyRecord(id: preKeyId, privateKey: PrivateKey.generate())
         try! self.preKeyStore.storePreKey(preKey, id: preKeyId, context: NullContext())
         return preKey
     }
@@ -79,10 +84,12 @@ class MockClient {
         let generatedAt = Date()
         let identityKeyPair = try! self.identityStore.identityKeyPair(context: NullContext())
         let signature = identityKeyPair.privateKey.generateSignature(message: keyPair.publicKey.serialize())
-        let signedPreKey = try! SignedPreKeyRecord(id: signedPreKeyId,
-                                                   timestamp: UInt64(generatedAt.timeIntervalSince1970),
-                                                   privateKey: keyPair.privateKey,
-                                                   signature: signature)
+        let signedPreKey = try! SignedPreKeyRecord(
+            id: signedPreKeyId,
+            timestamp: UInt64(generatedAt.timeIntervalSince1970),
+            privateKey: keyPair.privateKey,
+            signature: signature,
+        )
         try! self.signedPreKeyStore.storeSignedPreKey(signedPreKey, id: signedPreKeyId, context: NullContext())
         return signedPreKey
     }
@@ -93,10 +100,12 @@ class MockClient {
         let generatedAt = Date()
         let identityKeyPair = try! self.identityStore.identityKeyPair(context: NullContext())
         let signature = identityKeyPair.privateKey.generateSignature(message: keyPair.publicKey.serialize())
-        let kyberPreKey = try! KyberPreKeyRecord(id: kyberPreKeyId,
-                                                  timestamp: UInt64(generatedAt.timeIntervalSince1970),
-                                                  keyPair: keyPair,
-                                                  signature: signature)
+        let kyberPreKey = try! KyberPreKeyRecord(
+            id: kyberPreKeyId,
+            timestamp: UInt64(generatedAt.timeIntervalSince1970),
+            keyPair: keyPair,
+            signature: signature,
+        )
         try! self.kyberPreKeyStore.storeKyberPreKey(kyberPreKey, id: kyberPreKeyId, context: NullContext())
         return kyberPreKey
     }
@@ -137,7 +146,7 @@ class MockClient {
         try! processPreKeyBundle(
             bobBundle,
             for: bobProtocolAddress,
-            ourAddress: self.protocolAddress,
+            ourAddress: protocolAddress,
             sessionStore: sessionStore,
             identityStore: identityStore,
             context: NullContext(),

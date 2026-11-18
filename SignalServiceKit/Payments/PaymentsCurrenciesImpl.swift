@@ -23,7 +23,7 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
             self,
             selector: #selector(updateConversionRates),
             name: PaymentsConstants.arePaymentsEnabledDidChange,
-            object: nil
+            object: nil,
         )
     }
 
@@ -60,12 +60,18 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
     }
 
     private static func loadCurrentCurrencyCode(transaction: DBReadTransaction) -> Currency.Code {
-        if let currencyCode = Self.keyValueStore.getString(Self.currentCurrencyCodeKey,
-                                                           transaction: transaction) {
+        if
+            let currencyCode = Self.keyValueStore.getString(
+                Self.currentCurrencyCodeKey,
+                transaction: transaction,
+            )
+        {
             return currencyCode
         }
-        if let localeCurrencyCode = Locale.current.currencyCode,
-           localeCurrencyCode.count == 3 {
+        if
+            let localeCurrencyCode = Locale.current.currencyCode,
+            localeCurrencyCode.count == 3
+        {
             return localeCurrencyCode
         }
         if Platform.isSimulator {
@@ -81,7 +87,7 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
 
         Self.keyValueStore.setString(currencyCode, key: Self.currentCurrencyCodeKey, transaction: transaction)
     }
-    
+
     public func setFetchRateHandler(_ handler: @escaping () async throws -> [(String, Double)]) {
         self.fetchRateHandler = handler
     }
@@ -176,7 +182,7 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
         guard let fetchRateHandler = self.fetchRateHandler else {
             return
         }
-        
+
         let rates = try await fetchRateHandler()
         let date = Date.now
         var conversionRateMap = ConversionRateMap()
@@ -188,15 +194,15 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
                 Logger.warn("Ignoring invalid currencyCode: \(currencyCode)")
                 continue
             }
-            
+
             guard exchangeRate > 0 else {
                 Logger.warn("Ignoring invalid exchangeRate: \(exchangeRate), currencyCode: \(currencyCode)")
                 continue
             }
-            
+
             conversionRateMap[currencyCode] = exchangeRate
         }
-        
+
         self.setConversionRates(ConversionRates(conversionRateMap: conversionRateMap, serviceDate: date))
         Logger.info("Success.")
     }
@@ -209,33 +215,41 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
 
     private func conversionInfos(for currencyInfos: [Currency.Info]) -> [CurrencyConversionInfo] {
 
-        guard let conversionRates = conversionRates else {
+        guard let conversionRates else {
             return []
         }
 
         var infos = [CurrencyConversionInfo]()
         for currencyInfo in currencyInfos {
-            guard let info = conversionInfo(forCurrencyCode: currencyInfo.code,
-                                            conversionRates: conversionRates) else {
+            guard
+                let info = conversionInfo(
+                    forCurrencyCode: currencyInfo.code,
+                    conversionRates: conversionRates,
+                )
+            else {
                 continue
             }
             infos.append(info)
         }
-        infos.sort { (left, right) in
+        infos.sort { left, right in
             left.name < right.name
         }
         return infos
     }
 
     public func conversionInfo(forCurrencyCode currencyCode: Currency.Code) -> CurrencyConversionInfo? {
-        conversionInfo(forCurrencyCode: currencyCode,
-                       conversionRates: self.conversionRates)
+        conversionInfo(
+            forCurrencyCode: currencyCode,
+            conversionRates: self.conversionRates,
+        )
     }
 
-    private func conversionInfo(forCurrencyCode currencyCode: Currency.Code,
-                                conversionRates: ConversionRates?) -> CurrencyConversionInfo? {
+    private func conversionInfo(
+        forCurrencyCode currencyCode: Currency.Code,
+        conversionRates: ConversionRates?,
+    ) -> CurrencyConversionInfo? {
 
-        guard let conversionRates = conversionRates else {
+        guard let conversionRates else {
             return nil
         }
         guard let conversionRate = conversionRates.conversionRateMap[currencyCode] else {
@@ -249,10 +263,12 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
             owsFailDebug("Missing name for currencyCode: \(currencyCode)")
             return nil
         }
-        return CurrencyConversionInfo(currencyCode: currencyCode,
-                                      name: name,
-                                      conversionRate: conversionRate,
-                                      conversionDate: conversionRates.serviceDate)
+        return CurrencyConversionInfo(
+            currencyCode: currencyCode,
+            name: name,
+            conversionRate: conversionRate,
+            conversionDate: conversionRates.serviceDate,
+        )
     }
 
     private static let preferredCurrencyCodes: [Currency.Code] = [
@@ -260,7 +276,7 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
         "EUR",
         "GBP",
         "JPY",
-        "CNY"
+        "CNY",
     ]
 
     private static var supportedCurrencyCodesList: [Currency.Code] = []
@@ -288,7 +304,7 @@ public class PaymentsCurrenciesImpl: PaymentsCurrenciesSwift, PaymentsCurrencies
     public var supportedCurrencyInfosWithCurrencyConversions: [Currency.Info] {
         supportedConversionInfos.map { $0.asCurrencyInfo }
     }
-    
+
     public static func setSupportedCurrencyCodesList(_ list: [Currency.Code]) {
         Self.supportedCurrencyCodesList = list
     }

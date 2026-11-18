@@ -5,65 +5,72 @@
 
 import Foundation
 import SignalServiceKit
+import UIKit
 
-class RecoveryKeyReminderMegaphone: MegaphoneView {
-    init(experienceUpgrade: ExperienceUpgrade,
-         fromViewController: UIViewController
+class RecoveryKeyReminderMegaphone: Megaphone {
+    init(
+        experienceUpgrade: ExperienceUpgrade,
+        fromViewController: UIViewController,
     ) {
         super.init(experienceUpgrade: experienceUpgrade)
 
         titleText = OWSLocalizedString(
             "BACKUP_KEY_REMINDER_MEGAPHONE_TITLE",
-            comment: "Title for Recovery Key reminder megaphone"
+            comment: "Title for Recovery Key reminder megaphone",
         )
         bodyText = OWSLocalizedString(
             "BACKUP_KEY_REMINDER_MEGAPHONE_BODY",
-            comment: "Body for Recovery Key reminder megaphone"
+            comment: "Body for Recovery Key reminder megaphone",
         )
-        imageName = "backups-key"
+        image = .backupsKey
 
         let primaryButtonTitle = OWSLocalizedString(
             "BACKUP_KEY_REMINDER_MEGAPHONE_ACTION",
-            comment: "Action text for Recovery Key reminder megaphone"
+            comment: "Action text for Recovery Key reminder megaphone",
         )
         let secondaryButtonTitle = OWSLocalizedString(
             "BACKUP_KEY_REMINDER_NOT_NOW_ACTION",
-            comment: "Snooze text for Recovery Key reminder megaphone"
+            comment: "Snooze text for Recovery Key reminder megaphone",
         )
 
-        let primaryButton = MegaphoneView.Button(title: primaryButtonTitle) {
-            let backupsReminderCoordinator = BackupsReminderCoordinator(
-                fromViewController: fromViewController,
-                dismissHandler: { success in
-                    self.dismiss()
-                    if success {
-                        self.presentToastForNewRepetitionInterval(fromViewController: fromViewController)
-                    }
-                    DependenciesBridge.shared.db.write { tx in
-                        BackupSettingsStore().setLastRecoveryKeyReminderDate(Date(), tx: tx)
-                    }
-                })
+        let primaryButton = Button(title: primaryButtonTitle) {
+            let accountKeyStore = DependenciesBridge.shared.accountKeyStore
+            let backupSettingsStore = BackupSettingsStore()
+            let db = DependenciesBridge.shared.db
 
-            backupsReminderCoordinator.presentVerifyFlow()
+            guard let aep = db.read(block: { accountKeyStore.getAccountEntropyPool(tx: $0) }) else {
+                return
+            }
+
+            BackupRecoveryKeyReminderCoordinator().present(
+                aep: aep,
+                fromViewController: fromViewController,
+                onSuccess: {
+                    db.write { tx in
+                        backupSettingsStore.setLastRecoveryKeyReminderDate(Date(), tx: tx)
+                    }
+
+                    let toastText = OWSLocalizedString(
+                        "BACKUP_KEY_REMINDER_SUCCESSFUL_TOAST",
+                        comment: "Toast indicating that the Recovery Key was correct.",
+                    )
+                    fromViewController.presentToast(text: toastText)
+
+                    NotificationCenter.default.post(name: .megaphoneStateDidChange, object: nil)
+                },
+            )
         }
 
-        let secondaryButton = snoozeButton(
-            fromViewController: fromViewController,
-            snoozeTitle: secondaryButtonTitle)
+        // Only allow snoozing on the first appearance.
+        if experienceUpgrade.snoozeCount == 0 {
+            let secondaryButton = snoozeButton(
+                fromViewController: fromViewController,
+                snoozeTitle: secondaryButtonTitle,
+            )
 
-        setButtons(primary: primaryButton, secondary: secondaryButton)
-    }
-
-    required init(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    func presentToastForNewRepetitionInterval(fromViewController: UIViewController) {
-        let toastText = OWSLocalizedString(
-            "BACKUP_KEY_REMINDER_SUCCESSFUL_TOAST",
-            comment: "Toast indicating that the Recovery Key was correct."
-        )
-
-        presentToast(text: toastText, fromViewController: fromViewController)
+            buttons = [primaryButton, secondaryButton]
+        } else {
+            buttons = [primaryButton]
+        }
     }
 }

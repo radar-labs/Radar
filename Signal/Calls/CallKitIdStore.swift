@@ -12,18 +12,18 @@ import SignalUI
 class CallKitIdStore {
     private static let phoneNumberStore = KeyValueStore(collection: "TSStorageManagerCallKitIdToPhoneNumberCollection")
     private static let serviceIdStore = KeyValueStore(collection: "TSStorageManagerCallKitIdToUUIDCollection")
-    private static let groupIdStore = KeyValueStore(collection: "TSStorageManagerCallKitIdToGroupId")
-    private static let callLinkStore = KeyValueStore(collection: "CallKitIdToCallLink")
+    private static let groupIdStore = NewKeyValueStore(collection: "TSStorageManagerCallKitIdToGroupId")
+    private static let callLinkStore = NewKeyValueStore(collection: "CallKitIdToCallLink")
 
     static func setGroupId(_ groupId: GroupIdentifier, forCallKitId callKitId: String) {
         SSKEnvironment.shared.databaseStorageRef.write { tx in
             // Make sure it doesn't exist, but only in DEBUG builds.
             assert(!phoneNumberStore.hasValue(callKitId, transaction: tx))
             assert(!serviceIdStore.hasValue(callKitId, transaction: tx))
-            assert(!groupIdStore.hasValue(callKitId, transaction: tx))
-            assert(!callLinkStore.hasValue(callKitId, transaction: tx))
+            assert(groupIdStore.fetchValue(Data.self, forKey: callKitId, tx: tx) == nil)
+            assert(callLinkStore.fetchValue(Data.self, forKey: callKitId, tx: tx) == nil)
 
-            groupIdStore.setData(groupId.serialize(), key: callKitId, transaction: tx)
+            groupIdStore.writeValue(groupId.serialize(), forKey: callKitId, tx: tx)
         }
     }
 
@@ -32,8 +32,8 @@ class CallKitIdStore {
             // Make sure it doesn't exist, but only in DEBUG builds.
             assert(!phoneNumberStore.hasValue(callKitId, transaction: tx))
             assert(!serviceIdStore.hasValue(callKitId, transaction: tx))
-            assert(!groupIdStore.hasValue(callKitId, transaction: tx))
-            assert(!callLinkStore.hasValue(callKitId, transaction: tx))
+            assert(groupIdStore.fetchValue(Data.self, forKey: callKitId, tx: tx) == nil)
+            assert(callLinkStore.fetchValue(Data.self, forKey: callKitId, tx: tx) == nil)
 
             let address = thread.contactAddress
             if let serviceIdString = address.serviceIdUppercaseString {
@@ -52,10 +52,10 @@ class CallKitIdStore {
             // Make sure it doesn't exist, but only in DEBUG builds.
             assert(!phoneNumberStore.hasValue(callKitId, transaction: tx))
             assert(!serviceIdStore.hasValue(callKitId, transaction: tx))
-            assert(!groupIdStore.hasValue(callKitId, transaction: tx))
+            assert(groupIdStore.fetchValue(Data.self, forKey: callKitId, tx: tx) == nil)
             // Call Links may be stored multiple times...
 
-            callLinkStore.setData(callLink.rootKey.bytes, key: callKitId, transaction: tx)
+            callLinkStore.writeValue(callLink.rootKey.bytes, forKey: callKitId, tx: tx)
         }
     }
 
@@ -69,7 +69,7 @@ class CallKitIdStore {
 
             // Next try group calls
             if
-                let groupIdData = groupIdStore.getData(callKitId, transaction: tx),
+                let groupIdData = groupIdStore.fetchValue(Data.self, forKey: callKitId, tx: tx),
                 let groupId = try? GroupIdentifier(contents: groupIdData)
             {
                 return .groupThread(groupId)
@@ -81,7 +81,7 @@ class CallKitIdStore {
                 return TSContactThread.getWithContactAddress(address, transaction: tx).map { .individual($0) }
             }
 
-            if let rootKeyBytes = callLinkStore.getData(callKitId, transaction: tx) {
+            if let rootKeyBytes = callLinkStore.fetchValue(Data.self, forKey: callKitId, tx: tx) {
                 return (try? CallLinkRootKey(rootKeyBytes)).map { .callLink(CallLink(rootKey: $0)) }
             }
 

@@ -361,6 +361,26 @@ public struct GroupsProtoMember: Codable, CustomDebugStringConvertible {
         return !proto.presentation.isEmpty
     }
 
+    public var labelEmoji: Data? {
+        guard hasLabelEmoji else {
+            return nil
+        }
+        return proto.labelEmoji
+    }
+    public var hasLabelEmoji: Bool {
+        return !proto.labelEmoji.isEmpty
+    }
+
+    public var labelString: Data? {
+        guard hasLabelString else {
+            return nil
+        }
+        return proto.labelString
+    }
+    public var hasLabelString: Bool {
+        return !proto.labelString.isEmpty
+    }
+
     public var hasUnknownFields: Bool {
         return !proto.unknownFields.data.isEmpty
     }
@@ -420,6 +440,12 @@ extension GroupsProtoMember {
         if let _value = presentation {
             builder.setPresentation(_value)
         }
+        if let _value = labelEmoji {
+            builder.setLabelEmoji(_value)
+        }
+        if let _value = labelString {
+            builder.setLabelString(_value)
+        }
         if let _value = unknownFields {
             builder.setUnknownFields(_value)
         }
@@ -469,6 +495,26 @@ public struct GroupsProtoMemberBuilder {
 
     public mutating func setPresentation(_ valueParam: Data) {
         proto.presentation = valueParam
+    }
+
+    @available(swift, obsoleted: 1.0)
+    public mutating func setLabelEmoji(_ valueParam: Data?) {
+        guard let valueParam = valueParam else { return }
+        proto.labelEmoji = valueParam
+    }
+
+    public mutating func setLabelEmoji(_ valueParam: Data) {
+        proto.labelEmoji = valueParam
+    }
+
+    @available(swift, obsoleted: 1.0)
+    public mutating func setLabelString(_ valueParam: Data?) {
+        guard let valueParam = valueParam else { return }
+        proto.labelString = valueParam
+    }
+
+    public mutating func setLabelString(_ valueParam: Data) {
+        proto.labelString = valueParam
     }
 
     public mutating func setUnknownFields(_ unknownFields: SwiftProtobuf.UnknownStorage) {
@@ -1025,6 +1071,9 @@ public struct GroupsProtoAccessControl: Codable, CustomDebugStringConvertible {
     public var addFromInviteLink: GroupsProtoAccessControlAccessRequired {
         return GroupsProtoAccessControlAccessRequiredWrap(proto.addFromInviteLink)
     }
+    public var memberLabel: GroupsProtoAccessControlAccessRequired {
+        return GroupsProtoAccessControlAccessRequiredWrap(proto.memberLabel)
+    }
     public var hasUnknownFields: Bool {
         return !proto.unknownFields.data.isEmpty
     }
@@ -1076,6 +1125,7 @@ extension GroupsProtoAccessControl {
         builder.setAttributes(attributes)
         builder.setMembers(members)
         builder.setAddFromInviteLink(addFromInviteLink)
+        builder.setMemberLabel(memberLabel)
         if let _value = unknownFields {
             builder.setUnknownFields(_value)
         }
@@ -1099,6 +1149,10 @@ public struct GroupsProtoAccessControlBuilder {
 
     public mutating func setAddFromInviteLink(_ valueParam: GroupsProtoAccessControlAccessRequired) {
         proto.addFromInviteLink = GroupsProtoAccessControlAccessRequiredUnwrap(valueParam)
+    }
+
+    public mutating func setMemberLabel(_ valueParam: GroupsProtoAccessControlAccessRequired) {
+        proto.memberLabel = GroupsProtoAccessControlAccessRequiredUnwrap(valueParam)
     }
 
     public mutating func setUnknownFields(_ unknownFields: SwiftProtobuf.UnknownStorage) {
@@ -1212,6 +1266,9 @@ public struct GroupsProtoGroup: Codable, CustomDebugStringConvertible {
     public var announcementsOnly: Bool {
         return proto.announcementsOnly
     }
+    public var terminated: Bool {
+        return proto.terminated
+    }
     public var hasUnknownFields: Bool {
         return !proto.unknownFields.data.isEmpty
     }
@@ -1319,6 +1376,7 @@ extension GroupsProtoGroup {
         }
         builder.setAnnouncementsOnly(announcementsOnly)
         builder.setBannedMembers(bannedMembers)
+        builder.setTerminated(terminated)
         if let _value = unknownFields {
             builder.setUnknownFields(_value)
         }
@@ -1440,6 +1498,10 @@ public struct GroupsProtoGroupBuilder {
 
     public mutating func setBannedMembers(_ wrappedItems: [GroupsProtoBannedMember]) {
         proto.bannedMembers = wrappedItems.map { $0.proto }
+    }
+
+    public mutating func setTerminated(_ valueParam: Bool) {
+        proto.terminated = valueParam
     }
 
     public mutating func setUnknownFields(_ unknownFields: SwiftProtobuf.UnknownStorage) {
@@ -2475,6 +2537,171 @@ extension GroupsProtoGroupChangeActionsModifyMemberRoleAction {
 
 extension GroupsProtoGroupChangeActionsModifyMemberRoleActionBuilder {
     public func buildIgnoringErrors() -> GroupsProtoGroupChangeActionsModifyMemberRoleAction? {
+        return self.buildInfallibly()
+    }
+}
+
+#endif
+
+// MARK: - GroupsProtoGroupChangeActionsModifyMemberLabelAction
+
+public struct GroupsProtoGroupChangeActionsModifyMemberLabelAction: Codable, CustomDebugStringConvertible {
+
+    fileprivate let proto: GroupsProtos_GroupChange.Actions.ModifyMemberLabelAction
+
+    public var userID: Data? {
+        guard hasUserID else {
+            return nil
+        }
+        return proto.userID
+    }
+    public var hasUserID: Bool {
+        return !proto.userID.isEmpty
+    }
+
+    public var labelEmoji: Data? {
+        guard hasLabelEmoji else {
+            return nil
+        }
+        return proto.labelEmoji
+    }
+    public var hasLabelEmoji: Bool {
+        return !proto.labelEmoji.isEmpty
+    }
+
+    public var labelString: Data? {
+        guard hasLabelString else {
+            return nil
+        }
+        return proto.labelString
+    }
+    public var hasLabelString: Bool {
+        return !proto.labelString.isEmpty
+    }
+
+    public var hasUnknownFields: Bool {
+        return !proto.unknownFields.data.isEmpty
+    }
+    public var unknownFields: SwiftProtobuf.UnknownStorage? {
+        guard hasUnknownFields else { return nil }
+        return proto.unknownFields
+    }
+
+    private init(proto: GroupsProtos_GroupChange.Actions.ModifyMemberLabelAction) {
+        self.proto = proto
+    }
+
+    public func serializedData() throws -> Data {
+        return try self.proto.serializedData()
+    }
+
+    public init(serializedData: Data) throws {
+        let proto = try GroupsProtos_GroupChange.Actions.ModifyMemberLabelAction(serializedBytes: serializedData)
+        self.init(proto)
+    }
+
+    fileprivate init(_ proto: GroupsProtos_GroupChange.Actions.ModifyMemberLabelAction) {
+        self.init(proto: proto)
+    }
+
+    public init(from decoder: Swift.Decoder) throws {
+        let singleValueContainer = try decoder.singleValueContainer()
+        let serializedData = try singleValueContainer.decode(Data.self)
+        try self.init(serializedData: serializedData)
+    }
+    public func encode(to encoder: Swift.Encoder) throws {
+        var singleValueContainer = encoder.singleValueContainer()
+        try singleValueContainer.encode(try serializedData())
+    }
+
+    public var debugDescription: String {
+        return "\(proto)"
+    }
+}
+
+extension GroupsProtoGroupChangeActionsModifyMemberLabelAction {
+    public static func builder() -> GroupsProtoGroupChangeActionsModifyMemberLabelActionBuilder {
+        return GroupsProtoGroupChangeActionsModifyMemberLabelActionBuilder()
+    }
+
+    // asBuilder() constructs a builder that reflects the proto's contents.
+    public func asBuilder() -> GroupsProtoGroupChangeActionsModifyMemberLabelActionBuilder {
+        var builder = GroupsProtoGroupChangeActionsModifyMemberLabelActionBuilder()
+        if let _value = userID {
+            builder.setUserID(_value)
+        }
+        if let _value = labelEmoji {
+            builder.setLabelEmoji(_value)
+        }
+        if let _value = labelString {
+            builder.setLabelString(_value)
+        }
+        if let _value = unknownFields {
+            builder.setUnknownFields(_value)
+        }
+        return builder
+    }
+}
+
+public struct GroupsProtoGroupChangeActionsModifyMemberLabelActionBuilder {
+
+    private var proto = GroupsProtos_GroupChange.Actions.ModifyMemberLabelAction()
+
+    fileprivate init() {}
+
+    @available(swift, obsoleted: 1.0)
+    public mutating func setUserID(_ valueParam: Data?) {
+        guard let valueParam = valueParam else { return }
+        proto.userID = valueParam
+    }
+
+    public mutating func setUserID(_ valueParam: Data) {
+        proto.userID = valueParam
+    }
+
+    @available(swift, obsoleted: 1.0)
+    public mutating func setLabelEmoji(_ valueParam: Data?) {
+        guard let valueParam = valueParam else { return }
+        proto.labelEmoji = valueParam
+    }
+
+    public mutating func setLabelEmoji(_ valueParam: Data) {
+        proto.labelEmoji = valueParam
+    }
+
+    @available(swift, obsoleted: 1.0)
+    public mutating func setLabelString(_ valueParam: Data?) {
+        guard let valueParam = valueParam else { return }
+        proto.labelString = valueParam
+    }
+
+    public mutating func setLabelString(_ valueParam: Data) {
+        proto.labelString = valueParam
+    }
+
+    public mutating func setUnknownFields(_ unknownFields: SwiftProtobuf.UnknownStorage) {
+        proto.unknownFields = unknownFields
+    }
+
+    public func buildInfallibly() -> GroupsProtoGroupChangeActionsModifyMemberLabelAction {
+        return GroupsProtoGroupChangeActionsModifyMemberLabelAction(proto)
+    }
+
+    public func buildSerializedData() throws -> Data {
+        return try GroupsProtoGroupChangeActionsModifyMemberLabelAction(proto).serializedData()
+    }
+}
+
+#if TESTABLE_BUILD
+
+extension GroupsProtoGroupChangeActionsModifyMemberLabelAction {
+    public func serializedDataIgnoringErrors() -> Data? {
+        return try! self.serializedData()
+    }
+}
+
+extension GroupsProtoGroupChangeActionsModifyMemberLabelActionBuilder {
+    public func buildIgnoringErrors() -> GroupsProtoGroupChangeActionsModifyMemberLabelAction? {
         return self.buildInfallibly()
     }
 }
@@ -4613,6 +4840,110 @@ extension GroupsProtoGroupChangeActionsModifyAddFromInviteLinkAccessControlActio
 
 #endif
 
+// MARK: - GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlAction
+
+public struct GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlAction: Codable, CustomDebugStringConvertible {
+
+    fileprivate let proto: GroupsProtos_GroupChange.Actions.ModifyMemberLabelAccessControlAction
+
+    public var memberLabelAccess: GroupsProtoAccessControlAccessRequired {
+        return GroupsProtoAccessControlAccessRequiredWrap(proto.memberLabelAccess)
+    }
+    public var hasUnknownFields: Bool {
+        return !proto.unknownFields.data.isEmpty
+    }
+    public var unknownFields: SwiftProtobuf.UnknownStorage? {
+        guard hasUnknownFields else { return nil }
+        return proto.unknownFields
+    }
+
+    private init(proto: GroupsProtos_GroupChange.Actions.ModifyMemberLabelAccessControlAction) {
+        self.proto = proto
+    }
+
+    public func serializedData() throws -> Data {
+        return try self.proto.serializedData()
+    }
+
+    public init(serializedData: Data) throws {
+        let proto = try GroupsProtos_GroupChange.Actions.ModifyMemberLabelAccessControlAction(serializedBytes: serializedData)
+        self.init(proto)
+    }
+
+    fileprivate init(_ proto: GroupsProtos_GroupChange.Actions.ModifyMemberLabelAccessControlAction) {
+        self.init(proto: proto)
+    }
+
+    public init(from decoder: Swift.Decoder) throws {
+        let singleValueContainer = try decoder.singleValueContainer()
+        let serializedData = try singleValueContainer.decode(Data.self)
+        try self.init(serializedData: serializedData)
+    }
+    public func encode(to encoder: Swift.Encoder) throws {
+        var singleValueContainer = encoder.singleValueContainer()
+        try singleValueContainer.encode(try serializedData())
+    }
+
+    public var debugDescription: String {
+        return "\(proto)"
+    }
+}
+
+extension GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlAction {
+    public static func builder() -> GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlActionBuilder {
+        return GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlActionBuilder()
+    }
+
+    // asBuilder() constructs a builder that reflects the proto's contents.
+    public func asBuilder() -> GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlActionBuilder {
+        var builder = GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlActionBuilder()
+        builder.setMemberLabelAccess(memberLabelAccess)
+        if let _value = unknownFields {
+            builder.setUnknownFields(_value)
+        }
+        return builder
+    }
+}
+
+public struct GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlActionBuilder {
+
+    private var proto = GroupsProtos_GroupChange.Actions.ModifyMemberLabelAccessControlAction()
+
+    fileprivate init() {}
+
+    public mutating func setMemberLabelAccess(_ valueParam: GroupsProtoAccessControlAccessRequired) {
+        proto.memberLabelAccess = GroupsProtoAccessControlAccessRequiredUnwrap(valueParam)
+    }
+
+    public mutating func setUnknownFields(_ unknownFields: SwiftProtobuf.UnknownStorage) {
+        proto.unknownFields = unknownFields
+    }
+
+    public func buildInfallibly() -> GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlAction {
+        return GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlAction(proto)
+    }
+
+    public func buildSerializedData() throws -> Data {
+        return try GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlAction(proto).serializedData()
+    }
+}
+
+#if TESTABLE_BUILD
+
+extension GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlAction {
+    public func serializedDataIgnoringErrors() -> Data? {
+        return try! self.serializedData()
+    }
+}
+
+extension GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlActionBuilder {
+    public func buildIgnoringErrors() -> GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlAction? {
+        return self.buildInfallibly()
+    }
+}
+
+#endif
+
 // MARK: - GroupsProtoGroupChangeActionsModifyInviteLinkPasswordAction
 
 public struct GroupsProtoGroupChangeActionsModifyInviteLinkPasswordAction: Codable, CustomDebugStringConvertible {
@@ -4955,6 +5286,102 @@ extension GroupsProtoGroupChangeActionsModifyAnnouncementsOnlyActionBuilder {
 
 #endif
 
+// MARK: - GroupsProtoGroupChangeActionsTerminateGroupAction
+
+public struct GroupsProtoGroupChangeActionsTerminateGroupAction: Codable, CustomDebugStringConvertible {
+
+    fileprivate let proto: GroupsProtos_GroupChange.Actions.TerminateGroupAction
+
+    public var hasUnknownFields: Bool {
+        return !proto.unknownFields.data.isEmpty
+    }
+    public var unknownFields: SwiftProtobuf.UnknownStorage? {
+        guard hasUnknownFields else { return nil }
+        return proto.unknownFields
+    }
+
+    private init(proto: GroupsProtos_GroupChange.Actions.TerminateGroupAction) {
+        self.proto = proto
+    }
+
+    public func serializedData() throws -> Data {
+        return try self.proto.serializedData()
+    }
+
+    public init(serializedData: Data) throws {
+        let proto = try GroupsProtos_GroupChange.Actions.TerminateGroupAction(serializedBytes: serializedData)
+        self.init(proto)
+    }
+
+    fileprivate init(_ proto: GroupsProtos_GroupChange.Actions.TerminateGroupAction) {
+        self.init(proto: proto)
+    }
+
+    public init(from decoder: Swift.Decoder) throws {
+        let singleValueContainer = try decoder.singleValueContainer()
+        let serializedData = try singleValueContainer.decode(Data.self)
+        try self.init(serializedData: serializedData)
+    }
+    public func encode(to encoder: Swift.Encoder) throws {
+        var singleValueContainer = encoder.singleValueContainer()
+        try singleValueContainer.encode(try serializedData())
+    }
+
+    public var debugDescription: String {
+        return "\(proto)"
+    }
+}
+
+extension GroupsProtoGroupChangeActionsTerminateGroupAction {
+    public static func builder() -> GroupsProtoGroupChangeActionsTerminateGroupActionBuilder {
+        return GroupsProtoGroupChangeActionsTerminateGroupActionBuilder()
+    }
+
+    // asBuilder() constructs a builder that reflects the proto's contents.
+    public func asBuilder() -> GroupsProtoGroupChangeActionsTerminateGroupActionBuilder {
+        var builder = GroupsProtoGroupChangeActionsTerminateGroupActionBuilder()
+        if let _value = unknownFields {
+            builder.setUnknownFields(_value)
+        }
+        return builder
+    }
+}
+
+public struct GroupsProtoGroupChangeActionsTerminateGroupActionBuilder {
+
+    private var proto = GroupsProtos_GroupChange.Actions.TerminateGroupAction()
+
+    fileprivate init() {}
+
+    public mutating func setUnknownFields(_ unknownFields: SwiftProtobuf.UnknownStorage) {
+        proto.unknownFields = unknownFields
+    }
+
+    public func buildInfallibly() -> GroupsProtoGroupChangeActionsTerminateGroupAction {
+        return GroupsProtoGroupChangeActionsTerminateGroupAction(proto)
+    }
+
+    public func buildSerializedData() throws -> Data {
+        return try GroupsProtoGroupChangeActionsTerminateGroupAction(proto).serializedData()
+    }
+}
+
+#if TESTABLE_BUILD
+
+extension GroupsProtoGroupChangeActionsTerminateGroupAction {
+    public func serializedDataIgnoringErrors() -> Data? {
+        return try! self.serializedData()
+    }
+}
+
+extension GroupsProtoGroupChangeActionsTerminateGroupActionBuilder {
+    public func buildIgnoringErrors() -> GroupsProtoGroupChangeActionsTerminateGroupAction? {
+        return self.buildInfallibly()
+    }
+}
+
+#endif
+
 // MARK: - GroupsProtoGroupChangeActions
 
 public struct GroupsProtoGroupChangeActions: Codable, CustomDebugStringConvertible {
@@ -4987,6 +5414,8 @@ public struct GroupsProtoGroupChangeActions: Codable, CustomDebugStringConvertib
 
     public let modifyAddFromInviteLinkAccess: GroupsProtoGroupChangeActionsModifyAddFromInviteLinkAccessControlAction?
 
+    public let modifyMemberLabelAccess: GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlAction?
+
     public let addRequestingMembers: [GroupsProtoGroupChangeActionsAddRequestingMemberAction]
 
     public let deleteRequestingMembers: [GroupsProtoGroupChangeActionsDeleteRequestingMemberAction]
@@ -5004,6 +5433,10 @@ public struct GroupsProtoGroupChangeActions: Codable, CustomDebugStringConvertib
     public let deleteBannedMembers: [GroupsProtoGroupChangeActionsDeleteBannedMemberAction]
 
     public let promotePniPendingMembers: [GroupsProtoGroupChangeActionsPromoteMemberPendingPniAciProfileKeyAction]
+
+    public let modifyMemberLabel: [GroupsProtoGroupChangeActionsModifyMemberLabelAction]
+
+    public let terminateGroup: GroupsProtoGroupChangeActionsTerminateGroupAction?
 
     public var sourceUserID: Data? {
         guard hasSourceUserID else {
@@ -5050,6 +5483,7 @@ public struct GroupsProtoGroupChangeActions: Codable, CustomDebugStringConvertib
                  modifyAttributesAccess: GroupsProtoGroupChangeActionsModifyAttributesAccessControlAction?,
                  modifyMemberAccess: GroupsProtoGroupChangeActionsModifyMembersAccessControlAction?,
                  modifyAddFromInviteLinkAccess: GroupsProtoGroupChangeActionsModifyAddFromInviteLinkAccessControlAction?,
+                 modifyMemberLabelAccess: GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlAction?,
                  addRequestingMembers: [GroupsProtoGroupChangeActionsAddRequestingMemberAction],
                  deleteRequestingMembers: [GroupsProtoGroupChangeActionsDeleteRequestingMemberAction],
                  promoteRequestingMembers: [GroupsProtoGroupChangeActionsPromoteRequestingMemberAction],
@@ -5058,7 +5492,9 @@ public struct GroupsProtoGroupChangeActions: Codable, CustomDebugStringConvertib
                  modifyAnnouncementsOnly: GroupsProtoGroupChangeActionsModifyAnnouncementsOnlyAction?,
                  addBannedMembers: [GroupsProtoGroupChangeActionsAddBannedMemberAction],
                  deleteBannedMembers: [GroupsProtoGroupChangeActionsDeleteBannedMemberAction],
-                 promotePniPendingMembers: [GroupsProtoGroupChangeActionsPromoteMemberPendingPniAciProfileKeyAction]) {
+                 promotePniPendingMembers: [GroupsProtoGroupChangeActionsPromoteMemberPendingPniAciProfileKeyAction],
+                 modifyMemberLabel: [GroupsProtoGroupChangeActionsModifyMemberLabelAction],
+                 terminateGroup: GroupsProtoGroupChangeActionsTerminateGroupAction?) {
         self.proto = proto
         self.addMembers = addMembers
         self.deleteMembers = deleteMembers
@@ -5073,6 +5509,7 @@ public struct GroupsProtoGroupChangeActions: Codable, CustomDebugStringConvertib
         self.modifyAttributesAccess = modifyAttributesAccess
         self.modifyMemberAccess = modifyMemberAccess
         self.modifyAddFromInviteLinkAccess = modifyAddFromInviteLinkAccess
+        self.modifyMemberLabelAccess = modifyMemberLabelAccess
         self.addRequestingMembers = addRequestingMembers
         self.deleteRequestingMembers = deleteRequestingMembers
         self.promoteRequestingMembers = promoteRequestingMembers
@@ -5082,6 +5519,8 @@ public struct GroupsProtoGroupChangeActions: Codable, CustomDebugStringConvertib
         self.addBannedMembers = addBannedMembers
         self.deleteBannedMembers = deleteBannedMembers
         self.promotePniPendingMembers = promotePniPendingMembers
+        self.modifyMemberLabel = modifyMemberLabel
+        self.terminateGroup = terminateGroup
     }
 
     public func serializedData() throws -> Data {
@@ -5145,6 +5584,11 @@ public struct GroupsProtoGroupChangeActions: Codable, CustomDebugStringConvertib
             modifyAddFromInviteLinkAccess = GroupsProtoGroupChangeActionsModifyAddFromInviteLinkAccessControlAction(proto.modifyAddFromInviteLinkAccess)
         }
 
+        var modifyMemberLabelAccess: GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlAction?
+        if proto.hasModifyMemberLabelAccess {
+            modifyMemberLabelAccess = GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlAction(proto.modifyMemberLabelAccess)
+        }
+
         var addRequestingMembers: [GroupsProtoGroupChangeActionsAddRequestingMemberAction] = []
         addRequestingMembers = proto.addRequestingMembers.map { GroupsProtoGroupChangeActionsAddRequestingMemberAction($0) }
 
@@ -5178,6 +5622,14 @@ public struct GroupsProtoGroupChangeActions: Codable, CustomDebugStringConvertib
         var promotePniPendingMembers: [GroupsProtoGroupChangeActionsPromoteMemberPendingPniAciProfileKeyAction] = []
         promotePniPendingMembers = proto.promotePniPendingMembers.map { GroupsProtoGroupChangeActionsPromoteMemberPendingPniAciProfileKeyAction($0) }
 
+        var modifyMemberLabel: [GroupsProtoGroupChangeActionsModifyMemberLabelAction] = []
+        modifyMemberLabel = proto.modifyMemberLabel.map { GroupsProtoGroupChangeActionsModifyMemberLabelAction($0) }
+
+        var terminateGroup: GroupsProtoGroupChangeActionsTerminateGroupAction?
+        if proto.hasTerminateGroup {
+            terminateGroup = GroupsProtoGroupChangeActionsTerminateGroupAction(proto.terminateGroup)
+        }
+
         self.init(proto: proto,
                   addMembers: addMembers,
                   deleteMembers: deleteMembers,
@@ -5192,6 +5644,7 @@ public struct GroupsProtoGroupChangeActions: Codable, CustomDebugStringConvertib
                   modifyAttributesAccess: modifyAttributesAccess,
                   modifyMemberAccess: modifyMemberAccess,
                   modifyAddFromInviteLinkAccess: modifyAddFromInviteLinkAccess,
+                  modifyMemberLabelAccess: modifyMemberLabelAccess,
                   addRequestingMembers: addRequestingMembers,
                   deleteRequestingMembers: deleteRequestingMembers,
                   promoteRequestingMembers: promoteRequestingMembers,
@@ -5200,7 +5653,9 @@ public struct GroupsProtoGroupChangeActions: Codable, CustomDebugStringConvertib
                   modifyAnnouncementsOnly: modifyAnnouncementsOnly,
                   addBannedMembers: addBannedMembers,
                   deleteBannedMembers: deleteBannedMembers,
-                  promotePniPendingMembers: promotePniPendingMembers)
+                  promotePniPendingMembers: promotePniPendingMembers,
+                  modifyMemberLabel: modifyMemberLabel,
+                  terminateGroup: terminateGroup)
     }
 
     public init(from decoder: Swift.Decoder) throws {
@@ -5258,6 +5713,9 @@ extension GroupsProtoGroupChangeActions {
         if let _value = modifyAddFromInviteLinkAccess {
             builder.setModifyAddFromInviteLinkAccess(_value)
         }
+        if let _value = modifyMemberLabelAccess {
+            builder.setModifyMemberLabelAccess(_value)
+        }
         builder.setAddRequestingMembers(addRequestingMembers)
         builder.setDeleteRequestingMembers(deleteRequestingMembers)
         builder.setPromoteRequestingMembers(promoteRequestingMembers)
@@ -5273,6 +5731,10 @@ extension GroupsProtoGroupChangeActions {
         builder.setAddBannedMembers(addBannedMembers)
         builder.setDeleteBannedMembers(deleteBannedMembers)
         builder.setPromotePniPendingMembers(promotePniPendingMembers)
+        builder.setModifyMemberLabel(modifyMemberLabel)
+        if let _value = terminateGroup {
+            builder.setTerminateGroup(_value)
+        }
         if let _value = unknownFields {
             builder.setUnknownFields(_value)
         }
@@ -5426,6 +5888,16 @@ public struct GroupsProtoGroupChangeActionsBuilder {
         proto.modifyAddFromInviteLinkAccess = valueParam.proto
     }
 
+    @available(swift, obsoleted: 1.0)
+    public mutating func setModifyMemberLabelAccess(_ valueParam: GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlAction?) {
+        guard let valueParam = valueParam else { return }
+        proto.modifyMemberLabelAccess = valueParam.proto
+    }
+
+    public mutating func setModifyMemberLabelAccess(_ valueParam: GroupsProtoGroupChangeActionsModifyMemberLabelAccessControlAction) {
+        proto.modifyMemberLabelAccess = valueParam.proto
+    }
+
     public mutating func addAddRequestingMembers(_ valueParam: GroupsProtoGroupChangeActionsAddRequestingMemberAction) {
         proto.addRequestingMembers.append(valueParam.proto)
     }
@@ -5502,6 +5974,24 @@ public struct GroupsProtoGroupChangeActionsBuilder {
 
     public mutating func setPromotePniPendingMembers(_ wrappedItems: [GroupsProtoGroupChangeActionsPromoteMemberPendingPniAciProfileKeyAction]) {
         proto.promotePniPendingMembers = wrappedItems.map { $0.proto }
+    }
+
+    public mutating func addModifyMemberLabel(_ valueParam: GroupsProtoGroupChangeActionsModifyMemberLabelAction) {
+        proto.modifyMemberLabel.append(valueParam.proto)
+    }
+
+    public mutating func setModifyMemberLabel(_ wrappedItems: [GroupsProtoGroupChangeActionsModifyMemberLabelAction]) {
+        proto.modifyMemberLabel = wrappedItems.map { $0.proto }
+    }
+
+    @available(swift, obsoleted: 1.0)
+    public mutating func setTerminateGroup(_ valueParam: GroupsProtoGroupChangeActionsTerminateGroupAction?) {
+        guard let valueParam = valueParam else { return }
+        proto.terminateGroup = valueParam.proto
+    }
+
+    public mutating func setTerminateGroup(_ valueParam: GroupsProtoGroupChangeActionsTerminateGroupAction) {
+        proto.terminateGroup = valueParam.proto
     }
 
     public mutating func setUnknownFields(_ unknownFields: SwiftProtobuf.UnknownStorage) {

@@ -4,7 +4,7 @@
 //
 
 import LibSignalClient
-import SignalServiceKit
+public import SignalServiceKit
 import SignalUI
 
 protocol MockConversationDelegate: AnyObject {
@@ -24,9 +24,11 @@ class MockConversationView: UIView {
         case outgoing(text: String)
         case incoming(text: String)
     }
+
     struct MockModel {
         let items: [MockItem]
     }
+
     var model: MockModel {
         didSet {
             AssertIsOnMainThread()
@@ -34,7 +36,7 @@ class MockConversationView: UIView {
         }
     }
 
-    public var customChatColor: ColorOrGradientSetting? {
+    var customChatColor: ColorOrGradientSetting? {
         didSet {
             update()
         }
@@ -54,7 +56,7 @@ class MockConversationView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override func didMoveToSuperview() {
+    override func didMoveToSuperview() {
         super.didMoveToSuperview()
 
         update()
@@ -76,9 +78,9 @@ class MockConversationView: UIView {
     }()
 
     // Use a v5 UUID that's in a separate namespace from ACIs/PNIs.
-    fileprivate static let mockAddress = SignalServiceAddress(try! ServiceId.parseFrom(serviceIdString: "00000000-0000-5000-8000-000000000000"))
+    fileprivate static let mockAci = try! Aci.parseFrom(serviceIdString: "00000000-0000-5000-8000-000000000000")
 
-    private let thread = MockThread(contactAddress: MockConversationView.mockAddress)
+    private let thread = MockThread(contactAci: MockConversationView.mockAci)
 
     override var frame: CGRect {
         didSet {
@@ -128,7 +130,7 @@ class MockConversationView: UIView {
                 case .incoming(let text), .outgoing(let text):
                     return (item, DependenciesBridge.shared.attachmentContentValidator.truncatedMessageBodyForInlining(
                         MessageBody(text: text, ranges: .empty),
-                        tx: tx
+                        tx: tx,
                     ))
                 }
             }
@@ -138,36 +140,43 @@ class MockConversationView: UIView {
         SSKEnvironment.shared.databaseStorageRef.read { transaction in
             let chatColor = self.customChatColor ?? DependenciesBridge.shared.chatColorSettingStore.resolvedChatColor(
                 for: thread,
-                tx: transaction
+                tx: transaction,
+            )
+            let shouldDimWallpaperInDarkMode: Bool = DependenciesBridge.shared.wallpaperStore.fetchDimInDarkModeForRendering(
+                for: thread.uniqueId,
+                tx: transaction,
             )
             let conversationStyle = ConversationStyle(
                 type: .`default`,
                 thread: self.thread,
                 viewWidth: viewWidth,
                 hasWallpaper: hasWallpaper,
-                isWallpaperPhoto: false,
-                chatColor: chatColor
+                shouldDimWallpaperInDarkMode: shouldDimWallpaperInDarkMode,
+                chatColor: chatColor,
             )
-            let threadAssociatedData = ThreadAssociatedData.fetchOrDefault(for: thread, transaction: transaction)
             for (item, text) in modelItems {
                 let interaction: TSInteraction
                 switch item {
                 case .date:
-                    interaction = DateHeaderInteraction(thread: self.thread, timestamp: NSDate.ows_millisecondTimeStamp())
+                    interaction = DateHeaderInteraction(threadUniqueId: self.thread.uniqueId, timestamp: NSDate.ows_millisecondTimeStamp())
                 case .outgoing:
                     interaction = MockOutgoingMessage(messageBody: text!, thread: self.thread, transaction: transaction)
                 case .incoming:
                     interaction = MockIncomingMessage(messageBody: text!, thread: self.thread)
                 }
 
-                guard let renderItem = CVLoader.buildStandaloneRenderItem(
-                    interaction: interaction,
-                    thread: self.thread,
-                    threadAssociatedData: threadAssociatedData,
-                    conversationStyle: conversationStyle,
-                    spoilerState: SpoilerRenderState(),
-                    transaction: transaction
-                ) else {
+                let groupNameColors = GroupNameColors.forThread(thread)
+
+                guard
+                    let renderItem = CVLoader.buildStandaloneRenderItem(
+                        interaction: interaction,
+                        thread: self.thread,
+                        conversationStyle: conversationStyle,
+                        spoilerState: SpoilerRenderState(),
+                        groupNameColors: groupNameColors,
+                        transaction: transaction,
+                    )
+                else {
                     owsFailDebug("Could not build renderItem.")
                     continue
                 }
@@ -199,50 +208,75 @@ class MockConversationView: UIView {
 // MARK: - Mock Classes
 
 private class MockThread: TSContactThread {
-    public override var shouldBeSaved: Bool {
-        return false
+    init(contactAci: Aci) {
+        super.init(
+            uniqueId: "MockThread",
+            contactUUID: contactAci.serviceIdUppercaseString,
+            contactPhoneNumber: nil,
+        )
     }
 
-    override var uniqueId: String { "MockThread" }
+    required init(inheritableDecoder decoder: any Decoder) throws {
+        owsFail("not supported")
+    }
 
-    override func anyWillInsert(with transaction: DBWriteTransaction) {
+    override func anyWillInsert(transaction: DBWriteTransaction) {
         // no - op
-        owsFailDebug("shouldn't save mock thread")
+        owsFail("shouldn't save mock thread")
+    }
+}
+
+class MockGroupThread: TSGroupThread {
+    init(groupModel: TSGroupModelV2) {
+        super.init(
+            uniqueId: "MockGroupThread",
+            groupModel: groupModel,
+        )
+    }
+
+    required init(inheritableDecoder decoder: any Decoder) throws {
+        owsFail("not supported")
+    }
+
+    override func anyWillInsert(transaction: DBWriteTransaction) {
+        // no - op
+        owsFail("shouldn't save mock thread")
     }
 }
 
 // MARK: -
 
-private class MockIncomingMessage: TSIncomingMessage {
-    init(messageBody: ValidatedInlineMessageBody, thread: MockThread) {
+public class MockIncomingMessage: TSIncomingMessage {
+    fileprivate init(messageBody: ValidatedInlineMessageBody, thread: MockThread) {
         let builder: TSIncomingMessageBuilder = .withDefaultValues(
             thread: thread,
             authorAci: thread.contactAddress.aci!,
-            messageBody: messageBody
+            messageBody: messageBody,
         )
         super.init(incomingMessageWithBuilder: builder)
     }
 
-    required init(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    init(messageBody: ValidatedInlineMessageBody, thread: MockGroupThread, authorAci: Aci) {
+        let builder: TSIncomingMessageBuilder = .withDefaultValues(
+            thread: thread,
+            authorAci: authorAci,
+            messageBody: messageBody,
+        )
+        super.init(incomingMessageWithBuilder: builder)
     }
 
-    required init(dictionary dictionaryValue: [String: Any]!) throws {
-        fatalError("init(dictionary:) has not been implemented")
-    }
-
-    public override var shouldBeSaved: Bool {
+    override public var shouldBeSaved: Bool {
         return false
     }
 
-    override func anyWillInsert(with transaction: DBWriteTransaction) {
+    override public func anyWillInsert(with transaction: DBWriteTransaction) {
         owsFailDebug("shouldn't save mock message")
     }
 }
 
 // MARK: -
 
-private class MockOutgoingMessage: TSOutgoingMessage {
+public class MockOutgoingMessage: TSOutgoingMessage {
     init(messageBody: ValidatedInlineMessageBody, thread: TSThread, transaction: DBReadTransaction) {
         let builder: TSOutgoingMessageBuilder = .withDefaultValues(thread: thread, messageBody: messageBody)
         super.init(
@@ -250,7 +284,7 @@ private class MockOutgoingMessage: TSOutgoingMessage {
             additionalRecipients: [],
             explicitRecipients: [],
             skippedRecipients: [],
-            transaction: transaction
+            transaction: transaction,
         )
     }
 
@@ -258,31 +292,27 @@ private class MockOutgoingMessage: TSOutgoingMessage {
         fatalError("init(coder:) has not been implemented")
     }
 
-    required init(dictionary dictionaryValue: [String: Any]!) throws {
-        fatalError("init(dictionary:) has not been implemented")
-    }
-
-    public override var shouldBeSaved: Bool {
+    override public var shouldBeSaved: Bool {
         return false
     }
 
-    override func anyWillInsert(with transaction: DBWriteTransaction) {
+    override public func anyWillInsert(with transaction: DBWriteTransaction) {
         owsFailDebug("shouldn't save mock message")
     }
 
-    override var messageState: TSOutgoingMessageState { .sent }
+    override public var messageState: TSOutgoingMessageState { .sent }
 
-    override func readRecipientAddresses() -> [SignalServiceAddress] {
+    override public func readRecipientAddresses() -> [SignalServiceAddress] {
         // makes message appear as read
-        return [MockConversationView.mockAddress]
+        return [SignalServiceAddress(MockConversationView.mockAci)]
     }
 
-    override func recipientState(for recipientAddress: SignalServiceAddress) -> TSOutgoingMessageRecipientState? {
+    override public func recipientState(for recipientAddress: SignalServiceAddress) -> TSOutgoingMessageRecipientState? {
         return TSOutgoingMessageRecipientState(
             status: .read,
             statusTimestamp: Date().ows_millisecondsSince1970,
             wasSentByUD: true,
-            errorCode: nil
+            errorCode: nil,
         )
     }
 }
@@ -301,31 +331,43 @@ extension MockConversationView: CVComponentDelegate {
 
     func didTapSystemMessageItem(_ item: CVTextLabel.Item) {}
 
+    func didTapCollapseSet(collapseSetId: String) {}
+
     func didDoubleTapTextViewItem(_ itemViewModel: CVItemViewModelImpl) {}
 
-    func didLongPressTextViewItem(_ cell: CVCell,
-                                  itemViewModel: CVItemViewModelImpl,
-                                  shouldAllowReply: Bool) {}
+    func didLongPressTextViewItem(
+        _ cell: CVCell,
+        itemViewModel: CVItemViewModelImpl,
+        shouldAllowMessageSendActions: Bool,
+    ) {}
 
-    func didLongPressMediaViewItem(_ cell: CVCell,
-                                   itemViewModel: CVItemViewModelImpl,
-                                   shouldAllowReply: Bool) {}
+    func didLongPressMediaViewItem(
+        _ cell: CVCell,
+        itemViewModel: CVItemViewModelImpl,
+        shouldAllowMessageSendActions: Bool,
+    ) {}
 
-    func didLongPressQuote(_ cell: CVCell,
-                           itemViewModel: CVItemViewModelImpl,
-                           shouldAllowReply: Bool) {}
+    func didLongPressQuote(
+        _ cell: CVCell,
+        itemViewModel: CVItemViewModelImpl,
+        shouldAllowMessageSendActions: Bool,
+    ) {}
 
-    func didLongPressSystemMessage(_ cell: CVCell,
-                                   itemViewModel: CVItemViewModelImpl) {}
+    func didLongPressSystemMessage(
+        _ cell: CVCell,
+        itemViewModel: CVItemViewModelImpl,
+    ) {}
 
-    func didLongPressSticker(_ cell: CVCell,
-                             itemViewModel: CVItemViewModelImpl,
-                             shouldAllowReply: Bool) {}
+    func didLongPressSticker(
+        _ cell: CVCell,
+        itemViewModel: CVItemViewModelImpl,
+        shouldAllowMessageSendActions: Bool,
+    ) {}
 
     func didLongPressPoll(
         _ cell: CVCell,
         itemViewModel: CVItemViewModelImpl,
-        shouldAllowReply: Bool
+        shouldAllowMessageSendActions: Bool,
     ) {}
 
     func didChangeLongPress(_ itemViewModel: CVItemViewModelImpl) {}
@@ -336,9 +378,9 @@ extension MockConversationView: CVComponentDelegate {
 
     // MARK: -
 
-    func willBecomeVisibleWithFailedOrPendingDownloads(_ message: TSMessage) {}
+    func willBecomeVisibleWithSkippedDownloads(_ message: TSMessage) {}
 
-    func didTapFailedOrPendingDownloads(_ message: TSMessage) {}
+    func didTapSkippedDownloads(_ message: TSMessage) {}
 
     func didCancelDownload(_ message: TSMessage, attachmentId: Attachment.IDType) {}
 
@@ -348,10 +390,12 @@ extension MockConversationView: CVComponentDelegate {
 
     func didTapSenderAvatar(_ interaction: TSInteraction) {}
 
-    func shouldAllowReplyForItem(_ itemViewModel: CVItemViewModelImpl) -> Bool { false }
+    func shouldAllowMessageSendActionsForItem(_ itemViewModel: CVItemViewModelImpl) -> Bool { false }
 
-    func didTapReactions(reactionState: InteractionReactionState,
-                         message: TSMessage) {}
+    func didTapReactions(
+        reactionState: InteractionReactionState,
+        message: TSMessage,
+    ) {}
 
     func didTapTruncatedTextMessage(_ itemViewModel: CVItemViewModelImpl) {}
 
@@ -375,19 +419,23 @@ extension MockConversationView: CVComponentDelegate {
 
     func didTapBodyMedia(
         itemViewModel: CVItemViewModelImpl,
-        attachmentStream: ReferencedAttachmentStream,
-        imageView: UIView
+        attachment: ReferencedAttachment,
+        imageView: UIView,
     ) {}
 
     func didTapGenericAttachment(_ attachment: CVComponentGenericAttachment) -> CVAttachmentTapAction { .default }
 
     func didTapQuotedReply(_ quotedReply: QuotedReplyModel) {}
 
-    func didTapLinkPreview(_ linkPreview: OWSLinkPreview) {}
+    func didTapLinkPreview(url: URL) {}
 
     func didTapContactShare(_ contactShare: ContactShareViewModel) {}
 
     func didTapSendMessage(to phoneNumbers: [String]) {}
+
+    func didTapSendMessage(toAci aci: Aci, sharedName: OWSContactName) {}
+
+    func didTapAddToGroup(aci: Aci, sharedName: OWSContactName) {}
 
     func didTapSendInvite(toContactShare contactShare: ContactShareViewModel) {}
 
@@ -395,7 +443,9 @@ extension MockConversationView: CVComponentDelegate {
 
     func didTapStickerPack(_ stickerPackInfo: StickerPackInfo) {}
 
-    func didTapGroupInviteLink(url: URL) {}
+    func didTapSticker(_ stickerMetadata: any StickerMetadata) {}
+
+    func didTapGroupInviteLink(url: PossibleGroupInviteLinkUrl) {}
 
     func didTapProxyLink(url: URL) {}
 
@@ -418,15 +468,13 @@ extension MockConversationView: CVComponentDelegate {
 
     var view: UIView! { self }
 
-    var isConversationPreview: Bool { true }
-
     var wallpaperBlurProvider: WallpaperBlurProvider? { nil }
 
     var spoilerState: SpoilerRenderState { return SpoilerRenderState() }
 
     // MARK: - Selection
 
-    public var selectionState: CVSelectionState { CVSelectionState() }
+    var selectionState: CVSelectionState { CVSelectionState() }
 
     // MARK: - System Cell
 
@@ -434,13 +482,9 @@ extension MockConversationView: CVComponentDelegate {
 
     func didTapUnverifiedIdentityChange(_ address: SignalServiceAddress) {}
 
-    func didTapCorruptedMessage(_ message: TSErrorMessage) {}
-
     func didTapSessionRefreshMessage(_ message: TSErrorMessage) {}
 
     func didTapResendGroupUpdateForErrorMessage(_ errorMessage: TSErrorMessage) {}
-
-    func didTapShowFingerprint(_ address: SignalServiceAddress) {}
 
     func didTapIndividualCall(_ call: TSCall) {}
 
@@ -450,11 +494,11 @@ extension MockConversationView: CVComponentDelegate {
 
     func didTapPendingOutgoingMessage(_ message: TSOutgoingMessage) {}
 
-    func didTapFailedOutgoingMessage(_ message: TSOutgoingMessage) {}
+    func didTapFailedMessage(_ message: TSMessage) {}
 
     func didTapGroupMigrationLearnMore() {}
 
-    func didTapGroupInviteLinkPromotion(groupModel: TSGroupModel) {}
+    func didTapGroupInviteLinkPromotion() {}
 
     func didTapViewGroupDescription(newGroupDescription: String) {}
 
@@ -465,15 +509,17 @@ extension MockConversationView: CVComponentDelegate {
     func didTapShowConversationSettingsAndShowMemberRequests() {}
 
     func didTapBlockRequest(
-        groupModel: TSGroupModelV2,
+        secretParams: GroupSecretParams,
         requesterName: String,
-        requesterAci: Aci
+        requesterAci: Aci,
     ) {}
 
     func didTapShowUpgradeAppUI() {}
 
-    func didTapUpdateSystemContact(_ address: SignalServiceAddress,
-                                   newNameComponents: PersonNameComponents) {}
+    func didTapUpdateSystemContact(
+        _ address: SignalServiceAddress,
+        newNameComponents: PersonNameComponents,
+    ) {}
 
     func didTapPhoneNumberChange(aci: Aci, phoneNumberOld: String, phoneNumberNew: String) {}
 
@@ -490,7 +536,7 @@ extension MockConversationView: CVComponentDelegate {
     func didLongPressPaymentMessage(
         _ cell: CVCell,
         itemViewModel: CVItemViewModelImpl,
-        shouldAllowReply: Bool
+        shouldAllowMessageSendActions: Bool,
     ) { }
 
     func didTapPayment(_ payment: PaymentsHistoryItem) {}
@@ -511,4 +557,10 @@ extension MockConversationView: CVComponentDelegate {
     func didTapViewPoll(pollInteractionUniqueId: String) {}
 
     func didTapVoteOnPoll(poll: OWSPoll, optionIndex: UInt32, isUnvote: Bool) {}
+
+    func didTapViewPinnedMessage(pinnedMessageUniqueId: String) {}
+
+    func didTapSafetyTips() {}
+
+    func didTapReleaseNotesAnnouncementAction(action: RemoteAnnouncementModel.Manifest.Action) {}
 }

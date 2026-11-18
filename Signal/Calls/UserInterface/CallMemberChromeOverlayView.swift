@@ -20,7 +20,7 @@ class CallMemberChromeOverlayView: UIView, CallMemberComposableView {
             self.raisedHandView = nil
         case .remoteInGroup(let callMemberVisualContext):
             switch callMemberVisualContext {
-            case .videoGrid, .speaker:
+            case .videoGrid, .speaker, .contextMenuPreview:
                 self.raisedHandView = RaisedHandView(useCompactSize: false)
             case .videoOverflow:
                 self.raisedHandView = RaisedHandView(useCompactSize: true)
@@ -39,7 +39,7 @@ class CallMemberChromeOverlayView: UIView, CallMemberComposableView {
         muteIndicatorCircleView.isHidden = true
         muteIndicatorCircleView.backgroundColor = .ows_blackAlpha70
         let muteIndicatorImage = UIImageView()
-        muteIndicatorImage.setTemplateImageName("mic-slash-fill-28", tintColor: .ows_white)
+        muteIndicatorImage.setTemplateImageName("mic-slash-fill-28", tintColor: .white)
         muteIndicatorCircleView.addSubview(muteIndicatorImage)
         addSubview(muteIndicatorCircleView)
         muteIndicatorCircleView.autoSetDimension(.height, toSize: Constants.muteImageCircleDimension)
@@ -49,7 +49,7 @@ class CallMemberChromeOverlayView: UIView, CallMemberComposableView {
         muteIndicatorImage.autoCenterInSuperview()
         NSLayoutConstraint.activate([
             muteIndicatorCircleView.leadingAnchor.constraint(equalTo: self.layoutGuide.leadingAnchor),
-            muteIndicatorCircleView.bottomAnchor.constraint(equalTo: self.layoutGuide.bottomAnchor)
+            muteIndicatorCircleView.bottomAnchor.constraint(equalTo: self.layoutGuide.bottomAnchor),
         ])
 
         if let raisedHandView {
@@ -65,7 +65,7 @@ class CallMemberChromeOverlayView: UIView, CallMemberComposableView {
             addSubview(flipCameraButton)
             NSLayoutConstraint.activate([
                 flipCameraButton.trailingAnchor.constraint(equalTo: self.layoutGuide.trailingAnchor),
-                flipCameraButton.bottomAnchor.constraint(equalTo: self.layoutGuide.bottomAnchor)
+                flipCameraButton.bottomAnchor.constraint(equalTo: self.layoutGuide.bottomAnchor),
             ])
             updateFlipCameraButton()
         case .remoteInGroup, .remoteInIndividual:
@@ -91,18 +91,18 @@ class CallMemberChromeOverlayView: UIView, CallMemberComposableView {
     func configure(
         call: SignalCall,
         isFullScreen: Bool = false,
-        remoteGroupMemberDeviceState: RemoteDeviceState?
+        remoteGroupMemberDeviceState: RemoteDeviceState?,
     ) {
         self.call = call
         updateFlipCameraButton()
         updateMuteIndicatorHiddenState(
             call: call,
             isFullScreen: isFullScreen,
-            remoteGroupMemberDeviceState: remoteGroupMemberDeviceState
+            remoteGroupMemberDeviceState: remoteGroupMemberDeviceState,
         )
         updateRaisedHand(
             call: call,
-            remoteGroupMemberDeviceState: remoteGroupMemberDeviceState
+            remoteGroupMemberDeviceState: remoteGroupMemberDeviceState,
         )
     }
 
@@ -141,7 +141,7 @@ class CallMemberChromeOverlayView: UIView, CallMemberComposableView {
 
     private func updateLayoutGuideConstraints() {
         self.layoutGuideConstraints.forEach {
-            $0.constant = $0.constant/abs($0.constant) * inset
+            $0.constant = $0.constant / abs($0.constant) * inset
         }
         self.layoutMargins = .init(margin: self.inset)
     }
@@ -151,7 +151,7 @@ class CallMemberChromeOverlayView: UIView, CallMemberComposableView {
     private let raisedHandView: RaisedHandView?
     private func updateRaisedHand(
         call: SignalCall,
-        remoteGroupMemberDeviceState: RemoteDeviceState?
+        remoteGroupMemberDeviceState: RemoteDeviceState?,
     ) {
         guard let raisedHandView else { return }
         guard
@@ -182,6 +182,7 @@ class CallMemberChromeOverlayView: UIView, CallMemberComposableView {
         private var circleSize: CGFloat {
             useCompactSize ? 28 : 40
         }
+
         private var iconSize: CGFloat {
             useCompactSize ? 16 : 24
         }
@@ -204,18 +205,18 @@ class CallMemberChromeOverlayView: UIView, CallMemberComposableView {
             let iconBackground = UIView()
             self.addArrangedSubview(iconBackground)
             iconBackground.autoSetDimensions(to: .square(self.circleSize))
-            iconBackground.backgroundColor = .ows_white
+            iconBackground.backgroundColor = .white
             iconBackground.layer.cornerRadius = self.circleSize / 2
 
             let iconView = UIImageView(image: Theme.iconImage(.raiseHand))
             iconBackground.addSubview(iconView)
             iconView.autoSetDimensions(to: .square(self.iconSize))
             iconView.autoCenterInSuperview()
-            iconView.tintColor = .ows_black
+            iconView.tintColor = .black
 
             if !useCompactSize {
                 self.addArrangedSubview(nameLabel)
-                nameLabel.textColor = .ows_white
+                nameLabel.textColor = .white
                 nameLabel.font = .dynamicTypeSubheadline
             }
         }
@@ -233,7 +234,7 @@ class CallMemberChromeOverlayView: UIView, CallMemberComposableView {
     private func updateMuteIndicatorHiddenState(
         call: SignalCall,
         isFullScreen: Bool,
-        remoteGroupMemberDeviceState: RemoteDeviceState?
+        remoteGroupMemberDeviceState: RemoteDeviceState?,
     ) {
         switch type {
         case .local:
@@ -259,10 +260,10 @@ class CallMemberChromeOverlayView: UIView, CallMemberComposableView {
     private lazy var flipCameraImageView = {
         let imageView = UIImageView(image: UIImage(named: "switch-camera-28"))
         imageView.isUserInteractionEnabled = false
-        imageView.tintColor = .ows_white
+        imageView.tintColor = .white
         flipCameraImageWidthConstraint = imageView.autoSetDimension(
             .height,
-            toSize: Constants.flipCameraImageDimensionWhenPipNormal
+            toSize: Constants.flipCameraImageDimensionWhenPipNormal,
         )
         imageView.autoMatch(.width, to: .height, of: imageView)
         return imageView
@@ -277,17 +278,19 @@ class CallMemberChromeOverlayView: UIView, CallMemberComposableView {
 
         flipCameraButtonWidthConstraint = button.autoSetDimension(
             .height,
-            toSize: Constants.flipCameraButtonDimensionWhenPipNormal
+            toSize: Constants.flipCameraButtonDimensionWhenPipNormal,
         )
         button.autoMatch(.width, to: .height, of: button)
         button.accessibilityLabel = flipCameraButtonAccessibilityLabel
-        button.addTarget(self, action: #selector(didPressFlipCamera), for: .touchUpInside)
+        button.addAction(
+            UIAction { [weak self] _ in self?.didPressFlipCamera() },
+            for: .primaryActionTriggered,
+        )
         flipCameraCircleView.backgroundColor = .ows_blackAlpha70
         button.isHidden = true
         return button
     }()
 
-    @objc
     private func didPressFlipCamera() {
         guard let call else { return }
         if let isUsingFrontCamera = call.videoCaptureController.isUsingFrontCamera {
@@ -298,7 +301,7 @@ class CallMemberChromeOverlayView: UIView, CallMemberComposableView {
     private var flipCameraButtonAccessibilityLabel: String {
         return OWSLocalizedString(
             "CALL_VIEW_SWITCH_CAMERA_DIRECTION",
-            comment: "Accessibility label to toggle front- vs. rear-facing camera"
+            comment: "Accessibility label to toggle front- vs. rear-facing camera",
         )
     }
 
@@ -325,7 +328,7 @@ class CallMemberChromeOverlayView: UIView, CallMemberComposableView {
             self.flipCameraImageWidthConstraint?.constant = Constants.flipCameraImageDimensionWhenPipExpanded
             animateFlipCameraButtonAlphaIfNecessary(
                 call: call,
-                newIsHidden: call.isOutgoingVideoMuted
+                newIsHidden: call.isOutgoingVideoMuted,
             )
         } else if width >= Constants.mediumPipMinWidth {
             flipCameraButton.isEnabled = false
@@ -334,12 +337,12 @@ class CallMemberChromeOverlayView: UIView, CallMemberComposableView {
             self.flipCameraImageWidthConstraint?.constant = Constants.flipCameraImageDimensionWhenPipNormal
             animateFlipCameraButtonAlphaIfNecessary(
                 call: call,
-                newIsHidden: call.isOutgoingVideoMuted
+                newIsHidden: call.isOutgoingVideoMuted,
             )
         } else {
             animateFlipCameraButtonAlphaIfNecessary(
                 call: call,
-                newIsHidden: true
+                newIsHidden: true,
             )
         }
     }
@@ -347,11 +350,14 @@ class CallMemberChromeOverlayView: UIView, CallMemberComposableView {
     private func animateFlipCameraButtonAlphaIfNecessary(call: SignalCall, newIsHidden: Bool) {
         guard newIsHidden != self.flipCameraButton.isHidden else { return }
         self.flipCameraButton.alpha = newIsHidden ? 1 : 0
-        UIView.animate(withDuration: 0.3, animations: {
-            self.flipCameraButton.alpha = newIsHidden ? 0 : 1
-            }, completion: { [weak self] _ in
+        UIView.animate(
+            withDuration: 0.3,
+            animations: {
+                self.flipCameraButton.alpha = newIsHidden ? 0 : 1
+            },
+            completion: { [weak self] _ in
                 self?.flipCameraButton.isHidden = newIsHidden
-            }
+            },
         )
     }
 

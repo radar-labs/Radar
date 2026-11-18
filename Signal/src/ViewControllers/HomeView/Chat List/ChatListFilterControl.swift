@@ -51,7 +51,8 @@ final class ChatListFilterControl: UIView {
     }
 
     enum FilterState: Equatable {
-        case on, off
+        case on
+        case off
 
         var isOn: Bool {
             switch self {
@@ -286,7 +287,7 @@ final class ChatListFilterControl: UIView {
         // view controller disappears, so we need to properly clean up our
         // UIViewPropertyAnimator or the UI will be in an invalid state even if the
         // animator is recreated.
-        NotificationCenter.default.addObserver(self, selector: #selector(cancelFilterIconAnimator), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(cancelFilterIconAnimator), name: .OWSApplicationDidEnterBackground, object: nil)
     }
 
     @available(*, unavailable)
@@ -316,7 +317,8 @@ final class ChatListFilterControl: UIView {
         updateContentInsetIfNecessary()
     }
 
-    @objc private func cancelFilterIconAnimator() {
+    @objc
+    private func cancelFilterIconAnimator() {
         guard let filterIconAnimator, filterIconAnimator.state == .active else { return }
         filterIconAnimator.stopAnimation(false)
         filterIconAnimator.finishAnimation(at: .start)
@@ -543,6 +545,7 @@ final class ChatListFilterControl: UIView {
         case .tracking(state: .off):
             cancelFilterIconAnimator()
             fallthrough
+
         case .committed(newState: .off):
             state = .off
 
@@ -652,24 +655,19 @@ private extension UIImage.Configuration {
 }
 
 private extension UIColor {
+
     static var filterIconActiveForeground: UIColor {
-        UIColor { traitCollection in
-            if traitCollection.userInterfaceStyle == .dark {
-                .Signal.label
-            } else {
-                .Signal.ultramarine
-            }
-        }
+        UIColor(
+            light: .Signal.ultramarine,
+            dark: .Signal.label,
+        )
     }
 
     static var filterIconActiveBackground: UIColor {
-        UIColor { traitCollection in
-            if traitCollection.userInterfaceStyle == .dark {
-                .Signal.ultramarine
-            } else {
-                .Signal.secondaryUltramarineBackground
-            }
-        }
+        UIColor(
+            light: .Signal.secondaryUltramarineBackground,
+            dark: .Signal.ultramarine,
+        )
     }
 }
 

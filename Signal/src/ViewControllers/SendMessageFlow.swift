@@ -5,6 +5,7 @@
 
 public import SignalServiceKit
 import SignalUI
+public import UIKit
 
 public protocol SendMessageDelegate: AnyObject {
     func sendMessageFlowDidComplete(threads: [TSThread])
@@ -29,8 +30,8 @@ struct SendMessageUnapprovedContent {
 struct SendMessageApprovedContent {
     let messageBody: MessageBody
     let linkPreviewDraft: OWSLinkPreviewDraft?
-    init?(messageBody: MessageBody?, linkPreviewDraft: OWSLinkPreviewDraft?) {
-        guard let messageBody, !messageBody.text.isEmpty else {
+    init?(messageBody: MessageBody, linkPreviewDraft: OWSLinkPreviewDraft?) {
+        guard !messageBody.text.isEmpty else {
             return nil
         }
         self.messageBody = messageBody
@@ -54,16 +55,16 @@ class SendMessageFlow {
     private let presentationStyle: PresentationStyle
 
     enum PresentationStyle {
-      case pushOnto(UINavigationController)
-      case presentFrom(UIViewController)
+        case pushOnto(UINavigationController)
+        case presentFrom(UIViewController)
     }
 
     private weak var navigationController: UINavigationController?
 
-    public init(
+    init(
         unapprovedContent: SendMessageUnapprovedContent,
         presentationStyle: PresentationStyle,
-        delegate: SendMessageDelegate
+        delegate: SendMessageDelegate,
     ) {
         self.unapprovedContent = unapprovedContent
         self.presentationStyle = presentationStyle
@@ -85,7 +86,7 @@ class SendMessageFlow {
         case .pushOnto:
             if navigationController.viewControllers.isEmpty {
                 navigationController.setViewControllers([
-                    conversationPicker
+                    conversationPicker,
                 ], animated: false)
             } else {
                 navigationController.pushViewController(conversationPicker, animated: true)
@@ -101,15 +102,15 @@ class SendMessageFlow {
         navigationController?.dismiss(animated: animated)
     }
 
-    fileprivate func fireComplete(threads: [TSThread]) {
+    private func fireComplete(threads: [TSThread]) {
         delegate?.sendMessageFlowDidComplete(threads: threads)
     }
 
-    fileprivate func fireWillShowConversation() {
+    private func fireWillShowConversation() {
         delegate?.sendMessageFlowWillShowConversation()
     }
 
-    fileprivate func fireCancelled() {
+    private func fireCancelled() {
         delegate?.sendMessageFlowDidCancel()
     }
 
@@ -122,11 +123,11 @@ class SendMessageFlow {
         }
 
         let groupThread = SSKEnvironment.shared.databaseStorageRef.read { readTx in
-            TSGroupThread.anyFetchGroupThread(uniqueId: groupThreadId, transaction: readTx)
+            TSGroupThread.fetchGroupThreadViaCache(uniqueId: groupThreadId, transaction: readTx)
         }
 
         owsAssertDebug(groupThread != nil)
-        if let groupThread = groupThread, groupThread.allowsMentionSend {
+        if let groupThread, groupThread.allowsMentionSend {
             mentionCandidates = groupThread.recipientAddressesWithSneakyTransaction
         } else {
             mentionCandidates = []
@@ -139,7 +140,7 @@ class SendMessageFlow {
 extension SendMessageFlow {
 
     private func pushViewController(_ viewController: UIViewController, animated: Bool) {
-        guard let navigationController = navigationController else {
+        guard let navigationController else {
             owsFailDebug("Missing navigationController.")
             return
         }
@@ -166,7 +167,7 @@ extension SendMessageFlow {
                     draftMessageBody: messageBody,
                     replyInfo: nil,
                     editTargetTimestamp: nil,
-                    transaction: transaction
+                    transaction: transaction,
                 )
                 return thread
             }
@@ -175,7 +176,7 @@ extension SendMessageFlow {
                 SignalApp.shared.presentConversationForThread(
                     threadUniqueId: thread.uniqueId,
                     action: .updateDraft,
-                    animated: true
+                    animated: true,
                 )
             }
         }
@@ -262,7 +263,7 @@ extension SendMessageFlow: ConversationPickerDelegate {
 // MARK: -
 
 extension SendMessageFlow: TextApprovalViewControllerDelegate {
-    func textApproval(_ textApproval: TextApprovalViewController, didApproveMessage messageBody: MessageBody?, linkPreviewDraft: OWSLinkPreviewDraft?) {
+    func textApproval(_ textApproval: TextApprovalViewController, didApproveMessage messageBody: MessageBody, linkPreviewDraft: OWSLinkPreviewDraft?) {
         guard let approvedContent = SendMessageApprovedContent(messageBody: messageBody, linkPreviewDraft: linkPreviewDraft) else {
             owsFailDebug("Missing messageBody.")
             fireCancelled()
@@ -306,7 +307,7 @@ public class SendMessageController: SendMessageDelegate {
 
         sendMessageFlow.set(nil)
 
-        guard let fromViewController = fromViewController else {
+        guard let fromViewController else {
             return
         }
 
@@ -326,7 +327,7 @@ public class SendMessageController: SendMessageDelegate {
 
         sendMessageFlow.set(nil)
 
-        guard let fromViewController = fromViewController else {
+        guard let fromViewController else {
             return
         }
 

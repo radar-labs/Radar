@@ -37,7 +37,6 @@ public class KeychainStorageImpl: KeychainStorage {
 
     public init(isUsingProductionService: Bool) {
         self.isUsingProductionService = isUsingProductionService
-        SwiftSingletons.register(self)
     }
 
     private func normalizeService(_ service: String) -> String {

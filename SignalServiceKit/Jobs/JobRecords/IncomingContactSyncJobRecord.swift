@@ -6,8 +6,8 @@
 import Foundation
 import GRDB
 
-public final class IncomingContactSyncJobRecord: JobRecord, FactoryInitializableFromRecordType {
-    override class var jobRecordType: JobRecordType { .incomingContactSync }
+public final class IncomingContactSyncJobRecord: JobRecord {
+    override public class var jobRecordType: JobRecordType { .incomingContactSync }
 
     private let cdnNumber: UInt32?
     private let cdnKey: String?
@@ -17,37 +17,42 @@ public final class IncomingContactSyncJobRecord: JobRecord, FactoryInitializable
 
     public enum DownloadInfo {
         case invalid
-        case transient(AttachmentDownloads.DownloadMetadata)
+        case transient(downloadMetadata: AttachmentDownloads.DownloadMetadata, decryptionMetadata: DecryptionMetadata)
     }
 
     public var downloadInfo: DownloadInfo {
-        if
+        guard
             let cdnKey,
             let cdnNumber,
             let encryptionKey,
             let digest,
             let plaintextLength
-        {
-            return .transient(.init(
-                mimeType: MimeType.applicationOctetStream.rawValue,
-                cdnNumber: cdnNumber,
-                encryptionKey: encryptionKey,
-                source: .transitTier(
-                    cdnKey: cdnKey,
-                    integrityCheck: .digestSHA256Ciphertext(digest),
-                    plaintextLength: plaintextLength
-                )
-            ))
+        else {
+            owsAssertDebug(
+                cdnKey == nil
+                    && cdnNumber == nil
+                    && encryptionKey == nil
+                    && digest == nil
+                    && plaintextLength == nil,
+                "Either all fields should be set or none!",
+            )
+            return .invalid
         }
-        owsAssertDebug(
-            cdnKey == nil
-            && cdnNumber == nil
-            && encryptionKey == nil
-            && digest == nil
-            && plaintextLength == nil,
-            "Either all fields should be set or none!"
+        guard let attachmentKey = try? AttachmentKey(combinedKey: encryptionKey) else {
+            owsFailDebug("couldn't parse contact sync attachment key")
+            return .invalid
+        }
+        return .transient(
+            downloadMetadata: AttachmentDownloads.DownloadMetadata(
+                cdnNumber: cdnNumber,
+                source: .transitTier(cdnKey: cdnKey),
+            ),
+            decryptionMetadata: DecryptionMetadata(
+                key: attachmentKey,
+                integrityCheck: .ciphertextDigest(digest),
+                plaintextLength: UInt64(safeCast: plaintextLength),
+            ),
         )
-        return .invalid
     }
 
     public let isCompleteContactSync: Bool
@@ -55,28 +60,28 @@ public final class IncomingContactSyncJobRecord: JobRecord, FactoryInitializable
     public init(
         cdnNumber: UInt32,
         cdnKey: String,
-        encryptionKey: Data,
+        attachmentKey: AttachmentKey,
         digest: Data,
-        plaintextLength: UInt32?,
+        plaintextLength: UInt32,
         isCompleteContactSync: Bool,
         failureCount: UInt = 0,
-        status: Status = .ready
+        status: Status = .ready,
     ) {
         self.isCompleteContactSync = isCompleteContactSync
 
         self.cdnNumber = cdnNumber
         self.cdnKey = cdnKey
-        self.encryptionKey = encryptionKey
+        self.encryptionKey = attachmentKey.combinedKey
         self.digest = digest
         self.plaintextLength = plaintextLength
 
         super.init(
             failureCount: failureCount,
-            status: status
+            status: status,
         )
     }
 
-    #if TESTABLE_BUILD
+#if TESTABLE_BUILD
     public init(
         cdnNumber: UInt32?,
         cdnKey: String?,
@@ -85,7 +90,7 @@ public final class IncomingContactSyncJobRecord: JobRecord, FactoryInitializable
         plaintextLength: UInt32?,
         isCompleteContactSync: Bool,
         failureCount: UInt = 0,
-        status: Status = .ready
+        status: Status = .ready,
     ) {
         self.isCompleteContactSync = isCompleteContactSync
 
@@ -97,12 +102,12 @@ public final class IncomingContactSyncJobRecord: JobRecord, FactoryInitializable
 
         super.init(
             failureCount: failureCount,
-            status: status
+            status: status,
         )
     }
-    #endif
+#endif
 
-    required init(forRecordTypeFactoryInitializationFrom decoder: Decoder) throws {
+    required init(inheritableDecoder decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         cdnNumber = try container.decodeIfPresent(UInt32.self, forKey: .ICSJR_cdnNumber)
@@ -113,20 +118,17 @@ public final class IncomingContactSyncJobRecord: JobRecord, FactoryInitializable
 
         isCompleteContactSync = try container.decode(Bool.self, forKey: .isCompleteContactSync)
 
-        try super.init(baseClassDuringFactoryInitializationFrom: container.superDecoder())
+        try super.init(inheritableDecoder: decoder)
     }
 
-    public override func encode(to encoder: Encoder) throws {
+    override public func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
-
-        try super.encode(to: container.superEncoder())
-
         try container.encodeIfPresent(cdnNumber, forKey: .ICSJR_cdnNumber)
         try container.encodeIfPresent(cdnKey, forKey: .ICSJR_cdnKey)
         try container.encodeIfPresent(encryptionKey, forKey: .ICSJR_encryptionKey)
         try container.encodeIfPresent(digest, forKey: .ICSJR_digest)
         try container.encodeIfPresent(plaintextLength, forKey: .ICSJR_plaintextLength)
-
         try container.encode(isCompleteContactSync, forKey: .isCompleteContactSync)
     }
 }

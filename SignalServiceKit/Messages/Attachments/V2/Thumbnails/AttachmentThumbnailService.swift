@@ -4,17 +4,18 @@
 //
 
 import Foundation
+public import UIKit
 
 public protocol AttachmentThumbnailService {
 
     func thumbnailImage(
         for attachmentStream: AttachmentStream,
-        quality: AttachmentThumbnailQuality
+        quality: AttachmentThumbnailQuality,
     ) async -> UIImage?
 
     func thumbnailImageSync(
         for attachmentStream: AttachmentStream,
-        quality: AttachmentThumbnailQuality
+        quality: AttachmentThumbnailQuality,
     ) -> UIImage?
 
     func backupThumbnailData(image: UIImage) throws -> Data

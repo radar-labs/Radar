@@ -4,10 +4,10 @@
 //
 
 import Lottie
-import SwiftUI
-import SignalUI
-import SignalServiceKit
 import SafariServices
+import SignalServiceKit
+import SignalUI
+import SwiftUI
 
 // MARK: View Model
 
@@ -44,23 +44,15 @@ class LinkAndSyncSecondaryProgressViewModel: ObservableObject {
             // regardless of state.
             canBeCancelled = true
         } else {
-            canBeCancelled = progress
-                .progress(for: .waitingForBackup)?
-                .isFinished
-                ?? false
+            canBeCancelled = progress.progress(for: .waitingForBackup)?.isFinished ?? false
         }
 
         guard !didTapCancel else { return }
 
-        self.isIndeterminate = progress
-            .progress(for: .waitingForBackup)?
-            .isFinished.negated
-            ?? true
+        self.isIndeterminate = !(progress.progress(for: .waitingForBackup)?.isFinished ?? false)
 
         if
-            let downloadSource = progress.progressForChild(
-                label: AttachmentDownloads.downloadProgressLabel
-            ),
+            let downloadSource = progress.descendantProgresses(withLabel: AttachmentDownloads.downloadProgressLabel).first,
             downloadSource.completedUnitCount > 0,
             !downloadSource.isFinished
         {
@@ -85,7 +77,7 @@ class LinkAndSyncSecondaryProgressViewModel: ObservableObject {
         } else if !(waitForBackupTimeoutTimer?.isValid ?? false) {
             waitForBackupTimeoutTimer = Timer.scheduledTimer(
                 withTimeInterval: 60,
-                repeats: false
+                repeats: false,
             ) { [weak self] _ in
                 self?.didTimeoutWaitForBackup = true
                 self?.canBeCancelled = true
@@ -109,7 +101,7 @@ class LinkAndSyncSecondaryProgressViewModel: ObservableObject {
 
 class LinkAndSyncProvisioningProgressViewController: ProvisioningBaseViewController, LinkAndSyncProgressUI {
 
-    public var shouldSuppressNotifications: Bool { true }
+    var shouldSuppressNotifications: Bool { true }
 
     fileprivate var viewModel: LinkAndSyncSecondaryProgressViewModel
 
@@ -134,7 +126,7 @@ class LinkAndSyncProvisioningProgressViewController: ProvisioningBaseViewControl
             self,
             selector: #selector(appDidBackground),
             name: .OWSApplicationDidEnterBackground,
-            object: nil
+            object: nil,
         )
     }
 
@@ -166,8 +158,8 @@ class LinkAndSyncProvisioningProgressViewController: ProvisioningBaseViewControl
             // Reset the whole app and force quit. If the user
             // exits in the middle of syncing we'll probably
             // crash anyway (dead10cc).
-            SignalApp.resetAppDataAndExit(
-                keyFetcher: SSKEnvironment.shared.databaseStorageRef.keyFetcher
+            SignalApp.shared.resetAppDataAndExit(
+                keyFetcher: SSKEnvironment.shared.databaseStorageRef.keyFetcher,
             )
         }
     }
@@ -183,9 +175,11 @@ struct LinkAndSyncProvisioningProgressView: View {
     private var showIndeterminateProgress: Bool {
         viewModel.isIndeterminate || indeterminateProgressShouldShow
     }
+
     private var loopMode: LottieLoopMode {
         viewModel.isIndeterminate ? .loop : .playOnce
     }
+
     private var progressToShow: Float {
         indeterminateProgressShouldShow ? 0 : viewModel.progress
     }
@@ -198,35 +192,35 @@ struct LinkAndSyncProvisioningProgressView: View {
         if viewModel.didTapCancel {
             OWSLocalizedString(
                 "LINK_NEW_DEVICE_SYNC_PROGRESS_TILE_CANCELLING",
-                comment: "Title for a progress modal that would be indicating the sync progress while it's cancelling that sync"
+                comment: "Title for a progress modal that would be indicating the sync progress while it's cancelling that sync",
             )
-        } else if indeterminateProgressShouldShow && !viewModel.isFinalizing {
+        } else if indeterminateProgressShouldShow, !viewModel.isFinalizing {
             OWSLocalizedString(
                 "LINKING_SYNCING_PREPARING_TO_DOWNLOAD",
-                comment: "Progress label when the message loading has not yet started during the device linking process"
+                comment: "Progress label when the message loading has not yet started during the device linking process",
             )
         } else if let downloadProgress = viewModel.downloadProgress {
-            String(
-                format: OWSLocalizedString(
+            String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
                     "LINK_NEW_DEVICE_SYNC_DOWNLOAD_PROGRESS",
-                    comment: "Progress label showing the download progress of a linked device sync. Embeds {{ formatted downloaded size (such as megabytes), formatted total download size, formatted percentage }}"
+                    comment: "Progress label showing the download progress of a linked device sync. Embeds {{ formatted downloaded size (such as megabytes), formatted total download size, formatted percentage }}",
                 ),
                 downloadProgress.downloadedByteCount.formatted(byteCountFormat),
                 downloadProgress.totalByteCount.formatted(byteCountFormat),
-                progressToShow.formatted(.percent.precision(.fractionLength(0)))
+                progressToShow.formatted(.owsPercent()),
             )
         } else if !viewModel.isFinalizing {
-            String(
-                format: OWSLocalizedString(
+            String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
                     "LINK_NEW_DEVICE_SYNC_PROGRESS_PERCENT",
-                    comment: "On a progress modal indicating the percent complete the sync process is. Embeds {{ formatted percentage }}"
+                    comment: "On a progress modal indicating the percent complete the sync process is. Embeds {{ formatted percentage }}",
                 ),
-                progressToShow.formatted(.percent.precision(.fractionLength(0)))
+                progressToShow.formatted(.owsPercent()),
             )
         } else {
             OWSLocalizedString(
                 "LINKING_SYNCING_FINALIZING",
-                comment: "Progress label when the message loading has nearly completed during the device linking process"
+                comment: "Progress label when the message loading has nearly completed during the device linking process",
             )
         }
     }
@@ -236,7 +230,7 @@ struct LinkAndSyncProvisioningProgressView: View {
             Spacer()
             Text(OWSLocalizedString(
                 "LINKING_SYNCING_MESSAGES_TITLE",
-                comment: "Title shown when loading messages during linking process"
+                comment: "Title shown when loading messages during linking process",
             ))
             .font(.title2.bold())
             .foregroundStyle(Color.Signal.label)
@@ -274,7 +268,7 @@ struct LinkAndSyncProvisioningProgressView: View {
 
                 Text(OWSLocalizedString(
                     "LINKING_SYNCING_TIMING_INFO",
-                    comment: "Label below the progress bar when loading messages during linking process"
+                    comment: "Label below the progress bar when loading messages during linking process",
                 ))
                 .font(.subheadline)
             }
@@ -306,7 +300,7 @@ struct LinkAndSyncProvisioningProgressView: View {
 
                 Text(OWSLocalizedString(
                     "LINKING_SYNCING_FOOTER",
-                    comment: "Footer text when loading messages during linking process."
+                    comment: "Footer text when loading messages during linking process.",
                 ))
                 .appendLink(CommonStrings.learnMore) {
                     let vc = SFSafariViewController(url: URL.Support.linkedDevices)
@@ -329,17 +323,17 @@ struct LinkAndSyncProvisioningProgressView: View {
     let view = LinkAndSyncProvisioningProgressView(viewModel: LinkAndSyncSecondaryProgressViewModel())
 
     let task = Task { @MainActor in
-        let progressSink = await OWSSequentialProgress<SecondaryLinkNSyncProgressPhase>.createSink { progress in
+        let progressSink = OWSSequentialProgress<SecondaryLinkNSyncProgressPhase>.createSink { progress in
             await MainActor.run {
                 view.viewModel.updateProgress(progress)
             }
         }
 
-        let nonCancellableProgressSource = await progressSink.child(for: .waitingForBackup).addSource(
+        let nonCancellableProgressSource = progressSink.child(for: .waitingForBackup).addSource(
             withLabel: SecondaryLinkNSyncProgressPhase.waitingForBackup.rawValue,
-            unitCount: 10
+            unitCount: 10,
         )
-        let download = await progressSink.child(for: .downloadingBackup)
+        let download = progressSink.child(for: .downloadingBackup)
             .addSource(withLabel: "download", unitCount: 10_000_000)
 
         try? await Task.sleep(for: .seconds(1))

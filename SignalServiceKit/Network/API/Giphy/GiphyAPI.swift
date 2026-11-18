@@ -21,7 +21,7 @@ public enum GiphyAPI {
         return OWSURLSession(
             baseUrl: kGiphyBaseURL,
             securityPolicy: OWSURLSession.defaultSecurityPolicy,
-            configuration: configuration
+            configuration: configuration,
         )
     }
 
@@ -30,6 +30,14 @@ public enum GiphyAPI {
     // This is the Signal iOS API key.
     private static let kGiphyApiKey = "ZsUpUm2L6cVbvei347EQNp7HrROjbOdc"
     private static let kGiphyPageSize = 100
+    // Limit response payload to the renditions and fields we actually consume.
+    private static let kGiphyFields = [
+        "id",
+        "images.original.mp4",
+        "images.fixed_width.mp4",
+        "images.fixed_width.width",
+        "images.fixed_width.height",
+    ].joined(separator: ",")
 
     public static func trending() async throws -> [GiphyImageInfo] {
         try await fetch(urlPath: "/v1/gifs/trending", queryItems: [])
@@ -38,7 +46,7 @@ public enum GiphyAPI {
     public static func search(query: String) async throws -> [GiphyImageInfo] {
         try await fetch(urlPath: "/v1/gifs/search", queryItems: [
             URLQueryItem(name: "q", value: query),
-            URLQueryItem(name: "offset", value: "0")
+            URLQueryItem(name: "offset", value: "0"),
         ])
     }
 
@@ -47,7 +55,8 @@ public enum GiphyAPI {
         urlComponents.path = urlPath
         let baseQueryItems: [URLQueryItem] = [
             URLQueryItem(name: "api_key", value: kGiphyApiKey),
-            URLQueryItem(name: "limit", value: "\(kGiphyPageSize)")
+            URLQueryItem(name: "limit", value: "\(kGiphyPageSize)"),
+            URLQueryItem(name: "fields", value: kGiphyFields),
         ]
         urlComponents.queryItems = baseQueryItems + queryItems
         guard let urlString = urlComponents.string else {
@@ -60,30 +69,88 @@ public enum GiphyAPI {
             guard ContentProxy.configureProxiedRequest(request: &request) else {
                 throw OWSAssertionError("Invalid URL")
             }
-            let response = try await urlSession.performRequest(request: request, ignoreAppExpiry: false)
-            guard let responseDict = response.responseBodyDict else {
-                throw OWSAssertionError("Missing or invalid JSON")
+            let response = try await urlSession.performRequest(request: request, maxResponseSize: .max, ignoreAppExpiry: false)
+            guard let responseData = response.responseBodyData else {
+                throw OWSAssertionError("Missing response body")
             }
             Logger.info("Request succeeded.")
-            guard let imageInfos = self.parseGiphyImages(responseDict: responseDict) else {
-                throw OWSAssertionError("unable to parse trending images")
+            let parsed = try JSONDecoder().decode(SearchResponse.self, from: responseData)
+            return parsed.data.compactMap { lossy in
+                lossy.apiResponse.flatMap { imageInfo(from: $0) }
             }
-            return imageInfos
         } catch {
             Logger.warn("Request failed: \(error.shortDescription)")
             throw error
         }
     }
 
-    // MARK: Parse API Responses
-
-    private static func parseGiphyImages(responseDict: [String: Any]) -> [GiphyImageInfo]? {
-        guard let imageDicts = responseDict["data"] as? [[String: Any]] else {
-            Logger.error("Invalid response data.")
+    private static func imageInfo(from apiResponse: APIResponse) -> GiphyImageInfo? {
+        // Giphy returns numeric metadata as strings.
+        guard
+            let width = Int(apiResponse.images.fixedWidth.width),
+            let height = Int(apiResponse.images.fixedWidth.height),
+            width > 0,
+            height > 0
+        else {
             return nil
         }
-        return imageDicts.compactMap { imageDict in
-            GiphyImageInfo(parsing: imageDict)
+
+        return GiphyImageInfo(
+            giphyId: apiResponse.id,
+            fullSize: ProxiedContentAssetDescription(
+                url: apiResponse.images.original.mp4 as NSURL,
+                fileExtension: GiphyImageInfo.fileExtension,
+            ),
+            preview: ProxiedContentAssetDescription(
+                url: apiResponse.images.fixedWidth.mp4 as NSURL,
+                fileExtension: GiphyImageInfo.fileExtension,
+            ),
+            previewAspectRatio: CGFloat(width) / CGFloat(height),
+        )
+    }
+
+    private struct SearchResponse: Decodable {
+        let data: [LossyAPIResponse]
+    }
+
+    /// Wraps an `APIResponse` that may fail to decode, so one malformed item
+    /// doesn't fail decoding the entire `SearchResponse`.
+    private struct LossyAPIResponse: Decodable {
+        let apiResponse: APIResponse?
+
+        init(from decoder: Decoder) {
+            do {
+                apiResponse = try APIResponse(from: decoder)
+            } catch {
+                Logger.warn("Skipping item that failed to decode: \(error)")
+                apiResponse = nil
+            }
         }
     }
+
+    private struct APIResponse: Decodable {
+        let id: String
+        let images: Images
+
+        struct Images: Decodable {
+            let original: Original
+            let fixedWidth: FixedWidth
+
+            private enum CodingKeys: String, CodingKey {
+                case original
+                case fixedWidth = "fixed_width"
+            }
+
+            struct Original: Decodable {
+                let mp4: URL
+            }
+
+            struct FixedWidth: Decodable {
+                let mp4: URL
+                let width: String
+                let height: String
+            }
+        }
+    }
+
 }

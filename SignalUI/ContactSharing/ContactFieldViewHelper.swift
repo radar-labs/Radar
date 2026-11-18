@@ -24,15 +24,52 @@ public class ContactFieldViewHelper {
         return containerView
     }
 
-    public class func contactFieldView(forContactName contactName: String) -> UIView {
-        return simpleFieldView(name: nil, value: contactName)
+    public class func contactFieldView(forContactName contactName: String, organizationName: String?) -> UIView {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .leading
+        stackView.spacing = 3
+
+        let nameLabel = UILabel()
+        nameLabel.text = contactName
+        nameLabel.font = .dynamicTypeBody
+        nameLabel.textColor = .Signal.label
+        nameLabel.lineBreakMode = .byTruncatingTail
+        stackView.addArrangedSubview(nameLabel)
+
+        if let organizationName {
+            let organizationLabel = UILabel()
+            organizationLabel.text = organizationName
+            organizationLabel.font = .dynamicTypeSubheadline
+            organizationLabel.textColor = .Signal.secondaryLabel
+            organizationLabel.lineBreakMode = .byTruncatingTail
+            stackView.addArrangedSubview(organizationLabel)
+        }
+
+        return stackView
     }
 
     public class func contactFieldView(forOrganizationName organizationName: String) -> UIView {
         return simpleFieldView(
             name: OWSLocalizedString("CONTACT_FIELD_ORGANIZATION", comment: "Label for the 'organization' field of a contact."),
-            value: organizationName
+            value: organizationName,
         )
+    }
+
+    public static var nicknameFieldLabel: String {
+        OWSLocalizedString("CONTACT_FIELD_NICKNAME", comment: "Label for the 'nickname' field of a contact.")
+    }
+
+    public class func contactFieldView(forNickname nickname: PersonNameComponents) -> UIView {
+        return simpleFieldView(name: nicknameFieldLabel, value: OWSFormat.formatNameComponents(nickname))
+    }
+
+    public static var noteFieldLabel: String {
+        OWSLocalizedString("CONTACT_FIELD_NOTES", comment: "Label for the 'notes' field of a contact.")
+    }
+
+    public class func contactFieldView(forNote note: String) -> UIView {
+        return simpleFieldView(name: noteFieldLabel, value: note, isMultiline: true)
     }
 
     public class func contactFieldView(forPhoneNumber phoneNumber: OWSContactPhoneNumber) -> UIView {
@@ -44,7 +81,7 @@ public class ContactFieldViewHelper {
         return simpleFieldView(name: email.localizedLabel, value: email.email)
     }
 
-    private class func simpleFieldView(name: String?, value: String?) -> UIView {
+    private class func simpleFieldView(name: String?, value: String?, isMultiline: Bool = false) -> UIView {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.alignment = .leading
@@ -54,7 +91,7 @@ public class ContactFieldViewHelper {
             let nameLabel = UILabel()
             nameLabel.text = name.lowercased()
             nameLabel.font = .dynamicTypeSubheadline
-            nameLabel.textColor = Theme.secondaryTextAndIconColor
+            nameLabel.textColor = .Signal.secondaryLabel
             nameLabel.lineBreakMode = .byTruncatingTail
             stackView.addArrangedSubview(nameLabel)
         }
@@ -62,8 +99,13 @@ public class ContactFieldViewHelper {
         let valueLabel = UILabel()
         valueLabel.text = value
         valueLabel.font = .dynamicTypeBody
-        valueLabel.textColor = Theme.primaryTextColor
-        valueLabel.lineBreakMode = .byTruncatingTail
+        valueLabel.textColor = .Signal.label
+        if isMultiline {
+            valueLabel.lineBreakMode = .byWordWrapping
+            valueLabel.numberOfLines = 0
+        } else {
+            valueLabel.lineBreakMode = .byTruncatingTail
+        }
         stackView.addArrangedSubview(valueLabel)
 
         return stackView
@@ -80,7 +122,7 @@ public class ContactFieldViewHelper {
         let nameLabel = UILabel()
         nameLabel.text = address.localizedLabel
         nameLabel.font = UIFont.dynamicTypeSubheadline
-        nameLabel.textColor = Theme.secondaryTextAndIconColor
+        nameLabel.textColor = .Signal.secondaryLabel
         nameLabel.lineBreakMode = .byTruncatingTail
         stackView.addArrangedSubview(nameLabel)
 
@@ -92,7 +134,7 @@ public class ContactFieldViewHelper {
             let valueLabel = UILabel()
             valueLabel.text = formattedAddress
             valueLabel.font = UIFont.dynamicTypeBody
-            valueLabel.textColor = Theme.primaryTextColor
+            valueLabel.textColor = .Signal.label
             valueLabel.lineBreakMode = .byWordWrapping
             valueLabel.numberOfLines = 0
             stackView.addArrangedSubview(valueLabel)

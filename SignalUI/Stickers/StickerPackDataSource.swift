@@ -22,7 +22,7 @@ public protocol StickerPackDataSource: AnyObject {
     var title: String? { get }
     var author: String? { get }
 
-    func getStickerPack() -> StickerPack?
+    func getStickerPack() -> StickerPackRecord?
 
     var installedCoverInfo: StickerInfo? { get }
     var installedStickerInfos: [StickerInfo] { get }
@@ -46,11 +46,13 @@ public class BaseStickerPackDataSource: NSObject {
     }
 
     private lazy var didChangeEvent: DebouncedEvent = {
-        DebouncedEvents.build(mode: .firstLast,
-                              maxFrequencySeconds: 0.5,
-                              onQueue: .main) { [weak self] in
+        DebouncedEvents.build(
+            mode: .firstLast,
+            maxFrequencySeconds: 0.5,
+            onQueue: .main,
+        ) { [weak self] in
             AssertIsOnMainThread()
-            guard let self = self else {
+            guard let self else {
                 return
             }
             // Inform any observing views or data sources that they of the change.
@@ -114,9 +116,11 @@ public class InstalledStickerPackDataSource: BaseStickerPackDataSource {
 
     // MARK: Properties
 
+    private let stickerManager: StickerManager
     private let stickerPackInfo: StickerPackInfo
+    private let db: DB
 
-    fileprivate var stickerPack: StickerPack? {
+    fileprivate var stickerPack: StickerPackRecord? {
         didSet {
             AssertIsOnMainThread()
 
@@ -127,26 +131,32 @@ public class InstalledStickerPackDataSource: BaseStickerPackDataSource {
         }
     }
 
-    public init(stickerPackInfo: StickerPackInfo) {
+    public init(stickerPackInfo: StickerPackInfo, stickerManager: StickerManager, db: DB) {
         self.stickerPackInfo = stickerPackInfo
+        self.stickerManager = stickerManager
+        self.db = db
 
         super.init()
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(stickersOrPacksDidChange),
-                                               name: StickerManager.stickersOrPacksDidChange,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(didBecomeActive),
-                                               name: .OWSApplicationDidBecomeActive,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(stickersOrPacksDidChange),
+            name: StickerManager.stickersOrPacksDidChange,
+            object: nil,
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(didBecomeActive),
+            name: .OWSApplicationDidBecomeActive,
+            object: nil,
+        )
 
         ensureState()
     }
 
     func ensureState() {
-        SSKEnvironment.shared.databaseStorageRef.read { readTx in
-            let stateTuple = Self.fetchInstalledState(for: self.stickerPackInfo, readTx: readTx)
+        db.read { readTx in
+            let stateTuple = self.fetchInstalledState(for: self.stickerPackInfo, readTx: readTx)
 
             guard let stickerPack = stateTuple.stickerPack, stickerPack.isInstalled else {
                 self.stickerPack = nil
@@ -165,8 +175,8 @@ public class InstalledStickerPackDataSource: BaseStickerPackDataSource {
 
     func ensureStateAsync(completion: (() -> Void)? = nil) {
         DispatchQueue.sharedUserInitiated.async {
-            let stateTuple = SSKEnvironment.shared.databaseStorageRef.read { readTx in
-                return Self.fetchInstalledState(for: self.stickerPackInfo, readTx: readTx)
+            let stateTuple = self.db.read { readTx in
+                return self.fetchInstalledState(for: self.stickerPackInfo, readTx: readTx)
             }
 
             DispatchQueue.main.async {
@@ -188,14 +198,19 @@ public class InstalledStickerPackDataSource: BaseStickerPackDataSource {
         }
     }
 
-    private static func fetchInstalledState(for stickerPackInfo: StickerPackInfo, readTx: DBReadTransaction) -> (
-        stickerPack: StickerPack?,
+    private func fetchInstalledState(for stickerPackInfo: StickerPackInfo, readTx: DBReadTransaction) -> (
+        stickerPack: StickerPackRecord?,
         installedCoverInfo: StickerInfo?,
-        installedStickers: [StickerInfo]) {
+        installedStickers: [StickerInfo],
+    ) {
 
         // Update Sticker Pack.
-        guard let stickerPack = StickerManager.fetchStickerPack(stickerPackInfo: stickerPackInfo,
-                                                                transaction: readTx) else {
+        guard
+            let stickerPack = stickerManager.fetchStickerPack(
+                stickerPackInfo: stickerPackInfo,
+                transaction: readTx,
+            )
+        else {
             return (nil, nil, [])
         }
         guard stickerPack.isInstalled else {
@@ -206,24 +221,26 @@ public class InstalledStickerPackDataSource: BaseStickerPackDataSource {
         // Update Stickers.
 
         let coverInfo: StickerInfo?
-        if StickerManager.isStickerInstalled(stickerInfo: stickerPack.coverInfo, transaction: readTx) {
+        if stickerManager.isStickerInstalled(stickerInfo: stickerPack.coverInfo, transaction: readTx) {
             coverInfo = stickerPack.coverInfo
         } else {
             coverInfo = nil
         }
-        let stickerInfos = StickerManager.installedStickers(forStickerPack: stickerPack,
-                                                            verifyExists: false,
-                                                            transaction: readTx)
+        let stickerInfos = stickerManager.installedStickers(
+            forStickerPack: stickerPack,
+            verifyExists: false,
+            transaction: readTx,
+        )
 
         return (stickerPack, coverInfo, stickerInfos)
     }
 
     private func ensureDownloads() {
-        guard let stickerPack = stickerPack else {
+        guard let stickerPack else {
             return
         }
         // Download any missing stickers.
-        _ = StickerManager.ensureDownloadsAsync(forStickerPack: stickerPack)
+        _ = stickerManager.ensureDownloadsAsync(forStickerPack: stickerPack)
     }
 
     // MARK: Events
@@ -260,7 +277,7 @@ extension InstalledStickerPackDataSource: StickerPackDataSource {
         return stickerPack?.author
     }
 
-    public func getStickerPack() -> StickerPack? {
+    public func getStickerPack() -> StickerPackRecord? {
         return stickerPack
     }
 
@@ -281,7 +298,9 @@ extension InstalledStickerPackDataSource: StickerPackDataSource {
 
         // This logic is perf-sensitive and on the main thread;
         // don't bother checking that the sticker data resides on disk.
-        return StickerManager.installedStickerMetadataWithSneakyTransaction(stickerInfo: stickerInfo)
+        return db.read { tx in
+            stickerManager.installedStickerMetadata(stickerInfo: stickerInfo, transaction: tx)
+        }
     }
 }
 
@@ -300,7 +319,7 @@ public class TransientStickerPackDataSource: BaseStickerPackDataSource {
     // If false, only download manifest and cover.
     private let shouldDownloadAllStickers: Bool
 
-    fileprivate var stickerPack: StickerPack? {
+    fileprivate var stickerPack: StickerPackRecord? {
         didSet {
             AssertIsOnMainThread()
 
@@ -318,39 +337,38 @@ public class TransientStickerPackDataSource: BaseStickerPackDataSource {
 
     // This should only be accessed on the main thread.
     private var stickerMetadataMap = [String: any StickerMetadata]()
-    private var temporaryFileUrls = [URL]()
+    private let stickerManager: StickerManager
+    private let db: DB
 
-    public init(stickerPackInfo: StickerPackInfo,
-                shouldDownloadAllStickers: Bool) {
+    public init(
+        stickerPackInfo: StickerPackInfo,
+        shouldDownloadAllStickers: Bool,
+        stickerManager: StickerManager,
+        db: DB,
+    ) {
         self.stickerPackInfo = stickerPackInfo
         self.shouldDownloadAllStickers = shouldDownloadAllStickers
+        self.stickerManager = stickerManager
+        self.db = db
 
-        self.installedDataSource = InstalledStickerPackDataSource(stickerPackInfo: stickerPackInfo)
+        self.installedDataSource = InstalledStickerPackDataSource(
+            stickerPackInfo: stickerPackInfo,
+            stickerManager: stickerManager,
+            db: db,
+        )
 
         super.init()
 
         self.installedDataSource.add(delegate: self)
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(didBecomeActive),
-                                               name: .OWSApplicationDidBecomeActive,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(didBecomeActive),
+            name: .OWSApplicationDidBecomeActive,
+            object: nil,
+        )
 
         ensureState()
-    }
-
-    deinit {
-        // Eagerly clean up temp files.
-        let temporaryFileUrls = self.temporaryFileUrls
-        DispatchQueue.sharedUtility.async {
-            for fileUrl in temporaryFileUrls {
-                do {
-                    try OWSFileSystem.deleteFileIfExists(url: fileUrl)
-                } catch {
-                    owsFailDebug("Error: \(error)")
-                }
-            }
-        }
     }
 
     private func ensureState() {
@@ -363,7 +381,7 @@ public class TransientStickerPackDataSource: BaseStickerPackDataSource {
         }
 
         // If necessary, download and parse the pack's manifest.
-        guard let stickerPack = stickerPack else {
+        guard let stickerPack else {
             downloadStickerPack()
             return
         }
@@ -377,7 +395,7 @@ public class TransientStickerPackDataSource: BaseStickerPackDataSource {
 
         if shouldDownloadAllStickers {
             var downloadedStickerInfos = [StickerInfo]()
-            for stickerInfo in stickerPack.stickerInfos {
+            for stickerInfo in stickerPack.stickerInfos() {
                 if ensureStickerDownload(stickerPack: stickerPack, stickerInfo: stickerInfo) {
                     downloadedStickerInfos.append(stickerInfo)
                 }
@@ -401,9 +419,9 @@ public class TransientStickerPackDataSource: BaseStickerPackDataSource {
         }
         downloadKeySet.insert(key)
 
-        StickerManager.tryToDownloadStickerPack(stickerPackInfo: stickerPackInfo)
-            .done(on: DispatchQueue.main) { [weak self] (stickerPack) in
-                guard let self = self else {
+        stickerManager.tryToDownloadStickerPack(stickerPackInfo: stickerPackInfo)
+            .done(on: DispatchQueue.main) { [weak self] stickerPack in
+                guard let self else {
                     return
                 }
                 guard self.stickerPack == nil else {
@@ -414,9 +432,9 @@ public class TransientStickerPackDataSource: BaseStickerPackDataSource {
                 self.downloadKeySet.remove(key)
                 self.ensureState()
                 self.fireDidChange()
-            }.catch { [weak self] (error) in
+            }.catch { [weak self] error in
                 owsFailDebug("error: \(error)")
-                guard let self = self else {
+                guard let self else {
                     return
                 }
                 assert(self.downloadKeySet.contains(key))
@@ -431,8 +449,7 @@ public class TransientStickerPackDataSource: BaseStickerPackDataSource {
 
     // Returns true if sticker is already downloaded.
     // If not, kicks off the download.
-    private func ensureStickerDownload(stickerPack: StickerPack,
-                                       stickerInfo: StickerInfo) -> Bool {
+    private func ensureStickerDownload(stickerPack: StickerPackRecord, stickerInfo: StickerInfo) -> Bool {
         AssertIsOnMainThread()
 
         guard let stickerPackItem = stickerPack.stickerPackItem(forStickerInfo: stickerInfo) else {
@@ -454,18 +471,22 @@ public class TransientStickerPackDataSource: BaseStickerPackDataSource {
 
         // This sticker is not downloaded; try to download now.
         firstly(on: DispatchQueue.global()) {
-            StickerManager.tryToDownloadSticker(stickerPack: stickerPack, stickerInfo: stickerInfo)
-        }.done(on: DispatchQueue.main) { [weak self] (temporaryFileUrl) in
-            guard let self = self else {
+            self.stickerManager.tryToDownloadSticker(stickerInfo: stickerInfo)
+        }.done(on: DispatchQueue.main) { [weak self] stickerData in
+            guard let self else {
                 return
             }
-            self.temporaryFileUrls.append(temporaryFileUrl)
+
             assert(self.downloadKeySet.contains(key))
             self.downloadKeySet.remove(key)
-            self.set(temporaryFileUrl: temporaryFileUrl, stickerInfo: stickerInfo, stickerPackItem: stickerPackItem)
-        }.catch { [weak self] (error) in
+            self.set(
+                stickerInfo: stickerInfo,
+                stickerPackItem: stickerPackItem,
+                stickerData: stickerData,
+            )
+        }.catch { [weak self] error in
             owsFailDebug("error: \(error)")
-            guard let self = self else {
+            guard let self else {
                 return
             }
             assert(self.downloadKeySet.contains(key))
@@ -474,9 +495,11 @@ public class TransientStickerPackDataSource: BaseStickerPackDataSource {
         return false
     }
 
-    private func set(temporaryFileUrl: URL,
-                     stickerInfo: StickerInfo,
-                     stickerPackItem: StickerPackItem) {
+    private func set(
+        stickerInfo: StickerInfo,
+        stickerPackItem: StickerPackItem,
+        stickerData: Data,
+    ) {
         AssertIsOnMainThread()
 
         let key = stickerInfo.asKey()
@@ -484,11 +507,12 @@ public class TransientStickerPackDataSource: BaseStickerPackDataSource {
             return
         }
         let stickerType = StickerManager.stickerType(forContentType: stickerPackItem.contentType)
-        let stickerMetadata = DecryptedStickerMetadata(
+
+        let stickerMetadata = TransientStickerMetadata(
             stickerInfo: stickerInfo,
             stickerType: stickerType,
-            stickerDataUrl: temporaryFileUrl,
-            emojiString: stickerPackItem.emojiString
+            emojiString: stickerPackItem.emojiString,
+            stickerData: stickerData,
         )
         stickerMetadataMap[key] = stickerMetadata
         ensureState()
@@ -534,7 +558,7 @@ extension TransientStickerPackDataSource: StickerPackDataSource {
         return stickerPack?.author
     }
 
-    public func getStickerPack() -> StickerPack? {
+    public func getStickerPack() -> StickerPackRecord? {
         AssertIsOnMainThread()
 
         if let stickerPack = installedDataSource.getStickerPack() {
@@ -573,8 +597,12 @@ extension TransientStickerPackDataSource: StickerPackDataSource {
             return stickerMetadata
         }
 
-        guard let stickerMetadata = StickerManager.installedStickerMetadataWithSneakyTransaction(stickerInfo: stickerInfo) else {
-                                                                                                    return nil
+        guard
+            let stickerMetadata = db.read(block: { tx in
+                stickerManager.installedStickerMetadata(stickerInfo: stickerInfo, transaction: tx)
+            })
+        else {
+            return nil
         }
         stickerMetadataMap[key] = stickerMetadata
         return stickerMetadata
@@ -586,6 +614,7 @@ extension TransientStickerPackDataSource: StickerPackDataSource {
 extension TransientStickerPackDataSource: StickerPackDataSourceDelegate {
     public func stickerPackDataDidChange() {
         ensureState()
+        fireDidChange()
     }
 }
 
@@ -593,20 +622,29 @@ extension TransientStickerPackDataSource: StickerPackDataSourceDelegate {
 
 // Supplies sticker pack data for recently used stickers.
 public class RecentStickerPackDataSource: BaseStickerPackDataSource {
+    private let stickerManager: StickerManager
+    private let db: DB
 
-    public override init() {
+    public init(stickerManager: StickerManager, db: DB) {
+        self.stickerManager = stickerManager
+        self.db = db
+
         super.init()
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(recentStickersDidChange),
-                                               name: StickerManager.recentStickersDidChange,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(recentStickersDidChange),
+            name: StickerManager.recentStickersDidChange,
+            object: nil,
+        )
 
         ensureState()
     }
 
     private func ensureState() {
-        stickerInfos = StickerManager.recentStickers()
+        db.read { tx in
+            stickerInfos = stickerManager.recentStickers(transaction: tx)
+        }
     }
 
     // MARK: Events
@@ -637,7 +675,7 @@ extension RecentStickerPackDataSource: StickerPackDataSource {
         return nil
     }
 
-    public func getStickerPack() -> StickerPack? {
+    public func getStickerPack() -> StickerPackRecord? {
         owsFailDebug("This method should never be called.")
         return nil
     }
@@ -658,13 +696,15 @@ extension RecentStickerPackDataSource: StickerPackDataSource {
 
         // This logic is perf-sensitive and on the main thread;
         // don't bother checking that the sticker data resides on disk.
-        return StickerManager.installedStickerMetadataWithSneakyTransaction(stickerInfo: stickerInfo)
+        return db.read { tx in
+            stickerManager.installedStickerMetadata(stickerInfo: stickerInfo, transaction: tx)
+        }
     }
 }
 
 // MARK: -
 
-extension StickerPack {
+extension StickerPackRecord {
     func stickerPackItem(forStickerInfo stickerInfo: StickerInfo) -> StickerPackItem? {
         if cover.stickerId == stickerInfo.stickerId {
             return cover

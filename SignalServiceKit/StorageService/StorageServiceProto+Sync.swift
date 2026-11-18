@@ -32,7 +32,7 @@ protocol StorageServiceRecordUpdater {
     func buildRecord(
         for localId: IdType,
         unknownFields: UnknownStorage?,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> RecordType?
 
     func buildStorageItem(for record: RecordType) -> StorageService.StorageItem
@@ -57,7 +57,7 @@ protocol StorageServiceRecordUpdater {
     /// - Returns: A type indicating the result of the merge.
     func mergeRecord(
         _ record: RecordType,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) -> StorageServiceMergeResult<IdType>
 }
 
@@ -121,7 +121,7 @@ struct StorageServiceContact {
     fileprivate init?(_ contactRecord: StorageServiceProtoContactRecord) {
         let unregisteredAtTimestamp: UInt64?
         if contactRecord.unregisteredAtTimestamp == 0 {
-            unregisteredAtTimestamp = nil  // registered
+            unregisteredAtTimestamp = nil // registered
         } else {
             unregisteredAtTimestamp = contactRecord.unregisteredAtTimestamp
         }
@@ -138,7 +138,7 @@ struct StorageServiceContact {
             ),
             phoneNumber: E164.expectNilOrValid(stringValue: contactRecord.e164),
             pni: pni,
-            unregisteredAtTimestamp: unregisteredAtTimestamp
+            unregisteredAtTimestamp: unregisteredAtTimestamp,
         )
     }
 
@@ -148,14 +148,14 @@ struct StorageServiceContact {
             unregisteredAtTimestamp = nil
         } else {
             unregisteredAtTimestamp = (
-                signalRecipient.unregisteredAtTimestamp ?? SignalRecipient.Constants.distantPastUnregisteredTimestamp
+                signalRecipient.unregisteredAtTimestamp ?? SignalRecipient.Constants.distantPastUnregisteredTimestamp,
             )
         }
         self.init(
             aci: signalRecipient.aci,
             phoneNumber: E164.expectNilOrValid(stringValue: signalRecipient.phoneNumber?.stringValue),
             pni: signalRecipient.pni,
-            unregisteredAtTimestamp: unregisteredAtTimestamp
+            unregisteredAtTimestamp: unregisteredAtTimestamp,
         )
     }
 
@@ -169,7 +169,7 @@ struct StorageServiceContact {
     }
 
     func matchesAnyLocalIdentifier(in localIdentifiers: LocalIdentifiers) -> Bool {
-        return localIdentifiers.containsAnyOf(aci: aci, phoneNumber: phoneNumber, pni: pni)
+        return localIdentifiers.containsAnyOf(aci: aci, phoneNumber: phoneNumber?.stringValue, pni: pni)
     }
 }
 
@@ -181,6 +181,7 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
     private let isPrimaryDevice: Bool
     private let authedAccount: AuthedAccount
 
+    private let aciContactShareNameManager: any AciContactShareNameManager
     private let avatarDefaultColorManager: AvatarDefaultColorManager
     private let blockingManager: BlockingManager
     private let contactsManager: OWSContactsManager
@@ -194,13 +195,16 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
     private let recipientHidingManager: RecipientHidingManager
     private let remoteConfigProvider: any RemoteConfigProvider
     private let signalServiceAddressCache: SignalServiceAddressCache
+    private let threadMuteManager: ThreadMuteManager
     private let tsAccountManager: TSAccountManager
+    private let unreadReminderManager: UnreadReminderManager
     private let usernameLookupManager: UsernameLookupManager
 
     init(
         localIdentifiers: LocalIdentifiers,
         isPrimaryDevice: Bool,
         authedAccount: AuthedAccount,
+        aciContactShareNameManager: any AciContactShareNameManager,
         avatarDefaultColorManager: AvatarDefaultColorManager,
         blockingManager: BlockingManager,
         contactsManager: OWSContactsManager,
@@ -214,13 +218,16 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
         recipientHidingManager: RecipientHidingManager,
         remoteConfigProvider: any RemoteConfigProvider,
         signalServiceAddressCache: SignalServiceAddressCache,
+        threadMuteManager: ThreadMuteManager,
         tsAccountManager: TSAccountManager,
-        usernameLookupManager: UsernameLookupManager
+        unreadReminderManager: UnreadReminderManager,
+        usernameLookupManager: UsernameLookupManager,
     ) {
         self.localIdentifiers = localIdentifiers
         self.isPrimaryDevice = isPrimaryDevice
         self.authedAccount = authedAccount
 
+        self.aciContactShareNameManager = aciContactShareNameManager
         self.avatarDefaultColorManager = avatarDefaultColorManager
         self.blockingManager = blockingManager
         self.contactsManager = contactsManager
@@ -234,7 +241,9 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
         self.recipientHidingManager = recipientHidingManager
         self.remoteConfigProvider = remoteConfigProvider
         self.signalServiceAddressCache = signalServiceAddressCache
+        self.threadMuteManager = threadMuteManager
         self.tsAccountManager = tsAccountManager
+        self.unreadReminderManager = unreadReminderManager
         self.usernameLookupManager = usernameLookupManager
     }
 
@@ -243,7 +252,7 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
     func buildRecord(
         for recipientUniqueId: RecipientUniqueId,
         unknownFields: UnknownStorage?,
-        transaction tx: DBReadTransaction
+        transaction tx: DBReadTransaction,
     ) -> StorageServiceProtoContactRecord? {
         guard let recipient = recipientDatabaseTable.fetchRecipient(uniqueId: recipientUniqueId, tx: tx) else {
             return nil
@@ -269,24 +278,14 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
         var usernameBetterIdentifierChecker = Usernames.BetterIdentifierChecker(forRecipient: recipient)
 
         if let aci = contact.aci {
-            if BuildFlags.serviceIdStrings {
-                builder.setAci(aci.serviceIdString)
-            }
-            if BuildFlags.serviceIdBinaryConstantOverhead {
-                builder.setAciBinary(aci.serviceIdBinary)
-            }
+            builder.setAciBinary(aci.serviceIdBinary)
         }
         if let phoneNumber = contact.phoneNumber {
             builder.setE164(phoneNumber.stringValue)
             usernameBetterIdentifierChecker.add(e164: phoneNumber.stringValue)
         }
         if let pni = contact.pni {
-            if BuildFlags.serviceIdStrings {
-                builder.setPni(pni.rawUUID.uuidString.lowercased())
-            }
-            if BuildFlags.serviceIdBinaryConstantOverhead {
-                builder.setPniBinary(pni.rawUUID.data)
-            }
+            builder.setPniBinary(pni.rawUUID.data)
         }
 
         if let unregisteredAtTimestamp = contact.unregisteredAtTimestamp {
@@ -296,11 +295,11 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
         // This could be an ACI or a PNI address.
         let anyAddress = SignalServiceAddress(contact.serviceIds.aciOrElsePni)
 
-        let isInWhitelist = profileManager.isUser(inProfileWhitelist: anyAddress, transaction: tx)
-        builder.setWhitelisted(isInWhitelist)
-
-        builder.setBlocked(blockingManager.isAddressBlocked(anyAddress, transaction: tx))
-        builder.setHidden(recipientHidingManager.isHiddenAddress(anyAddress, tx: tx))
+        let isHidden = recipientHidingManager.isHiddenAddress(anyAddress, tx: tx)
+        builder.setHidden(isHidden)
+        builder.setWhitelisted(recipient.isWhitelisted && !isHidden)
+        builder.setBlocked(recipient.isBlocked)
+        builder.setBlockedAtTimestamp(recipient.blockedAt.asMilliseconds)
 
         // Identity
 
@@ -319,16 +318,16 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
         let profileGivenName = userProfile?.givenName
         let profileFamilyName = userProfile?.familyName
 
-        if let profileKey = profileKey {
+        if let profileKey {
             builder.setProfileKey(profileKey)
         }
 
-        if let profileGivenName = profileGivenName {
+        if let profileGivenName {
             builder.setGivenName(profileGivenName)
             usernameBetterIdentifierChecker.add(profileGivenName: profileGivenName)
         }
 
-        if let profileFamilyName = profileFamilyName {
+        if let profileFamilyName {
             builder.setFamilyName(profileFamilyName)
             usernameBetterIdentifierChecker.add(profileFamilyName: profileFamilyName)
         }
@@ -339,7 +338,7 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
             }
             return contactsManager.fetchSignalAccount(
                 forPhoneNumber: phoneNumber.stringValue,
-                transaction: tx
+                transaction: tx,
             )
         }()
 
@@ -376,11 +375,11 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
         }
 
         if let thread = TSContactThread.getWithContactAddress(anyAddress, transaction: tx) {
-            let threadAssociatedData = ThreadAssociatedData.fetchOrDefault(for: thread, transaction: tx)
-
-            builder.setArchived(threadAssociatedData.isArchived)
-            builder.setMarkedUnread(threadAssociatedData.isMarkedUnread)
-            builder.setMutedUntilTimestamp(threadAssociatedData.mutedUntilTimestamp)
+            builder.setArchived(thread.isArchived)
+            builder.setMarkedUnread(thread.isMarkedUnread)
+            builder.setMutedUntilTimestamp(thread.mutedUntilTimestamp)
+            builder.setNotifyForCallsIfMuted(StorageServiceProtoOptionalBool(thread.shouldNotifyForCallsWhenMuted))
+            builder.setShowUnreadReminders(StorageServiceProtoOptionalBool(thread.shouldNotifyForUnreadRemindersWhenMuted))
         }
 
         if let aci = contact.aci, let associatedData = StoryFinder.getAssociatedData(forAci: aci, tx: tx) {
@@ -411,18 +410,27 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
             nicknameRecord.note.map { builder.setNote($0) }
         }
 
+        // Name shared by a third party
+
+        if let aciContactShareName = aciContactShareNameManager.fetchName(recipient: recipient, tx: tx) {
+            var sharedNameBuilder = StorageServiceProtoContactRecordName.builder()
+            aciContactShareName.givenName.map { sharedNameBuilder.setGiven($0) }
+            aciContactShareName.familyName.map { sharedNameBuilder.setFamily($0) }
+            builder.setSharedName(sharedNameBuilder.buildInfallibly())
+        }
+
         // Avatar color
 
         builder.setAvatarColor(
             avatarDefaultColorManager.defaultColor(
                 useCase: .contact(recipient: recipient),
-                tx: tx
-            ).asStorageServiceProtoAvatarColor
+                tx: tx,
+            ).asStorageServiceProtoAvatarColor,
         )
 
         // Unknown
 
-        if let unknownFields = unknownFields {
+        if let unknownFields {
             builder.setUnknownFields(unknownFields)
         }
 
@@ -439,7 +447,7 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
 
     func mergeRecord(
         _ record: StorageServiceProtoContactRecord,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) -> StorageServiceMergeResult<RecipientUniqueId> {
         guard let contact = StorageServiceContact(record) else {
             owsFailDebug("Can't merge record with invalid identifiers: hasAci? \(record.hasAci) hasAciBinary? \(record.hasAciBinary) hasPni? \(record.hasPni) hasPniBinary? \(record.hasPniBinary) hasPhoneNumber? \(record.hasE164)")
@@ -456,14 +464,14 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
             isPrimaryDevice: isPrimaryDevice,
             serviceIds: contact.serviceIds,
             phoneNumber: contact.phoneNumber,
-            tx: transaction
+            tx: transaction,
         )
         if let unregisteredAtTimestamp = contact.unregisteredAtTimestamp {
             recipientManager.markAsUnregisteredAndSave(
                 &recipient,
                 unregisteredAt: .specificTimeFromOtherDevice(unregisteredAtTimestamp),
                 shouldUpdateStorageService: false,
-                tx: transaction
+                tx: transaction,
             )
             // For Storage Service, we only perform contact splitting if it's an
             // ACI-only recipient. The recipient returned from
@@ -473,14 +481,15 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
                 recipientMerger.splitUnregisteredRecipientIfNeeded(
                     localIdentifiers: localIdentifiers,
                     unregisteredRecipient: &recipient,
-                    tx: transaction
+                    shouldUpdateStorageService: false,
+                    tx: transaction,
                 )
             }
         } else {
             recipientManager.markAsRegisteredAndSave(
                 &recipient,
                 shouldUpdateStorageService: false,
-                tx: transaction
+                tx: transaction,
             )
         }
 
@@ -491,37 +500,34 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
 
         return _mergeRecord(
             record,
-            recipient: recipient,
+            recipient: &recipient,
             serviceIds: serviceIds,
             // If we merge and don't end up with what's in Storage Service, then it
             // probably means that a linked device is wrong or we've hit a race
             // condition where we learned something that's not yet reflected in Storage
             // Service. When this happens, we should schedule an update to make sure
             // Storage Service knows everything we know.
-            needsUpdate: (
-                recipient.aci != contact.aci
+            needsUpdate:
+            recipient.aci != contact.aci
                 || E164(recipient.phoneNumber?.stringValue) != contact.phoneNumber
                 || recipient.pni != contact.pni
-            ),
-            tx: transaction
+            ,
+            tx: transaction,
         )
     }
 
     private func _mergeRecord(
         _ record: StorageServiceProtoContactRecord,
-        recipient: SignalRecipient,
+        recipient: inout SignalRecipient,
         serviceIds: AtLeastOneServiceId,
         needsUpdate: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> StorageServiceMergeResult<RecipientUniqueId> {
         var needsUpdate = needsUpdate
 
         let anyAddress = SignalServiceAddress(serviceIds.aciOrElsePni)
 
         // Gather some local contact state to do comparisons against.
-        let localIsBlocked = blockingManager.isAddressBlocked(anyAddress, transaction: tx)
-        let localIsHidden = recipientHidingManager.isHiddenAddress(anyAddress, tx: tx)
-        let localIsWhitelisted = profileManager.isUser(inProfileWhitelist: anyAddress, transaction: tx)
         let localUserProfile = profileManager.userProfile(for: anyAddress, tx: tx)
 
         // If our local profile key record differs from what's on the service, use the service's value.
@@ -534,10 +540,10 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
                 userProfileWriter: .storageService,
                 localIdentifiers: localIdentifiers,
                 authedAccount: authedAccount,
-                tx: tx
+                tx: tx,
             )
 
-        // If we have a local profile key for this user but the service doesn't mark it as needing update.
+            // If we have a local profile key for this user but the service doesn't mark it as needing update.
         } else if localUserProfile?.profileKey != nil && !record.hasProfileKey {
             needsUpdate = true
         }
@@ -547,18 +553,18 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
         if record.hasGivenName && (localUserProfile?.givenName != record.givenName || localUserProfile?.familyName != record.familyName) {
             let profileAddress = OWSUserProfile.insertableAddress(
                 serviceId: serviceIds.aciOrElsePni,
-                localIdentifiers: localIdentifiers
+                localIdentifiers: localIdentifiers,
             )
             let localUserProfile = OWSUserProfile.getOrBuildUserProfile(
                 for: profileAddress,
                 userProfileWriter: .storageService,
-                tx: tx
+                tx: tx,
             )
             localUserProfile.update(
                 givenName: .setTo(record.givenName),
                 familyName: .setTo(record.familyName),
                 userProfileWriter: .storageService,
-                transaction: tx
+                transaction: tx,
             )
         } else if localUserProfile?.givenName != nil && !record.hasGivenName || localUserProfile?.familyName != nil && !record.hasFamilyName {
             needsUpdate = true
@@ -572,7 +578,12 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
         let localIdentityKey = try? identityManager.identityKey(for: serviceIds.aciOrElsePni, tx: tx)
         if let identityKey = record.identityKey.flatMap({ try? IdentityKey(bytes: $0) }) {
             if identityKey != localIdentityKey {
-                identityManager.saveIdentityKey(identityKey, for: serviceIds.aciOrElsePni, tx: tx)
+                identityManager.saveIdentityKey(
+                    identityKey,
+                    for: serviceIds.aciOrElsePni,
+                    shouldUpdateStorageService: false,
+                    tx: tx,
+                )
             }
             // Make sure we fetch this after changing the identity key.
             let identityState = record.identityState.verificationState
@@ -583,7 +594,7 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
                     of: identityKey.publicKey.keyBytes,
                     for: anyAddress,
                     isUserInitiatedChange: false,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
@@ -592,73 +603,92 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
             needsUpdate = true
         }
 
-        // If our local blocked state differs from the service state, use the service's value.
-        if record.blocked != localIsBlocked {
-            if record.blocked {
-                blockingManager.addBlockedAddress(anyAddress, blockMode: .remote, transaction: tx)
-            } else {
-                blockingManager.removeBlockedAddress(anyAddress, wasLocallyInitiated: false, transaction: tx)
-            }
+        // Set our local blocked state to match the remote state. (We do this
+        // unconditionally because BlockingManager will ignore redundant requests.)
+        if record.blocked {
+            blockingManager.addBlockedRecipient(
+                &recipient,
+                blockedAt: BlockedTimestamp(clamping: record.blockedAtTimestamp),
+                blockMode: .storageService,
+                tx: tx,
+            )
+        } else {
+            blockingManager.removeBlockedRecipient(
+                &recipient,
+                wasLocallyInitiated: false,
+                tx: tx,
+            )
         }
 
         // If our local hidden state differs from the service state, use the service's value.
+        let localIsHidden = recipientHidingManager.isHiddenRecipient(recipientId: recipient.id, tx: tx)
         if record.hidden != localIsHidden {
             if record.hidden {
-                do {
-                    try recipientHidingManager.addHiddenRecipient(
-                        anyAddress,
-                        inKnownMessageRequestState: false,
-                        wasLocallyInitiated: false,
-                        tx: tx
-                    )
-                } catch {
-                    Logger.warn("Recipient hidden remotely could not be hidden locally.")
-                }
+                recipientHidingManager.addHiddenRecipient(
+                    &recipient,
+                    inKnownMessageRequestState: false,
+                    wasLocallyInitiated: false,
+                    tx: tx,
+                )
             } else {
-                do {
-                    try recipientHidingManager.removeHiddenRecipient(anyAddress, wasLocallyInitiated: false, tx: tx)
-                } catch {
-                    Logger.warn("Recipient hidden remotely could not be unhidden locally.")
-                }
+                recipientHidingManager.removeHiddenRecipient(
+                    &recipient,
+                    wasLocallyInitiated: false,
+                    tx: tx,
+                )
             }
         }
 
+        // Note: It's important to set "blocked" first so that blocked ->
+        // whitelisted transitions work properly and so that whitelisted -> blocked
+        // transitions schedule a profile key rotation.
+
         // If our local whitelisted state differs from the service state, use the service's value.
-        if record.whitelisted != localIsWhitelisted {
+        if record.whitelisted != recipient.isWhitelisted {
             if record.whitelisted {
-                profileManager.addUser(
-                    toProfileWhitelist: anyAddress,
-                    userProfileWriter: .storageService,
-                    transaction: tx
-                )
+                profileManager.addRecipientToProfileWhitelist(&recipient, userProfileWriter: .storageService, tx: tx)
             } else {
-                profileManager.removeUser(
-                    fromProfileWhitelist: anyAddress,
-                    userProfileWriter: .storageService,
-                    transaction: tx
-                )
+                _ = profileManager.removeRecipientFromProfileWhitelist(&recipient, userProfileWriter: .storageService, tx: tx)
             }
         }
 
         let localThread = TSContactThread.getOrCreateThread(withContactAddress: anyAddress, transaction: tx)
-        let localThreadAssociatedData = ThreadAssociatedData.fetchOrDefault(for: localThread, transaction: tx)
 
-        if record.archived != localThreadAssociatedData.isArchived {
-            localThreadAssociatedData.updateWith(isArchived: record.archived, updateStorageService: false, transaction: tx)
+        if record.archived != localThread.isArchived {
+            localThread.updateWith(isArchived: record.archived, updateStorageService: false, transaction: tx)
         }
 
-        if record.markedUnread != localThreadAssociatedData.isMarkedUnread {
-            localThreadAssociatedData.updateWith(isMarkedUnread: record.markedUnread, updateStorageService: false, transaction: tx)
+        if record.markedUnread != localThread.isMarkedUnread {
+            localThread.updateWith(isMarkedUnread: record.markedUnread, updateStorageService: false, transaction: tx)
         }
 
-        if record.mutedUntilTimestamp != localThreadAssociatedData.mutedUntilTimestamp {
-            localThreadAssociatedData.updateWith(mutedUntilTimestamp: record.mutedUntilTimestamp, updateStorageService: false, transaction: tx)
+        if record.mutedUntilTimestamp != localThread.mutedUntilTimestamp {
+            threadMuteManager.setMutedUntilTimestamp(record.mutedUntilTimestamp, for: localThread, updateStorageService: false, tx: tx)
+        }
+
+        if
+            !record.notifyForCallsIfMuted.isUnrecognized,
+            record.notifyForCallsIfMuted.boolValue != localThread.shouldNotifyForCallsWhenMuted
+        {
+            localThread.updateWithShouldNotifyForCallsWhenMuted(record.notifyForCallsIfMuted.boolValue, transaction: tx)
+        }
+
+        if
+            !record.showUnreadReminders.isUnrecognized,
+            record.showUnreadReminders.boolValue != localThread.shouldNotifyForUnreadRemindersWhenMuted
+        {
+            unreadReminderManager.setShowUnreadReminders(
+                record.showUnreadReminders.boolValue,
+                thread: localThread,
+                updateStorageService: false,
+                tx: tx,
+            )
         }
 
         if let aci = serviceIds.aci {
             let localStoryContextAssociatedData = StoryContextAssociatedData.fetchOrDefault(
                 sourceContext: .contact(contactAci: aci),
-                transaction: tx
+                transaction: tx,
             )
             if record.hideStory != localStoryContextAssociatedData.isHidden {
                 localStoryContextAssociatedData.update(updateStorageService: false, isHidden: record.hideStory, transaction: tx)
@@ -682,29 +712,39 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
             usernameLookupManager.saveUsername(
                 usernameIsBestIdentifierOnRecord ? record.username : nil,
                 forAci: aci,
-                transaction: tx
+                transaction: tx,
             )
         }
+
+        aciContactShareNameManager.saveName(
+            givenName: record.sharedName?.given,
+            familyName: record.sharedName?.family,
+            recipient: recipient,
+            allowOverwrite: true,
+            // Don't create a recursive Storage Service sync
+            updateStorageService: false,
+            tx: tx,
+        )
 
         if record.nickname?.hasGiven == true || record.nickname?.hasFamily == true || record.hasNote {
             let nicknameRecord = NicknameRecord(
                 recipient: recipient,
                 givenName: record.nickname?.given,
                 familyName: record.nickname?.family,
-                note: record.note
+                note: record.note,
             )
             nicknameManager.createOrUpdate(
                 nicknameRecord: nicknameRecord,
                 // Don't create a recursive Storage Service sync
                 updateStorageServiceFor: nil,
-                tx: tx
+                tx: tx,
             )
         } else {
             nicknameManager.deleteNickname(
                 recipientRowID: recipient.id,
                 // Don't create a recursive Storage Service sync
                 updateStorageServiceFor: nil,
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -728,7 +768,7 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
         in record: StorageServiceProtoContactRecord,
         recipient: SignalRecipient,
         serviceIds: AtLeastOneServiceId,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> Bool {
         // If there's no phone number, there's no system contact. If a phone number
         // is removed, it'll be claimed by another account; if it's not claimed,
@@ -739,7 +779,7 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
 
         let localAccount = contactsManager.fetchSignalAccount(
             forPhoneNumber: phoneNumber,
-            transaction: tx
+            transaction: tx,
         )
 
         if isPrimaryDevice {
@@ -748,11 +788,11 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
             let localSystemFamilyName = localContact ? localAccount?.familyName : nil
             let localSystemNickname = localContact ? localAccount?.nickname : nil
             // On the primary device, we should mark it as `needsUpdate` if it doesn't match the local state.
-            return (
+            return
                 localSystemGivenName != record.systemGivenName
-                || localSystemFamilyName != record.systemFamilyName
-                || localSystemNickname != record.systemNickname
-            )
+                    || localSystemFamilyName != record.systemFamilyName
+                    || localSystemNickname != record.systemNickname
+
         }
 
         // Otherwise, we should update the state on linked devices to match.
@@ -762,7 +802,7 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
         let systemFullName = Contact.fullName(
             fromGivenName: record.systemGivenName,
             familyName: record.systemFamilyName,
-            nickname: record.systemNickname
+            nickname: record.systemNickname,
         )
         if let systemFullName {
             // TODO: we should find a way to fill in `multipleAccountLabelText`.
@@ -783,7 +823,7 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
                 familyName: record.systemFamilyName ?? "",
                 nickname: record.systemNickname ?? "",
                 fullName: systemFullName,
-                contactAvatarHash: nil
+                contactAvatarHash: nil,
             )
         } else {
             newAccount = nil
@@ -814,7 +854,7 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
             }
             let aciToUpdate = SignalAccount.aciForPhoneNumberVisibilityUpdate(
                 oldAccount: localAccount,
-                newAccount: newAccount
+                newAccount: newAccount,
             )
             if aciToUpdate != nil {
                 // Tell the cache to refresh its state for this recipient. It will check
@@ -837,11 +877,11 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
     private func mergeDefaultAvatarColor(
         in record: StorageServiceProtoContactRecord,
         recipient: SignalRecipient,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> Bool {
         let localDefaultAvatarColor = avatarDefaultColorManager.defaultColor(
             useCase: .contact(recipient: recipient),
-            tx: tx
+            tx: tx,
         )
         let remoteDefaultAvatarColor = record.avatarColor.flatMap {
             AvatarTheme.from(storageServiceProtoAvatarColor: $0)
@@ -857,7 +897,7 @@ class StorageServiceContactRecordUpdater: StorageServiceRecordUpdater {
             try? avatarDefaultColorManager.persistDefaultColor(
                 remoteDefaultAvatarColor,
                 recipientRowId: recipient.id,
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -923,7 +963,7 @@ class StorageServiceGroupV1RecordUpdater: StorageServiceRecordUpdater {
     func buildRecord(
         for groupId: Data,
         unknownFields: UnknownStorage?,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> StorageServiceProtoGroupV1Record? {
         var builder = StorageServiceProtoGroupV1Record.builder(id: groupId)
 
@@ -936,7 +976,7 @@ class StorageServiceGroupV1RecordUpdater: StorageServiceRecordUpdater {
 
     func mergeRecord(
         _ record: StorageServiceProtoGroupV1Record,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) -> StorageServiceMergeResult<Data> {
         return .merged(needsUpdate: false, record.id)
     }
@@ -955,6 +995,8 @@ class StorageServiceGroupV2RecordUpdater: StorageServiceRecordUpdater {
     private let blockingManager: BlockingManager
     private let groupsV2: GroupsV2
     private let profileManager: ProfileManager
+    private let threadMuteManager: ThreadMuteManager
+    private let unreadReminderManager: UnreadReminderManager
 
     init(
         authedAccount: AuthedAccount,
@@ -962,7 +1004,9 @@ class StorageServiceGroupV2RecordUpdater: StorageServiceRecordUpdater {
         avatarDefaultColorManager: AvatarDefaultColorManager,
         blockingManager: BlockingManager,
         groupsV2: GroupsV2,
-        profileManager: ProfileManager
+        profileManager: ProfileManager,
+        threadMuteManager: ThreadMuteManager,
+        unreadReminderManager: UnreadReminderManager,
     ) {
         self.authedAccount = authedAccount
         self.isPrimaryDevice = isPrimaryDevice
@@ -971,6 +1015,8 @@ class StorageServiceGroupV2RecordUpdater: StorageServiceRecordUpdater {
         self.blockingManager = blockingManager
         self.groupsV2 = groupsV2
         self.profileManager = profileManager
+        self.threadMuteManager = threadMuteManager
+        self.unreadReminderManager = unreadReminderManager
     }
 
     func unknownFields(for record: StorageServiceProtoGroupV2Record) -> UnknownStorage? { record.unknownFields }
@@ -982,66 +1028,87 @@ class StorageServiceGroupV2RecordUpdater: StorageServiceRecordUpdater {
     func buildRecord(
         for masterKeyData: Data,
         unknownFields: UnknownStorage?,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> StorageServiceProtoGroupV2Record? {
-        let groupContextInfo: GroupV2ContextInfo
+        let masterKey: GroupMasterKey
         do {
-            groupContextInfo = try GroupV2ContextInfo.deriveFrom(masterKeyData: masterKeyData)
+            masterKey = try GroupMasterKey(contents: masterKeyData)
         } catch {
-            owsFailDebug("Invalid master key \(error).")
+            owsFailDebug("can't build record for malformed master key: \(error)")
             return nil
         }
 
-        let groupId = groupContextInfo.groupId
+        let secretParams = failIfThrows {
+            return try GroupSecretParams.deriveFromMasterKey(groupMasterKey: masterKey)
+        }
+        let groupId = failIfThrows {
+            return try secretParams.getPublicParams().getGroupIdentifier()
+        }
+
+        // If we've deleted the GroupRecord, delete the group from Storage Service.
+        guard let groupRecord = GroupStore().fetchGroup(forGroupId: groupId, tx: transaction) else {
+            return nil
+        }
 
         var builder = StorageServiceProtoGroupV2Record.builder(masterKey: masterKeyData)
 
-        builder.setWhitelisted(profileManager.isGroupId(inProfileWhitelist: groupId.serialize(), transaction: transaction))
-        builder.setBlocked(blockingManager.isGroupIdBlocked(groupId, transaction: transaction))
-
-        let threadId = TSGroupThread.threadId(forGroupId: groupId.serialize(), transaction: transaction)
-        let threadAssociatedData = ThreadAssociatedData.fetchOrDefault(for: threadId,
-                                                                       ignoreMissing: true,
-                                                                       transaction: transaction)
-
-        builder.setArchived(threadAssociatedData.isArchived)
-        builder.setMarkedUnread(threadAssociatedData.isMarkedUnread)
-        builder.setMutedUntilTimestamp(threadAssociatedData.mutedUntilTimestamp)
-
-        let groupThread = TSGroupThread.fetch(forGroupId: groupId, tx: transaction)
-        switch groupThread?.mentionNotificationMode {
-        case .none, .default:
-            break
-        case .never:
-            builder.setDontNotifyForMentionsIfMuted(true)
-        case .always:
-            builder.setDontNotifyForMentionsIfMuted(false)
-        }
+        builder.setWhitelisted(groupRecord.isWhitelisted)
+        builder.setBlocked(groupRecord.isBlocked)
+        builder.setBlockedAtTimestamp(groupRecord.blockedAt.asMilliseconds)
 
         if let storyContextAssociatedData = StoryFinder.getAssociatedData(forContext: .group(groupId: groupId.serialize()), transaction: transaction) {
             builder.setHideStory(storyContextAssociatedData.isHidden)
         }
 
-        if let thread = TSGroupThread.anyFetchGroupThread(uniqueId: threadId, transaction: transaction) {
-            builder.setStorySendMode(thread.storyViewMode.storageServiceMode)
-        } else if let enqueuedRecord = groupsV2.groupRecordPendingStorageServiceRestore(
-            masterKeyData: masterKeyData,
-            transaction: transaction
-        ) {
-            // We have a record pending restoration from storage service,
-            // preserve any of the data that we weren't able to restore
-            // yet because the thread record doesn't exist.
+        if
+            let threadId = groupRecord.threadId,
+            let threadUniqueId = TSGroupThread.threadUniqueId(forThreadId: threadId, tx: transaction),
+            let groupThread = TSGroupThread.fetchViaCache(uniqueId: threadUniqueId, transaction: transaction)
+        {
+            builder.setArchived(groupThread.isArchived)
+            builder.setMarkedUnread(groupThread.isMarkedUnread)
+            builder.setMutedUntilTimestamp(groupThread.mutedUntilTimestamp)
+            // TODO: Move this out of the `let groupThread` block.
+            if let lastVerifiedGroupNameHash = groupRecord.lastVerifiedGroupNameHash {
+                builder.setVerifiedNameHash(lastVerifiedGroupNameHash)
+            }
+            builder.setNotifyForCallsIfMuted(StorageServiceProtoOptionalBool(groupThread.shouldNotifyForCallsWhenMuted))
+            builder.setNotifyForMentionsIfMuted(StorageServiceProtoOptionalBool(groupThread.shouldNotifyForMentionsWhenMuted))
+            builder.setNotifyForRepliesIfMuted(StorageServiceProtoOptionalBool(groupThread.shouldNotifyForRepliesWhenMuted))
+            builder.setShowUnreadReminders(StorageServiceProtoOptionalBool(groupThread.shouldNotifyForUnreadRemindersWhenMuted))
+            builder.setDontNotifyForMentionsIfMuted(groupThread.shouldNotifyForMentionsWhenMuted == false)
+            builder.setStorySendMode(groupThread.storyViewMode.storageServiceMode)
+        } else if
+            let enqueuedRecord = groupsV2.groupRecordPendingStorageServiceRestore(
+                masterKeyData: masterKeyData,
+                transaction: transaction,
+            )
+        {
+            // We have a record pending restoration from storage service, preserve any
+            // of the data that we weren't able to restore yet because the thread
+            // record doesn't exist.
+            builder.setArchived(enqueuedRecord.archived)
+            builder.setMarkedUnread(enqueuedRecord.markedUnread)
+            builder.setMutedUntilTimestamp(enqueuedRecord.mutedUntilTimestamp)
+            if let verifiedNameHash = enqueuedRecord.verifiedNameHash {
+                builder.setVerifiedNameHash(verifiedNameHash)
+            }
+            builder.setDontNotifyForMentionsIfMuted(enqueuedRecord.dontNotifyForMentionsIfMuted)
+            builder.setNotifyForCallsIfMuted(enqueuedRecord.notifyForCallsIfMuted)
+            builder.setNotifyForMentionsIfMuted(enqueuedRecord.notifyForMentionsIfMuted)
+            builder.setNotifyForRepliesIfMuted(enqueuedRecord.notifyForRepliesIfMuted)
+            builder.setShowUnreadReminders(enqueuedRecord.showUnreadReminders)
             builder.setStorySendMode(enqueuedRecord.storySendMode)
         }
 
         builder.setAvatarColor(
             avatarDefaultColorManager.defaultColor(
                 useCase: .group(groupId: groupId.serialize()),
-                tx: transaction
-            ).asStorageServiceProtoAvatarColor
+                tx: transaction,
+            ).asStorageServiceProtoAvatarColor,
         )
 
-        if let unknownFields = unknownFields {
+        if let unknownFields {
             builder.setUnknownFields(unknownFields)
         }
 
@@ -1050,7 +1117,7 @@ class StorageServiceGroupV2RecordUpdater: StorageServiceRecordUpdater {
 
     func mergeRecord(
         _ record: StorageServiceProtoGroupV2Record,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) -> StorageServiceMergeResult<Data> {
         var needsUpdate = false
 
@@ -1065,75 +1132,149 @@ class StorageServiceGroupV2RecordUpdater: StorageServiceRecordUpdater {
         }
         let groupId = groupContextInfo.groupId
 
-        if let localThread = TSGroupThread.fetch(forGroupId: groupId, tx: transaction) {
-            let localStorySendMode = localThread.storyViewMode.storageServiceMode
+        // Insert the GroupRecord immediately, even before we've restored the group.
+        var localRecord = GroupStore().fetchGroupOrInsert(secretParams: groupContextInfo.groupSecretParams, tx: transaction)
+
+        if
+            let threadId = localRecord.threadId,
+            let threadUniqueId = TSGroupThread.threadUniqueId(forThreadId: threadId, tx: transaction),
+            let groupThread = TSGroupThread.fetchViaCache(uniqueId: threadUniqueId, transaction: transaction)
+        {
+            let localStorySendMode = groupThread.storyViewMode.storageServiceMode
             if localStorySendMode != record.storySendMode {
-                localThread.updateWithStoryViewMode(.init(storageServiceMode: record.storySendMode), transaction: transaction)
+                groupThread.updateWithStoryViewMode(.init(storageServiceMode: record.storySendMode), transaction: transaction)
             }
 
-            // If the group thread doesn't exist, we will create it and reapply this update so the
-            // setting won't be lost. Note this isn't true for contact threads, only group threads,
-            // so TSContactThread metadata needs to live on ThreadAssociatedData so it can be saved
-            // even if the thread doesn't exist. But this field only applies to group threads, so
-            // no need.
-            switch (localThread.mentionNotificationMode, record.dontNotifyForMentionsIfMuted) {
-            case (.default, false), (.never, false):
-                localThread.updateWithMentionNotificationMode(.always, wasLocallyInitiated: false, transaction: transaction)
-            case (.default, true), (.always, true):
-                localThread.updateWithMentionNotificationMode(.never, wasLocallyInitiated: false, transaction: transaction)
-            case (.never, true), (.always, false):
-                // No change
-                break
+            if
+                !record.notifyForCallsIfMuted.isUnrecognized,
+                record.notifyForCallsIfMuted.boolValue != groupThread.shouldNotifyForCallsWhenMuted
+            {
+                groupThread.updateWithShouldNotifyForCallsWhenMuted(record.notifyForCallsIfMuted.boolValue, transaction: transaction)
+            }
+
+            let remoteNotifyForRepliesWhenMuted: Bool?
+            switch record.notifyForRepliesIfMuted {
+            case .unset:
+                remoteNotifyForRepliesWhenMuted = nil
+            case .true:
+                remoteNotifyForRepliesWhenMuted = true
+            case .false:
+                remoteNotifyForRepliesWhenMuted = false
+            case .UNRECOGNIZED:
+                // Make it fail the != check to skip it
+                remoteNotifyForRepliesWhenMuted = groupThread.shouldNotifyForRepliesWhenMuted
+            }
+
+            if remoteNotifyForRepliesWhenMuted != groupThread.shouldNotifyForRepliesWhenMuted {
+                groupThread.updateWithShouldNotifyForRepliesWhenMuted(
+                    remoteNotifyForRepliesWhenMuted,
+                    transaction: transaction,
+                )
+            }
+
+            let remoteNotifyForMentionsWhenMuted: Bool?
+            if record.dontNotifyForMentionsIfMuted {
+                // The legacy field wins when the fields disagree: an old client
+                // edited it and round-tripped a stale value for the new field.
+                remoteNotifyForMentionsWhenMuted = false
+                if record.notifyForMentionsIfMuted != .false {
+                    needsUpdate = true
+                }
+            } else {
+                // Note that the legacy setting is false here, or "do notify".
+                switch record.notifyForMentionsIfMuted {
+                case .unset, .UNRECOGNIZED:
+                    remoteNotifyForMentionsWhenMuted = nil
+                case .true:
+                    remoteNotifyForMentionsWhenMuted = true
+                case .false:
+                    // An old client re-enabled mentions, and round-tripped a stale
+                    // value for the new setting.
+                    remoteNotifyForMentionsWhenMuted = true
+                    needsUpdate = true
+                }
+            }
+
+            if remoteNotifyForMentionsWhenMuted != groupThread.shouldNotifyForMentionsWhenMuted {
+                groupThread.updateWithShouldNotifyForMentionsWhenMuted(
+                    remoteNotifyForMentionsWhenMuted,
+                    transaction: transaction,
+                )
+            }
+
+            if
+                !record.showUnreadReminders.isUnrecognized,
+                record.showUnreadReminders.boolValue != groupThread.shouldNotifyForUnreadRemindersWhenMuted
+            {
+                unreadReminderManager.setShowUnreadReminders(
+                    record.showUnreadReminders.boolValue,
+                    thread: groupThread,
+                    updateStorageService: false,
+                    tx: transaction,
+                )
+            }
+
+            if record.archived != groupThread.isArchived {
+                groupThread.updateWith(isArchived: record.archived, updateStorageService: false, transaction: transaction)
+            }
+
+            if record.markedUnread != groupThread.isMarkedUnread {
+                groupThread.updateWith(isMarkedUnread: record.markedUnread, updateStorageService: false, transaction: transaction)
+            }
+
+            if record.mutedUntilTimestamp != groupThread.mutedUntilTimestamp {
+                threadMuteManager.setMutedUntilTimestamp(record.mutedUntilTimestamp, for: groupThread, updateStorageService: false, tx: transaction)
             }
         } else {
-            groupsV2.restoreGroupFromStorageServiceIfNecessary(groupRecord: record, account: authedAccount, transaction: transaction)
+            // Save this and re-apply it after we successfully restore the group.
+            groupsV2.restoreGroupFromStorageServiceIfNecessary(groupRecord: record, transaction: transaction)
         }
 
-        // Gather some local contact state to do comparisons against.
-        let localIsBlocked = blockingManager.isGroupIdBlocked(groupId, transaction: transaction)
-        let localIsWhitelisted = profileManager.isGroupId(inProfileWhitelist: groupId.serialize(), transaction: transaction)
-
-        // If our local blocked state differs from the service state, use the service's value.
-        if record.blocked != localIsBlocked {
-            if record.blocked {
-                blockingManager.addBlockedGroupId(groupId.serialize(), blockMode: .remote, transaction: transaction)
-            } else {
-                blockingManager.removeBlockedGroup(groupId: groupId.serialize(), wasLocallyInitiated: false, transaction: transaction)
-            }
+        if let verifiedHash = record.verifiedNameHash, verifiedHash != localRecord.lastVerifiedGroupNameHash {
+            localRecord.setLastVerifiedGroupNameHash(verifiedHash, tx: transaction)
         }
+
+        // Set our local blocked state to match the remote state. (We do this
+        // unconditionally because BlockingManager will ignore redundant requests.)
+        if record.blocked {
+            blockingManager.addBlockedGroup(
+                &localRecord,
+                blockedAt: BlockedTimestamp(clamping: record.blockedAtTimestamp),
+                blockMode: .storageService,
+                tx: transaction,
+            )
+        } else {
+            blockingManager.removeBlockedGroup(
+                &localRecord,
+                wasLocallyInitiated: false,
+                tx: transaction,
+            )
+        }
+
+        // Note: It's important to set "blocked" first so that blocked ->
+        // whitelisted transitions work properly and so that whitelisted -> blocked
+        // transitions schedule a profile key rotation.
 
         // If our local whitelisted state differs from the service state, use the service's value.
-        if record.whitelisted != localIsWhitelisted {
+        if record.whitelisted != localRecord.isWhitelisted {
             if record.whitelisted {
-                profileManager.addGroupId(toProfileWhitelist: groupId.serialize(),
-                                          userProfileWriter: .storageService,
-                                          transaction: transaction)
+                profileManager.addGroupToProfileWhitelist(
+                    &localRecord,
+                    userProfileWriter: .storageService,
+                    tx: transaction,
+                )
             } else {
-                profileManager.removeGroupId(fromProfileWhitelist: groupId.serialize(),
-                                             userProfileWriter: .storageService,
-                                             transaction: transaction)
+                _ = profileManager.removeGroupFromProfileWhitelist(
+                    &localRecord,
+                    userProfileWriter: .storageService,
+                    tx: transaction,
+                )
             }
-        }
-
-        let localThreadId = TSGroupThread.threadId(forGroupId: groupId.serialize(), transaction: transaction)
-        ThreadAssociatedData.create(for: localThreadId, transaction: transaction)
-        let localThreadAssociatedData = ThreadAssociatedData.fetchOrDefault(for: localThreadId, transaction: transaction)
-
-        if record.archived != localThreadAssociatedData.isArchived {
-            localThreadAssociatedData.updateWith(isArchived: record.archived, updateStorageService: false, transaction: transaction)
-        }
-
-        if record.markedUnread != localThreadAssociatedData.isMarkedUnread {
-            localThreadAssociatedData.updateWith(isMarkedUnread: record.markedUnread, updateStorageService: false, transaction: transaction)
-        }
-
-        if record.mutedUntilTimestamp != localThreadAssociatedData.mutedUntilTimestamp {
-            localThreadAssociatedData.updateWith(mutedUntilTimestamp: record.mutedUntilTimestamp, updateStorageService: false, transaction: transaction)
         }
 
         let localStoryContextAssociatedData = StoryContextAssociatedData.fetchOrDefault(
             sourceContext: .group(groupId: groupId.serialize()),
-            transaction: transaction
+            transaction: transaction,
         )
         if record.hideStory != localStoryContextAssociatedData.isHidden {
             localStoryContextAssociatedData.update(updateStorageService: false, isHidden: record.hideStory, transaction: transaction)
@@ -1153,11 +1294,11 @@ class StorageServiceGroupV2RecordUpdater: StorageServiceRecordUpdater {
     private func mergeDefaultAvatarColor(
         in record: StorageServiceProtoGroupV2Record,
         groupId: GroupIdentifier,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> Bool {
         let localDefaultAvatarColor = avatarDefaultColorManager.defaultColor(
             useCase: .group(groupId: groupId.serialize()),
-            tx: tx
+            tx: tx,
         )
         let remoteDefaultAvatarColor = record.avatarColor.flatMap {
             AvatarTheme.from(storageServiceProtoAvatarColor: $0)
@@ -1173,7 +1314,7 @@ class StorageServiceGroupV2RecordUpdater: StorageServiceRecordUpdater {
             try? avatarDefaultColorManager.persistDefaultColor(
                 remoteDefaultAvatarColor,
                 groupId: groupId.serialize(),
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -1194,16 +1335,21 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
     private let avatarDefaultColorManager: AvatarDefaultColorManager
     private let backupPlanManager: BackupPlanManager
     private let backupSubscriptionManager: BackupSubscriptionManager
+    private let donationSubscriptionManager: DonationSubscriptionManager
     private let dmConfigurationStore: DisappearingMessagesConfigurationStore
     private let linkPreviewSettingStore: LinkPreviewSettingStore
     private let localUsernameManager: LocalUsernameManager
+    private let notificationPreferencesManager: NotificationPreferencesManager
+    private let keyTransparencyManager: KeyTransparencyManager
     private let paymentsHelper: PaymentsHelperSwift
     private let phoneNumberDiscoverabilityManager: PhoneNumberDiscoverabilityManager
     private let pinnedThreadManager: PinnedThreadManager
+    private let pinnedThreadStore: PinnedThreadStore
     private let preferences: Preferences
     private let profileManager: OWSProfileManager
     private let receiptManager: OWSReceiptManager
     private let recipientDatabaseTable: RecipientDatabaseTable
+    private let recipientFetcher: RecipientFetcher
     private let registrationStateChangeManager: RegistrationStateChangeManager
     private let storageServiceManager: StorageServiceManager
     private let systemStoryManager: SystemStoryManagerProtocol
@@ -1211,6 +1357,11 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
     private let typingIndicators: TypingIndicators
     private let udManager: OWSUDManager
     private let usernameEducationManager: UsernameEducationManager
+    private let adminDeleteManager: AdminDeleteManager
+    private let blockingManager: BlockingManager
+    private let threadMuteManager: ThreadMuteManager
+    private let threadStore: ThreadStore
+    private let unreadReminderManager: UnreadReminderManager
 
     init(
         localIdentifiers: LocalIdentifiers,
@@ -1219,23 +1370,33 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
         avatarDefaultColorManager: AvatarDefaultColorManager,
         backupPlanManager: BackupPlanManager,
         backupSubscriptionManager: BackupSubscriptionManager,
+        donationSubscriptionManager: DonationSubscriptionManager,
         dmConfigurationStore: DisappearingMessagesConfigurationStore,
         linkPreviewSettingStore: LinkPreviewSettingStore,
         localUsernameManager: LocalUsernameManager,
+        notificationPreferencesManager: NotificationPreferencesManager,
+        keyTransparencyManager: KeyTransparencyManager,
         paymentsHelper: PaymentsHelperSwift,
         phoneNumberDiscoverabilityManager: PhoneNumberDiscoverabilityManager,
         pinnedThreadManager: PinnedThreadManager,
+        pinnedThreadStore: PinnedThreadStore,
         preferences: Preferences,
         profileManager: OWSProfileManager,
         receiptManager: OWSReceiptManager,
         recipientDatabaseTable: RecipientDatabaseTable,
+        recipientFetcher: RecipientFetcher,
         registrationStateChangeManager: RegistrationStateChangeManager,
         storageServiceManager: StorageServiceManager,
         systemStoryManager: SystemStoryManagerProtocol,
         tsAccountManager: TSAccountManager,
         typingIndicators: TypingIndicators,
         udManager: OWSUDManager,
-        usernameEducationManager: UsernameEducationManager
+        usernameEducationManager: UsernameEducationManager,
+        adminDeleteManager: AdminDeleteManager,
+        blockingManager: BlockingManager,
+        threadMuteManager: ThreadMuteManager,
+        threadStore: ThreadStore,
+        unreadReminderManager: UnreadReminderManager,
     ) {
         self.localIdentifiers = localIdentifiers
         self.isPrimaryDevice = isPrimaryDevice
@@ -1244,16 +1405,21 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
         self.avatarDefaultColorManager = avatarDefaultColorManager
         self.backupPlanManager = backupPlanManager
         self.backupSubscriptionManager = backupSubscriptionManager
+        self.donationSubscriptionManager = donationSubscriptionManager
         self.dmConfigurationStore = dmConfigurationStore
         self.linkPreviewSettingStore = linkPreviewSettingStore
         self.localUsernameManager = localUsernameManager
+        self.notificationPreferencesManager = notificationPreferencesManager
+        self.keyTransparencyManager = keyTransparencyManager
         self.paymentsHelper = paymentsHelper
         self.phoneNumberDiscoverabilityManager = phoneNumberDiscoverabilityManager
         self.pinnedThreadManager = pinnedThreadManager
+        self.pinnedThreadStore = pinnedThreadStore
         self.preferences = preferences
         self.profileManager = profileManager
         self.receiptManager = receiptManager
         self.recipientDatabaseTable = recipientDatabaseTable
+        self.recipientFetcher = recipientFetcher
         self.registrationStateChangeManager = registrationStateChangeManager
         self.storageServiceManager = storageServiceManager
         self.systemStoryManager = systemStoryManager
@@ -1261,6 +1427,11 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
         self.typingIndicators = typingIndicators
         self.udManager = udManager
         self.usernameEducationManager = usernameEducationManager
+        self.adminDeleteManager = adminDeleteManager
+        self.blockingManager = blockingManager
+        self.threadMuteManager = threadMuteManager
+        self.threadStore = threadStore
+        self.unreadReminderManager = unreadReminderManager
     }
 
     func unknownFields(for record: StorageServiceProtoAccountRecord) -> UnknownStorage? { record.unknownFields }
@@ -1272,8 +1443,9 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
     func buildRecord(
         for ignoredId: Void,
         unknownFields: UnknownStorage?,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> StorageServiceProtoAccountRecord? {
+        let tx = transaction
         var builder = StorageServiceProtoAccountRecord.builder()
 
         let localAddress = localIdentifiers.aciAddress
@@ -1291,12 +1463,12 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
             if let usernameLink = localUsernameState.usernameLink {
                 var usernameLinkProtoBuilder = StorageServiceProtoAccountRecordUsernameLink.builder()
 
-                usernameLinkProtoBuilder.setEntropy(usernameLink.entropy)
+                usernameLinkProtoBuilder.setEntropy(usernameLink.entropy.rawValue)
                 usernameLinkProtoBuilder.setServerID(usernameLink.handle.data)
                 usernameLinkProtoBuilder.setColor(
                     localUsernameManager.usernameLinkQRCodeColor(
-                        tx: transaction
-                    ).asProto
+                        tx: transaction,
+                    ).asProto,
                 )
 
                 builder.setUsernameLink(usernameLinkProtoBuilder.buildInfallibly())
@@ -1314,10 +1486,8 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
         }
 
         if let thread = TSContactThread.getWithContactAddress(localAddress, transaction: transaction) {
-            let threadAssociatedData = ThreadAssociatedData.fetchOrDefault(for: thread, transaction: transaction)
-
-            builder.setNoteToSelfArchived(threadAssociatedData.isArchived)
-            builder.setNoteToSelfMarkedUnread(threadAssociatedData.isMarkedUnread)
+            builder.setNoteToSelfArchived(thread.isArchived)
+            builder.setNoteToSelfMarkedUnread(thread.isMarkedUnread)
         }
 
         let readReceiptsEnabled = OWSReceiptManager.areReadReceiptsEnabled(transaction: transaction)
@@ -1342,7 +1512,7 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
         builder.setPhoneNumberSharingMode(phoneNumberSharingMode.asProtoMode)
 
         builder.setNotDiscoverableByPhoneNumber(
-            tsAccountManager.phoneNumberDiscoverability(tx: transaction).orDefault.isNotDiscoverableByPhoneNumber
+            !tsAccountManager.phoneNumberDiscoverability(tx: transaction).orDefault.isDiscoverable,
         )
 
         let pinnedConversationProtos = self.pinnedConversationProtos(transaction: transaction)
@@ -1359,7 +1529,7 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
         }
         builder.setPayments(paymentsBuilder.buildInfallibly())
 
-        if let unknownFields = unknownFields {
+        if let unknownFields {
             builder.setUnknownFields(unknownFields)
         }
 
@@ -1371,13 +1541,13 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
         }
 
         if
-            let donationSubscriberID = DonationSubscriptionManager.getSubscriberID(transaction: transaction),
-            let donationSubscriberCurrencyCode = DonationSubscriptionManager.getSubscriberCurrencyCode(transaction: transaction)
+            let donationSubscriberID = donationSubscriptionManager.getSubscriberID(tx: transaction),
+            let donationSubscriberCurrencyCode = donationSubscriptionManager.getSubscriberCurrencyCode(tx: transaction)
         {
             builder.setDonorSubscriberID(donationSubscriberID)
             builder.setDonorSubscriberCurrencyCode(donationSubscriberCurrencyCode)
         }
-        builder.setDonorSubscriptionManuallyCancelled(DonationSubscriptionManager.userManuallyCancelledSubscription(transaction: transaction))
+        builder.setDonorSubscriptionManuallyCancelled(donationSubscriptionManager.userManuallyCancelledSubscription(tx: transaction))
 
         if let backupSubscriberData = backupSubscriptionManager.getIAPSubscriberData(tx: transaction) {
             var subscriberDataBuilder = StorageServiceProtoAccountRecordIAPSubscriberData.builder()
@@ -1398,25 +1568,47 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
         builder.setReadOnboardingStory(systemStoryManager.isOnboardingStoryRead(transaction: transaction))
         builder.setViewedOnboardingStory(systemStoryManager.isOnboardingStoryViewed(transaction: transaction))
 
-        builder.setDisplayBadgesOnProfile(DonationSubscriptionManager.displayBadgesOnProfile(transaction: transaction))
+        builder.setDisplayBadgesOnProfile(donationSubscriptionManager.displayBadgesOnProfile(tx: transaction))
 
         builder.setKeepMutedChatsArchived(SSKPreferences.shouldKeepMutedChatsArchived(transaction: transaction))
 
         builder.setStoriesDisabled(!StoryManager.areStoriesEnabled(transaction: transaction))
 
         builder.setCompletedUsernameOnboarding(
-            !usernameEducationManager.shouldShowUsernameEducation(tx: transaction)
+            !usernameEducationManager.shouldShowUsernameEducation(tx: transaction),
         )
 
-        if let localRecipient = recipientDatabaseTable.fetchRecipient(
-            serviceId: localIdentifiers.aci,
-            transaction: transaction
-        ) {
+        // While-muted notifications
+        builder.setNotifyForCallsIfMuted(StorageServiceProtoOptionalBool(notificationPreferencesManager.globalNotifyForCallsWhenMuted(tx: tx)))
+        builder.setNotifyForMentionsIfMuted(StorageServiceProtoOptionalBool(notificationPreferencesManager.globalNotifyForMentionsWhenMuted(tx: tx)))
+        builder.setNotifyForRepliesIfMuted(StorageServiceProtoOptionalBool(notificationPreferencesManager.globalNotifyForRepliesWhenMuted(tx: tx)))
+
+        builder.setReactionNotifications(StorageServiceProtoOptionalBool(notificationPreferencesManager.areReactionNotificationsEnabled(tx: tx)))
+
+        builder.setShowUnreadReminders(.init(notificationPreferencesManager.globalShowUnreadReminders(tx: tx)))
+
+        builder.setNotifyWhenContactJoins(StorageServiceProtoOptionalBool(notificationPreferencesManager.shouldNotifyOfNewAccounts(tx: tx)))
+
+        // Badge
+        builder.setUnreadBadgeType({
+            switch notificationPreferencesManager.badgeCountType(tx: tx) {
+            case .unreadMessages: .unreadMessages
+            case .unreadChats: .unreadChats
+            }
+        }())
+        builder.setIncludeMutedChatsInBadge(StorageServiceProtoOptionalBool(notificationPreferencesManager.includeMutedThreadsInBadgeCount(tx: tx)))
+
+        if
+            let localRecipient = recipientDatabaseTable.fetchRecipient(
+                serviceId: localIdentifiers.aci,
+                transaction: transaction,
+            )
+        {
             builder.setAvatarColor(
                 avatarDefaultColorManager.defaultColor(
                     useCase: .contact(recipient: localRecipient),
-                    tx: transaction
-                ).asStorageServiceProtoAvatarColor
+                    tx: transaction,
+                ).asStorageServiceProtoAvatarColor,
             )
         }
 
@@ -1431,13 +1623,28 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
             // Leave backupTier unset.
         }
 
+        // Note that Storage Service stores the boolean inverted, because of a
+        // misunderstanding when we added the field.
+        builder.setAutomaticKeyVerificationDisabled(!keyTransparencyManager.isEnabled(tx: transaction))
+
+        builder.setSeenAdminDeleteEducationDialog(adminDeleteManager.adminDeleteEducationReadStatus(tx: transaction))
+
+        if let releaseNotesThread = threadStore.fetchThread(uniqueId: TSReleaseNotesThread.releaseNotesUniqueId, tx: transaction) {
+            let isBlocked = blockingManager.isReleaseNotesThreadBlocked(tx: transaction)
+            Logger.info("[ReleaseNotes] uploading to storage service: blocked=\(isBlocked), archived=\(releaseNotesThread.isArchived), mutedUntilTimestamp=\(releaseNotesThread.mutedUntilTimestamp)")
+            builder.setReleaseNotesChatBlocked(isBlocked)
+            builder.setReleaseNotesChatArchived(releaseNotesThread.isArchived)
+            builder.setReleaseNotesChatMarkedUnread(releaseNotesThread.isMarkedUnread)
+            builder.setReleaseNotesChatMutedUntilTimestamp(releaseNotesThread.mutedUntilTimestamp)
+        }
         return builder.buildInfallibly()
     }
 
     func mergeRecord(
         _ record: StorageServiceProtoAccountRecord,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) -> StorageServiceMergeResult<Void> {
+        let tx = transaction
         var needsUpdate = false
 
         let localAddress = localIdentifiers.aciAddress
@@ -1460,7 +1667,7 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
                 userProfileWriter: .storageService,
                 localIdentifiers: localIdentifiers,
                 authedAccount: authedAccount,
-                tx: transaction
+                tx: transaction,
             )
         } else if localUserProfile?.profileKey != nil && !record.hasProfileKey {
             // If we have a local profile key for this user but the service doesn't, mark it as needing update.
@@ -1492,36 +1699,39 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
 
         // Given name can never be cleared, so ignore all info about the profile if
         // there's no given name.
-        if let normalizedRemoteGivenName, (
+        if
+            let normalizedRemoteGivenName,
             localUserProfile?.givenName != normalizedRemoteGivenName
             || localUserProfile?.familyName != normalizedRemoteFamilyName
             || localAvatarUrl != record.avatarURL
-        ) {
+        {
             let localUserProfile = OWSUserProfile.getOrBuildUserProfileForLocalUser(
                 userProfileWriter: .storageService,
-                tx: transaction
+                tx: transaction,
             )
             localUserProfile.update(
                 givenName: .setTo(normalizedRemoteGivenName),
                 familyName: .setTo(normalizedRemoteFamilyName),
                 avatarUrlPath: .setTo(record.avatarURL),
                 userProfileWriter: .storageService,
-                transaction: transaction
+                transaction: transaction,
             )
             transaction.addSyncCompletion { [authedAccount, profileManager] in
                 Task {
                     do {
                         try await profileManager.downloadAndDecryptLocalUserAvatarIfNeeded(authedAccount: authedAccount)
                     } catch {
-                        Logger.warn("Couldn't download local avatar: \(error)")
+                        // Log only domain/code; the raw error's userInfo can
+                        // contain the avatar CDN URL.
+                        Logger.warn("Couldn't download local avatar: \(error.shortDescription)")
                     }
                 }
             }
-        } else if (
+        } else if
             localUserProfile?.givenName != nil && !record.hasGivenName
             || localUserProfile?.familyName != nil && !record.hasFamilyName
             || localAvatarUrl != nil && !record.hasAvatarURL
-        ) {
+        {
             needsUpdate = true
         }
 
@@ -1530,26 +1740,27 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
                 let remoteUsernameLinkProto = record.usernameLink,
                 let remoteUsernameLinkProtoHandleData = remoteUsernameLinkProto.serverID,
                 let remoteUsernameLinkProtoHandle = UUID(data: remoteUsernameLinkProtoHandleData),
-                let remoteUsernameLinkProtoEntropy = remoteUsernameLinkProto.entropy,
-                let remoteUsernameLink = Usernames.UsernameLink(
-                    handle: remoteUsernameLinkProtoHandle,
-                    entropy: remoteUsernameLinkProtoEntropy
-                )
+                let remoteUsernameLinkProtoEntropyData = remoteUsernameLinkProto.entropy,
+                let remoteUsernameLinkProtoEntropy = try? UsernameLink.Entropy(rawValue: remoteUsernameLinkProtoEntropyData)
             {
+                let remoteUsernameLink = UsernameLink(
+                    handle: remoteUsernameLinkProtoHandle,
+                    entropy: remoteUsernameLinkProtoEntropy,
+                )
                 localUsernameManager.setLocalUsername(
                     username: remoteUsername,
                     usernameLink: remoteUsernameLink,
-                    tx: transaction
+                    tx: transaction,
                 )
 
                 localUsernameManager.setUsernameLinkQRCodeColor(
                     color: QRCodeColor(proto: remoteUsernameLinkProto.color),
-                    tx: transaction
+                    tx: transaction,
                 )
             } else {
                 localUsernameManager.setLocalUsernameWithCorruptedLink(
                     username: remoteUsername,
-                    tx: transaction
+                    tx: transaction,
                 )
             }
         } else {
@@ -1557,17 +1768,16 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
         }
 
         let localThread = TSContactThread.getOrCreateThread(withContactAddress: localAddress, transaction: transaction)
-        let localThreadAssociatedData = ThreadAssociatedData.fetchOrDefault(for: localThread, transaction: transaction)
 
-        if record.noteToSelfArchived != localThreadAssociatedData.isArchived {
-            localThreadAssociatedData.updateWith(isArchived: record.noteToSelfArchived, updateStorageService: false, transaction: transaction)
+        if record.noteToSelfArchived != localThread.isArchived {
+            localThread.updateWith(isArchived: record.noteToSelfArchived, updateStorageService: false, transaction: transaction)
         }
 
-        if record.noteToSelfMarkedUnread != localThreadAssociatedData.isMarkedUnread {
-            localThreadAssociatedData.updateWith(isMarkedUnread: record.noteToSelfMarkedUnread, updateStorageService: false, transaction: transaction)
+        if record.noteToSelfMarkedUnread != localThread.isMarkedUnread {
+            localThread.updateWith(isMarkedUnread: record.noteToSelfMarkedUnread, updateStorageService: false, transaction: transaction)
         }
 
-        let localReadReceiptsEnabled = receiptManager.areReadReceiptsEnabled()
+        let localReadReceiptsEnabled = OWSReceiptManager.areReadReceiptsEnabled(transaction: transaction)
         if record.readReceipts != localReadReceiptsEnabled {
             receiptManager.setAreReadReceiptsEnabled(record.readReceipts, transaction: transaction)
         }
@@ -1610,48 +1820,56 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
             }
         }
 
-        let localPhoneNumberDiscoverability = tsAccountManager.phoneNumberDiscoverability(tx: transaction)
-        if record.notDiscoverableByPhoneNumber != localPhoneNumberDiscoverability?.isNotDiscoverableByPhoneNumber {
+        let oldIsDiscoverable = tsAccountManager.phoneNumberDiscoverability(tx: transaction)?.isDiscoverable
+        let newIsDiscoverable = !record.notDiscoverableByPhoneNumber && localIdentifiers.hasPhoneNumber
+        if newIsDiscoverable != oldIsDiscoverable {
             phoneNumberDiscoverabilityManager.setPhoneNumberDiscoverability(
-                record.notDiscoverableByPhoneNumber ? .nobody : .everybody,
+                newIsDiscoverable ? .everybody : .nobody,
                 updateAccountAttributes: false,
                 updateStorageService: false,
                 authedAccount: authedAccount,
-                tx: transaction
+                tx: transaction,
             )
         }
 
-        do {
-            try self.processPinnedConversationsProto(record.pinnedConversations, transaction: transaction)
-        } catch {
-            owsFailDebug("Failed to process pinned conversations \(error)")
-            needsUpdate = true
+        let releaseNotesThread: TSReleaseNotesThread
+        if let _releaseNotesThread = threadStore.fetchThread(uniqueId: TSReleaseNotesThread.releaseNotesUniqueId, tx: transaction) as? TSReleaseNotesThread {
+            releaseNotesThread = _releaseNotesThread
+        } else {
+            releaseNotesThread = TSReleaseNotesThread.createReleaseNotes(transaction: transaction)
         }
+
+        processPinnedConversationsProto(
+            record.pinnedConversations,
+            releaseNotesThread: releaseNotesThread,
+            transaction: transaction,
+        )
 
         let localPrefersContactAvatars = SSKPreferences.preferContactAvatars(transaction: transaction)
         if record.preferContactAvatars != localPrefersContactAvatars {
             SSKPreferences.setPreferContactAvatars(
                 record.preferContactAvatars,
                 updateStorageService: false,
-                transaction: transaction)
+                transaction: transaction,
+            )
         }
 
         let localPaymentsState = paymentsHelper.paymentsState
         let servicePaymentsState = PaymentsState.build(
             arePaymentsEnabled: record.payments?.enabled ?? false,
-            paymentsEntropy: record.payments?.paymentsEntropy
+            paymentsEntropy: record.payments?.paymentsEntropy,
         )
         if localPaymentsState != servicePaymentsState {
             let mergedPaymentsState = PaymentsState.build(
                 // Honor "arePaymentsEnabled" from the service.
                 arePaymentsEnabled: servicePaymentsState.isEnabled,
                 // Prefer paymentsEntropy from service, but try to retain local paymentsEntropy otherwise.
-                paymentsEntropy: servicePaymentsState.paymentsEntropy ?? localPaymentsState.paymentsEntropy
+                paymentsEntropy: servicePaymentsState.paymentsEntropy ?? localPaymentsState.paymentsEntropy,
             )
             paymentsHelper.setPaymentsState(
                 mergedPaymentsState,
                 originatedLocally: false,
-                transaction: transaction
+                transaction: transaction,
             )
         }
 
@@ -1670,21 +1888,21 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
             let donationSubscriberId = record.donorSubscriberID,
             let donationSubscriberCurrencyCode = record.donorSubscriberCurrencyCode
         {
-            if donationSubscriberId != DonationSubscriptionManager.getSubscriberID(transaction: transaction) {
-                DonationSubscriptionManager.setSubscriberID(donationSubscriberId, transaction: transaction)
+            if donationSubscriberId != donationSubscriptionManager.getSubscriberID(tx: transaction) {
+                donationSubscriptionManager.setSubscriberID(donationSubscriberId, tx: transaction)
             }
 
-            if donationSubscriberCurrencyCode != DonationSubscriptionManager.getSubscriberCurrencyCode(transaction: transaction) {
-                DonationSubscriptionManager.setSubscriberCurrencyCode(donationSubscriberCurrencyCode, transaction: transaction)
+            if donationSubscriberCurrencyCode != donationSubscriptionManager.getSubscriberCurrencyCode(tx: transaction) {
+                donationSubscriptionManager.setSubscriberCurrencyCode(donationSubscriberCurrencyCode, tx: transaction)
             }
         }
 
-        let localDonationSubscriptionManuallyCancelled = DonationSubscriptionManager.userManuallyCancelledSubscription(transaction: transaction)
+        let localDonationSubscriptionManuallyCancelled = donationSubscriptionManager.userManuallyCancelledSubscription(tx: transaction)
         if localDonationSubscriptionManuallyCancelled != record.donorSubscriptionManuallyCancelled {
-            DonationSubscriptionManager.setUserManuallyCancelledSubscription(
+            donationSubscriptionManager.setUserManuallyCancelledSubscription(
                 record.donorSubscriptionManuallyCancelled,
                 updateStorageService: false,
-                transaction: transaction
+                tx: transaction,
             )
         }
 
@@ -1706,18 +1924,18 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
             backupSubscriptionManager.restoreIAPSubscriberData(
                 IAPSubscriberData(
                     subscriberId: subscriberId,
-                    iapSubscriptionId: iapSubscriptionId
+                    iapSubscriptionId: iapSubscriptionId,
                 ),
-                tx: transaction
+                tx: transaction,
             )
         }
 
-        let localDisplayBadgesOnProfile = DonationSubscriptionManager.displayBadgesOnProfile(transaction: transaction)
+        let localDisplayBadgesOnProfile = donationSubscriptionManager.displayBadgesOnProfile(tx: transaction)
         if localDisplayBadgesOnProfile != record.displayBadgesOnProfile {
-            DonationSubscriptionManager.setDisplayBadgesOnProfile(
+            donationSubscriptionManager.setDisplayBadgesOnProfile(
                 record.displayBadgesOnProfile,
                 updateStorageService: false,
-                transaction: transaction
+                tx: transaction,
             )
         }
 
@@ -1727,17 +1945,17 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
         }
 
         let localHasSetMyStoriesPrivacy = StoryManager.hasSetMyStoriesPrivacy(transaction: transaction)
-        if !localHasSetMyStoriesPrivacy && record.myStoryPrivacyHasBeenSet {
+        if !localHasSetMyStoriesPrivacy, record.myStoryPrivacyHasBeenSet {
             StoryManager.setHasSetMyStoriesPrivacy(true, shouldUpdateStorageService: false, transaction: transaction)
         }
 
         let localHasReadOnboardingStory = systemStoryManager.isOnboardingStoryRead(transaction: transaction)
-        if !localHasReadOnboardingStory && record.readOnboardingStory {
+        if !localHasReadOnboardingStory, record.readOnboardingStory {
             systemStoryManager.setHasReadOnboardingStory(transaction: transaction, updateStorageService: false)
         }
 
         let localHasViewedOnboardingStory = systemStoryManager.isOnboardingStoryViewed(transaction: transaction)
-        if !localHasViewedOnboardingStory && record.viewedOnboardingStory {
+        if !localHasViewedOnboardingStory, record.viewedOnboardingStory {
             try? systemStoryManager.setHasViewedOnboardingStory(source: .otherDevice, transaction: transaction)
         }
 
@@ -1747,21 +1965,177 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
         }
 
         let hasCompletedUsernameOnboarding = !usernameEducationManager.shouldShowUsernameEducation(tx: transaction)
-        if !hasCompletedUsernameOnboarding && record.completedUsernameOnboarding {
+        if !hasCompletedUsernameOnboarding, record.completedUsernameOnboarding {
             usernameEducationManager.setShouldShowUsernameEducation(
                 false,
-                tx: transaction
+                tx: transaction,
             )
         }
 
-        do {
-            try mergeBackupPlan(in: record, tx: transaction)
-        } catch {
-            owsFail("Failed to merge BackupPlan from Storage Service! \(error)")
+        // MARK: Notifications
+
+        func setIfMismatched(
+            localValue: Bool,
+            recordValue: StorageServiceProtoOptionalBool,
+            setter: (_ newValue: Bool, _ updateStorageService: Bool, _ tx: DBWriteTransaction) -> Void,
+        ) {
+            switch recordValue {
+            case .unset:
+                needsUpdate = true
+            case .true:
+                if !localValue {
+                    setter(true, false, tx)
+                }
+            case .false:
+                if localValue {
+                    setter(false, false, tx)
+                }
+            case .UNRECOGNIZED:
+                break
+            }
         }
+
+        // While-muted notifications
+        setIfMismatched(
+            localValue: notificationPreferencesManager.globalNotifyForCallsWhenMuted(tx: tx),
+            recordValue: record.notifyForCallsIfMuted,
+            setter: notificationPreferencesManager.setGlobalNotifyForCallsWhenMuted(_:updateStorageService:tx:),
+        )
+        setIfMismatched(
+            localValue: notificationPreferencesManager.globalNotifyForMentionsWhenMuted(tx: tx),
+            recordValue: record.notifyForMentionsIfMuted,
+            setter: notificationPreferencesManager.setGlobalNotifyForMentionsWhenMuted(_:updateStorageService:tx:),
+        )
+        setIfMismatched(
+            localValue: notificationPreferencesManager.globalNotifyForRepliesWhenMuted(tx: tx),
+            recordValue: record.notifyForRepliesIfMuted,
+            setter: notificationPreferencesManager.setGlobalNotifyForRepliesWhenMuted(_:updateStorageService:tx:),
+        )
+
+        setIfMismatched(
+            localValue: notificationPreferencesManager.areReactionNotificationsEnabled(tx: tx),
+            recordValue: record.reactionNotifications,
+            setter: notificationPreferencesManager.setAreReactionNotificationsEnabled(_:updateStorageService:tx:),
+        )
+
+        setIfMismatched(
+            localValue: notificationPreferencesManager.globalShowUnreadReminders(tx: tx),
+            recordValue: record.showUnreadReminders,
+            setter: unreadReminderManager.setGlobalShowUnreadReminders(_:updateStorageService:tx:),
+        )
+
+        setIfMismatched(
+            localValue: notificationPreferencesManager.shouldNotifyOfNewAccounts(tx: tx),
+            recordValue: record.notifyWhenContactJoins,
+            setter: notificationPreferencesManager.setShouldNotifyOfNewAccounts(_:updateStorageService:tx:),
+        )
+
+        // Badge
+        setIfMismatched(
+            localValue: notificationPreferencesManager.includeMutedThreadsInBadgeCount(tx: tx),
+            recordValue: record.includeMutedChatsInBadge,
+            setter: notificationPreferencesManager.setIncludeMutedThreadsInBadgeCount(_:updateStorageService:tx:),
+        )
+        let localBadgeCountType = notificationPreferencesManager.badgeCountType(tx: tx)
+        switch record.unreadBadgeType {
+        case .unknownBadgeType:
+            needsUpdate = true
+        case .unreadMessages:
+            if localBadgeCountType != .unreadMessages {
+                notificationPreferencesManager.setBadgeCountType(
+                    .unreadMessages,
+                    updateStorageService: false,
+                    tx: tx,
+                )
+            }
+        case .unreadChats:
+            if localBadgeCountType != .unreadChats {
+                notificationPreferencesManager.setBadgeCountType(
+                    .unreadChats,
+                    updateStorageService: false,
+                    tx: tx,
+                )
+            }
+        case .UNRECOGNIZED:
+            break
+        }
+
+        mergeBackupPlan(in: record, tx: transaction)
 
         if mergeDefaultAvatarColor(in: record, tx: transaction) {
             needsUpdate = true
+        }
+
+        // Note that Storage Service stores the boolean inverted, because of a
+        // misunderstanding when we added the field.
+        let localKeyTransparencyEnabled = keyTransparencyManager.isEnabled(tx: transaction)
+        let remoteKeyTransparencyEnabled = !record.automaticKeyVerificationDisabled
+        if localKeyTransparencyEnabled != remoteKeyTransparencyEnabled {
+            keyTransparencyManager.setIsEnabled(
+                remoteKeyTransparencyEnabled,
+                updateStorageService: false,
+                tx: transaction,
+            )
+        }
+
+        let localAdminDeleteEducationRead = adminDeleteManager.adminDeleteEducationReadStatus(tx: transaction)
+        if !localAdminDeleteEducationRead, record.seenAdminDeleteEducationDialog {
+            adminDeleteManager.setAdminDeleteEducationRead(tx: transaction, updateStorageService: false)
+        }
+
+        let localReleaseNotesBlocked = blockingManager.isReleaseNotesThreadBlocked(tx: transaction)
+        if
+            let newReleaseNotesBlocked = record.releaseNotesChatBlocked,
+            localReleaseNotesBlocked != newReleaseNotesBlocked
+        {
+            Logger.info("[ReleaseNotes] blocked changing: \(localReleaseNotesBlocked) -> \(newReleaseNotesBlocked)")
+            if newReleaseNotesBlocked {
+                blockingManager.addBlockedReleaseNotesThread(thread: releaseNotesThread, blockMode: .storageService, transaction: transaction)
+            } else {
+                blockingManager.removeBlockedReleaseNotesThread(thread: releaseNotesThread, wasLocallyInitiated: false, transaction: transaction)
+            }
+        }
+
+        var updatedMutedTimestampValue: UInt64? = nil
+        var updatedArchivedValue: Bool? = nil
+        var updatedUnreadValue: Bool? = nil
+
+        if
+            let recordMutedUntilTimestamp = record.releaseNotesChatMutedUntilTimestamp,
+            recordMutedUntilTimestamp != releaseNotesThread.mutedUntilTimestamp
+        {
+            Logger.info("[ReleaseNotes] mutedUntilTimestamp changing: \(releaseNotesThread.mutedUntilTimestamp) -> \(recordMutedUntilTimestamp)")
+            updatedMutedTimestampValue = recordMutedUntilTimestamp
+        }
+
+        if
+            let recordArchived = record.releaseNotesChatArchived,
+            recordArchived != releaseNotesThread.isArchived
+        {
+            Logger.info("[ReleaseNotes] archived changing: \(releaseNotesThread.isArchived) -> \(recordArchived)")
+            updatedArchivedValue = recordArchived
+        }
+
+        if
+            let recordUnread = record.releaseNotesChatMarkedUnread,
+            recordUnread != releaseNotesThread.isMarkedUnread
+        {
+            updatedUnreadValue = recordUnread
+        }
+
+        releaseNotesThread.updateWith(
+            isArchived: updatedArchivedValue,
+            isMarkedUnread: updatedUnreadValue,
+            updateStorageService: false,
+            transaction: transaction,
+        )
+        if let updatedMutedTimestampValue {
+            threadMuteManager.setMutedUntilTimestamp(
+                updatedMutedTimestampValue,
+                for: releaseNotesThread,
+                updateStorageService: false,
+                tx: transaction,
+            )
         }
 
         return .merged(needsUpdate: needsUpdate, ())
@@ -1770,7 +2144,7 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
     private func mergeBackupPlan(
         in record: StorageServiceProtoAccountRecord,
         tx: DBWriteTransaction,
-    ) throws {
+    ) {
         guard !isPrimaryDevice else {
             // Never set the BackupPlan on a primary via Storage Service.
             return
@@ -1781,13 +2155,13 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
                 let backupTierUInt8 = UInt8(exactly: backupTierRawValue),
                 let backupLevel = LibSignalClient.BackupLevel(rawValue: backupTierUInt8)
             {
-                try backupPlanManager.setBackupPlan(fromStorageService: backupLevel, tx: tx)
+                backupPlanManager.setBackupPlan(fromStorageService: backupLevel, tx: tx)
             } else {
                 let logger = PrefixedLogger(prefix: "[Backups]")
                 logger.warn("Ignoring backupTier value: \(backupTierRawValue)")
             }
         } else {
-            try backupPlanManager.setBackupPlan(fromStorageService: nil, tx: tx)
+            backupPlanManager.setBackupPlan(fromStorageService: nil, tx: tx)
         }
     }
 
@@ -1797,18 +2171,20 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
     /// may need to overwrite state set by a linked device.
     private func mergeDefaultAvatarColor(
         in record: StorageServiceProtoAccountRecord,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> Bool {
-        guard let localRecipient = recipientDatabaseTable.fetchRecipient(
-            serviceId: localIdentifiers.aci,
-            transaction: tx
-        ) else {
+        guard
+            let localRecipient = recipientDatabaseTable.fetchRecipient(
+                serviceId: localIdentifiers.aci,
+                transaction: tx,
+            )
+        else {
             return false
         }
 
         let localDefaultAvatarColor = avatarDefaultColorManager.defaultColor(
             useCase: .contact(recipient: localRecipient),
-            tx: tx
+            tx: tx,
         )
         let remoteDefaultAvatarColor = record.avatarColor.flatMap {
             AvatarTheme.from(storageServiceProtoAvatarColor: $0)
@@ -1824,7 +2200,7 @@ class StorageServiceAccountRecordUpdater: StorageServiceRecordUpdater {
             try? avatarDefaultColorManager.persistDefaultColor(
                 remoteDefaultAvatarColor,
                 recipientRowId: localRecipient.id,
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -1861,85 +2237,104 @@ extension StorageServiceProtoAccountRecordPhoneNumberSharingMode {
 
 extension StorageServiceAccountRecordUpdater {
 
-    fileprivate func processPinnedConversationsProto(
+    private func processPinnedConversationsProto(
         _ pinnedConversations: [StorageServiceProtoAccountRecordPinnedConversation],
-        transaction: DBWriteTransaction
-    ) throws {
+        releaseNotesThread: TSReleaseNotesThread,
+        transaction tx: DBWriteTransaction,
+    ) {
         if pinnedConversations.count > PinnedThreads.maxPinnedThreads {
             Logger.warn("Received unexpected number of pinned threads (\(pinnedConversations.count))")
         }
 
-        var pinnedThreadIds = [String]()
+        var pinnedThreadIds = [PinnedThreadId]()
         for pinnedConversation in pinnedConversations {
+            let thread: TSThread?
             switch pinnedConversation.identifier {
             case .contact(let contact)?:
-                let address = SignalServiceAddress.legacyAddress(
-                    serviceId: ServiceId.parseFrom(
-                        serviceIdBinary: contact.serviceIDBinary,
-                        serviceIdString: contact.serviceID,
-                    ),
-                    phoneNumber: contact.e164
+                let serviceId = ServiceId.parseFrom(
+                    serviceIdBinary: contact.serviceIDBinary,
+                    serviceIdString: contact.serviceID,
                 )
-                guard address.isValid else {
-                    owsFailDebug("Dropping pinned thread with invalid address \(address)")
+                let recipient: SignalRecipient
+                if let aci = serviceId as? Aci {
+                    recipient = recipientFetcher.fetchOrCreate(serviceId: aci, tx: tx)
+                } else if let phoneNumber = E164(contact.e164) {
+                    recipient = recipientFetcher.fetchOrCreate(phoneNumber: phoneNumber, tx: tx)
+                } else if let pni = serviceId as? Pni {
+                    recipient = recipientFetcher.fetchOrCreate(serviceId: pni, tx: tx)
+                } else {
+                    owsFailDebug("dropping pinned recipient with invalid address")
                     continue
                 }
-                let thread = TSContactThread.getOrCreateThread(withContactAddress: address, transaction: transaction)
-                pinnedThreadIds.append(thread.uniqueId)
-            case .groupMasterKey(let masterKey)?:
-                let contextInfo = try GroupV2ContextInfo.deriveFrom(masterKeyData: masterKey)
-                let threadUniqueId = TSGroupThread.threadId(forGroupId: contextInfo.groupId.serialize(), transaction: transaction)
-                pinnedThreadIds.append(threadUniqueId)
+                pinnedThreadIds.append(.recipientId(recipient.id))
+                thread = TSContactThread.getOrCreateThread(withContactAddress: recipient.address, transaction: tx)
+            case .groupMasterKey(let masterKeyData)?:
+                guard let masterKey = try? GroupMasterKey(contents: masterKeyData) else {
+                    owsFailDebug("dropping pinned group with invalid master key")
+                    continue
+                }
+                let contextInfo = GroupV2ContextInfo.deriveFrom(masterKey: masterKey)
+                let groupId = contextInfo.groupId
+                thread = threadStore.fetchThread(forGroupId: groupId, tx: tx)
+                pinnedThreadIds.append(.groupId(groupId.serialize()))
             case .legacyGroupID(let groupId)?:
-                let threadUniqueId = TSGroupThread.threadId(forGroupId: groupId,
-                                                            transaction: transaction)
-                pinnedThreadIds.append(threadUniqueId)
-            default:
-                break
+                thread = threadStore.fetchThread(forGroupIdData: groupId, tx: tx)
+                pinnedThreadIds.append(.groupId(groupId))
+            case .releaseNotes:
+                thread = releaseNotesThread
+                pinnedThreadIds.append(.releaseNotes)
+            case nil:
+                continue
             }
+            // If the thread exists, make sure it's visible.
+            thread?.updateWithShouldThreadBeVisible(true, transaction: tx)
         }
 
-        pinnedThreadManager.updatePinnedThreadIds(pinnedThreadIds, updateStorageService: false, tx: transaction)
+        pinnedThreadManager.setPinnedThreadIds(pinnedThreadIds, updateStorageService: false, tx: tx)
     }
 
-    fileprivate func pinnedConversationProtos(
-        transaction: DBReadTransaction
+    private func pinnedConversationProtos(
+        transaction tx: DBReadTransaction,
     ) -> [StorageServiceProtoAccountRecordPinnedConversation] {
-        let pinnedThreads = pinnedThreadManager.pinnedThreads(tx: transaction)
+        let pinnedThreads = pinnedThreadStore.fetchPinnedThreadRecords(tx: tx)
 
         var pinnedConversationProtos = [StorageServiceProtoAccountRecordPinnedConversation]()
         for pinnedThread in pinnedThreads {
             var pinnedConversationBuilder = StorageServiceProtoAccountRecordPinnedConversation.builder()
 
-            if let groupThread = pinnedThread as? TSGroupThread {
-                if let groupModelV2 = groupThread.groupModel as? TSGroupModelV2 {
-                    let masterKey: GroupMasterKey
-                    do {
-                        masterKey = try groupModelV2.masterKey()
-                    } catch {
-                        owsFailDebug("Missing master key: \(error)")
+            switch pinnedThread.threadId {
+            case .groupId(let _groupId):
+                switch try? AnyGroupIdentifier.parseFrom(_groupId) {
+                case .V2(let groupId):
+                    let groupRecord = GroupStore().fetchGroup(forGroupId: groupId, tx: tx)
+                    guard let groupRecord, let secretParams = groupRecord.deriveSecretParams() else {
+                        Logger.warn("skipping pinned group without secret params")
                         continue
                     }
+                    let masterKey = failIfThrows { try secretParams.getMasterKey() }
                     pinnedConversationBuilder.setIdentifier(.groupMasterKey(masterKey.serialize()))
-                } else {
-                    pinnedConversationBuilder.setIdentifier(.legacyGroupID(groupThread.groupModel.groupId))
+                case .V1(let groupId):
+                    pinnedConversationBuilder.setIdentifier(.legacyGroupID(groupId.rawValue))
+                case nil:
+                    owsFailDebug("malformed pinned group id")
+                    pinnedConversationBuilder.setIdentifier(.legacyGroupID(_groupId))
                 }
-
-            } else if let contactThread = pinnedThread as? TSContactThread {
+            case .recipientId(let recipientId):
+                let recipient = recipientDatabaseTable.fetchRecipient(rowId: recipientId, tx: tx)
                 var contactBuilder = StorageServiceProtoAccountRecordPinnedConversationContact.builder()
-                if let serviceId = contactThread.contactAddress.serviceId {
-                    if BuildFlags.serviceIdStrings {
-                        contactBuilder.setServiceID(serviceId.serviceIdString)
-                    }
-                    if BuildFlags.serviceIdBinaryConstantOverhead {
-                        contactBuilder.setServiceIDBinary(serviceId.serviceIdBinary)
-                    }
-                } else if let e164 = contactThread.contactAddress.phoneNumber {
-                    contactBuilder.setE164(e164)
+                if let aci = recipient?.aci {
+                    contactBuilder.setServiceIDBinary(aci.serviceIdBinary)
+                } else if let phoneNumber = recipient?.phoneNumber {
+                    contactBuilder.setE164(phoneNumber.stringValue)
+                } else if let pni = recipient?.pni {
+                    contactBuilder.setServiceIDBinary(pni.serviceIdBinary)
                 } else {
-                    owsFailDebug("Missing uuid and phone number for thread")
+                    owsFailDebug("missing all identifiers for pinned recipient")
                 }
                 pinnedConversationBuilder.setIdentifier(.contact(contactBuilder.buildInfallibly()))
+            case .releaseNotes:
+                let releaseNotesBuilder = StorageServiceProtoAccountRecordPinnedConversationReleaseNotes.builder()
+                pinnedConversationBuilder.setIdentifier(.releaseNotes(releaseNotesBuilder.buildInfallibly()))
             }
 
             pinnedConversationProtos.append(pinnedConversationBuilder.buildInfallibly())
@@ -1955,27 +2350,31 @@ class StorageServiceStoryDistributionListRecordUpdater: StorageServiceRecordUpda
     typealias IdType = Data
     typealias RecordType = StorageServiceProtoStoryDistributionListRecord
 
+    private let localIdentifiers: LocalIdentifiers
+
     private let privateStoryThreadDeletionManager: any PrivateStoryThreadDeletionManager
     private let recipientDatabaseTable: RecipientDatabaseTable
-    private let recipientFetcher: any RecipientFetcher
+    private let recipientFetcher: RecipientFetcher
     private let storyRecipientManager: StoryRecipientManager
     private let storyRecipientStore: StoryRecipientStore
-    private let threadRemover: any ThreadRemover
+    private let threadDeletionManager: any ThreadDeletionManager
 
     init(
+        localIdentifiers: LocalIdentifiers,
         privateStoryThreadDeletionManager: any PrivateStoryThreadDeletionManager,
         recipientDatabaseTable: RecipientDatabaseTable,
-        recipientFetcher: any RecipientFetcher,
+        recipientFetcher: RecipientFetcher,
         storyRecipientManager: StoryRecipientManager,
         storyRecipientStore: StoryRecipientStore,
-        threadRemover: any ThreadRemover
+        threadDeletionManager: any ThreadDeletionManager,
     ) {
+        self.localIdentifiers = localIdentifiers
         self.privateStoryThreadDeletionManager = privateStoryThreadDeletionManager
         self.recipientDatabaseTable = recipientDatabaseTable
         self.recipientFetcher = recipientFetcher
         self.storyRecipientManager = storyRecipientManager
         self.storyRecipientStore = storyRecipientStore
-        self.threadRemover = threadRemover
+        self.threadDeletionManager = threadDeletionManager
     }
 
     func unknownFields(for record: StorageServiceProtoStoryDistributionListRecord) -> UnknownStorage? { record.unknownFields }
@@ -1987,7 +2386,7 @@ class StorageServiceStoryDistributionListRecordUpdater: StorageServiceRecordUpda
     func buildRecord(
         for distributionListIdentifier: Data,
         unknownFields: UnknownStorage?,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> StorageServiceProtoStoryDistributionListRecord? {
         guard let uniqueId = UUID(data: distributionListIdentifier)?.uuidString else {
             owsFailDebug("Invalid distributionListIdentifier.")
@@ -1997,24 +2396,23 @@ class StorageServiceStoryDistributionListRecordUpdater: StorageServiceRecordUpda
         var builder = StorageServiceProtoStoryDistributionListRecord.builder()
         builder.setIdentifier(distributionListIdentifier)
 
-        if let deletedAtTimestamp = privateStoryThreadDeletionManager.deletedAtTimestamp(
-            forDistributionListIdentifier: distributionListIdentifier,
-            tx: transaction
-        ) {
+        if
+            let deletedAtTimestamp = privateStoryThreadDeletionManager.deletedAtTimestamp(
+                forDistributionListIdentifier: distributionListIdentifier,
+                tx: transaction,
+            )
+        {
             builder.setDeletedAtTimestamp(deletedAtTimestamp)
-        } else if let story = TSPrivateStoryThread.anyFetchPrivateStoryThread(
-            uniqueId: uniqueId,
-            transaction: transaction
-        ) {
+        } else if
+            let story = TSPrivateStoryThread.fetchPrivateStoryThreadViaCache(
+                uniqueId: uniqueId,
+                transaction: transaction,
+            )
+        {
             builder.setName(story.name)
-            let recipients = (try? storyRecipientManager.fetchRecipients(forStoryThread: story, tx: transaction)) ?? []
-            let serviceIds = recipients.compactMap { ($0.aci ?? $0.pni) }
-            if BuildFlags.serviceIdStrings {
-                builder.setRecipientServiceIds(serviceIds.map(\.serviceIdString))
-            }
-            if BuildFlags.serviceIdBinaryVariableOverhead {
-                builder.setRecipientServiceIdsBinary(serviceIds.map(\.serviceIdBinary))
-            }
+            let recipients = storyRecipientManager.fetchRecipients(forStoryThread: story, tx: transaction)
+            let serviceIds = recipients.compactMap { $0.aci ?? $0.pni }
+            builder.setRecipientServiceIdsBinary(serviceIds.map(\.serviceIdBinary))
             builder.setAllowsReplies(story.allowsReplies)
             builder.setIsBlockList(story.storyViewMode == .blockList)
         } else {
@@ -2023,7 +2421,7 @@ class StorageServiceStoryDistributionListRecordUpdater: StorageServiceRecordUpda
 
         // Unknown
 
-        if let unknownFields = unknownFields {
+        if let unknownFields {
             builder.setUnknownFields(unknownFields)
         }
 
@@ -2032,28 +2430,40 @@ class StorageServiceStoryDistributionListRecordUpdater: StorageServiceRecordUpda
 
     func mergeRecord(
         _ record: StorageServiceProtoStoryDistributionListRecord,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) -> StorageServiceMergeResult<Data> {
         guard let identifier = record.identifier, let uniqueId = UUID(data: identifier) else {
             owsFailDebug("identifier unexpectedly missing for distribution list")
             return .invalid
         }
 
-        let existingStory = TSPrivateStoryThread.anyFetchPrivateStoryThread(
+        let existingStory = TSPrivateStoryThread.fetchPrivateStoryThreadViaCache(
             uniqueId: uniqueId.uuidString,
-            transaction: transaction
+            transaction: transaction,
         )
 
         // The story has been deleted on another device, record that
         // and ensure we don't try and put it back.
         guard record.deletedAtTimestamp == 0 else {
+            if uniqueId.uuidString == TSPrivateStoryThread.myStoryUniqueId {
+                // My Story should never be deleted. If someone put such in
+                // Storage Service, ignore and overwrite it.
+                return .merged(needsUpdate: true, identifier)
+            }
+
             if let existingStory {
-                threadRemover.remove(existingStory, tx: transaction)
+                threadDeletionManager.deleteThreads(
+                    [existingStory],
+                    sendDeleteForMeSyncMessage: false,
+                    updateStorageService: false,
+                    localIdentifiers: localIdentifiers,
+                    tx: transaction,
+                )
             }
             privateStoryThreadDeletionManager.recordDeletedAtTimestamp(
                 record.deletedAtTimestamp,
                 forDistributionListIdentifier: identifier,
-                tx: transaction
+                tx: transaction,
             )
             return .merged(needsUpdate: false, identifier)
         }
@@ -2089,7 +2499,7 @@ class StorageServiceStoryDistributionListRecordUpdater: StorageServiceRecordUpda
 
             let hasChanged: Bool = (
                 (story.storyViewMode == .blockList) != record.isBlockList
-                || Set(remoteRecipientIds) != (try? storyRecipientStore.fetchRecipientIds(forStoryThreadId: story.sqliteRowId!, tx: transaction)).map(Set.init(_:))
+                    || Set(remoteRecipientIds) != Set(storyRecipientStore.fetchRecipientIds(forStoryThreadId: story.sqliteRowId!, tx: transaction)),
             )
 
             if hasChanged {
@@ -2097,7 +2507,7 @@ class StorageServiceStoryDistributionListRecordUpdater: StorageServiceRecordUpda
                     record.isBlockList ? .blockList : .explicit,
                     storyRecipientIds: .setTo(remoteRecipientIds),
                     updateStorageService: false,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             }
         } else {
@@ -2109,18 +2519,16 @@ class StorageServiceStoryDistributionListRecordUpdater: StorageServiceRecordUpda
                 uniqueId: uniqueId.uuidString,
                 name: name,
                 allowsReplies: record.allowsReplies,
-                viewMode: record.isBlockList ? .blockList : .explicit
+                viewMode: record.isBlockList ? .blockList : .explicit,
             )
             newStory.anyInsert(transaction: transaction)
 
-            failIfThrows {
-                try storyRecipientManager.setRecipientIds(
-                    remoteRecipientIds,
-                    for: newStory,
-                    shouldUpdateStorageService: false,
-                    tx: transaction
-                )
-            }
+            storyRecipientManager.setRecipientIds(
+                remoteRecipientIds,
+                for: newStory,
+                shouldUpdateStorageService: false,
+                tx: transaction,
+            )
         }
 
         return .merged(needsUpdate: needsUpdate, identifier)
@@ -2133,14 +2541,14 @@ class StorageServiceCallLinkRecordUpdater: StorageServiceRecordUpdater {
     typealias IdType = Data
     typealias RecordType = StorageServiceProtoCallLinkRecord
 
-    let callLinkStore: any CallLinkRecordStore
+    let callLinkStore: CallLinkRecordStore
     private let callRecordDeleteManager: any CallRecordDeleteManager
     private let callRecordStore: any CallRecordStore
 
     init(
-        callLinkStore: any CallLinkRecordStore,
+        callLinkStore: CallLinkRecordStore,
         callRecordDeleteManager: any CallRecordDeleteManager,
-        callRecordStore: any CallRecordStore
+        callRecordStore: any CallRecordStore,
     ) {
         self.callLinkStore = callLinkStore
         self.callRecordDeleteManager = callRecordDeleteManager
@@ -2156,20 +2564,14 @@ class StorageServiceCallLinkRecordUpdater: StorageServiceRecordUpdater {
     func buildRecord(
         for rootKeyData: Data,
         unknownFields: UnknownStorage?,
-        transaction tx: DBReadTransaction
+        transaction tx: DBReadTransaction,
     ) -> StorageServiceProtoCallLinkRecord? {
         guard let rootKey = try? CallLinkRootKey(rootKeyData) else {
             owsFailDebug("Invalid CallLinkRootKey")
             return nil
         }
         let roomId = rootKey.deriveRoomId()
-        let callLink: CallLinkRecord?
-        do {
-            callLink = try self.callLinkStore.fetch(roomId: roomId, tx: tx)
-        } catch {
-            owsFailDebug("Skipping CallLink that can't be fetched: \(rootKey.description)")
-            return nil
-        }
+        let callLink = self.callLinkStore.fetch(roomId: roomId, tx: tx)
 
         guard let callLink, callLink.adminPasskey != nil || callLink.adminDeletedAtTimestampMs != nil else {
             // We're not an admin, so this link doesn't go in Storage Service.
@@ -2192,30 +2594,26 @@ class StorageServiceCallLinkRecordUpdater: StorageServiceRecordUpdater {
 
     func mergeRecord(
         _ record: StorageServiceProtoCallLinkRecord,
-        transaction tx: DBWriteTransaction
+        transaction tx: DBWriteTransaction,
     ) -> StorageServiceMergeResult<Data> {
         guard let rootKeyData = record.rootKey, let rootKey = try? CallLinkRootKey(rootKeyData) else {
             owsFailDebug("invalid rootKey")
             return .invalid
         }
-        do {
-            var (callLink, _) = try self.callLinkStore.fetchOrInsert(rootKey: rootKey, tx: tx)
-            // The earliest deletion timestamp takes precendence when merging.
-            if record.deletedAtTimestampMs > 0 || callLink.adminDeletedAtTimestampMs != nil {
-                self.callRecordDeleteManager.deleteCallRecords(
-                    try self.callRecordStore.fetchExisting(conversationId: .callLink(callLinkRowId: callLink.id), limit: nil, tx: tx),
-                    sendSyncMessageOnDelete: false,
-                    tx: tx
-                )
-                callLink.markDeleted(atTimestampMs: [record.deletedAtTimestampMs, callLink.adminDeletedAtTimestampMs].compacted().min()!)
-            } else if let adminPasskey = record.adminPasskey?.nilIfEmpty {
-                callLink.adminPasskey = adminPasskey
-                callLink.setNeedsFetch()
-            }
-            try self.callLinkStore.update(callLink, tx: tx)
-        } catch {
-            owsFailDebug("Couldn't merge CallLink \(rootKey.description): \(error)")
+        var (callLink, _) = self.callLinkStore.fetchOrInsert(rootKey: rootKey, tx: tx)
+        // The earliest deletion timestamp takes precendence when merging.
+        if record.deletedAtTimestampMs > 0 || callLink.adminDeletedAtTimestampMs != nil {
+            self.callRecordDeleteManager.deleteCallRecords(
+                self.callRecordStore.fetchExisting(conversationId: .callLink(callLinkRowId: callLink.id), limit: nil, tx: tx),
+                sendSyncMessageOnDelete: false,
+                tx: tx,
+            )
+            callLink.markDeleted(atTimestampMs: [record.deletedAtTimestampMs, callLink.adminDeletedAtTimestampMs].compacted().min()!)
+        } else if let adminPasskey = record.adminPasskey?.nilIfEmpty {
+            callLink.adminPasskey = adminPasskey
+            callLink.setNeedsFetch()
         }
+        self.callLinkStore.update(callLink, tx: tx)
         return .merged(needsUpdate: false, rootKey.bytes)
     }
 }
@@ -2232,8 +2630,16 @@ extension StorageServiceProtoOptionalBool {
         }
     }
 
-    init(_ boolValue: Bool) {
-        self = boolValue ? .true : .false
+    var isUnrecognized: Bool {
+        if case .UNRECOGNIZED = self { true } else { false }
+    }
+
+    init(_ boolValue: Bool?) {
+        switch boolValue {
+        case nil: self = .unset
+        case true: self = .true
+        case false: self = .false
+        }
     }
 }
 

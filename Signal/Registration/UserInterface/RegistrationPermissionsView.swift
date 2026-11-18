@@ -14,7 +14,7 @@ protocol RegistrationPermissionsPresenter: AnyObject {
 
 struct RegistrationPermissionsView: View {
     var requestingContactsAuthorization: Bool
-    var permissionTask: (() async -> Void)
+    var permissionTask: () async -> Void
 
     @State private var hasAppeared = (notifications: false, relay: false, contacts: false)
     @State private var requestPermissions: RequestPermissionsTask?
@@ -33,9 +33,13 @@ struct RegistrationPermissionsView: View {
     var body: some View {
         VStack {
             VStack(spacing: headerSpacing) {
-                Text(OWSLocalizedString("ONBOARDING_PERMISSIONS_TITLE", comment: "Title of the 'onboarding permissions' view."))
-                    .font(.title.weight(.semibold))
-                    .lineLimit(1)
+                Text(OWSLocalizedString(
+                    "ONBOARDING_PERMISSIONS_TITLE",
+                    comment: "Title of the 'onboarding permissions' view.",
+                ))
+                .font(.title.weight(.semibold))
+                .lineLimit(1)
+                .accessibilityAddTraits(.isHeader)
                 Text(OWSLocalizedString("ONBOARDING_PERMISSIONS_PREAMBLE", comment: "Preamble of the 'onboarding permissions' view."))
                     .dynamicTypeSize(...DynamicTypeSize.accessibility1)
             }
@@ -72,7 +76,7 @@ struct RegistrationPermissionsView: View {
                                     notificationRelayPermissionView
                                 }
 
-                                if requestingContactsAuthorization && hasAppeared.contacts {
+                                if requestingContactsAuthorization, hasAppeared.contacts {
                                     contactsPermissionView
                                 }
                             }
@@ -174,6 +178,7 @@ private extension RegistrationPermissionsView {
                     HStack(spacing: 16) {
                         icon
                             .frame(width: 36)
+                            .accessibilityHidden(true)
                         title
                             .font(.headline)
                             .lineLimit(1)
@@ -183,9 +188,11 @@ private extension RegistrationPermissionsView {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
+                .accessibilityElement(children: .combine)
             } else {
                 HStack(alignment: .top, spacing: 16) {
                     icon
+                        .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 4) {
                         title
                             .font(.headline)
@@ -196,6 +203,7 @@ private extension RegistrationPermissionsView {
                             .layoutPriority(1)
                     }
                 }
+                .accessibilityElement(children: .combine)
             }
         }
     }
@@ -236,7 +244,7 @@ private extension RegistrationPermissionsView {
 
     struct RequestPermissionsTask: AsyncViewTask {
         let id = UUID()
-        let task: (() async -> Void)
+        let task: () async -> Void
 
         func perform() async {
             await task()
@@ -264,8 +272,8 @@ final class RegistrationPermissionsViewController: OWSViewController, OWSNavigat
                 requestingContactsAuthorization: requestingContactsAuthorization,
                 permissionTask: { [weak self] in
                     await self?.presenter?.requestPermissions()
-                }
-            )
+                },
+            ),
         )
         addChild(hostingController)
         view.addSubview(hostingController.view)
@@ -299,8 +307,8 @@ private let presenter = PreviewPermissionsPresenter()
         animateFirstAppearance: true,
         viewController: RegistrationPermissionsViewController(
             requestingContactsAuthorization: true,
-            presenter: presenter
-        )
+            presenter: presenter,
+        ),
     )
 }
 #endif

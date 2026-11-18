@@ -33,7 +33,7 @@ struct CLVRenderState {
         CLVRenderState(
             viewInfo: .empty,
             pinnedThreadUniqueIds: [],
-            unpinnedThreadUniqueIds: []
+            unpinnedThreadUniqueIds: [],
         )
     }
 
@@ -47,7 +47,7 @@ struct CLVRenderState {
     init(
         viewInfo: CLVViewInfo,
         pinnedThreadUniqueIds: [String],
-        unpinnedThreadUniqueIds: [String]
+        unpinnedThreadUniqueIds: [String],
     ) {
         self.viewInfo = viewInfo
         self.pinnedThreadUniqueIds = pinnedThreadUniqueIds
@@ -63,7 +63,7 @@ struct CLVRenderState {
             return Section(
                 type: sectionType,
                 title: isTitleVisible ? OWSLocalizedString("PINNED_SECTION_TITLE", comment: "The title for pinned conversation section on the conversation list") : nil,
-                threadUniqueIds: \.pinnedThreadUniqueIds
+                threadUniqueIds: \.pinnedThreadUniqueIds,
             )
 
         case .unpinned:
@@ -71,20 +71,28 @@ struct CLVRenderState {
             return Section(
                 type: sectionType,
                 title: isTitleVisible ? OWSLocalizedString("UNPINNED_SECTION_TITLE", comment: "The title for unpinned conversation section on the conversation list") : nil,
-                threadUniqueIds: \.unpinnedThreadUniqueIds
+                threadUniqueIds: \.unpinnedThreadUniqueIds,
             )
 
         case .reminders where hasVisibleReminders,
              .backupDownloadProgressView where shouldBackupDownloadProgressViewBeVisible,
+             .backupExportProgressView where shouldBackupExportProgressViewBeVisible,
+             .localFileBackupRestoreProgressView where shouldLocalFileBackupRestoreProgressViewBeVisible,
+             .localFileBackupExportProgressView where shouldLocalFileBackupExportProgressViewBeVisible,
              .archiveButton where hasArchivedThreadsRow:
             return Section(type: sectionType)
+
+        case .reminders,
+             .backupDownloadProgressView,
+             .backupExportProgressView,
+             .localFileBackupRestoreProgressView,
+             .localFileBackupExportProgressView,
+             .archiveButton:
+            return nil
 
         case .inboxFilterFooter:
             guard let inboxFilterSection else { return nil }
             return Section(type: sectionType, value: inboxFilterSection)
-
-        case .reminders, .backupDownloadProgressView, .archiveButton:
-            return nil
         }
     }
 
@@ -108,11 +116,29 @@ struct CLVRenderState {
         viewInfo.shouldBackupDownloadProgressViewBeVisible
     }
 
+    var shouldBackupExportProgressViewBeVisible: Bool {
+        viewInfo.shouldBackupExportProgressViewBeVisible
+    }
+
+    var shouldLocalFileBackupRestoreProgressViewBeVisible: Bool {
+        viewInfo.shouldLocalFileBackupRestoreProgressViewBeVisible
+    }
+
+    var shouldLocalFileBackupExportProgressViewBeVisible: Bool {
+        viewInfo.shouldLocalFileBackupExportProgressViewBeVisible
+    }
+
     // MARK: UITableViewDataSource
 
     func numberOfRows(in section: Section) -> Int {
         switch section.type {
-        case .reminders, .backupDownloadProgressView, .archiveButton, .inboxFilterFooter:
+        case .reminders,
+             .backupDownloadProgressView,
+             .backupExportProgressView,
+             .localFileBackupRestoreProgressView,
+             .localFileBackupExportProgressView,
+             .archiveButton,
+             .inboxFilterFooter:
             return 1
         case .pinned:
             return pinnedThreadUniqueIds.count
@@ -130,7 +156,14 @@ struct CLVRenderState {
             let oldValue = renderState.items(in: section) ?? []
             return items.difference(from: oldValue)
 
-        case .pinned, .unpinned, .reminders, .backupDownloadProgressView, .archiveButton:
+        case .pinned,
+             .unpinned,
+             .reminders,
+             .backupDownloadProgressView,
+             .backupExportProgressView,
+             .localFileBackupRestoreProgressView,
+             .localFileBackupExportProgressView,
+             .archiveButton:
             return nil
         }
     }
@@ -144,7 +177,14 @@ struct CLVRenderState {
                 return nil
             }
 
-        case .pinned, .unpinned, .reminders, .backupDownloadProgressView, .archiveButton:
+        case .pinned,
+             .unpinned,
+             .reminders,
+             .backupDownloadProgressView,
+             .backupExportProgressView,
+             .localFileBackupRestoreProgressView,
+             .localFileBackupExportProgressView,
+             .archiveButton:
             owsFailDebug("Section diffing not yet supported in section '\(section.type)'")
             return nil
         }
@@ -189,8 +229,9 @@ struct CLVRenderState {
 
         let firstIndexPath = IndexPath(item: 0, section: section.index)
 
-        guard let thread,
-              let index = self[keyPath: section.threadUniqueIds].firstIndex(of: thread.uniqueId)
+        guard
+            let thread,
+            let index = self[keyPath: section.threadUniqueIds].firstIndex(of: thread.uniqueId)
         else { return firstIndexPath }
 
         if index < (self[keyPath: section.threadUniqueIds].count - 1) {

@@ -3,10 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
 import UIKit
-
-let kIsDebuggingMediaPresentationAnimations = false
 
 enum Media {
     case gallery(MediaGalleryItem)
@@ -15,7 +12,7 @@ enum Media {
     var image: UIImage? {
         switch self {
         case let .gallery(item):
-            return try? item.attachmentStream.attachmentStream.decryptedImage()
+            return item.referencedAttachment.getBestAvailableLocalImage()
         case let .image(image):
             return image
         }
@@ -44,19 +41,24 @@ enum MediaViewShape {
 }
 
 struct MediaPresentationContext {
+    static let animationDuration: TimeInterval = 0.25
+
     let mediaView: UIView
     let presentationFrame: CGRect
+    let backgroundColor: UIColor
     let mediaViewShape: MediaViewShape
     let clippingAreaInsets: UIEdgeInsets?
 
     init(
         mediaView: UIView,
         presentationFrame: CGRect,
+        backgroundColor: UIColor = .clear,
         mediaViewShape: MediaViewShape = .rectangle(0),
-        clippingAreaInsets: UIEdgeInsets? = nil
+        clippingAreaInsets: UIEdgeInsets? = nil,
     ) {
         self.mediaView = mediaView
         self.presentationFrame = presentationFrame
+        self.backgroundColor = backgroundColor
         self.mediaViewShape = mediaViewShape
         self.clippingAreaInsets = clippingAreaInsets
     }
@@ -80,10 +82,6 @@ struct MediaPresentationContext {
 // stop showing the media pager. This can be a pop to the tile view, or a modal dismiss.
 protocol MediaPresentationContextProvider {
     func mediaPresentationContext(item: Media, in coordinateSpace: UICoordinateSpace) -> MediaPresentationContext?
-
-    // The transitionView will be presented below this view.
-    // If nil, the transitionView will be presented above all
-    func snapshotOverlayView(in coordinateSpace: UICoordinateSpace) -> (UIView, CGRect)?
 
     func mediaWillPresent(fromContext: MediaPresentationContext)
     func mediaWillPresent(toContext: MediaPresentationContext)

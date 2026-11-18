@@ -17,9 +17,6 @@ final class ThreadMergerTest: XCTestCase {
     private var disappearingMessagesConfigurationManager: ThreadMerger_MockDisappearingMessagesConfigurationManager!
     private var disappearingMessagesConfigurationStore: MockDisappearingMessagesConfigurationStore!
     private var interactionStore: MockInteractionStore!
-    private var pinnedThreadManager: MockPinnedThreadManager!
-    private var threadAssociatedDataManager: ThreadMerger_MockThreadAssociatedDataManager!
-    private var threadAssociatedDataStore: MockThreadAssociatedDataStore!
     private var threadStore: MockThreadStore!
     private var threadRemover: ThreadRemover!
     private var threadReplyInfoStore: ThreadReplyInfoStore!
@@ -43,29 +40,27 @@ final class ThreadMergerTest: XCTestCase {
         deletedCallRecordStore = MockDeletedCallRecordStore()
         disappearingMessagesConfigurationStore = MockDisappearingMessagesConfigurationStore()
         disappearingMessagesConfigurationManager = ThreadMerger_MockDisappearingMessagesConfigurationManager(disappearingMessagesConfigurationStore)
-        pinnedThreadManager = MockPinnedThreadManager()
         interactionStore = MockInteractionStore()
-        threadAssociatedDataStore = MockThreadAssociatedDataStore()
-        threadAssociatedDataManager = ThreadMerger_MockThreadAssociatedDataManager(threadAssociatedDataStore)
         threadReplyInfoStore = ThreadReplyInfoStore()
         threadStore = MockThreadStore()
         wallpaperStore = WallpaperStore(
-            wallpaperImageStore: MockWallpaperImageStore()
+            wallpaperImageStore: MockWallpaperImageStore(),
         )
         chatColorSettingStore = ChatColorSettingStore(
-            wallpaperStore: wallpaperStore
+            wallpaperStore: wallpaperStore,
         )
         threadRemover = ThreadRemoverImpl(
             chatColorSettingStore: chatColorSettingStore,
             databaseStorage: ThreadRemover_MockDatabaseStorage(),
+            deletedCallRecordStore: DeletedCallRecordStoreImpl(),
             disappearingMessagesConfigurationStore: disappearingMessagesConfigurationStore,
+            groupMemberUpdater: MockGroupMemberUpdater(),
             lastVisibleInteractionStore: LastVisibleInteractionStore(),
-            threadAssociatedDataStore: threadAssociatedDataStore,
             threadReadCache: ThreadRemover_MockThreadReadCache(),
             threadReplyInfoStore: threadReplyInfoStore,
-            threadSoftDeleteManager: MockThreadSoftDeleteManager(),
             threadStore: threadStore,
-            wallpaperStore: wallpaperStore
+            wallpaperStore: wallpaperStore,
+            observers: [],
         )
         threadMerger = ThreadMerger(
             callRecordStore: callRecordStore,
@@ -74,15 +69,12 @@ final class ThreadMergerTest: XCTestCase {
             disappearingMessagesConfigurationManager: disappearingMessagesConfigurationManager,
             disappearingMessagesConfigurationStore: disappearingMessagesConfigurationStore,
             interactionStore: interactionStore,
-            pinnedThreadManager: pinnedThreadManager,
             sdsThreadMerger: ThreadMerger_MockSDSThreadMerger(),
-            threadAssociatedDataManager: threadAssociatedDataManager,
-            threadAssociatedDataStore: threadAssociatedDataStore,
             threadRemover: threadRemover,
             threadReplyInfoStore: threadReplyInfoStore,
             threadStore: threadStore,
             wallpaperImageStore: MockWallpaperImageStore(),
-            wallpaperStore: wallpaperStore
+            wallpaperStore: wallpaperStore,
         )
 
         serviceIdThread = makeThread(aci: aci, phoneNumber: nil)
@@ -102,56 +94,22 @@ final class ThreadMergerTest: XCTestCase {
         XCTAssertEqual(deletedCallRecordStore.askedToMergeThread!.into, serviceIdThread.sqliteRowId!)
     }
 
-    // MARK: - Pinned Threads
-
-    func testPinnedThreadsNeither() {
-        let otherPinnedThreadId = "00000000-0000-4000-8000-000000000ABC"
-        threadStore.insertThreads([serviceIdThread, phoneNumberThread])
-        pinnedThreadManager.pinnedThreadIds = [otherPinnedThreadId]
-        performDefaultMerge()
-        XCTAssertEqual(pinnedThreadManager.pinnedThreadIds, [otherPinnedThreadId])
-    }
-
-    func testPinnedThreadsJustServiceId() {
-        let otherPinnedThreadId = "00000000-0000-4000-8000-000000000ABC"
-        threadStore.insertThreads([serviceIdThread, phoneNumberThread])
-        pinnedThreadManager.pinnedThreadIds = [otherPinnedThreadId, serviceIdThread.uniqueId]
-        performDefaultMerge()
-        XCTAssertEqual(pinnedThreadManager.pinnedThreadIds, [otherPinnedThreadId, serviceIdThread.uniqueId])
-    }
-
-    func testPinnedThreadsJustPhoneNumber() {
-        let otherPinnedThreadId = "00000000-0000-4000-8000-000000000ABC"
-        threadStore.insertThreads([serviceIdThread, phoneNumberThread])
-        pinnedThreadManager.pinnedThreadIds = [phoneNumberThread.uniqueId, otherPinnedThreadId]
-        performDefaultMerge()
-        XCTAssertEqual(pinnedThreadManager.pinnedThreadIds, [serviceIdThread.uniqueId, otherPinnedThreadId])
-    }
-
-    func testPinnedThreadsBoth() {
-        let otherPinnedThreadId = "00000000-0000-4000-8000-000000000ABC"
-        threadStore.insertThreads([serviceIdThread, phoneNumberThread])
-        pinnedThreadManager.pinnedThreadIds = [phoneNumberThread.uniqueId, serviceIdThread.uniqueId, otherPinnedThreadId]
-        performDefaultMerge()
-        XCTAssertEqual(pinnedThreadManager.pinnedThreadIds, [serviceIdThread.uniqueId, otherPinnedThreadId])
-    }
-
     // MARK: - Disappearing Messages
 
     private func setDisappearingMessageIntervals(serviceIdValue: UInt32?, phoneNumberValue: UInt32?) {
         disappearingMessagesConfigurationStore.values = [
-            serviceIdThread.uniqueId: OWSDisappearingMessagesConfiguration(
-                threadId: serviceIdThread.uniqueId,
-                enabled: serviceIdValue != nil,
+            serviceIdThread.uniqueId: DisappearingMessagesConfigurationRecord(
+                threadUniqueId: serviceIdThread.uniqueId,
+                isEnabled: serviceIdValue != nil,
                 durationSeconds: serviceIdValue ?? 0,
-                timerVersion: 1
+                timerVersion: 1,
             ),
-            phoneNumberThread.uniqueId: OWSDisappearingMessagesConfiguration(
-                threadId: phoneNumberThread.uniqueId,
-                enabled: phoneNumberValue != nil,
+            phoneNumberThread.uniqueId: DisappearingMessagesConfigurationRecord(
+                threadUniqueId: phoneNumberThread.uniqueId,
+                isEnabled: phoneNumberValue != nil,
                 durationSeconds: phoneNumberValue ?? 0,
-                timerVersion: 1
-            )
+                timerVersion: 1,
+            ),
         ]
     }
 
@@ -197,19 +155,16 @@ final class ThreadMergerTest: XCTestCase {
     // MARK: - Thread Associated Data
 
     private func setThreadAssociatedData(for thread: TSContactThread, isArchived: Bool, isMarkedUnread: Bool, mutedUntilTimestamp: UInt64, audioPlaybackRate: Float) {
-        threadAssociatedDataStore.values[thread.uniqueId] = ThreadAssociatedData(
-            threadUniqueId: thread.uniqueId,
-            isArchived: isArchived,
-            isMarkedUnread: isMarkedUnread,
-            mutedUntilTimestamp: mutedUntilTimestamp,
-            audioPlaybackRate: audioPlaybackRate
-        )
+        thread.isArchived = isArchived
+        thread.isMarkedUnread = isMarkedUnread
+        thread.mutedUntilTimestamp = mutedUntilTimestamp
+        thread.audioPlaybackRate = audioPlaybackRate
     }
 
     private func getThreadAssociatedDatas() -> [String: String] {
-        threadAssociatedDataStore.values.mapValues {
-            "\($0.isArchived)-\($0.isMarkedUnread)-\($0.mutedUntilTimestamp)-\($0.audioPlaybackRate)"
-        }
+        return Dictionary(uniqueKeysWithValues: threadStore.threads.map {
+            ($0.uniqueId, "\($0.isArchived)-\($0.isMarkedUnread)-\($0.mutedUntilTimestamp)-\($0.audioPlaybackRate)")
+        })
     }
 
     func testThreadAssociatedDataNeither() {
@@ -322,7 +277,7 @@ final class ThreadMergerTest: XCTestCase {
                     oldRecipient: nil,
                     newRecipient: try! SignalRecipient.insertRecord(aci: aci, phoneNumber: phoneNumber, tx: tx),
                 ),
-                tx: tx
+                tx: tx,
             )
         }
     }
@@ -331,9 +286,8 @@ final class ThreadMergerTest: XCTestCase {
         let result = TSContactThread(contactAddress: SignalServiceAddress(
             serviceId: aci,
             phoneNumber: phoneNumber?.stringValue,
-            cache: _signalServiceAddressCache
+            cache: _signalServiceAddressCache,
         ))
-        threadAssociatedDataStore.values[result.uniqueId] = ThreadAssociatedData(threadUniqueId: result.uniqueId)
         return result
     }
 }

@@ -6,7 +6,7 @@
 /// Represents an error encountered while making a receipt credential request.
 public struct DonationReceiptCredentialRequestError: Codable, Equatable {
     public let errorCode: ReceiptCredentialRequestError.ErrorCode
-    public let badge: ProfileBadge
+    public let badgeID: String
     public let amount: FiatMoney
     public let paymentMethod: DonationPaymentMethod?
     public let creationDate: Date
@@ -18,19 +18,19 @@ public struct DonationReceiptCredentialRequestError: Codable, Equatable {
     public init(
         errorCode: ReceiptCredentialRequestError.ErrorCode,
         chargeFailureCodeIfPaymentFailed: String?,
-        badge: ProfileBadge,
+        badgeID: String,
         amount: FiatMoney,
         paymentMethod: DonationPaymentMethod?,
         now: Date,
     ) {
         owsPrecondition(
             chargeFailureCodeIfPaymentFailed == nil || errorCode == .paymentFailed,
-            "Charge failure must only be populated if the error code is payment failed!"
+            "Charge failure must only be populated if the error code is payment failed!",
         )
 
         self.errorCode = errorCode
         self.chargeFailureCodeIfPaymentFailed = chargeFailureCodeIfPaymentFailed
-        self.badge = badge
+        self.badgeID = badgeID
         self.amount = amount
         self.paymentMethod = paymentMethod
         self.creationDate = now
@@ -41,7 +41,9 @@ public struct DonationReceiptCredentialRequestError: Codable, Equatable {
     private enum CodingKeys: String, CodingKey {
         case errorCode
         case chargeFailureCodeIfPaymentFailed
+        // Deserialize-only; see usage.
         case badge
+        case badgeID
         case amount
         case paymentMethod
         case timestampMs
@@ -51,14 +53,16 @@ public struct DonationReceiptCredentialRequestError: Codable, Equatable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let rawErrorCode = try container.decode(Int.self, forKey: .errorCode)
-        if let errorCode = ReceiptCredentialRequestError.ErrorCode(
-            rawValue: rawErrorCode,
-        ) {
+        if
+            let errorCode = ReceiptCredentialRequestError.ErrorCode(
+                rawValue: rawErrorCode,
+            )
+        {
             self.errorCode = errorCode
         } else {
             throw DecodingError.dataCorrupted(DecodingError.Context(
                 codingPath: [CodingKeys.errorCode],
-                debugDescription: "Unexpected error code value: \(rawErrorCode)"
+                debugDescription: "Unexpected error code value: \(rawErrorCode)",
             ))
         }
 
@@ -66,7 +70,7 @@ public struct DonationReceiptCredentialRequestError: Codable, Equatable {
             guard let paymentMethod = DonationPaymentMethod(rawValue: paymentMethodString) else {
                 throw DecodingError.dataCorrupted(DecodingError.Context(
                     codingPath: [CodingKeys.paymentMethod],
-                    debugDescription: "Unexpected payment method value: \(paymentMethodString)"
+                    debugDescription: "Unexpected payment method value: \(paymentMethodString)",
                 ))
             }
 
@@ -78,7 +82,19 @@ public struct DonationReceiptCredentialRequestError: Codable, Equatable {
         let timestampMs = try container.decode(UInt64.self, forKey: .timestampMs)
         creationDate = Date(millisecondsSince1970: timestampMs)
 
-        badge = try container.decode(ProfileBadge.self, forKey: .badge)
+        if container.contains(.badgeID) {
+            badgeID = try container.decode(String.self, forKey: .badgeID)
+        } else {
+            // In the past, we persisted this with a full ProfileBadge property.
+            // We've since migrated to only storing the badge ID, but we may
+            // need to decode legacy ProfileBadge objects to get their ID.
+            struct LegacyProfileBadge: Decodable {
+                let id: String
+            }
+            let legacyProfileBadge = try container.decode(LegacyProfileBadge.self, forKey: .badge)
+            badgeID = legacyProfileBadge.id
+        }
+
         amount = try container.decode(FiatMoney.self, forKey: .amount)
         chargeFailureCodeIfPaymentFailed = try container.decodeIfPresent(String.self, forKey: .chargeFailureCodeIfPaymentFailed)
     }
@@ -87,7 +103,7 @@ public struct DonationReceiptCredentialRequestError: Codable, Equatable {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         try container.encodeIfPresent(chargeFailureCodeIfPaymentFailed, forKey: .chargeFailureCodeIfPaymentFailed)
-        try container.encode(badge, forKey: .badge)
+        try container.encode(badgeID, forKey: .badgeID)
         try container.encode(amount, forKey: .amount)
         try container.encode(creationDate.ows_millisecondsSince1970, forKey: .timestampMs)
         try container.encode(errorCode.rawValue, forKey: .errorCode)

@@ -15,7 +15,7 @@ public class MentionFinder {
         aci: Aci,
         in threadUniqueId: String? = nil,
         includeReadMessages: Bool = true,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> [TSMessage] {
         var filters = [String]()
         var arguments = [aci.serviceIdUppercaseString]
@@ -57,16 +57,16 @@ public class MentionFinder {
         owsPrecondition(!filters.isEmpty)
 
         let sql = """
-            SELECT interaction.*
-            FROM \(InteractionRecord.databaseTableName) as interaction
-            \(isIndexedByUnreadIndex ? DEBUG_INDEXED_BY("index_model_TSInteraction_UnreadMessages") : "")
-            INNER JOIN \(TSMention.databaseTableName) as mention
-                \(!isIndexedByUnreadIndex ? DEBUG_INDEXED_BY("index_model_TSMention_on_uuidString_and_uniqueThreadId") : "")
-                ON mention.\(TSMention.columnName(.uniqueMessageId)) = interaction.\(interactionColumn: .uniqueId)
-                AND mention.\(TSMention.columnName(.aciString)) = ?
-            WHERE \(filters.joined(separator: " AND "))
-            ORDER BY \(interactionColumn: .id)
-            """
+        SELECT interaction.*
+        FROM \(InteractionRecord.databaseTableName) as interaction
+        \(isIndexedByUnreadIndex ? DEBUG_INDEXED_BY("index_model_TSInteraction_UnreadMessages") : "")
+        INNER JOIN \(TSMention.databaseTableName) as mention
+            \(!isIndexedByUnreadIndex ? DEBUG_INDEXED_BY("index_model_TSMention_on_uuidString_and_uniqueThreadId") : "")
+            ON mention.\(TSMention.columnName(.uniqueMessageId)) = interaction.\(interactionColumn: .uniqueId)
+            AND mention.\(TSMention.columnName(.aciString)) = ?
+        WHERE \(filters.joined(separator: " AND "))
+        ORDER BY \(interactionColumn: .id)
+        """
 
         let cursor = TSMessage.grdbFetchCursor(sql: sql, arguments: StatementArguments(arguments), transaction: tx)
 
@@ -83,12 +83,14 @@ public class MentionFinder {
         return messages
     }
 
-    public class func deleteAllMentions(for message: TSMessage, transaction: DBWriteTransaction) {
+    public class func deleteAllMentions(for message: TSMessage, transaction tx: DBWriteTransaction) {
         let sql = """
             DELETE FROM \(TSMention.databaseTableName)
             WHERE \(TSMention.columnName(.uniqueMessageId)) = ?
         """
-        transaction.database.executeHandlingErrors(sql: sql, arguments: [message.uniqueId])
+        failIfThrows {
+            try tx.database.execute(sql: sql, arguments: [message.uniqueId])
+        }
     }
 
     public class func mentionedAcis(for message: TSMessage, tx: DBReadTransaction) -> [Aci] {
@@ -113,7 +115,7 @@ public class MentionFinder {
         uniqueId: String,
         thresholdDate: Date,
         shouldPerformRemove: Bool,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) -> Bool {
         guard let mention = TSMention.anyFetch(uniqueId: uniqueId, transaction: transaction) else {
             // This could just be a race condition, but it should be very unlikely.
@@ -122,7 +124,7 @@ public class MentionFinder {
         }
 
         guard mention.creationDate <= thresholdDate else {
-            Logger.info("Skipping orphan mention due to age: \(mention.creationDate.timeIntervalSinceNow)")
+            Logger.info("Skipping orphan mention due to age: \(-mention.creationDate.timeIntervalSinceNow)")
             return false
         }
 

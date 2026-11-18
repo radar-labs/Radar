@@ -4,8 +4,154 @@
 //
 
 import Foundation
+public import GRDB
 
-extension TSPrivateStoryThread {
+/// Represents a story distribution list.
+public final class TSPrivateStoryThread: TSThread {
+    override public class var recordType: TSThreadType { .privateStoryThread }
+
+    public private(set) var allowsReplies: Bool
+    public private(set) var _name: String
+
+    public enum CodingKeys: String, CodingKey, ColumnExpression {
+        case allowsReplies
+        case name
+        case addresses
+    }
+
+    required init(inheritableDecoder decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.allowsReplies = try container.decode(Bool.self, forKey: .allowsReplies)
+        self._name = try container.decode(String.self, forKey: .name)
+        try super.init(inheritableDecoder: decoder)
+    }
+
+    override public func encode(to encoder: any Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.allowsReplies, forKey: .allowsReplies)
+        try container.encode(self._name, forKey: .name)
+        try container.encode(nil as Data?, forKey: .addresses)
+    }
+
+    init(
+        id: Int64?,
+        uniqueId: String,
+        creationDate: Date?,
+        editTargetTimestamp: UInt64?,
+        isArchived: Bool,
+        isMarkedUnread: Bool,
+        lastDraftInteractionRowId: UInt64,
+        lastDraftUpdateTimestamp: UInt64,
+        lastInteractionRowId: UInt64,
+        lastSentStoryTimestamp: UInt64?,
+        shouldNotifyForMentionsWhenMutedLegacy: Bool,
+        shouldNotifyForMentionsWhenMuted: Bool?,
+        shouldNotifyForRepliesWhenMuted: Bool?,
+        shouldNotifyForCallsWhenMuted: Bool?,
+        shouldNotifyForUnreadRemindersWhenMuted: Bool?,
+        messageDraft: String?,
+        messageDraftBodyRanges: MessageBodyRanges?,
+        mutedUntilTimestamp: UInt64,
+        shouldThreadBeVisible: Bool,
+        storyViewMode: TSThreadStoryViewMode,
+        audioPlaybackRate: Float,
+        allowsReplies: Bool,
+        name: String,
+    ) {
+        self.allowsReplies = allowsReplies
+        self._name = name
+        super.init(
+            id: id,
+            uniqueId: uniqueId,
+            creationDate: creationDate,
+            editTargetTimestamp: editTargetTimestamp,
+            isArchived: isArchived,
+            isMarkedUnread: isMarkedUnread,
+            lastDraftInteractionRowId: lastDraftInteractionRowId,
+            lastDraftUpdateTimestamp: lastDraftUpdateTimestamp,
+            lastInteractionRowId: lastInteractionRowId,
+            lastSentStoryTimestamp: lastSentStoryTimestamp,
+            shouldNotifyForMentionsWhenMutedLegacy: shouldNotifyForMentionsWhenMutedLegacy,
+            shouldNotifyForMentionsWhenMuted: shouldNotifyForMentionsWhenMuted,
+            shouldNotifyForRepliesWhenMuted: shouldNotifyForRepliesWhenMuted,
+            shouldNotifyForCallsWhenMuted: shouldNotifyForCallsWhenMuted,
+            shouldNotifyForUnreadRemindersWhenMuted: shouldNotifyForUnreadRemindersWhenMuted,
+            messageDraft: messageDraft,
+            messageDraftBodyRanges: messageDraftBodyRanges,
+            mutedUntilTimestamp: mutedUntilTimestamp,
+            shouldThreadBeVisible: shouldThreadBeVisible,
+            storyViewMode: storyViewMode,
+            audioPlaybackRate: audioPlaybackRate,
+        )
+    }
+
+    public init(uniqueId: String = UUID().uuidString, name: String, allowsReplies: Bool, viewMode: TSThreadStoryViewMode) {
+        self._name = name
+        self.allowsReplies = allowsReplies
+        super.init(uniqueId: uniqueId)
+        self.storyViewMode = viewMode
+    }
+
+    override func deepCopy() -> TSThread {
+        return TSPrivateStoryThread(
+            id: self.id,
+            uniqueId: self.uniqueId,
+            creationDate: self.creationDate,
+            editTargetTimestamp: self.editTargetTimestamp,
+            isArchived: self.isArchived,
+            isMarkedUnread: self.isMarkedUnread,
+            lastDraftInteractionRowId: self.lastDraftInteractionRowId,
+            lastDraftUpdateTimestamp: self.lastDraftUpdateTimestamp,
+            lastInteractionRowId: self.lastInteractionRowId,
+            lastSentStoryTimestamp: self.lastSentStoryTimestamp,
+            shouldNotifyForMentionsWhenMutedLegacy: self.shouldNotifyForMentionsWhenMutedLegacy,
+            shouldNotifyForMentionsWhenMuted: self.shouldNotifyForMentionsWhenMuted,
+            shouldNotifyForRepliesWhenMuted: self.shouldNotifyForRepliesWhenMuted,
+            shouldNotifyForCallsWhenMuted: self.shouldNotifyForCallsWhenMuted,
+            shouldNotifyForUnreadRemindersWhenMuted: self.shouldNotifyForUnreadRemindersWhenMuted,
+            messageDraft: self.messageDraft,
+            messageDraftBodyRanges: self.messageDraftBodyRanges,
+            mutedUntilTimestamp: self.mutedUntilTimestamp,
+            shouldThreadBeVisible: self.shouldThreadBeVisible,
+            storyViewMode: self.storyViewMode,
+            audioPlaybackRate: self.audioPlaybackRate,
+            allowsReplies: self.allowsReplies,
+            name: self.name,
+        )
+    }
+
+    override public var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(super.hash)
+        hasher.combine(self.allowsReplies)
+        hasher.combine(self.name)
+        return hasher.finalize()
+    }
+
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard super.isEqual(object) else { return false }
+        guard self.allowsReplies == object.allowsReplies else { return false }
+        guard self.name == object.name else { return false }
+        return true
+    }
+
+    public class func fetchPrivateStoryThreadViaCache(uniqueId: String, transaction: DBReadTransaction) -> TSPrivateStoryThread? {
+        return fetchViaCache(uniqueId: uniqueId, transaction: transaction)
+    }
+
+    public var isMyStory: Bool {
+        return self.uniqueId == Self.myStoryUniqueId
+    }
+
+    public var name: String {
+        if self.isMyStory {
+            return OWSLocalizedString("MY_STORY_NAME", comment: "Name for the 'My Story' default story that sends to all the user's contacts.")
+        }
+        return _name
+    }
+
     public typealias RowId = Int64
 
     @objc
@@ -14,8 +160,8 @@ extension TSPrivateStoryThread {
         "00000000-0000-0000-0000-000000000000"
     }
 
-    public class func getMyStory(transaction: DBReadTransaction) -> TSPrivateStoryThread! {
-        anyFetchPrivateStoryThread(uniqueId: myStoryUniqueId, transaction: transaction)
+    public class func getMyStory(transaction: DBReadTransaction) -> TSPrivateStoryThread? {
+        fetchPrivateStoryThreadViaCache(uniqueId: myStoryUniqueId, transaction: transaction)
     }
 
     @discardableResult
@@ -32,24 +178,20 @@ extension TSPrivateStoryThread {
     @objc
     public var distributionListIdentifier: Data? { UUID(uuidString: uniqueId)?.data }
 
-    public override func recipientAddresses(with tx: DBReadTransaction) -> [SignalServiceAddress] {
+    override public func recipientAddresses(with tx: DBReadTransaction) -> [SignalServiceAddress] {
         let storyRecipientManager = DependenciesBridge.shared.storyRecipientManager
-        do {
-            switch storyViewMode {
-            case .default:
-                throw OWSAssertionError("Unexpectedly have private story with no view mode")
-            case .explicit, .disabled:
-                return try storyRecipientManager.fetchRecipients(forStoryThread: self, tx: tx).map { $0.address }
-            case .blockList:
-                let blockedAddresses = try storyRecipientManager.fetchRecipients(forStoryThread: self, tx: tx).map { $0.address }
-                let profileManager = SSKEnvironment.shared.profileManagerRef
-                return profileManager.allWhitelistedRegisteredAddresses(tx: tx).filter {
-                    return !blockedAddresses.contains($0) && !$0.isLocalAddress
-                }
-            }
-        } catch {
-            Logger.warn("Couldn't fetch addresses; returning []: \(error)")
+        switch storyViewMode {
+        case .default:
+            owsFailDebug("can't have private story with no view mode")
             return []
+        case .explicit, .disabled:
+            return storyRecipientManager.fetchRecipients(forStoryThread: self, tx: tx).map { $0.address }
+        case .blockList:
+            let blockedAddresses = storyRecipientManager.fetchRecipients(forStoryThread: self, tx: tx).map { $0.address }
+            let profileManager = SSKEnvironment.shared.profileManagerRef
+            return profileManager.allWhitelistedRegisteredAddresses(tx: tx).filter {
+                return !blockedAddresses.contains($0) && !$0.isLocalAddress
+            }
         }
     }
 
@@ -58,15 +200,15 @@ extension TSPrivateStoryThread {
     public func updateWithAllowsReplies(
         _ allowsReplies: Bool,
         updateStorageService: Bool,
-        transaction tx: DBWriteTransaction
+        transaction tx: DBWriteTransaction,
     ) {
-        anyUpdatePrivateStoryThread(transaction: tx) { privateStoryThread in
+        anyUpdate(transaction: tx) { privateStoryThread in
             privateStoryThread.allowsReplies = allowsReplies
         }
 
         if updateStorageService, let distributionListIdentifier {
             SSKEnvironment.shared.storageServiceManagerRef.recordPendingUpdates(
-                updatedStoryDistributionListIds: [distributionListIdentifier]
+                updatedStoryDistributionListIds: [distributionListIdentifier],
             )
         }
     }
@@ -74,15 +216,15 @@ extension TSPrivateStoryThread {
     public func updateWithName(
         _ name: String,
         updateStorageService: Bool,
-        transaction tx: DBWriteTransaction
+        transaction tx: DBWriteTransaction,
     ) {
-        anyUpdatePrivateStoryThread(transaction: tx) { privateStoryThread in
-            privateStoryThread.name = name
+        anyUpdate(transaction: tx) { privateStoryThread in
+            privateStoryThread._name = name
         }
 
         if updateStorageService, let distributionListIdentifier {
             SSKEnvironment.shared.storageServiceManagerRef.recordPendingUpdates(
-                updatedStoryDistributionListIds: [distributionListIdentifier]
+                updatedStoryDistributionListIds: [distributionListIdentifier],
             )
         }
     }
@@ -103,17 +245,17 @@ extension TSPrivateStoryThread {
         storyRecipientIds storyRecipientIdsChange: OptionalChange<[SignalRecipient.RowId]>,
         updateStorageService: Bool,
         updateHasSetMyStoryPrivacyIfNeeded: Bool = true,
-        transaction tx: DBWriteTransaction
+        transaction tx: DBWriteTransaction,
     ) {
         if updateHasSetMyStoryPrivacyIfNeeded, isMyStory {
             StoryManager.setHasSetMyStoriesPrivacy(
                 true,
                 shouldUpdateStorageService: updateStorageService,
-                transaction: tx
+                transaction: tx,
             )
         }
 
-        anyUpdatePrivateStoryThread(transaction: tx) { privateStoryThread in
+        anyUpdate(transaction: tx) { privateStoryThread in
             privateStoryThread.storyViewMode = storyViewMode
         }
 
@@ -122,14 +264,12 @@ extension TSPrivateStoryThread {
             break
         case .setTo(let storyRecipientIds):
             let storyRecipientManager = DependenciesBridge.shared.storyRecipientManager
-            failIfThrows {
-                try storyRecipientManager.setRecipientIds(
-                    storyRecipientIds,
-                    for: self,
-                    shouldUpdateStorageService: false, // handled below
-                    tx: tx
-                )
-            }
+            storyRecipientManager.setRecipientIds(
+                storyRecipientIds,
+                for: self,
+                shouldUpdateStorageService: false, // handled below
+                tx: tx,
+            )
         }
 
         if updateStorageService, let distributionListIdentifier {

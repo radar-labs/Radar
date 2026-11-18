@@ -9,21 +9,13 @@ public extension Notification.Name {
     static let themeDidChange = Notification.Name("ThemeDidChangeNotification")
 }
 
-@objc
-public extension NSNotification {
-    static var ThemeDidChange: NSString { Notification.Name.themeDidChange.rawValue as NSString }
-}
+public final class Theme {
 
-final public class Theme: NSObject {
+    private static var shared = Theme(themeDataStore: ThemeDataStore())
 
-    public enum Mode: UInt {
-        case system, light, dark
-    }
-
-    private static var shared = Theme()
-
-    private override init() {
-        super.init()
+    private let themeDataStore: ThemeDataStore
+    private init(themeDataStore: ThemeDataStore) {
+        self.themeDataStore = themeDataStore
     }
 
     public static func performInitialSetup(appReadiness: AppReadiness) {
@@ -43,21 +35,22 @@ final public class Theme: NSObject {
         }
     }
 
-    private static var keyValueStore: KeyValueStore {
-        return KeyValueStore(collection: "ThemeCollection")
+    public class func setupAppearance() {
+        // Tint color for template images and accessory checkmarks in table view cells.
+        UITableViewCell.appearance().tintColor = .Signal.label
+
+        if #unavailable(iOS 26) {
+            setupLegacyAppearance()
+        }
     }
 
-    private struct KVSKeys {
-        static var currentMode = "ThemeKeyCurrentMode"
-        static var legacyThemeEnabled = "ThemeKeyThemeEnabled"
-    }
+    @available(iOS, deprecated: 26)
+    public class func setupLegacyAppearance() {
+        guard #unavailable(iOS 26) else { return }
 
-    public class func setupSignalAppearance() {
         let primaryIconColor = UIColor(
-            light: .ows_gray75,
-            lightHighContrast: .ows_gray75,
-            dark: .ows_gray15,
-            darkHighContrast: .ows_gray15
+            light: lightThemeLegacyPrimaryIconColor,
+            dark: darkThemeLegacyPrimaryIconColor,
         )
         UINavigationBar.appearance().barTintColor = UIColor.Signal.background
         UINavigationBar.appearance().tintColor = primaryIconColor
@@ -77,18 +70,16 @@ final public class Theme: NSObject {
         // so we don't do it.
 
         UITableViewCell.appearance().tintColor = primaryIconColor
-        UIToolbar.appearance().tintColor = .ows_accentBlue
+        UIToolbar.appearance().tintColor = .Signal.accent
 
         // If we set NSShadowAttributeName, the NSForegroundColorAttributeName value is ignored.
         UINavigationBar.appearance().titleTextAttributes = [
-            .foregroundColor: UIColor.Signal.label
+            .foregroundColor: UIColor.Signal.label,
         ]
 
         let cursorColor = UIColor(
             light: .Signal.accent,
-            lightHighContrast: .Signal.accent,
             dark: .white,
-            darkHighContrast: .white,
         )
         UITextView.appearance(whenContainedInInstancesOf: [OWSNavigationController.self]).tintColor = cursorColor
         UITextField.appearance(whenContainedInInstancesOf: [OWSNavigationController.self]).tintColor = cursorColor
@@ -98,19 +89,22 @@ final public class Theme: NSObject {
 
     public static var isDarkThemeEnabled: Bool { shared.isDarkThemeEnabled }
 
-    public class func getOrFetchCurrentMode() -> Mode {
+    @available(iOS, deprecated: 26)
+    public static var forceDarkThemeForMedia: Bool { if #available(iOS 26, *) { false } else { true } }
+
+    public class func getOrFetchCurrentMode() -> ThemeDataStore.Appearance {
         return shared.getOrFetchCurrentMode()
     }
 
-    public class func setCurrentMode(_ mode: Mode) {
+    public class func setCurrentMode(_ mode: ThemeDataStore.Appearance) {
         shared.setCurrentMode(mode)
     }
 
-    public class func performWithModeAsCurrent(_ mode: Mode, _ operation: () -> Void) {
+    public class func performWithModeAsCurrent(_ mode: ThemeDataStore.Appearance, _ operation: () -> Void) {
         shared.performWithModeAsCurrent(mode, operation)
     }
 
-    private func performWithModeAsCurrent(_ mode: Mode, _ operation: () -> Void) {
+    private func performWithModeAsCurrent(_ mode: ThemeDataStore.Appearance, _ operation: () -> Void) {
         let previousMode = cachedCurrentMode
         defer { cachedCurrentMode = previousMode }
         cachedCurrentMode = mode
@@ -118,14 +112,18 @@ final public class Theme: NSObject {
     }
 
     private var cachedIsDarkThemeEnabled: Bool?
-    private var cachedCurrentMode: Mode?
+    private var cachedCurrentMode: ThemeDataStore.Appearance?
 
-    public static var shareExtensionThemeOverride: UIUserInterfaceStyle = .unspecified {
+    public static var shareExtensionInterfaceStyleOverride: UIUserInterfaceStyle = .unspecified {
         didSet {
-            guard !CurrentAppContext().isMainApp else {
-                return owsFailDebug("Should only be set in share extension")
+            owsPrecondition(
+                CurrentAppContext().isShareExtension,
+                "Must only be set in the share extension!",
+            )
+
+            if oldValue != shareExtensionInterfaceStyleOverride {
+                shared.themeDidChange()
             }
-            shared.themeDidChange()
         }
     }
 
@@ -143,7 +141,7 @@ final public class Theme: NSObject {
 
         // Always respect the system theme in extensions.
         guard CurrentAppContext().isMainApp else {
-            return switch Self.shareExtensionThemeOverride {
+            return switch Self.shareExtensionInterfaceStyleOverride {
             case .dark:
                 true
             case .light:
@@ -175,7 +173,7 @@ final public class Theme: NSObject {
         return UITraitCollection.current.userInterfaceStyle == .dark
     }
 
-    private func getOrFetchCurrentMode() -> Mode {
+    private func getOrFetchCurrentMode() -> ThemeDataStore.Appearance {
         if let cachedCurrentMode {
             return cachedCurrentMode
         }
@@ -184,31 +182,9 @@ final public class Theme: NSObject {
             return defaultMode
         }
 
-        var currentMode: Mode = .system
-        SSKEnvironment.shared.databaseStorageRef.read { transaction in
-            let hasDefinedMode = Theme.keyValueStore.hasValue(KVSKeys.currentMode, transaction: transaction)
-            if hasDefinedMode {
-                let rawMode = Theme.keyValueStore.getUInt(
-                    KVSKeys.currentMode,
-                    defaultValue: Theme.Mode.system.rawValue,
-                    transaction: transaction
-                )
-                if let definedMode = Mode(rawValue: rawMode) {
-                    currentMode = definedMode
-                }
-            } else {
-                // If the theme has not yet been defined, check if the user ever manually changed
-                // themes in a legacy app version. If so, preserve their selection. Otherwise,
-                // default to matching the system theme.
-                if Theme.keyValueStore.hasValue(KVSKeys.legacyThemeEnabled, transaction: transaction) {
-                    let isLegacyModeDark = Theme.keyValueStore.getBool(
-                        KVSKeys.legacyThemeEnabled,
-                        defaultValue: false,
-                        transaction: transaction
-                    )
-                    currentMode = isLegacyModeDark ? .dark : .light
-                }
-            }
+        var currentMode: ThemeDataStore.Appearance = .system
+        SSKEnvironment.shared.databaseStorageRef.read { tx in
+            currentMode = self.themeDataStore.getCurrentMode(tx: tx)
         }
 
         cachedCurrentMode = currentMode
@@ -216,7 +192,7 @@ final public class Theme: NSObject {
         return currentMode
     }
 
-    private func setCurrentMode(_ mode: Mode) {
+    public func setCurrentMode(_ mode: ThemeDataStore.Appearance) {
         AssertIsOnMainThread()
 
         let previousMode = cachedCurrentMode
@@ -233,8 +209,8 @@ final public class Theme: NSObject {
         cachedCurrentMode = mode
 
         // It's safe to do an async write because all accesses check self.cachedCurrentThemeNumber first.
-        SSKEnvironment.shared.databaseStorageRef.asyncWrite { transaction in
-            Theme.keyValueStore.setUInt(mode.rawValue, key: KVSKeys.currentMode, transaction: transaction)
+        SSKEnvironment.shared.databaseStorageRef.asyncWrite { tx in
+            self.themeDataStore.setCurrentMode(mode, tx: tx)
         }
 
         if previousMode != mode {
@@ -242,7 +218,7 @@ final public class Theme: NSObject {
         }
     }
 
-    private var defaultMode: Mode {
+    private var defaultMode: ThemeDataStore.Appearance {
         return .system
     }
 
@@ -274,7 +250,6 @@ final public class Theme: NSObject {
     }
 
     private func themeDidChange() {
-        Theme.setupSignalAppearance()
         NotificationCenter.default.post(name: .themeDidChange, object: self)
     }
 
@@ -306,29 +281,14 @@ final public class Theme: NSObject {
         ])
     }
 
-    @objc
     public class var backgroundColor: UIColor {
         isDarkThemeEnabled
-        ? darkThemeBackgroundColor
-        : lightThemeBackgroundColor
-    }
-
-    public class var secondaryBackgroundColor: UIColor {
-        isDarkThemeEnabled
-        ? darkThemeSecondaryBackgroundColor
-        : UIColor.Signal.secondaryBackground.resolvedColor(with: lightTraitCollection)
-    }
-
-    public class var darkThemeSecondaryBackgroundColor: UIColor {
-        UIColor.Signal.secondaryBackground.resolvedColor(with: darkTraitCollection)
-    }
-
-    public static var actionSheetBackgroundColor: UIColor {
-        isDarkThemeEnabled ? .ows_gray75 : .ows_white
+            ? darkThemeBackgroundColor
+            : UIColor.Signal.background.resolvedColor(with: lightTraitCollection)
     }
 
     public class var washColor: UIColor {
-        isDarkThemeEnabled ? darkThemeWashColor : .ows_gray05
+        isDarkThemeEnabled ? .ows_gray75 : .ows_gray05
     }
 
     public class var primaryTextColor: UIColor {
@@ -339,107 +299,24 @@ final public class Theme: NSObject {
         if #available(iOS 26, *) {
             return primaryTextColor
         }
-        return legacyPrimaryIconColor
-    }
-
-    public class var legacyPrimaryIconColor: UIColor {
-        isDarkThemeEnabled ? darkThemeLegacyPrimaryIconColor : lightThemeLegacyPrimaryIconColor
+        return isDarkThemeEnabled ? darkThemeLegacyPrimaryIconColor : lightThemeLegacyPrimaryIconColor
     }
 
     public class var secondaryTextAndIconColor: UIColor {
         isDarkThemeEnabled ? darkThemeSecondaryTextAndIconColor : lightThemeSecondaryTextAndIconColor
     }
 
-    public class var ternaryTextColor: UIColor {
-        UIColor.Signal.tertiaryLabel.resolvedColor(with: currentThemeTraitCollection)
-    }
-
-    public class var hairlineColor: UIColor {
-        UIColor.Signal.opaqueSeparator.resolvedColor(with: currentThemeTraitCollection)
-    }
-
-    public class var outlineColor: UIColor {
-        hairlineColor
-    }
-
     public class var navbarBackgroundColor: UIColor {
         backgroundColor
     }
 
-    public class var navbarTitleColor: UIColor { primaryTextColor }
-
     public class var toolbarBackgroundColor: UIColor { navbarBackgroundColor }
 
-    // For accessibility:
-    //
-    // * Flat areas (e.g. button backgrounds) should use UIColor.ows_accentBlue.
-    // * Fine detail (e.g., text, non-filled icons) should use Theme.accentBlueColor.
-    //   It is brighter in dark mode, improving legibility.
-    public class var accentBlueColor: UIColor {
-        UIColor.Signal.accent.resolvedColor(with: currentThemeTraitCollection)
-    }
-
-    public class var conversationButtonBackgroundColor: UIColor {
-        isDarkThemeEnabled ? .ows_gray80 : .ows_gray02
-    }
-
-    public class var conversationButtonTextColor: UIColor {
-        isDarkThemeEnabled ? .ows_gray05 : .ows_accentBlue
-    }
-
-    @objc
     public class var launchScreenBackgroundColor: UIColor {
         backgroundColor
     }
 
-    // MARK: - Table View
-
-    public class var tableCell2BackgroundColor: UIColor {
-        isDarkThemeEnabled
-        ? darkThemeTableCell2BackgroundColor
-        : UIColor.Signal.secondaryGroupedBackground.resolvedColor(with: lightTraitCollection)
-    }
-
-    public class var tableCell2PresentedBackgroundColor: UIColor {
-        isDarkThemeEnabled
-        ? darkThemeTableCell2PresentedBackgroundColor
-        : UIColor.Signal.secondaryGroupedBackground.resolvedColor(with: elevatedLightTraitCollection)
-    }
-
-    public class var tableCell2SelectedBackgroundColor: UIColor {
-        UIColor(
-            light: UIColor(rgbHex: 0xD4D4D6),
-            lightHighContrast: UIColor(rgbHex: 0xC6C6CA),
-            dark: UIColor(rgbHex: 0x3A3A3D),
-            darkHighContrast: UIColor(rgbHex: 0x525257)
-        )
-    }
-
-    public class var tableView2BackgroundColor: UIColor {
-        isDarkThemeEnabled
-        ? darkThemeTableView2BackgroundColor
-        : UIColor.Signal.groupedBackground.resolvedColor(with: lightTraitCollection)
-    }
-
-    public class var tableView2PresentedBackgroundColor: UIColor {
-        isDarkThemeEnabled
-        ? darkThemeTableView2PresentedBackgroundColor
-        : UIColor.Signal.groupedBackground.resolvedColor(with: elevatedLightTraitCollection)
-    }
-
-    public class var tableView2SeparatorColor: UIColor {
-        isDarkThemeEnabled ? darkThemeTableView2SeparatorColor : .ows_gray20
-    }
-
-    public class var tableView2PresentedSeparatorColor: UIColor {
-        isDarkThemeEnabled ? darkThemeTableView2PresentedSeparatorColor : .ows_gray20
-    }
-
     // MARK: - Light Theme Colors
-
-    public class var lightThemeBackgroundColor: UIColor {
-        UIColor.Signal.background.resolvedColor(with: lightTraitCollection)
-    }
 
     public class var lightThemePrimaryColor: UIColor {
         UIColor.Signal.label.resolvedColor(with: lightTraitCollection)
@@ -465,35 +342,13 @@ final public class Theme: NSObject {
 
     public class var darkThemeSecondaryTextAndIconColor: UIColor {
         UIColor.Signal.secondaryLabel.resolvedColor(with: darkTraitCollection)
-     }
-
-    public class var darkThemeWashColor: UIColor { .ows_gray75 }
+    }
 
     public class var darkThemeNavbarBackgroundColor: UIColor {
         darkThemeBackgroundColor
     }
 
     public class var darkThemeNavbarIconColor: UIColor { .ows_gray15 }
-
-    public class var darkThemeTableCell2BackgroundColor: UIColor {
-        UIColor.Signal.secondaryGroupedBackground.resolvedColor(with: darkTraitCollection)
-    }
-
-    public class var darkThemeTableCell2PresentedBackgroundColor: UIColor {
-        UIColor.Signal.secondaryGroupedBackground.resolvedColor(with: elevatedDarkTraitCollection)
-    }
-
-    public class var darkThemeTableView2BackgroundColor: UIColor {
-        UIColor.Signal.groupedBackground.resolvedColor(with: darkTraitCollection)
-    }
-
-    public class var darkThemeTableView2PresentedBackgroundColor: UIColor {
-        UIColor.Signal.groupedBackground.resolvedColor(with: elevatedDarkTraitCollection)
-    }
-
-    public class var darkThemeTableView2SeparatorColor: UIColor { .ows_gray75 }
-
-    public class var darkThemeTableView2PresentedSeparatorColor: UIColor { .ows_gray65 }
 
     // MARK: - Blur Effect
 
@@ -506,25 +361,13 @@ final public class Theme: NSObject {
     // MARK: - Keyboard
 
     public class var keyboardAppearance: UIKeyboardAppearance {
-        isDarkThemeEnabled ? darkThemeKeyboardAppearance : .default
-    }
-
-    public class var darkThemeKeyboardAppearance: UIKeyboardAppearance { .dark }
-
-    public class var keyboardBackgroundColor: UIColor {
-        isDarkThemeEnabled ? .ows_gray90 : .ows_gray02
+        isDarkThemeEnabled ? .dark : .default
     }
 
     // MARK: - Search Bar
 
     public class var barStyle: UIBarStyle {
         isDarkThemeEnabled ? .black : .default
-    }
-
-    public class var searchFieldBackgroundColor: UIColor { washColor }
-
-    public class var searchFieldElevatedBackgroundColor: UIColor {
-        isDarkThemeEnabled ? .ows_gray75 : .ows_gray12
     }
 
 #if TESTABLE_BUILD

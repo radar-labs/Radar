@@ -5,44 +5,68 @@
 
 import Foundation
 
-public enum PinnedThreads {
-    public static let maxPinnedThreads = 4
+public struct TooManyPinnedThreadsError: Error {
 }
 
+public enum PinnedThreads {
+    public static var maxPinnedThreads: UInt {
+        RemoteConfig.current.pinnedThreadLimit
+    }
+}
+
+// MARK: -
+
 public protocol PinnedThreadManager {
+    /// A value used for sorting pinned threads.
+    ///
+    /// There may be "gaps" between values. (For example, calling this method
+    /// for every thread may return `[3, nil, 1, nil, 4]`, which would mean
+    /// there are five threads and three of them are pinned.)
+    ///
+    /// Returns nil if a thread isn't pinned.
+    func pinnedThreadOrder(forThread thread: TSThread, tx: DBReadTransaction) -> Int64?
 
-    func pinnedThreadIds(tx: DBReadTransaction) -> [String]
+    /// Fetches pinned threads.
+    ///
+    /// - Warning: If a pinned thread doesn't yet exist (e.g., a group that's
+    /// still being restored), it's omitted from the result.
+    ///
+    /// - Parameter filterToVisible: if true, omits threads that are "pinned"
+    /// but also archived or otherwise not visible.
+    func pinnedThreads(filterToVisible: Bool, tx: DBReadTransaction) -> [TSThread]
 
-    func pinnedThreads(tx: DBReadTransaction) -> [TSThread]
-
-    func isThreadPinned(_ thread: TSThread, tx: DBReadTransaction) -> Bool
-
-    func updatePinnedThreadIds(
-        _ pinnedThreadIds: [String],
+    func setPinnedThreads(
+        _ threads: [TSThread],
         updateStorageService: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
+    )
+
+    func setPinnedThreadIds(
+        _ threadIds: [PinnedThreadId],
+        updateStorageService: Bool,
+        tx: DBWriteTransaction,
     )
 
     func pinThread(
         _ thread: TSThread,
         updateStorageService: Bool,
-        tx: DBWriteTransaction
-    ) throws
+        tx: DBWriteTransaction,
+    ) throws(TooManyPinnedThreadsError)
 
     func unpinThread(
         _ thread: TSThread,
         updateStorageService: Bool,
-        tx: DBWriteTransaction
-    ) throws
-
-    func handleUpdatedThread(_ thread: TSThread, tx: DBWriteTransaction)
+        tx: DBWriteTransaction,
+    )
 }
 
-@objc
-public class PinnedThreadManagerObjcBridge: NSObject {
+// MARK: -
 
-    @objc
-    static func handleUpdatedThread(_ thread: TSThread, transaction: DBWriteTransaction) {
-        DependenciesBridge.shared.pinnedThreadManager.handleUpdatedThread(thread, tx: transaction)
-    }
+protocol PinnedThreadMerger {
+    func mergeRecipientId(
+        _ recipientId: SignalRecipient.RowId,
+        into targetRecipientId: SignalRecipient.RowId,
+        updateStorageService: Bool,
+        tx: DBWriteTransaction,
+    )
 }

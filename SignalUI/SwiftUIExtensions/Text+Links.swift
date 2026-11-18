@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import SwiftUI
 import SignalServiceKit
+public import SwiftUI
 
 extension Text {
     /// Appends a tappable link with a custom action to the end of a `Text`.
@@ -13,7 +13,7 @@ extension Text {
         _ title: String,
         useBold: Bool = false,
         tint: Color = Color.Signal.link,
-        action: @escaping () -> Void
+        action: @escaping () -> Void,
     ) -> some View {
         // Placeholder URL is needed for the link, but it's thrown away in the OpenURLAction
         (self + Text(" [\(title)](https://support.signal.org/)").fontWeight(useBold ? .bold : nil))

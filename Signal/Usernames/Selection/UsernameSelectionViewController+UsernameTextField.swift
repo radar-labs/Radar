@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import LibSignalClient
 import SignalServiceKit
 import SignalUI
 
@@ -14,7 +15,7 @@ extension UsernameSelectionViewController {
     class UsernameTextFieldWrapper: UIView {
         let textField: UsernameTextField
 
-        init(username: ParsedUsername?) {
+        init(username: UsernameComponents?) {
             textField = UsernameTextField(forUsername: username)
 
             super.init(frame: .zero)
@@ -35,7 +36,7 @@ extension UsernameSelectionViewController {
         }
 
         func setColorsForCurrentTheme() {
-            backgroundColor = Theme.isDarkThemeEnabled ? .ows_gray80 : .ows_white
+            backgroundColor = Theme.isDarkThemeEnabled ? .ows_gray80 : .white
 
             textField.setColorsForCurrentTheme()
         }
@@ -77,7 +78,7 @@ extension UsernameSelectionViewController {
 
                 super.init(
                     name: "Username discriminator view",
-                    arrangedSubviews: []
+                    arrangedSubviews: [],
                 )
 
                 addArrangedSubviews([
@@ -209,7 +210,7 @@ extension UsernameSelectionViewController {
 
         let discriminatorView: DiscriminatorView = .init(inMode: .empty)
 
-        init(forUsername username: ParsedUsername?) {
+        init(forUsername username: UsernameComponents?) {
             if let username {
                 lastKnownGoodDiscriminator = username.discriminator
                 discriminatorView.mode = .discriminator(value: username.discriminator)
@@ -225,7 +226,7 @@ extension UsernameSelectionViewController {
 
             placeholder = OWSLocalizedString(
                 "USERNAME_SELECTION_TEXT_FIELD_PLACEHOLDER",
-                comment: "The placeholder for a text field into which users can type their desired username."
+                comment: "The placeholder for a text field into which users can type their desired username.",
             )
 
             returnKeyType = .next
@@ -282,7 +283,7 @@ extension UsernameSelectionViewController {
 
         /// Configure the text field for a confirmed username. If `nil`,
         /// configures for the intentional absence of a username.
-        func configure(forConfirmedUsername confirmedUsername: ParsedUsername?) {
+        func configure(forConfirmedUsername confirmedUsername: UsernameComponents?) {
             if confirmedUsername?.discriminator != discriminatorView.customDiscriminator {
                 discriminatorView.isUsingCustomDiscriminator = false
             }
@@ -339,7 +340,7 @@ extension UsernameSelectionViewController.UsernameTextField.DiscriminatorView: U
             replacementString: string,
             allowedCharacters: .numbers,
             maxCharacters: 9,
-            format: { $0 }
+            format: { $0 },
         )
 
         // Remove execess leading zeroes
@@ -357,7 +358,7 @@ extension UsernameSelectionViewController.UsernameTextField.DiscriminatorView: U
                     // Find any amount of `0`s at the start of the string
                     of: "^0*",
                     with: "",
-                    options: .regularExpression
+                    options: .regularExpression,
                 )
                 .appending(text.suffix(2))
         }

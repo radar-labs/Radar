@@ -17,7 +17,7 @@ public struct AccountAttributesGenerator {
         profileManager: ProfileManager,
         svrLocalStorage: SVRLocalStorage,
         tsAccountManager: TSAccountManager,
-        udManager: OWSUDManager
+        udManager: OWSUDManager,
     ) {
         self.accountKeyStore = accountKeyStore
         self.ows2FAManager = ows2FAManager
@@ -28,11 +28,15 @@ public struct AccountAttributesGenerator {
     }
 
     func generateForPrimary(
-        aciRegistrationId: UInt32,
-        pniRegistrationId: UInt32,
-        tx: DBReadTransaction
-    ) -> AccountAttributes {
+        capabilities: AccountAttributes.Capabilities,
+        tx: DBReadTransaction,
+    ) throws -> AccountAttributes {
         owsAssertDebug(tsAccountManager.registrationState(tx: tx).isPrimaryDevice == true)
+
+        guard let aciRegistrationId = tsAccountManager.getRegistrationId(for: .aci, tx: tx) else {
+            throw OWSGenericError("couldn't fetch aci registration id")
+        }
+        let pniRegistrationId = tsAccountManager.getRegistrationId(for: .pni, tx: tx)
 
         let isManualMessageFetchEnabled = tsAccountManager.isManualMessageFetchEnabled(tx: tx)
 
@@ -42,21 +46,15 @@ public struct AccountAttributesGenerator {
         let udAccessKey = SMKUDAccessKey(profileKey: profileKey).keyData.base64EncodedString()
 
         let allowUnrestrictedUD = udManager.shouldAllowUnrestrictedAccessLocal(transaction: tx)
-        let hasSVRBackups = svrLocalStorage.getIsMasterKeyBackedUp(tx)
 
-        let reglockToken: String?
-        if
-            let _reglockToken = accountKeyStore.getMasterKey(tx: tx)?.data(for: .registrationLock),
-            ows2FAManager.isRegistrationLockV2Enabled(transaction: tx)
-        {
-            reglockToken = _reglockToken.canonicalStringRepresentation
-        } else {
-            reglockToken = nil
+        let aep = accountKeyStore.getAccountEntropyPool(tx: tx)
+
+        var registrationLock: RegistrationLock?
+        if ows2FAManager.isRegistrationLockV2Enabled(transaction: tx) {
+            registrationLock = aep?.getMasterKey().deriveRegistrationLock()
         }
 
-        let registrationRecoveryPassword = accountKeyStore.getMasterKey(tx: tx)?.data(
-            for: .registrationRecoveryPassword
-        ).canonicalStringRepresentation
+        let registrationRecoveryPassword = aep?.getMasterKey().deriveRegistrationRecoveryPassword()
 
         let phoneNumberDiscoverability = tsAccountManager.phoneNumberDiscoverability(tx: tx)
 
@@ -66,11 +64,11 @@ public struct AccountAttributesGenerator {
             pniRegistrationId: pniRegistrationId,
             unidentifiedAccessKey: udAccessKey,
             unrestrictedUnidentifiedAccess: allowUnrestrictedUD,
-            reglockToken: reglockToken,
-            registrationRecoveryPassword: registrationRecoveryPassword,
+            reglockToken: registrationLock?.canonicalStringRepresentation,
+            registrationRecoveryPassword: registrationRecoveryPassword?.canonicalStringRepresentation,
             encryptedDeviceName: nil,
             discoverableByPhoneNumber: phoneNumberDiscoverability,
-            hasSVRBackups: hasSVRBackups
+            capabilities: capabilities,
         )
     }
 }

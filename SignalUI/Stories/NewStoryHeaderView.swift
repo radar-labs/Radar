@@ -15,7 +15,7 @@ public class NewStoryHeaderView: UIStackView {
     public init(
         title: String,
         showsNewStoryButton: Bool = true,
-        delegate: NewStoryHeaderDelegate
+        delegate: NewStoryHeaderDelegate,
     ) {
         self.delegate = delegate
 
@@ -25,61 +25,87 @@ public class NewStoryHeaderView: UIStackView {
         isLayoutMarginsRelativeArrangement = true
         layoutMargins = .init(
             top: 11,
-            leading: OWSTableViewController2.cellHInnerMargin * 0.5,
+            leading: OWSTableViewController2.defaultHeaderTextHorizontalInset,
             bottom: 14,
-            trailing: 0
+            trailing: 0,
         )
         layoutMargins.left += delegate.tableView.safeAreaInsets.left
         layoutMargins.right += delegate.tableView.safeAreaInsets.right
 
         let textView = UILabel()
-        textView.textColor = UIColor.Signal.label
-        textView.font = UIFont.dynamicTypeHeadlineClamped
+        textView.textColor = OWSTableViewController2.defaultHeaderTextColor
+        textView.font = OWSTableViewController2.defaultHeaderFont
         textView.text = title
 
         addArrangedSubview(textView)
         addArrangedSubview(.hStretchingSpacer())
 
-        // TODO: Replace with ContextMenuButton
-        let newStoryButton = OWSFlatButton.button(
-            title: OWSLocalizedString(
-                "NEW_STORY_HEADER_VIEW_ADD_NEW_STORY_BUTTON",
-                comment: "table section header button to add a new story"
-            ),
-            font: UIFont.dynamicTypeFootnoteClamped.semibold(),
-            titleColor: Theme.isDarkThemeEnabled ? UIColor.ows_gray05 : UIColor.ows_gray90,
-            backgroundColor: delegate.cellBackgroundColor,
-            target: self,
-            selector: #selector(didTapNewStory)
+        var configuration = UIButton.Configuration.bordered()
+        configuration.image = UIImage(imageLiteralResourceName: "plus-extra-small")
+        configuration.imagePlacement = .leading
+        configuration.imagePadding = 6
+        configuration.title = OWSLocalizedString(
+            "NEW_STORY_HEADER_VIEW_ADD_NEW_STORY_BUTTON",
+            comment: "table section header button to add a new story",
         )
-        newStoryButton.setImage(UIImage(imageLiteralResourceName: "plus-extra-small"))
-        newStoryButton.contentEdgeInsets = UIEdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 18)
-        newStoryButton.titleEdgeInsets = UIEdgeInsets(top: 0, leading: 6, bottom: 0, trailing: -6)
-        newStoryButton.tintColor = Theme.primaryIconColor
-        newStoryButton.clipsToBounds = true
-        newStoryButton.isHidden = !showsNewStoryButton
-
-        let pillWrapper = ManualLayoutView(name: "PillWrapper")
-        pillWrapper.shouldDeactivateConstraints = false
-
-        pillWrapper.addSubview(newStoryButton) { view in
-            newStoryButton.layer.cornerRadius = view.height / 2
-        }
-        newStoryButton.autoPinEdgesToSuperviewEdges()
-
-        addArrangedSubview(pillWrapper)
+        configuration.titleTextAttributesTransformer = .defaultFont(.dynamicTypeFootnoteClamped.semibold())
+        configuration.contentInsets = .init(hMargin: 12, vMargin: 6)
+        configuration.baseForegroundColor = .Signal.label
+        configuration.baseBackgroundColor = delegate.cellBackgroundColor
+        configuration.cornerStyle = .capsule
+        let newStoryButton = UIButton(configuration: configuration)
+        newStoryButton.showsMenuAsPrimaryAction = true
+        newStoryButton.menu = UIMenu(children: [
+            UIAction(
+                title: OWSLocalizedString(
+                    "NEW_STORY_SHEET_CUSTOM_STORY_TITLE",
+                    comment: "Title for create custom story row on the 'new story sheet'",
+                ),
+                subtitle: OWSLocalizedString(
+                    "NEW_STORY_SHEET_CUSTOM_STORY_SUBTITLE",
+                    comment: "Subtitle for create custom story row on the 'new story sheet'",
+                ),
+                image: Theme.iconImage(.genericStories),
+                handler: { [weak self] _ in
+                    self?.didTapNewCustomStory()
+                },
+            ),
+            UIAction(
+                title: OWSLocalizedString(
+                    "NEW_STORY_SHEET_GROUP_STORY_TITLE",
+                    comment: "Title for create group story row on the 'new story sheet'",
+                ),
+                subtitle: OWSLocalizedString(
+                    "NEW_STORY_SHEET_GROUP_STORY_SUBTITLE",
+                    comment: "Subtitle for create group story row on the 'new story sheet'",
+                ),
+                image: Theme.iconImage(.genericGroup),
+                handler: { [weak self] _ in
+                    self?.didTapNewGroupStory()
+                },
+            ),
+        ])
+        addArrangedSubview(newStoryButton)
     }
 
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    @objc
-    private func didTapNewStory() {
-        let vc = NewStorySheet { [weak self] items in
-            guard let self = self else { return }
+    private func didTapNewCustomStory() {
+        let vc = NewPrivateStoryRecipientsViewController { [weak self] items in
+            guard let self else { return }
             self.delegate.newStoryHeaderView(self, didCreateNewStoryItems: items)
         }
-        delegate.present(vc, animated: true)
+        delegate.presentFormSheet(OWSNavigationController(rootViewController: vc), animated: true)
+    }
+
+    private func didTapNewGroupStory() {
+        let vc = NewGroupStoryViewController { [weak self] items in
+            guard let self else { return }
+            self.delegate.newStoryHeaderView(self, didCreateNewStoryItems: items)
+        }
+        delegate.presentFormSheet(OWSNavigationController(rootViewController: vc), animated: true)
+
     }
 }

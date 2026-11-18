@@ -4,8 +4,8 @@
 //
 
 import Foundation
-import Intents
 public import GRDB
+import Intents
 
 // Recipient hiding (also called "contact hiding," "contact management," or
 // "contact removal/deletion" by Product) is a feature that allows users to
@@ -31,8 +31,8 @@ public protocol RecipientHidingManager {
     /// Fetch the hidden-recipient state for the given `SignalRecipient`, if the
     /// `SignalRecipient` is currently hidden.
     func fetchHiddenRecipient(
-        signalRecipient: SignalRecipient,
-        tx: DBReadTransaction
+        recipientId: SignalRecipient.RowId,
+        tx: DBReadTransaction,
     ) -> HiddenRecipient?
 
     /// Should the thread for the given hidden recipient be in a message-request
@@ -46,7 +46,7 @@ public protocol RecipientHidingManager {
     func isHiddenRecipientThreadInMessageRequest(
         hiddenRecipient: HiddenRecipient,
         contactThread: TSContactThread?,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> Bool
 
     // MARK: Write
@@ -60,11 +60,11 @@ public protocol RecipientHidingManager {
     /// Whether this hide represents one initiated on this device, or one that
     /// occurred on a linked device.
     func addHiddenRecipient(
-        _ recipient: SignalRecipient,
+        _ recipient: inout SignalRecipient,
         inKnownMessageRequestState: Bool,
         wasLocallyInitiated: Bool,
-        tx: DBWriteTransaction
-    ) throws
+        tx: DBWriteTransaction,
+    )
 
     /// Removes a recipient from the hidden recipient table.
     ///
@@ -73,20 +73,20 @@ public protocol RecipientHidingManager {
     ///   the hide on this device (true) or a linked device (false).
     /// - Parameter tx: The transaction to use for database operations.
     func removeHiddenRecipient(
-        _ recipient: SignalRecipient,
+        _ recipient: inout SignalRecipient,
         wasLocallyInitiated: Bool,
-        tx: DBWriteTransaction
-    ) throws
+        tx: DBWriteTransaction,
+    )
 }
 
 public extension RecipientHidingManager {
 
     /// Whether the given `SignalRecipient` is currently hidden.
     func isHiddenRecipient(
-        _ recipient: SignalRecipient,
-        tx: DBReadTransaction
+        recipientId: SignalRecipient.RowId,
+        tx: DBReadTransaction,
     ) -> Bool {
-        return fetchHiddenRecipient(signalRecipient: recipient, tx: tx) != nil
+        return fetchHiddenRecipient(recipientId: recipientId, tx: tx) != nil
     }
 }
 
@@ -140,7 +140,7 @@ public final class RecipientHidingManagerImpl: RecipientHidingManager {
         profileManager: ProfileManager,
         storageServiceManager: StorageServiceManager,
         tsAccountManager: TSAccountManager,
-        messageSenderJobQueue: MessageSenderJobQueue
+        messageSenderJobQueue: MessageSenderJobQueue,
     ) {
         self.profileManager = profileManager
         self.storageServiceManager = storageServiceManager
@@ -167,21 +167,18 @@ public final class RecipientHidingManagerImpl: RecipientHidingManager {
     }
 
     public func fetchHiddenRecipient(
-        signalRecipient: SignalRecipient,
-        tx: DBReadTransaction
+        recipientId: SignalRecipient.RowId,
+        tx: DBReadTransaction,
     ) -> HiddenRecipient? {
-        do {
-            return try HiddenRecipient.fetchOne(tx.database, key: signalRecipient.id)
-        } catch {
-            Logger.warn("Failed to fetch HiddenRecipient: \(error.grdbErrorForLogging)")
-            return nil
+        return failIfThrows {
+            return try HiddenRecipient.fetchOne(tx.database, key: recipientId)
         }
     }
 
     public func isHiddenRecipientThreadInMessageRequest(
         hiddenRecipient: HiddenRecipient,
         contactThread: TSContactThread?,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> Bool {
         if hiddenRecipient.inKnownMessageRequestState {
             /// We know, immediately, that this thread should be in a
@@ -225,21 +222,21 @@ public final class RecipientHidingManagerImpl: RecipientHidingManager {
         } else if let individualCall = mostRecentInteraction as? TSCall {
             switch individualCall.callType {
             case
-                    .incoming,
-                    .incomingMissed,
-                    .incomingIncomplete,
-                    .incomingMissedBecauseOfChangedIdentity,
-                    .incomingDeclined,
-                    .incomingAnsweredElsewhere,
-                    .incomingDeclinedElsewhere,
-                    .incomingBusyElsewhere,
-                    .incomingMissedBecauseOfDoNotDisturb,
-                    .incomingMissedBecauseBlockedSystemContact:
+                .incoming,
+                .incomingMissed,
+                .incomingIncomplete,
+                .incomingMissedBecauseOfChangedIdentity,
+                .incomingDeclined,
+                .incomingAnsweredElsewhere,
+                .incomingDeclinedElsewhere,
+                .incomingBusyElsewhere,
+                .incomingMissedBecauseOfDoNotDisturb,
+                .incomingMissedBecauseBlockedSystemContact:
                 return true
             case
-                    .outgoing,
-                    .outgoingIncomplete,
-                    .outgoingMissed:
+                .outgoing,
+                .outgoingIncomplete,
+                .outgoingMissed:
                 return false
             @unknown default:
                 owsFailDebug("Unknown call type: \(individualCall.callType)")
@@ -255,45 +252,45 @@ public final class RecipientHidingManagerImpl: RecipientHidingManager {
     // MARK: -
 
     public func addHiddenRecipient(
-        _ recipient: SignalRecipient,
+        _ recipient: inout SignalRecipient,
         inKnownMessageRequestState: Bool,
         wasLocallyInitiated: Bool,
-        tx: DBWriteTransaction
-    ) throws {
+        tx: DBWriteTransaction,
+    ) {
         Logger.info("Hiding recipient")
-        guard !isHiddenRecipient(recipient, tx: tx) else {
+        guard !isHiddenRecipient(recipientId: recipient.id, tx: tx) else {
             // This is a perhaps extraneous safeguard against
             // hiding an already-hidden address. I say extraneous
             // because theoretically the UI should not be available to
             // hide an already-hidden recipient. However, we return here,
             // just in case, in order to avoid the side-effects of
             // `didSetAsHidden`.
-            Logger.warn("Cannot hide already-hidden recipient.")
-            throw RecipientHidingError.recipientAlreadyHidden
+            Logger.warn("can't hide already-hidden recipient")
+            return
         }
 
         let record = HiddenRecipient(
             signalRecipientRowId: recipient.id,
-            inKnownMessageRequestState: inKnownMessageRequestState
+            inKnownMessageRequestState: inKnownMessageRequestState,
         )
-        try record.save(tx.database)
+        failIfThrows {
+            try record.insert(tx.database)
+        }
 
-        didSetAsHidden(recipient: recipient, wasLocallyInitiated: wasLocallyInitiated, tx: tx)
+        didSetAsHidden(recipient: &recipient, wasLocallyInitiated: wasLocallyInitiated, tx: tx)
     }
 
     public func removeHiddenRecipient(
-        _ recipient: SignalRecipient,
+        _ recipient: inout SignalRecipient,
         wasLocallyInitiated: Bool,
-        tx: DBWriteTransaction
-    ) throws {
-        if isHiddenRecipient(recipient, tx: tx) {
+        tx: DBWriteTransaction,
+    ) {
+        if isHiddenRecipient(recipientId: recipient.id, tx: tx) {
             Logger.info("Unhiding recipient")
-            let sql = """
-                DELETE FROM \(HiddenRecipient.databaseTableName)
-                WHERE \(HiddenRecipient.CodingKeys.signalRecipientRowId.stringValue) = ?
-            """
-            try tx.database.execute(sql: sql, arguments: [recipient.id])
-            didSetAsUnhidden(recipient: recipient, wasLocallyInitiated: wasLocallyInitiated, tx: tx)
+            failIfThrows {
+                try HiddenRecipient.deleteOne(tx.database, key: recipient.id)
+            }
+            didSetAsUnhidden(recipient: &recipient, wasLocallyInitiated: wasLocallyInitiated, tx: tx)
         }
     }
 }
@@ -309,18 +306,20 @@ private extension RecipientHidingManagerImpl {
     ///   the hide on this device (true) or a linked device (false).
     /// - Parameter tx: The transaction to use for database operations.
     func didSetAsHidden(
-        recipient: SignalRecipient,
+        recipient: inout SignalRecipient,
         wasLocallyInitiated: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         // Triggers UI updates of recipient lists.
         NotificationCenter.default.postOnMainThread(name: Self.hideListDidChange, object: nil)
 
         Logger.info("[Recipient hiding][side effects] Beginning side effects of setting as hidden.")
-        if let thread = TSContactThread.getWithContactAddress(
-            recipient.address,
-            transaction: tx
-        ) {
+        if
+            let thread = TSContactThread.getWithContactAddress(
+                recipient.address,
+                transaction: tx,
+            )
+        {
             Logger.info("[Recipient hiding][side effects] Posting TSInfoMessage.")
             let infoMessage: TSInfoMessage = .makeForContactHidden(contactThread: thread)
             infoMessage.anyInsert(transaction: tx)
@@ -332,17 +331,13 @@ private extension RecipientHidingManagerImpl {
 
         if wasLocallyInitiated {
             Logger.info("[Recipient hiding][side effects] Remove from whitelist.")
-            profileManager.removeUser(
-                fromProfileWhitelist: recipient.address,
-                userProfileWriter: .localUser,
-                transaction: tx
-            )
+            _ = profileManager.removeRecipientFromProfileWhitelist(&recipient, userProfileWriter: .localUser, tx: tx)
             Logger.info("[Recipient hiding][side effects] Remove from story distribution lists.")
             let storyRecipientManager = DependenciesBridge.shared.storyRecipientManager
             storyRecipientManager.removeRecipientIdFromAllPrivateStoryThreads(
                 recipient.id,
                 shouldUpdateStorageService: true,
-                tx: tx
+                tx: tx,
             )
             Logger.info("[Recipient hiding][side effects] Sync with storage service.")
             storageServiceManager.recordPendingUpdates(updatedAddresses: [recipient.address])
@@ -356,26 +351,19 @@ private extension RecipientHidingManagerImpl {
         }
 
         if
-            tsAccountManager.registrationState(tx: tx).isRegisteredPrimaryDevice,
             let recipientServiceId = recipient.address.serviceId,
             let localAci = self.tsAccountManager.localIdentifiers(tx: tx)?.aci,
-            !GroupManager.hasMutualGroupThread(
-                with: recipientServiceId,
+            !GroupManager.hasGroupThreadWithProfileKey(
+                otherMember: recipientServiceId,
                 localAci: localAci,
-                tx: tx
+                tx: tx,
             )
         {
-            // Profile key rotations should only be initiated by the primary device
-            // when we have no common groups with the hidee (because mutual group
-            // members are authorized to have profile keys of all group members).
+            // Profile key rotations should only be initiated when we have no common
+            // groups with the hidee (because mutual group members are authorized to
+            // have profile keys of all group members).
             Logger.info("[Recipient hiding][side effects] Rotate profile key.")
-            self.profileManager.rotateProfileKeyUponRecipientHide(
-                withTx: tx
-            )
-            // A nice-to-have was to throw out the other user's profile key if we're
-            // not in a group with them. Product said this was not strictly necessary.
-            // Note that this _is_ something that is done on Android, so there is a
-            // slight lack of parity here.
+            self.profileManager.setNeedsProfileKeyRotation(tx: tx)
         }
     }
 
@@ -391,18 +379,14 @@ private extension RecipientHidingManagerImpl {
     /// rule is in place that will also delete the corresponding
     /// `HiddenRecipient` entry. This method does not get hit in
     /// that case.
-    func didSetAsUnhidden(recipient: SignalRecipient, wasLocallyInitiated: Bool, tx: DBWriteTransaction) {
+    func didSetAsUnhidden(recipient: inout SignalRecipient, wasLocallyInitiated: Bool, tx: DBWriteTransaction) {
         // Triggers UI updates of recipient lists.
         NotificationCenter.default.postOnMainThread(name: Self.hideListDidChange, object: nil)
 
         Logger.info("[Recipient hiding][side effects] Beginning side effects of setting as unhidden.")
         if wasLocallyInitiated {
             Logger.info("[Recipient hiding][side effects] Add to whitelist.")
-            profileManager.addUser(
-                toProfileWhitelist: recipient.address,
-                userProfileWriter: .localUser,
-                transaction: tx
-            )
+            profileManager.addRecipientToProfileWhitelist(&recipient, userProfileWriter: .localUser, tx: tx)
             Logger.info("[Recipient hiding][side effects] Sync with storage service.")
             storageServiceManager.recordPendingUpdates(updatedAddresses: [recipient.address])
         }
@@ -410,22 +394,22 @@ private extension RecipientHidingManagerImpl {
         if
             let thread = TSContactThread.getWithContactAddress(
                 recipient.address,
-                transaction: tx
+                transaction: tx,
             ),
             let profileKey = profileManager.localProfileKey(tx: tx)
         {
-            let profileKeyMessage = OWSProfileKeyMessage(
+            let profileKeyMessage = ProfileKeyMessage(
                 thread: thread,
-                profileKey: profileKey.serialize(),
-                transaction: tx
+                profileKey: profileKey,
+                tx: tx,
             )
             Logger.info("[Recipient hiding][side effects] Share profile key.")
             let preparedMessage = PreparedOutgoingMessage.preprepared(
-                transientMessageWithoutAttachments: profileKeyMessage
+                transientMessageWithoutAttachments: profileKeyMessage,
             )
             self.messageSenderJobQueue.add(
                 message: preparedMessage,
-                transaction: tx
+                transaction: tx,
             )
         }
     }

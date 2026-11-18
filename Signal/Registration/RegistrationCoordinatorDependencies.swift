@@ -19,9 +19,11 @@ public struct RegistrationCoordinatorDependencies {
     public let contactsStore: RegistrationCoordinatorImpl.Shims.ContactsStore
     public let dateProvider: DateProvider
     public let db: any DB
-    let deviceTransferService: RegistrationCoordinatorImpl.Shims.DeviceTransferService
+    let deviceSleepManager: (any DeviceSleepManager)?
+    let deviceTransferRestore: any DeviceTransferRestore
     public let experienceManager: RegistrationCoordinatorImpl.Shims.ExperienceManager
     public let identityManager: RegistrationCoordinatorImpl.Shims.IdentityManager
+    public let localFileBackupManager: LocalFileBackupManager
     public let localUsernameManager: LocalUsernameManager
     public let messagePipelineSupervisor: RegistrationCoordinatorImpl.Shims.MessagePipelineSupervisor
     public let messageProcessor: RegistrationCoordinatorImpl.Shims.MessageProcessor
@@ -31,22 +33,23 @@ public struct RegistrationCoordinatorDependencies {
     public let preKeyManager: any PreKeyManager
     public let profileManager: RegistrationCoordinatorImpl.Shims.ProfileManager
     public let pushRegistrationManager: RegistrationCoordinatorImpl.Shims.PushRegistrationManager
-    let quickRestoreManager: RegistrationCoordinatorImpl.Shims.QuickRestoreManager
+    let quickRestoreManager: QuickRestoreManager
     public let receiptManager: RegistrationCoordinatorImpl.Shims.ReceiptManager
     public let registrationBackupErrorPresenter: RegistrationCoordinatorBackupErrorPresenter
     public let registrationStateChangeManager: RegistrationStateChangeManager
     let registrationWebSocketManager: any RegistrationWebSocketManager
     public let remoteConfigManager: any RemoteConfigManager
+    public let securityScopedBookmarkAccess: SecurityScopedBookmarkAccess
+    let serviceProvider: any ServiceProvider
     public let sessionManager: RegistrationSessionManager
     public let signalService: OWSSignalServiceProtocol
     public let storageServiceManager: RegistrationCoordinatorImpl.Shims.StorageServiceManager
     public let svr: SecureValueRecovery
-    public let svrAuthCredentialStore: SVRAuthCredentialStorage
+    public let svrLocalStorage: SVRLocalStorage
+    public let svrAuthCredentialManager: SVRAuthCredentialManager
     public let timeoutProvider: RegistrationCoordinatorImpl.Shims.TimeoutProvider
     public let tsAccountManager: TSAccountManager
     public let udManager: RegistrationCoordinatorImpl.Shims.UDManager
-    public let usernameApiClient: any RegistrationCoordinatorImpl.Shims.UsernameApiClient
-    public let usernameLinkManager: UsernameLinkManager
 
     public static func from(_ object: NSObject) -> RegistrationCoordinatorDependencies {
         return RegistrationCoordinatorDependencies(
@@ -62,9 +65,11 @@ public struct RegistrationCoordinatorDependencies {
             contactsStore: RegistrationCoordinatorImpl.Wrappers.ContactsStore(),
             dateProvider: { Date() },
             db: DependenciesBridge.shared.db,
-            deviceTransferService: RegistrationCoordinatorImpl.Wrappers.DeviceTransferService(AppEnvironment.shared.deviceTransferServiceRef),
+            deviceSleepManager: DependenciesBridge.shared.deviceSleepManager,
+            deviceTransferRestore: AppEnvironment.shared.deviceTransferRestore,
             experienceManager: RegistrationCoordinatorImpl.Wrappers.ExperienceManager(),
             identityManager: RegistrationCoordinatorImpl.Wrappers.IdentityManager(DependenciesBridge.shared.identityManager),
+            localFileBackupManager: DependenciesBridge.shared.localFileBackupManager,
             localUsernameManager: DependenciesBridge.shared.localUsernameManager,
             messagePipelineSupervisor: RegistrationCoordinatorImpl.Wrappers.MessagePipelineSupervisor(SSKEnvironment.shared.messagePipelineSupervisorRef),
             messageProcessor: RegistrationCoordinatorImpl.Wrappers.MessageProcessor(SSKEnvironment.shared.messageProcessorRef),
@@ -74,7 +79,7 @@ public struct RegistrationCoordinatorDependencies {
             preKeyManager: DependenciesBridge.shared.preKeyManager,
             profileManager: RegistrationCoordinatorImpl.Wrappers.ProfileManager(SSKEnvironment.shared.profileManagerRef),
             pushRegistrationManager: RegistrationCoordinatorImpl.Wrappers.PushRegistrationManager(AppEnvironment.shared.pushRegistrationManagerRef),
-            quickRestoreManager: RegistrationCoordinatorImpl.Wrappers.QuickRestoreManager(AppEnvironment.shared.quickRestoreManager),
+            quickRestoreManager: AppEnvironment.shared.quickRestoreManager,
             receiptManager: RegistrationCoordinatorImpl.Wrappers.ReceiptManager(SSKEnvironment.shared.receiptManagerRef),
             registrationBackupErrorPresenter: RegistrationCoordinatorBackupErrorPresenterImpl(),
             registrationStateChangeManager: DependenciesBridge.shared.registrationStateChangeManager,
@@ -84,16 +89,17 @@ public struct RegistrationCoordinatorDependencies {
                 messageProcessor: SSKEnvironment.shared.messageProcessorRef,
             ),
             remoteConfigManager: SSKEnvironment.shared.remoteConfigManagerRef,
+            securityScopedBookmarkAccess: SecurityScopedBookmarkAccessImpl(),
+            serviceProvider: DependenciesBridge.shared.chatConnectionManager,
             sessionManager: DependenciesBridge.shared.registrationSessionManager,
             signalService: SSKEnvironment.shared.signalServiceRef,
             storageServiceManager: RegistrationCoordinatorImpl.Wrappers.StorageServiceManager(SSKEnvironment.shared.storageServiceManagerRef),
             svr: DependenciesBridge.shared.svr,
-            svrAuthCredentialStore: DependenciesBridge.shared.svrCredentialStorage,
+            svrLocalStorage: DependenciesBridge.shared.svrLocalStorage,
+            svrAuthCredentialManager: DependenciesBridge.shared.svrAuthCredentialManager,
             timeoutProvider: RegistrationCoordinatorImpl.Wrappers.TimeoutProvider(),
             tsAccountManager: DependenciesBridge.shared.tsAccountManager,
             udManager: RegistrationCoordinatorImpl.Wrappers.UDManager(SSKEnvironment.shared.udManagerRef),
-            usernameApiClient: RegistrationCoordinatorImpl.Wrappers.UsernameApiClient(DependenciesBridge.shared.usernameApiClient),
-            usernameLinkManager: DependenciesBridge.shared.usernameLinkManager
         )
     }
 }

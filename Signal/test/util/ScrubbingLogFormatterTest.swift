@@ -3,19 +3,41 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import CocoaLumberjack
+import Foundation
+import LibSignalClient
 import SignalRingRTC
-import XCTest
+import Testing
 
 @testable import SignalServiceKit
 
-final class ScrubbingLogFormatterTest: XCTestCase {
-    private let formatter = ScrubbingLogFormatter()
+struct ScrubbingLogFormatterTest {
+    /// A formatter with no logging key: sensitive identifiers are fully
+    /// redacted rather than hashed.
+    private let formatter: ScrubbingLogFormatter
+
+    /// A fixed logging key derived from an all-`0x01` master key, matching the
+    /// expected hashes hard-coded in the keyed tests below.
+    private let loggingKey: LoggingKey
+
+    /// A formatter using ``loggingKey``: sensitive identifiers are hashed.
+    private let keyedFormatter: ScrubbingLogFormatter
+
+    init() {
+        let loggingKey = try! MasterKey(data: Data(repeating: 0x01, count: 32)).deriveLoggingKey()
+        self.loggingKey = loggingKey
+        self.formatter = ScrubbingLogFormatter(loggingKey: { nil })
+        self.keyedFormatter = ScrubbingLogFormatter(loggingKey: { loggingKey })
+    }
 
     private func format(_ input: String) -> String {
         return formatter.redactMessage(input)
     }
 
+    private func keyedFormat(_ input: String) -> String {
+        return keyedFormatter.redactMessage(input)
+    }
+
+    @Test
     func testDataScrubbed_preformatted() {
         let testCases: [String: String] = [
             "<01>": "<01…>",
@@ -46,18 +68,15 @@ final class ScrubbingLogFormatterTest: XCTestCase {
                 "<00…>",
             "My data is: <01234567 89a23def 23234567 89ab1223>": "My data is: <01…>",
             "My data is <12345670 89a23def 23234567 89ab1223> their data is <87654321 89ab1234>":
-                "My data is <12…> their data is <87…>"
+                "My data is <12…> their data is <87…>",
         ]
 
         for (input, expectedOutput) in testCases {
-            XCTAssertEqual(
-                format(input),
-                expectedOutput,
-                "Failed redaction: \(input)"
-            )
+            #expect(format(input) == expectedOutput, "Failed redaction: \(input)")
         }
     }
 
+    @Test
     func testIOS13AndHigherDataScrubbed() {
         let testCases: [String: String] = [
             "{length = 32, bytes = 0x01}": "<01…>",
@@ -87,18 +106,15 @@ final class ScrubbingLogFormatterTest: XCTestCase {
             "My data is: {length = 32, bytes = 0x0123456789a23def2323456789ab1223}":
                 "My data is: <01…>",
             "My data is {length = 32, bytes = 0x1234567089a23def2323456789ab1223} their data is {length = 16, bytes = 0x8765432189ab1234}":
-                "My data is <12…> their data is <87…>"
+                "My data is <12…> their data is <87…>",
         ]
 
         for (input, expectedOutput) in testCases {
-            XCTAssertEqual(
-                format(input),
-                expectedOutput,
-                "Failed redaction: \(input)"
-            )
+            #expect(format(input) == expectedOutput, "Failed redaction: \(input)")
         }
     }
 
+    @Test
     func testDataScrubbed_lazyFormatted() {
         let testCases: [Data: String] = [
             .init([0]): "<00…>",
@@ -106,52 +122,71 @@ final class ScrubbingLogFormatterTest: XCTestCase {
             .init([1]): "<01…>",
             .init([1, 2, 3, 0x10, 0x20]): "<01…>",
             .init([0xff]): "<ff…>",
-            .init([0xff, 0xff, 0xff]): "<ff…>"
+            .init([0xff, 0xff, 0xff]): "<ff…>",
         ]
 
         for (inputData, expectedOutput) in testCases {
             let input = (inputData as NSData).description
-            XCTAssertEqual(
-                format(input),
-                expectedOutput,
-                "Failed redaction: \(input)"
+            #expect(format(input) == expectedOutput, "Failed redaction: \(input)")
+        }
+    }
+
+    @Test
+    func testSensitiveIdentifiersRedactedOrHashed() {
+        struct TestCase {
+            let input: String
+            /// Whether a logging key is available. Without one, sensitive
+            /// identifiers are fully redacted; with one, they're stably hashed.
+            let hasLoggingKey: Bool
+            let expectedOutput: String
+        }
+
+        let testCases: [TestCase] = [
+            // Phone numbers.
+            TestCase(input: "my phone is +15557340123", hasLoggingKey: false, expectedOutput: "my phone is [redacted]"),
+            TestCase(input: "my phone is +15557340123", hasLoggingKey: true, expectedOutput: "my phone is …575"),
+            TestCase(input: "your phone is +447700900124", hasLoggingKey: false, expectedOutput: "your phone is [redacted]"),
+            TestCase(input: "your phone is +447700900124", hasLoggingKey: true, expectedOutput: "your phone is …8c7"),
+            TestCase(input: "+15557340123 something +15557340123", hasLoggingKey: false, expectedOutput: "[redacted] something [redacted]"),
+            TestCase(input: "+15557340123 something +15557340123", hasLoggingKey: true, expectedOutput: "…575 something …575"),
+
+            // UUIDs (e.g. ACIs/PNIs).
+            TestCase(input: "My UUID is BAF1768C-2A25-4D8F-83B7-A89C59C98748", hasLoggingKey: false, expectedOutput: "My UUID is [redacted]"),
+            TestCase(input: "My UUID is BAF1768C-2A25-4D8F-83B7-A89C59C98748", hasLoggingKey: true, expectedOutput: "My UUID is …1fb"),
+            TestCase(input: "My UUID is baf1768c-2a25-4d8f-83b7-a89c59c98748", hasLoggingKey: true, expectedOutput: "My UUID is …1fb"),
+        ]
+
+        for testCase in testCases {
+            let scrubber = testCase.hasLoggingKey ? keyedFormatter : formatter
+            #expect(
+                scrubber.redactMessage(testCase.input) == testCase.expectedOutput,
+                "input: \(testCase.input), hasLoggingKey: \(testCase.hasLoggingKey)",
             )
         }
     }
 
-    func testPhoneNumbersScrubbed() {
-        let testCases: [(String, String)] = [
-            ("my phone is +15557340123", "my phone is +x…123"),
-            ("your phone is +447700900124", "your phone is +x…124"),
-            ("+15557340123 something +15557340123", "+x…123 something +x…123"),
-        ]
-
-        for (inputValue, expectedValue) in testCases {
-            let actualOutput = format(inputValue)
-            XCTAssertEqual(actualOutput, expectedValue)
-        }
-    }
-
+    @Test
     func testGroupIdScrubbed() {
         for _ in 1...100 {
             let isGV1 = Bool.random()
             let groupIdCount = isGV1 ? kGroupIdLengthV1 : kGroupIdLengthV2
             let paddingCount = isGV1 ? 2 : 1
             let groupId = Randomness.generateRandomBytes(groupIdCount)
-            let groupIdString = TSGroupThread.defaultThreadId(forGroupId: groupId)
+            let groupIdString = TSGroupThread.defaultThreadUniqueId(forGroupIdData: groupId)
 
             let expectedOutput = "Hello g…\(groupIdString.suffix(3 + paddingCount))!"
             let actualOutput = format("Hello \(groupIdString)!")
 
-            XCTAssertEqual(actualOutput, expectedOutput, groupIdString)
+            #expect(actualOutput == expectedOutput, "\(groupIdString)")
         }
     }
 
+    @Test
     func testThingsThatLookLikeGroupIdNotScrubbed() {
         for _ in 1...1024 {
             let fakeGroupIdCount = UInt.random(in: 1...(kGroupIdLengthV2 * 2))
             let fakeGroupId = Randomness.generateRandomBytes(fakeGroupIdCount)
-            let fakeGroupIdString = TSGroupThread.defaultThreadId(forGroupId: fakeGroupId)
+            let fakeGroupIdString = TSGroupThread.defaultThreadUniqueId(forGroupIdData: fakeGroupId)
             let input = "Hello \(fakeGroupIdString)!"
 
             let result = format(input)
@@ -163,28 +198,30 @@ final class ScrubbingLogFormatterTest: XCTestCase {
             // - a value that happens to look like a base64 UUID in a path (≈1/192 chance)
             // - a value that happens to have many adjacent hex characters (??? chance)
         }
-        XCTFail("Too many things that aren't group IDs are being treated as group IDs.")
+        Issue.record("Too many things that aren't group IDs are being treated as group IDs.")
     }
 
+    @Test
     func testCallLinkScrubbed() {
-        XCTAssertEqual(
-            format("https://signal.link/call/#key=bcdf-ghkm-npqr-stxz-bcdf-ghkm-npqr-stxz"),
-            "https://signal.link/call/#key=bcdf-…-xxxx"
+        #expect(
+            format("https://signal.link/call/#key=bcdf-ghkm-npqr-stxz-bcdf-ghkm-npqr-stxz")
+                == "https://signal.link/call/#key=bcdf-…-xxxx",
         )
     }
 
+    @Test
     func testNotScrubbed() {
         let input = "Some unfiltered string"
-        let result = format(input)
-        XCTAssertEqual(result, input)
+        #expect(format(input) == input)
     }
 
+    @Test
     func testIPv4AddressesScrubbed() {
         let valueMap: [String: String] = [
             "0.0.0.0": "x.x.x.0",
             "127.0.0.1": "x.x.x.1",
             "255.255.255.255": "x.x.x.255",
-            "1.2.3.4": "x.x.x.4"
+            "1.2.3.4": "x.x.x.4",
         ]
         let messageFormats: [String] = [
             "a%@b",
@@ -194,7 +231,7 @@ final class ScrubbingLogFormatterTest: XCTestCase {
             "%@",
             "%@ %@",
             "no ip address!",
-            ""
+            "",
         ]
 
         for (ipAddress, redactedIpAddress) in valueMap {
@@ -202,7 +239,7 @@ final class ScrubbingLogFormatterTest: XCTestCase {
                 let input = messageFormat.replacingOccurrences(of: "%@", with: ipAddress)
                 let result = format(input)
                 let expectedOutput = messageFormat.replacingOccurrences(of: "%@", with: redactedIpAddress)
-                XCTAssertEqual(result, expectedOutput, input)
+                #expect(result == expectedOutput, "\(input)")
             }
         }
     }
@@ -212,12 +249,13 @@ final class ScrubbingLogFormatterTest: XCTestCase {
     /// The test cases here were borrowed from RingRTC:
     /// - https://github.com/signalapp/ringrtc/blob/cfe07c57888d930d1114ddccbdd73d3f556b3b40/src/rust/src/core/util.rs#L149-L197
     /// - https://github.com/signalapp/ringrtc/blob/cfe07c57888d930d1114ddccbdd73d3f556b3b40/src/rust/src/core/util.rs#L364-L413
+    @Test
     func testIPv6AddressesScrubbed() {
         func runTest(messageFormat: String, ipAddress: String) {
             let input = messageFormat.replacingOccurrences(of: "%@", with: ipAddress)
             let expectedOutput = messageFormat.replacingOccurrences(of: "%@", with: "[IPV6]")
             let result = format(input)
-            XCTAssertEqual(result, expectedOutput, input)
+            #expect(result == expectedOutput, "\(input)")
         }
 
         let testAddresses: [String] = [
@@ -276,36 +314,50 @@ final class ScrubbingLogFormatterTest: XCTestCase {
             "%@",
             "%@ %@",
             "no ip address!",
-            ""
+            "",
         ]
 
         for ipAddress in testAddresses {
-            for messageFormat in (messageFormats + ["x%@y"]) {
+            for messageFormat in messageFormats + ["x%@y"] {
                 runTest(messageFormat: messageFormat, ipAddress: ipAddress)
             }
         }
 
         for ipAddress in testAddressesWithZoneIndex {
-            for messageFormat in (messageFormats + ["x%@"]) {
+            for messageFormat in messageFormats + ["x%@"] {
                 runTest(messageFormat: messageFormat, ipAddress: ipAddress)
             }
         }
     }
 
-    func testUUIDsScrubbed_Random() {
-        for _ in (1...10) {
-            let uuidString = UUID().uuidString
-            let result = format("My UUID is \(uuidString)")
-            XCTAssertEqual(result, "My UUID is xxxx-xx-xx-xxx\(uuidString.suffix(3))")
-        }
+    /// The hash a log line ends up with must match what
+    /// `LoggingKey.hashForLogging`'s typed overloads produce, since the
+    /// internal-settings UI uses those to display a searchable hash.
+    @Test
+    func testLoggingKeyHashMatchesFormatter() {
+        let aci = Aci(fromUUID: UUID(uuidString: "BAF1768C-2A25-4D8F-83B7-A89C59C98748")!)
+        #expect(keyedFormat("recipient: \(aci.serviceIdString)") == "recipient: \(loggingKey.hashForLogging(aci: aci))")
+
+        let e164 = E164("+15557340123")!
+        #expect(keyedFormat("phone: \(e164.stringValue)") == "phone: \(loggingKey.hashForLogging(e164: e164))")
     }
 
-    func testUUIDsScrubbed_Specific() {
-        let uuidString = "BAF1768C-2A25-4D8F-83B7-A89C59C98748"
-        let result = format("My UUID is \(uuidString)")
-        XCTAssertEqual(result, "My UUID is xxxx-xx-xx-xxx748")
+    /// Identifiers appear in real logs via their `logString` (e.g. "<ACI:…>"),
+    /// so verify that form is hashed (matching the typed `hashForLogging`
+    /// overloads the UI uses), or fully redacted when there's no key.
+    @Test
+    func testAciAndPniLogStringsScrubbed() {
+        let aci = Aci(fromUUID: UUID(uuidString: "BAF1768C-2A25-4D8F-83B7-A89C59C98748")!)
+        let pni = Pni(fromUUID: UUID(uuidString: "43C05E8B-4F67-480F-94D9-C519CB1ABC20")!)
+
+        #expect(keyedFormat(aci.logString) == "<ACI:\(loggingKey.hashForLogging(aci: aci))>")
+        #expect(keyedFormat(pni.logString) == "<PNI:\(loggingKey.hashForLogging(pni: pni))>")
+
+        #expect(format(aci.logString) == "<ACI:[redacted]>")
+        #expect(format(pni.logString) == "<PNI:[redacted]>")
     }
 
+    @Test
     func testTimestampsNotScrubbed() {
         // A couple sample messages from our logs
         let timestamp = Date.ows_millisecondTimestamp()
@@ -314,18 +366,15 @@ final class ScrubbingLogFormatterTest: XCTestCase {
             "Sending message: TSOutgoingMessage, timestamp: \(timestamp)": "Sending message: TSOutgoingMessage, timestamp: \(timestamp)",
             // Leave timestamp, but UUID and phone number should be redacted
             "attempting to send message: TSOutgoingMessage, timestamp: \(timestamp), recipient: <SignalServiceAddress phoneNumber: +12345550123, uuid: BAF1768C-2A25-4D8F-83B7-A89C59C98748>":
-                "attempting to send message: TSOutgoingMessage, timestamp: \(timestamp), recipient: <SignalServiceAddress phoneNumber: +x…123, uuid: xxxx-xx-xx-xxx748>"
+                "attempting to send message: TSOutgoingMessage, timestamp: \(timestamp), recipient: <SignalServiceAddress phoneNumber: [redacted], uuid: [redacted]>",
         ]
 
         for (input, expectedOutput) in testCases {
-            XCTAssertEqual(
-                format(input),
-                expectedOutput,
-                "Failed redaction: \(input)"
-            )
+            #expect(format(input) == expectedOutput, "Failed redaction: \(input)")
         }
     }
 
+    @Test
     func testLongHexStrings() {
         let testCases: [String: String] = [
             "": "",
@@ -339,62 +388,64 @@ final class ScrubbingLogFormatterTest: XCTestCase {
             "0102030405060708": "…708",
             "010203040506070809": "…809",
             "010203040506070809ab": "…9ab",
-            "010203040506070809abcd": "…bcd"
+            "010203040506070809abcd": "…bcd",
         ]
 
         for (input, expectedOutput) in testCases {
-            XCTAssertEqual(
-                format(input),
-                expectedOutput,
-                "Failed redaction: \(input)"
-            )
+            #expect(format(input) == expectedOutput, "Failed redaction: \(input)")
         }
     }
 
+    @Test
     func testBase64UUIDsScrubbed_Random() {
-        for _ in (1...10) {
+        for _ in 1...10 {
             let uuid = UUID().data.base64EncodedString()
             let result = format("My base64 UUID is \(uuid)")
-            XCTAssertEqual(result, "My base64 UUID is …\(uuid.suffix(5))")
+            #expect(result == "My base64 UUID is …\(uuid.suffix(5))")
         }
     }
 
+    @Test
     func testBase64UUIDsScrubbed_Specific() {
         let uuidString = "GW/VMbPjTiyr5cSoblKBmQ=="
         let result = format("My base64 UUID is \(uuidString)")
-        XCTAssertEqual(result, "My base64 UUID is …BmQ==")
+        #expect(result == "My base64 UUID is …BmQ==")
     }
 
+    @Test
     func testBase64UUIDsScrubbed_SpecificInURL() {
         var uuidString = "sdfssAFFDSAFdsFFsdaFfg=="
         var result = format("http://signal.org/\(uuidString)")
-        XCTAssertEqual(result, "http://signal.org/…Ffg==")
+        #expect(result == "http://signal.org/…Ffg==")
 
         // Do one with a leading / in itself.
         uuidString = "/dfssAFFDSAFdsFFsdaFfg=="
         result = format("http://signal.org/\(uuidString)")
-        XCTAssertEqual(result, "http://signal.org/…Ffg==")
+        #expect(result == "http://signal.org/…Ffg==")
     }
 
+    @Test
     func testBase64UUIDsScrubbed_dontScrubDifferentLengths() {
         for byteLength in [15, 17, 1] {
-            for _ in (1...10) {
+            for _ in 1...10 {
                 let stringValue = Randomness.generateRandomBytes(UInt(byteLength)).base64EncodedString()
                 let result = format("My base64 UUID is not \(stringValue)")
-                XCTAssert(result.contains(stringValue), "Incorrectly redacted non UUID base64 string: \(result)")
+                #expect(result.contains(stringValue), "Incorrectly redacted non UUID base64 string: \(result)")
             }
         }
     }
 
+    @Test
     func testBase64RoomId() {
         let roomIdString = CallLinkRootKey.generate().deriveRoomId().base64EncodedString()
         let result = format("The room is \(roomIdString)")
-        XCTAssertEqual(result, "The room is …\(roomIdString.suffix(4))")
+        #expect(result == "The room is …\(roomIdString.suffix(4))")
     }
 
+    @Test
     func testHexRoomId() {
         let roomIdString = CallLinkRootKey.generate().deriveRoomId().hexadecimalString
         let result = format("The room is \(roomIdString)")
-        XCTAssertEqual(result, "The room is …\(roomIdString.suffix(3))")
+        #expect(result == "The room is …\(roomIdString.suffix(3))")
     }
 }

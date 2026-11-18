@@ -11,6 +11,8 @@ import SignalUI
 protocol RegistrationChangeNumberSplashPresenter: AnyObject {
     func continueFromSplash()
 
+    func canChangeNumber() -> ChangeNumberAllowedResult
+
     func exitRegistration()
 }
 
@@ -18,17 +20,17 @@ class RegistrationChangeNumberSplashViewController: OWSViewController, OWSNaviga
 
     private weak var presenter: RegistrationChangeNumberSplashPresenter?
 
-    public init(presenter: RegistrationChangeNumberSplashPresenter) {
+    init(presenter: RegistrationChangeNumberSplashPresenter) {
         self.presenter = presenter
         super.init()
         navigationItem.hidesBackButton = true
     }
 
-    public var preferredNavigationBarStyle: OWSNavigationBarStyle {
+    var preferredNavigationBarStyle: OWSNavigationBarStyle {
         return .solid
     }
 
-    public var navbarBackgroundColorOverride: UIColor? {
+    var navbarBackgroundColorOverride: UIColor? {
         return view.backgroundColor
     }
 
@@ -36,9 +38,10 @@ class RegistrationChangeNumberSplashViewController: OWSViewController, OWSNaviga
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.addConstraints([
-            imageView.widthAnchor.constraint(lessThanOrEqualToConstant: 80),
-            imageView.heightAnchor.constraint(lessThanOrEqualToConstant: 80),
+            imageView.widthAnchor.constraint(lessThanOrEqualToConstant: 160),
+            imageView.heightAnchor.constraint(lessThanOrEqualToConstant: 160),
         ])
+        imageView.contentMode = .scaleAspectFit
         return imageView
     }()
 
@@ -50,65 +53,89 @@ class RegistrationChangeNumberSplashViewController: OWSViewController, OWSNaviga
             self?.presenter?.exitRegistration()
         }
 
-        // UI Elements
-        let heroImageCircle = OWSLayerView.circleView()
-        heroImageCircle.backgroundColor = .Signal.secondaryFill
-        heroImageCircle.addSubview(heroImageView)
-        let heroImageContainer = UIView.container()
-        heroImageContainer.addSubview(heroImageCircle)
-        heroImageView.translatesAutoresizingMaskIntoConstraints = false
-        heroImageCircle.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            heroImageView.centerXAnchor.constraint(equalTo: heroImageCircle.centerXAnchor),
-            heroImageView.centerYAnchor.constraint(equalTo: heroImageCircle.centerYAnchor),
-
-            heroImageCircle.widthAnchor.constraint(equalToConstant: 112),
-            heroImageCircle.heightAnchor.constraint(equalToConstant: 112),
-
-            heroImageCircle.topAnchor.constraint(equalTo: heroImageContainer.topAnchor),
-            heroImageCircle.leadingAnchor.constraint(greaterThanOrEqualTo: heroImageContainer.leadingAnchor),
-            heroImageCircle.centerXAnchor.constraint(equalTo: heroImageContainer.centerXAnchor),
-            heroImageCircle.bottomAnchor.constraint(equalTo: heroImageContainer.bottomAnchor),
-        ])
         let titleLabel = UILabel.titleLabelForRegistration(
             text: OWSLocalizedString(
                 "SETTINGS_CHANGE_PHONE_NUMBER_SPLASH_TITLE",
-                comment: "Title text in the 'change phone number splash' view."
-            )
+                comment: "Title text in the 'change phone number splash' view.",
+            ),
         )
         let subtitleLabel = UILabel.explanationLabelForRegistration(
             text: OWSLocalizedString(
                 "SETTINGS_CHANGE_PHONE_NUMBER_SPLASH_DESCRIPTION",
-                comment: "Description text in the 'change phone number splash' view."
-            )
+                comment: "Description text in the 'change phone number splash' view.",
+            ),
         )
         let continueButton = UIButton(
             configuration: .largePrimary(title: CommonStrings.continueButton),
             primaryAction: UIAction { [weak self] _ in
                 self?.didTapContinue()
-            }
+            },
         )
 
+        let heroImageView = heroImageView
         let stackView = addStaticContentStackView(arrangedSubviews: [
-            heroImageContainer,
+            heroImageView,
             titleLabel,
             subtitleLabel,
             .vStretchingSpacer(),
             continueButton.enclosedInVerticalStackView(isFullWidthButton: true),
         ])
-        stackView.setCustomSpacing(24, after: heroImageContainer)
+        stackView.setCustomSpacing(24, after: heroImageView)
 
         updateContents()
     }
 
     private func updateContents() {
-        let heroImageName = Theme.isDarkThemeEnabled ? "change-number-dark-40" : "change-number-light-40"
+        let heroImageName = "change_number"
         heroImageView.image = UIImage(named: heroImageName)
         heroImageView.sizeToFit()
     }
 
     private func didTapContinue() {
-        presenter?.continueFromSplash()
+        guard let presenter else {
+            owsFailDebug("Missing presenter")
+            return
+        }
+
+        // check for bool here to determine if timeout needs to be shown
+        switch presenter.canChangeNumber() {
+        case .success:
+            presenter.continueFromSplash()
+        case .retryAfter(let backoff):
+            let title = OWSLocalizedString(
+                "SETTINGS_CHANGE_PHONE_NUMBER_SPLASH_CANT_CHANGE_TITLE",
+                comment: "Title text for sheet displaying the 'Can't change phone number splash' message.",
+            )
+
+            let bodyTextFormat = OWSLocalizedString(
+                "SETTINGS_CHANGE_PHONE_NUMBER_SPLASH_CANT_CHANGE_BODY",
+                tableName: "PluralAware",
+                comment: "Title text for sheet displaying the 'Can't change phone number splash' message. Embeds {{number of hours before retry}}",
+            )
+
+            let bodyTextFormatted = String.localizedStringWithFormat(
+                bodyTextFormat,
+                Int(ceil(Double(backoff) / Double(1 * TimeInterval.hour))),
+            )
+
+            let bodyAttributedString = NSAttributedString(string: bodyTextFormatted)
+                .styled(
+                    with:
+                    .font(.dynamicTypeBody),
+                    .color(UIColor.Signal.label),
+                )
+
+            let heroImage = UIImage(named: "change_number_error")!
+
+            let actionSheet = ActionSheetController(
+                title: title,
+                message: bodyAttributedString,
+                image: heroImage,
+            )
+            actionSheet.addAction(ActionSheetAction.ok)
+
+            present(actionSheet, animated: true)
+        }
     }
 }
 
@@ -121,6 +148,11 @@ private class PreviewRegistrationChangeNumberSplashPresenter: RegistrationChange
         print("continueFromSplash")
     }
 
+    func canChangeNumber() -> ChangeNumberAllowedResult {
+        print("canChangeNumber")
+        return .success
+    }
+
     func exitRegistration() {
         print("exitRegistration")
     }
@@ -131,8 +163,8 @@ private class PreviewRegistrationChangeNumberSplashPresenter: RegistrationChange
     let presenter = PreviewRegistrationChangeNumberSplashPresenter()
     return UINavigationController(
         rootViewController: RegistrationChangeNumberSplashViewController(
-            presenter: presenter
-        )
+            presenter: presenter,
+        ),
     )
 }
 

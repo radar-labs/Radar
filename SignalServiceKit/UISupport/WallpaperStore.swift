@@ -4,6 +4,7 @@
 //
 
 import Foundation
+public import UIKit
 
 public class WallpaperStore {
     public static let wallpaperDidChangeNotification = NSNotification.Name("wallpaperDidChangeNotification")
@@ -13,14 +14,14 @@ public class WallpaperStore {
     }
 
     private let wallpaperImageStore: WallpaperImageStore
-    private let enumStore: KeyValueStore
-    private let dimmingStore: KeyValueStore
+    private let enumStore: NewKeyValueStore
+    private let dimmingStore: NewKeyValueStore
 
     init(
-        wallpaperImageStore: WallpaperImageStore
+        wallpaperImageStore: WallpaperImageStore,
     ) {
-        self.enumStore = KeyValueStore(collection: "Wallpaper+Enum")
-        self.dimmingStore = KeyValueStore(collection: "Wallpaper+Dimming")
+        self.enumStore = NewKeyValueStore(collection: "Wallpaper+Enum")
+        self.dimmingStore = NewKeyValueStore(collection: "Wallpaper+Dimming")
         self.wallpaperImageStore = wallpaperImageStore
     }
 
@@ -52,7 +53,7 @@ public class WallpaperStore {
     private func _set(_ wallpaper: Wallpaper?, photo: UIImage? = nil, for thread: TSThread?) async throws {
         owsAssertDebug(photo == nil || wallpaper == .photo)
 
-        let onInsert = { [self] (tx: DBWriteTransaction) throws -> Void in
+        let onInsert = { [self] (tx: DBWriteTransaction) -> Void in
             self.setWallpaperType(wallpaper, for: thread?.uniqueId, tx: tx)
         }
 
@@ -65,12 +66,12 @@ public class WallpaperStore {
 
     /// Set just the type; doesn't override any wallpaper image that may be set.
     public func setWallpaperType(_ wallpaper: Wallpaper?, for threadUniqueId: String?, tx: DBWriteTransaction) {
-        enumStore.setString(wallpaper?.rawValue, key: Self.persistenceKey(for: threadUniqueId), transaction: tx)
+        enumStore.writeValue(wallpaper?.rawValue, forKey: Self.persistenceKey(for: threadUniqueId), tx: tx)
         postWallpaperDidChangeNotification(for: threadUniqueId, tx: tx)
     }
 
     public func fetchWallpaper(for threadUniqueId: String?, tx: DBReadTransaction) -> Wallpaper? {
-        guard let raw = enumStore.getString(Self.persistenceKey(for: threadUniqueId), transaction: tx) else {
+        guard let raw = enumStore.fetchValue(String.self, forKey: Self.persistenceKey(for: threadUniqueId), tx: tx) else {
             return nil
         }
         guard let wallpaper = Wallpaper(rawValue: raw) else {
@@ -83,7 +84,7 @@ public class WallpaperStore {
     /// Return either the per-thread wallpaper setting, or the global setting if none is set on the thread.
     public func fetchWallpaperForRendering(
         for threadUniqueId: String?,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> Wallpaper? {
         return Self.fetchResolvedValue(for: threadUniqueId) {
             return fetchWallpaper(for: $0, tx: tx)
@@ -97,21 +98,21 @@ public class WallpaperStore {
     }
 
     public func fetchUniqueThreadIdsWithWallpaper(tx: DBReadTransaction) -> [String?] {
-        return enumStore.allKeys(transaction: tx).map { Self.threadUniqueId(for: $0) }
+        return enumStore.fetchKeys(tx: tx).map { Self.threadUniqueId(for: $0) }
     }
 
     public func setDimInDarkMode(_ dimInDarkMode: Bool?, for threadUniqueId: String?, tx: DBWriteTransaction) {
         let key = Self.persistenceKey(for: threadUniqueId)
         if let dimInDarkMode {
-            dimmingStore.setBool(dimInDarkMode, key: key, transaction: tx)
+            dimmingStore.writeValue(dimInDarkMode, forKey: key, tx: tx)
         } else {
-            dimmingStore.removeValue(forKey: key, transaction: tx)
+            dimmingStore.removeValue(forKey: key, tx: tx)
         }
         postWallpaperDidChangeNotification(for: threadUniqueId, tx: tx)
     }
 
     public func fetchDimInDarkMode(for threadUniqueId: String?, tx: DBReadTransaction) -> Bool? {
-        return dimmingStore.getBool(Self.persistenceKey(for: threadUniqueId), transaction: tx)
+        return dimmingStore.fetchValue(Bool.self, forKey: Self.persistenceKey(for: threadUniqueId), tx: tx)
     }
 
     public func fetchDimInDarkModeForRendering(for threadUniqueId: String?, tx: DBReadTransaction) -> Bool {
@@ -122,16 +123,16 @@ public class WallpaperStore {
 
     // MARK: - Resetting Values
 
-    public func reset(for thread: TSThread?, tx: DBWriteTransaction) throws {
+    public func reset(for thread: TSThread?, tx: DBWriteTransaction) {
         let threadUniqueId = thread?.uniqueId
-        enumStore.removeValue(forKey: Self.persistenceKey(for: threadUniqueId), transaction: tx)
-        dimmingStore.removeValue(forKey: Self.persistenceKey(for: threadUniqueId), transaction: tx)
+        enumStore.removeValue(forKey: Self.persistenceKey(for: threadUniqueId), tx: tx)
+        dimmingStore.removeValue(forKey: Self.persistenceKey(for: threadUniqueId), tx: tx)
         postWallpaperDidChangeNotification(for: threadUniqueId, tx: tx)
     }
 
-    public func resetAll(tx: DBWriteTransaction) throws {
-        enumStore.removeAll(transaction: tx)
-        dimmingStore.removeAll(transaction: tx)
+    public func resetAll(tx: DBWriteTransaction) {
+        enumStore.removeAll(tx: tx)
+        dimmingStore.removeAll(tx: tx)
         postWallpaperDidChangeNotification(for: nil, tx: tx)
     }
 

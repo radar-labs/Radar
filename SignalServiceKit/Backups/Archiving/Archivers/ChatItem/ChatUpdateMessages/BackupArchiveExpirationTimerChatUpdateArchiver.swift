@@ -15,8 +15,8 @@ final class BackupArchiveExpirationTimerChatUpdateArchiver {
     typealias ArchiveChatUpdateMessageResult = BackupArchive.ArchiveInteractionResult<Details>
     typealias RestoreChatUpdateMessageResult = BackupArchive.RestoreInteractionResult<Void>
 
-    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError<BackupArchive.InteractionUniqueId>
-    private typealias RestoreFrameError = BackupArchive.RestoreFrameError<BackupArchive.ChatItemId>
+    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError
+    private typealias RestoreFrameError = BackupArchive.RestoreFrameError
 
     private let contactManager: BackupArchive.Shims.ContactManager
     private let groupUpdateArchiver: BackupArchiveGroupUpdateMessageArchiver
@@ -25,7 +25,7 @@ final class BackupArchiveExpirationTimerChatUpdateArchiver {
     init(
         contactManager: BackupArchive.Shims.ContactManager,
         groupUpdateArchiver: BackupArchiveGroupUpdateMessageArchiver,
-        interactionStore: BackupArchiveInteractionStore
+        interactionStore: BackupArchiveInteractionStore,
     ) {
         self.contactManager = contactManager
         self.groupUpdateArchiver = groupUpdateArchiver
@@ -37,17 +37,13 @@ final class BackupArchiveExpirationTimerChatUpdateArchiver {
     func archiveExpirationTimerChatUpdate(
         infoMessage: TSInfoMessage,
         threadInfo: BackupArchive.ChatArchivingContext.CachedThreadInfo,
-        context: BackupArchive.ChatArchivingContext
+        context: BackupArchive.ChatArchivingContext,
     ) -> ArchiveChatUpdateMessageResult {
         func messageFailure(
             _ errorType: ArchiveFrameError.ErrorType,
-            line: UInt = #line
+            line: UInt = #line,
         ) -> ArchiveChatUpdateMessageResult {
-            return .messageFailure([.archiveFrameError(
-                errorType,
-                infoMessage.uniqueInteractionId,
-                line: line
-            )])
+            return .messageFailure([.archiveFrameError(errorType, line: line)])
         }
 
         guard let dmUpdateInfoMessage = infoMessage as? OWSDisappearingConfigurationUpdateInfoMessage else {
@@ -79,7 +75,7 @@ final class BackupArchiveExpirationTimerChatUpdateArchiver {
                 wasAuthoredByLocalUser: wasAuthoredByLocalUser,
                 updatedExpiresInMs: chatUpdateExpiresInMs,
                 threadInfo: threadInfo,
-                context: context
+                context: context,
             )
         }
 
@@ -104,13 +100,12 @@ final class BackupArchiveExpirationTimerChatUpdateArchiver {
             author: chatUpdateAuthorAddress,
             directionalDetails: .directionless(BackupProto_ChatItem.DirectionlessMessageDetails()),
             dateCreated: infoMessage.timestamp,
-            expireStartDate: nil,
-            expiresInMs: nil,
             isSealedSender: false,
             chatItemType: .updateMessage(chatUpdateMessage),
             isSmsPreviouslyRestoredFromBackup: false,
             threadInfo: threadInfo,
-            context: context.recipientContext
+            pinMessageDetails: nil,
+            context: context.recipientContext,
         )
     }
 
@@ -122,7 +117,7 @@ final class BackupArchiveExpirationTimerChatUpdateArchiver {
         wasAuthoredByLocalUser: Bool,
         updatedExpiresInMs: UInt64,
         threadInfo: BackupArchive.ChatArchivingContext.CachedThreadInfo,
-        context: BackupArchive.ChatArchivingContext
+        context: BackupArchive.ChatArchivingContext,
     ) -> ArchiveChatUpdateMessageResult {
 
         let swizzledGroupUpdateItem: TSInfoMessage.PersistableGroupUpdateItem
@@ -140,7 +135,7 @@ final class BackupArchiveExpirationTimerChatUpdateArchiver {
             [swizzledGroupUpdateItem],
             for: dmUpdateInfoMessage,
             threadInfo: threadInfo,
-            context: context
+            context: context,
         )
     }
 
@@ -150,17 +145,13 @@ final class BackupArchiveExpirationTimerChatUpdateArchiver {
         _ expirationTimerChatUpdate: BackupProto_ExpirationTimerChatUpdate,
         chatItem: BackupProto_ChatItem,
         chatThread: BackupArchive.ChatThread,
-        context: BackupArchive.ChatItemRestoringContext
+        context: BackupArchive.ChatItemRestoringContext,
     ) -> RestoreChatUpdateMessageResult {
         func invalidProtoData(
             _ error: RestoreFrameError.ErrorType.InvalidProtoDataError,
-            line: UInt = #line
+            line: UInt = #line,
         ) -> RestoreChatUpdateMessageResult {
-            return .messageFailure([.restoreFrameError(
-                .invalidProtoData(error),
-                chatItem.id,
-                line: line
-            )])
+            return .messageFailure([.restoreFrameError(.invalidProtoData(error), line: line)])
         }
 
         let contactThread: TSContactThread
@@ -190,7 +181,7 @@ final class BackupArchiveExpirationTimerChatUpdateArchiver {
             timestamp: chatItem.dateSent,
             isConfigurationEnabled: expiresInSeconds > 0,
             configurationDurationSeconds: UInt32(clamping: expiresInSeconds), // Safe to clamp, we checked for overflow above
-            createdByRemoteName: createdByRemoteName
+            createdByRemoteName: createdByRemoteName,
         )
 
         do {
@@ -198,10 +189,10 @@ final class BackupArchiveExpirationTimerChatUpdateArchiver {
                 dmUpdateInfoMessage,
                 in: chatThread,
                 chatId: chatItem.typedChatId,
-                context: context
+                context: context,
             )
         } catch let error {
-            return .messageFailure([.restoreFrameError(.databaseInsertionFailed(error), chatItem.id)])
+            return .messageFailure([.restoreFrameError(.databaseInsertionFailed(error))])
         }
 
         return .success(())

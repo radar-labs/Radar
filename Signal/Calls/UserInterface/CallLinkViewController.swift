@@ -4,17 +4,15 @@
 //
 
 import Combine
-import Foundation
 import SignalServiceKit
 import SignalUI
-import UIKit
 
-final class CallLinkViewController: OWSTableViewController2 {
+final class CallLinkViewController: OWSTableViewController2, DatabaseChangeDelegate, SendMessageDelegate {
     override var preferredNavigationBarStyle: OWSNavigationBarStyle { .solid }
-    override var navbarBackgroundColorOverride: UIColor? { tableBackgroundColor }
+    override var navbarBackgroundColorOverride: UIColor? { OWSTableViewController2.tableBackgroundColor }
 
     private var db: any DB { DependenciesBridge.shared.db }
-    private var callLinkStore: any CallLinkRecordStore { DependenciesBridge.shared.callLinkStore }
+    private var callLinkStore: CallLinkRecordStore { DependenciesBridge.shared.callLinkStore }
 
     private let callLink: CallLink
 
@@ -43,13 +41,13 @@ final class CallLinkViewController: OWSTableViewController2 {
                 return ($0, CallLinkAdminManager(
                     rootKey: callLinkRecord.rootKey,
                     adminPasskey: $0,
-                    callLinkState: callLinkRecord.state
+                    callLinkState: callLinkRecord.state,
                 ))
             },
             canShowDeleteButton: true,
             callLinkRowId: callLinkRecord.id,
             callLinkState: callLinkRecord.state,
-            callRecords: callRecords
+            callRecords: callRecords,
         )
     }
 
@@ -57,7 +55,7 @@ final class CallLinkViewController: OWSTableViewController2 {
         let adminManager = CallLinkAdminManager(
             rootKey: callLink.rootKey,
             adminPasskey: adminPasskey,
-            callLinkState: callLinkState
+            callLinkState: callLinkState,
         )
         let result = CallLinkViewController(
             title: CallStrings.createCallLinkTitle,
@@ -66,7 +64,7 @@ final class CallLinkViewController: OWSTableViewController2 {
             canShowDeleteButton: false,
             callLinkRowId: nil,
             callLinkState: callLinkState,
-            callRecords: []
+            callRecords: [],
         )
         // We need to learn about updates before `persistIfNeeded` is invoked.
         adminManager.didUpdateCallLinkState = { [weak result] callLinkState in
@@ -83,7 +81,7 @@ final class CallLinkViewController: OWSTableViewController2 {
         canShowDeleteButton: Bool,
         callLinkRowId: Int64?,
         callLinkState: CallLinkState?,
-        callRecords: [CallRecord]
+        callRecords: [CallRecord],
     ) {
         self.callLink = callLink
         self.adminPasskey = adminInfo?.adminPasskey
@@ -115,7 +113,7 @@ final class CallLinkViewController: OWSTableViewController2 {
         let view = CallLinkCardView(
             callLink: self.callLink,
             callName: self.callLinkState.localizedName,
-            joinAction: { [unowned self] in self.joinCall() }
+            joinAction: { [unowned self] in self.joinCall() },
         )
         cell.contentView.addSubview(view)
         view.autoPinLeadingToSuperviewMargin()
@@ -134,9 +132,9 @@ final class CallLinkViewController: OWSTableViewController2 {
     private func buildTableContents() -> OWSTableContents {
         let callLinkCardItem = OWSTableItem(
             customCellBlock: { [weak self] in
-                guard let self = self else { return UITableViewCell() }
+                guard let self else { return UITableViewCell() }
                 return self.callLinkCardCell()
-            }
+            },
         )
 
         var settingSection: OWSTableSection?
@@ -148,22 +146,22 @@ final class CallLinkViewController: OWSTableViewController2 {
                 actionBlock: { [unowned self] in
                     EditCallLinkNameViewController(
                         oldName: self.callLinkState?.name ?? "",
-                        setNewName: callLinkAdminManager.updateName(_:)
+                        setNewName: callLinkAdminManager.updateName(_:),
                     ).presentInNavController(from: self)
-                }
+                },
             ))
             settingItems.append(.switch(
                 withText: CallStrings.approveAllMembers,
                 isOn: { [unowned self] in
                     return (
                         self.callLinkState?.requiresAdminApproval
-                        ?? CallLinkState.Constants.defaultRequiresAdminApproval
+                            ?? CallLinkState.Constants.defaultRequiresAdminApproval,
                     )
                 },
                 isEnabled: { [unowned self] in self.callLinkState != nil },
                 actionBlock: { [unowned self] sender in
                     callLinkAdminManager.toggleApproveAllMembersWithActivityIndicator(sender, from: self)
-                }
+                },
             ))
             settingSection = OWSTableSection(items: settingItems)
         }
@@ -172,24 +170,24 @@ final class CallLinkViewController: OWSTableViewController2 {
             .item(
                 icon: .buttonForward,
                 name: CallStrings.shareLinkViaSignal,
-                actionBlock: { [unowned self] in self.shareCallLinkViaSignal() }
+                actionBlock: { [unowned self] in self.shareCallLinkViaSignal() },
             ),
             .item(
                 icon: .buttonCopy,
                 name: CallStrings.copyLinkToClipboard,
-                actionBlock: { [unowned self] in self.copyCallLink() }
+                actionBlock: { [unowned self] in self.copyCallLink() },
             ),
             OWSTableItem(
                 customCellBlock: {
                     let cell = OWSTableItem.buildCell(
                         icon: .buttonShare,
-                        itemName: CallStrings.shareLinkViaSystem
+                        itemName: CallStrings.shareLinkViaSystem,
                     )
                     self.systemShareTableViewCell = cell
                     return cell
                 },
-                actionBlock: { [unowned self] in self.shareCallLinkViaSystem() }
-            )
+                actionBlock: { [unowned self] in self.shareCallLinkViaSystem() },
+            ),
         ])
         sharingSection.separatorInsetLeading = OWSTableViewController2.cellHInnerMargin + OWSTableItem.iconSize + OWSTableItem.iconSpacing
 
@@ -198,12 +196,12 @@ final class CallLinkViewController: OWSTableViewController2 {
             let rootKey = self.callLink.rootKey
             let deleteItem: OWSTableItem = .item(
                 icon: .buttonDelete,
-                tintColor: .ows_accentRed,
+                tintColor: .Signal.red,
                 name: OWSLocalizedString(
                     "CALL_LINK_DELETE_ACTION",
-                    comment: "A button to delete a call link that's shown after tapping the (i) info button on an item in the calls tab."
+                    comment: "A button to delete a call link that's shown after tapping the (i) info button on an item in the calls tab.",
                 ),
-                textColor: .ows_accentRed,
+                textColor: .Signal.red,
                 actionBlock: { [unowned self] in
                     CallLinkDeleter.promptToDelete(fromViewController: self) { [weak self] in
                         do {
@@ -211,7 +209,7 @@ final class CallLinkViewController: OWSTableViewController2 {
                                 stateUpdater: AppEnvironment.shared.callService.callLinkStateUpdater,
                                 storageServiceManager: SSKEnvironment.shared.storageServiceManagerRef,
                                 rootKey: rootKey,
-                                adminPasskey: adminPasskey
+                                adminPasskey: adminPasskey,
                             )
                             if let self {
                                 let navigationController = self.navigationController!
@@ -223,19 +221,22 @@ final class CallLinkViewController: OWSTableViewController2 {
                             self?.presentToast(text: CallLinkDeleter.failureText)
                         }
                     }
-                }
+                },
             )
             deleteSection = OWSTableSection(items: [deleteItem])
         }
 
         return OWSTableContents(
             sections: [
-                ConversationSettingsViewController.createCallHistorySection(callRecords: callRecords),
+                ConversationSettingsViewController.createCallHistorySection(
+                    callRecords: callRecords,
+                    callExpirations: [:],
+                ),
                 OWSTableSection(items: [callLinkCardItem]),
                 settingSection,
                 sharingSection,
-                deleteSection
-            ].compacted()
+                deleteSection,
+            ].compacted(),
         )
     }
 
@@ -257,24 +258,29 @@ final class CallLinkViewController: OWSTableViewController2 {
     }
 
     private func createCallLinkRecord() -> Int64 {
-        let rowId = SSKEnvironment.shared.databaseStorageRef.write { tx in
+        let databaseStorage = SSKEnvironment.shared.databaseStorageRef
+        let messageSenderJobQueue = SSKEnvironment.shared.messageSenderJobQueueRef
+        let storageServiceManager = SSKEnvironment.shared.storageServiceManagerRef
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        let rowId = databaseStorage.write { tx in
             var callLinkRecord: CallLinkRecord
-            do {
-                (callLinkRecord, _) = try callLinkStore.fetchOrInsert(rootKey: callLink.rootKey, tx: tx)
-                callLinkRecord.adminPasskey = adminPasskey!
-                callLinkRecord.updateState(callLinkState!)
-                try callLinkStore.update(callLinkRecord, tx: tx)
-            } catch {
-                owsFail("Couldn't create CallLinkRecord: \(error)")
-            }
+            (callLinkRecord, _) = callLinkStore.fetchOrInsert(rootKey: callLink.rootKey, tx: tx)
+            callLinkRecord.adminPasskey = adminPasskey.owsFailUnwrap("must have passkey")
+            callLinkRecord.updateState(callLinkState.owsFailUnwrap("must have state"))
+            callLinkStore.update(callLinkRecord, tx: tx)
 
             CallLinkUpdateMessageSender(
-                messageSenderJobQueue: SSKEnvironment.shared.messageSenderJobQueueRef
-            ).sendCallLinkUpdateMessage(rootKey: callLink.rootKey, adminPasskey: adminPasskey, tx: tx)
+                messageSenderJobQueue: messageSenderJobQueue,
+            ).sendCallLinkUpdateMessage(
+                rootKey: callLink.rootKey,
+                adminPasskey: adminPasskey,
+                localIdentifiers: tsAccountManager.mustBeRegisteredState(tx: tx).localIdentifiers,
+                tx: tx,
+            )
 
             return callLinkRecord.id
         }
-        SSKEnvironment.shared.storageServiceManagerRef.recordPendingUpdates(callLinkRootKeys: [callLink.rootKey])
+        storageServiceManager.recordPendingUpdates(callLinkRootKeys: [callLink.rootKey])
         return rowId
     }
 
@@ -292,21 +298,21 @@ final class CallLinkViewController: OWSTableViewController2 {
                 // In all other cases, the admin may have changed the details, so we should
                 // check when joining the call.
                 return .fetch
-            }()
+            }(),
         )
     }
 
     private func copyCallLink() {
         self.persistIfNeeded()
         UIPasteboard.general.url = self.callLink.url()
-        self.presentToast(text: CommonStrings.copiedToClipboardToast)
+        self.presentToast(text: CommonStrings.copiedToClipboardToast, image: .copy)
     }
 
     private func shareCallLinkViaSystem() {
         self.persistIfNeeded()
         let shareViewController = UIActivityViewController(
             activityItems: [self.callLink.url()],
-            applicationActivities: nil
+            applicationActivities: nil,
         )
         shareViewController.popoverPresentationController?.sourceView = self.systemShareTableViewCell
         self.present(shareViewController, animated: true)
@@ -323,35 +329,30 @@ final class CallLinkViewController: OWSTableViewController2 {
         let sendMessageFlow = SendMessageFlow(
             unapprovedContent: unapprovedContent,
             presentationStyle: .presentFrom(self),
-            delegate: self
+            delegate: self,
         )
         // Retain the flow until it is complete.
         self.sendMessageFlow = sendMessageFlow
     }
-}
 
-extension CallLinkViewController: DatabaseChangeDelegate {
+    // MARK: - DatabaseChangeDelegate
+
     private func loadStateAndReloadViewIfNeeded(callLinkRowId: Int64) {
         let didChangeVisibleProperty: Bool
-        do {
-            let oldState = self.callLinkState
-            let newState = try self.db.read { tx in try callLinkStore.fetch(rowId: callLinkRowId, tx: tx)?.state }
-            didChangeVisibleProperty = (
-                (oldState == nil) != (newState == nil)
+        let oldState = self.callLinkState
+        let newState = self.db.read { tx in callLinkStore.fetch(rowId: callLinkRowId, tx: tx)?.state }
+        didChangeVisibleProperty = (
+            (oldState == nil) != (newState == nil)
                 || (oldState?.name != newState?.name)
-                || (oldState?.requiresAdminApproval != newState?.requiresAdminApproval)
-            )
-            self.callLinkState = newState
-        } catch {
-            owsFailDebug("Couldn't fetch CallLink: \(error)")
-            return
-        }
+                || (oldState?.requiresAdminApproval != newState?.requiresAdminApproval),
+        )
+        self.callLinkState = newState
         if didChangeVisibleProperty, self.isViewLoaded {
             updateContents(shouldReload: true)
         }
     }
 
-    func databaseChangesDidUpdate(databaseChanges: any DatabaseChanges) {
+    func databaseChangesDidUpdate(databaseChanges: DatabaseChanges) {
         guard let callLinkRowId else {
             return
         }
@@ -370,9 +371,9 @@ extension CallLinkViewController: DatabaseChangeDelegate {
 
     func databaseChangesDidReset() {
     }
-}
 
-extension CallLinkViewController: SendMessageDelegate {
+    // MARK: - SendMessageDelegate
+
     func sendMessageFlowDidComplete(threads: [TSThread]) {
         AssertIsOnMainThread()
 
@@ -406,92 +407,53 @@ private class CallLinkCardView: UIView {
     private lazy var iconView: UIImageView = {
         let image = CommonCallLinksUI.callLinkIcon(rootKey: callLink.rootKey)
         let imageView = UIImageView(image: image)
-        imageView.autoSetDimensions(to: CGSize(
-            width: Constants.circleViewDimension,
-            height: Constants.circleViewDimension
-        ))
+        imageView.autoSetDimensions(to: .square(CommonCallLinksUI.Constants.circleViewDimension))
         return imageView
     }()
 
     private lazy var textStack: UIStackView = {
-        let stackView = UIStackView()
-
         let nameLabel = UILabel()
         nameLabel.text = callName
         nameLabel.lineBreakMode = .byWordWrapping
         nameLabel.numberOfLines = 0
-        nameLabel.textColor = Theme.primaryTextColor
+        nameLabel.textColor = .Signal.label
         nameLabel.font = .dynamicTypeHeadline
 
         let linkLabel = UILabel()
         linkLabel.text = callLink.url().absoluteString
         linkLabel.lineBreakMode = .byTruncatingTail
         linkLabel.numberOfLines = 2
-
         linkLabel.textColor = .Signal.secondaryLabel
         linkLabel.font = .dynamicTypeSubheadline
 
+        let stackView = UIStackView()
         stackView.addArrangedSubviews([nameLabel, linkLabel])
         stackView.axis = .vertical
-        stackView.spacing = Constants.textStackSpacing
+        stackView.spacing = 2
         stackView.alignment = .leading
-
-        stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
 
-    private let joinButton: UIButton
+    private lazy var joinButton: UIButton = {
+        // When we're in dark theme, we actually want the color corresponding
+        // with the _high contrast_ dark theme, due to the background color
+        // of the button. Design requested this exception.
+        let darkThemeTraits = UITraitCollection(traitsFrom: [
+            UITraitCollection(userInterfaceStyle: .dark),
+            UITraitCollection(accessibilityContrast: .high),
+        ])
+        let darkThemeColor = UIColor.Signal.ultramarine.resolvedColor(with: darkThemeTraits)
+        let lightThemeColor = UIColor.Signal.ultramarine.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light))
 
-    private class JoinButton: UIButton {
-        init(joinAction: @escaping () -> Void) {
-            super.init(frame: .zero)
-
-            let view = UIView()
-            view.backgroundColor = Theme.isDarkThemeEnabled ? .ows_gray65 : .ows_gray05
-            view.isUserInteractionEnabled = false
-            view.layer.cornerRadius = bounds.size.height / 2
-
-            let label = UILabel()
-            label.setCompressionResistanceHigh()
-            label.text = CallStrings.joinCallPillButtonTitle
-            label.font = UIFont.dynamicTypeSubheadlineClamped.semibold()
-            label.textColor = Theme.joinButtonTextColor
-            view.isUserInteractionEnabled = false
-
-            self.clipsToBounds = true
-            self.addAction(UIAction(handler: { _ in joinAction() }), for: .touchUpInside)
-
-            view.addSubview(label)
-            label.autoPinEdge(.top, to: .top, of: view, withOffset: Constants.vMargin)
-            label.autoPinEdge(.bottom, to: .bottom, of: view, withOffset: -Constants.vMargin)
-            label.autoPinEdge(.leading, to: .leading, of: view, withOffset: Constants.hMargin)
-            label.autoPinEdge(.trailing, to: .trailing, of: view, withOffset: -Constants.hMargin)
-
-            self.addSubview(view)
-            view.autoPinEdgesToSuperviewEdges()
-
-            self.accessibilityLabel = CallStrings.joinCallPillButtonTitle
-        }
-
-        override public var bounds: CGRect {
-            didSet {
-                updateRadius()
-            }
-        }
-
-        private func updateRadius() {
-            layer.cornerRadius = bounds.size.height / 2
-        }
-
-        private enum Constants {
-            static let vMargin: CGFloat = 4
-            static let hMargin: CGFloat = 12
-        }
-
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
-    }
+        var buttonConfiguration = UIButton.Configuration.filled()
+        buttonConfiguration.baseForegroundColor = UIColor(light: lightThemeColor, dark: darkThemeColor)
+        buttonConfiguration.baseBackgroundColor = UIColor(light: .ows_gray05, dark: .ows_gray65)
+        buttonConfiguration.title = CallStrings.joinCallPillButtonTitle
+        buttonConfiguration.attributedTitle?.font = .dynamicTypeSubheadlineClamped.semibold()
+        buttonConfiguration.cornerStyle = .capsule
+        buttonConfiguration.contentInsets = .init(hMargin: 12, vMargin: 4)
+        return UIButton(configuration: buttonConfiguration)
+    }()
 
     private let callLink: CallLink
     private let callName: String
@@ -499,50 +461,37 @@ private class CallLinkCardView: UIView {
     init(
         callLink: CallLink,
         callName: String,
-        joinAction: @escaping () -> Void
+        joinAction: @escaping () -> Void,
     ) {
         self.callLink = callLink
         self.callName = callName
-        self.joinButton = JoinButton(joinAction: joinAction)
 
         super.init(frame: .zero)
+
+        joinButton.setCompressionResistanceHorizontalHigh()
+        joinButton.addAction(
+            UIAction { _ in joinAction() },
+            for: .primaryActionTriggered,
+        )
 
         let stackView = UIStackView()
         stackView.addArrangedSubviews([iconView, textStack, joinButton])
         stackView.axis = .horizontal
         stackView.distribution = .fillProportionally
         stackView.alignment = .center
-        stackView.spacing = Constants.spacingIconToText
-        stackView.setCustomSpacing(Constants.spacingTextToButton, after: textStack)
-
-        self.addSubview(stackView)
-        stackView.autoPinEdgesToSuperviewEdges()
+        stackView.spacing = 12
+        stackView.setCustomSpacing(16, after: textStack)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(stackView)
+        NSLayoutConstraint.activate([
+            stackView.topAnchor.constraint(equalTo: topAnchor),
+            stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            stackView.bottomAnchor.constraint(equalTo: bottomAnchor),
+        ])
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-
-    private enum Constants {
-        static let spacingTextToButton: CGFloat = 16
-        static let spacingIconToText: CGFloat = 12
-        static let textStackSpacing: CGFloat = 2
-
-        static let circleViewDimension: CGFloat = CommonCallLinksUI.Constants.circleViewDimension
-    }
-}
-
-private extension Theme {
-    class var joinButtonTextColor: UIColor {
-        // When we're in dark theme, we actually want the color corresponding
-        // with the _high contrast_ dark theme, due to the background color
-        // of the button. Design requested this exception.
-        let darkThemeTraits = UITraitCollection(traitsFrom: [
-            UITraitCollection(userInterfaceStyle: .dark),
-            UITraitCollection(accessibilityContrast: .high)
-        ])
-        let darkThemeColor = UIColor.Signal.ultramarine.resolvedColor(with: darkThemeTraits)
-        let lightThemeColor = UIColor.Signal.ultramarine.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light))
-        return isDarkThemeEnabled ? darkThemeColor : lightThemeColor
     }
 }

@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public final class CallRecordDeleteAllJobRecord: JobRecord, FactoryInitializableFromRecordType {
-    override class var jobRecordType: JobRecord.JobRecordType { .callRecordDeleteAll }
+public final class CallRecordDeleteAllJobRecord: JobRecord {
+    override public class var jobRecordType: JobRecord.JobRecordType { .callRecordDeleteAll }
 
     /// Whether this job should send a "delete all" `CallLogEvent` sync message.
     /// - SeeAlso ``OutgoingCallLogEventSyncMessage``.
@@ -48,7 +48,7 @@ public final class CallRecordDeleteAllJobRecord: JobRecord, FactoryInitializable
         deleteAllBeforeConversationId: Data?,
         deleteAllBeforeTimestamp: UInt64,
         failureCount: UInt = 0,
-        status: Status = .ready
+        status: Status = .ready,
     ) {
         self.sendDeleteAllSyncMessage = sendDeleteAllSyncMessage
         self._deleteAllBeforeCallIdString = deleteAllBeforeCallId.map { String($0) }
@@ -57,11 +57,11 @@ public final class CallRecordDeleteAllJobRecord: JobRecord, FactoryInitializable
 
         super.init(
             failureCount: failureCount,
-            status: status
+            status: status,
         )
     }
 
-    required init(forRecordTypeFactoryInitializationFrom decoder: Decoder) throws {
+    required init(inheritableDecoder decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         sendDeleteAllSyncMessage = try container.decode(Bool.self, forKey: .sendDeleteAllSyncMessage)
@@ -78,17 +78,14 @@ public final class CallRecordDeleteAllJobRecord: JobRecord, FactoryInitializable
             deleteAllBeforeConversationId = nil
         }
 
-        try super.init(baseClassDuringFactoryInitializationFrom: container.superDecoder())
+        try super.init(inheritableDecoder: decoder)
     }
 
     override public func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
-
-        try super.encode(to: container.superEncoder())
-
         try container.encode(sendDeleteAllSyncMessage, forKey: .sendDeleteAllSyncMessage)
         try container.encode(deleteAllBeforeTimestamp, forKey: .deleteAllBeforeTimestamp)
-
         if let _deleteAllBeforeCallIdString, let deleteAllBeforeConversationId {
             try container.encode(_deleteAllBeforeCallIdString, forKey: .deleteAllBeforeCallId)
             try container.encode(deleteAllBeforeConversationId, forKey: .deleteAllBeforeConversationId)

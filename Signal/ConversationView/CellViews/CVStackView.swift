@@ -4,17 +4,19 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
-public typealias CVStackViewConfig = OWSStackView.Config
+typealias CVStackViewConfig = OWSStackView.Config
 
 // MARK: -
 
-public extension UIStackView {
+extension UIStackView {
 
-    static func measure(config: CVStackViewConfig,
-                        subviewSizes: [CGSize],
-                        verboseLogging: Bool = false) -> CGSize {
+    static func measure(
+        config: CVStackViewConfig,
+        subviewSizes: [CGSize],
+        verboseLogging: Bool = false,
+    ) -> CGSize {
 
         let spacingCount = max(0, subviewSizes.count - 1)
 
@@ -78,7 +80,7 @@ public extension UIStackView {
 // MARK: -
 
 // TODO: Can this be moved to UIView+OWS.swift?
-public extension CGRect {
+extension CGRect {
 
     var width: CGFloat {
         get {

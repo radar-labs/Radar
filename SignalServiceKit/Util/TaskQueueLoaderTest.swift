@@ -14,7 +14,7 @@ public class TaskQueueLoaderTest: XCTestCase {
             maxConcurrentTasks: 4,
             dateProvider: { Date() },
             db: InMemoryDB(),
-            runner: runner
+            runner: runner,
         )
         try await loader.loadAndRunTasks()
         // We should have run all tasks
@@ -29,7 +29,7 @@ public class TaskQueueLoaderTest: XCTestCase {
             maxConcurrentTasks: 1,
             dateProvider: { Date() },
             db: InMemoryDB(),
-            runner: runner
+            runner: runner,
         )
         try await loader.loadAndRunTasks()
         // We should have run all tasks
@@ -45,7 +45,7 @@ public class TaskQueueLoaderTest: XCTestCase {
             maxConcurrentTasks: 4,
             dateProvider: { Date() },
             db: InMemoryDB(),
-            runner: runner
+            runner: runner,
         )
         try await loader.loadAndRunTasks()
         XCTAssertEqual(runner.completedTasks.count, 3)
@@ -58,7 +58,7 @@ public class TaskQueueLoaderTest: XCTestCase {
             maxConcurrentTasks: 4,
             dateProvider: { Date() },
             db: InMemoryDB(),
-            runner: runner
+            runner: runner,
         )
         try await loader.loadAndRunTasks()
         XCTAssertEqual(runner.completedTasks.count, 0)
@@ -70,7 +70,7 @@ public class TaskQueueLoaderTest: XCTestCase {
             maxConcurrentTasks: 4,
             dateProvider: { Date() },
             db: InMemoryDB(),
-            runner: runner
+            runner: runner,
         )
 
         // One single task (the first) will be stuck waiting on the continuation
@@ -110,7 +110,7 @@ public class TaskQueueLoaderTest: XCTestCase {
             maxConcurrentTasks: 4,
             dateProvider: { Date() },
             db: InMemoryDB(),
-            runner: runner
+            runner: runner,
         )
 
         var numFailures = 0
@@ -135,7 +135,7 @@ public class TaskQueueLoaderTest: XCTestCase {
             maxConcurrentTasks: 4,
             dateProvider: { Date() },
             db: InMemoryDB(),
-            runner: runner
+            runner: runner,
         )
 
         runner.taskRunner = { id in
@@ -158,13 +158,13 @@ public class TaskQueueLoaderTest: XCTestCase {
             maxConcurrentTasks: 4,
             dateProvider: { Date() },
             db: InMemoryDB(),
-            runner: runner
+            runner: runner,
         )
 
         runner.taskRunner = { id in
             if id == 1 {
                 // Make the first task cancel.
-                return .cancelled
+                return .obsolete
             } else {
                 return .success
             }
@@ -181,7 +181,7 @@ public class TaskQueueLoaderTest: XCTestCase {
             maxConcurrentTasks: 1,
             dateProvider: { Date() },
             db: InMemoryDB(),
-            runner: runner
+            runner: runner,
         )
 
         var mainTask: Task<Void, Error>!
@@ -216,7 +216,7 @@ public class TaskQueueLoaderTest: XCTestCase {
             maxConcurrentTasks: 1,
             dateProvider: { Date() },
             db: InMemoryDB(),
-            runner: runner
+            runner: runner,
         )
 
         // Make two tasks that wait on `loadAndRunTasks`.
@@ -283,7 +283,7 @@ public class TaskQueueLoaderTest: XCTestCase {
             maxConcurrentTasks: 1,
             dateProvider: { Date() },
             db: InMemoryDB(),
-            runner: runner
+            runner: runner,
         )
 
         // Make two tasks that wait on `loadAndRunTasks`.
@@ -358,7 +358,7 @@ public class TaskQueueLoaderTest: XCTestCase {
             maxConcurrentTasks: 1,
             dateProvider: { Date() },
             db: InMemoryDB(),
-            runner: runner
+            runner: runner,
         )
 
         // Make two tasks that wait on `loadAndRunTasks`.
@@ -445,7 +445,7 @@ public class TaskQueueLoaderTest: XCTestCase {
             maxConcurrentTasks: 1,
             dateProvider: { Date() },
             db: db,
-            runner: runner
+            runner: runner,
         )
 
         var beginDidDrainQueueContinuation: AsyncStream<Void>.Continuation!
@@ -506,7 +506,7 @@ public class TaskQueueLoaderTest: XCTestCase {
             maxConcurrentTasks: 1,
             dateProvider: { Date() },
             db: InMemoryDB(),
-            runner: runner
+            runner: runner,
         )
 
         struct MockError: Error {}
@@ -526,7 +526,7 @@ public class TaskQueueLoaderTest: XCTestCase {
                     try Task.checkCancellation()
                     await Task.yield()
                 } catch {
-                    return .cancelled
+                    return .obsolete
                 }
             }
         }
@@ -541,7 +541,7 @@ public class TaskQueueLoaderTest: XCTestCase {
                     await withCheckedContinuation { continuation in
                         cancelContinuation = continuation
                     }
-                    try await loader.stop(reason: MockError())
+                    await loader.stop(reason: MockError())
                 }
                 try await taskGroup.waitForAll()
             }
@@ -560,7 +560,7 @@ public class TaskQueueLoaderTest: XCTestCase {
             maxConcurrentTasks: 1,
             dateProvider: { Date() },
             db: InMemoryDB(),
-            runner: runner
+            runner: runner,
         )
 
         struct MockError: Error {}
@@ -568,7 +568,7 @@ public class TaskQueueLoaderTest: XCTestCase {
         var mainTask: Task<Void, Error>!
         runner.taskRunner = { [weak loader] id in
             if id == 1 {
-                try! await loader?.stop(reason: MockError())
+                await loader?.stop(reason: MockError())
                 return .success
             } else {
                 while true {
@@ -576,7 +576,7 @@ public class TaskQueueLoaderTest: XCTestCase {
                         try Task.checkCancellation()
                         await Task.yield()
                     } catch {
-                        return .cancelled
+                        return .obsolete
                     }
                 }
             }
@@ -624,7 +624,7 @@ public class TaskQueueLoaderTest: XCTestCase {
             sleep: { nanoseconds in
                 XCTAssertEqual(nanoseconds, NSEC_PER_SEC)
                 await sleepTask.value
-            }
+            },
         )
 
         runner.taskRunner = { id in
@@ -644,6 +644,28 @@ public class TaskQueueLoaderTest: XCTestCase {
         try await loader.loadAndRunTasks()
         XCTAssertEqual(runner.completedTasks.count, 10)
         XCTAssertEqual(runner.failedTasks.count, 0)
+    }
+
+    func testRecordPresentDuringCallbacks() async throws {
+        let runner = MockRunner(numRecords: 9)
+        let loader = TaskQueueLoader(
+            maxConcurrentTasks: 4,
+            dateProvider: { Date() },
+            db: InMemoryDB(),
+            runner: runner,
+        )
+        runner.taskRunner = { id in
+            switch id % 3 {
+            case 0: return .success
+            case 1: return .unretryableError(MockError())
+            default: return .obsolete
+            }
+        }
+
+        try await loader.loadAndRunTasks()
+        XCTAssertEqual(runner.recordPresentDuringCallback.count, 9)
+        XCTAssert(runner.recordPresentDuringCallback.get().allSatisfy { $0 })
+        XCTAssert(runner.store.records.get().isEmpty)
     }
 
     // MARK: - Mocks
@@ -674,13 +696,15 @@ public class TaskQueueLoaderTest: XCTestCase {
 
         func peek(
             count: UInt,
-            tx: DBReadTransaction
-        ) throws -> [MockTaskRecord] {
+            tx: DBReadTransaction,
+        ) -> [MockTaskRecord] {
             return Array(records.get().prefix(Int(count)))
         }
 
-        func removeRecord(_ record: MockTaskRecord, tx: DBWriteTransaction) throws {
-            records.remove(record)
+        func removeRecord(recordId: Int, tx: DBWriteTransaction) {
+            if let record = records.get().first(where: { $0.id == recordId }) {
+                records.remove(record)
+            }
         }
     }
 
@@ -700,25 +724,34 @@ public class TaskQueueLoaderTest: XCTestCase {
         var completedTasks = AtomicArray<Int>(lock: .init())
         var failedTasks = AtomicArray<Int>(lock: .init())
         var cancelledTasks = AtomicArray<Int>(lock: .init())
+        var recordPresentDuringCallback = AtomicArray<Bool>(lock: .init())
+
+        private func noteRecordPresence(recordId: Int) {
+            let isPresent = store.records.get().contains(where: { $0.id == recordId })
+            recordPresentDuringCallback.append(isPresent)
+        }
 
         var taskRunner: (Int) async -> TaskRecordResult = { _ in
             return .success
         }
 
-        func runTask(record: MockTaskRecord, loader: TaskQueueLoader<MockRunner>) async -> TaskRecordResult {
-            return await taskRunner(record.id)
+        func runTask(recordId: Int, loader: TaskQueueLoader<MockRunner>) async -> TaskRecordResult {
+            return await taskRunner(recordId)
         }
 
-        func didSucceed(record: MockTaskRecord, tx: DBWriteTransaction) throws {
-            completedTasks.append(record.id)
+        func didSucceed(recordId: Int, tx: DBWriteTransaction) {
+            noteRecordPresence(recordId: recordId)
+            completedTasks.append(recordId)
         }
 
-        func didFail(record: MockTaskRecord, error: Error, isRetryable: Bool, tx: DBWriteTransaction) throws {
-            failedTasks.append(record.id)
+        func didFail(recordId: Int, error: Error, isRetryable: Bool, tx: DBWriteTransaction) {
+            noteRecordPresence(recordId: recordId)
+            failedTasks.append(recordId)
         }
 
-        func didCancel(record: MockTaskRecord, tx: DBWriteTransaction) throws {
-            cancelledTasks.append(record.id)
+        func didObsolete(recordId: Int, tx: DBWriteTransaction) {
+            noteRecordPresence(recordId: recordId)
+            cancelledTasks.append(recordId)
         }
 
         var didDrainQueueBlock: (() async -> Void)?

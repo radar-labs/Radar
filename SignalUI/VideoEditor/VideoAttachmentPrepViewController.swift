@@ -22,7 +22,10 @@ protocol VideoEditorDataSource: AnyObject {
 /**
  * Coordinate data transfer between VideoEditorView and VideoTimelineView
  */
-class VideoAttachmentPrepViewController: AttachmentPrepViewController {
+class VideoAttachmentPrepViewController: AttachmentPrepViewController, VideoEditorDataSource, VideoEditorModelObserver,
+    VideoEditorViewDelegate, VideoPlaybackState, VideoTimelineViewDataSource, VideoTimelineViewDelegate,
+    VideoEditorViewControllerProviding
+{
 
     private let model: VideoEditorModel
 
@@ -57,6 +60,7 @@ class VideoAttachmentPrepViewController: AttachmentPrepViewController {
     }
 
     override func prepareContentView() {
+        editorView.hasRoundedCorners = true
         editorView.configureSubviews()
         generateThumbnailsAsync()
     }
@@ -65,7 +69,7 @@ class VideoAttachmentPrepViewController: AttachmentPrepViewController {
         editorView.pauseIfPlaying()
     }
 
-    override public var canSaveMedia: Bool {
+    override var canSaveMedia: Bool {
         if model.needsRender {
             return true
         }
@@ -73,18 +77,17 @@ class VideoAttachmentPrepViewController: AttachmentPrepViewController {
     }
 
     private(set) var videoThumbnails: [UIImage]?
-    private var shouldResumeVideoPlaybackOnScrubbingEnd = false
-}
 
-extension VideoAttachmentPrepViewController: VideoEditorViewDelegate {
+    private var shouldResumeVideoPlaybackOnScrubbingEnd = false
+
+    // MARK: - VideoEditorViewDelegate
 
     func videoEditorViewPlaybackTimeDidChange(_ videoEditorView: VideoEditorView) {
         timelineView.updateCursorPosition()
         timelineView.updateTimeBubble()
     }
-}
 
-extension VideoAttachmentPrepViewController: VideoEditorDataSource {
+    // MARK: - VideoEditorDataSource
 
     var untrimmedDurationSeconds: TimeInterval {
         return model.untrimmedDurationSeconds
@@ -105,9 +108,8 @@ extension VideoAttachmentPrepViewController: VideoEditorDataSource {
     var isTrimmed: Bool {
         return model.isTrimmed
     }
-}
 
-extension VideoAttachmentPrepViewController: VideoPlaybackState {
+    // MARK: - VideoPlaybackState
 
     var isPlaying: Bool {
         return editorView.isPlaying
@@ -116,9 +118,8 @@ extension VideoAttachmentPrepViewController: VideoPlaybackState {
     var currentTimeSeconds: TimeInterval {
         return editorView.currentTimeSeconds
     }
-}
 
-extension VideoAttachmentPrepViewController: VideoTimelineViewDataSource {
+    // MARK: - VideoTimelineViewDataSource
 
     var videoAspectRatio: CGSize {
         return model.displaySize
@@ -129,33 +130,34 @@ extension VideoAttachmentPrepViewController: VideoTimelineViewDataSource {
         let videoAspectRatio = videoAspectRatio
         let untrimmedDurationSeconds = self.untrimmedDurationSeconds
         let contextSize = CurrentAppContext().frame.size
-        let screenScale = UIScreen.main.scale
+        let displayScale = traitCollection.displayScale
 
         Task { [weak self] in
             do {
                 let thumbnails = try await VideoAttachmentPrepViewController.thumbnails(
                     forVideoAtPath: model.srcVideoPath,
                     aspectRatio: videoAspectRatio,
-                    thumbnailHeight: VideoTimelineView.preferredHeight,
+                    thumbnailHeight: VideoTimelineView.thumbnailStripHeight,
                     contextSize: contextSize,
-                    screenScale: screenScale,
-                    untrimmedDurationSeconds: untrimmedDurationSeconds
+                    screenScale: displayScale,
+                    untrimmedDurationSeconds: untrimmedDurationSeconds,
                 )
                 self?.videoThumbnails = thumbnails
-                self?.timelineView.updateThumbnailView()
+                self?.timelineView.updateThumbnailStrip()
             } catch {
                 owsFailDebug("Error: \(error)")
             }
         }
     }
 
-    private nonisolated static func thumbnails(
+    @concurrent
+    private static func thumbnails(
         forVideoAtPath videoPath: String,
         aspectRatio: CGSize,
         thumbnailHeight: CGFloat,
         contextSize: CGSize,
         screenScale: CGFloat,
-        untrimmedDurationSeconds: TimeInterval
+        untrimmedDurationSeconds: TimeInterval,
     ) async throws -> [UIImage] {
         // We generate enough thumbnails for the worst case (full-screen landscape)
         // to avoid the complexity of regeneration.
@@ -181,9 +183,8 @@ extension VideoAttachmentPrepViewController: VideoTimelineViewDataSource {
         }
         return thumbnails
     }
-}
 
-extension VideoAttachmentPrepViewController: VideoTimelineViewDelegate {
+    // MARK: - VideoTimelineViewDelegate
 
     func videoTimelineViewDidBeginTrimming(_ view: VideoTimelineView) {
         editorView.pauseIfPlaying()
@@ -219,16 +220,14 @@ extension VideoAttachmentPrepViewController: VideoTimelineViewDelegate {
             editorView.playVideo()
         }
     }
-}
 
-extension VideoAttachmentPrepViewController: VideoEditorModelObserver {
+    // MARK: - VideoEditorModelObserver
 
     func videoEditorModelDidChange(_ model: VideoEditorModel) {
         timelineView.updateContents()
     }
-}
 
-extension VideoAttachmentPrepViewController: VideoEditorViewControllerProviding {
+    // MARK: - VideoEditorViewControllerProviding
 
     func viewController(forVideoEditorView videoEditorView: VideoEditorView) -> UIViewController {
         return self

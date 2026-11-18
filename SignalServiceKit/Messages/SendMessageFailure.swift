@@ -6,7 +6,7 @@
 import Foundation
 import LibSignalClient
 
-struct SendMessageFailure {
+public struct SendMessageFailure {
     let recipientErrors: [(serviceId: ServiceId, error: any Error)]
 
     init?(recipientErrors: [(ServiceId, any Error)]) {
@@ -20,9 +20,9 @@ struct SendMessageFailure {
         return self.recipientErrors.first!.error
     }
 
-    func containsAny(of senderKeyError: MessageSender.SenderKeyError) -> Bool {
+    func containsAny(of senderKeyError: SenderKeyError) -> Bool {
         return recipientErrors.contains(where: { _, recipientError in
-            return senderKeyError == (recipientError as? MessageSender.SenderKeyError)
+            return senderKeyError == (recipientError as? SenderKeyError)
         })
     }
 }

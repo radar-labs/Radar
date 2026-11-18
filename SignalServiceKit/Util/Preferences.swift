@@ -3,34 +3,16 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public enum NotificationType: UInt {
-    case noNameNoPreview = 0
-    case nameNoPreview = 1
-    case namePreview = 2
-
-    public var displayName: String {
-        switch self {
-        case .namePreview:
-            return OWSLocalizedString("NOTIFICATIONS_SENDER_AND_MESSAGE", comment: "")
-        case .nameNoPreview:
-            return OWSLocalizedString("NOTIFICATIONS_SENDER_ONLY", comment: "")
-        case .noNameNoPreview:
-            return OWSLocalizedString("NOTIFICATIONS_NONE", comment: "")
-        }
-    }
-}
+public import UIKit
 
 public class Preferences {
 
     private enum Key: String {
         case screenSecurity = "Screen Security Key"
-        case notificationPreviewType = "Notification Preview Type Key"
-        case playSoundInForeground = "NotificationSoundInForeground"
         case lastRecordedPushToken = "LastRecordedPushToken"
         case callsHideIPAddress = "CallsHideIPAddress"
         case hasDeclinedNoContactsView = "hasDeclinedNoContactsView"
         case shouldShowUnidentifiedDeliveryIndicators = "OWSPreferencesKeyShouldShowUnidentifiedDeliveryIndicators"
-        case shouldNotifyOfNewAccountKey = "OWSPreferencesKeyShouldNotifyOfNewAccountKey"
         case iOSUpgradeNagDate = "iOSUpgradeNagDate"
         case systemCallLogEnabled = "OWSPreferencesKeySystemCallLogEnabled"
         case wasViewOnceTooltipShown = "OWSPreferencesKeyWasViewOnceTooltipShown"
@@ -46,18 +28,19 @@ public class Preferences {
 
     private enum UserDefaultsKeys {
         static let deviceScale = "OWSPreferencesKeyDeviceScale"
-        static let isAudibleErrorLoggingEnabled = "IsAudibleErrorLoggingEnabled"
         static let isFailDebugEnabled = "IsFailDebugEnabled"
     }
 
     private static let preferencesCollection = "SignalPreferences"
     private let keyValueStore = KeyValueStore(collection: Preferences.preferencesCollection)
 
-    public init() {
-        if CurrentAppContext().hasUI {
-            CurrentAppContext().appUserDefaults().set(UIScreen.main.scale, forKey: UserDefaultsKeys.deviceScale)
+    public init(appContext: any AppContext) {
+        if appContext.hasUI {
+            appContext.appUserDefaults().set(
+                UITraitCollection.current.displayScale,
+                forKey: UserDefaultsKeys.deviceScale,
+            )
         }
-        SwiftSingletons.register(self)
     }
 
     // MARK: Helpers
@@ -71,8 +54,12 @@ public class Preferences {
 
     private func removeValue(forKey key: Key) {
         SSKEnvironment.shared.databaseStorageRef.write { transaction in
-            keyValueStore.removeValue(forKey: key.rawValue, transaction: transaction)
+            removeValue(forKey: key, tx: transaction)
         }
+    }
+
+    private func removeValue(forKey key: Key, tx: DBWriteTransaction) {
+        keyValueStore.removeValue(forKey: key.rawValue, transaction: tx)
     }
 
     private func bool(forKey key: Key, defaultValue: Bool) -> Bool {
@@ -90,19 +77,6 @@ public class Preferences {
 
     private func setBool(_ value: Bool, forKey key: Key, tx: DBWriteTransaction) {
         keyValueStore.setBool(value, key: key.rawValue, transaction: tx)
-    }
-
-    private func uint(forKey key: Key, defaultValue: UInt) -> UInt {
-        let result = SSKEnvironment.shared.databaseStorageRef.read { transaction in
-            keyValueStore.getUInt(key.rawValue, defaultValue: defaultValue, transaction: transaction)
-        }
-        return result
-    }
-
-    private func setUInt(_ value: UInt, forKey key: Key) {
-        SSKEnvironment.shared.databaseStorageRef.write { transaction in
-            keyValueStore.setUInt(value, key: key.rawValue, transaction: transaction)
-        }
     }
 
     private func date(forKey key: Key) -> Date? {
@@ -144,14 +118,6 @@ public class Preferences {
         CurrentAppContext().appUserDefaults().set(value, forKey: UserDefaultsKeys.isFailDebugEnabled)
     }
 
-    public static var isAudibleErrorLoggingEnabled: Bool {
-        CurrentAppContext().appUserDefaults().bool(forKey: UserDefaultsKeys.isAudibleErrorLoggingEnabled) && BuildFlags.choochoo
-    }
-
-    public static func setIsAudibleErrorLoggingEnabled(_ value: Bool) {
-        CurrentAppContext().appUserDefaults().set(value, forKey: UserDefaultsKeys.isAudibleErrorLoggingEnabled)
-    }
-
     // MARK: Specific Preferences
 
     public var isScreenSecurityEnabled: Bool {
@@ -187,14 +153,19 @@ public class Preferences {
         keyValueStore.getBool(
             Key.shouldShowUnidentifiedDeliveryIndicators.rawValue,
             defaultValue: false,
-            transaction: transaction
+            transaction: transaction,
         )
     }
 
     public func setShouldShowUnidentifiedDeliveryIndicatorsAndSendSyncMessage(_ value: Bool) {
-        setBool(value, forKey: .shouldShowUnidentifiedDeliveryIndicators)
+        let db = DependenciesBridge.shared.db
+        let syncManager = SSKEnvironment.shared.syncManagerRef
 
-        SSKEnvironment.shared.syncManagerRef.sendConfigurationSyncMessage()
+        db.write { tx in
+            setBool(value, forKey: .shouldShowUnidentifiedDeliveryIndicators, tx: tx)
+            syncManager.sendConfigurationSyncMessage(tx: tx)
+        }
+
         SSKEnvironment.shared.storageServiceManagerRef.recordPendingLocalAccountUpdates()
     }
 
@@ -203,19 +174,11 @@ public class Preferences {
         keyValueStore.setBool(value, key: Key.shouldShowUnidentifiedDeliveryIndicators.rawValue, transaction: transaction)
     }
 
-    public func shouldNotifyOfNewAccounts(transaction: DBReadTransaction) -> Bool {
-        keyValueStore.getBool(Key.shouldNotifyOfNewAccountKey.rawValue, defaultValue: false, transaction: transaction)
-    }
-
-    public func setShouldNotifyOfNewAccounts(_ value: Bool, transaction: DBWriteTransaction) {
-        keyValueStore.setBool(value, key: Key.shouldNotifyOfNewAccountKey.rawValue, transaction: transaction)
-    }
-
     public var cachedDeviceScale: CGFloat {
-        guard !CurrentAppContext().hasUI else { return UIScreen.main.scale }
+        guard !CurrentAppContext().hasUI else { return UITraitCollection.current.displayScale }
 
         guard let cachedValue = CurrentAppContext().appUserDefaults().object(forKey: UserDefaultsKeys.deviceScale) as? CGFloat else {
-            return UIScreen.main.scale
+            return UITraitCollection.current.displayScale
         }
 
         return cachedValue
@@ -223,12 +186,16 @@ public class Preferences {
 
     // MARK: Calls
 
-    public func isSystemCallLogEnabled(tx: DBReadTransaction) -> Bool {
-        return keyValueStore.getBool(Key.systemCallLogEnabled.rawValue, defaultValue: true, transaction: tx)
+    public func isSystemCallLogEnabled(tx: DBReadTransaction) -> Bool? {
+        return keyValueStore.getBool(Key.systemCallLogEnabled.rawValue, transaction: tx)
     }
 
-    public func setIsSystemCallLogEnabled(_ value: Bool) {
-        setBool(value, forKey: .systemCallLogEnabled)
+    public func isSystemCallLogEnabledOrDefault(tx: DBReadTransaction) -> Bool {
+        return keyValueStore.getBool(Key.systemCallLogEnabled.rawValue, transaction: tx) ?? true
+    }
+
+    public func setIsSystemCallLogEnabled(_ value: Bool, tx: DBWriteTransaction) {
+        setBool(value, forKey: .systemCallLogEnabled, tx: tx)
     }
 
     // Allow callers to connect directly, when desirable, vs. enforcing TURN only proxy connectivity
@@ -254,7 +221,7 @@ public class Preferences {
         bool(forKey: .wasBlurTooltipShown, defaultValue: false)
     }
 
-    public func setWasBlurTooltipShown( ) {
+    public func setWasBlurTooltipShown() {
         setBool(true, forKey: .wasBlurTooltipShown)
     }
 
@@ -264,28 +231,6 @@ public class Preferences {
 
     public func setWasDeleteForEveryoneConfirmationShown() {
         setBool(true, forKey: .wasDeleteForEveryoneConfirmationShown)
-    }
-
-    // MARK: Notification Preferences
-
-    public var soundInForeground: Bool {
-        bool(forKey: .playSoundInForeground, defaultValue: true)
-    }
-
-    public func setSoundInForeground(_ value: Bool) {
-        setBool(value, forKey: .playSoundInForeground)
-    }
-
-    public func notificationPreviewType(tx: DBReadTransaction) -> NotificationType {
-        let rawValue = keyValueStore.getUInt(
-            Key.notificationPreviewType.rawValue,
-            transaction: tx
-        )
-        return rawValue.flatMap(NotificationType.init(rawValue:)) ?? .namePreview
-    }
-
-    public func setNotificationPreviewType(_ value: NotificationType) {
-        setUInt(value.rawValue, forKey: .notificationPreviewType)
     }
 
     // MARK: Push Tokens
@@ -302,8 +247,8 @@ public class Preferences {
         setString(value, for: .lastRecordedPushToken, tx: tx)
     }
 
-    public func unsetRecordedAPNSTokens() {
+    public func unsetRecordedAPNSTokens(tx: DBWriteTransaction) {
         Logger.warn("Forgetting recorded APNS tokens")
-        removeValue(forKey: .lastRecordedPushToken)
+        removeValue(forKey: .lastRecordedPushToken, tx: tx)
     }
 }

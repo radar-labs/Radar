@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import LibSignalClient
+
 public struct MostRecentlyLinkedDeviceDetails: Codable {
     public let linkedTime: Date
     public let notificationDelay: TimeInterval
@@ -17,26 +19,22 @@ public struct OWSDeviceStore {
         static let mostRecentlyLinkedDeviceDetails: String = "mostRecentlyLinkedDeviceDetails"
     }
 
-    private let kvStore: KeyValueStore
+    private let kvStore: NewKeyValueStore
 
     init() {
-        kvStore = KeyValueStore(collection: "DeviceStore")
+        kvStore = NewKeyValueStore(collection: "DeviceStore")
     }
 
     // MARK: -
 
     public func fetchAll(tx: DBReadTransaction) -> [OWSDevice] {
-        do {
+        return failIfThrows {
             return try OWSDevice.fetchAll(tx.database)
-        } catch {
-            owsFailDebug("Failed to fetch devices! \(error)")
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(error: error)
-            return []
         }
     }
 
     public func hasLinkedDevices(tx: DBReadTransaction) -> Bool {
-        return fetchAll(tx: tx).contains { $0.isLinkedDevice }
+        return fetchAll(tx: tx).contains { !$0.deviceId.isPrimary }
     }
 
     // MARK: -
@@ -45,33 +43,30 @@ public struct OWSDeviceStore {
         let existingDevices = fetchAll(tx: tx)
 
         for existingDevice in existingDevices {
-            do {
+            failIfThrows {
                 try existingDevice.delete(tx.database)
-            } catch {
-                owsFailDebug("Failed to delete device! \(error)")
             }
         }
 
-        for newDevice in newDevices {
-            do {
+        var newDeviceIds = Set<DeviceId>()
+        for var newDevice in newDevices {
+            guard newDeviceIds.insert(newDevice.deviceId).inserted else {
+                owsFailDebug("trying to insert device with duplicate id")
+                continue
+            }
+            failIfThrows {
                 try newDevice.insert(tx.database)
-            } catch {
-                owsFailDebug("Failed to insert device! \(error)")
             }
         }
 
-        let existingDeviceIds = Set(existingDevices.map { $0.deviceId })
-        let newDeviceIds = Set(newDevices.map { $0.deviceId })
-        return !newDeviceIds.symmetricDifference(existingDeviceIds).isEmpty
+        return !newDeviceIds.symmetricDifference(existingDevices.map(\.deviceId)).isEmpty
     }
 
     // MARK: -
 
     public func remove(_ device: OWSDevice, tx: DBWriteTransaction) {
-        do {
+        failIfThrows {
             try device.delete(tx.database)
-        } catch {
-            owsFailDebug("Failed to delete device! \(error)")
         }
     }
 
@@ -80,27 +75,26 @@ public struct OWSDeviceStore {
     public func setName(
         _ name: String,
         for device: OWSDevice,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         var device = device
         device.name = name
 
-        do {
+        failIfThrows {
             try device.update(tx.database)
-        } catch {
-            owsFailDebug("Failed to update device with new encryptedName! \(error)")
         }
     }
 
     // MARK: -
 
     public func mostRecentlyLinkedDeviceDetails(
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> MostRecentlyLinkedDeviceDetails? {
         do {
-            return try kvStore.getCodableValue(
+            return try kvStore.fetchJSONAsValue(
+                MostRecentlyLinkedDeviceDetails.self,
                 forKey: StoreKeys.mostRecentlyLinkedDeviceDetails,
-                transaction: tx
+                tx: tx,
             )
         } catch {
             owsFailDebug("Failed to get MostRecentlyLinkedDeviceDetails! \(error)")
@@ -111,26 +105,22 @@ public struct OWSDeviceStore {
     public func setMostRecentlyLinkedDeviceDetails(
         linkedTime: Date,
         notificationDelay: TimeInterval,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
-        do {
-            try kvStore.setCodable(
-                MostRecentlyLinkedDeviceDetails(
-                    linkedTime: linkedTime,
-                    notificationDelay: notificationDelay
-                ),
-                key: StoreKeys.mostRecentlyLinkedDeviceDetails,
-                transaction: tx
-            )
-        } catch {
-            owsFailDebug("Failed to set MostRecentlyLinkedDeviceDetails!")
-        }
+        kvStore.writeValueAsJSON(
+            MostRecentlyLinkedDeviceDetails(
+                linkedTime: linkedTime,
+                notificationDelay: notificationDelay,
+            ),
+            forKey: StoreKeys.mostRecentlyLinkedDeviceDetails,
+            tx: tx,
+        )
     }
 
     public func clearMostRecentlyLinkedDeviceDetails(tx: DBWriteTransaction) {
         kvStore.removeValue(
             forKey: StoreKeys.mostRecentlyLinkedDeviceDetails,
-            transaction: tx
+            tx: tx,
         )
     }
 }

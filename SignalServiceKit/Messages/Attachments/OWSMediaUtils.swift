@@ -3,8 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
 public import AVFoundation
+import Foundation
+public import UIKit
 
 public enum OWSMediaError: Error {
     case failure(description: String)
@@ -13,8 +14,10 @@ public enum OWSMediaError: Error {
 public enum OWSMediaUtils {
 
     public static func thumbnail(forImage image: UIImage, maxDimensionPixels: CGFloat) throws -> UIImage {
-        if image.pixelSize.width <= maxDimensionPixels,
-           image.pixelSize.height <= maxDimensionPixels {
+        if
+            image.pixelSize.width <= maxDimensionPixels,
+            image.pixelSize.height <= maxDimensionPixels
+        {
             let result = image.withNativeScale
             return result
         }
@@ -28,71 +31,6 @@ public enum OWSMediaUtils {
         return result
     }
 
-    private static func thumbnail(forImage image: UIImage, maxDimensionPoints: CGFloat) throws -> UIImage {
-        let scale = UIScreen.main.scale
-        let maxDimensionPixels = maxDimensionPoints * scale
-        return try thumbnail(forImage: image, maxDimensionPixels: maxDimensionPixels)
-    }
-
-    public static func thumbnail(forImageAtPath path: String, maxDimensionPixels: CGFloat) throws -> UIImage {
-        guard FileManager.default.fileExists(atPath: path) else {
-            throw OWSMediaError.failure(description: "Media file missing.")
-        }
-        guard (try? DataImageSource.forPath(path))?.ows_isValidImage ?? false else {
-            throw OWSMediaError.failure(description: "Invalid image.")
-        }
-        guard let originalImage = UIImage(contentsOfFile: path) else {
-            throw OWSMediaError.failure(description: "Could not load original image.")
-        }
-        return try thumbnail(forImage: originalImage, maxDimensionPixels: maxDimensionPixels)
-    }
-
-    public static func thumbnail(forImageAtPath path: String, maxDimensionPoints: CGFloat) throws -> UIImage {
-        guard FileManager.default.fileExists(atPath: path) else {
-            throw OWSMediaError.failure(description: "Media file missing.")
-        }
-        guard (try? DataImageSource.forPath(path))?.ows_isValidImage ?? false else {
-            throw OWSMediaError.failure(description: "Invalid image.")
-        }
-        guard let originalImage = UIImage(contentsOfFile: path) else {
-            throw OWSMediaError.failure(description: "Could not load original image.")
-        }
-        return try thumbnail(forImage: originalImage, maxDimensionPoints: maxDimensionPoints)
-    }
-
-    public static func thumbnail(forImageData imageData: Data, maxDimensionPoints: CGFloat) throws -> UIImage {
-        guard DataImageSource(imageData).ows_isValidImage else {
-            throw OWSMediaError.failure(description: "Invalid image.")
-        }
-        guard let originalImage = UIImage(data: imageData) else {
-            throw OWSMediaError.failure(description: "Could not load original image.")
-        }
-        return try thumbnail(forImage: originalImage, maxDimensionPoints: maxDimensionPoints)
-    }
-
-    public static func thumbnail(forImageData imageData: Data, maxDimensionPixels: CGFloat) throws -> UIImage {
-        guard DataImageSource(imageData).ows_isValidImage else {
-            throw OWSMediaError.failure(description: "Invalid image.")
-        }
-        guard let originalImage = UIImage(data: imageData) else {
-            throw OWSMediaError.failure(description: "Could not load original image.")
-        }
-        return try thumbnail(forImage: originalImage, maxDimensionPixels: maxDimensionPixels)
-    }
-
-    public static func thumbnail(forWebpAtPath path: String, maxDimensionPoints: CGFloat) throws -> UIImage {
-        guard FileManager.default.fileExists(atPath: path) else {
-            throw OWSMediaError.failure(description: "Media file missing.")
-        }
-        guard let imageSource = try? DataImageSource.forPath(path), imageSource.ows_isValidImage else {
-            throw OWSMediaError.failure(description: "Invalid image.")
-        }
-        guard let stillImage = imageSource.stillForWebpData() else {
-            throw OWSMediaError.failure(description: "Could not generate still.")
-        }
-        return try thumbnail(forImage: stillImage, maxDimensionPoints: maxDimensionPoints)
-    }
-
     public static let videoStillFrameMimeType = MimeType.imageJpeg
 
     public static func generateThumbnail(forVideo asset: AVAsset, maxSizePixels: CGSize) throws -> UIImage {
@@ -102,7 +40,8 @@ public enum OWSMediaUtils {
         generator.appliesPreferredTrackTransform = true
         let time: CMTime = CMTimeMake(value: 1, timescale: 60)
         let cgImage = try generator.copyCGImage(at: time, actualTime: nil)
-        return UIImage(cgImage: cgImage, scale: UIScreen.main.scale, orientation: .up)
+        let displayScale = UITraitCollection.current.displayScale
+        return UIImage(cgImage: cgImage, scale: displayScale, orientation: .up)
     }
 
     public static func validateVideoExtension(ofPath path: String) throws {
@@ -111,13 +50,6 @@ public enum OWSMediaUtils {
         }
         guard MimeTypeUtil.isSupportedVideoMimeType(contentType) else {
             throw OWSGenericError("video file has invalid content type")
-        }
-    }
-
-    public static func validateVideoSize(atPath path: String) throws {
-        let fileSize = try OWSFileSystem.fileSize(ofPath: path)
-        guard fileSize <= kMaxFileSizeVideo else {
-            throw OWSGenericError("video file is too large")
         }
     }
 
@@ -148,18 +80,11 @@ public enum OWSMediaUtils {
      *
      * https://github.com/signalapp/Signal-Android/blob/c4bc2162f23e0fd6bc25941af8fb7454d91a4a35/app/src/main/java/org/thoughtcrime/securesms/mms/PushMediaConstraints.java
      */
-    public static let kMaxFileSizeAnimatedImage = UInt(25 * 1024 * 1024)
-    public static let kMaxFileSizeImage = UInt(8 * 1024 * 1024)
-    // Cloudflare limits uploads to 100 MB. To avoid hitting those limits,
-    // we use limits that are 5% lower for the unencrypted content.
-    public static let kMaxFileSizeVideo = UInt(95 * 1000 * 1000)
-    public static let kMaxFileSizeAudio = UInt(95 * 1000 * 1000)
-    public static let kMaxFileSizeGeneric = UInt(95 * 1000 * 1000)
-    public static let kMaxAttachmentUploadSizeBytes = UInt(100 * 1000 * 1000)
+    public static let kMaxFileSizeAnimatedImage: UInt64 = 25 * 1024 * 1024
+    public static let kMaxFileSizeImage: UInt64 = 8 * 1024 * 1024
 
     public static let kMaxVideoDimensions: CGFloat = 4096 // 4k video width
-    public static let kMaxAnimatedImageDimensions: UInt = 12 * 1024
-    public static let kMaxStillImageDimensions: UInt = 12 * 1024
+    public static let kMaxImageDimensions: CGFloat = 12 * 1024
 
     /// Text past this size on send (excluding forwarding) is truncated to this length and the rest
     /// is sent as an oversize text attachment.
@@ -170,10 +95,4 @@ public enum OWSMediaUtils {
     /// Oversize text attachments past this size will be rejected on receive. (Larger than send
     /// to support legacy cases)
     public static let kMaxOversizeTextMessageReceiveSizeBytes = 128 * 1024
-}
-
-@objc
-class OWSMediaUtilsObjc: NSObject {
-    @objc
-    public static let kOversizeTextMessageSizeThresholdBytes = UInt(OWSMediaUtils.kOversizeTextMessageSizeThresholdBytes)
 }

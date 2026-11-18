@@ -34,7 +34,7 @@ public class PaymentModelCell: UITableViewCell {
         fiatAmountLabel.setContentHuggingHigh()
         fiatAmountLabel.textAlignment = .right
         fiatAmountLabel.font = UIFont.systemFont(ofSize: 14)
-        fiatAmountLabel.textColor = Theme.ternaryTextColor
+        fiatAmountLabel.textColor = UIColor.Signal.tertiaryLabel
 
         amountStack.addArrangedSubview(amountLabel)
         amountStack.addArrangedSubview(fiatAmountLabel)
@@ -79,12 +79,14 @@ public class PaymentModelCell: UITableViewCell {
         nameLabel.textColor = Theme.primaryTextColor
 
         statusLabel.font = .dynamicTypeSubheadlineClamped
-        statusLabel.textColor = Theme.ternaryTextColor
+        statusLabel.textColor = UIColor.Signal.tertiaryLabel
 
         amountLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        amountLabel.textColor = (paymentItem.isIncoming
-                                    ? UIColor.ows_accentGreen
-                                    : Theme.primaryTextColor)
+        amountLabel.textColor = (
+            paymentItem.isIncoming
+                ? UIColor.Signal.green
+                : Theme.primaryTextColor,
+        )
 
         var avatarView: UIView
         if let address = paymentItem.address {
@@ -94,14 +96,18 @@ public class PaymentModelCell: UITableViewCell {
             avatarView = contactAvatarView
         } else {
             let avatarSize = Self.avatarSizeClass.diameter
-            avatarView = PaymentsViewUtils.buildUnidentifiedTransactionAvatar(avatarSize: avatarSize)
+            avatarView = PaymentsUI.buildUnidentifiedTransactionAvatar(avatarSize: avatarSize)
         }
         if paymentItem.isUnread {
             let avatarWrapper = UIView.container()
             avatarWrapper.addSubview(avatarView)
             avatarView.autoPinEdgesToSuperviewEdges()
+            avatarWrapper.addCircleBadge(
+                color: .Signal.accent,
+                onCircleView: avatarView,
+                circleDiameter: CGFloat(Self.avatarSizeClass.diameter),
+            )
             avatarView = avatarWrapper
-            avatarView.addCircleBadge(color: .Signal.accent)
         }
         arrangedSubviews.append(avatarView)
 
@@ -125,7 +131,7 @@ public class PaymentModelCell: UITableViewCell {
         accessoryType = .disclosureIndicator
     }
 
-    public override func prepareForReuse() {
+    override public func prepareForReuse() {
         super.prepareForReuse()
 
         contactAvatarView.reset()

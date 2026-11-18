@@ -18,7 +18,7 @@ public class ConversationInternalViewController: OWSTableViewController2 {
 
     // MARK: -
 
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
 
         title = "Internal"
@@ -32,16 +32,24 @@ public class ConversationInternalViewController: OWSTableViewController2 {
         let contents = OWSTableContents()
         let thread = self.thread
 
+        let databaseSection = OWSTableSection()
+        databaseSection.add(.actionItem(withText: "Query Database") { [weak self] in
+            let vc = InternalSQLClientViewController()
+            self?.navigationController?.pushViewController(vc, animated: true)
+        })
+        contents.add(databaseSection)
+
         let infoSection = OWSTableSection()
         SSKEnvironment.shared.databaseStorageRef.read { transaction in
             let section = infoSection
 
             let isThreadInProfileWhitelist = SSKEnvironment.shared.profileManagerRef.isThread(
-                inProfileWhitelist: thread, transaction: transaction
+                inProfileWhitelist: thread,
+                transaction: transaction,
             )
             section.add(.copyableItem(
                 label: "Whitelisted",
-                value: isThreadInProfileWhitelist ? "Yes" : "No"
+                value: isThreadInProfileWhitelist ? "Yes" : "No",
             ))
 
             if let contactThread = thread as? TSContactThread {
@@ -52,22 +60,37 @@ public class ConversationInternalViewController: OWSTableViewController2 {
 
                 section.add(.copyableItem(
                     label: "ACI",
-                    value: signalRecipient?.aci?.serviceIdString
+                    value: signalRecipient?.aci?.serviceIdString,
                 ))
 
                 section.add(.copyableItem(
                     label: "Phone Number",
-                    value: signalRecipient?.phoneNumber?.stringValue
+                    value: signalRecipient?.phoneNumber?.stringValue,
                 ))
 
                 section.add(.copyableItem(
                     label: "PNI",
-                    value: signalRecipient?.pni?.serviceIdString
+                    value: signalRecipient?.pni?.serviceIdString,
                 ))
+
+                if let loggingKey = DebugLogger.shared.loggingKey, let signalRecipient {
+                    section.add(.copyableItem(
+                        label: "ACI Log Hash",
+                        value: signalRecipient.aci.map { loggingKey.hashForLogging(aci: $0) },
+                    ))
+                    section.add(.copyableItem(
+                        label: "Phone Number Log Hash",
+                        value: signalRecipient.phoneNumber.map { loggingKey.hashForLogging(string: $0.stringValue) },
+                    ))
+                    section.add(.copyableItem(
+                        label: "PNI Log Hash",
+                        value: signalRecipient.pni.map { loggingKey.hashForLogging(pni: $0) },
+                    ))
+                }
 
                 section.add(.copyableItem(
                     label: "Discoverable Phone Number?",
-                    value: signalRecipient?.phoneNumber?.isDiscoverable == true ? "Yes" : "No"
+                    value: signalRecipient?.phoneNumber?.isDiscoverable == true ? "Yes" : "No",
                 ))
 
                 let userProfile = SSKEnvironment.shared.profileManagerRef.userProfile(for: address, tx: transaction)
@@ -83,37 +106,37 @@ public class ConversationInternalViewController: OWSTableViewController2 {
                         case .none:
                             return "!isProfileNameKnown"
                         }
-                    }()
+                    }(),
                 ))
 
                 section.add(.copyableItem(
                     label: "Profile Key",
-                    value: userProfile?.profileKey?.keyData.hexadecimalString
+                    value: userProfile?.profileKey?.keyData.hexadecimalString,
                 ))
 
                 let identityManager = DependenciesBridge.shared.identityManager
                 let identityKey = identityManager.recipientIdentity(for: address, tx: transaction)?.identityKey
                 section.add(.copyableItem(
                     label: "Identity Key",
-                    value: identityKey?.hexadecimalString
+                    value: identityKey?.hexadecimalString,
                 ))
 
-                let arePaymentsEnabled = SSKEnvironment.shared.paymentsHelperRef.arePaymentsEnabled(for: address, transaction: transaction)
+                let arePaymentsEnabled = userProfile?.hasPaymentAddress == true
                 section.add(.copyableItem(
                     label: "Payments",
-                    value: arePaymentsEnabled ? "Yes" : "No"
+                    value: arePaymentsEnabled ? "Yes" : "No",
                 ))
 
             } else if let groupThread = thread as? TSGroupThread {
                 section.add(.copyableItem(
                     label: "Group ID",
-                    value: groupThread.groupId.toHex()
+                    value: groupThread.groupId.toHex(),
                 ))
             }
 
             section.add(.copyableItem(
                 label: "DB Unique ID",
-                value: thread.uniqueId
+                value: thread.uniqueId,
             ))
         }
         contents.add(infoSection)
@@ -135,8 +158,8 @@ public class ConversationInternalViewController: OWSTableViewController2 {
             let sessionSection = OWSTableSection()
             sessionSection.add(.actionItem(withText: "Delete Session") {
                 SSKEnvironment.shared.databaseStorageRef.write { transaction in
-                    let aciStore = DependenciesBridge.shared.signalProtocolStoreManager.signalProtocolStore(for: .aci)
-                    aciStore.sessionStore.deleteAllSessions(for: address.serviceId!, tx: transaction)
+                    let sessionStore = DependenciesBridge.shared.signalProtocolStoreManager.signalProtocolStore(for: .aci).sessionStore
+                    sessionStore.deleteSessions(forServiceId: address.serviceId!, tx: transaction)
                 }
             })
 
@@ -148,7 +171,7 @@ public class ConversationInternalViewController: OWSTableViewController2 {
 
     // MARK: - Helpers
 
-    public override func themeDidChange() {
+    override public func themeDidChange() {
         super.themeDidChange()
         updateTableContents()
     }

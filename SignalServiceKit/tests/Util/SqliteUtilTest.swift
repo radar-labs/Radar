@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import XCTest
 import GRDB
 import SignalServiceKit
+import XCTest
 
 final class SqliteUtilTest: XCTestCase {
     func testIsSafe() {
@@ -19,7 +19,7 @@ final class SqliteUtilTest: XCTestCase {
             "sqlite",
             "sqlite_master",
             "SQLITE_master",
-            String(repeating: "x", count: 2000)
+            String(repeating: "x", count: 2000),
         ]
         for unsafeName in unsafeNames {
             XCTAssertFalse(SqliteUtil.isSafe(sqlName: unsafeName))
@@ -42,7 +42,10 @@ final class SqliteUtilTest: XCTestCase {
     }
 
     func testCipherProvider() throws {
-        let databasePath = OWSFileSystem.temporaryFilePath(fileExtension: "sqlite")
+        let databasePath = OWSFileSystem.temporaryFilePath(
+            fileExtension: "sqlite",
+            isAvailableWhileDeviceLocked: false,
+        )
 
         let databaseQueue = try DatabaseQueue(path: databasePath)
         defer { try? databaseQueue.close() }
@@ -56,7 +59,10 @@ final class SqliteUtilTest: XCTestCase {
     }
 
     func testCipherIntegrityCheck() throws {
-        let databasePath = OWSFileSystem.temporaryFilePath(fileExtension: "sqlite")
+        let databasePath = OWSFileSystem.temporaryFilePath(
+            fileExtension: "sqlite",
+            isAvailableWhileDeviceLocked: false,
+        )
 
         let databaseQueue = try DatabaseQueue(path: databasePath)
         defer { try? databaseQueue.close() }
@@ -68,7 +74,10 @@ final class SqliteUtilTest: XCTestCase {
     func testQuickCheck() throws {
         guard #available(iOS 16, *) else { throw XCTSkip() }
 
-        let databasePath = OWSFileSystem.temporaryFilePath(fileExtension: "sqlite")
+        let databasePath = OWSFileSystem.temporaryFilePath(
+            fileExtension: "sqlite",
+            isAvailableWhileDeviceLocked: false,
+        )
         let databaseUrl = URL(filePath: databasePath)
 
         let happyResult: SqliteUtil.IntegrityCheckResult = try {
@@ -104,7 +113,7 @@ final class SqliteUtilTest: XCTestCase {
             let result = try SqliteUtil.Fts5.integrityCheck(
                 db: db,
                 ftsTableName: "fts",
-                compareToExternalContentTable: false
+                compareToExternalContentTable: false,
             )
 
             XCTAssertEqual(result, .ok)
@@ -121,7 +130,7 @@ final class SqliteUtilTest: XCTestCase {
             let resultBeforeCorruption = try SqliteUtil.Fts5.integrityCheck(
                 db: db,
                 ftsTableName: "fts",
-                compareToExternalContentTable: true
+                compareToExternalContentTable: true,
             )
             XCTAssertEqual(resultBeforeCorruption, .ok)
 
@@ -131,7 +140,7 @@ final class SqliteUtilTest: XCTestCase {
             let resultAfterCorruption = try SqliteUtil.Fts5.integrityCheck(
                 db: db,
                 ftsTableName: "fts",
-                compareToExternalContentTable: true
+                compareToExternalContentTable: true,
             )
             XCTAssertEqual(resultAfterCorruption, .corrupted)
         }
@@ -147,7 +156,7 @@ final class SqliteUtilTest: XCTestCase {
 
             XCTAssertEqual(
                 try! Int.fetchOne(db, sql: "SELECT COUNT(*) FROM fts('Alice')"),
-                1
+                1,
             )
         }
     }
@@ -166,7 +175,8 @@ final class SqliteUtilTest: XCTestCase {
                 db.trace { traceEvent in
                     if
                         case let .statement(statement) = traceEvent,
-                        statement.expandedSQL == expectedSql {
+                        statement.expandedSQL == expectedSql
+                    {
                         hasRunExpectedStatement = true
                     }
                 }
@@ -185,7 +195,7 @@ final class SqliteUtilTest: XCTestCase {
         XCTAssertEqual(
             mergeResult,
             .noop,
-            "Expected no pages in an empty FTS table, so merge should be a no-op"
+            "Expected no pages in an empty FTS table, so merge should be a no-op",
         )
         XCTAssert(hasRunExpectedStatement, "Expected a merge statement to be run")
     }

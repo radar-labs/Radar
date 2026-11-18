@@ -5,16 +5,18 @@
 
 import SignalServiceKit
 
-// MARK: - Draw Tool
-
 extension ImageEditorViewController {
 
     private func initializeDrawToolUIIfNecessary() {
         guard !drawToolUIInitialized else { return }
 
+        drawToolbar.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(drawToolbar)
-        drawToolbar.autoPinWidthToSuperview()
-        drawToolbar.autoPinEdge(.bottom, to: .top, of: bottomBar)
+        NSLayoutConstraint.activate([
+            drawToolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            drawToolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            drawToolbar.bottomAnchor.constraint(equalTo: bottomBar.topAnchor),
+        ])
 
         view.addGestureRecognizer(drawToolGestureRecognizer)
 
@@ -39,7 +41,7 @@ extension ImageEditorViewController {
         drawToolGestureRecognizer.isEnabled = visible
 
         if visible {
-            currentStrokeType = drawToolbar.strokeTypeButton.isSelected ? .highlighter : .pen
+            currentStrokeType = drawToolbar.strokeType
         }
     }
 
@@ -61,20 +63,24 @@ extension ImageEditorViewController {
         let tryToAppendStrokeSample = { (locationInView: CGPoint) in
             let view = self.imageEditorView.gestureReferenceView
             let viewBounds = view.bounds
-            let newSample = ImageEditorCanvasView.locationImageUnit(forLocationInView: locationInView,
-                                                                    viewBounds: viewBounds,
-                                                                    model: self.model,
-                                                                    transform: self.model.currentTransform())
+            let newSample = ImageEditorCanvasView.locationImageUnit(
+                forLocationInView: locationInView,
+                viewBounds: viewBounds,
+                model: self.model,
+                transform: self.model.currentTransform(),
+            )
 
-            if let prevSample = self.currentStrokeSamples.last,
-                prevSample == newSample {
+            if
+                let prevSample = self.currentStrokeSamples.last,
+                prevSample == newSample
+            {
                 // Ignore duplicate samples.
                 return
             }
             self.currentStrokeSamples.append(newSample)
         }
 
-        var strokeColor = drawToolbar.colorPickerView.selectedValue.color
+        var strokeColor = drawToolbar.colorPickerBar.uiColor
         if currentStrokeType == .highlighter {
             strokeColor = strokeColor.withAlphaComponent(Self.highligherStrokeOpacity)
         }
@@ -95,10 +101,12 @@ extension ImageEditorViewController {
             let locationInView = gestureRecognizer.location(in: imageEditorView.gestureReferenceView)
             tryToAppendStrokeSample(locationInView)
 
-            let stroke = ImageEditorStrokeItem(color: strokeColor,
-                                               strokeType: currentStrokeType,
-                                               unitSamples: currentStrokeSamples,
-                                               unitStrokeWidth: unitStrokeWidth)
+            let stroke = ImageEditorStrokeItem(
+                color: strokeColor,
+                strokeType: currentStrokeType,
+                unitSamples: currentStrokeSamples,
+                unitStrokeWidth: unitStrokeWidth,
+            )
             model.append(item: stroke)
             currentStroke = stroke
 
@@ -114,11 +122,13 @@ extension ImageEditorViewController {
 
             // Model items are immutable; we _replace_ the
             // stroke item rather than modify it.
-            let stroke = ImageEditorStrokeItem(itemId: lastStroke.itemId,
-                                               color: strokeColor,
-                                               strokeType: currentStrokeType,
-                                               unitSamples: currentStrokeSamples,
-                                               unitStrokeWidth: unitStrokeWidth)
+            let stroke = ImageEditorStrokeItem(
+                itemId: lastStroke.itemId,
+                color: strokeColor,
+                strokeType: currentStrokeType,
+                unitSamples: currentStrokeSamples,
+                unitStrokeWidth: unitStrokeWidth,
+            )
             model.replace(item: stroke, suppressUndo: true)
 
             if gestureRecognizer.state == .ended {
@@ -127,6 +137,7 @@ extension ImageEditorViewController {
             } else {
                 currentStroke = stroke
             }
+
         default:
             removeCurrentStroke()
         }
@@ -134,53 +145,68 @@ extension ImageEditorViewController {
 
     class DrawToolbar: UIView {
 
-        let colorPickerView: ColorPickerBarView
+        var strokeType: ImageEditorStrokeItem.StrokeType = .pen {
+            didSet {
+                updateStrokeTypeButtonImage()
+            }
+        }
 
-        let strokeTypeButton = RoundMediaButton(
+        let colorPickerBar: ColorPickerBar
+
+        let strokeTypeButton = UIButton(configuration: .roundMedia(
             image: UIImage(imageLiteralResourceName: "brush-pen"),
-            backgroundStyle: .blur
-        )
+            size: 44,
+        ))
+
+        private func updateStrokeTypeButtonImage() {
+            switch strokeType {
+            case .pen:
+                strokeTypeButton.configuration?.image = UIImage(imageLiteralResourceName: "brush-pen")
+            case .highlighter:
+                strokeTypeButton.configuration?.image = UIImage(imageLiteralResourceName: "brush-highlighter")
+            case .blur:
+                owsFailDebug("Invalid stroke type")
+            }
+        }
+
+        func toggleStrokeType() {
+            strokeType = strokeType == .pen ? .highlighter : .pen
+        }
 
         init(currentColor: ColorPickerBarColor) {
-            self.colorPickerView = ColorPickerBarView(currentColor: currentColor)
+            colorPickerBar = ColorPickerBar(color: currentColor)
+
             super.init(frame: .zero)
 
-            layoutMargins.top = 0
-            layoutMargins.bottom = 2
+            preservesSuperviewLayoutMargins = true
+            directionalLayoutMargins.top = 0
+            directionalLayoutMargins.bottom = 2
 
-            strokeTypeButton.setImage(UIImage(imageLiteralResourceName: "brush-highlighter"), for: .selected)
-
-            // A container with width capped at a predefined size,
-            // centered in superview and constrained to layout margins.
-            let stackViewLayoutGuide = UILayoutGuide()
-            addLayoutGuide(stackViewLayoutGuide)
-            addConstraints([
-                stackViewLayoutGuide.centerXAnchor.constraint(equalTo: centerXAnchor),
-                stackViewLayoutGuide.leadingAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.leadingAnchor),
-                stackViewLayoutGuide.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
-                stackViewLayoutGuide.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor) ])
-            addConstraint({
-                let constraint = stackViewLayoutGuide.widthAnchor.constraint(equalToConstant: ImageEditorViewController.preferredToolbarContentWidth)
-                constraint.priority = .defaultHigh
-                return constraint
-            }())
+            strokeTypeButton.setCompressionResistanceHorizontalHigh()
+            updateStrokeTypeButtonImage() // just in case
 
             // I had to use a custom layout guide because stack view isn't centered
             // but instead has slight offset towards the trailing edge.
-            let stackView = UIStackView(arrangedSubviews: [ colorPickerView, strokeTypeButton ])
+            let stackView = UIStackView(arrangedSubviews: [colorPickerBar, strokeTypeButton])
             stackView.translatesAutoresizingMaskIntoConstraints = false
             stackView.alignment = .center
             stackView.spacing = 8
             addSubview(stackView)
-            addConstraints([
-                stackView.leadingAnchor.constraint(equalTo: stackViewLayoutGuide.leadingAnchor),
-                stackView.trailingAnchor.constraint(equalTo: stackViewLayoutGuide.trailingAnchor,
-                                                    constant: strokeTypeButton.layoutMargins.trailing),
-                stackView.topAnchor.constraint(equalTo: stackViewLayoutGuide.topAnchor),
-                stackView.bottomAnchor.constraint(equalTo: stackViewLayoutGuide.bottomAnchor) ])
+            NSLayoutConstraint.activate([
+                stackView.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor),
+                stackView.leadingAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.leadingAnchor),
+                stackView.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
+                stackView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
+                {
+                    let constraint = stackView.widthAnchor.constraint(
+                        equalToConstant: ImageEditorViewController.preferredToolbarContentWidth,
+                    )
+                    constraint.priority = .defaultHigh
+                    return constraint
+                }(),
+            ])
         }
 
-        @available(iOS, unavailable, message: "Use init(currentColor:)")
         required init(coder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }

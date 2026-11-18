@@ -8,11 +8,11 @@ import SignalServiceKit
 public class MediaTextView: UITextView {
 
     public enum DecorationStyle: String, CaseIterable {
-        case none                   // colored text, no background
-        case whiteBackground        // colored text, white background
-        case coloredBackground      // white text, colored background
-        case underline              // white text, colored underline
-        case outline                // white text, colored outline
+        case none // colored text, no background
+        case whiteBackground // colored text, white background
+        case coloredBackground // white text, colored background
+        case underline // white text, colored underline
+        case outline // white text, colored outline
     }
 
     // Resource names are derived from these values. Do not change without consideration.
@@ -41,19 +41,19 @@ public class MediaTextView: UITextView {
 
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
-        self.disableAiWritingTools()
+
+        disableAiWritingTools()
 
         backgroundColor = .clear
         isOpaque = false
         isScrollEnabled = false
-        keyboardAppearance = .dark
         scrollsToTop = false
         textAlignment = .center
-        tintColor = .white
+        tintColor = .Signal.label
         self.textContainer.lineFragmentPadding = 0
 
         kvoObservation = observe(\.contentSize, options: [.new]) { [weak self] _, _ in
-            guard let self = self else { return }
+            guard let self else { return }
             self.adjustFontSizeIfNecessary()
         }
     }
@@ -66,23 +66,29 @@ public class MediaTextView: UITextView {
         // TODO: Figure out correct way to handle long text and implement it.
     }
 
-    public func update(using textStylingToolbar: TextStylingToolbar,
-                       fontPointSize: CGFloat,
-                       textAlignment: NSTextAlignment = .center) {
+    public func update(
+        using textStylingToolbar: TextStylingToolbar,
+        fontPointSize: CGFloat,
+        textAlignment: NSTextAlignment = .center,
+    ) {
         let font = MediaTextView.font(for: textStylingToolbar.textStyle, withPointSize: fontPointSize)
-        updateWith(textForegroundColor: textStylingToolbar.textForegroundColor,
-                   font: font,
-                   textAlignment: textAlignment,
-                   textDecorationColor: textStylingToolbar.textDecorationColor,
-                   decorationStyle: textStylingToolbar.decorationStyle)
+        updateWith(
+            textForegroundColor: textStylingToolbar.textForegroundColor,
+            font: font,
+            textAlignment: textAlignment,
+            textDecorationColor: textStylingToolbar.textDecorationColor,
+            decorationStyle: textStylingToolbar.decorationStyle,
+        )
     }
 
-    public func updateWith(textForegroundColor: UIColor,
-                           font: UIFont,
-                           textAlignment: NSTextAlignment,
-                           textDecorationColor: UIColor?,
-                           decorationStyle: MediaTextView.DecorationStyle) {
-        var attributes: [NSAttributedString.Key: Any] = [ .font: font]
+    public func updateWith(
+        textForegroundColor: UIColor,
+        font: UIFont,
+        textAlignment: NSTextAlignment,
+        textDecorationColor: UIColor?,
+        decorationStyle: MediaTextView.DecorationStyle,
+    ) {
+        var attributes: [NSAttributedString.Key: Any] = [.font: font]
 
         attributes[.foregroundColor] = textForegroundColor
 
@@ -91,7 +97,7 @@ public class MediaTextView: UITextView {
             attributes[.paragraphStyle] = paragraphStyle
         }
 
-        if let textDecorationColor = textDecorationColor {
+        if let textDecorationColor {
             switch decorationStyle {
             case .underline:
                 attributes[.underlineStyle] = NSUnderlineStyle.single.rawValue
@@ -116,10 +122,10 @@ public class MediaTextView: UITextView {
 
     // MARK: - Key Commands
 
-    public override var keyCommands: [UIKeyCommand]? {
+    override public var keyCommands: [UIKeyCommand]? {
         return [
             UIKeyCommand(action: #selector(modifiedReturnPressed(sender:)), input: "\r", modifierFlags: .command, discoverabilityTitle: "Add Text"),
-            UIKeyCommand(action: #selector(modifiedReturnPressed(sender:)), input: "\r", modifierFlags: .alternate, discoverabilityTitle: "Add Text")
+            UIKeyCommand(action: #selector(modifiedReturnPressed(sender:)), input: "\r", modifierFlags: .alternate, discoverabilityTitle: "Add Text"),
         ]
     }
 
@@ -132,147 +138,163 @@ public class MediaTextView: UITextView {
 
 public class TextStylingToolbar: UIControl {
 
-    private let colorPickerView: ColorPickerBarView
+    private let colorPickerBar: ColorPickerBar
 
     // Photo Editor operates with ColorPickerBarColor hence the need to expose this value.
     public var currentColorPickerValue: ColorPickerBarColor {
-        get { colorPickerView.selectedValue }
-        set { colorPickerView.selectedValue = newValue }
+        get { colorPickerBar.color }
+        set { colorPickerBar.color = newValue }
     }
 
-    public let textStyleButton = RoundMediaButton(image: TextStylingToolbar.buttonImage(forTextStyle: .regular),
-                                                  backgroundStyle: .blur)
+    public let textStyleButton: UIButton
+
     public var textStyle: MediaTextView.TextStyle = .regular {
         didSet {
-            textStyleButton.setImage(TextStylingToolbar.buttonImage(forTextStyle: textStyle), for: .normal)
+            textStyleButton.configuration?.image = TextStylingToolbar.buttonImage(forTextStyle: textStyle)
         }
     }
 
-    private static func buttonImage(forTextStyle textStyle: MediaTextView.TextStyle) -> UIImage? {
+    private static func buttonImage(forTextStyle textStyle: MediaTextView.TextStyle) -> UIImage {
         return UIImage(imageLiteralResourceName: "font-" + textStyle.rawValue)
     }
 
     public var textForegroundColor: UIColor {
         switch decorationStyle {
-        case .none, .whiteBackground: return colorPickerView.color
+        case .none, .whiteBackground: return colorPickerBar.uiColor
 
         case .coloredBackground:
             // Switch text color to black if background is almost white.
-            let backgroundColor = colorPickerView.color
+            let backgroundColor = colorPickerBar.uiColor
             return backgroundColor.isCloseToColor(.white) ? .black : .white
 
         case .outline, .underline: return .white
         }
     }
+
     public var textBackgroundColor: UIColor? {
         switch decorationStyle {
         case .none, .underline, .outline: return nil
 
         case .whiteBackground:
             // Switch background color to black if text color is almost white.
-            let textColor = colorPickerView.color
+            let textColor = colorPickerBar.uiColor
             return textColor.isCloseToColor(.white) ? .black : .white
 
-        case .coloredBackground: return colorPickerView.color
+        case .coloredBackground: return colorPickerBar.uiColor
         }
     }
+
     public var textDecorationColor: UIColor? {
         switch decorationStyle {
         case .none, .whiteBackground, .coloredBackground: return nil
-        case .outline, .underline: return colorPickerView.color
+        case .outline, .underline: return colorPickerBar.uiColor
         }
     }
 
-    public let decorationStyleButton = RoundMediaButton(
-        image: UIImage(imageLiteralResourceName: "text_effects"),
-        backgroundStyle: .blur
-    )
+    public let decorationStyleButton: UIButton
+
     public var decorationStyle: MediaTextView.DecorationStyle = .none {
         didSet {
-            decorationStyleButton.isSelected = (decorationStyle != .none)
+            let buttonImageName = decorationStyle == .none ? "text_effects" : "text_effects-fill"
+            decorationStyleButton.configuration?.image = UIImage(named: buttonImageName)
         }
     }
 
-    public lazy var doneButton = RoundMediaButton(image: Theme.iconImage(.checkmark), backgroundStyle: .blur)
+    public let doneButton: UIButton = UIButton(
+        configuration: .roundMedia(
+            image: UIImage(imageLiteralResourceName: "check"),
+            size: 44,
+        ),
+    )
 
     public private(set) var contentWidthConstraint: NSLayoutConstraint?
+
     private lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [ textStyleButton, decorationStyleButton, colorPickerView, doneButton ])
+        let stackView: UIStackView
+        if #available(iOS 26, *) {
+            let buttonStack = UIStackView(arrangedSubviews: [textStyleButton, decorationStyleButton])
+            buttonStack.spacing = 8
+            buttonStack.directionalLayoutMargins = .init(hMargin: 2, vMargin: 0)
+            buttonStack.isLayoutMarginsRelativeArrangement = true
+            buttonStack.translatesAutoresizingMaskIntoConstraints = false
+            let glassEffect = UIGlassEffect(style: .regular)
+            glassEffect.isInteractive = true
+            let glassPanel = UIVisualEffectView(effect: glassEffect)
+            glassPanel.clipsToBounds = true
+            glassPanel.cornerConfiguration = .capsule()
+            glassPanel.contentView.addSubview(buttonStack)
+            NSLayoutConstraint.activate([
+                buttonStack.topAnchor.constraint(equalTo: glassPanel.topAnchor),
+                buttonStack.leadingAnchor.constraint(equalTo: glassPanel.leadingAnchor),
+                buttonStack.trailingAnchor.constraint(equalTo: glassPanel.trailingAnchor),
+                buttonStack.bottomAnchor.constraint(equalTo: glassPanel.bottomAnchor),
+            ])
+            stackView = UIStackView(arrangedSubviews: [glassPanel, colorPickerBar, doneButton])
+        } else {
+            stackView = UIStackView(arrangedSubviews: [textStyleButton, decorationStyleButton, colorPickerBar, doneButton])
+            stackView.setCustomSpacing(8, after: textStyleButton)
+        }
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.alignment = .center
-        stackView.spacing = 8
-        stackView.setCustomSpacing(0, after: textStyleButton)
+        stackView.spacing = 20
         return stackView
     }()
 
     public init(currentColor: ColorPickerBarColor? = nil) {
-        colorPickerView = ColorPickerBarView(currentColor: currentColor ?? ColorPickerBarColor.white)
+        colorPickerBar = ColorPickerBar(color: currentColor ?? ColorPickerBarColor.white)
+
+        // No background for leading buttons on iOS 26 because they are placed onto a glass panel together.
+        let useBackgroundForLeadingEdgeButtons = if #available(iOS 26, *) { false } else { true }
+        textStyleButton = UIButton(configuration: .roundMedia(
+            image: TextStylingToolbar.buttonImage(forTextStyle: .regular),
+            size: 44,
+            withBackground: useBackgroundForLeadingEdgeButtons,
+        ))
+        decorationStyleButton = UIButton(configuration: .roundMedia(
+            image: UIImage(imageLiteralResourceName: "text_effects"),
+            size: 44,
+            withBackground: useBackgroundForLeadingEdgeButtons,
+        ))
 
         super.init(frame: .zero)
 
-        autoresizingMask = [ .flexibleHeight ]
+        preservesSuperviewLayoutMargins = true
+        autoresizingMask = [.flexibleHeight]
 
-        colorPickerView.delegate = self
+        colorPickerBar.addAction(
+            UIAction { [weak self] action in
+                guard let self, action.sender is ColorPickerBar else { return }
+                self.colorPickerBarValueChanged()
+            },
+            for: .valueChanged,
+        )
 
-        decorationStyleButton.setContentCompressionResistancePriority(.required, for: .vertical)
-        decorationStyleButton.setImage(UIImage(imageLiteralResourceName: "text_effects-fill"), for: .selected)
+        textStyleButton.setCompressionResistanceHigh()
+        decorationStyleButton.setCompressionResistanceHigh()
+        doneButton.setCompressionResistanceHigh()
 
-        // A container with width capped at a predefined size,
-        // centered in superview and constrained to layout margins.
-        let stackViewLayoutGuide = UILayoutGuide()
-
-        let contentWidthConstraint = stackViewLayoutGuide.widthAnchor.constraint(equalToConstant: ImageEditorViewController.preferredToolbarContentWidth)
-        contentWidthConstraint.priority = .defaultHigh
-        self.contentWidthConstraint = contentWidthConstraint
-
-        addLayoutGuide(stackViewLayoutGuide)
-        addConstraints([
-            stackViewLayoutGuide.centerXAnchor.constraint(equalTo: centerXAnchor),
-            stackViewLayoutGuide.leadingAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.leadingAnchor),
-            stackViewLayoutGuide.topAnchor.constraint(equalTo: topAnchor),
-            stackViewLayoutGuide.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -2),
-            contentWidthConstraint
-        ])
-
-        // I had to use a custom layout guide because stack view isn't centered
-        // but instead has slight offset towards the trailing edge.
+        stackView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(stackView)
 
-        // Round buttons have no-zero layout margins. Use values of those margins
-        // to offset button positions so that they appear properly aligned.
-        var leadingMargin: CGFloat = 0
-        var trailingMargin: CGFloat = 0
-        if let button = stackView.arrangedSubviews.first as? RoundMediaButton {
-            leadingMargin = button.layoutMargins.leading
-        }
-        if let button = stackView.arrangedSubviews.last as? RoundMediaButton {
-            trailingMargin = button.layoutMargins.trailing
-        }
+        let contentWidthConstraint = stackView.widthAnchor.constraint(
+            equalToConstant: ImageEditorViewController.preferredToolbarContentWidth,
+        )
+        contentWidthConstraint.priority = .defaultHigh
+        self.contentWidthConstraint = contentWidthConstraint
         addConstraints([
-            stackView.leadingAnchor.constraint(equalTo: stackViewLayoutGuide.leadingAnchor, constant: -leadingMargin),
-            stackView.trailingAnchor.constraint(equalTo: stackViewLayoutGuide.trailingAnchor, constant: trailingMargin),
-            stackView.topAnchor.constraint(equalTo: stackViewLayoutGuide.topAnchor),
-            stackView.bottomAnchor.constraint(equalTo: stackViewLayoutGuide.bottomAnchor)
+            stackView.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor),
+            stackView.leadingAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.leadingAnchor),
+            stackView.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
+            stackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -8),
+            contentWidthConstraint,
         ])
     }
 
-    @available(iOS, unavailable, message: "Use init(currentColor:)")
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override var intrinsicContentSize: CGSize {
-        // NOTE: Update size calculation if changing margins around UIStackView in init(layout:currentColor:).
-        CGSize(
-            width: UIScreen.main.bounds.width,
-            height: stackView.frame.height + 2 + safeAreaInsets.bottom
-        )
-    }
-}
-
-extension TextStylingToolbar: ColorPickerBarViewDelegate {
-
-    public func colorPickerBarView(_ pickerView: ColorPickerBarView, didSelectColor color: ColorPickerBarColor) {
+    func colorPickerBarValueChanged() {
         sendActions(for: .valueChanged)
     }
 }

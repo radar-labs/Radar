@@ -3,20 +3,205 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+public import GRDB
 public import LibSignalClient
 
-extension TSGroupThread {
+extension Notification.Name {
+    public static let TSGroupThreadAvatarChanged = Notification.Name("TSGroupThreadAvatarChangedNotification")
+}
+
+public let TSGroupThread_NotificationKey_UniqueId = "TSGroupThread_NotificationKey_UniqueId"
+
+open class TSGroupThread: TSThread {
+    override public class var recordType: TSThreadType { .groupThread }
+
+    public private(set) var groupModel: TSGroupModel
+
+    public enum CodingKeys: String, CodingKey, ColumnExpression {
+        case groupModel
+    }
+
+    public required init(inheritableDecoder decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let groupModelData = try container.decode(Data.self, forKey: .groupModel)
+        self.groupModel = try LegacySDSSerializer().deserializeLegacySDSData(groupModelData, ofClass: TSGroupModel.self)
+        try super.init(inheritableDecoder: decoder)
+    }
+
+    override public func encode(to encoder: any Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(LegacySDSSerializer().serializeAsLegacySDSData(self.groupModel), forKey: .groupModel)
+    }
+
+    override public var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(super.hash)
+        hasher.combine(self.groupModel)
+        return hasher.finalize()
+    }
+
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard super.isEqual(object) else { return false }
+        guard self.groupModel == object.groupModel else { return false }
+        return true
+    }
+
+    init(
+        id: Int64?,
+        uniqueId: String,
+        creationDate: Date?,
+        editTargetTimestamp: UInt64?,
+        isArchived: Bool,
+        isMarkedUnread: Bool,
+        lastDraftInteractionRowId: UInt64,
+        lastDraftUpdateTimestamp: UInt64,
+        lastInteractionRowId: UInt64,
+        lastSentStoryTimestamp: UInt64?,
+        shouldNotifyForMentionsWhenMutedLegacy: Bool,
+        shouldNotifyForMentionsWhenMuted: Bool?,
+        shouldNotifyForRepliesWhenMuted: Bool?,
+        shouldNotifyForCallsWhenMuted: Bool?,
+        shouldNotifyForUnreadRemindersWhenMuted: Bool?,
+        messageDraft: String?,
+        messageDraftBodyRanges: MessageBodyRanges?,
+        mutedUntilTimestamp: UInt64,
+        shouldThreadBeVisible: Bool,
+        storyViewMode: TSThreadStoryViewMode,
+        audioPlaybackRate: Float,
+        groupModel: TSGroupModel,
+    ) {
+        self.groupModel = groupModel
+        super.init(
+            id: id,
+            uniqueId: uniqueId,
+            creationDate: creationDate,
+            editTargetTimestamp: editTargetTimestamp,
+            isArchived: isArchived,
+            isMarkedUnread: isMarkedUnread,
+            lastDraftInteractionRowId: lastDraftInteractionRowId,
+            lastDraftUpdateTimestamp: lastDraftUpdateTimestamp,
+            lastInteractionRowId: lastInteractionRowId,
+            lastSentStoryTimestamp: lastSentStoryTimestamp,
+            shouldNotifyForMentionsWhenMutedLegacy: shouldNotifyForMentionsWhenMutedLegacy,
+            shouldNotifyForMentionsWhenMuted: shouldNotifyForMentionsWhenMuted,
+            shouldNotifyForRepliesWhenMuted: shouldNotifyForRepliesWhenMuted,
+            shouldNotifyForCallsWhenMuted: shouldNotifyForCallsWhenMuted,
+            shouldNotifyForUnreadRemindersWhenMuted: shouldNotifyForUnreadRemindersWhenMuted,
+            messageDraft: messageDraft,
+            messageDraftBodyRanges: messageDraftBodyRanges,
+            mutedUntilTimestamp: mutedUntilTimestamp,
+            shouldThreadBeVisible: shouldThreadBeVisible,
+            storyViewMode: storyViewMode,
+            audioPlaybackRate: audioPlaybackRate,
+        )
+    }
+
+    public init(
+        uniqueId: String = UUID().uuidString,
+        groupModel: TSGroupModelV2,
+    ) {
+        owsAssertDebug(!groupModel.groupId.isEmpty)
+#if DEBUG
+        groupModel.groupMembers.forEach({ owsAssertDebug($0.isValid) })
+#endif
+
+        self.groupModel = groupModel
+        super.init(uniqueId: uniqueId)
+    }
+
+    override func deepCopy() -> TSThread {
+        return TSGroupThread(
+            id: self.id,
+            uniqueId: self.uniqueId,
+            creationDate: self.creationDate,
+            editTargetTimestamp: self.editTargetTimestamp,
+            isArchived: self.isArchived,
+            isMarkedUnread: self.isMarkedUnread,
+            lastDraftInteractionRowId: self.lastDraftInteractionRowId,
+            lastDraftUpdateTimestamp: self.lastDraftUpdateTimestamp,
+            lastInteractionRowId: self.lastInteractionRowId,
+            lastSentStoryTimestamp: self.lastSentStoryTimestamp,
+            shouldNotifyForMentionsWhenMutedLegacy: self.shouldNotifyForMentionsWhenMutedLegacy,
+            shouldNotifyForMentionsWhenMuted: self.shouldNotifyForMentionsWhenMuted,
+            shouldNotifyForRepliesWhenMuted: self.shouldNotifyForRepliesWhenMuted,
+            shouldNotifyForCallsWhenMuted: self.shouldNotifyForCallsWhenMuted,
+            shouldNotifyForUnreadRemindersWhenMuted: self.shouldNotifyForUnreadRemindersWhenMuted,
+            messageDraft: self.messageDraft,
+            messageDraftBodyRanges: self.messageDraftBodyRanges,
+            mutedUntilTimestamp: self.mutedUntilTimestamp,
+            shouldThreadBeVisible: self.shouldThreadBeVisible,
+            storyViewMode: self.storyViewMode,
+            audioPlaybackRate: self.audioPlaybackRate,
+            groupModel: self.groupModel,
+        )
+    }
+
+    override func recordPendingUpdates(storageServiceManager: any StorageServiceManager) {
+        storageServiceManager.recordPendingUpdates(groupModel: self.groupModel)
+    }
+
+    public class func fetchGroupThreadViaCache(uniqueId: String, transaction: DBReadTransaction) -> TSGroupThread? {
+        return fetchViaCache(uniqueId: uniqueId, transaction: transaction)
+    }
+
+    override public func recipientAddresses(with tx: DBReadTransaction) -> [SignalServiceAddress] {
+        var groupMembers = self.groupModel.groupMembers
+        groupMembers.removeAll(where: { $0.isLocalAddress })
+        return groupMembers
+    }
+
+    public var groupNameOrDefault: String {
+        return self.groupModel.groupNameOrDefault
+    }
+
+    @objc
+    public class var defaultGroupName: String {
+        return OWSLocalizedString("NEW_GROUP_DEFAULT_TITLE", comment: "")
+    }
+
+    func canBeDeleted(localIdentifiers: LocalIdentifiers) -> Bool {
+        if self.isGroupV2Thread, !self.isTerminatedGroup {
+            let groupMembership = self.groupModel.groupMembership
+            if groupMembership.isMemberOfAnyKind(localIdentifiers.aci) {
+                return false
+            }
+            if let pni = localIdentifiers.pni, groupMembership.isMemberOfAnyKind(pni) {
+                return false
+            }
+        }
+        return true
+    }
+
+    override open func anyWillInsert(transaction: DBWriteTransaction) {
+        super.anyWillInsert(transaction: transaction)
+        updateGroupMemberRecords(transaction: transaction)
+    }
+
+    override public func anyWillUpdate(transaction: DBWriteTransaction) {
+        super.anyWillUpdate(transaction: transaction)
+
+        // We used to update the group member records here, but there are many
+        // updates that don't touch membership. Now it's done explicitly where we
+        // update the group model, and not for other updates.
+    }
+
+    override public func anyDidInsert(transaction: DBWriteTransaction) {
+        super.anyDidInsert(transaction: transaction)
+        Logger.info("Inserted group thread: \(self.groupId.hexadecimalString)")
+    }
+
     func update(
         with newGroupModel: TSGroupModel,
-        shouldUpdateChatListUi: Bool = true,
-        transaction tx: DBWriteTransaction
+        transaction tx: DBWriteTransaction,
     ) {
         let didAvatarChange = newGroupModel.avatarHash == groupModel.avatarHash
         let didNameChange = newGroupModel.groupNameOrDefault == groupModel.groupNameOrDefault
 
         let oldGroupMembers = groupModel.groupMembers
 
-        anyUpdateGroupThread(transaction: tx) { groupThread in
+        anyUpdate(transaction: tx) { groupThread in
             if let oldGroupModelV2 = groupThread.groupModel as? TSGroupModelV2 {
                 if let newGroupModelV2 = newGroupModel as? TSGroupModelV2 {
                     owsPrecondition(oldGroupModelV2.revision <= newGroupModelV2.revision)
@@ -25,6 +210,7 @@ extension TSGroupThread {
                 }
             }
 
+            _ = newGroupModel as NSCopying
             groupThread.groupModel = newGroupModel.copy() as! TSGroupModel
         }
 
@@ -34,7 +220,7 @@ extension TSGroupThread {
         SSKEnvironment.shared.databaseStorageRef.touch(
             thread: self,
             shouldReindex: didNameChange,
-            tx: tx
+            tx: tx,
         )
 
         if didAvatarChange {
@@ -42,7 +228,7 @@ extension TSGroupThread {
                 NotificationCenter.default.postOnMainThread(
                     name: .TSGroupThreadAvatarChanged,
                     object: self.uniqueId,
-                    userInfo: [TSGroupThread_NotificationKey_UniqueId: self.uniqueId]
+                    userInfo: [TSGroupThread_NotificationKey_UniqueId: self.uniqueId],
                 )
             }
         }
@@ -56,20 +242,25 @@ extension TSGroupThread {
         }
     }
 
-    public static func fetch(forGroupId groupId: GroupIdentifier, tx: DBReadTransaction) -> TSGroupThread? {
-        return fetch(groupId: groupId.serialize(), transaction: tx)
+    public static func fetchThread(forGroupId groupId: GroupIdentifier, tx: DBReadTransaction) -> TSGroupThread? {
+        return fetchThread(forGroupIdData: groupId.serialize(), tx: tx)
     }
 
     @objc
-    public static func fetch(groupId: Data, transaction: DBReadTransaction) -> TSGroupThread? {
-        let uniqueId = threadId(forGroupId: groupId, transaction: transaction)
-        return TSGroupThread.anyFetchGroupThread(uniqueId: uniqueId, transaction: transaction)
+    public static func fetchThread(forGroupIdData groupIdData: Data, tx: DBReadTransaction) -> TSGroupThread? {
+        guard let uniqueId = threadUniqueId(forGroupIdData: groupIdData, tx: tx) else {
+            return nil
+        }
+        return TSGroupThread.fetchGroupThreadViaCache(uniqueId: uniqueId, transaction: tx)
     }
 
     // MARK: -
 
     @objc
     func clearGroupSendEndorsementsIfNeeded(oldGroupMembers: [SignalServiceAddress], tx: DBWriteTransaction) {
+        guard let groupId = try? self.groupIdentifier else {
+            return
+        }
         let tsAccountManager = DependenciesBridge.shared.tsAccountManager
         let localIdentifiers = tsAccountManager.localIdentifiers(tx: tx)
         var oldGroupMembers = Set(oldGroupMembers.compactMap(\.serviceId))
@@ -79,11 +270,15 @@ extension TSGroupThread {
             oldGroupMembers.remove(localIdentifiers.aci)
             newGroupMembers.remove(localIdentifiers.aci)
         }
-        if oldGroupMembers != newGroupMembers {
-            let groupSendEndorsementStore = DependenciesBridge.shared.groupSendEndorsementStore
-            Logger.info("Clearing GSEs in \(self.logString) due to membership change.")
-            groupSendEndorsementStore.deleteEndorsements(groupThreadId: self.sqliteRowId!, tx: tx)
+        if oldGroupMembers == newGroupMembers {
+            return
         }
+        guard let groupRowId = GroupStore().fetchRowId(forGroupId: groupId, tx: tx) else {
+            return
+        }
+        let groupSendEndorsementStore = DependenciesBridge.shared.groupSendEndorsementStore
+        Logger.info("Clearing GSEs in \(self.logString) due to membership change.")
+        groupSendEndorsementStore.deleteEndorsements(groupRowId: groupRowId, tx: tx)
     }
 
     // MARK: -
@@ -91,7 +286,7 @@ extension TSGroupThread {
     public func updateWithStorySendEnabled(
         _ storySendEnabled: Bool,
         transaction: DBWriteTransaction,
-        updateStorageService: Bool = true
+        updateStorageService: Bool = true,
     ) {
         let wasStorySendEnabled = self.isStorySendExplicitlyEnabled
         updateWithStoryViewMode(storySendEnabled ? .explicit : .disabled, transaction: transaction)
@@ -109,7 +304,7 @@ extension TSGroupThread {
                 storyContextAssociatedData.update(
                     updateStorageService: updateStorageService,
                     isHidden: false,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             }
         }
@@ -117,7 +312,7 @@ extension TSGroupThread {
 
     public func updateWithStoryViewMode(
         _ storyViewMode: TSThreadStoryViewMode,
-        transaction tx: DBWriteTransaction
+        transaction tx: DBWriteTransaction,
     ) {
         anyUpdate(transaction: tx) { thread in
             thread.storyViewMode = storyViewMode
@@ -135,9 +330,9 @@ extension TSGroupThread {
 
     // MARK: -
 
-    override open func updateWithInsertedInteraction(
+    override func updateWithInsertedInteraction(
         _ interaction: TSInteraction,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         super.updateWithInsertedInteraction(interaction, tx: tx)
 
@@ -153,16 +348,20 @@ extension TSGroupThread {
 
         guard let senderAddress else { return }
 
-        guard let groupMember = TSGroupMember.groupMember(
-            for: senderAddress, in: uniqueId, transaction: tx
-        ) else {
+        guard
+            let groupMember = TSGroupMember.groupMember(
+                for: senderAddress,
+                in: uniqueId,
+                transaction: tx,
+            )
+        else {
             owsFailDebug("Unexpectedly missing group member record!")
             return
         }
 
         groupMember.anyUpdateWith(
             lastInteractionTimestamp: interaction.timestamp,
-            transaction: tx
+            transaction: tx,
         )
     }
 
@@ -170,55 +369,45 @@ extension TSGroupThread {
 
 #if TESTABLE_BUILD
     static func forUnitTest(
-        groupId: UInt8 = 0,
-        groupMembers: [SignalServiceAddress] = []
+        masterKey: GroupMasterKey,
+        groupMembers: [SignalServiceAddress] = [],
     ) -> TSGroupThread {
-        return _forUnitTest(
-            groupId: Data(repeating: groupId, count: 32),
-            secretParamsData: Data(count: 1),
-            groupMembers: groupMembers
+        let secretParams = try! GroupSecretParams.deriveFromMasterKey(groupMasterKey: masterKey)
+        return forUnitTest(
+            groupId: try! secretParams.getPublicParams().getGroupIdentifier().serialize(),
+            secretParamsData: secretParams.serialize(),
+            groupMembers: groupMembers,
         )
     }
 
     static func forUnitTest(
-        masterKey: GroupMasterKey,
-        groupMembers: [SignalServiceAddress] = []
-    ) -> TSGroupThread {
-        let secretParams = try! GroupSecretParams.deriveFromMasterKey(groupMasterKey: masterKey)
-        return _forUnitTest(
-            groupId: try! secretParams.getPublicParams().getGroupIdentifier().serialize(),
-            secretParamsData: secretParams.serialize(),
-            groupMembers: groupMembers
-        )
-    }
-
-    private static func _forUnitTest(
         groupId: Data,
-        secretParamsData: Data,
-        groupMembers: [SignalServiceAddress] = []
+        secretParamsData: Data = Data(count: 1),
+        groupMembers: [SignalServiceAddress] = [],
+        isArchived: Bool = false,
     ) -> TSGroupThread {
-        let groupThreadId = TSGroupThread.defaultThreadId(forGroupId: groupId)
         let groupThread = TSGroupThread(
-            grdbId: 1,
-            uniqueId: groupThreadId,
-            conversationColorNameObsolete: "",
+            id: 1,
+            uniqueId: UUID().uuidString,
             creationDate: nil,
             editTargetTimestamp: nil,
-            isArchivedObsolete: false,
-            isMarkedUnreadObsolete: false,
+            isArchived: isArchived,
+            isMarkedUnread: false,
             lastDraftInteractionRowId: 0,
             lastDraftUpdateTimestamp: 0,
             lastInteractionRowId: 1,
             lastSentStoryTimestamp: nil,
-            lastVisibleSortIdObsolete: 0,
-            lastVisibleSortIdOnScreenPercentageObsolete: 0,
-            mentionNotificationMode: .default,
+            shouldNotifyForMentionsWhenMutedLegacy: true,
+            shouldNotifyForMentionsWhenMuted: nil,
+            shouldNotifyForRepliesWhenMuted: nil,
+            shouldNotifyForCallsWhenMuted: nil,
+            shouldNotifyForUnreadRemindersWhenMuted: nil,
             messageDraft: nil,
             messageDraftBodyRanges: nil,
-            mutedUntilDateObsolete: nil,
-            mutedUntilTimestampObsolete: 0,
+            mutedUntilTimestamp: 0,
             shouldThreadBeVisible: true,
             storyViewMode: .default,
+            audioPlaybackRate: 1,
             groupModel: TSGroupModelV2(
                 groupId: groupId,
                 name: "Example Group",
@@ -234,10 +423,11 @@ extension TSGroupThread {
                 isJoinRequestPlaceholder: false,
                 wasJustMigrated: false,
                 didJustAddSelfViaGroupLink: false,
-                addedByAddress: nil
-            )
+                addedByAddress: nil,
+                isTerminated: false,
+            ),
         )
-        groupThread.clearRowId()
+        groupThread.id = nil
         return groupThread
     }
 #endif
@@ -272,5 +462,17 @@ public extension TSThreadStoryViewMode {
             owsFailDebug("Unexpected story mode \(value)")
             self = .default
         }
+    }
+}
+
+// MARK: - StringInterpolation
+
+public extension String.StringInterpolation {
+    mutating func appendInterpolation(groupThreadColumn column: TSGroupThread.CodingKeys) {
+        appendLiteral(column.rawValue)
+    }
+
+    mutating func appendInterpolation(groupThreadColumnFullyQualified column: TSGroupThread.CodingKeys) {
+        appendLiteral("\(TSThread.databaseTableName).\(column.rawValue)")
     }
 }

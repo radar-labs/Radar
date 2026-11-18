@@ -8,22 +8,31 @@ public import LibSignalClient
 
 public struct LinkingProvisioningMessage {
 
-    public enum RootKey {
-        case accountEntropyPool(AccountEntropyPool)
-        case masterKey(MasterKey)
-    }
-
     public enum Constants {
-        public static let provisioningVersion: UInt32  = 1
+        public static let provisioningVersion: UInt32 = 1
         public static let userAgent: String = "OWI"
     }
 
-    public let rootKey: RootKey
+    /// Wraps state that's only available for accounts with phone numbers.
+    public struct PhoneNumberState {
+        public let phoneNumber: LocalIdentifiers.PhoneNumber
+        public let pniIdentityKeyPair: IdentityKeyPair
+
+        public init(phoneNumber: LocalIdentifiers.PhoneNumber, pniIdentityKeyPair: IdentityKeyPair) {
+            self.phoneNumber = phoneNumber
+            self.pniIdentityKeyPair = pniIdentityKeyPair
+        }
+    }
+
+    public enum AccountType {
+        case phoneNumberfull(PhoneNumberState)
+        case phoneNumberless(AuthCredentialSalt)
+    }
+
     public let aci: Aci
-    public let phoneNumber: String
-    public let pni: Pni
     public let aciIdentityKeyPair: IdentityKeyPair
-    public let pniIdentityKeyPair: IdentityKeyPair
+    public let aep: AccountEntropyPool
+    public let accountType: AccountType
     public let profileKey: Aes256Key
     public let mrbk: MediaRootBackupKey
     public let ephemeralBackupKey: MessageRootBackupKey?
@@ -33,26 +42,22 @@ public struct LinkingProvisioningMessage {
     public let provisioningVersion: UInt32
 
     public init(
-        rootKey: RootKey,
         aci: Aci,
-        phoneNumber: String,
-        pni: Pni,
         aciIdentityKeyPair: IdentityKeyPair,
-        pniIdentityKeyPair: IdentityKeyPair,
+        aep: AccountEntropyPool,
+        accountType: AccountType,
         profileKey: Aes256Key,
         mrbk: MediaRootBackupKey,
         ephemeralBackupKey: MessageRootBackupKey?,
         areReadReceiptsEnabled: Bool,
         provisioningCode: String,
         provisioningUserAgent: String? = Constants.userAgent,
-        provisioningVersion: UInt32 = Constants.provisioningVersion
+        provisioningVersion: UInt32 = Constants.provisioningVersion,
     ) {
-        self.rootKey = rootKey
+        self.aep = aep
         self.aci = aci
-        self.phoneNumber = phoneNumber
-        self.pni = pni
+        self.accountType = accountType
         self.aciIdentityKeyPair = aciIdentityKeyPair
-        self.pniIdentityKeyPair = pniIdentityKeyPair
         self.profileKey = profileKey
         self.mrbk = mrbk
         self.ephemeralBackupKey = ephemeralBackupKey
@@ -62,21 +67,14 @@ public struct LinkingProvisioningMessage {
         self.provisioningVersion = provisioningVersion
     }
 
-    public init(plaintext: Data) throws {
-        let proto = try ProvisioningProtoProvisionMessage(serializedData: plaintext)
-
+    public init(_ proto: ProvisioningProtos_ProvisionMessage) throws {
         self.aciIdentityKeyPair = try IdentityKeyPair(
             publicKey: PublicKey(proto.aciIdentityKeyPublic),
-            privateKey: PrivateKey(proto.aciIdentityKeyPrivate)
-        )
-
-        self.pniIdentityKeyPair = try IdentityKeyPair(
-            publicKey: PublicKey(proto.pniIdentityKeyPublic),
-            privateKey: PrivateKey(proto.pniIdentityKeyPrivate)
+            privateKey: PrivateKey(proto.aciIdentityKeyPrivate),
         )
 
         guard let profileKey = Aes256Key(data: proto.profileKey) else {
-            throw ProvisioningError.invalidProvisionMessage("invalid profileKey - count: \(proto.profileKey.count)")
+            throw OWSGenericError("invalid profileKey - count: \(proto.profileKey.count)")
         }
         self.profileKey = profileKey
 
@@ -87,96 +85,75 @@ public struct LinkingProvisioningMessage {
         let provisioningVersion = proto.provisioningVersion
         self.provisioningVersion = provisioningVersion
 
-        guard let phoneNumber = proto.number, phoneNumber.count > 1 else {
-            throw ProvisioningError.invalidProvisionMessage("missing number from provisioning message")
-        }
-        self.phoneNumber = phoneNumber
-
-        self.aci = try {
-            guard let aci = Aci.parseFrom(serviceIdBinary: proto.aciBinary, serviceIdString: proto.aci) else {
-                throw ProvisioningError.invalidProvisionMessage("invalid ACI from provisioning message")
+        let accountType: AccountType
+        if proto.hasNumber {
+            guard let e164 = E164(proto.number) else {
+                throw OWSGenericError("malformed number in provisioning message")
             }
-            return aci
-        }()
-
-        self.pni = try {
-            if let pniBinary = proto.pniBinary {
-                guard let pniUuid = UUID(data: pniBinary) else {
-                    throw ProvisioningError.invalidProvisionMessage("invalid PNI from provisioning message")
-                }
-                return Pni(fromUUID: pniUuid)
+            guard let pniUuid = UUID(data: proto.pniBinary) else {
+                throw OWSGenericError("malformed PNI in provisioning message")
             }
-            if let pniString = proto.pni {
-                guard let pni = Pni.parseFrom(ambiguousString: pniString) else {
-                    throw ProvisioningError.invalidProvisionMessage("invalid PNI from provisioning message")
-                }
-                return pni
-            }
-            throw ProvisioningError.invalidProvisionMessage("invalid PNI from provisioning message")
-        }()
-
-        if
-            let accountEntropyPool = proto.accountEntropyPool?.nilIfEmpty,
-            let aep = try? AccountEntropyPool(key: accountEntropyPool)
-        {
-            self.rootKey = .accountEntropyPool(aep)
-        } else if let masterKey = try proto.masterKey.map({ try MasterKey(data: $0)}) {
-            self.rootKey = .masterKey(masterKey)
+            let pni = Pni(fromUUID: pniUuid)
+            let pniIdentityKeyPair = try IdentityKeyPair(
+                publicKey: PublicKey(proto.pniIdentityKeyPublic),
+                privateKey: PrivateKey(proto.pniIdentityKeyPrivate),
+            )
+            let phoneNumber = LocalIdentifiers.PhoneNumber(e164: e164, pni: pni)
+            accountType = .phoneNumberfull(PhoneNumberState(
+                phoneNumber: phoneNumber,
+                pniIdentityKeyPair: pniIdentityKeyPair,
+            ))
         } else {
-            throw ProvisioningError.invalidProvisionMessage("missing master key from provisioning message")
+            guard BuildFlags.phoneNumberlessCanBeLinkedDevice else {
+                throw OWSGenericError("missing phone number")
+            }
+            let authCredentialSalt = try AuthCredentialSalt(rawValue: proto.authCredentialSalt)
+            accountType = .phoneNumberless(authCredentialSalt)
         }
+        self.accountType = accountType
 
-        guard let mrbkBytes = proto.mediaRootBackupKey else {
-            throw ProvisioningError.invalidProvisionMessage("missing media key from provisioning message")
-        }
-        self.mrbk = try MediaRootBackupKey(backupKey: BackupKey(contents: mrbkBytes))
+        self.aci = try Aci.parseFrom(serviceIdBinary: proto.aciBinary)
 
-        let aci = aci
-        self.ephemeralBackupKey = try proto.ephemeralBackupKey.map {
-            return MessageRootBackupKey(
-                backupKey: try BackupKey(contents: $0),
-                aci: aci
+        self.aep = try AccountEntropyPool(key: proto.accountEntropyPool)
+
+        self.mrbk = MediaRootBackupKey(backupKey: try BackupKey(contents: proto.mediaRootBackupKey))
+
+        var ephemeralBackupKey: MessageRootBackupKey?
+        if proto.hasEphemeralBackupKey {
+            ephemeralBackupKey = MessageRootBackupKey(
+                backupKey: try BackupKey(contents: proto.ephemeralBackupKey),
+                aci: self.aci,
             )
         }
+        self.ephemeralBackupKey = ephemeralBackupKey
     }
 
     public func buildEncryptedMessageBody(theirPublicKey: PublicKey) throws -> Data {
-        let messageBuilder = ProvisioningProtoProvisionMessage.builder(
-            aciIdentityKeyPublic: aciIdentityKeyPair.publicKey.serialize(),
-            aciIdentityKeyPrivate: aciIdentityKeyPair.privateKey.serialize(),
-            pniIdentityKeyPublic: pniIdentityKeyPair.publicKey.serialize(),
-            pniIdentityKeyPrivate: pniIdentityKeyPair.privateKey.serialize(),
-            provisioningCode: provisioningCode,
-            profileKey: profileKey.keyData
-        )
-        messageBuilder.setUserAgent(Constants.userAgent)
-        messageBuilder.setReadReceipts(areReadReceiptsEnabled)
-        messageBuilder.setProvisioningVersion(Constants.provisioningVersion)
-        messageBuilder.setNumber(phoneNumber)
-        if BuildFlags.serviceIdStrings {
-            messageBuilder.setAci(aci.rawUUID.uuidString.lowercased())
+        var message = ProvisioningProtos_ProvisionMessage()
+        message.aciIdentityKeyPublic = aciIdentityKeyPair.publicKey.serialize()
+        message.aciIdentityKeyPrivate = aciIdentityKeyPair.privateKey.serialize()
+        message.provisioningCode = provisioningCode
+        message.profileKey = profileKey.keyData
+        message.userAgent = Constants.userAgent
+        message.readReceipts = areReadReceiptsEnabled
+        message.provisioningVersion = Constants.provisioningVersion
+        message.aciBinary = aci.rawUUID.data
+        message.accountEntropyPool = aep.rawString
+        message.mediaRootBackupKey = mrbk.serialize()
+        if let ephemeralBackupKey {
+            message.ephemeralBackupKey = ephemeralBackupKey.serialize()
         }
-        if BuildFlags.serviceIdBinaryProvisioning {
-            messageBuilder.setAciBinary(aci.rawUUID.data)
-        }
-        if BuildFlags.serviceIdStrings {
-            messageBuilder.setPni(pni.rawUUID.uuidString.lowercased())
-        }
-        if BuildFlags.serviceIdBinaryProvisioning {
-            messageBuilder.setPniBinary(pni.rawUUID.data)
+        switch accountType {
+        case .phoneNumberfull(let phoneNumberState):
+            message.number = phoneNumberState.phoneNumber.e164.stringValue
+            message.pniBinary = phoneNumberState.phoneNumber.pni.rawUUID.data
+            message.pniIdentityKeyPublic = phoneNumberState.pniIdentityKeyPair.publicKey.serialize()
+            message.pniIdentityKeyPrivate = phoneNumberState.pniIdentityKeyPair.privateKey.serialize()
+        case .phoneNumberless(let authCredentialSalt):
+            message.authCredentialSalt = authCredentialSalt.rawValue
         }
 
-        switch rootKey {
-        case .accountEntropyPool(let accountEntropyPool):
-            messageBuilder.setAccountEntropyPool(accountEntropyPool.rawString)
-            messageBuilder.setMasterKey(accountEntropyPool.getMasterKey().rawData)
-        case .masterKey(let masterKey):
-            messageBuilder.setMasterKey(masterKey.rawData)
-        }
-        messageBuilder.setMediaRootBackupKey(mrbk.serialize())
-        ephemeralBackupKey.map { messageBuilder.setEphemeralBackupKey($0.serialize())}
-
-        let plainTextProvisionMessage = try messageBuilder.buildSerializedData()
+        let plainTextProvisionMessage = try message.serializedData()
 
         // Note that this is a one-time-use *cipher* public key, not our Signal *identity* public key
         let ourKeyPair = IdentityKeyPair.generate()
@@ -185,16 +162,15 @@ public struct LinkingProvisioningMessage {
         do {
             encryptedProvisionMessage = try cipher.encrypt(
                 plainTextProvisionMessage,
-                theirPublicKey: theirPublicKey
+                theirPublicKey: theirPublicKey,
             )
         } catch {
             throw OWSAssertionError("Failed to encrypt provision message")
         }
 
-        let envelopeBuilder = ProvisioningProtoProvisionEnvelope.builder(
-            publicKey: ourKeyPair.publicKey.serialize(),
-            body: encryptedProvisionMessage
-        )
-        return try envelopeBuilder.buildSerializedData()
+        var envelope = ProvisioningProtos_ProvisionEnvelope()
+        envelope.publicKey = ourKeyPair.publicKey.serialize()
+        envelope.body = encryptedProvisionMessage
+        return try envelope.serializedData()
     }
 }

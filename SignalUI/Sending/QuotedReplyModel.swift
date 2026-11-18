@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import SignalServiceKit
 public import LibSignalClient
+public import SignalServiceKit
 
 /// View model for an existing quoted reply which has already fetched any attachments.
 /// NOT used for draft quoted replies; this is for TSMessages with quoted replies (or story replies)
@@ -16,6 +16,8 @@ public class QuotedReplyModel {
 
     /// Address of the original message's author, be it StoryMessage or TSMessage.
     public let originalMessageAuthorAddress: SignalServiceAddress
+
+    public let originalMessageMemberLabel: String?
 
     public let isOriginalMessageAuthorLocalUser: Bool
 
@@ -44,14 +46,14 @@ public class QuotedReplyModel {
         /// be thumbnail-ed
         case attachmentStub(
             MessageBody?,
-            QuotedMessageAttachmentReference.Stub
+            QuotedMessageAttachmentReference.Stub,
         )
         /// The original message had an attachment that can be thumbnail-ed,
         /// though it may not actually be thumbnail-ed *yet*.
         case attachment(
             MessageBody?,
             attachment: ReferencedAttachment,
-            thumbnailImage: UIImage?
+            thumbnailImage: UIImage?,
         )
 
         // MARK: - Story types
@@ -59,7 +61,7 @@ public class QuotedReplyModel {
         case mediaStory(
             body: StyleOnlyMessageBody?,
             attachment: ReferencedAttachment,
-            thumbnailImage: UIImage?
+            thumbnailImage: UIImage?,
         )
 
         public typealias TextStoryThumbnailRenderer = (SpoilerRenderState) -> UIView
@@ -101,11 +103,11 @@ public class QuotedReplyModel {
 
         public var attachmentMimeType: String? {
             switch self {
-            case .text(_):
+            case .text:
                 return nil
             case .giftBadge:
                 return nil
-            case .storyReactionEmoji(_):
+            case .storyReactionEmoji:
                 return nil
             case .attachmentStub(_, let stub):
                 return stub.mimeType
@@ -113,7 +115,7 @@ public class QuotedReplyModel {
                 return attachment.attachment.mimeType
             case .mediaStory(_, let attachment, _):
                 return attachment.attachment.mimeType
-            case .textStory(_):
+            case .textStory:
                 return nil
             case .expiredStory:
                 return nil
@@ -124,19 +126,19 @@ public class QuotedReplyModel {
 
         public var attachmentContentType: Attachment.ContentType? {
             switch self {
-            case .text(_):
+            case .text:
                 return nil
             case .giftBadge:
                 return nil
-            case .storyReactionEmoji(_):
+            case .storyReactionEmoji:
                 return nil
-            case .attachmentStub(_, _):
+            case .attachmentStub:
                 return nil
             case .attachment(_, let attachment, _):
                 return attachment.attachment.asStream()?.contentType
             case .mediaStory(_, let attachment, _):
                 return attachment.attachment.asStream()?.contentType
-            case .textStory(_):
+            case .textStory:
                 return nil
             case .expiredStory:
                 return nil
@@ -169,15 +171,15 @@ public class QuotedReplyModel {
             return messageBody
         case .mediaStory(let body, _, _):
             return body?.asMessageBody()
-        case .textStory(_):
+        case .textStory:
             return nil
         case .expiredStory:
             return MessageBody(
                 text: OWSLocalizedString(
                     "STORY_NO_LONGER_AVAILABLE",
-                    comment: "Text indicating a story that was replied to is no longer available."
+                    comment: "Text indicating a story that was replied to is no longer available.",
                 ),
-                ranges: .empty
+                ranges: .empty,
             )
         case .poll(let pollQuestion):
             return MessageBody(text: pollQuestion, ranges: .empty)
@@ -186,19 +188,19 @@ public class QuotedReplyModel {
 
     public var originalAttachmentSourceFilename: String? {
         switch originalContent {
-        case .text(_):
+        case .text:
             return nil
         case .giftBadge:
             return nil
-        case .storyReactionEmoji(_):
+        case .storyReactionEmoji:
             return nil
         case .attachmentStub(_, let stub):
             return stub.sourceFilename
         case .attachment(_, let attachment, _):
             return attachment.reference.sourceFilename
-        case .mediaStory(_, _, _):
+        case .mediaStory:
             return nil
-        case .textStory(_):
+        case .textStory:
             return nil
         case .expiredStory:
             return nil
@@ -207,22 +209,67 @@ public class QuotedReplyModel {
         }
     }
 
+    public var originalMessageAccessibilityLabel: String? {
+        let mediaString = OWSLocalizedString(
+            "ACCESSIBILITY_LABEL_MEDIA",
+            comment: "Accessibility label for media.",
+        )
+
+        switch originalContent {
+        case .text(let messageBody):
+            return messageBody?.text
+        case .giftBadge:
+            return nil
+        case .storyReactionEmoji(let string):
+            return string
+        case .attachmentStub(let messageBody, _):
+            var captionString = ""
+            let caption = messageBody?.text.nilIfEmpty
+            if let caption {
+                captionString.append(caption + ",")
+            }
+            return captionString + mediaString
+        case .attachment(let messageBody, _, _):
+            var captionString = ""
+            let caption = messageBody?.text.nilIfEmpty
+            if let caption {
+                captionString.append(caption + ",")
+            }
+            return captionString + mediaString
+        case .mediaStory(let body, _, _):
+            return body?.text
+        case .textStory:
+            return nil
+        case .expiredStory:
+            return OWSLocalizedString(
+                "STORY_NO_LONGER_AVAILABLE",
+                comment: "Text indicating a story that was replied to is no longer available.",
+            )
+        case .poll(let pollQuestion):
+            let formatQuestion = OWSLocalizedString(
+                "POLL_ACCESSIBILITY_LABEL",
+                comment: "Accessibility label for poll message. Embeds {{ poll question }}.",
+            )
+            return String.nonPluralLocalizedStringWithFormat(formatQuestion, pollQuestion)
+        }
+    }
+
     public var hasQuotedThumbnail: Bool {
         switch originalContent {
-        case .text(_):
+        case .text:
             return false
         case .giftBadge:
             // This pretends to be a thumbnail
             return true
-        case .storyReactionEmoji(_):
+        case .storyReactionEmoji:
             return false
-        case .attachmentStub(_, _):
+        case .attachmentStub:
             return false
         case .attachment(_, _, let thumbnailImage):
             return thumbnailImage != nil
-        case .mediaStory(_, _, _):
+        case .mediaStory:
             return true
-        case .textStory(_):
+        case .textStory:
             return true
         case .expiredStory:
             return false
@@ -234,7 +281,7 @@ public class QuotedReplyModel {
     public static func build(
         replyingTo storyMessage: StoryMessage,
         reactionEmoji: String? = nil,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> QuotedReplyModel {
         let isOriginalAuthorLocalUser = DependenciesBridge.shared.tsAccountManager
             .localIdentifiers(tx: transaction)?
@@ -243,15 +290,16 @@ public class QuotedReplyModel {
             ?? false
 
         func buildQuotedReplyModel(
-            originalContent: OriginalContent
+            originalContent: OriginalContent,
         ) -> QuotedReplyModel {
             return QuotedReplyModel(
                 originalMessageTimestamp: storyMessage.timestamp,
                 originalMessageAuthorAddress: storyMessage.authorAddress,
+                originalMessageMemberLabel: nil,
                 isOriginalMessageAuthorLocalUser: isOriginalAuthorLocalUser,
                 storyReactionEmoji: reactionEmoji,
                 originalContent: originalContent,
-                sourceOfOriginal: .story
+                sourceOfOriginal: .story,
             )
         }
 
@@ -259,9 +307,9 @@ public class QuotedReplyModel {
         case .media:
             let referencedAttachment = storyMessage.id.map {
                 return DependenciesBridge.shared.attachmentStore
-                    .fetchFirstReferencedAttachment(
+                    .fetchAnyReferencedAttachment(
                         for: .storyMessageMedia(storyMessageRowId: $0),
-                        tx: transaction
+                        tx: transaction,
                     )
             } ?? nil
 
@@ -277,7 +325,7 @@ public class QuotedReplyModel {
                 return buildQuotedReplyModel(originalContent: .mediaStory(
                     body: referencedAttachment.reference.storyMediaCaption,
                     attachment: referencedAttachment,
-                    thumbnailImage: thumbnailImage
+                    thumbnailImage: thumbnailImage,
                 ))
             } else {
                 return buildQuotedReplyModel(originalContent: .expiredStory)
@@ -287,30 +335,30 @@ public class QuotedReplyModel {
             let preloadedTextAttachment = PreloadedTextAttachment.from(
                 textAttachment,
                 storyMessage: storyMessage,
-                tx: transaction
+                tx: transaction,
             )
             return buildQuotedReplyModel(originalContent: .textStory({ spoilerState in
                 return TextAttachmentView(
                     attachment: preloadedTextAttachment,
                     interactionIdentifier: .fromStoryMessage(storyMessage),
-                    spoilerState: spoilerState
+                    spoilerState: spoilerState,
                 ).asThumbnailView()
             }))
         }
-     }
+    }
 
     public static func build(
         storyReplyMessage message: TSMessage,
         storyTimestamp: UInt64?,
         storyAuthorAci: Aci,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> QuotedReplyModel {
         guard
             let storyTimestamp,
             let storyMessage = StoryFinder.story(
                 timestamp: storyTimestamp,
                 author: storyAuthorAci,
-                transaction: transaction
+                transaction: transaction,
             )
         else {
             let isOriginalMessageAuthorLocalUser = DependenciesBridge.shared.tsAccountManager
@@ -319,16 +367,17 @@ public class QuotedReplyModel {
             return QuotedReplyModel(
                 originalMessageTimestamp: storyTimestamp,
                 originalMessageAuthorAddress: SignalServiceAddress(storyAuthorAci),
+                originalMessageMemberLabel: nil,
                 isOriginalMessageAuthorLocalUser: isOriginalMessageAuthorLocalUser,
                 storyReactionEmoji: message.storyReactionEmoji,
                 originalContent: .expiredStory,
-                sourceOfOriginal: .story
+                sourceOfOriginal: .story,
             )
         }
         return QuotedReplyModel.build(
             replyingTo: storyMessage,
             reactionEmoji: message.storyReactionEmoji,
-            transaction: transaction
+            transaction: transaction,
         )
     }
 
@@ -336,10 +385,11 @@ public class QuotedReplyModel {
     public static func build(
         replyMessage message: TSMessage,
         quotedMessage: TSQuotedMessage,
-        transaction: DBReadTransaction
+        memberLabel: String?,
+        transaction: DBReadTransaction,
     ) -> QuotedReplyModel {
         func buildQuotedReplyModel(
-            originalContent: OriginalContent
+            originalContent: OriginalContent,
         ) -> QuotedReplyModel {
             let isOriginalAuthorLocalUser = DependenciesBridge.shared.tsAccountManager
                 .localIdentifiers(tx: transaction)?
@@ -350,10 +400,11 @@ public class QuotedReplyModel {
             return QuotedReplyModel(
                 originalMessageTimestamp: quotedMessage.timestampValue?.uint64Value,
                 originalMessageAuthorAddress: quotedMessage.authorAddress,
+                originalMessageMemberLabel: memberLabel,
                 isOriginalMessageAuthorLocalUser: isOriginalAuthorLocalUser,
                 storyReactionEmoji: nil,
                 originalContent: originalContent,
-                sourceOfOriginal: quotedMessage.bodySource
+                sourceOfOriginal: quotedMessage.bodySource,
             )
         }
 
@@ -377,36 +428,39 @@ public class QuotedReplyModel {
             return buildQuotedReplyModel(originalContent: .text(.init(
                 text: OWSLocalizedString(
                     "PER_MESSAGE_EXPIRATION_NOT_VIEWABLE",
-                    comment: "inbox cell and notification text for an already viewed view-once media message."
+                    comment: "inbox cell and notification text for an already viewed view-once media message.",
                 ),
-                ranges: .empty
+                ranges: .empty,
             )))
         }
 
-        let attachmentReference = DependenciesBridge.shared.attachmentStore.quotedAttachmentReference(
-            for: message,
-            tx: transaction
+        let quotedMessageAttachmentReference = DependenciesBridge.shared.attachmentStore.quotedAttachmentReference(
+            owningMessage: message,
+            tx: transaction,
         )
 
-        switch attachmentReference {
+        switch quotedMessageAttachmentReference {
         case nil:
-            break
+            return buildQuotedReplyModel(originalContent: .text(originalMessageBody))
         case .stub(let stub):
             return buildQuotedReplyModel(originalContent: .attachmentStub(originalMessageBody, stub))
-        case .thumbnail(let attachmentRef):
-            // Fetch the full attachment.
-            let thumbnailAttachment = DependenciesBridge.shared.attachmentStore.fetch(
-                id: attachmentRef.attachmentRowId,
-                tx: transaction
-            )
+        case .thumbnail(let thumbnailReferencedAttachment):
             let image: UIImage? = {
                 if
-                    let thumbnailAttachment,
-                    let image = thumbnailAttachment.asStream()?.thumbnailImageSync(quality: .small)
+                    let image = thumbnailReferencedAttachment.attachment
+                        .asStream()?
+                        .thumbnailImageSync(quality: .small)
                 {
                     return image
                 } else if
-                    let blurHash = thumbnailAttachment?.blurHash,
+                    let image = thumbnailReferencedAttachment
+                        .asReferencedBackupThumbnail?
+                        .attachmentBackupThumbnail
+                        .image
+                {
+                    return image
+                } else if
+                    let blurHash = thumbnailReferencedAttachment.attachment.blurHash,
                     let image = BlurHash.image(for: blurHash)
                 {
                     return image
@@ -421,50 +475,48 @@ public class QuotedReplyModel {
                     withTimestamp: originalMessageTimestamp,
                     threadId: message.uniqueThreadId,
                     author: quotedMessage.authorAddress,
-                    transaction: transaction
+                    transaction: transaction,
                 ),
                 let originalAttachmentReference = DependenciesBridge.shared.attachmentStore
                     .attachmentToUseInQuote(
                         originalMessageRowId: originalMessage.sqliteRowId!,
-                        tx: transaction
+                        tx: transaction,
                     ),
                 let originalAttachment = DependenciesBridge.shared.attachmentStore.fetch(
                     id: originalAttachmentReference.attachmentRowId,
-                    tx: transaction
+                    tx: transaction,
                 )
             {
                 return buildQuotedReplyModel(originalContent: .attachment(
                     originalMessageBody,
                     attachment: .init(
                         reference: originalAttachmentReference,
-                        attachment: originalAttachment
+                        attachment: originalAttachment,
                     ),
-                    thumbnailImage: image
-                ))
-            } else if let thumbnailAttachment {
-                return buildQuotedReplyModel(originalContent: .attachment(
-                    originalMessageBody,
-                    attachment: .init(reference: attachmentRef, attachment: thumbnailAttachment),
-                    thumbnailImage: image
+                    thumbnailImage: image,
                 ))
             } else {
-                break
+                return buildQuotedReplyModel(originalContent: .attachment(
+                    originalMessageBody,
+                    attachment: thumbnailReferencedAttachment,
+                    thumbnailImage: image,
+                ))
             }
         }
-
-        return buildQuotedReplyModel(originalContent: .text(originalMessageBody))
     }
 
     private init(
         originalMessageTimestamp: UInt64?,
         originalMessageAuthorAddress: SignalServiceAddress,
+        originalMessageMemberLabel: String?,
         isOriginalMessageAuthorLocalUser: Bool,
         storyReactionEmoji: String?,
         originalContent: OriginalContent,
-        sourceOfOriginal: TSQuotedMessageContentSource
+        sourceOfOriginal: TSQuotedMessageContentSource,
     ) {
         self.originalMessageTimestamp = originalMessageTimestamp
         self.originalMessageAuthorAddress = originalMessageAuthorAddress
+        self.originalMessageMemberLabel = originalMessageMemberLabel
         self.isOriginalMessageAuthorLocalUser = isOriginalMessageAuthorLocalUser
         self.storyReactionEmoji = storyReactionEmoji
         self.originalContent = originalContent
@@ -475,7 +527,7 @@ public class QuotedReplyModel {
 // MARK: - Equatable
 
 extension QuotedReplyModel: Equatable {
-    public static func == (lhs: QuotedReplyModel, rhs: QuotedReplyModel) -> Bool {
+    public static func ==(lhs: QuotedReplyModel, rhs: QuotedReplyModel) -> Bool {
         return lhs.originalMessageTimestamp == rhs.originalMessageTimestamp
             && lhs.originalMessageAuthorAddress == rhs.originalMessageAuthorAddress
             && lhs.isOriginalMessageAuthorLocalUser == rhs.isOriginalMessageAuthorLocalUser
@@ -486,7 +538,7 @@ extension QuotedReplyModel: Equatable {
 }
 
 extension QuotedReplyModel.OriginalContent: Equatable {
-    public static func == (lhs: QuotedReplyModel.OriginalContent, rhs: QuotedReplyModel.OriginalContent) -> Bool {
+    public static func ==(lhs: QuotedReplyModel.OriginalContent, rhs: QuotedReplyModel.OriginalContent) -> Bool {
         switch (lhs, rhs) {
         case let (.text(lhsBody), .text(rhsBody)):
             return lhsBody == rhsBody

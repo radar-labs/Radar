@@ -9,67 +9,6 @@ import XCTest
 @testable import SignalServiceKit
 
 class ProfileManagerTest: XCTestCase {
-    func testNormalizeRecipientInProfileWhitelist() {
-        let aci = Aci.constantForTesting("00000000-0000-4000-8000-000000000aaa")
-        let phoneNumber = E164("+16505550100")!
-        let pni = Pni.constantForTesting("PNI:00000000-0000-4000-8000-000000000bbb")
-
-        let serviceIdStore = KeyValueStore(collection: "serviceId")
-        let phoneNumberStore = KeyValueStore(collection: "phoneNumber")
-
-        let db = InMemoryDB()
-
-        func normalizeRecipient(aci: Aci?, phoneNumber: E164?, pni: Pni?, tx: DBWriteTransaction) {
-            try! SignalRecipient.deleteAll(tx.database)
-            let recipient = try! SignalRecipient.insertRecord(
-                aci: aci,
-                phoneNumber: phoneNumber,
-                pni: pni,
-                tx: tx,
-            )
-            OWSProfileManager.swift_normalizeRecipientInProfileWhitelist(
-                recipient,
-                serviceIdStore: serviceIdStore,
-                phoneNumberStore: phoneNumberStore,
-                tx: tx
-            )
-        }
-
-        // Don't add any values unless one is already present.
-        db.write { tx in
-            normalizeRecipient(aci: aci, phoneNumber: phoneNumber, pni: pni, tx: tx)
-            XCTAssertFalse(serviceIdStore.hasValue(aci.serviceIdUppercaseString, transaction: tx))
-            XCTAssertFalse(phoneNumberStore.hasValue(phoneNumber.stringValue, transaction: tx))
-            XCTAssertFalse(serviceIdStore.hasValue(pni.serviceIdUppercaseString, transaction: tx))
-        }
-
-        // Move the PNI identifier to the phone number.
-        db.write { tx in
-            serviceIdStore.setBool(true, key: pni.serviceIdUppercaseString, transaction: tx)
-            normalizeRecipient(aci: nil, phoneNumber: phoneNumber, pni: pni, tx: tx)
-            XCTAssertFalse(serviceIdStore.hasValue(aci.serviceIdUppercaseString, transaction: tx))
-            XCTAssertTrue(phoneNumberStore.hasValue(phoneNumber.stringValue, transaction: tx))
-            XCTAssertFalse(serviceIdStore.hasValue(pni.serviceIdUppercaseString, transaction: tx))
-        }
-
-        // Clear lower priority identifiers when multiple are present.
-        db.write { tx in
-            serviceIdStore.setBool(true, key: aci.serviceIdUppercaseString, transaction: tx)
-            normalizeRecipient(aci: aci, phoneNumber: phoneNumber, pni: pni, tx: tx)
-            XCTAssertTrue(serviceIdStore.hasValue(aci.serviceIdUppercaseString, transaction: tx))
-            XCTAssertFalse(phoneNumberStore.hasValue(phoneNumber.stringValue, transaction: tx))
-            XCTAssertFalse(serviceIdStore.hasValue(pni.serviceIdUppercaseString, transaction: tx))
-        }
-
-        // Keep the highest priority identifier if it's already present.
-        db.write { tx in
-            normalizeRecipient(aci: aci, phoneNumber: phoneNumber, pni: pni, tx: tx)
-            XCTAssertTrue(serviceIdStore.hasValue(aci.serviceIdUppercaseString, transaction: tx))
-            XCTAssertFalse(phoneNumberStore.hasValue(phoneNumber.stringValue, transaction: tx))
-            XCTAssertFalse(serviceIdStore.hasValue(pni.serviceIdUppercaseString, transaction: tx))
-        }
-    }
-
     func testEncodeDecodeProfileChanges() throws {
         let testCases: [(PendingProfileUpdate, String)] = [
             (
@@ -80,9 +19,9 @@ class ProfileManagerTest: XCTestCase {
                     profileBioEmoji: .setTo("💙"),
                     profileAvatarData: .setTo(Data(1...3)),
                     visibleBadgeIds: .setTo(["BOOST"]),
-                    userProfileWriter: .registration
+                    userProfileWriter: .registration,
                 ),
-                "YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGvEA8LDCEiIyQlJicsLTM3ODxVJG51bGzaDQ4PEBESExQVFhcYGRobHB0eHyBfEA9wcm9maWxlQmlvRW1vamlacHJvZmlsZUJpb1YkY2xhc3NSaWRfEBh1bnNhdmVkUm90YXRlZFByb2ZpbGVLZXlfEBF1c2VyUHJvZmlsZVdyaXRlcl8QD3Zpc2libGVCYWRnZUlkc18QEXByb2ZpbGVBdmF0YXJEYXRhXxARcHJvZmlsZUZhbWlseU5hbWVfEBBwcm9maWxlR2l2ZW5OYW1lgAaABYAOgAKACxAEgAiAB4AEgANfECQwMDAwMDAwMC0wMDAwLTQwMDAtQTAwMC0wMDAwMDAwMDAwMDBVQWxpY2VXSm9obnNvblxBIHNob3J0IGJpby5i2D3cmUMBAgPSKA8pK1pOUy5vYmplY3RzoSqACYAKVUJPT1NU0i4vMDFaJGNsYXNzbmFtZVgkY2xhc3Nlc1dOU0FycmF5ojAyWE5TT2JqZWN00jQPNTZXa2V5RGF0YYAMgA1PECABAgMEBQYHCAkKCwwNDg8QERITFBUWFxgZGhscHR4fINIuLzk6XE9XU0FFUzI1NktleaI7MlxPV1NBRVMyNTZLZXnSLi89Pl8QJFNpZ25hbE1lc3NhZ2luZy5QZW5kaW5nUHJvZmlsZVVwZGF0ZaI/Ml8QJFNpZ25hbE1lc3NhZ2luZy5QZW5kaW5nUHJvZmlsZVVwZGF0ZQAIABEAGgAkACkAMgA3AEkATABRAFMAZQBrAIAAkgCdAKQApwDCANYA6AD8ARABIwElAScBKQErAS0BLwExATMBNQE3AV4BZAFsAXkBfgGCAYcBkgGUAZYBmAGeAaMBrgG3Ab8BwgHLAdAB2AHaAdwB/wIEAhECFAIhAiYCTQJQAAAAAAAAAgEAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAnc="
+                "YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGvEA8LDCEiIyQlJicsLTM3ODxVJG51bGzaDQ4PEBESExQVFhcYGRobHB0eHyBfEA9wcm9maWxlQmlvRW1vamlacHJvZmlsZUJpb1YkY2xhc3NSaWRfEBh1bnNhdmVkUm90YXRlZFByb2ZpbGVLZXlfEBF1c2VyUHJvZmlsZVdyaXRlcl8QD3Zpc2libGVCYWRnZUlkc18QEXByb2ZpbGVBdmF0YXJEYXRhXxARcHJvZmlsZUZhbWlseU5hbWVfEBBwcm9maWxlR2l2ZW5OYW1lgAaABYAOgAKACxAEgAiAB4AEgANfECQwMDAwMDAwMC0wMDAwLTQwMDAtQTAwMC0wMDAwMDAwMDAwMDBVQWxpY2VXSm9obnNvblxBIHNob3J0IGJpby5i2D3cmUMBAgPSKA8pK1pOUy5vYmplY3RzoSqACYAKVUJPT1NU0i4vMDFaJGNsYXNzbmFtZVgkY2xhc3Nlc1dOU0FycmF5ojAyWE5TT2JqZWN00jQPNTZXa2V5RGF0YYAMgA1PECABAgMEBQYHCAkKCwwNDg8QERITFBUWFxgZGhscHR4fINIuLzk6XE9XU0FFUzI1NktleaI7MlxPV1NBRVMyNTZLZXnSLi89Pl8QJFNpZ25hbE1lc3NhZ2luZy5QZW5kaW5nUHJvZmlsZVVwZGF0ZaI/Ml8QJFNpZ25hbE1lc3NhZ2luZy5QZW5kaW5nUHJvZmlsZVVwZGF0ZQAIABEAGgAkACkAMgA3AEkATABRAFMAZQBrAIAAkgCdAKQApwDCANYA6AD8ARABIwElAScBKQErAS0BLwExATMBNQE3AV4BZAFsAXkBfgGCAYcBkgGUAZYBmAGeAaMBrgG3Ab8BwgHLAdAB2AHaAdwB/wIEAhECFAIhAiYCTQJQAAAAAAAAAgEAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAnc=",
             ),
             (
                 PendingProfileUpdate(
@@ -92,9 +31,9 @@ class ProfileManagerTest: XCTestCase {
                     profileBioEmoji: .setTo("💙"),
                     profileAvatarData: .setTo(Data(1...3)),
                     visibleBadgeIds: .setTo(["BOOST"]),
-                    userProfileWriter: .registration
+                    userProfileWriter: .registration,
                 ),
-                "YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGsCwwfICEiIyQlKisxVSRudWxs2Q0ODxAREhMUFRYXGBkaGxwdHl8QD3Byb2ZpbGVCaW9FbW9qaVpwcm9maWxlQmlvViRjbGFzc1JpZF8QEXVzZXJQcm9maWxlV3JpdGVyXxAPdmlzaWJsZUJhZGdlSWRzXxARcHJvZmlsZUF2YXRhckRhdGFfEBFwcm9maWxlRmFtaWx5TmFtZV8QEHByb2ZpbGVHaXZlbk5hbWWABoAFgAuAAhAEgAiAB4AEgANfECQwMDAwMDAwMC0wMDAwLTQwMDAtQTAwMC0wMDAwMDAwMDAwMDBVQWxpY2VXSm9obnNvblxBIHNob3J0IGJpby5i2D3cmUMBAgPSJg8nKVpOUy5vYmplY3RzoSiACYAKVUJPT1NU0iwtLi9aJGNsYXNzbmFtZVgkY2xhc3Nlc1dOU0FycmF5oi4wWE5TT2JqZWN00iwtMjNfECRTaWduYWxNZXNzYWdpbmcuUGVuZGluZ1Byb2ZpbGVVcGRhdGWiNDBfECRTaWduYWxNZXNzYWdpbmcuUGVuZGluZ1Byb2ZpbGVVcGRhdGUACAARABoAJAApADIANwBJAEwAUQBTAGAAZgB5AIsAlgCdAKAAtADGANoA7gEBAQMBBQEHAQkBCwENAQ8BEQETAToBQAFIAVUBWgFeAWMBbgFwAXIBdAF6AX8BigGTAZsBngGnAawB0wHWAAAAAAAAAgEAAAAAAAAANQAAAAAAAAAAAAAAAAAAAf0="
+                "YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGsCwwfICEiIyQlKisxVSRudWxs2Q0ODxAREhMUFRYXGBkaGxwdHl8QD3Byb2ZpbGVCaW9FbW9qaVpwcm9maWxlQmlvViRjbGFzc1JpZF8QEXVzZXJQcm9maWxlV3JpdGVyXxAPdmlzaWJsZUJhZGdlSWRzXxARcHJvZmlsZUF2YXRhckRhdGFfEBFwcm9maWxlRmFtaWx5TmFtZV8QEHByb2ZpbGVHaXZlbk5hbWWABoAFgAuAAhAEgAiAB4AEgANfECQwMDAwMDAwMC0wMDAwLTQwMDAtQTAwMC0wMDAwMDAwMDAwMDBVQWxpY2VXSm9obnNvblxBIHNob3J0IGJpby5i2D3cmUMBAgPSJg8nKVpOUy5vYmplY3RzoSiACYAKVUJPT1NU0iwtLi9aJGNsYXNzbmFtZVgkY2xhc3Nlc1dOU0FycmF5oi4wWE5TT2JqZWN00iwtMjNfECRTaWduYWxNZXNzYWdpbmcuUGVuZGluZ1Byb2ZpbGVVcGRhdGWiNDBfECRTaWduYWxNZXNzYWdpbmcuUGVuZGluZ1Byb2ZpbGVVcGRhdGUACAARABoAJAApADIANwBJAEwAUQBTAGAAZgB5AIsAlgCdAKAAtADGANoA7gEBAQMBBQEHAQkBCwENAQ8BEQETAToBQAFIAVUBWgFeAWMBbgFwAXIBdAF6AX8BigGTAZsBngGnAawB0wHWAAAAAAAAAgEAAAAAAAAANQAAAAAAAAAAAAAAAAAAAf0=",
             ),
             (
                 PendingProfileUpdate(
@@ -104,9 +43,9 @@ class ProfileManagerTest: XCTestCase {
                     profileBioEmoji: .noChange,
                     profileAvatarData: .noChange,
                     visibleBadgeIds: .noChange,
-                    userProfileWriter: .localUser
+                    userProfileWriter: .localUser,
                 ),
-                "YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGkCwwdHlUkbnVsbNgNDg8QERITFBUWFxcXFxsXViRjbGFzc1JpZF8QFnByb2ZpbGVCaW9FbW9qaUNoYW5nZWRfEBhwcm9maWxlRmFtaWx5TmFtZUNoYW5nZWRfEBFwcm9maWxlQmlvQ2hhbmdlZF8QF3Byb2ZpbGVHaXZlbk5hbWVDaGFuZ2VkXxARdXNlclByb2ZpbGVXcml0ZXJfEBhwcm9maWxlQXZhdGFyRGF0YUNoYW5nZWSAA4ACCAgICBAACF8QJDAwMDAwMDAwLTAwMDAtNDAwMC1BMDAwLTAwMDAwMDAwMDAwMNIfICEiWiRjbGFzc25hbWVYJGNsYXNzZXNfECRTaWduYWxNZXNzYWdpbmcuUGVuZGluZ1Byb2ZpbGVVcGRhdGWiIyRfECRTaWduYWxNZXNzYWdpbmcuUGVuZGluZ1Byb2ZpbGVVcGRhdGVYTlNPYmplY3QACAARABoAJAApADIANwBJAEwAUQBTAFgAXgBvAHYAeQCSAK0AwQDbAO8BCgEMAQ4BDwEQAREBEgEUARUBPAFBAUwBVQF8AX8BpgAAAAAAAAIBAAAAAAAAACUAAAAAAAAAAAAAAAAAAAGv"
+                "YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGkCwwdHlUkbnVsbNgNDg8QERITFBUWFxcXFxsXViRjbGFzc1JpZF8QFnByb2ZpbGVCaW9FbW9qaUNoYW5nZWRfEBhwcm9maWxlRmFtaWx5TmFtZUNoYW5nZWRfEBFwcm9maWxlQmlvQ2hhbmdlZF8QF3Byb2ZpbGVHaXZlbk5hbWVDaGFuZ2VkXxARdXNlclByb2ZpbGVXcml0ZXJfEBhwcm9maWxlQXZhdGFyRGF0YUNoYW5nZWSAA4ACCAgICBAACF8QJDAwMDAwMDAwLTAwMDAtNDAwMC1BMDAwLTAwMDAwMDAwMDAwMNIfICEiWiRjbGFzc25hbWVYJGNsYXNzZXNfECRTaWduYWxNZXNzYWdpbmcuUGVuZGluZ1Byb2ZpbGVVcGRhdGWiIyRfECRTaWduYWxNZXNzYWdpbmcuUGVuZGluZ1Byb2ZpbGVVcGRhdGVYTlNPYmplY3QACAARABoAJAApADIANwBJAEwAUQBTAFgAXgBvAHYAeQCSAK0AwQDbAO8BCgEMAQ4BDwEQAREBEgEUARUBPAFBAUwBVQF8AX8BpgAAAAAAAAIBAAAAAAAAACUAAAAAAAAAAAAAAAAAAAGv",
             ),
             (
                 PendingProfileUpdate(
@@ -116,9 +55,9 @@ class ProfileManagerTest: XCTestCase {
                     profileBioEmoji: .noChange,
                     profileAvatarData: .noChangeButMustReupload,
                     visibleBadgeIds: .noChange,
-                    userProfileWriter: .localUser
+                    userProfileWriter: .localUser,
                 ),
-                "YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGkCwwfIFUkbnVsbNkNDg8QERITFBUWFxgYGBgYHR5WJGNsYXNzUmlkXxAYcHJvZmlsZUF2YXRhckRhdGFDaGFuZ2VkXxAYcHJvZmlsZUZhbWlseU5hbWVDaGFuZ2VkXxARcHJvZmlsZUJpb0NoYW5nZWRfEBZwcm9maWxlQmlvRW1vamlDaGFuZ2VkXxAXcHJvZmlsZUdpdmVuTmFtZUNoYW5nZWRfEBF1c2VyUHJvZmlsZVdyaXRlcl8QHXByb2ZpbGVBdmF0YXJEYXRhTXVzdFJldXBsb2FkgAOAAggICAgIEAAJXxAkMDAwMDAwMDAtMDAwMC00MDAwLUEwMDAtMDAwMDAwMDAwMDAw0iEiIyRaJGNsYXNzbmFtZVgkY2xhc3Nlc18QJVNpZ25hbFNlcnZpY2VLaXQuUGVuZGluZ1Byb2ZpbGVVcGRhdGWiJSZfECVTaWduYWxTZXJ2aWNlS2l0LlBlbmRpbmdQcm9maWxlVXBkYXRlWE5TT2JqZWN0AAgAEQAaACQAKQAyADcASQBMAFEAUwBYAF4AcQB4AHsAlgCxAMUA3gD4AQwBLAEuATABMQEyATMBNAE1ATcBOAFfAWQBbwF4AaABowHLAAAAAAAAAgEAAAAAAAAAJwAAAAAAAAAAAAAAAAAAAdQ="
+                "YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGkCwwfIFUkbnVsbNkNDg8QERITFBUWFxgYGBgYHR5WJGNsYXNzUmlkXxAYcHJvZmlsZUF2YXRhckRhdGFDaGFuZ2VkXxAYcHJvZmlsZUZhbWlseU5hbWVDaGFuZ2VkXxARcHJvZmlsZUJpb0NoYW5nZWRfEBZwcm9maWxlQmlvRW1vamlDaGFuZ2VkXxAXcHJvZmlsZUdpdmVuTmFtZUNoYW5nZWRfEBF1c2VyUHJvZmlsZVdyaXRlcl8QHXByb2ZpbGVBdmF0YXJEYXRhTXVzdFJldXBsb2FkgAOAAggICAgIEAAJXxAkMDAwMDAwMDAtMDAwMC00MDAwLUEwMDAtMDAwMDAwMDAwMDAw0iEiIyRaJGNsYXNzbmFtZVgkY2xhc3Nlc18QJVNpZ25hbFNlcnZpY2VLaXQuUGVuZGluZ1Byb2ZpbGVVcGRhdGWiJSZfECVTaWduYWxTZXJ2aWNlS2l0LlBlbmRpbmdQcm9maWxlVXBkYXRlWE5TT2JqZWN0AAgAEQAaACQAKQAyADcASQBMAFEAUwBYAF4AcQB4AHsAlgCxAMUA3gD4AQwBLAEuATABMQEyATMBNAE1ATcBOAFfAWQBbwF4AaABowHLAAAAAAAAAgEAAAAAAAAAJwAAAAAAAAAAAAAAAAAAAdQ=",
             ),
         ]
         let expectedId = UUID(uuidString: "00000000-0000-4000-A000-000000000000")!
@@ -148,7 +87,7 @@ class ProfileManagerTest: XCTestCase {
     }
 
     private static func serialize(_ pendingProfileUpdate: PendingProfileUpdate) throws -> Data {
-        try NSKeyedArchiver.archivedData(withRootObject: pendingProfileUpdate, requiringSecureCoding: false)
+        try NSKeyedArchiver.archivedData(withRootObject: pendingProfileUpdate, requiringSecureCoding: true)
     }
 
     private static func deserialize(data: Data) throws -> PendingProfileUpdate {

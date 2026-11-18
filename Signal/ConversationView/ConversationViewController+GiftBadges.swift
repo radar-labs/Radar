@@ -3,27 +3,26 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
-public import SignalServiceKit
+import SignalServiceKit
 
 extension ConversationViewController {
 
-    public func willWrapGift(_ messageUniqueId: String) -> Bool {
+    func willWrapGift(_ messageUniqueId: String) -> Bool {
         // If a gift is unwrapped at roughly the same we're reloading the
         // conversation for an unrelated reason, there's a chance we'll try to
         // re-wrap a gift that was just unwrapped. This provides an opportunity to
         // override that behavior.
-        return !self.viewState.unwrappedGiftMessageIds.contains(messageUniqueId)
+        !viewState.unwrappedGiftMessageIds.contains(messageUniqueId)
     }
 
-    public func willShakeGift(_ messageUniqueId: String) -> Bool {
+    func willShakeGift(_ messageUniqueId: String) -> Bool {
         let (justInserted, _) = self.viewState.shakenGiftMessageIds.insert(messageUniqueId)
         return justInserted
     }
 
-    public func willUnwrapGift(_ itemViewModel: CVItemViewModelImpl) {
-        self.viewState.unwrappedGiftMessageIds.insert(itemViewModel.interaction.uniqueId)
-        self.markGiftAsOpened(itemViewModel.interaction)
+    func willUnwrapGift(_ itemViewModel: CVItemViewModelImpl) {
+        viewState.unwrappedGiftMessageIds.insert(itemViewModel.interaction.uniqueId)
+        markGiftAsOpened(itemViewModel.interaction)
     }
 
     private func markGiftAsOpened(_ interaction: TSInteraction) {
@@ -42,7 +41,7 @@ extension ConversationViewController {
         }
     }
 
-    public func didTapGiftBadge(_ itemViewModel: CVItemViewModelImpl, profileBadge: ProfileBadge, isExpired: Bool, isRedeemed: Bool) {
+    func didTapGiftBadge(_ itemViewModel: CVItemViewModelImpl, profileBadge: ProfileBadge, isExpired: Bool, isRedeemed: Bool) {
         AssertIsOnMainThread()
 
         let viewControllerToPresent: UIViewController
@@ -53,7 +52,7 @@ extension ConversationViewController {
                 incomingMessage: incomingMessage,
                 profileBadge: profileBadge,
                 isExpired: isExpired,
-                isRedeemed: isRedeemed
+                isRedeemed: isRedeemed,
             )
 
         case is TSOutgoingMessage:
@@ -69,20 +68,20 @@ extension ConversationViewController {
             return
         }
 
-        self.present(viewControllerToPresent, animated: true)
+        present(viewControllerToPresent, animated: true)
     }
 
     private func incomingGiftSheet(
         incomingMessage: TSIncomingMessage,
         profileBadge: ProfileBadge,
         isExpired: Bool,
-        isRedeemed: Bool
+        isRedeemed: Bool,
     ) -> UIViewController {
         if isExpired {
             let mode: BadgeIssueSheetState.Mode
             if isRedeemed {
                 let hasCurrentSubscription = SSKEnvironment.shared.databaseStorageRef.read { tx -> Bool in
-                    return DonationSubscriptionManager.probablyHasCurrentSubscription(tx: tx)
+                    return DependenciesBridge.shared.donationSubscriptionManager.probablyHasCurrentSubscription(tx: tx)
                 }
                 mode = .giftBadgeExpired(hasCurrentSubscription: hasCurrentSubscription)
             } else {
@@ -103,7 +102,7 @@ extension ConversationViewController {
             }
             return BadgeGiftingAlreadyRedeemedSheet(badge: profileBadge, shortName: shortName)
         }
-        return self.giftRedemptionSheet(incomingMessage: incomingMessage, profileBadge: profileBadge)
+        return giftRedemptionSheet(incomingMessage: incomingMessage, profileBadge: profileBadge)
     }
 
     private func giftRedemptionSheet(incomingMessage: TSIncomingMessage, profileBadge: ProfileBadge) -> UIViewController {
@@ -114,7 +113,7 @@ extension ConversationViewController {
         let (shortName, oldBadgesSnapshot) = databaseStorage.read { tx in
             return (
                 contactManager.displayName(for: authorAddress, tx: tx).resolvedValue(useShortNameIfAvailable: true),
-                ProfileBadgesSnapshot.forLocalProfile(profileManager: profileManager, tx: tx)
+                ProfileBadgesSnapshot.forLocalProfile(profileManager: profileManager, tx: tx),
             )
         }
         return BadgeThanksSheet(
@@ -122,58 +121,57 @@ extension ConversationViewController {
             thanksType: .giftReceived(
                 shortName: shortName,
                 notNowAction: { [weak self] in self?.showRedeemBadgeLaterText() },
-                incomingMessage: incomingMessage
+                incomingMessage: incomingMessage,
             ),
-            oldBadgesSnapshot: oldBadgesSnapshot
+            oldBadgesSnapshot: oldBadgesSnapshot,
         )
     }
 
     private func showRedeemBadgeLaterText() {
         let text = OWSLocalizedString(
             "DONATION_ON_BEHALF_OF_A_FRIEND_REDEEM_BADGE_LATER",
-            comment: "When you receive a badge as a result of a donation from a friend, a screen is shown. This toast is shown when dismissing that screen if you do not redeem the badge."
+            comment: "When you receive a badge as a result of a donation from a friend, a screen is shown. This toast is shown when dismissing that screen if you do not redeem the badge.",
         )
-        self.presentToastCVC(text)
+        presentToastCVC(text)
     }
 
-}
+    // MARK: - BadgeIssueSheetDelegate
 
-extension ConversationViewController: BadgeIssueSheetDelegate {
     func badgeIssueSheetActionTapped(_ action: BadgeIssueSheetAction) {
         switch action {
         case .dismiss:
             break
-        case .openDonationView:
-            let appSettings = AppSettingsViewController.inModalNavigationController(appReadiness: appReadiness)
-            let donateViewController = DonateViewController(preferredDonateMode: .oneTime) { [weak self] finishResult in
+        case .openDonationView(let donationAllowedToken):
+            let appSettings = AppSettingsViewController.inModalNavigationController()
+            let donateViewController = DonateViewController(preferredDonateMode: .oneTime, donationAllowedToken: donationAllowedToken) { [weak self] finishResult in
                 switch finishResult {
                 case let .completedDonation(donateSheet, receiptCredentialSuccessMode):
                     donateSheet.dismiss(animated: true) { [weak self] in
                         guard
                             let self,
                             let badgeThanksSheetPresenter = BadgeThanksSheetPresenter.fromGlobalsWithSneakyTransaction(
-                                successMode: receiptCredentialSuccessMode
+                                successMode: receiptCredentialSuccessMode,
                             )
                         else { return }
 
                         Task {
                             await badgeThanksSheetPresenter.presentAndRecordBadgeThanks(
-                                fromViewController: self
+                                fromViewController: self,
                             )
                         }
                     }
                 case let .monthlySubscriptionCancelled(donateSheet, toastText):
                     donateSheet.dismiss(animated: true) { [weak self] in
-                        guard let self = self else { return }
-                        self.view.presentToast(text: toastText, fromViewController: self)
+                        guard let self else { return }
+                        self.presentToastCVC(toastText)
                     }
                 }
             }
             appSettings.viewControllers += [
                 DonationSettingsViewController(),
-                donateViewController
+                donateViewController,
             ]
-            self.presentFormSheet(appSettings, animated: true, completion: nil)
+            presentFormSheet(appSettings, animated: true, completion: nil)
         }
     }
 }

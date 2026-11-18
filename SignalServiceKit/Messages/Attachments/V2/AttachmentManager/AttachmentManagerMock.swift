@@ -9,70 +9,46 @@ import Foundation
 
 open class AttachmentManagerMock: AttachmentManager {
 
-    open func createAttachmentPointers(
-        from protos: [OwnedAttachmentPointerProto],
-        tx: DBWriteTransaction
-    ) throws {
+    open func createAttachmentPointer(
+        from ownedProto: OwnedAttachmentPointerProto,
+        tx: DBWriteTransaction,
+    ) throws -> Attachment.IDType {
         // Do nothing
+        return 0
     }
 
-    open func createAttachmentPointers(
-        from backupProtos: [OwnedAttachmentBackupPointerProto],
+    open func createAttachmentPointer(
+        from ownedBackupProto: OwnedAttachmentBackupPointerProto,
         uploadEra: String,
         attachmentByteCounter: BackupArchiveAttachmentByteCounter,
-        tx: DBWriteTransaction
-    ) -> [OwnedAttachmentBackupPointerProto.CreationError] {
+        tx: DBWriteTransaction,
+    ) {
         // Do nothing
-        return []
     }
 
-    open func createAttachmentStreams(
-        consuming dataSources: [OwnedAttachmentDataSource],
-        tx: DBWriteTransaction
-    ) throws {
+    open func createAttachmentStream(
+        from ownedDataSource: OwnedAttachmentDataSource,
+        tx: DBWriteTransaction,
+    ) -> Attachment.IDType {
         // Do nothing
+        return 0
     }
 
     open func updateAttachmentWithOversizeTextFromBackup(
         attachmentId: Attachment.IDType,
         pendingAttachment: PendingAttachment,
-        tx: DBWriteTransaction
-    ) throws {
+        tx: DBWriteTransaction,
+    ) {
         // Do nothing
     }
 
-    open func quotedReplyAttachmentInfo(
-        originalMessage: TSMessage,
-        tx: DBReadTransaction
-    ) -> QuotedAttachmentInfo? {
-        return nil
-    }
-
-    open func createQuotedReplyMessageThumbnailBuilder(
-        from dataSource: QuotedReplyAttachmentDataSource,
-        tx: DBWriteTransaction
-    ) -> OwnedAttachmentBuilder<QuotedAttachmentInfo> {
-        return .withoutFinalizer(.init(
-            info: .stub(
-                withOriginalAttachmentMimeType: dataSource.originalAttachmentMimeType,
-                originalAttachmentSourceFilename: dataSource.originalAttachmentSourceFilename
-            ),
-            renderingFlag: dataSource.renderingFlag
-        ))
-    }
-
-    open func removeAttachment(
-        reference: AttachmentReference,
-        tx: DBWriteTransaction
-    ) throws {
+    open func createQuotedReplyMessageThumbnail(
+        from quotedReplyAttachmentDataSource: QuotedReplyAttachmentDataSource,
+        owningMessageAttachmentBuilder: AttachmentReference.OwnerBuilder.MessageAttachmentBuilder,
+        tx: DBWriteTransaction,
+    ) throws -> Attachment.IDType {
         // Do nothing
-    }
-
-    open func removeAllAttachments(
-        from owners: [AttachmentReference.OwnerId],
-        tx: DBWriteTransaction
-    ) throws {
-        // Do nothing
+        return 0
     }
 }
 

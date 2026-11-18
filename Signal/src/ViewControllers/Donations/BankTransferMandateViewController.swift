@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import SignalUI
 import SignalServiceKit
+import SignalUI
 
 @MainActor
-class BankTransferMandateViewController: OWSTableViewController2 {
+class BankTransferMandateViewController: OWSTableViewController2, UITextViewDelegate {
     override var preferredNavigationBarStyle: OWSNavigationBarStyle { .solid }
-    override var navbarBackgroundColorOverride: UIColor? { self.tableBackgroundColor }
+    override var navbarBackgroundColorOverride: UIColor? { OWSTableViewController2.tableBackgroundColor }
 
     private enum State {
         case loading
@@ -30,7 +30,7 @@ class BankTransferMandateViewController: OWSTableViewController2 {
 
     init(
         bankTransferType: OWSRequestFactory.StripePaymentMethod.BankTransfer,
-        didAgree: @escaping (Stripe.PaymentMethod.Mandate) -> Void
+        didAgree: @escaping (Stripe.PaymentMethod.Mandate) -> Void,
     ) {
         self.bankTransferType = bankTransferType
         self.didAgree = didAgree
@@ -105,7 +105,7 @@ class BankTransferMandateViewController: OWSTableViewController2 {
 
         let titleLabel = UILabel.title1Label(text: OWSLocalizedString(
             "BANK_MANDATE_TITLE",
-            comment: "Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate."
+            comment: "Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is the title above that mandate.",
         ))
 
         let subtitleTextView = LinkingTextView()
@@ -113,10 +113,10 @@ class BankTransferMandateViewController: OWSTableViewController2 {
         subtitleTextView.attributedText = .composed(of: [
             OWSLocalizedString(
                 "BANK_MANDATE_SUBTITLE",
-                comment: "Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate."
+                comment: "Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a subtitle about the payment processor Stripe above that mandate.",
             ),
             " ",
-            CommonStrings.learnMore.styled(with: .link(Self.learnMoreURL))
+            CommonStrings.learnMore.styled(with: .link(Self.learnMoreURL)),
         ]).styled(with: .color(.Signal.secondaryLabel), .font(.dynamicTypeSubheadline))
         subtitleTextView.textAlignment = .center
 
@@ -184,32 +184,16 @@ class BankTransferMandateViewController: OWSTableViewController2 {
         isScrolledCloseToBottom = tableView.contentOffset.y >= tableViewBottom - 56
     }
 
-    override var bottomFooter: UIView? {
-        get { bottomFooterContainer }
-        set {}
+    override func bottomFooter() -> UIView? {
+        OWSTableViewController2.buildHeaderFooterView(for: UIStackView.verticalButtonStack(buttons: [bottomFooterButton]))
     }
 
     private lazy var bottomFooterButton = UIButton(
         configuration: .largePrimary(title: ""),
         primaryAction: UIAction { [weak self] _ in
             self?.didTapBottomFooterButton()
-        }
+        },
     )
-
-    private lazy var bottomFooterContainer: UIView = {
-        let stackView = UIStackView.verticalButtonStack(buttons: [bottomFooterButton])
-        let view = UIView()
-        view.preservesSuperviewLayoutMargins = true
-        view.addSubview(stackView)
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: view.topAnchor),
-            stackView.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            stackView.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-        ])
-        return view
-    }()
 
     private func updateBottomFooter() {
         switch state {
@@ -229,12 +213,12 @@ class BankTransferMandateViewController: OWSTableViewController2 {
         if isScrolledCloseToBottom {
             title = OWSLocalizedString(
                 "BANK_MANDATE_AGREE",
-                comment: "Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button to agree to the mandate."
+                comment: "Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button to agree to the mandate.",
             )
         } else {
             title = OWSLocalizedString(
                 "BANK_MANDATE_READ_MORE",
-                comment: "Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button that shows more of the mandate if it is not all visible."
+                comment: "Users can donate to Signal with a bank account. We are required to show them a mandate with information about bank transfers. This is a label for a button that shows more of the mandate if it is not all visible.",
             )
         }
         bottomFooterButton.configuration?.title = title
@@ -247,7 +231,7 @@ class BankTransferMandateViewController: OWSTableViewController2 {
             let pageHeight = tableView.bounds.height - tableView.safeAreaInsets.top - tableView.safeAreaInsets.bottom
             let yOffset = min(
                 tableView.contentOffset.y + pageHeight,
-                tableView.contentSize.height - tableView.bounds.height
+                tableView.contentSize.height - tableView.bounds.height,
             )
             let newOffset = CGPoint(x: tableView.contentOffset.x, y: yOffset)
             tableView.setContentOffset(newOffset, animated: true)
@@ -277,11 +261,9 @@ class BankTransferMandateViewController: OWSTableViewController2 {
         super.scrollViewDidScroll(scrollView)
         checkScrollPosition()
     }
-}
 
-// MARK: - UITextViewDelegate
+    // MARK: - UITextViewDelegate
 
-extension BankTransferMandateViewController: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         present(DonationPaymentDetailsReadMoreSheetViewController(), animated: true)
         return false
@@ -294,7 +276,31 @@ extension Stripe.PaymentMethod.Mandate {
     fileprivate static func accept() -> Self {
         .init(mode: .online(
             userAgent: OWSURLSession.userAgentHeaderValueSignalIos,
-            ipAddress: "0.0.0.0"
+            ipAddress: "0.0.0.0",
         ))
     }
 }
+
+#if DEBUG
+
+@available(iOS 17, *)
+#Preview("SEPA") {
+    NavigationPreviewController(
+        viewController: BankTransferMandateViewController(
+            bankTransferType: .sepa,
+            didAgree: { _ in },
+        ),
+    )
+}
+
+@available(iOS 17, *)
+#Preview("iDEAL") {
+    NavigationPreviewController(
+        viewController: BankTransferMandateViewController(
+            bankTransferType: .ideal,
+            didAgree: { _ in },
+        ),
+    )
+}
+
+#endif

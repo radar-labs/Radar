@@ -9,7 +9,7 @@ public import LibSignalClient
 public protocol SignalRecipientManager {
     func fetchRecipientIfPhoneNumberVisible(
         _ phoneNumber: String,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> SignalRecipient?
 
     func modifyAndSave(
@@ -17,14 +17,14 @@ public protocol SignalRecipientManager {
         deviceIdsToAdd: [DeviceId],
         deviceIdsToRemove: [DeviceId],
         shouldUpdateStorageService: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 
     func markAsUnregisteredAndSave(
         _ recipient: inout SignalRecipient,
         unregisteredAt: UnregisteredAt,
         shouldUpdateStorageService: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 }
 
@@ -38,14 +38,14 @@ extension SignalRecipientManager {
         _ recipient: inout SignalRecipient,
         deviceId: DeviceId = .primary,
         shouldUpdateStorageService: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         modifyAndSave(
             &recipient,
             deviceIdsToAdd: [deviceId],
             deviceIdsToRemove: [],
             shouldUpdateStorageService: shouldUpdateStorageService,
-            tx: tx
+            tx: tx,
         )
     }
 
@@ -59,7 +59,7 @@ public class SignalRecipientManagerImpl: SignalRecipientManager {
     public init(
         phoneNumberVisibilityFetcher: any PhoneNumberVisibilityFetcher,
         recipientDatabaseTable: RecipientDatabaseTable,
-        storageServiceManager: any StorageServiceManager
+        storageServiceManager: any StorageServiceManager,
     ) {
         self.phoneNumberVisibilityFetcher = phoneNumberVisibilityFetcher
         self.recipientDatabaseTable = recipientDatabaseTable
@@ -81,7 +81,7 @@ public class SignalRecipientManagerImpl: SignalRecipientManager {
         _ recipient: inout SignalRecipient,
         unregisteredAt: UnregisteredAt,
         shouldUpdateStorageService: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         if case .specificTimeFromOtherDevice(let timestamp) = unregisteredAt {
             setUnregisteredAtTimestamp(timestamp, for: &recipient, shouldUpdateStorageService: shouldUpdateStorageService)
@@ -91,7 +91,7 @@ public class SignalRecipientManagerImpl: SignalRecipientManager {
             deviceIdsToAdd: [],
             deviceIdsToRemove: recipient.deviceIds,
             shouldUpdateStorageService: shouldUpdateStorageService,
-            tx: tx
+            tx: tx,
         )
     }
 
@@ -100,7 +100,7 @@ public class SignalRecipientManagerImpl: SignalRecipientManager {
         deviceIdsToAdd: [DeviceId],
         deviceIdsToRemove: [DeviceId],
         shouldUpdateStorageService: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         var deviceIdsToAdd = deviceIdsToAdd
         // Always add the primary if any other device is registered.

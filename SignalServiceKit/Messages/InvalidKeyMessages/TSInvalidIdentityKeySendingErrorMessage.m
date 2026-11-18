@@ -4,7 +4,6 @@
 //
 
 #import "TSInvalidIdentityKeySendingErrorMessage.h"
-#import "TSContactThread.h"
 #import "TSOutgoingMessage.h"
 #import <SignalServiceKit/SignalServiceKit-Swift.h>
 
@@ -25,9 +24,27 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation TSInvalidIdentityKeySendingErrorMessage
 #pragma clang diagnostic pop
 
-- (nullable instancetype)initWithCoder:(NSCoder *)coder
+- (NSUInteger)hash
 {
-    return [super initWithCoder:coder];
+    NSUInteger result = [super hash];
+    result ^= self.messageId.hash;
+    result ^= self.preKeyBundle.hash;
+    return result;
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (![super isEqual:other]) {
+        return NO;
+    }
+    TSInvalidIdentityKeySendingErrorMessage *typedOther = (TSInvalidIdentityKeySendingErrorMessage *)other;
+    if (![NSObject isObject:self.messageId equalToObject:typedOther.messageId]) {
+        return NO;
+    }
+    if (![NSObject isObject:self.preKeyBundle equalToObject:typedOther.preKeyBundle]) {
+        return NO;
+    }
+    return YES;
 }
 
 // --- CODE GENERATION MARKER
@@ -56,7 +73,6 @@ NS_ASSUME_NONNULL_BEGIN
                isGroupStoryReply:(BOOL)isGroupStoryReply
                           isPoll:(BOOL)isPoll
   isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
-                       isStarred:(BOOL)isStarred
               isViewOnceComplete:(BOOL)isViewOnceComplete
                isViewOnceMessage:(BOOL)isViewOnceMessage
                      linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -94,7 +110,6 @@ NS_ASSUME_NONNULL_BEGIN
                  isGroupStoryReply:isGroupStoryReply
                             isPoll:isPoll
     isSmsMessageRestoredFromBackup:isSmsMessageRestoredFromBackup
-                         isStarred:isStarred
                 isViewOnceComplete:isViewOnceComplete
                  isViewOnceMessage:isViewOnceMessage
                        linkPreview:linkPreview

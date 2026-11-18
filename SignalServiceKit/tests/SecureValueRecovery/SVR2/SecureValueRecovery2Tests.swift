@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import Testing
 import XCTest
 
 @testable public import SignalServiceKit
@@ -13,88 +14,81 @@ class SecureValueRecovery2Tests: XCTestCase {
     private var db: InMemoryDB!
     private var svr: SecureValueRecovery2Impl!
 
-    private var credentialStorage: SVRAuthCredentialStorageMock!
+    private var credentialManager: SVRAuthCredentialManager!
 
     private var mock2FAManager: SVR2.TestMocks.OWS2FAManager!
     private var accountKeyStore: AccountKeyStore!
-    private var localStorage: SVRLocalStorageImpl!
+    private var localStorage: SVRLocalStorage!
     private var mockConnectionFactory: MockSgxWebsocketConnectionFactory!
     private var mockConnection: MockSgxWebsocketConnection<SVR2WebsocketConfigurator>!
-    private var mockTSAccountManager: MockTSAccountManager!
     private var mockTSConstants: TSConstantsMock!
 
     override func setUp() {
         self.db = InMemoryDB()
-        self.credentialStorage = SVRAuthCredentialStorageMock()
+        self.credentialManager = SVRAuthCredentialManager.mock()
 
         mock2FAManager = SVR2.TestMocks.OWS2FAManager()
         accountKeyStore = AccountKeyStore(
             backupSettingsStore: BackupSettingsStore(),
         )
-        localStorage = SVRLocalStorageImpl()
+        localStorage = SVRLocalStorage()
 
         let mockConnection = MockSgxWebsocketConnection<SVR2WebsocketConfigurator>()
-        mockConnection.mockAuth = RemoteAttestation.Auth(username: "username", password: "password")
+        mockConnection.mockAuth = RemoteAttestationAuth(username: "username", password: "password")
         self.mockConnection = mockConnection
         mockConnectionFactory = MockSgxWebsocketConnectionFactory()
 
-        mockTSAccountManager = .init()
         mockTSConstants = TSConstantsMock()
 
         self.svr = SecureValueRecovery2Impl(
-            appContext: SVR2.Mocks.AppContext(),
-            appReadiness: AppReadinessMock(),
-            appVersion: MockAppVerion(),
-            clientWrapper: MockSVR2ClientWrapper(),
             connectionFactory: mockConnectionFactory,
-            credentialStorage: credentialStorage,
+            credentialManager: credentialManager,
             db: db,
             accountKeyStore: accountKeyStore,
-            scheduler: DispatchQueue(label: ""),
+            pinHasher: MockPinHasher(),
+            remoteAttestationAuthFetcher: RemoteAttestationAuthFetcher(networkManager: MockNetworkManager()),
             storageServiceManager: FakeStorageServiceManager(),
             svrLocalStorage: localStorage,
-            tsAccountManager: mockTSAccountManager,
             tsConstants: mockTSConstants,
-            twoFAManager: mock2FAManager
+            twoFAManager: mock2FAManager,
         )
     }
 
     @MainActor
     func testMigration() async throws {
         // Set up the connections to both the old and new enclaves.
-        let mockAuth = RemoteAttestation.Auth(username: "username", password: "password")
+        let mockAuth = RemoteAttestationAuth(username: "username", password: "password")
+
         let oldEnclave = MrEnclave("0000000000000000000000000000000000000000000000000000000000000000")
         let oldEnclaveConnection = MockSgxWebsocketConnection<SVR2WebsocketConfigurator>()
+        oldEnclaveConnection.mockEnclave = oldEnclave
         oldEnclaveConnection.mockAuth = mockAuth
+
         let newEnclave = MrEnclave("0101010101010101010101010101010101010101010101010101010101010101")
         let newEnclaveConnection = MockSgxWebsocketConnection<SVR2WebsocketConfigurator>()
+        newEnclaveConnection.mockEnclave = newEnclave
         newEnclaveConnection.mockAuth = mockAuth
+
         mockConnectionFactory.setOnConnectAndPerformHandshake { (config: SVR2WebsocketConfigurator) in
             switch config.mrenclave.stringValue {
             case oldEnclave.stringValue:
-                return .value(oldEnclaveConnection)
+                return oldEnclaveConnection
             case newEnclave.stringValue:
-                return .value(newEnclaveConnection)
+                return newEnclaveConnection
             default:
                 XCTFail("Unexpected enclave connection")
-                return .init(error: OWSAssertionError(""))
+                throw OWSAssertionError("")
             }
         }
 
-        let masterKey = MasterKey()
+        let aep = AccountEntropyPool()
         let pin = "0000"
 
         // Set up the local data needed.
         db.write { tx in
-            localStorage.setIsMasterKeyBackedUp(true, tx)
-            accountKeyStore.setMasterKey(masterKey, tx: tx)
-            localStorage.setSVR2MrEnclaveStringValue(oldEnclave.stringValue, tx)
+            accountKeyStore.setAccountEntropyPool(aep, tx: tx)
         }
-        mockTSAccountManager.registrationStateMock = { .registered }
         mock2FAManager.pinCode = pin
-
-        mockTSConstants.svr2Enclave = newEnclave
-        mockTSConstants.svr2PreviousEnclaves = [oldEnclave]
 
         // Expect backup and expose to the new enclave.
         var newEnclaveRequestCount = 0
@@ -105,9 +99,8 @@ class SecureValueRecovery2Tests: XCTestCase {
             case 0:
                 // First it should issue a backup to the new enclave.
                 XCTAssert(request.hasBackup)
-                // Test mock encruption just passes along the unmodified master key and pin.
-                XCTAssertEqual(request.backup.data, masterKey.rawData)
-                XCTAssertEqual(request.backup.pin, pin.data(using: .utf8))
+                XCTAssertEqual(request.backup.data.count, 48)
+                XCTAssertEqual(request.backup.pin.count, 32)
 
                 var backupResponse = SVR2Proto_BackupResponse()
                 backupResponse.status = .ok
@@ -115,8 +108,7 @@ class SecureValueRecovery2Tests: XCTestCase {
             case 1:
                 // Then an expose
                 XCTAssert(request.hasExpose)
-                // Test mock encruption just passes along the unmodified master key.
-                XCTAssertEqual(request.expose.data, masterKey.rawData)
+                XCTAssertEqual(request.expose.data.count, 48)
 
                 var exposeResponse = SVR2Proto_ExposeResponse()
                 exposeResponse.status = .ok
@@ -135,6 +127,24 @@ class SecureValueRecovery2Tests: XCTestCase {
             var response = SVR2Proto_Response()
             switch oldEnclaveRequestCount {
             case 0:
+                // First it should issue a backup to the old enclave
+                XCTAssert(request.hasBackup)
+                XCTAssertEqual(request.backup.data.count, 48)
+                XCTAssertEqual(request.backup.pin.count, 32)
+
+                var backupResponse = SVR2Proto_BackupResponse()
+                backupResponse.status = .ok
+                response.backup = backupResponse
+            case 1:
+                // Then an expose
+                XCTAssert(request.hasExpose)
+                XCTAssertEqual(request.expose.data.count, 48)
+
+                var exposeResponse = SVR2Proto_ExposeResponse()
+                exposeResponse.status = .ok
+                response.expose = exposeResponse
+            case 2:
+                // Then a delete
                 XCTAssert(request.hasDelete)
                 // New enclave should be all backed up by now.
                 XCTAssertEqual(newEnclaveRequestCount, 2)
@@ -147,57 +157,70 @@ class SecureValueRecovery2Tests: XCTestCase {
             return .value(response)
         }
 
-        // Kick off the migration.
-        _ = try await svr.performStartupMigrationsIfNecessary().awaitable()
-
-        XCTAssertEqual(newEnclaveRequestCount, 2)
-        XCTAssertEqual(oldEnclaveRequestCount, 1)
-
+        // Migrate to the old enclave.
+        mockTSConstants.svr2Enclaves = [oldEnclave]
+        mockTSConstants.activeSvr2EnclaveCount = 1
+        _ = try await svr.refreshBackupIfNecessary()
+        XCTAssertEqual(newEnclaveRequestCount, 0)
+        XCTAssertEqual(oldEnclaveRequestCount, 2)
         db.read { tx in
-            XCTAssertEqual(localStorage.getSVR2MrEnclaveStringValue(tx), newEnclave.stringValue)
+            XCTAssertEqual(localStorage.backupAttemptStore.fetchKeys(tx: tx), [oldEnclave.stringValue])
         }
 
-        // If we try to migrate again, it does nothing because we are at the newest enclave.
-        _ = try await svr.performStartupMigrationsIfNecessary().awaitable()
+        // Migrate to the new enclave.
+        mockTSConstants.svr2Enclaves = [newEnclave, oldEnclave]
+        mockTSConstants.activeSvr2EnclaveCount = 1
+        _ = try await svr.refreshBackupIfNecessary()
         XCTAssertEqual(newEnclaveRequestCount, 2)
-        XCTAssertEqual(oldEnclaveRequestCount, 1)
+        XCTAssertEqual(oldEnclaveRequestCount, 3)
+        db.read { tx in
+            XCTAssertEqual(localStorage.backupAttemptStore.fetchKeys(tx: tx), [newEnclave.stringValue])
+        }
+
+        // Migrate again; nothing should change.
+        _ = try await svr.refreshBackupIfNecessary()
+        XCTAssertEqual(newEnclaveRequestCount, 2)
+        XCTAssertEqual(oldEnclaveRequestCount, 3)
+        db.read { tx in
+            XCTAssertEqual(localStorage.backupAttemptStore.fetchKeys(tx: tx), [newEnclave.stringValue])
+        }
     }
 
     @MainActor
     func testMigration_forgottenEnclave() async throws {
         // Set up the connections to both the old and new enclaves.
-        let mockAuth = RemoteAttestation.Auth(username: "username", password: "password")
+        let mockAuth = RemoteAttestationAuth(username: "username", password: "password")
+
         let oldEnclave = MrEnclave("0000000000000000000000000000000000000000000000000000000000000000")
         let oldEnclaveConnection = MockSgxWebsocketConnection<SVR2WebsocketConfigurator>()
+        oldEnclaveConnection.mockEnclave = oldEnclave
         oldEnclaveConnection.mockAuth = mockAuth
+
         let newEnclave = MrEnclave("0101010101010101010101010101010101010101010101010101010101010101")
         let newEnclaveConnection = MockSgxWebsocketConnection<SVR2WebsocketConfigurator>()
+        newEnclaveConnection.mockEnclave = newEnclave
         newEnclaveConnection.mockAuth = mockAuth
+
         mockConnectionFactory.setOnConnectAndPerformHandshake { (config: SVR2WebsocketConfigurator) in
             switch config.mrenclave.stringValue {
+            case oldEnclave.stringValue:
+                return oldEnclaveConnection
             case newEnclave.stringValue:
-                return .value(newEnclaveConnection)
+                return newEnclaveConnection
             default:
                 XCTFail("Unexpected enclave connection")
-                return .init(error: OWSAssertionError(""))
+                throw OWSAssertionError("")
             }
         }
 
-        let masterKey = MasterKey()
+        let aep = AccountEntropyPool()
         let pin = "0000"
 
         // Set up the local data needed.
         db.write { tx in
-            localStorage.setIsMasterKeyBackedUp(true, tx)
-            accountKeyStore.setMasterKey(masterKey, tx: tx)
-            localStorage.setSVR2MrEnclaveStringValue(oldEnclave.stringValue, tx)
+            accountKeyStore.setAccountEntropyPool(aep, tx: tx)
         }
-        mockTSAccountManager.registrationStateMock = { .registered }
         mock2FAManager.pinCode = pin
-
-        mockTSConstants.svr2Enclave = newEnclave
-        // No old enclaves to know about.
-        mockTSConstants.svr2PreviousEnclaves = []
 
         // Expect backup and expose to the new enclave.
         var newEnclaveRequestCount = 0
@@ -208,9 +231,8 @@ class SecureValueRecovery2Tests: XCTestCase {
             case 0:
                 // First it should issue a backup to the new enclave.
                 XCTAssert(request.hasBackup)
-                // Test mock encruption just passes along the unmodified master key and pin.
-                XCTAssertEqual(request.backup.data, masterKey.rawData)
-                XCTAssertEqual(request.backup.pin, pin.data(using: .utf8))
+                XCTAssertEqual(request.backup.data.count, 48)
+                XCTAssertEqual(request.backup.pin.count, 32)
 
                 var backupResponse = SVR2Proto_BackupResponse()
                 backupResponse.status = .ok
@@ -218,8 +240,7 @@ class SecureValueRecovery2Tests: XCTestCase {
             case 1:
                 // Then an expose
                 XCTAssert(request.hasExpose)
-                // Test mock encruption just passes along the unmodified master key.
-                XCTAssertEqual(request.expose.data, masterKey.rawData)
+                XCTAssertEqual(request.expose.data.count, 48)
 
                 var exposeResponse = SVR2Proto_ExposeResponse()
                 exposeResponse.status = .ok
@@ -231,90 +252,138 @@ class SecureValueRecovery2Tests: XCTestCase {
             return .value(response)
         }
 
-        // NOTE: the old enclave should get no requests, its considered dead.
+        // The old enclave should just get a delete.
+        var oldEnclaveRequestCount = 0
+        oldEnclaveConnection.onSendRequestAndReadResponse = { request in
+            defer { oldEnclaveRequestCount += 1 }
+            var response = SVR2Proto_Response()
+            switch oldEnclaveRequestCount {
+            case 0:
+                // First it should issue a backup to the old enclave
+                XCTAssert(request.hasBackup)
+                XCTAssertEqual(request.backup.data.count, 48)
+                XCTAssertEqual(request.backup.pin.count, 32)
 
-        // Kick off the migration.
-        _ = try await svr.performStartupMigrationsIfNecessary().awaitable()
+                var backupResponse = SVR2Proto_BackupResponse()
+                backupResponse.status = .ok
+                response.backup = backupResponse
+            case 1:
+                // Then an expose
+                XCTAssert(request.hasExpose)
+                XCTAssertEqual(request.expose.data.count, 48)
 
-        XCTAssertEqual(newEnclaveRequestCount, 2)
-
-        db.read { tx in
-            XCTAssertEqual(localStorage.getSVR2MrEnclaveStringValue(tx), newEnclave.stringValue)
+                var exposeResponse = SVR2Proto_ExposeResponse()
+                exposeResponse.status = .ok
+                response.expose = exposeResponse
+            default:
+                XCTFail("Unexpected request")
+                return .init(error: OWSAssertionError(""))
+            }
+            return .value(response)
         }
 
-        // If we try to migrate again, it does nothing because we are at the newest enclave.
-        _ = try await svr.performStartupMigrationsIfNecessary().awaitable()
+        // Migrate to the old enclave.
+        mockTSConstants.svr2Enclaves = [oldEnclave]
+        mockTSConstants.activeSvr2EnclaveCount = 1
+        _ = try await svr.refreshBackupIfNecessary()
+        XCTAssertEqual(newEnclaveRequestCount, 0)
+        XCTAssertEqual(oldEnclaveRequestCount, 2)
+        db.read { tx in
+            XCTAssertEqual(localStorage.backupAttemptStore.fetchKeys(tx: tx), [oldEnclave.stringValue])
+        }
+
+        // Migrate to the new enclave.
+        mockTSConstants.svr2Enclaves = [newEnclave]
+        mockTSConstants.activeSvr2EnclaveCount = 1
+        _ = try await svr.refreshBackupIfNecessary()
         XCTAssertEqual(newEnclaveRequestCount, 2)
+        XCTAssertEqual(oldEnclaveRequestCount, 2)
+        db.read { tx in
+            XCTAssertEqual(localStorage.backupAttemptStore.fetchKeys(tx: tx), [newEnclave.stringValue])
+        }
     }
 
-    func testPinHashingNumeric() throws {
-        let pin = "1234"
-        let normalizedPin = SVRUtil.normalizePin(pin)
-        XCTAssertEqual(pin, normalizedPin)
+    /// Tests that backups made prior to the introduction of isBackedUp are
+    /// still classified as having been completed.
+    func testInvalidationMigration() async throws {
+        let mockEnclave = MrEnclave("0000000000000000000000000000000000000000000000000000000000000000")
 
-        let encodedString = try SVRUtil.deriveEncodedPINVerificationString(pin: pin)
-        XCTAssert(SVRUtil.verifyPIN(pin: pin, againstEncodedPINVerificationString: encodedString))
-        // Some other password should fail to verify.
-        XCTAssertFalse(SVRUtil.verifyPIN(pin: "notAPassword", againstEncodedPINVerificationString: encodedString))
+        let aep = try AccountEntropyPool(key: String(repeating: "A", count: 64))
+        let masterKey = aep.getMasterKey()
+        let pin = "0000"
 
-        // Test that pin hashes generated by argon2 are compatible with our current
-        // verification strategy; we store these hashes to disk for verification,
-        // so future verification needs to be backwards compatible.
-        // Note that we don't need _new_ verification strings to be equivalent to old ones,
-        // as long as both pass verification.
-        let argon2EncodedString = "$argon2i$v=19$m=512,t=64,p=1$CxIHZ5tsrelHqqMfW7AsZw$4v19z1zecfP1hZ4b8RG1RFv6XDgU3BAEXME01r+xIBA"
-        // This string was generated using:
-        // let (_, encodedString) = try Argon2.hash(
-        //    iterations: 64,
-        //    memoryInKiB: 512,
-        //    threads: 1,
-        //    password: normalizedPin.data(using: .utf8)!,
-        //    // Generated using `Cryptography.generateRandomBytes(SVRUtil.Constants.pinSaltLengthBytes)`
-        //    salt: Data([11, 18, 7, 103, 155, 108, 173, 233, 71, 170, 163, 31, 91, 176, 44, 103]),
-        //    desiredLength: 32,
-        //    variant: .i,
-        //    version: .v13
-        // )
+        db.write { tx in
+            accountKeyStore.setAccountEntropyPool(aep, tx: tx)
+        }
+        mock2FAManager.pinCode = pin
 
-        XCTAssert(SVRUtil.verifyPIN(pin: pin, againstEncodedPINVerificationString: argon2EncodedString))
-        // Some other password should fail to verify.
-        XCTAssertFalse(SVRUtil.verifyPIN(pin: "notAPassword", againstEncodedPINVerificationString: argon2EncodedString))
-    }
+        struct CompletedBackup: Encodable {
+            let masterKey: Data
+            let encryptedMasterKey: Data
+            let encodedPINVerificationString: String
+            var isExposed: Bool
+        }
+        let oldCompletedBackup = CompletedBackup(
+            masterKey: masterKey.rawData,
+            encryptedMasterKey: try MockPinHasher().hashPin(
+                normalizedPin: pin,
+                username: "",
+                mrEnclave: mockEnclave,
+            ).encryptMasterKey(masterKey.rawData),
+            encodedPINVerificationString: try SVRUtil.deriveEncodedPINVerificationString(pin: pin),
+            isExposed: true,
+        )
+        db.write { tx in
+            localStorage.backupAttemptStore.writeValueAsJSON(
+                oldCompletedBackup,
+                forKey: mockEnclave.stringValue,
+                tx: tx,
+            )
+        }
 
-    func testPinHashingAlphaNumeric() throws {
-        let pin = " LukeIAmYourFather123\n"
-        let normalizedPin = SVRUtil.normalizePin(pin)
-        XCTAssertEqual("LukeIAmYourFather123", normalizedPin)
-
-        let encodedString = try SVRUtil.deriveEncodedPINVerificationString(pin: pin)
-        XCTAssert(SVRUtil.verifyPIN(pin: pin, againstEncodedPINVerificationString: encodedString))
-        // Some other password should fail to verify.
-        XCTAssertFalse(SVRUtil.verifyPIN(pin: "notAPassword", againstEncodedPINVerificationString: encodedString))
-
-        // Test that pin hashes generated by argon2 are compatible with our current
-        // verification strategy; we store these hashes to disk for verification,
-        // so future verification needs to be backwards compatible.
-        // Note that we don't need _new_ verification strings to be equivalent to old ones,
-        // as long as both pass verification.
-        let argon2EncodedString = "$argon2i$v=19$m=512,t=64,p=1$CxIHZ5tsrelHqqMfW7AsZw$OgeedfJVzRTOUJ9CqeJ0e5ENGwfYiGyGj7/ejVrLOnw"
-        // This string was generated using:
-        // let (_, encodedString) = try Argon2.hash(
-        //    iterations: 64,
-        //    memoryInKiB: 512,
-        //    threads: 1,
-        //    password: normalizedPin.data(using: .utf8)!,
-        //    // Generated using `Cryptography.generateRandomBytes(SVRUtil.Constants.pinSaltLengthBytes)`
-        //    salt: Data([11, 18, 7, 103, 155, 108, 173, 233, 71, 170, 163, 31, 91, 176, 44, 103]),
-        //    desiredLength: 32,
-        //    variant: .i,
-        //    version: .v13
-        // )
-
-        XCTAssert(SVRUtil.verifyPIN(pin: pin, againstEncodedPINVerificationString: argon2EncodedString))
-        // Some other password should fail to verify.
-        XCTAssertFalse(SVRUtil.verifyPIN(pin: "notAPassword", againstEncodedPINVerificationString: argon2EncodedString))
+        mockTSConstants.svr2Enclaves = [mockEnclave]
+        mockTSConstants.activeSvr2EnclaveCount = 1
+        _ = try await svr.refreshBackupIfNecessary()
+        db.read { tx in
+            XCTAssertEqual(localStorage.backupAttemptStore.fetchKeys(tx: tx), [mockEnclave.stringValue])
+        }
     }
 }
+
+// MARK: -
+
+struct SVRUtilTest {
+
+    @Test(arguments: [
+        ("1234", "1234"),
+        (" LukeIAmYourFather123\n", "LukeIAmYourFather123"),
+    ])
+    func testNormalizePin(testCase: (pin: String, normalizedPin: String)) {
+        #expect(SVRUtil.normalizePin(testCase.pin) == testCase.normalizedPin)
+    }
+
+    @Test(arguments: [
+        ("1234", "$argon2i$v=19$m=512,t=64,p=1$CxIHZ5tsrelHqqMfW7AsZw$4v19z1zecfP1hZ4b8RG1RFv6XDgU3BAEXME01r+xIBA"),
+        (" LukeIAmYourFather123\n", "$argon2i$v=19$m=512,t=64,p=1$CxIHZ5tsrelHqqMfW7AsZw$OgeedfJVzRTOUJ9CqeJ0e5ENGwfYiGyGj7/ejVrLOnw"),
+    ])
+    func testPinHashing(testCase: (pin: String, oldEncodedString: String)) throws {
+        let encodedString = try SVRUtil.deriveEncodedPINVerificationString(pin: testCase.pin)
+        #expect(SVRUtil.verifyPIN(pin: testCase.pin, againstEncodedPINVerificationString: encodedString))
+        // Some other password should fail to verify.
+        #expect(!SVRUtil.verifyPIN(pin: "notAPassword", againstEncodedPINVerificationString: encodedString))
+
+        // Test that pin hashes generated by argon2 are compatible with our current
+        // verification strategy; we store these hashes to disk for verification,
+        // so future verification needs to be backwards compatible.
+        // Note that we don't need _new_ verification strings to be equivalent to old ones,
+        // as long as both pass verification.
+        #expect(SVRUtil.verifyPIN(pin: testCase.pin, againstEncodedPINVerificationString: testCase.oldEncodedString))
+        // Some other password should fail to verify.
+        #expect(!SVRUtil.verifyPIN(pin: "notAPassword", againstEncodedPINVerificationString: testCase.oldEncodedString))
+    }
+}
+
+// MARK: -
 
 extension SVR2 {
     public enum TestMocks {
@@ -333,5 +402,9 @@ public class _SVR2_OWS2FAManagerTestMock: SVR2.Shims.OWS2FAManager {
         return pinCode
     }
 
-    public func markDisabled(transaction: DBWriteTransaction) {}
+    public var shouldMasterKeyBeBackedUp: Bool!
+
+    public func shouldMasterKeyBeBackedUp(tx: DBReadTransaction) -> Bool {
+        return shouldMasterKeyBeBackedUp
+    }
 }

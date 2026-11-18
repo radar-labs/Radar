@@ -5,7 +5,7 @@
 
 import SignalServiceKit
 
-final class NewLinkedDeviceNotificationMegaphone: MegaphoneView {
+final class NewLinkedDeviceNotificationMegaphone: Megaphone {
     private let db: DB
     private let deviceStore: OWSDeviceStore
 
@@ -13,26 +13,26 @@ final class NewLinkedDeviceNotificationMegaphone: MegaphoneView {
         db: DB,
         deviceStore: OWSDeviceStore,
         experienceUpgrade: ExperienceUpgrade,
-        mostRecentlyLinkedDeviceDetails: MostRecentlyLinkedDeviceDetails
+        mostRecentlyLinkedDeviceDetails: MostRecentlyLinkedDeviceDetails,
     ) {
         self.db = db
         self.deviceStore = deviceStore
         super.init(experienceUpgrade: experienceUpgrade)
 
-        imageName = "inactive-linked-device-reminder-megaphone"
+        image = .inactiveLinkedDeviceReminderMegaphone
         imageContentMode = .center
         titleText = OWSLocalizedString(
             "LINKED_DEVICE_NOTIFICATION_TITLE",
-            comment: "Title for system notification when a new device is linked."
+            comment: "Title for system notification when a new device is linked.",
         )
 
-        let bodyText = String(
-            format: OWSLocalizedString(
+        let bodyText = String.nonPluralLocalizedStringWithFormat(
+            OWSLocalizedString(
                 "LINKED_DEVICE_NOTIFICATION_MEGAPHONE_BODY",
-                comment: "Body for megaphone notification when a new device is linked. Embeds {{ time the device was linked }}"
+                comment: "Body for megaphone notification when a new device is linked. Embeds {{ time the device was linked }}",
             ),
             mostRecentlyLinkedDeviceDetails.linkedTime
-                .formatted(date: .omitted, time: .shortened)
+                .formatted(date: .omitted, time: .shortened),
         )
 
         self.bodyText = bodyText
@@ -41,31 +41,27 @@ final class NewLinkedDeviceNotificationMegaphone: MegaphoneView {
             title: OWSLocalizedString(
                 "NEW_LINKED_DEVICE_NOTIFICATION_MEGAPHONE_VIEW_DEVICE_BUTTON",
                 value: "View device",
-                comment: "Main button for megaphone notification when a new device is linked"
-            )
+                comment: "Main button for megaphone notification when a new device is linked",
+            ),
         ) { [weak self] in
             SignalApp.shared.showAppSettings(mode: .linkedDevices)
-            self?.markAsViewed()
-            self?.dismiss()
+            self?.stopShowing()
         }
 
         let acknowledgeButton = Button(
-            title: CommonStrings.acknowledgeButton
+            title: CommonStrings.acknowledgeButton,
         ) { [weak self] in
-            self?.markAsViewed()
-            self?.dismiss()
+            self?.stopShowing()
         }
 
-        setButtons(primary: acknowledgeButton, secondary: viewDeviceButton)
+        buttons = [acknowledgeButton, viewDeviceButton]
     }
 
-    @MainActor required init(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    private func markAsViewed() {
+    private func stopShowing() {
         db.write { tx in
             deviceStore.clearMostRecentlyLinkedDeviceDetails(tx: tx)
         }
+
+        NotificationCenter.default.post(name: .megaphoneStateDidChange, object: nil)
     }
 }

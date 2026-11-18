@@ -55,6 +55,7 @@ typedef NS_CLOSED_ENUM(NSInteger, TSInfoMessageType) {
     /// - SeeAlso: ``TSInfoMessageTypeLocalUserEndedSession``
     TSInfoMessageTypeRemoteUserEndedSession,
     TSInfoMessageTypeEndPoll,
+    TSInfoMessageTypePinnedMessage,
 };
 
 typedef NSString *InfoMessageUserInfoKey NS_STRING_ENUM;
@@ -77,13 +78,16 @@ extern InfoMessageUserInfoKey const InfoMessageUserInfoKeyThreadMergePhoneNumber
 extern InfoMessageUserInfoKey const InfoMessageUserInfoKeySessionSwitchoverPhoneNumber;
 extern InfoMessageUserInfoKey const InfoMessageUserInfoKeyPhoneNumberDisplayNameBeforeLearningProfileName;
 extern InfoMessageUserInfoKey const InfoMessageUserInfoKeyUsernameDisplayNameBeforeLearningProfileName;
+extern InfoMessageUserInfoKey const InfoMessageUserInfoKeySharedNameDisplayNameBeforeLearningProfileName;
 extern InfoMessageUserInfoKey const InfoMessageUserInfoKeyEndPoll;
+extern InfoMessageUserInfoKey const InfoMessageUserInfoKeyPinnedMessage;
 
 @property (nonatomic, readonly) TSInfoMessageType messageType;
 @property (nonatomic, readonly, nullable) NSString *customMessage;
 @property (nonatomic, readonly, nullable) SignalServiceAddress *unregisteredAddress;
 @property (nonatomic, readonly, nullable) NSString *serverGuid;
 
++ (NSArray<Class> *)infoMessageUserInfoObjectClasses;
 @property (nonatomic, nullable) NSDictionary<InfoMessageUserInfoKey, id> *infoMessageUserInfo;
 
 - (instancetype)initMessageWithBuilder:(TSMessageBuilder *)messageBuilder NS_UNAVAILABLE;
@@ -107,7 +111,6 @@ extern InfoMessageUserInfoKey const InfoMessageUserInfoKeyEndPoll;
                  isGroupStoryReply:(BOOL)isGroupStoryReply
                             isPoll:(BOOL)isPoll
     isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
-                         isStarred:(BOOL)isStarred
                 isViewOnceComplete:(BOOL)isViewOnceComplete
                  isViewOnceMessage:(BOOL)isViewOnceMessage
                        linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -119,7 +122,7 @@ extern InfoMessageUserInfoKey const InfoMessageUserInfoKeyEndPoll;
                     storyTimestamp:(nullable NSNumber *)storyTimestamp
                 wasRemotelyDeleted:(BOOL)wasRemotelyDeleted NS_UNAVAILABLE;
 
-- (nullable instancetype)initWithCoder:(NSCoder *)coder NS_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder *)coder NS_UNAVAILABLE;
 
 - (instancetype)initWithThread:(TSThread *)thread
                      timestamp:(uint64_t)timestamp
@@ -127,6 +130,7 @@ extern InfoMessageUserInfoKey const InfoMessageUserInfoKeyEndPoll;
                    messageType:(TSInfoMessageType)messageType
             expireTimerVersion:(nullable NSNumber *)expireTimerVersion
               expiresInSeconds:(unsigned int)expiresInSeconds
+               expireStartedAt:(uint64_t)expireStartedAt
            infoMessageUserInfo:(nullable NSDictionary<InfoMessageUserInfoKey, id> *)infoMessageUserInfo
     NS_DESIGNATED_INITIALIZER;
 
@@ -156,7 +160,6 @@ extern InfoMessageUserInfoKey const InfoMessageUserInfoKeyEndPoll;
                isGroupStoryReply:(BOOL)isGroupStoryReply
                           isPoll:(BOOL)isPoll
   isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
-                       isStarred:(BOOL)isStarred
               isViewOnceComplete:(BOOL)isViewOnceComplete
                isViewOnceMessage:(BOOL)isViewOnceMessage
                      linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -173,7 +176,7 @@ extern InfoMessageUserInfoKey const InfoMessageUserInfoKeyEndPoll;
                             read:(BOOL)read
                       serverGuid:(nullable NSString *)serverGuid
              unregisteredAddress:(nullable SignalServiceAddress *)unregisteredAddress
-NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp:sortId:timestamp:uniqueThreadId:body:bodyRanges:contactShare:deprecated_attachmentIds:editState:expireStartedAt:expireTimerVersion:expiresAt:expiresInSeconds:giftBadge:isGroupStoryReply:isPoll:isSmsMessageRestoredFromBackup:isStarred:isViewOnceComplete:isViewOnceMessage:linkPreview:messageSticker:quotedMessage:storedShouldStartExpireTimer:storyAuthorUuidString:storyReactionEmoji:storyTimestamp:wasRemotelyDeleted:customMessage:infoMessageUserInfo:messageType:read:serverGuid:unregisteredAddress:));
+NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp:sortId:timestamp:uniqueThreadId:body:bodyRanges:contactShare:deprecated_attachmentIds:editState:expireStartedAt:expireTimerVersion:expiresAt:expiresInSeconds:giftBadge:isGroupStoryReply:isPoll:isSmsMessageRestoredFromBackup:isViewOnceComplete:isViewOnceMessage:linkPreview:messageSticker:quotedMessage:storedShouldStartExpireTimer:storyAuthorUuidString:storyReactionEmoji:storyTimestamp:wasRemotelyDeleted:customMessage:infoMessageUserInfo:messageType:read:serverGuid:unregisteredAddress:));
 
 // clang-format on
 

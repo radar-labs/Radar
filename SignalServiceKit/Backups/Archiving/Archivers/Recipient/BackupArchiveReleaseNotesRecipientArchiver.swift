@@ -8,28 +8,28 @@
 /// - Important
 /// The Release Notes Channel has yet to be built on iOS, and consequently this
 /// class is implemented with stubs.
-public class BackupArchiveReleaseNotesRecipientArchiver: BackupArchiveProtoStreamWriter {
+class BackupArchiveReleaseNotesRecipientArchiver {
     typealias RecipientId = BackupArchive.RecipientId
     typealias RecipientAppId = BackupArchive.RecipientArchivingContext.Address
 
-    typealias ArchiveFrameResult = BackupArchive.ArchiveSingleFrameResult<Void, RecipientAppId>
-    typealias RestoreFrameResult = BackupArchive.RestoreFrameResult<RecipientId>
+    typealias ArchiveFrameResult = BackupArchive.ArchiveSingleFrameResult<Void>
+    typealias RestoreFrameResult = BackupArchive.RestoreFrameResult
 
-    public init() {}
+    init() {}
 
     // MARK: -
 
     func archiveReleaseNotesRecipient(
-        stream: BackupArchiveProtoOutputStream,
-        context: BackupArchive.RecipientArchivingContext
+        stream: BackupArchiveOutputStream,
+        context: BackupArchive.RecipientArchivingContext,
     ) -> ArchiveFrameResult {
-        return context.bencher.processFrame { frameBencher in
+        return context.processFrame { frameBencher in
             let releaseNotesAppId: RecipientAppId = .releaseNotesChannel
             let recipientId = context.assignRecipientId(to: releaseNotesAppId)
 
-            let maybeError = Self.writeFrameToStream(
-                stream,
-                objectId: releaseNotesAppId,
+            let maybeError: BackupArchive.ArchiveFrameError? = context.writeFrame(
+                toStream: stream,
+                flush: .afterWrite,
                 frameBencher: frameBencher,
                 frameBuilder: {
                     var recipient = BackupProto_Recipient()
@@ -39,7 +39,7 @@ public class BackupArchiveReleaseNotesRecipientArchiver: BackupArchiveProtoStrea
                     var frame = BackupProto_Frame()
                     frame.item = .recipient(recipient)
                     return frame
-                }
+                },
             )
 
             if let maybeError {
@@ -55,11 +55,10 @@ public class BackupArchiveReleaseNotesRecipientArchiver: BackupArchiveProtoStrea
     func restoreReleaseNotesRecipientProto(
         _ releaseNotesRecipientProto: BackupProto_ReleaseNotes,
         recipient: BackupProto_Recipient,
-        context: BackupArchive.RecipientRestoringContext
+        context: BackupArchive.RecipientRestoringContext,
     ) -> RestoreFrameResult {
         context[recipient.recipientId] = .releaseNotesChannel
-
-        // TODO: [Backups] Implement restoring the Release Notes channel recipient.
+        let _ = TSReleaseNotesThread.createReleaseNotes(transaction: context.tx)
         return .success
     }
 }

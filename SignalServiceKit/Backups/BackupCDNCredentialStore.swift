@@ -3,20 +3,20 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-struct BackupCDNCredentialStore {
+public struct BackupCDNCredentialStore {
     private enum Constants {
         static let cdnMetadataLifetime: TimeInterval = BackupCDNReadCredential.lifetime
     }
 
     private let kvStore: KeyValueStore
 
-    init() {
+    public init() {
         self.kvStore = KeyValueStore(collection: "BackupCDNCredentialStore")
     }
 
     // MARK: -
 
-    func wipe(tx: DBWriteTransaction) {
+    public func wipe(tx: DBWriteTransaction) {
         kvStore.removeAll(transaction: tx)
     }
 
@@ -38,7 +38,7 @@ struct BackupCDNCredentialStore {
         do {
             let cachedCredential: BackupCDNReadCredential? = try kvStore.getCodableValue(
                 forKey: Self.backupCDNAuthCredentialKey(cdnNumber: cdnNumber, authType: authType),
-                transaction: tx
+                transaction: tx,
             )
 
             if
@@ -73,7 +73,7 @@ struct BackupCDNCredentialStore {
             try kvStore.setCodable(
                 backupCDNReadCredential,
                 key: Self.backupCDNAuthCredentialKey(cdnNumber: cdnNumber, authType: authType),
-                transaction: tx
+                transaction: tx,
             )
         } catch {
             Logger.warn("Failed to serialize BackupCDNReadCredential! \(error)")
@@ -84,7 +84,7 @@ struct BackupCDNCredentialStore {
 
     private static func backupCDNMetadataKeys(authType: BackupAuthCredentialType) -> (
         metadata: String,
-        metadataSavedDate: String
+        metadataSavedDate: String,
     ) {
         return (
             "BackupCDNMetadata:\(authType.rawValue)",

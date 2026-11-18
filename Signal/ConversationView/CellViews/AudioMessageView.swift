@@ -7,37 +7,43 @@ import Lottie
 import SignalServiceKit
 import SignalUI
 
-class AudioMessageView: ManualStackView {
+class AudioMessageView: ManualStackView, CVAudioPlayerListener {
     private enum Constants {
         static let animationSize: CGFloat = 40
         static let waveformHeight: CGFloat = 32
+        static let progressTrackHeight: CGFloat = 4
+        static let thumbSize = CGSize(width: 24, height: 18)
+        static let undownloadedSliderAlpha: CGFloat = 0.5
         static let vSpacing: CGFloat = 2
         static let innerLayoutMargins = UIEdgeInsets(hMargin: 0, vMargin: 4)
     }
+
     // MARK: - State
+
+    private var playbackID: CVAudioPlaybackID {
+        CVAudioPlaybackID(audioAttachment: presentation.audioAttachment)
+    }
+
     private var attachment: Attachment { presentation.audioAttachment.attachment }
     private var attachmentStream: AttachmentStream? { presentation.audioAttachment.attachmentStream?.attachmentStream }
-    private var durationSeconds: TimeInterval { presentation.audioAttachment.durationSeconds }
+    private var durationSeconds: TimeInterval? { presentation.audioAttachment.durationSeconds }
 
-    private var isIncoming: Bool {
-        presentation.isIncoming
-    }
     private weak var audioMessageViewDelegate: AudioMessageViewDelegate?
     private let mediaCache: CVMediaCache
 
     private var audioPlaybackState: AudioPlaybackState {
-        AppEnvironment.shared.cvAudioPlayerRef.audioPlaybackState(forAttachmentId: attachment.id)
+        AppEnvironment.shared.cvAudioPlayerRef.audioPlaybackState(playbackID: playbackID)
     }
 
     private var elapsedSeconds: TimeInterval {
-        guard let attachmentStream = self.attachmentStream else {
+        guard attachmentStream != nil else {
             return 0
         }
-        return AppEnvironment.shared.cvAudioPlayerRef.playbackProgress(forAttachmentStream: attachmentStream)
+        return AppEnvironment.shared.cvAudioPlayerRef.playbackProgress(playbackID: playbackID)
     }
 
     private var isViewed = false
-    public func setViewed(_ isViewed: Bool, animated: Bool) {
+    func setViewed(_ isViewed: Bool, animated: Bool) {
         guard isViewed != self.isViewed else { return }
         self.isViewed = isViewed
         updateContents(animated: animated)
@@ -48,7 +54,7 @@ class AudioMessageView: ManualStackView {
     private let playedDotAnimation: LottieAnimationView
     private let playPauseAnimation: LottieAnimationView
     private let playPauseContainer = ManualLayoutView.circleView(name: "playPauseContainer")
-    private let progressSlider = UISlider()
+    private let progressSlider = ProgressSlider()
     private let waveformProgress: AudioWaveformProgressView
     private let waveformContainer = ManualLayoutView(name: "waveformContainer")
     private let presentation: AudioPresenter
@@ -58,7 +64,7 @@ class AudioMessageView: ManualStackView {
     init(
         presentation: AudioPresenter,
         audioMessageViewDelegate: AudioMessageViewDelegate,
-        mediaCache: CVMediaCache
+        mediaCache: CVMediaCache,
     ) {
         self.audioMessageViewDelegate = audioMessageViewDelegate
         self.mediaCache = mediaCache
@@ -73,29 +79,32 @@ class AudioMessageView: ManualStackView {
 
     // MARK: - Rendering
 
-    public func configureForRendering(cellMeasurement: CVCellMeasurement, conversationStyle: ConversationStyle) {
+    func configureForRendering(cellMeasurement: CVCellMeasurement, conversationStyle: ConversationStyle) {
         var outerSubviews = [UIView]()
 
-        if let topLabelConfig = presentation.topLabelConfig(
-            audioAttachment: presentation.audioAttachment,
-            isIncoming: isIncoming,
-            conversationStyle: conversationStyle
-        ) {
+        if let topLabelConfig = presentation.topLabelConfig {
             let topLabel = CVLabel()
             topLabelConfig.applyForRendering(label: topLabel)
             outerSubviews.append(topLabel)
         }
 
-        waveformProgress.playedColor = presentation.playedColor(isIncoming: isIncoming)
-        waveformProgress.unplayedColor = presentation.unplayedColor(isIncoming: isIncoming)
-        waveformProgress.thumbColor = presentation.thumbColor(isIncoming: isIncoming)
+        waveformProgress.playedColor = presentation.playedColor()
+        waveformProgress.unplayedColor = presentation.unplayedColor()
+        waveformProgress.thumbColor = presentation.waveformThumbColor()
+        waveformProgress.waveformDidFailToLoad = { [weak self] in
+            // No waveform for this audio; a progress bar is all we can show.
+            self?.setWaveformVisible(false)
+        }
+        waveformProgress.audioWaveformTask = presentation.audioWaveform(attachment: attachment)
+        setWaveformVisible(true)
         waveformContainer.addSubviewToFillSuperviewEdges(waveformProgress)
 
-        progressSlider.setThumbImage(UIImage(named: "audio_message_thumb")?.withTintColor(presentation.thumbColor(isIncoming: isIncoming), renderingMode: .alwaysTemplate), for: .normal)
-        progressSlider.setMinimumTrackImage(trackImage(color: presentation.playedColor(isIncoming: isIncoming)), for: .normal)
-        progressSlider.setMaximumTrackImage(trackImage(color: presentation.unplayedColor(isIncoming: isIncoming)), for: .normal)
-        progressSlider.isEnabled = presentation.audioAttachment.isDownloaded
+        progressSlider.setThumbImage(Self.thumbImage(color: presentation.progressBarThumbColor()), for: .normal)
+        progressSlider.minimumTrackTintColor = presentation.playedColor()
+        progressSlider.maximumTrackTintColor = presentation.unplayedColor()
         progressSlider.isUserInteractionEnabled = false
+        // Dim the slider until the attachment is downloaded.
+        progressSlider.alpha = attachmentStream != nil ? 1 : Constants.undownloadedSliderAlpha
 
         waveformContainer.addSubview(progressSlider) { [progressSlider] view in
             var sliderFrame = view.bounds
@@ -109,8 +118,6 @@ class AudioMessageView: ManualStackView {
         let leftView: UIView
         switch presentation.audioAttachment.state {
         case .attachmentStream:
-            fallthrough
-        case .attachmentPointer where presentation.audioAttachment.isDownloaded:
             let playPauseAnimation = self.playPauseAnimation
             let playedDotAnimation = self.playedDotAnimation
 
@@ -129,29 +136,37 @@ class AudioMessageView: ManualStackView {
 
             let fillColorKeypath = AnimationKeypath(keypath: "**.Fill 1.Color")
             playPauseAnimation.setValueProvider(
-                presentation.playPauseAnimationColor(isIncoming: isIncoming),
-                keypath: fillColorKeypath
+                ColorValueProvider(
+                    presentation.playPauseAnimationColor().lottieColorValue,
+                ),
+                keypath: fillColorKeypath,
             )
             playedDotAnimation.setValueProvider(
-                presentation.playedDotAnimationColor(conversationStyle: conversationStyle, isIncoming: isIncoming),
-                keypath: fillColorKeypath
+                ColorValueProvider(
+                    presentation.playedDotAnimationColor(
+                        conversationStyle: conversationStyle,
+                    ).lottieColorValue,
+                ),
+                keypath: fillColorKeypath,
             )
 
-            playPauseContainer.backgroundColor = presentation.playPauseContainerBackgroundColor(isIncoming: isIncoming)
+            playPauseContainer.backgroundColor = presentation.playPauseContainerBackgroundColor(
+                conversationStyle: conversationStyle,
+            )
             playPauseContainer.addSubviewToCenterOnSuperview(playPauseAnimation, size: CGSize(square: 24))
 
             presentation.playedDotContainer.addSubviewToCenterOnSuperview(playedDotAnimation, size: CGSize(square: 16))
 
             leftView = playPauseContainer
-        case .attachmentPointer(let attachmentPointer, let downloadState):
+        case .attachmentPointer(_, let downloadState):
             leftView = CVAttachmentProgressView(
                 direction: .download(
-                    attachmentPointer: attachmentPointer.attachmentPointer,
-                    downloadState: downloadState
+                    attachmentID: attachment.id,
+                    downloadState: downloadState,
                 ),
-                diameter: Constants.animationSize,
-                isDarkThemeEnabled: conversationStyle.isDarkThemeEnabled,
-                mediaCache: mediaCache
+                configuration: presentation.progressViewConfiguration(
+                    conversationStyle: conversationStyle,
+                ),
             )
         }
 
@@ -165,8 +180,8 @@ class AudioMessageView: ManualStackView {
                 leftView,
                 .transparentSpacer(),
                 waveformContainer,
-                .transparentSpacer()
-            ]
+                .transparentSpacer(),
+            ],
         )
         outerSubviews.append(topInnerStack)
 
@@ -177,7 +192,7 @@ class AudioMessageView: ManualStackView {
             config: Self.bottomInnerStackConfig(presentation: presentation),
             cellMeasurement: cellMeasurement,
             measurementKey: Self.measurementKey_bottomInnerStack,
-            subviews: generators.map { $0.viewGenerator() }
+            subviews: generators.map { $0.viewGenerator() },
         )
         outerSubviews.append(bottomInnerStack)
 
@@ -185,7 +200,7 @@ class AudioMessageView: ManualStackView {
             config: Self.outerStackConfig,
             cellMeasurement: cellMeasurement,
             measurementKey: Self.measurementKey_outerStack,
-            subviews: outerSubviews
+            subviews: outerSubviews,
         )
 
         updateContents(animated: false)
@@ -199,19 +214,15 @@ class AudioMessageView: ManualStackView {
     private static let measurementKey_bottomInnerStack = "CVComponentAudioAttachment.measurementKey_bottomInnerStack"
     private static let measurementKey_outerStack = "CVComponentAudioAttachment.measurementKey_outerStack"
 
-    public static func measure(
+    static func measure(
         maxWidth: CGFloat,
         measurementBuilder: CVCellMeasurement.Builder,
-        presentation: AudioPresenter
+        presentation: AudioPresenter,
     ) -> CGSize {
         owsAssertDebug(maxWidth > 0)
 
         var outerSubviewInfos = [ManualStackSubviewInfo]()
-        if let topLabelConfig = presentation.topLabelConfig(
-            audioAttachment: presentation.audioAttachment,
-            isIncoming: presentation.isIncoming,
-            conversationStyle: nil
-        ) {
+        if let topLabelConfig = presentation.topLabelConfig {
             let topLabelSize = CGSize(width: 0, height: topLabelConfig.font.lineHeight)
             outerSubviewInfos.append(topLabelSize.asManualSubviewInfo)
         }
@@ -231,7 +242,7 @@ class AudioMessageView: ManualStackView {
             config: topInnerStackConfig,
             measurementBuilder: measurementBuilder,
             measurementKey: Self.measurementKey_topInnerStack,
-            subviewInfos: topInnerSubviewInfos
+            subviewInfos: topInnerSubviewInfos,
         )
         let topInnerStackSize = topInnerStackMeasurement.measuredSize
         outerSubviewInfos.append(topInnerStackSize.ceil.asManualSubviewInfo)
@@ -240,7 +251,7 @@ class AudioMessageView: ManualStackView {
             config: bottomInnerStackConfig(presentation: presentation),
             measurementBuilder: measurementBuilder,
             measurementKey: Self.measurementKey_bottomInnerStack,
-            subviewInfos: presentation.bottomSubviewGenerators(conversationStyle: nil).map { $0.measurementInfo(maxWidth) }
+            subviewInfos: presentation.bottomSubviewGenerators(conversationStyle: nil).map { $0.measurementInfo(maxWidth) },
         )
         let bottomInnerStackSize = bottomInnerStackMeasurement.measuredSize
         outerSubviewInfos.append(bottomInnerStackSize.ceil.asManualSubviewInfo)
@@ -250,7 +261,7 @@ class AudioMessageView: ManualStackView {
             measurementBuilder: measurementBuilder,
             measurementKey: Self.measurementKey_outerStack,
             subviewInfos: outerSubviewInfos,
-            maxWidth: maxWidth
+            maxWidth: maxWidth,
         )
         return outerStackMeasurement.measuredSize
     }
@@ -258,33 +269,39 @@ class AudioMessageView: ManualStackView {
     // MARK: - View Configs
 
     private static var outerStackConfig: CVStackViewConfig {
-        CVStackViewConfig(axis: .vertical,
-                          alignment: .fill,
-                          spacing: Constants.vSpacing,
-                          layoutMargins: .zero)
+        CVStackViewConfig(
+            axis: .vertical,
+            alignment: .fill,
+            spacing: Constants.vSpacing,
+            layoutMargins: .zero,
+        )
     }
 
     private static var topInnerStackConfig: CVStackViewConfig {
-        CVStackViewConfig(axis: .horizontal,
-                          alignment: .center,
-                          spacing: 0,
-                          layoutMargins: Constants.innerLayoutMargins)
+        CVStackViewConfig(
+            axis: .horizontal,
+            alignment: .center,
+            spacing: 0,
+            layoutMargins: Constants.innerLayoutMargins,
+        )
     }
 
     private static func bottomInnerStackConfig(presentation: AudioPresenter) -> CVStackViewConfig {
-        CVStackViewConfig(axis: .horizontal,
-                          alignment: .center,
-                          spacing: presentation.bottomInnerStackSpacing,
-                          layoutMargins: .zero)
+        CVStackViewConfig(
+            axis: .horizontal,
+            alignment: .center,
+            spacing: presentation.bottomInnerStackSpacing,
+            layoutMargins: .zero,
+        )
     }
 
     // MARK: - Tapping
 
-    public func handleTap(sender: UIGestureRecognizer, itemModel: CVItemModel) -> Bool {
+    func handleTap(sender: UIGestureRecognizer, itemModel: CVItemModel) -> Bool {
         presentation.playbackRateView.handleTap(
             sender: sender,
             itemModel: itemModel,
-            audioMessageViewDelegate: audioMessageViewDelegate
+            audioMessageViewDelegate: audioMessageViewDelegate,
         )
     }
 
@@ -293,25 +310,26 @@ class AudioMessageView: ManualStackView {
     var isScrubbing = false
 
     func isPointInScrubbableRegion(_ point: CGPoint) -> Bool {
-        guard waveformProgress.canScrub else {
+        // Only downloaded audio can be scrubbed, waveform or not.
+        guard attachmentStream != nil, durationSeconds != nil else {
             return false
         }
 
-        let locationInSlider = convert(point, to: waveformProgress)
-        return locationInSlider.x >= 0 && locationInSlider.x <= waveformProgress.width
+        let locationInContainer = convert(point, to: waveformContainer)
+        return locationInContainer.x >= 0 && locationInContainer.x <= waveformContainer.width
     }
 
     func progressForLocation(_ point: CGPoint) -> CGFloat {
-        let sliderContainer = convert(waveformProgress.frame, from: waveformProgress.superview)
-        let newRatio = CGFloat.inverseLerp(point.x, min: sliderContainer.minX, max: sliderContainer.maxX).clamp01()
+        let containerFrame = convert(waveformContainer.bounds, from: waveformContainer)
+        let newRatio = CGFloat.inverseLerp(point.x, min: containerFrame.minX, max: containerFrame.maxX).clamp01()
         return newRatio.clamp01()
     }
 
     func scrubToLocation(_ point: CGPoint) -> TimeInterval {
+        guard let durationSeconds else { return 0 }
+
         let newRatio = progressForLocation(point)
-
         visibleProgressRatio = newRatio
-
         return TimeInterval(newRatio) * durationSeconds
     }
 
@@ -336,7 +354,7 @@ class AudioMessageView: ManualStackView {
         if let overrideProgress = self.overrideProgress {
             return overrideProgress.clamp01()
         }
-        guard durationSeconds > 0 else { return 0 }
+        guard let durationSeconds, durationSeconds > 0 else { return 0 }
         return CGFloat(elapsedSeconds / durationSeconds)
     }
 
@@ -347,7 +365,13 @@ class AudioMessageView: ManualStackView {
         set {
             waveformProgress.value = newValue
             progressSlider.value = Float(newValue)
-            updateElapsedTime(durationSeconds * TimeInterval(newValue))
+            if let durationSeconds {
+                let elapsedSeconds = durationSeconds * TimeInterval(newValue)
+                let timeRemaining = max(0, durationSeconds - elapsedSeconds)
+                presentation.playbackTimeLabel.text = OWSFormat.localizedDurationString(from: timeRemaining)
+            } else {
+                presentation.playbackTimeLabel.text = OWSFormat.localizedDurationString(from: 0)
+            }
         }
     }
 
@@ -387,48 +411,25 @@ class AudioMessageView: ManualStackView {
         }
     }
 
-    private func updateElapsedTime(_ elapsedSeconds: TimeInterval) {
-        let timeRemaining = max(0, durationSeconds - elapsedSeconds)
-        presentation.playbackTimeLabel.text = OWSFormat.localizedDurationString(from: timeRemaining)
-    }
-
     private func updateAudioProgress() {
         guard !isScrubbing else { return }
 
         visibleProgressRatio = audioProgressRatio
-
-        if let waveformTask = presentation.audioWaveform(attachmentStream: attachmentStream) {
-            waveformProgress.audioWaveformTask = waveformTask
-            waveformProgress.isHidden = false
-            progressSlider.isHidden = true
-        } else {
-            waveformProgress.isHidden = true
-            progressSlider.isHidden = false
-        }
-        waveformProgress.cachedAudioDuration = {
-            switch attachmentStream?.contentType {
-            case .audio(let duration, _):
-                return duration
-            default:
-                return nil
-            }
-        }()
     }
 
-    public func setOverrideProgress(_ value: CGFloat, animated: Bool) {
+    private func setWaveformVisible(_ isVisible: Bool) {
+        waveformProgress.isHidden = !isVisible
+        progressSlider.isHidden = isVisible
+    }
+
+    func setOverrideProgress(_ value: CGFloat, animated: Bool) {
         overrideProgress = value
         updateContents(animated: animated)
     }
 
-    public func clearOverrideProgress(animated: Bool) {
+    func clearOverrideProgress(animated: Bool) {
         overrideProgress = nil
         updateContents(animated: animated)
-    }
-
-    private func trackImage(color: UIColor) -> UIImage? {
-        return UIImage(named: "audio_message_track")?
-            .withTintColor(color, renderingMode: .alwaysTemplate)
-            .resizableImage(withCapInsets: UIEdgeInsets(top: 0, leading: 2, bottom: 0, trailing: 2))
     }
 
     // MARK: Viewed State
@@ -471,62 +472,72 @@ class AudioMessageView: ManualStackView {
 
     private func updatePlaybackRate(animated: Bool) {
         let isPlaying: Bool = {
-            guard let attachmentStream = attachmentStream else {
+            guard attachmentStream != nil else {
                 return false
             }
-            return AppEnvironment.shared.cvAudioPlayerRef.audioPlaybackState(forAttachmentId: attachmentStream.id) == .playing
+            let cvAudioPlayer = AppEnvironment.shared.cvAudioPlayerRef
+            return cvAudioPlayer.audioPlaybackState(playbackID: playbackID) == .playing
         }()
         presentation.playbackRateView.setVisibility(isPlaying, animated: animated)
     }
-}
 
-// MARK: - CVAudioPlayerListener
+    // MARK: - CVAudioPlayerListener
 
-extension AudioMessageView: CVAudioPlayerListener {
-    func audioPlayerStateDidChange(attachmentId: Attachment.IDType) {
+    func audioPlayerStateDidChange(playbackID: CVAudioPlaybackID) {
         AssertIsOnMainThread()
 
-        guard attachmentId == attachment.id else { return }
+        guard playbackID == self.playbackID else { return }
 
         updateContents(animated: true)
     }
 
-    func audioPlayerDidFinish(attachmentId: Attachment.IDType) {
+    func audioPlayerDidFinish(playbackID: CVAudioPlaybackID) {
         AssertIsOnMainThread()
 
-        guard attachmentId == attachment.id else { return }
+        guard playbackID == self.playbackID else { return }
 
         updateContents(animated: true)
     }
 
-    func audioPlayerDidMarkViewed(attachmentId: Attachment.IDType) {
+    func audioPlayerDidMarkViewed(playbackID: CVAudioPlaybackID) {
         AssertIsOnMainThread()
 
-        guard !isViewed, attachmentId == attachment.id else { return }
+        guard playbackID == self.playbackID else { return }
 
         setViewed(true, animated: true)
     }
-}
 
-extension AudioAttachment {
-    var sizeString: String {
-        switch state {
-        case .attachmentStream(let stream, _):
-            return ByteCountFormatter().string(for: stream.attachmentStream.unencryptedByteCount) ?? ""
-        case .attachmentPointer:
-            owsFailDebug("Shouldn't get here - undownloaded media not implemented")
-            return ""
+    // MARK: - Thumb
+
+    private static var thumbImageCache = [UIColor: UIImage]()
+
+    private static func thumbImage(color: UIColor) -> UIImage {
+        AssertIsOnMainThread()
+
+        if let cachedImage = thumbImageCache[color] {
+            return cachedImage
         }
+
+        let image = UIGraphicsImageRenderer(size: Constants.thumbSize).image { _ in
+            color.setFill()
+            UIBezierPath(
+                roundedRect: CGRect(origin: .zero, size: Constants.thumbSize),
+                cornerRadius: Constants.thumbSize.height / 2,
+            ).fill()
+        }
+        thumbImageCache[color] = image
+        return image
     }
-    var dateString: String {
-        switch state {
-        case .attachmentStream(_, _):
-            let dateFormatter = DateFormatter()
-            dateFormatter.setLocalizedDateFormatFromTemplate("Mdyy")
-            return dateFormatter.string(from: receivedAtDate)
-        case .attachmentPointer:
-            owsFailDebug("Shouldn't get here - undownloaded media not implemented")
-            return ""
+
+    // MARK: - ProgressSlider
+
+    // Overridden to set a custom track height.
+    private class ProgressSlider: UISlider {
+        override func trackRect(forBounds bounds: CGRect) -> CGRect {
+            var rect = super.trackRect(forBounds: bounds)
+            rect.size.height = Constants.progressTrackHeight
+            rect.origin.y = (bounds.height - Constants.progressTrackHeight) / 2
+            return rect
         }
     }
 }

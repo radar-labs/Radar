@@ -4,44 +4,47 @@
 //
 
 import SignalServiceKit
+import UIKit
 
 class BadgeThanksSheetPresenter {
-    private struct Deps {
+    private enum Deps {
         static var donationReceiptCredentialResultStore: DonationReceiptCredentialResultStore {
             DependenciesBridge.shared.donationReceiptCredentialResultStore
         }
     }
 
-    private let badgeStore: BadgeStore
-    private let databaseStorage: SDSDatabaseStorage
+    private let db: DB
     private let donationReceiptCredentialResultStore: DonationReceiptCredentialResultStore
+    private let profileBadgeManager: ProfileBadgeManager
 
     private var redemptionSuccess: DonationReceiptCredentialRedemptionSuccess
     private let successMode: DonationReceiptCredentialResultStore.Mode
 
     private init(
-        badgeStore: BadgeStore,
-        databaseStorage: SDSDatabaseStorage,
+        db: DB,
         donationReceiptCredentialResultStore: DonationReceiptCredentialResultStore,
+        profileBadgeManager: ProfileBadgeManager,
         redemptionSuccess: DonationReceiptCredentialRedemptionSuccess,
-        successMode: DonationReceiptCredentialResultStore.Mode
+        successMode: DonationReceiptCredentialResultStore.Mode,
     ) {
-        self.badgeStore = badgeStore
-        self.databaseStorage = databaseStorage
+        self.db = db
         self.donationReceiptCredentialResultStore = donationReceiptCredentialResultStore
+        self.profileBadgeManager = profileBadgeManager
         self.redemptionSuccess = redemptionSuccess
         self.successMode = successMode
     }
 
     static func fromGlobalsWithSneakyTransaction(
-        successMode: DonationReceiptCredentialResultStore.Mode
+        successMode: DonationReceiptCredentialResultStore.Mode,
     ) -> BadgeThanksSheetPresenter? {
-        guard let redemptionSuccess = SSKEnvironment.shared.databaseStorageRef.read(block: { tx in
-            Deps.donationReceiptCredentialResultStore.getRedemptionSuccess(
-                successMode: successMode,
-                tx: tx
-            )
-        }) else {
+        guard
+            let redemptionSuccess = SSKEnvironment.shared.databaseStorageRef.read(block: { tx in
+                Deps.donationReceiptCredentialResultStore.getRedemptionSuccess(
+                    successMode: successMode,
+                    tx: tx,
+                )
+            })
+        else {
             owsFailBeta("[Donations] Missing redemption success while trying to present badge thanks! \(successMode)")
             return nil
         }
@@ -54,40 +57,45 @@ class BadgeThanksSheetPresenter {
 
     static func fromGlobals(
         redemptionSuccess: DonationReceiptCredentialRedemptionSuccess,
-        successMode: DonationReceiptCredentialResultStore.Mode
+        successMode: DonationReceiptCredentialResultStore.Mode,
     ) -> BadgeThanksSheetPresenter {
         return BadgeThanksSheetPresenter(
-            badgeStore: SSKEnvironment.shared.profileManagerRef.badgeStore,
-            databaseStorage: SSKEnvironment.shared.databaseStorageRef,
+            db: DependenciesBridge.shared.db,
             donationReceiptCredentialResultStore: Deps.donationReceiptCredentialResultStore,
+            profileBadgeManager: DependenciesBridge.shared.profileBadgeManager,
             redemptionSuccess: redemptionSuccess,
-            successMode: successMode
+            successMode: successMode,
         )
     }
 
     @MainActor
     func presentAndRecordBadgeThanks(
-        fromViewController: UIViewController
+        fromViewController: UIViewController,
     ) async {
         let logger = PrefixedLogger(prefix: "[Donations]", suffix: "\(successMode)")
         logger.info("Preparing to present badge thanks sheet.")
 
-        do {
-            try await self.badgeStore.populateAssetsOnBadge(self.redemptionSuccess.badge)
-        } catch {
-            logger.error("Failed to populated badge assets for badge thanks sheet!")
+        guard
+            let badge = db.read(block: { tx in
+                profileBadgeManager.fetchBadgeWithId(redemptionSuccess.badgeID, tx: tx)
+            })
+        else {
+            owsFailDebug("Missing badge for expected badge ID! \(redemptionSuccess.badgeID)", logger: logger)
             return
         }
 
         logger.info("Showing badge thanks sheet on receipt credential redemption.")
-        let badgeThanksSheet = BadgeThanksSheet(receiptCredentialRedemptionSuccess: self.redemptionSuccess)
+        let badgeThanksSheet = BadgeThanksSheet(
+            receiptCredentialRedemptionSuccess: redemptionSuccess,
+            newBadge: badge,
+        )
 
         await fromViewController.awaitablePresent(badgeThanksSheet, animated: true)
 
-        await self.databaseStorage.awaitableWrite { tx in
-            self.donationReceiptCredentialResultStore.setHasPresentedSuccess(
+        await db.awaitableWrite { tx in
+            donationReceiptCredentialResultStore.setHasPresentedSuccess(
                 successMode: self.successMode,
-                tx: tx
+                tx: tx,
             )
         }
     }

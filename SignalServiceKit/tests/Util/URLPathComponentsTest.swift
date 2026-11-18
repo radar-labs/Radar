@@ -3,10 +3,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import XCTest
 import SignalServiceKit
+import XCTest
 
 final class URLPathComponentsTest: XCTestCase {
+
     // MARK: - URLPathComponents tests
 
     func testExpressibleByArrayLiteral() {

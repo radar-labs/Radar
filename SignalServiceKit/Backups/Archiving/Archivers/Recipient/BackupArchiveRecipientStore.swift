@@ -3,14 +3,16 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public class BackupArchiveRecipientStore {
+import GRDB
+
+class BackupArchiveRecipientStore {
 
     private let recipientTable: RecipientDatabaseTable
     private let searchableNameIndexer: SearchableNameIndexer
 
     init(
         recipientTable: RecipientDatabaseTable,
-        searchableNameIndexer: SearchableNameIndexer
+        searchableNameIndexer: SearchableNameIndexer,
     ) {
         self.recipientTable = recipientTable
         self.searchableNameIndexer = searchableNameIndexer
@@ -20,25 +22,25 @@ public class BackupArchiveRecipientStore {
 
     func enumerateAllSignalRecipients(
         tx: DBReadTransaction,
-        block: (SignalRecipient) -> Void
-    ) throws {
-        let cursor = try SignalRecipient.fetchCursor(tx.database)
-        while let next = try cursor.next() {
-            try Task.checkCancellation()
-            block(next)
+        block: (SignalRecipient) throws(CancellationError) -> Bool,
+    ) throws(CancellationError) {
+        var cursor = FailIfThrowsRecordCursor {
+            try SignalRecipient.fetchCursor(tx.database)
         }
+
+        while let recipient = cursor.next(), try block(recipient) {}
     }
 
     func fetchRecipient(
         for address: BackupArchive.ContactAddress,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> SignalRecipient? {
-        return recipientTable.fetchRecipient(address: address.asInteropAddress(), tx: tx)
+        return recipientTable.fetchRecipient(address: address.asSignalServiceAddress(), tx: tx)
     }
 
     func fetchRecipient(
         localIdentifiers: LocalIdentifiers,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> SignalRecipient? {
         return recipientTable.fetchRecipient(serviceId: localIdentifiers.aci, transaction: tx)
     }

@@ -80,7 +80,7 @@ public class ZoomableMediaView: UIScrollView {
     // MARK: -
 
     public func updateZoomScaleForLayout() {
-        let scrollViewSize = safeAreaLayoutGuide.layoutFrame.size
+        let scrollViewSize = bounds.size
 
         // We want a default layout that...
         //
@@ -102,7 +102,7 @@ public class ZoomableMediaView: UIScrollView {
         //   media is valid.
         let mediaSize: CGSize
         let mediaIntrinsicSize = mediaView.intrinsicContentSize
-        if mediaIntrinsicSize.width > 0 && mediaIntrinsicSize.height > 0 {
+        if mediaIntrinsicSize.width > 0, mediaIntrinsicSize.height > 0 {
             mediaSize = mediaIntrinsicSize
         } else if
             let imageView = mediaView as? UIImageView,

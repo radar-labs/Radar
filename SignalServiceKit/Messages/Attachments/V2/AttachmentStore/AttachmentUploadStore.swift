@@ -3,69 +3,51 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
+import GRDB
 
-/// Attachment mutations needed for upload handling.
-public protocol AttachmentUploadStore {
+public class AttachmentUploadStore {
 
-    /// Mark the attachment as having been uploaded to the transit tier.
-    func markUploadedToTransitTier(
-        attachmentStream: AttachmentStream,
-        info: Attachment.TransitTierInfo,
-        tx: DBWriteTransaction
-    ) throws
+    public init() {
+    }
 
-    /// Mark the attachment's transit tier upload as expired (wipe its transit tier info).
-    func markTransitTierUploadExpired(
-        attachment: Attachment,
-        info: Attachment.TransitTierInfo,
-        tx: DBWriteTransaction
-    ) throws
+    public func upsert(record: AttachmentUploadRecord, tx: DBWriteTransaction) {
+        var newRecord = AttachmentUploadRecord(sourceType: record.sourceType, attachmentId: record.attachmentId)
+        newRecord.sqliteId = record.sqliteId
+        newRecord.uploadForm = record.uploadForm
+        newRecord.uploadFormTimestamp = record.uploadFormTimestamp
+        newRecord.localMetadata = record.localMetadata
+        newRecord.uploadSessionUrl = record.uploadSessionUrl
+        newRecord.attempt = record.attempt
+        failIfThrows {
+            try newRecord.save(tx.database)
+        }
+    }
 
-    /// Mark the attachment as having been uploaded to the media tier.
-    func markUploadedToMediaTier(
-        attachment: Attachment,
-        mediaTierInfo: Attachment.MediaTierInfo,
-        mediaName: String,
-        tx: DBWriteTransaction
-    ) throws
-
-    /// Mark the attachment as deleted and/or not uploaded to media tier,
-    /// wiping media tier info if set.
-    func markMediaTierUploadExpired(
-        attachment: Attachment,
-        tx: DBWriteTransaction
-    ) throws
-
-    /// Mark the attachment thumbnail as having been uploaded to the media tier.
-    func markThumbnailUploadedToMediaTier(
-        attachment: Attachment,
-        thumbnailMediaTierInfo: Attachment.ThumbnailMediaTierInfo,
-        mediaName: String,
-        tx: DBWriteTransaction
-    ) throws
-
-    /// Mark the attachment's thumbnail as deleted and/or not uploaded to media tier,
-    /// wiping media tier info if set.
-    func markThumbnailMediaTierUploadExpired(
-        attachment: Attachment,
-        tx: DBWriteTransaction
-    ) throws
-
-    func upsert(
-        record: AttachmentUploadRecord,
-        tx: DBWriteTransaction
-    ) throws
-
-    func removeRecord(
+    public func removeRecord(
         for attachmentId: Attachment.IDType,
         sourceType: AttachmentUploadRecord.SourceType,
-        tx: DBWriteTransaction
-    ) throws
+        tx: DBWriteTransaction,
+    ) {
+        let query = AttachmentUploadRecord
+            .filter(Column(AttachmentUploadRecord.CodingKeys.attachmentId) == attachmentId)
+            .filter(Column(AttachmentUploadRecord.CodingKeys.sourceType) == sourceType.rawValue)
 
-    func fetchAttachmentUploadRecord(
+        failIfThrows {
+            try query.deleteAll(tx.database)
+        }
+    }
+
+    public func fetchAttachmentUploadRecord(
         for attachmentId: Attachment.IDType,
         sourceType: AttachmentUploadRecord.SourceType,
-        tx: DBReadTransaction
-    ) throws -> AttachmentUploadRecord?
+        tx: DBReadTransaction,
+    ) -> AttachmentUploadRecord? {
+        let query = AttachmentUploadRecord
+            .filter(Column(AttachmentUploadRecord.CodingKeys.attachmentId) == attachmentId)
+            .filter(Column(AttachmentUploadRecord.CodingKeys.sourceType) == sourceType.rawValue)
+
+        return failIfThrows {
+            try query.fetchOne(tx.database)
+        }
+    }
 }

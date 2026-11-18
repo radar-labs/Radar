@@ -3,19 +3,21 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import SignalServiceKit
+import SignalServiceKit
 
 extension ConversationViewController {
 
-    func presentContextMenu(with messageActions: [MessageAction],
-                            focusedOn cell: UICollectionViewCell,
-                            andModel model: CVItemViewModelImpl) {
+    func presentContextMenu(
+        with messageActions: [MessageAction],
+        focusedOn cell: UICollectionViewCell,
+        andModel model: CVItemViewModelImpl,
+    ) {
         let keyboardActive = inputToolbar?.isInputViewFirstResponder ?? false
         let interaction = ChatHistoryContextMenuInteraction(delegate: self, itemViewModel: model, thread: thread, messageActions: messageActions, initiatingGestureRecognizer: collectionViewContextMenuGestureRecognizer, keyboardWasActive: keyboardActive)
         collectionViewActiveContextMenuInteraction = interaction
         cell.addInteraction(interaction)
         let cellCenterPoint = cell.frame.center
-        let screenPoint = self.collectionView .convert(cellCenterPoint, from: cell)
+        let screenPoint = self.collectionView.convert(cellCenterPoint, from: cell)
         var presentImmediately = false
         if collectionViewContextMenuSecondaryClickRecognizer.state == .ended {
             presentImmediately = true
@@ -23,7 +25,7 @@ extension ConversationViewController {
         interaction.initiateContextMenuGesture(locationInView: screenPoint, presentImmediately: presentImmediately)
     }
 
-    public var isPresentingContextMenu: Bool {
+    var isPresentingContextMenu: Bool {
         if let interaction = viewState.collectionViewActiveContextMenuInteraction, interaction.contextMenuVisible {
             return true
         }
@@ -31,8 +33,7 @@ extension ConversationViewController {
         return false
     }
 
-    @objc
-    public func dismissMessageContextMenu(animated: Bool) {
+    func dismissMessageContextMenu(animated: Bool) {
         if let collectionViewActiveContextMenuInteraction = self.collectionViewActiveContextMenuInteraction {
             collectionViewActiveContextMenuInteraction.dismissMenu(animated: animated, completion: { })
         }
@@ -54,7 +55,7 @@ extension ConversationViewController {
         return self.indexPath(forInteractionUniqueId: messageActionInteractionId) == nil
     }
 
-    public func reloadReactionsDetailSheetWithSneakyTransaction() {
+    func reloadReactionsDetailSheetWithSneakyTransaction() {
         AssertIsOnMainThread()
 
         guard let reactionsDetailSheet = self.reactionsDetailSheet else {
@@ -63,14 +64,15 @@ extension ConversationViewController {
 
         let messageId = reactionsDetailSheet.messageId
 
-        guard let indexPath = self.indexPath(forInteractionUniqueId: messageId),
-              let renderItem = self.renderItem(forIndex: indexPath.row) else {
+        guard
+            let indexPath = self.indexPath(forInteractionUniqueId: messageId),
+            let renderItem = self.renderItem(forIndex: indexPath.row)
+        else {
             // The message no longer exists, dismiss the sheet.
             dismissReactionsDetailSheet(animated: true)
             return
         }
-        guard let reactionState = renderItem.reactionState,
-              reactionState.hasReactions else {
+        guard let reactionState = renderItem.reactionState else {
             // There are no longer reactions on this message, dismiss the sheet.
             dismissReactionsDetailSheet(animated: true)
             return
@@ -83,7 +85,7 @@ extension ConversationViewController {
         }
     }
 
-    public func dismissReactionsDetailSheet(animated: Bool) {
+    func dismissReactionsDetailSheet(animated: Bool) {
         AssertIsOnMainThread()
 
         guard let reactionsDetailSheet = self.reactionsDetailSheet else {
@@ -94,17 +96,17 @@ extension ConversationViewController {
             self.reactionsDetailSheet = nil
         }
     }
-}
 
-extension ConversationViewController: ContextMenuInteractionDelegate {
+    // MARK: - ContextMenuInteractionDelegate
 
-    public func contextMenuInteraction(
+    func contextMenuInteraction(
         _ interaction: ContextMenuInteraction,
-        configurationForMenuAtLocation location: CGPoint) -> ContextMenuConfiguration? {
+        configurationForMenuAtLocation location: CGPoint,
+    ) -> ContextMenuConfiguration? {
 
         return ContextMenuConfiguration(identifier: UUID() as NSCopying, actionProvider: { [weak self] _ in
 
-            guard let self = self else {
+            guard let self else {
                 owsFailDebug("conversationViewController was unexpectedly nil")
                 return ContextMenu([])
             }
@@ -124,7 +126,7 @@ extension ConversationViewController: ContextMenuInteractionDelegate {
                             attributes: messageAction.contextMenuAttributes,
                             handler: { _ in
                                 messageAction.block(nil)
-                            }
+                            },
                         ))
                     }
                 }
@@ -134,9 +136,10 @@ extension ConversationViewController: ContextMenuInteractionDelegate {
         })
     }
 
-    public func contextMenuInteraction(
+    func contextMenuInteraction(
         _ interaction: ContextMenuInteraction,
-        previewForHighlightingMenuWithConfiguration configuration: ContextMenuConfiguration) -> ContextMenuTargetedPreview? {
+        previewForHighlightingMenuWithConfiguration configuration: ContextMenuConfiguration,
+    ) -> ContextMenuTargetedPreview? {
 
         guard let contextInteraction = interaction as? ChatHistoryContextMenuInteraction else {
             owsFailDebug("Expected ChatHistoryContextMenuInteraction.")
@@ -156,8 +159,8 @@ extension ConversationViewController: ContextMenuInteractionDelegate {
         var accessories = cell.rootComponent?.contextMenuAccessoryViews(componentView: componentView) ?? []
 
         // Add reaction bar if necessary
-        if thread.canSendReactionToThread && shouldShowReactionPickerForInteraction(contextInteraction.itemViewModel.interaction) {
-            let reactionBarAccessory = ContextMenuRectionBarAccessory(thread: self.thread, itemViewModel: contextInteraction.itemViewModel)
+        if thread.canSendReactionToThread, shouldShowReactionPickerForInteraction(contextInteraction.itemViewModel.interaction) {
+            let reactionBarAccessory = ContextMenuReactionBarAccessory(thread: self.thread, itemViewModel: contextInteraction.itemViewModel)
             reactionBarAccessory.didSelectReactionHandler = { [weak self] (message: TSMessage, reaction: String, isRemoving: Bool) in
 
                 guard self != nil else {
@@ -170,7 +173,7 @@ extension ConversationViewController: ContextMenuInteractionDelegate {
                         to: message.uniqueId,
                         emoji: reaction,
                         isRemoving: isRemoving,
-                        tx: transaction
+                        tx: transaction,
                     )
                 }
             }
@@ -196,7 +199,7 @@ extension ConversationViewController: ContextMenuInteractionDelegate {
         }
     }
 
-    public func contextMenuInteraction(_ interaction: ContextMenuInteraction, willDisplayMenuForConfiguration: ContextMenuConfiguration) {
+    func contextMenuInteraction(_ interaction: ContextMenuInteraction, willDisplayMenuForConfiguration: ContextMenuConfiguration) {
         // Reset scroll view pan gesture recognizer, so CV does not scroll behind context menu post presentation on user swipe
         collectionView.panGestureRecognizer.isEnabled = false
         collectionView.panGestureRecognizer.isEnabled = true
@@ -205,14 +208,14 @@ extension ConversationViewController: ContextMenuInteractionDelegate {
             componentView.contextMenuPresentationWillBegin?()
         }
 
-        dismissKeyBoard()
+        dismissKeyboard()
     }
 
-    public func contextMenuInteraction(_ interaction: ContextMenuInteraction, willEndForConfiguration: ContextMenuConfiguration) {
+    func contextMenuInteraction(_ interaction: ContextMenuInteraction, willEndForConfiguration: ContextMenuConfiguration) {
 
     }
 
-    public func contextMenuInteraction(_ interaction: ContextMenuInteraction, didEndForConfiguration: ContextMenuConfiguration) {
+    func contextMenuInteraction(_ interaction: ContextMenuInteraction, didEndForConfiguration: ContextMenuConfiguration) {
         if let contextInteraction = interaction as? ChatHistoryContextMenuInteraction, let cell = contextInteraction.view as? CVCell, let componentView = cell.componentView {
             componentView.contextMenuPresentationDidEnd?()
 
@@ -232,12 +235,16 @@ extension ConversationViewController: ContextMenuInteractionDelegate {
         collectionViewActiveContextMenuInteraction = nil
     }
 
-    public func shouldShowReactionPickerForInteraction(_ interaction: TSInteraction) -> Bool {
+    func shouldShowReactionPickerForInteraction(_ interaction: TSInteraction) -> Bool {
         if threadViewModel.hasPendingMessageRequest {
             return false
         }
 
         guard threadViewModel.isLocalUserFullMemberOfThread else {
+            return false
+        }
+
+        guard !threadViewModel.threadRecord.isTerminatedGroup else {
             return false
         }
 
@@ -259,5 +266,4 @@ extension ConversationViewController: ContextMenuInteractionDelegate {
             return false
         }
     }
-
 }

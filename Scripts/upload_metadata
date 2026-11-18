@@ -10,6 +10,7 @@ cd "$BASE_DIR"
 bundle exec fastlane deliver \
   --skip-screenshots \
   --skip-binary-upload \
+  --force true \
   --username "$FASTLANE_USERNAME" \
   --phased_release true \
   --reset_ratings false \

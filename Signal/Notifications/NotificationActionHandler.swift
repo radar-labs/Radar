@@ -14,7 +14,8 @@ public class NotificationActionHandler {
     @MainActor
     class func handleNotificationResponse(
         _ response: UNNotificationResponse,
-        appReadiness: AppReadinessSetter
+        appReadiness: AppReadinessSetter,
+        screenLockUI: ScreenLockUI,
     ) async throws {
         owsAssertDebug(appReadiness.isAppReady)
 
@@ -32,10 +33,14 @@ public class NotificationActionHandler {
                 try await showThread(userInfo: userInfo)
             case .showMyStories:
                 await showMyStories(appReadiness: appReadiness)
+            case .showMessage:
+                showMessage(userInfo: userInfo)
             case .showCallLobby:
                 showCallLobby(userInfo: userInfo)
             case .submitDebugLogs:
                 await submitDebugLogs(supportTag: nil)
+            case .submitDebugLogsForBackupsMediaError:
+                await submitDebugLogs(supportTag: "BackupsMedia")
             case .reregister:
                 await reregister(appReadiness: appReadiness)
             case .showChatList:
@@ -45,8 +50,6 @@ public class NotificationActionHandler {
                 showLinkedDevices()
             case .showBackupsSettings:
                 showBackupsSettings()
-            case .listMediaIntegrityCheck:
-                await submitDebugLogs(supportTag: "BackupsMedia")
             }
         case UNNotificationDismissActionIdentifier:
             // TODO - mark as read?
@@ -61,6 +64,7 @@ public class NotificationActionHandler {
             }
             switch responseAction {
             case .callBack:
+                try await screenLockUI.waitForScreenUnlockThrowingPrevious()
                 try await self.callBack(userInfo: userInfo)
             case .markAsRead:
                 try await markAsRead(userInfo: userInfo)
@@ -121,7 +125,12 @@ public class NotificationActionHandler {
         let optionalDraftModel: DraftQuotedReplyModel? = SSKEnvironment.shared.databaseStorageRef.read { transaction in
             if
                 let incomingMessage = notificationMessage.interaction as? TSIncomingMessage,
-                let draftQuotedReplyModel = DependenciesBridge.shared.quotedReplyManager.buildDraftQuotedReply(originalMessage: incomingMessage, tx: transaction) {
+                let draftQuotedReplyModel = DependenciesBridge.shared.quotedReplyManager.buildDraftQuotedReply(
+                    originalMessage: incomingMessage,
+                    loadNormalizedImage: NormalizedImage.loadImage(imageSource:maxPixelSize:),
+                    tx: transaction,
+                )
+            {
                 return draftQuotedReplyModel
             }
             return nil
@@ -163,10 +172,10 @@ public class NotificationActionHandler {
                         additionalRecipients: [],
                         explicitRecipients: [],
                         skippedRecipients: [],
-                        transaction: transaction
+                        transaction: transaction,
                     ),
                     body: messageBody,
-                    quotedReplyDraft: draftModelForSending
+                    quotedReplyDraft: draftModelForSending,
                 )
                 let preparedMessage = try unpreparedMessage.prepare(tx: transaction)
                 return ThreadUtil.enqueueMessagePromise(message: preparedMessage, transaction: transaction)
@@ -196,7 +205,20 @@ public class NotificationActionHandler {
                 continuation.resume()
             }
         }
-        SignalApp.shared.showMyStories(animated: UIApplication.shared.applicationState == .active)
+        SignalApp.shared.showMyStories(animated: CurrentAppContext().isMainAppAndActiveIsolated)
+    }
+
+    @MainActor
+    private class func showMessage(userInfo: AppNotificationUserInfo) {
+        guard let threadId = userInfo.threadId else {
+            owsFailDebug("Missing threadId for showMessage action.")
+            return
+        }
+        SignalApp.shared.presentConversationForThread(
+            threadUniqueId: threadId,
+            focusMessageId: userInfo.messageId,
+            animated: CurrentAppContext().isMainAppAndActiveIsolated,
+        )
     }
 
     @MainActor
@@ -206,7 +228,7 @@ public class NotificationActionHandler {
         // it animate in from the homescreen.
         SignalApp.shared.presentConversationAndScrollToFirstUnreadMessage(
             threadUniqueId: uniqueId,
-            animated: UIApplication.shared.applicationState == .active
+            animated: CurrentAppContext().isMainAppAndActiveIsolated,
         )
     }
 
@@ -247,7 +269,7 @@ public class NotificationActionHandler {
             // Fresh state when coming in from a notification; no need to share.
             spoilerState: SpoilerRenderState(),
             loadMessage: storyMessage,
-            action: .presentReplies
+            action: .presentReplies,
         )
         frontmostViewController.present(vc, animated: true)
     }
@@ -268,7 +290,7 @@ public class NotificationActionHandler {
                     emoji: "👍",
                     isRemoving: false,
                     isHighPriority: false,
-                    tx: transaction
+                    tx: transaction,
                 )
             }.awaitableWithUncooperativeCancellationHandling()
         } catch {
@@ -301,7 +323,7 @@ public class NotificationActionHandler {
         let lobbyTarget = { () -> LobbyTarget? in
             if let threadUniqueId {
                 return SSKEnvironment.shared.databaseStorageRef.read { tx in
-                    if let groupId = try? (TSThread.anyFetch(uniqueId: threadUniqueId, transaction: tx) as? TSGroupThread)?.groupIdentifier {
+                    if let groupId = try? (TSThread.fetchViaCache(uniqueId: threadUniqueId, transaction: tx) as? TSGroupThread)?.groupIdentifier {
                         return .groupThread(groupId: groupId, uniqueId: threadUniqueId)
                     }
                     return nil
@@ -310,7 +332,7 @@ public class NotificationActionHandler {
             if let callLinkRoomId {
                 return SSKEnvironment.shared.databaseStorageRef.read { tx in
                     let callLinkStore = DependenciesBridge.shared.callLinkStore
-                    if let callLinkRecord = try? callLinkStore.fetch(roomId: callLinkRoomId, tx: tx) {
+                    if let callLinkRecord = callLinkStore.fetch(roomId: callLinkRoomId, tx: tx) {
                         return .callLink(CallLink(rootKey: callLinkRecord.rootKey))
                     }
                     return nil
@@ -346,11 +368,13 @@ public class NotificationActionHandler {
 
     @MainActor
     private class func submitDebugLogs(supportTag: String?) async {
-        await withCheckedContinuation { continuation in
-            DebugLogs.submitLogs(supportTag: supportTag, dumper: .fromGlobals()) {
-                continuation.resume()
-            }
+        guard let viewController = CurrentAppContext().frontmostViewController() else {
+            return
         }
+        await DebugLogs(dumper: .fromGlobals()).promptToSubmitLogs(
+            from: viewController,
+            supportTag: supportTag,
+        )
     }
 
     @MainActor
@@ -360,12 +384,19 @@ public class NotificationActionHandler {
                 continuation.resume()
             }
         }
-        guard let viewController = CurrentAppContext().frontmostViewController() else {
-            Logger.error("Responding to reregister notification action without a view controller!")
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        let registrationState = tsAccountManager.registrationStateWithMaybeSneakyTransaction
+        guard let deregisteredState = registrationState.deregisteredState else {
+            Logger.warn("ignoring request from logged out notification")
             return
         }
-        Logger.info("Reregistering from deregistered notification")
-        RegistrationUtils.reregister(fromViewController: viewController, appReadiness: appReadiness)
+        if deregisteredState.isPrimary {
+            Logger.info("re-registering from logged out notification")
+            RegistrationUtils.showReRegistration(deregisteredState: deregisteredState)
+        } else {
+            Logger.info("re-linking from logged out notification")
+            RegistrationUtils.showReLinking(deregisteredState: deregisteredState)
+        }
     }
 
     @MainActor
@@ -375,7 +406,7 @@ public class NotificationActionHandler {
 
     @MainActor
     private class func showBackupsSettings() {
-        SignalApp.shared.showAppSettings(mode: .backups)
+        SignalApp.shared.showAppSettings(mode: .backups())
     }
 
     private struct NotificationMessage {
@@ -392,14 +423,14 @@ public class NotificationActionHandler {
         }
         let messageId = userInfo.messageId
 
-        return try SSKEnvironment.shared.databaseStorageRef.read { (transaction) throws -> NotificationMessage in
-            guard let thread = TSThread.anyFetch(uniqueId: threadId, transaction: transaction) else {
+        return try SSKEnvironment.shared.databaseStorageRef.read { transaction throws -> NotificationMessage in
+            guard let thread = TSThread.fetchViaCache(uniqueId: threadId, transaction: transaction) else {
                 throw OWSAssertionError("unable to find thread with id: \(threadId)")
             }
 
             let interaction: TSInteraction?
-            if let messageId = messageId {
-                interaction = TSInteraction.anyFetch(uniqueId: messageId, transaction: transaction)
+            if let messageId {
+                interaction = TSInteraction.fetchViaCache(uniqueId: messageId, transaction: transaction)
             } else {
                 interaction = nil
             }
@@ -422,7 +453,7 @@ public class NotificationActionHandler {
                 interaction: interaction,
                 storyMessage: storyMessage,
                 isGroupStoryReply: (interaction as? TSMessage)?.isGroupStoryReply == true,
-                hasPendingMessageRequest: hasPendingMessageRequest
+                hasPendingMessageRequest: hasPendingMessageRequest,
             )
         }
     }
@@ -431,13 +462,12 @@ public class NotificationActionHandler {
         guard let interaction = notificationMessage.interaction else {
             throw OWSAssertionError("missing interaction")
         }
-        return await withCheckedContinuation { continuation in
-            SSKEnvironment.shared.receiptManagerRef.markAsReadLocally(
-                beforeSortId: interaction.sortId,
-                thread: notificationMessage.thread,
-                hasPendingMessageRequest: notificationMessage.hasPendingMessageRequest,
-                completion: { continuation.resume() }
-            )
-        }
+
+        let receiptManager = SSKEnvironment.shared.receiptManagerRef
+        await receiptManager.markAsReadLocally(
+            beforeSortId: interaction.sortId,
+            thread: notificationMessage.thread,
+            hasPendingMessageRequest: notificationMessage.hasPendingMessageRequest,
+        )
     }
 }

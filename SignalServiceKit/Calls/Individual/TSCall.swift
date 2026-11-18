@@ -11,21 +11,31 @@ extension RPRecentCallType: CustomStringConvertible {
     }
 }
 
+// MARK: - Disappearing messages
+
+extension TSCall: ExpiringCallInteraction {
+    @objc
+    func ensureExpirationStarted(transaction tx: DBWriteTransaction) {
+        startExpirationIfNecessary(transaction: tx)
+    }
+}
+
 // MARK: - OWSReadTracking
 
 @objc
 extension TSCall: OWSReadTracking {
-    public var expireStartedAt: UInt64 {
-        return 0
-    }
-
     public func markAsRead(
         atTimestamp readTimestamp: UInt64,
         thread: TSThread,
         circumstance: OWSReceiptCircumstance,
         shouldClearNotifications: Bool,
-        transaction tx: DBWriteTransaction
+        transaction tx: DBWriteTransaction,
     ) {
+        if readTimestamp < expireStartedAt {
+            // This device already read the item but a linked device read it earlier
+            startOrUpdateExpiration(readTimestamp: readTimestamp, tx: tx)
+        }
+
         if wasRead {
             return
         }
@@ -40,19 +50,21 @@ extension TSCall: OWSReadTracking {
             let missedCallManager = DependenciesBridge.shared.callRecordMissedCallManager
 
             if
-                let sqliteRowId = sqliteRowId,
+                let sqliteRowId,
                 let associatedCallRecord = callRecordStore.fetch(
-                    interactionRowId: sqliteRowId, tx: tx
+                    interactionRowId: sqliteRowId,
+                    tx: tx,
                 )
             {
                 missedCallManager.markUnreadCallsInConversationAsRead(
                     beforeCallRecord: associatedCallRecord,
                     sendSyncMessage: true,
-                    tx: tx
+                    tx: tx,
                 )
             }
         case .onLinkedDevice, .onLinkedDeviceWhilePendingMessageRequest:
-            break
+            // This device has not read the item but a linked device has
+            startOrUpdateExpiration(readTimestamp: readTimestamp, tx: tx)
         @unknown default:
             break
         }

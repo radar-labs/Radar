@@ -1,8 +1,3 @@
-//
-// Copyright 2020 Signal Messenger, LLC
-// SPDX-License-Identifier: AGPL-3.0-only
-//
-
 // DO NOT EDIT.
 // swift-format-ignore-file
 // swiftlint:disable all
@@ -17,7 +12,11 @@
 // Copyright 2020 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
 import Foundation
+#endif
 import SwiftProtobuf
 
 // If the compiler emits an error on this type, it is because this file
@@ -25,152 +24,152 @@ import SwiftProtobuf
 // incompatible with the version of SwiftProtobuf to which you are linking.
 // Please ensure that you are building against the same version of the API
 // that was used to generate this file.
-fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAPIVersionCheck {
+fileprivate nonisolated struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAPIVersionCheck {
   struct _2: SwiftProtobuf.ProtobufAPIVersion_2 {}
   typealias Version = _2
 }
 
-struct SessionRecordProtos_SessionStructure: @unchecked Sendable {
+nonisolated struct SessionRecordProtos_SessionStructure: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var sessionVersion: UInt32 {
-    get {return _storage._sessionVersion ?? 0}
+    get {_storage._sessionVersion ?? 0}
     set {_uniqueStorage()._sessionVersion = newValue}
   }
   /// Returns true if `sessionVersion` has been explicitly set.
-  var hasSessionVersion: Bool {return _storage._sessionVersion != nil}
+  var hasSessionVersion: Bool {_storage._sessionVersion != nil}
   /// Clears the value of `sessionVersion`. Subsequent reads from it will return its default value.
   mutating func clearSessionVersion() {_uniqueStorage()._sessionVersion = nil}
 
   var localIdentityPublic: Data {
-    get {return _storage._localIdentityPublic ?? Data()}
+    get {_storage._localIdentityPublic ?? Data()}
     set {_uniqueStorage()._localIdentityPublic = newValue}
   }
   /// Returns true if `localIdentityPublic` has been explicitly set.
-  var hasLocalIdentityPublic: Bool {return _storage._localIdentityPublic != nil}
+  var hasLocalIdentityPublic: Bool {_storage._localIdentityPublic != nil}
   /// Clears the value of `localIdentityPublic`. Subsequent reads from it will return its default value.
   mutating func clearLocalIdentityPublic() {_uniqueStorage()._localIdentityPublic = nil}
 
   var remoteIdentityPublic: Data {
-    get {return _storage._remoteIdentityPublic ?? Data()}
+    get {_storage._remoteIdentityPublic ?? Data()}
     set {_uniqueStorage()._remoteIdentityPublic = newValue}
   }
   /// Returns true if `remoteIdentityPublic` has been explicitly set.
-  var hasRemoteIdentityPublic: Bool {return _storage._remoteIdentityPublic != nil}
+  var hasRemoteIdentityPublic: Bool {_storage._remoteIdentityPublic != nil}
   /// Clears the value of `remoteIdentityPublic`. Subsequent reads from it will return its default value.
   mutating func clearRemoteIdentityPublic() {_uniqueStorage()._remoteIdentityPublic = nil}
 
   var rootKey: Data {
-    get {return _storage._rootKey ?? Data()}
+    get {_storage._rootKey ?? Data()}
     set {_uniqueStorage()._rootKey = newValue}
   }
   /// Returns true if `rootKey` has been explicitly set.
-  var hasRootKey: Bool {return _storage._rootKey != nil}
+  var hasRootKey: Bool {_storage._rootKey != nil}
   /// Clears the value of `rootKey`. Subsequent reads from it will return its default value.
   mutating func clearRootKey() {_uniqueStorage()._rootKey = nil}
 
   var previousCounter: UInt32 {
-    get {return _storage._previousCounter ?? 0}
+    get {_storage._previousCounter ?? 0}
     set {_uniqueStorage()._previousCounter = newValue}
   }
   /// Returns true if `previousCounter` has been explicitly set.
-  var hasPreviousCounter: Bool {return _storage._previousCounter != nil}
+  var hasPreviousCounter: Bool {_storage._previousCounter != nil}
   /// Clears the value of `previousCounter`. Subsequent reads from it will return its default value.
   mutating func clearPreviousCounter() {_uniqueStorage()._previousCounter = nil}
 
   var senderChain: SessionRecordProtos_SessionStructure.Chain {
-    get {return _storage._senderChain ?? SessionRecordProtos_SessionStructure.Chain()}
+    get {_storage._senderChain ?? SessionRecordProtos_SessionStructure.Chain()}
     set {_uniqueStorage()._senderChain = newValue}
   }
   /// Returns true if `senderChain` has been explicitly set.
-  var hasSenderChain: Bool {return _storage._senderChain != nil}
+  var hasSenderChain: Bool {_storage._senderChain != nil}
   /// Clears the value of `senderChain`. Subsequent reads from it will return its default value.
   mutating func clearSenderChain() {_uniqueStorage()._senderChain = nil}
 
   /// The order is significant; keys at the end are "older" and will get trimmed.
   var receiverChains: [SessionRecordProtos_SessionStructure.Chain] {
-    get {return _storage._receiverChains}
+    get {_storage._receiverChains}
     set {_uniqueStorage()._receiverChains = newValue}
   }
 
   var pendingPreKey: SessionRecordProtos_SessionStructure.PendingPreKey {
-    get {return _storage._pendingPreKey ?? SessionRecordProtos_SessionStructure.PendingPreKey()}
+    get {_storage._pendingPreKey ?? SessionRecordProtos_SessionStructure.PendingPreKey()}
     set {_uniqueStorage()._pendingPreKey = newValue}
   }
   /// Returns true if `pendingPreKey` has been explicitly set.
-  var hasPendingPreKey: Bool {return _storage._pendingPreKey != nil}
+  var hasPendingPreKey: Bool {_storage._pendingPreKey != nil}
   /// Clears the value of `pendingPreKey`. Subsequent reads from it will return its default value.
   mutating func clearPendingPreKey() {_uniqueStorage()._pendingPreKey = nil}
 
   var remoteRegistrationID: UInt32 {
-    get {return _storage._remoteRegistrationID ?? 0}
+    get {_storage._remoteRegistrationID ?? 0}
     set {_uniqueStorage()._remoteRegistrationID = newValue}
   }
   /// Returns true if `remoteRegistrationID` has been explicitly set.
-  var hasRemoteRegistrationID: Bool {return _storage._remoteRegistrationID != nil}
+  var hasRemoteRegistrationID: Bool {_storage._remoteRegistrationID != nil}
   /// Clears the value of `remoteRegistrationID`. Subsequent reads from it will return its default value.
   mutating func clearRemoteRegistrationID() {_uniqueStorage()._remoteRegistrationID = nil}
 
   var localRegistrationID: UInt32 {
-    get {return _storage._localRegistrationID ?? 0}
+    get {_storage._localRegistrationID ?? 0}
     set {_uniqueStorage()._localRegistrationID = newValue}
   }
   /// Returns true if `localRegistrationID` has been explicitly set.
-  var hasLocalRegistrationID: Bool {return _storage._localRegistrationID != nil}
+  var hasLocalRegistrationID: Bool {_storage._localRegistrationID != nil}
   /// Clears the value of `localRegistrationID`. Subsequent reads from it will return its default value.
   mutating func clearLocalRegistrationID() {_uniqueStorage()._localRegistrationID = nil}
 
   var needsRefresh: Bool {
-    get {return _storage._needsRefresh ?? false}
+    get {_storage._needsRefresh ?? false}
     set {_uniqueStorage()._needsRefresh = newValue}
   }
   /// Returns true if `needsRefresh` has been explicitly set.
-  var hasNeedsRefresh: Bool {return _storage._needsRefresh != nil}
+  var hasNeedsRefresh: Bool {_storage._needsRefresh != nil}
   /// Clears the value of `needsRefresh`. Subsequent reads from it will return its default value.
   mutating func clearNeedsRefresh() {_uniqueStorage()._needsRefresh = nil}
 
   var aliceBaseKey: Data {
-    get {return _storage._aliceBaseKey ?? Data()}
+    get {_storage._aliceBaseKey ?? Data()}
     set {_uniqueStorage()._aliceBaseKey = newValue}
   }
   /// Returns true if `aliceBaseKey` has been explicitly set.
-  var hasAliceBaseKey: Bool {return _storage._aliceBaseKey != nil}
+  var hasAliceBaseKey: Bool {_storage._aliceBaseKey != nil}
   /// Clears the value of `aliceBaseKey`. Subsequent reads from it will return its default value.
   mutating func clearAliceBaseKey() {_uniqueStorage()._aliceBaseKey = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  struct Chain: Sendable {
+  nonisolated struct Chain: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var senderRatchetKey: Data {
-      get {return _senderRatchetKey ?? Data()}
+      get {_senderRatchetKey ?? Data()}
       set {_senderRatchetKey = newValue}
     }
     /// Returns true if `senderRatchetKey` has been explicitly set.
-    var hasSenderRatchetKey: Bool {return self._senderRatchetKey != nil}
+    var hasSenderRatchetKey: Bool {self._senderRatchetKey != nil}
     /// Clears the value of `senderRatchetKey`. Subsequent reads from it will return its default value.
     mutating func clearSenderRatchetKey() {self._senderRatchetKey = nil}
 
     var senderRatchetKeyPrivate: Data {
-      get {return _senderRatchetKeyPrivate ?? Data()}
+      get {_senderRatchetKeyPrivate ?? Data()}
       set {_senderRatchetKeyPrivate = newValue}
     }
     /// Returns true if `senderRatchetKeyPrivate` has been explicitly set.
-    var hasSenderRatchetKeyPrivate: Bool {return self._senderRatchetKeyPrivate != nil}
+    var hasSenderRatchetKeyPrivate: Bool {self._senderRatchetKeyPrivate != nil}
     /// Clears the value of `senderRatchetKeyPrivate`. Subsequent reads from it will return its default value.
     mutating func clearSenderRatchetKeyPrivate() {self._senderRatchetKeyPrivate = nil}
 
     var chainKey: SessionRecordProtos_SessionStructure.Chain.ChainKey {
-      get {return _chainKey ?? SessionRecordProtos_SessionStructure.Chain.ChainKey()}
+      get {_chainKey ?? SessionRecordProtos_SessionStructure.Chain.ChainKey()}
       set {_chainKey = newValue}
     }
     /// Returns true if `chainKey` has been explicitly set.
-    var hasChainKey: Bool {return self._chainKey != nil}
+    var hasChainKey: Bool {self._chainKey != nil}
     /// Clears the value of `chainKey`. Subsequent reads from it will return its default value.
     mutating func clearChainKey() {self._chainKey = nil}
 
@@ -178,26 +177,26 @@ struct SessionRecordProtos_SessionStructure: @unchecked Sendable {
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    struct ChainKey: Sendable {
+    nonisolated struct ChainKey: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var index: UInt32 {
-        get {return _index ?? 0}
+        get {_index ?? 0}
         set {_index = newValue}
       }
       /// Returns true if `index` has been explicitly set.
-      var hasIndex: Bool {return self._index != nil}
+      var hasIndex: Bool {self._index != nil}
       /// Clears the value of `index`. Subsequent reads from it will return its default value.
       mutating func clearIndex() {self._index = nil}
 
       var key: Data {
-        get {return _key ?? Data()}
+        get {_key ?? Data()}
         set {_key = newValue}
       }
       /// Returns true if `key` has been explicitly set.
-      var hasKey: Bool {return self._key != nil}
+      var hasKey: Bool {self._key != nil}
       /// Clears the value of `key`. Subsequent reads from it will return its default value.
       mutating func clearKey() {self._key = nil}
 
@@ -209,44 +208,44 @@ struct SessionRecordProtos_SessionStructure: @unchecked Sendable {
       fileprivate var _key: Data? = nil
     }
 
-    struct MessageKey: Sendable {
+    nonisolated struct MessageKey: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var index: UInt32 {
-        get {return _index ?? 0}
+        get {_index ?? 0}
         set {_index = newValue}
       }
       /// Returns true if `index` has been explicitly set.
-      var hasIndex: Bool {return self._index != nil}
+      var hasIndex: Bool {self._index != nil}
       /// Clears the value of `index`. Subsequent reads from it will return its default value.
       mutating func clearIndex() {self._index = nil}
 
       var cipherKey: Data {
-        get {return _cipherKey ?? Data()}
+        get {_cipherKey ?? Data()}
         set {_cipherKey = newValue}
       }
       /// Returns true if `cipherKey` has been explicitly set.
-      var hasCipherKey: Bool {return self._cipherKey != nil}
+      var hasCipherKey: Bool {self._cipherKey != nil}
       /// Clears the value of `cipherKey`. Subsequent reads from it will return its default value.
       mutating func clearCipherKey() {self._cipherKey = nil}
 
       var macKey: Data {
-        get {return _macKey ?? Data()}
+        get {_macKey ?? Data()}
         set {_macKey = newValue}
       }
       /// Returns true if `macKey` has been explicitly set.
-      var hasMacKey: Bool {return self._macKey != nil}
+      var hasMacKey: Bool {self._macKey != nil}
       /// Clears the value of `macKey`. Subsequent reads from it will return its default value.
       mutating func clearMacKey() {self._macKey = nil}
 
       var iv: Data {
-        get {return _iv ?? Data()}
+        get {_iv ?? Data()}
         set {_iv = newValue}
       }
       /// Returns true if `iv` has been explicitly set.
-      var hasIv: Bool {return self._iv != nil}
+      var hasIv: Bool {self._iv != nil}
       /// Clears the value of `iv`. Subsequent reads from it will return its default value.
       mutating func clearIv() {self._iv = nil}
 
@@ -267,35 +266,35 @@ struct SessionRecordProtos_SessionStructure: @unchecked Sendable {
     fileprivate var _chainKey: SessionRecordProtos_SessionStructure.Chain.ChainKey? = nil
   }
 
-  struct PendingPreKey: Sendable {
+  nonisolated struct PendingPreKey: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var preKeyID: UInt32 {
-      get {return _preKeyID ?? 0}
+      get {_preKeyID ?? 0}
       set {_preKeyID = newValue}
     }
     /// Returns true if `preKeyID` has been explicitly set.
-    var hasPreKeyID: Bool {return self._preKeyID != nil}
+    var hasPreKeyID: Bool {self._preKeyID != nil}
     /// Clears the value of `preKeyID`. Subsequent reads from it will return its default value.
     mutating func clearPreKeyID() {self._preKeyID = nil}
 
     var signedPreKeyID: Int32 {
-      get {return _signedPreKeyID ?? 0}
+      get {_signedPreKeyID ?? 0}
       set {_signedPreKeyID = newValue}
     }
     /// Returns true if `signedPreKeyID` has been explicitly set.
-    var hasSignedPreKeyID: Bool {return self._signedPreKeyID != nil}
+    var hasSignedPreKeyID: Bool {self._signedPreKeyID != nil}
     /// Clears the value of `signedPreKeyID`. Subsequent reads from it will return its default value.
     mutating func clearSignedPreKeyID() {self._signedPreKeyID = nil}
 
     var baseKey: Data {
-      get {return _baseKey ?? Data()}
+      get {_baseKey ?? Data()}
       set {_baseKey = newValue}
     }
     /// Returns true if `baseKey` has been explicitly set.
-    var hasBaseKey: Bool {return self._baseKey != nil}
+    var hasBaseKey: Bool {self._baseKey != nil}
     /// Clears the value of `baseKey`. Subsequent reads from it will return its default value.
     mutating func clearBaseKey() {self._baseKey = nil}
 
@@ -313,17 +312,17 @@ struct SessionRecordProtos_SessionStructure: @unchecked Sendable {
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
-struct SessionRecordProtos_RecordStructure: Sendable {
+nonisolated struct SessionRecordProtos_RecordStructure: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var currentSession: SessionRecordProtos_SessionStructure {
-    get {return _currentSession ?? SessionRecordProtos_SessionStructure()}
+    get {_currentSession ?? SessionRecordProtos_SessionStructure()}
     set {_currentSession = newValue}
   }
   /// Returns true if `currentSession` has been explicitly set.
-  var hasCurrentSession: Bool {return self._currentSession != nil}
+  var hasCurrentSession: Bool {self._currentSession != nil}
   /// Clears the value of `currentSession`. Subsequent reads from it will return its default value.
   mutating func clearCurrentSession() {self._currentSession = nil}
 
@@ -339,9 +338,9 @@ struct SessionRecordProtos_RecordStructure: Sendable {
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
-fileprivate let _protobuf_package = "SessionRecordProtos"
+fileprivate nonisolated let _protobuf_package = "SessionRecordProtos"
 
-extension SessionRecordProtos_SessionStructure: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SessionRecordProtos_SessionStructure: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".SessionStructure"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}sessionVersion\0\u{1}localIdentityPublic\0\u{1}remoteIdentityPublic\0\u{1}rootKey\0\u{1}previousCounter\0\u{1}senderChain\0\u{1}receiverChains\0\u{2}\u{2}pendingPreKey\0\u{1}remoteRegistrationId\0\u{1}localRegistrationId\0\u{1}needsRefresh\0\u{1}aliceBaseKey\0")
 
@@ -488,7 +487,7 @@ extension SessionRecordProtos_SessionStructure: SwiftProtobuf.Message, SwiftProt
   }
 }
 
-extension SessionRecordProtos_SessionStructure.Chain: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SessionRecordProtos_SessionStructure.Chain: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SessionRecordProtos_SessionStructure.protoMessageName + ".Chain"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}senderRatchetKey\0\u{1}senderRatchetKeyPrivate\0\u{1}chainKey\0\u{1}messageKeys\0")
 
@@ -537,7 +536,7 @@ extension SessionRecordProtos_SessionStructure.Chain: SwiftProtobuf.Message, Swi
   }
 }
 
-extension SessionRecordProtos_SessionStructure.Chain.ChainKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SessionRecordProtos_SessionStructure.Chain.ChainKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SessionRecordProtos_SessionStructure.Chain.protoMessageName + ".ChainKey"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}index\0\u{1}key\0")
 
@@ -576,7 +575,7 @@ extension SessionRecordProtos_SessionStructure.Chain.ChainKey: SwiftProtobuf.Mes
   }
 }
 
-extension SessionRecordProtos_SessionStructure.Chain.MessageKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SessionRecordProtos_SessionStructure.Chain.MessageKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SessionRecordProtos_SessionStructure.Chain.protoMessageName + ".MessageKey"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}index\0\u{1}cipherKey\0\u{1}macKey\0\u{1}iv\0")
 
@@ -625,7 +624,7 @@ extension SessionRecordProtos_SessionStructure.Chain.MessageKey: SwiftProtobuf.M
   }
 }
 
-extension SessionRecordProtos_SessionStructure.PendingPreKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SessionRecordProtos_SessionStructure.PendingPreKey: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = SessionRecordProtos_SessionStructure.protoMessageName + ".PendingPreKey"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}preKeyId\0\u{1}baseKey\0\u{1}signedPreKeyId\0")
 
@@ -669,7 +668,7 @@ extension SessionRecordProtos_SessionStructure.PendingPreKey: SwiftProtobuf.Mess
   }
 }
 
-extension SessionRecordProtos_RecordStructure: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension SessionRecordProtos_RecordStructure: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".RecordStructure"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}currentSession\0\u{1}previousSessions\0")
 

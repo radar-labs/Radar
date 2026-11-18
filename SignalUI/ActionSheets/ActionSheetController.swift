@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import BonMot
+import BonMot
 import SafariServices
 import SignalServiceKit
 
@@ -23,13 +23,13 @@ private final class OnDismissHandler: SheetDismissalDelegate {
     }
 }
 
-@objc
 open class ActionSheetController: OWSViewController {
     private enum Message {
         case text(String)
         case attributedText(NSAttributedString)
     }
 
+    private let backgroundView = ActionSheetController.createBackgroundView()
     private let contentView = UIView()
     private let stackView = UIStackView()
     private let scrollView = UIScrollView()
@@ -70,7 +70,7 @@ open class ActionSheetController: OWSViewController {
         }
     }
 
-    private(set) public var actions = [ActionSheetAction]() {
+    public private(set) var actions = [ActionSheetAction]() {
         didSet {
             isCancelable = firstCancelAction != nil
         }
@@ -88,9 +88,37 @@ open class ActionSheetController: OWSViewController {
     public var customHeader: UIView? {
         didSet {
             oldValue?.removeFromSuperview()
-            guard let customHeader = customHeader else { return }
-            stackView.insertArrangedSubview(customHeader, at: 0)
+            guard let customHeader else { return }
+            stackView.insertArrangedSubview(customHeader, at: headerInsertIndex)
         }
+    }
+
+    /// Keep a reference in case we need to remove/replace it.
+    private var defaultHeader: UIView?
+
+    private var imageHeaderView: UIImageView?
+
+    // If there's an image, insert the header below that.
+    private var headerInsertIndex: Int {
+        imageHeaderView != nil ? 1 : 0
+    }
+
+    public func setTitle(_ title: String? = nil, message: String? = nil) {
+        createHeader(title: title, message: { if let message { .text(message) } else { nil } }())
+    }
+
+    public func setTitle(_ title: String? = nil, message: NSAttributedString) {
+        createHeader(title: title, message: .attributedText(message))
+    }
+
+    public func setImage(_ image: UIImage) {
+        imageHeaderView?.removeFromSuperview()
+        let imageView = UIImageView(image: image)
+        imageView.contentMode = .center
+        imageView.setCompressionResistanceVerticalHigh()
+        stackView.insertArrangedSubview(imageView, at: 0)
+        stackView.setCustomSpacing(16, after: imageView)
+        self.imageHeaderView = imageView
     }
 
     public var isCancelable = false
@@ -101,13 +129,7 @@ open class ActionSheetController: OWSViewController {
         return stackView.height + view.safeAreaInsets.bottom
     }
 
-    public static var messageLabelFont: UIFont { .dynamicTypeSubheadlineClamped }
-
-    public static var messageBaseStyle: BonMot.StringStyle {
-        return BonMot.StringStyle(.font(messageLabelFont), .alignment(.center))
-    }
-
-    public override init() {
+    override public init() {
         super.init()
         modalPresentationStyle = .custom
         transitioningDelegate = self
@@ -115,41 +137,41 @@ open class ActionSheetController: OWSViewController {
 
     public convenience init(title: String? = nil, message: String? = nil) {
         self.init()
-        createHeader(title: title, message: {
-            guard let message else { return nil }
-            return .text(message)
-        }())
+        setTitle(title, message: message)
     }
 
-    public convenience init(
-        title: String? = nil,
-        message: NSAttributedString,
-    ) {
+    public convenience init(title: String? = nil, message: NSAttributedString, image: UIImage? = nil) {
         self.init()
-        createHeader(title: title, message: .attributedText(message))
+
+        if let image {
+            setImage(image)
+        }
+
+        setTitle(title, message: message)
     }
 
     var firstCancelAction: ActionSheetAction? {
         return actions.first(where: { $0.style == .cancel })
     }
 
-    @objc
     public func addAction(_ action: ActionSheetAction) {
-        if action.style == .cancel && firstCancelAction != nil {
+        if action.style == .cancel, firstCancelAction != nil {
             owsFailDebug("Only one cancel button permitted per action sheet.")
         }
 
         // If we've already added a cancel action, any non-cancel actions should come before it
         // This matches how UIAlertController handles cancel actions.
-        if action.style != .cancel,
-            let firstCancelAction = firstCancelAction,
-            let index = stackView.arrangedSubviews.firstIndex(of: firstCancelAction.button) {
+        if
+            action.style != .cancel,
+            let firstCancelAction,
+            let index = stackView.arrangedSubviews.firstIndex(of: firstCancelAction.button)
+        {
             stackView.insertArrangedSubview(action.button, at: index)
         } else {
             stackView.addArrangedSubview(action.button)
         }
         action.button.releaseAction = { [weak self, weak action] in
-            guard let self = self, let action = action else { return }
+            guard let self, let action else { return }
             self.dismiss(animated: true) { action.handler?(action) }
         }
         actions.append(action)
@@ -157,13 +179,12 @@ open class ActionSheetController: OWSViewController {
 
     // MARK: -
 
-    public override var canBecomeFirstResponder: Bool {
+    override public var canBecomeFirstResponder: Bool {
         return true
     }
 
     private var widthLimitConstraint: NSLayoutConstraint?
     private var pinWidthConstraints: [NSLayoutConstraint]?
-    private var backgroundView: UIView?
 
     let maxPreferredWidth: CGFloat = 414
     /// Add some wiggle room to the max width so the rounded corners don't look
@@ -175,58 +196,44 @@ open class ActionSheetController: OWSViewController {
 
         // Depending on the number of actions, the sheet may need
         // to scroll to allow access to all options.
-        view.addSubview(scrollView)
-        scrollView.clipsToBounds = false
+        view.addSubview(backgroundView)
+        backgroundView.clipsToBounds = true
+
+        backgroundView.contentView.addSubview(scrollView)
+        scrollView.autoPinEdgesToSuperviewEdges()
         scrollView.showsVerticalScrollIndicator = false
 
-        let insetFromScreenEdge: CGFloat = if
-            #available(iOS 26, *),
-            BuildFlags.iOS26SDKIsAvailable
-        {
+        let insetFromScreenEdge: CGFloat = if #available(iOS 26, *) {
             8
         } else {
             0
         }
 
-        widthLimitConstraint = scrollView.autoSetDimension(.width, toSize: maxPreferredWidth)
+        widthLimitConstraint = backgroundView.autoSetDimension(.width, toSize: maxPreferredWidth)
         widthLimitConstraint?.isActive = false
 
-        scrollView.autoPinEdge(toSuperviewEdge: .bottom, withInset: insetFromScreenEdge)
-        pinWidthConstraints = scrollView.autoPinWidthToSuperview(withMargin: insetFromScreenEdge)
-        scrollView.autoHCenterInSuperview()
-
-        scrollView.autoMatch(.height, to: .height, of: view, withOffset: 0, relation: .lessThanOrEqual)
+        backgroundView.autoPinEdge(toSuperviewEdge: .bottom, withInset: insetFromScreenEdge)
+        pinWidthConstraints = backgroundView.autoPinWidthToSuperview(withMargin: insetFromScreenEdge)
+        backgroundView.autoHCenterInSuperview()
 
         let topMargin: CGFloat = 18
+        backgroundView.topAnchor.constraint(
+            greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor,
+            constant: topMargin,
+        ).isActive = true
 
         scrollView.addSubview(contentView)
         contentView.autoPinWidthToSuperview()
-        contentView.autoPinEdge(toSuperviewEdge: .top, withInset: topMargin)
+        contentView.autoPinEdge(toSuperviewEdge: .top)
         contentView.autoPinEdge(toSuperviewEdge: .bottom)
         contentView.autoMatch(.width, to: .width, of: scrollView)
 
         // If possible, the scrollview should be as tall as the content (no scrolling)
         // but if it doesn't fit on screen, it's okay to be greater than the scroll view.
-        contentView.autoMatch(.height, to: .height, of: scrollView, withOffset: -topMargin, relation: .greaterThanOrEqual)
-        NSLayoutConstraint.autoSetPriority(.defaultHigh) {
-            contentView.autoMatch(.height, to: .height, of: scrollView, withOffset: -topMargin)
-        }
-
-        // The backdrop view needs to extend from the top of the scroll view content to the bottom of the scroll view
-        // If the backdrop was not pinned to the scroll view frame, we'd see empty space in the safe area as we bounce
-        //
-        // The backdrop has to be a subview of the scrollview's content because constraints that bridge from the inside
-        // to outside of the scroll view cause the content to be pinned. Views outside the scrollview will not follow
-        // the content offset.
-        //
-        // This means that the backdrop view will extend outside of the bounds of the content view as the user
-        // scrolls the content out of the safe area
-        let backgroundView = createBackgroundView()
-        self.backgroundView = backgroundView
-        contentView.addSubview(backgroundView)
-        backgroundView.autoPinWidthToSuperview()
-        backgroundView.autoPinEdge(.top, to: .top, of: contentView)
-        scrollView.frameLayoutGuide.bottomAnchor.constraint(equalTo: backgroundView.bottomAnchor).isActive = true
+        contentView.autoMatch(.height, to: .height, of: scrollView, withOffset: 0, relation: .greaterThanOrEqual)
+        let contentHeightConstraint = contentView.heightAnchor.constraint(equalTo: scrollView.frameLayoutGuide.heightAnchor)
+        contentHeightConstraint.priority = .defaultLow
+        contentHeightConstraint.isActive = true
 
         contentView.addSubview(stackView)
         stackView.autoPinEdgesToSuperviewEdges()
@@ -236,18 +243,12 @@ open class ActionSheetController: OWSViewController {
         stackView.layoutMargins = .init(margin: 16)
         stackView.insetsLayoutMarginsFromSafeArea = false
 
-        // We can't mask the content view because the backdrop intentionally extends outside of the content
-        // view's bounds. But its two subviews are pinned at same top edge. We can just apply corner
-        // radii to each layer individually to get a similar effect.
-        if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable {
-            // Background container sets corner radius itself
+        if #available(iOS 26, *) {
+            // updateWidthConstraints sets corner radius
         } else {
             let cornerRadius: CGFloat = 24
-            [backgroundView, stackView].forEach { subview in
-                subview.layer.cornerRadius = cornerRadius
-                subview.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-                subview.layer.masksToBounds = true
-            }
+            backgroundView.layer.cornerRadius = cornerRadius
+            backgroundView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         }
 
         // Support tapping the backdrop to cancel the action sheet.
@@ -255,50 +256,38 @@ open class ActionSheetController: OWSViewController {
         view.addGestureRecognizer(tapGestureRecognizer)
     }
 
-    private func createBackgroundView() -> UIView {
-#if compiler(>=6.2)
-        if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable {
+    private static func createBackgroundView() -> UIVisualEffectView {
+        if #available(iOS 26, *) {
             let glassEffect = UIGlassEffect(style: .regular)
-            glassEffect.tintColor = UIColor.Signal.background.withAlphaComponent(2/3)
+            glassEffect.tintColor = UIColor.Signal.background.withAlphaComponent(2 / 3)
             let background = UIVisualEffectView(effect: glassEffect)
             return background
         } else {
             return UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
         }
-#else
-        return UIVisualEffectView(effect: UIBlurEffect(style: .prominent))
-#endif
     }
 
     private func updateWidthConstraints() {
         if view.width > maxPreferredWidth + maxWidthWiggleRoom {
             pinWidthConstraints?.forEach { $0.isActive = false }
             widthLimitConstraint?.isActive = true
-#if compiler(>=6.2)
-            if #available(iOS 26.0, *), BuildFlags.iOS26SDKIsAvailable {
-                backgroundView?.cornerConfiguration = .corners(radius: .fixed(24))
+            if #available(iOS 26.0, *) {
+                backgroundView.cornerConfiguration = .corners(radius: .fixed(24))
             }
-#endif
         } else {
             widthLimitConstraint?.isActive = false
             pinWidthConstraints?.forEach { $0.isActive = true }
-#if compiler(>=6.2)
-            if #available(iOS 26.0, *), BuildFlags.iOS26SDKIsAvailable {
-                let topRadius: CGFloat = if UIDevice.current.hasIPhoneXNotch {
-                    40
-                } else {
-                    20
-                }
-                backgroundView?.cornerConfiguration = .uniformEdges(
+            if #available(iOS 26.0, *) {
+                let topRadius: CGFloat = if view.safeAreaInsets.bottom > 0 { 40 } else { 20 }
+                backgroundView.cornerConfiguration = .uniformEdges(
                     topRadius: .fixed(topRadius),
-                    bottomRadius: .containerConcentric(minimum: 20)
+                    bottomRadius: .containerConcentric(minimum: 20),
                 )
             }
-#endif
         }
     }
 
-    public override func viewDidLayoutSubviews() {
+    override public func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
         updateWidthConstraints()
@@ -318,12 +307,12 @@ open class ActionSheetController: OWSViewController {
         scrollView.contentOffset = CGPoint(x: 0, y: scrollView.contentSize.height - scrollView.height + bottomInset)
     }
 
-    open override func viewSafeAreaInsetsDidChange() {
+    override open func viewSafeAreaInsetsDidChange() {
         stackView.layoutMargins.bottom = max(20, view.safeAreaInsets.bottom)
         super.viewSafeAreaInsetsDidChange()
     }
 
-    open override func viewDidDisappear(_ animated: Bool) {
+    override open func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         dismissalDelegate?.didDismissPresentedSheet()
         onDismissHandler = nil
@@ -339,12 +328,18 @@ open class ActionSheetController: OWSViewController {
         guard !contentView.frame.contains(point) else { return }
 
         dismiss(animated: true) { [firstCancelAction] in
-            guard let firstCancelAction = firstCancelAction else { return }
+            guard let firstCancelAction else { return }
             firstCancelAction.handler?(firstCancelAction)
         }
     }
 
     private func createHeader(title: String? = nil, message: Message? = nil) {
+        if let defaultHeader {
+            stackView.removeArrangedSubview(defaultHeader)
+            defaultHeader.removeFromSuperview()
+            self.defaultHeader = nil
+        }
+
         guard title != nil || message != nil else { return }
 
         let headerStack = UIStackView()
@@ -354,11 +349,12 @@ open class ActionSheetController: OWSViewController {
         headerStack.layoutMargins = UIEdgeInsets(top: 8, leading: 12, bottom: 0, trailing: 12)
         headerStack.spacing = 4
 
-        stackView.addArrangedSubview(headerStack)
+        stackView.insertArrangedSubview(headerStack, at: headerInsertIndex)
         stackView.setCustomSpacing(20, after: headerStack)
+        self.defaultHeader = headerStack
 
         // Title
-        if let title = title {
+        if let title {
             let titleLabel = UILabel()
             titleLabel.textColor = UIColor.Signal.label
             titleLabel.font = .dynamicTypeHeadline.semibold()
@@ -372,7 +368,7 @@ open class ActionSheetController: OWSViewController {
         }
 
         // Message
-        if let message = message {
+        if let message {
             let messageView: UIView = {
                 switch message {
                 case let .text(text):
@@ -419,9 +415,9 @@ public class ActionSheetAction: NSObject {
         fileprivate var textColor: UIColor {
             switch self {
             case .default, .cancel:
-                UIColor.Signal.label
+                .Signal.label
             case .destructive:
-                UIColor.Signal.red
+                .Signal.red
             }
         }
     }
@@ -429,7 +425,7 @@ public class ActionSheetAction: NSObject {
     fileprivate let handler: Handler?
     public typealias Handler = @MainActor (ActionSheetAction) -> Void
 
-    private(set) public lazy var button = Button(action: self)
+    public private(set) lazy var button = Button(action: self)
 
     public init(title: String, style: Style = .default, handler: Handler? = nil) {
         self.title = title
@@ -437,12 +433,10 @@ public class ActionSheetAction: NSObject {
         self.handler = handler
     }
 
-    public static let buttonBackgroundColor = UIColor { traitCollection in
-        switch traitCollection.userInterfaceStyle {
-        case .dark: .black
-        default: .white
-        }
-    }
+    public static let buttonBackgroundColor = UIColor(
+        light: .white,
+        dark: .black,
+    )
 
     public class Button: UIButton {
         let style: Style
@@ -461,16 +455,17 @@ public class ActionSheetAction: NSObject {
             config.contentInsets = .init(margin: 14)
             self.configuration = config
 
-            addTarget(self, action: #selector(didTouchUpInside), for: .touchUpInside)
+            addAction(
+                UIAction { [weak self] _ in
+                    guard let buttonAction = self?.releaseAction else { return }
+                    buttonAction()
+                },
+                for: .primaryActionTriggered,
+            )
         }
 
         required init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
-        }
-
-        @objc
-        private func didTouchUpInside() {
-            releaseAction?()
         }
     }
 }
@@ -481,21 +476,28 @@ extension ActionSheetAction {
     public static var acknowledge: ActionSheetAction {
         ActionSheetAction(
             title: CommonStrings.acknowledgeButton,
-            style: .default
+            style: .default,
+        )
+    }
+
+    public static var ok: ActionSheetAction {
+        ActionSheetAction(
+            title: CommonStrings.okButton,
+            style: .default,
         )
     }
 
     public static var okay: ActionSheetAction {
         ActionSheetAction(
             title: CommonStrings.okayButton,
-            style: .default
+            style: .default,
         )
     }
 
     public static var cancel: ActionSheetAction {
         ActionSheetAction(
             title: CommonStrings.cancelButton,
-            style: .cancel
+            style: .cancel,
         )
     }
 }
@@ -511,7 +513,7 @@ private class ActionSheetPresentationController: UIPresentationController {
     }
 
     override func presentationTransitionWillBegin() {
-        guard let containerView = containerView, let presentedVC = presentedViewController as? ActionSheetController else { return }
+        guard let containerView, let presentedVC = presentedViewController as? ActionSheetController else { return }
         backdropView.alpha = 0
         containerView.addSubview(backdropView)
         backdropView.autoPinEdgesToSuperviewEdges()
@@ -528,7 +530,7 @@ private class ActionSheetPresentationController: UIPresentationController {
     }
 
     override func dismissalTransitionWillBegin() {
-        guard let containerView = containerView, let presentedVC = presentedViewController as? ActionSheetController else { return }
+        guard let containerView, let presentedVC = presentedViewController as? ActionSheetController else { return }
 
         var endFrame = containerView.frame
         endFrame.origin.y = presentedVC.height
@@ -544,7 +546,7 @@ private class ActionSheetPresentationController: UIPresentationController {
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        guard let presentedView = presentedView else { return }
+        guard let presentedView else { return }
         coordinator.animate(alongsideTransition: { _ in
             presentedView.frame = self.frameOfPresentedViewInContainerView
             presentedView.layoutIfNeeded()
@@ -563,7 +565,7 @@ extension ActionSheetController: UITextViewDelegate {
         _ textView: UITextView,
         shouldInteractWith url: URL,
         in characterRange: NSRange,
-        interaction: UITextItemInteraction
+        interaction: UITextItemInteraction,
     ) -> Bool {
         // Because of our modal presentation style, we can't present another controller over this
         // one. We must dismiss it first.
@@ -625,6 +627,17 @@ private func buildPreview(
     buildPreview(
         title: "Action Sheet Title",
         message: "This is an action sheet message.",
+        cancelButton: "Cancel",
+        destructiveButton: "Delete",
+        customButtons: ["Action1", "Action2"],
+    )
+}
+
+@available(iOS 17.0, *)
+#Preview("Super Long Title") {
+    buildPreview(
+        title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam pretium, arcu id dignissim iaculis, nulla ipsum pulvinar est, sed convallis tellus neque sit amet diam. Nunc sit amet ipsum vitae purus finibus varius. In ligula turpis, semper vitae faucibus eu, dapibus et nunc. Nam nec laoreet nunc. Nam et pulvinar mauris, vitae pulvinar ligula. In sapien dui, auctor commodo quam eu, luctus feugiat mauris. In gravida porttitor eros, nec elementum diam facilisis nec. Ut finibus erat at fermentum consectetur. Maecenas vitae consectetur sem. Proin dignissim enim molestie dignissim tincidunt. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse tempor aliquam tortor eu dictum. Sed laoreet felis elit, ut bibendum ex feugiat eu. Morbi pulvinar maximus dolor, et aliquet ex fringilla sed. Nunc id tempor massa, at luctus nisi. Aenean pellentesque mattis finibus. Pellentesque tempor, quam ut ornare dignissim, purus ante cursus lorem, et convallis erat nunc vitae ligula. Nullam in laoreet nulla, id sagittis ipsum. Nam non purus lorem. Maecenas a aliquet tortor, ut pulvinar lorem. Praesent ex nisi, blandit sed metus quis, malesuada porta quam. Morbi in ligula scelerisque, volutpat lorem sit amet, mollis ex. Pellentesque facilisis venenatis metus. Ut ac porttitor neque. Fusce convallis dolor tortor, sit amet interdum urna suscipit et. Vivamus quis viverra velit, sed aliquam ex. Nam ligula ligula, ultrices at vehicula aliquet, aliquam sed orci. Morbi tortor elit, suscipit vel cursus at, accumsan nec leo. Quisque aliquet risus vitae massa suscipit, sit amet elementum lacus convallis. Nulla facilisi. Integer tempus tellus tellus, eu faucibus augue maximus facilisis. Quisque feugiat convallis magna, quis ornare orci efficitur quis. Suspendisse ac hendrerit tortor, sed rutrum massa. Quisque vehicula odio sed ultrices pharetra. Fusce ornare consectetur eros, non fermentum turpis consequat egestas. Integer tempus ac nulla at mattis. Praesent et iaculis eros. Duis vel ex non odio rhoncus dictum. Vestibulum dapibus lacus ac ipsum tempor bibendum. Integer at interdum libero. Curabitur non lacus tincidunt, semper leo vel, hendrerit ex. Curabitur vitae finibus mauris. Vestibulum auctor urna in consectetur lacinia. Nunc vehicula leo vitae magna auctor posuere. Mauris suscipit mauris nec tincidunt elementum. Nullam tincidunt sit amet ipsum quis porta. Aliquam laoreet felis ac porttitor lacinia. Sed et diam quis eros iaculis bibendum ut nec velit. Cras quis semper augue. Nullam in auctor sem, at efficitur turpis. Maecenas ornare felis ut cursus interdum. Curabitur sed congue velit, vitae condimentum mi. ",
+        message: nil,
         cancelButton: "Cancel",
         destructiveButton: "Delete",
         customButtons: ["Action1", "Action2"],

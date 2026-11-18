@@ -6,10 +6,122 @@
 import Foundation
 import LibSignalClient
 
-extension OWSOutgoingReactionMessage {
-    @objc
-    func buildDataMessageReactionProto(tx: DBReadTransaction) -> SSKProtoDataMessageReaction? {
-        guard let message = TSMessage.anyFetchMessage(uniqueId: messageUniqueId, transaction: tx) else {
+@objc(OWSOutgoingReactionMessage)
+final class OutgoingReactionMessage: TransientOutgoingMessage {
+
+    let messageUniqueId: String
+    let emoji: String
+    let isRemoving: Bool
+    let createdReaction: OWSReaction?
+    let previousReaction: OWSReaction?
+
+    init(
+        timestamp: UInt64,
+        emoji: String,
+        isRemoving: Bool,
+        inThread thread: TSThread,
+        onMessage message: TSMessage,
+        newReaction: OWSReaction?,
+        oldReaction: OWSReaction?,
+        expiresInSeconds: UInt32,
+        expireTimerVersion: UInt32,
+        tx: DBReadTransaction,
+    ) {
+        owsAssertDebug(thread.uniqueId == message.uniqueThreadId)
+        owsAssertDebug(emoji.isSingleEmoji)
+
+        self.messageUniqueId = message.uniqueId
+        self.emoji = emoji
+        self.isRemoving = isRemoving
+        self.createdReaction = newReaction
+        self.previousReaction = oldReaction
+
+        let messageBuilder = TSOutgoingMessageBuilder.outgoingMessageBuilder(thread: thread)
+        messageBuilder.timestamp = timestamp
+        messageBuilder.expiresInSeconds = expiresInSeconds
+        messageBuilder.expireTimerVersion = NSNumber(value: expireTimerVersion)
+        super.init(
+            outgoingMessageWith: messageBuilder,
+            additionalRecipients: [],
+            explicitRecipients: [],
+            skippedRecipients: [],
+            transaction: tx,
+        )
+    }
+
+    override class var supportsSecureCoding: Bool { true }
+
+    override func encode(with coder: NSCoder) {
+        super.encode(with: coder)
+        if let createdReaction {
+            coder.encode(createdReaction, forKey: "createdReaction")
+        }
+        coder.encode(self.emoji, forKey: "emoji")
+        coder.encode(NSNumber(value: self.isRemoving), forKey: "isRemoving")
+        coder.encode(self.messageUniqueId, forKey: "messageUniqueId")
+        if let previousReaction {
+            coder.encode(previousReaction, forKey: "previousReaction")
+        }
+    }
+
+    required init?(coder: NSCoder) {
+        self.createdReaction = coder.decodeObject(of: OWSReaction.self, forKey: "createdReaction")
+        guard let emoji = coder.decodeObject(of: NSString.self, forKey: "emoji") as String? else {
+            return nil
+        }
+        self.emoji = emoji
+        guard let isRemoving = coder.decodeObject(of: NSNumber.self, forKey: "isRemoving") else {
+            return nil
+        }
+        self.isRemoving = isRemoving.boolValue
+        guard let messageUniqueId = coder.decodeObject(of: NSString.self, forKey: "messageUniqueId") as String? else {
+            return nil
+        }
+        self.messageUniqueId = messageUniqueId
+        self.previousReaction = coder.decodeObject(of: OWSReaction.self, forKey: "previousReaction")
+        super.init(coder: coder)
+    }
+
+    override var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(super.hash)
+        hasher.combine(self.createdReaction)
+        hasher.combine(self.emoji)
+        hasher.combine(self.isRemoving)
+        hasher.combine(self.messageUniqueId)
+        hasher.combine(self.previousReaction)
+        return hasher.finalize()
+    }
+
+    override func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard super.isEqual(object) else { return false }
+        guard self.createdReaction == object.createdReaction else { return false }
+        guard self.emoji == object.emoji else { return false }
+        guard self.isRemoving == object.isRemoving else { return false }
+        guard self.messageUniqueId == object.messageUniqueId else { return false }
+        guard self.previousReaction == object.previousReaction else { return false }
+        return true
+    }
+
+    override func dataMessageBuilder(with thread: TSThread, transaction tx: DBReadTransaction) -> SSKProtoDataMessageBuilder? {
+        guard let reactionProto = self.buildDataMessageReactionProto(tx: tx) else {
+            return nil
+        }
+
+        let builder = super.dataMessageBuilder(with: thread, transaction: tx)
+        builder?.setTimestamp(self.timestamp)
+        builder?.setReaction(reactionProto)
+        builder?.setRequiredProtocolVersion(UInt32(SSKProtoDataMessageProtocolVersion.reactions.rawValue))
+        return builder
+    }
+
+    override var relatedUniqueIds: Set<String> {
+        return super.relatedUniqueIds.union([self.messageUniqueId])
+    }
+
+    private func buildDataMessageReactionProto(tx: DBReadTransaction) -> SSKProtoDataMessageReaction? {
+        guard let message = TSMessage.fetchMessageViaCache(uniqueId: messageUniqueId, transaction: tx) else {
             owsFailDebug("Missing message for reaction.")
             return nil
         }
@@ -30,12 +142,7 @@ extension OWSOutgoingReactionMessage {
             owsFailDebug("Missing author for reaction.")
             return nil
         }
-        if BuildFlags.serviceIdStrings {
-            reactionBuilder.setTargetAuthorAci(messageAuthor.serviceIdString)
-        }
-        if BuildFlags.serviceIdBinaryConstantOverhead {
-            reactionBuilder.setTargetAuthorAciBinary(messageAuthor.serviceIdBinary)
-        }
+        reactionBuilder.setTargetAuthorAciBinary(messageAuthor.serviceIdBinary)
 
         do {
             return try reactionBuilder.build()
@@ -45,9 +152,9 @@ extension OWSOutgoingReactionMessage {
         }
     }
 
-    public override func updateWithAllSendingRecipientsMarkedAsFailed(
+    override func updateWithAllSendingRecipientsMarkedAsFailed(
         error: (any Error)? = nil,
-        transaction tx: DBWriteTransaction
+        transaction tx: DBWriteTransaction,
     ) {
         super.updateWithAllSendingRecipientsMarkedAsFailed(error: error, transaction: tx)
 
@@ -66,7 +173,7 @@ extension OWSOutgoingReactionMessage {
             owsFailDebug("Missing localAci.")
             return
         }
-        guard let message = TSMessage.anyFetchMessage(uniqueId: messageUniqueId, transaction: tx) else {
+        guard let message = TSMessage.fetchMessageViaCache(uniqueId: messageUniqueId, transaction: tx) else {
             owsFailDebug("Missing message.")
             return
         }
@@ -85,8 +192,7 @@ extension OWSOutgoingReactionMessage {
                 for: localAci,
                 emoji: previousReaction.emoji,
                 sentAtTimestamp: previousReaction.sentAtTimestamp,
-                sortOrder: previousReaction.sortOrder,
-                tx: tx
+                tx: tx,
             )
         } else {
             message.removeReaction(for: localAci, tx: tx)

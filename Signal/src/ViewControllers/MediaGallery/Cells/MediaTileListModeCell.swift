@@ -19,22 +19,17 @@ class MediaTileListModeCell: UICollectionViewCell, MediaGalleryCollectionViewCel
     private var constraintWithoutSelectionButton: NSLayoutConstraint!
 
     var item: MediaGalleryCellItem?
+    var downloadTask: Task<Void, Never>?
 
     /// Since UICollectionView doesn't support separators, we have to do it ourselves. Show the
     /// separator at the bottom of each item except when last in a section.
     let separator: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(dynamicProvider: { _ in Theme.tableView2SeparatorColor })
-        view.autoSetDimension(.height, toSize: .hairlineWidth)
+        view.backgroundColor = .Signal.opaqueSeparator
         return view
     }()
 
-    let selectionButton: SelectionButton = {
-        let button = SelectionButton()
-        button.outlineColor = UIColor(dynamicProvider: { _ in Theme.isDarkThemeEnabled ? .ows_gray25 : .ows_gray22 })
-        button.hidesOutlineWhenSelected = true
-        return button
-    }()
+    let selectionButton = SelectionIndicatorView()
 
     private let selectedMaskView = UIView()
 
@@ -48,6 +43,9 @@ class MediaTileListModeCell: UICollectionViewCell, MediaGalleryCollectionViewCel
         contentView.addSubview(selectedMaskView)
         contentView.addSubview(selectionButton)
         contentView.addSubview(separator)
+        separator.autoSetDimension(.height, toSize: hairlineWidth)
+
+        selectionButton.translatesAutoresizingMaskIntoConstraints = false
     }
 
     required init?(coder: NSCoder) {
@@ -68,20 +66,17 @@ class MediaTileListModeCell: UICollectionViewCell, MediaGalleryCollectionViewCel
 
             selectionButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             selectionButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            selectionButton.widthAnchor.constraint(equalToConstant: 24),
-            selectionButton.heightAnchor.constraint(equalToConstant: 24),
 
             separator.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            separator.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+            separator.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
         ])
         selectedMaskView.autoPinEdgesToSuperviewEdges()
     }
 
-    override public func prepareForReuse() {
+    override func prepareForReuse() {
         super.prepareForReuse()
 
         selectedMaskView.isHidden = true
-        selectionButton.reset()
     }
 
     var cellsAbut: Bool { true }
@@ -120,7 +115,7 @@ class MediaTileListModeCell: UICollectionViewCell, MediaGalleryCollectionViewCel
         updateSelectionState(animated: animated)
     }
 
-    override public var isSelected: Bool {
+    override var isSelected: Bool {
         didSet {
             updateSelectionState(animated: false)
         }
@@ -129,9 +124,7 @@ class MediaTileListModeCell: UICollectionViewCell, MediaGalleryCollectionViewCel
     private func updateSelectionState(animated: Bool) {
         selectedMaskView.isHidden = !isSelected
         selectionButton.isSelected = isSelected
-        if !allowsMultipleSelection {
-            selectionButton.allowsMultipleSelection = false
-        }
+
         if animated {
             UIView.animate(withDuration: 0.2) {
                 self.updateLayoutForSelectionStateChange()
@@ -158,9 +151,7 @@ class MediaTileListModeCell: UICollectionViewCell, MediaGalleryCollectionViewCel
     }
 
     private func didUpdateLayoutForSelectionStateChange() {
-        if allowsMultipleSelection {
-            selectionButton.allowsMultipleSelection = true
-        }
+        selectionButton.isHidden = !allowsMultipleSelection
     }
 
     func makePlaceholder() {
@@ -173,5 +164,22 @@ class MediaTileListModeCell: UICollectionViewCell, MediaGalleryCollectionViewCel
 
     func mediaPresentationContext(collectionView: UICollectionView, in coordinateSpace: UICoordinateSpace) -> MediaPresentationContext? {
         return nil
+    }
+
+    func downloadItemIfNeeded() {
+        guard
+            let item,
+            downloadTask == nil
+        else {
+            return
+        }
+        downloadTask = MediaGallery.createGalleryItemDownloadTask(
+            item: item,
+            priority: .userInitiated,
+        )
+        Task {
+            await downloadTask?.value
+            downloadTask = nil
+        }
     }
 }

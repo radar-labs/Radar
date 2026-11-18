@@ -71,7 +71,7 @@ public class StoryFinder {
             ORDER BY \(StoryMessage.columnName(.timestamp)) DESC
         """
 
-        if let limit = limit {
+        if let limit {
             sql += " LIMIT \(limit)"
         }
 
@@ -83,7 +83,7 @@ public class StoryFinder {
         }
     }
 
-    public static func enumerateOutgoingStories(transaction: DBReadTransaction, block: @escaping (StoryMessage, UnsafeMutablePointer<ObjCBool>) -> Void) {
+    public static func enumerateOutgoingStories(transaction: DBReadTransaction, block: (StoryMessage, inout Bool) -> Void) {
         let sql = """
             SELECT *
             FROM \(StoryMessage.databaseTableName)
@@ -94,9 +94,9 @@ public class StoryFinder {
         do {
             let cursor = try StoryMessage.fetchCursor(transaction.database, sql: sql)
             while let message = try cursor.next() {
-                var stop: ObjCBool = false
+                var stop = false
                 block(message, &stop)
-                if stop.boolValue {
+                if stop {
                     return
                 }
             }
@@ -107,7 +107,7 @@ public class StoryFinder {
 
     public static func enumerateUnreadIncomingStories(
         transaction: DBReadTransaction,
-        block: @escaping (StoryMessage, UnsafeMutablePointer<ObjCBool>) -> Void
+        block: (StoryMessage, inout Bool) -> Void,
     ) {
         let sql = """
             SELECT *
@@ -119,9 +119,9 @@ public class StoryFinder {
         do {
             let cursor = try StoryMessage.fetchCursor(transaction.database, sql: sql)
             while let message = try cursor.next() {
-                var stop: ObjCBool = false
+                var stop = false
                 block(message, &stop)
-                if stop.boolValue {
+                if stop {
                     return
                 }
             }
@@ -190,7 +190,7 @@ public class StoryFinder {
         }
     }
 
-    public static func enumerateStoriesForContext(_ context: StoryContext, transaction: DBReadTransaction, block: (StoryMessage, UnsafeMutablePointer<ObjCBool>) -> Void) {
+    public static func enumerateStoriesForContext(_ context: StoryContext, transaction: DBReadTransaction, block: (StoryMessage, inout Bool) -> Void) {
 
         guard let contextQuery = context.query else { return }
 
@@ -204,9 +204,9 @@ public class StoryFinder {
         do {
             let cursor = try StoryMessage.fetchCursor(transaction.database, sql: sql)
             while let message = try cursor.next() {
-                var stop: ObjCBool = false
+                var stop = false
                 block(message, &stop)
-                if stop.boolValue {
+                if stop {
                     return
                 }
             }
@@ -218,7 +218,7 @@ public class StoryFinder {
     public static func enumerateStories(
         fromSender senderAci: Aci,
         tx: DBReadTransaction,
-        block: (StoryMessage, UnsafeMutablePointer<ObjCBool>) -> Void
+        block: (StoryMessage, inout Bool) -> Void,
     ) {
         let sql = """
             SELECT *
@@ -229,9 +229,9 @@ public class StoryFinder {
         do {
             let cursor = try StoryMessage.fetchCursor(tx.database, sql: sql, arguments: [senderAci.rawUUID.uuidString])
             while let message = try cursor.next() {
-                var stop: ObjCBool = false
+                var stop = false
                 block(message, &stop)
-                if stop.boolValue {
+                if stop {
                     return
                 }
             }
@@ -240,7 +240,7 @@ public class StoryFinder {
         }
     }
 
-    public static func enumerateUnviewedIncomingStoriesForContext(_ context: StoryContext, transaction: DBReadTransaction, block: @escaping (StoryMessage, UnsafeMutablePointer<ObjCBool>) -> Void) {
+    public static func enumerateUnviewedIncomingStoriesForContext(_ context: StoryContext, transaction: DBReadTransaction, block: (StoryMessage, inout Bool) -> Void) {
 
         guard let contextQuery = context.query else { return }
 
@@ -256,9 +256,9 @@ public class StoryFinder {
         do {
             let cursor = try StoryMessage.fetchCursor(transaction.database, sql: sql)
             while let message = try cursor.next() {
-                var stop: ObjCBool = false
+                var stop = false
                 block(message, &stop)
-                if stop.boolValue {
+                if stop {
                     return
                 }
             }
@@ -267,42 +267,20 @@ public class StoryFinder {
         }
     }
 
-    // The stories should be enumerated in order from "next to expire" to "last to expire".
-    public static func fetchSomeExpiredStories(now: UInt64, limit: Int, tx: DBReadTransaction) throws -> [StoryMessage] {
+    public static func nextExpiringStory(tx: DBReadTransaction) -> StoryMessage? {
         let sql = """
             SELECT *
             FROM \(StoryMessage.databaseTableName)
-            WHERE \(StoryMessage.columnName(.timestamp)) <= ?
-            AND \(StoryMessage.columnName(.authorAci)) != ?
-            ORDER BY \(StoryMessage.columnName(.timestamp)) ASC
-            LIMIT \(limit)
-        """
-        do {
-            return try StoryMessage.fetchAll(tx.database, sql: sql, arguments: [
-                now - StoryManager.storyLifetimeMillis,
-                StoryMessage.systemStoryAuthor.serviceIdUppercaseString
-            ])
-        } catch {
-            throw error.grdbErrorForLogging
-        }
-    }
-
-    public static func oldestExpirableTimestamp(transaction: DBReadTransaction) -> UInt64? {
-        let sql = """
-            SELECT \(StoryMessage.columnName(.timestamp))
-            FROM \(StoryMessage.databaseTableName)
             WHERE \(StoryMessage.columnName(.authorAci)) != ?
             ORDER BY \(StoryMessage.columnName(.timestamp)) ASC
-            LIMIT 1
         """
 
-        do {
-            return try UInt64.fetchOne(transaction.database, sql: sql, arguments: [
-                StoryMessage.systemStoryAuthor.serviceIdUppercaseString
-            ])
-        } catch {
-            owsFailDebug("failed to lookup next story expiration \(error)")
-            return nil
+        return failIfThrows {
+            return try StoryMessage.fetchOne(
+                tx.database,
+                sql: sql,
+                arguments: [StoryMessage.systemStoryAuthor.serviceIdUppercaseString],
+            )
         }
     }
 
@@ -324,7 +302,7 @@ public class StoryFinder {
         }
     }
 
-    public static func enumerateSendingStories(transaction: DBReadTransaction, block: @escaping (StoryMessage, UnsafeMutablePointer<ObjCBool>) -> Void) {
+    public static func enumerateSendingStories(transaction: DBReadTransaction, block: (StoryMessage, inout Bool) -> Void) {
 
         let sql = """
             SELECT *
@@ -341,9 +319,9 @@ public class StoryFinder {
         do {
             let cursor = try StoryMessage.fetchCursor(transaction.database, sql: sql)
             while let message = try cursor.next() {
-                var stop: ObjCBool = false
+                var stop = false
                 block(message, &stop)
-                if stop.boolValue {
+                if stop {
                     return
                 }
             }
@@ -364,14 +342,8 @@ public class StoryFinder {
                 )
             )
         """
-        do {
+        return failIfThrows {
             return try Bool.fetchOne(transaction.database, sql: sql) ?? false
-        } catch {
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(
-                userDefaults: CurrentAppContext().appUserDefaults(),
-                error: error
-            )
-            owsFail("Fetch failed")
         }
     }
 }
@@ -405,7 +377,7 @@ extension StoryFinder {
 
     public static func getAssociatedData(
         forContext source: StoryContextAssociatedData.SourceContext,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> StoryContextAssociatedData? {
         switch source {
         case .contact(let contactAci):
@@ -422,7 +394,7 @@ extension StoryFinder {
 
     public static func getAssociatedData(
         forAci contactAci: Aci,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> StoryContextAssociatedData? {
         return getAssociatedData(forContext: .contact(contactAci: contactAci), transaction: tx)
     }
@@ -440,9 +412,9 @@ extension StoryFinder {
     public static func associatedDatasWithRecentlyViewedStories(limit: Int, transaction: DBReadTransaction) -> [StoryContextAssociatedData] {
         do {
             return try StoryContextAssociatedData
-            .order(Column(StoryContextAssociatedData.columnName(.lastViewedTimestamp)).desc)
-            .limit(limit)
-            .fetchAll(transaction.database)
+                .order(Column(StoryContextAssociatedData.columnName(.lastViewedTimestamp)).desc)
+                .limit(limit)
+                .fetchAll(transaction.database)
         } catch {
             owsFailDebug("Failed to query recent threads \(error)")
             return []

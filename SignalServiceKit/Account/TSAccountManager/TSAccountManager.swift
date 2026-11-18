@@ -49,7 +49,7 @@ public protocol TSAccountManager {
     func setRegistrationId(
         _ newRegistrationId: UInt32,
         for identity: OWSIdentity,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
     func getRegistrationId(for identity: OWSIdentity, tx: DBReadTransaction) -> UInt32?
     func clearRegistrationIds(tx: DBWriteTransaction)
@@ -65,8 +65,13 @@ public protocol TSAccountManager {
     func lastSetIsDiscoverableByPhoneNumber(tx: DBReadTransaction) -> Date
 }
 
-public struct NotRegisteredError: Error, IsRetryableProvider {
-    public let isRetryableProvider: Bool = false
+public struct NotRegisteredError: Error, UserErrorDescriptionProvider {
+    public var localizedDescription: String {
+        return OWSLocalizedString(
+            "NOT_REGISTERED_ERROR_LOCALIZED_DESCRIPTION",
+            comment: "Description for an error indicating you are not registered.",
+        )
+    }
 }
 
 /// It's *possible* (but implausible) that the local user's "device ID"
@@ -111,20 +116,33 @@ public enum LocalDeviceId: CustomStringConvertible {
 }
 
 extension TSAccountManager {
-    public func localIdentifiersWithMaybeSneakyTransaction(authedAccount: AuthedAccount) throws -> LocalIdentifiers {
-        switch authedAccount.info {
+    public func mustBeRegisteredStateWithMaybeSneakyTransaction() -> RegisteredState {
+        return failIfThrows { try registeredStateWithMaybeSneakyTransaction() }
+    }
+
+    public func registeredStateWithMaybeSneakyTransaction() throws(NotRegisteredError) -> RegisteredState {
+        return try self.registrationStateWithMaybeSneakyTransaction.registeredState()
+    }
+
+    public func mustBeRegisteredState(tx: DBReadTransaction) -> RegisteredState {
+        return failIfThrows { try registeredState(tx: tx) }
+    }
+
+    public func registeredState(tx: DBReadTransaction) throws(NotRegisteredError) -> RegisteredState {
+        return try self.registrationState(tx: tx).registeredState()
+    }
+
+    public func localIdentifiersWithMaybeSneakyTransaction(authedAccount: AuthedAccount) throws(NotRegisteredError) -> LocalIdentifiers {
+        switch authedAccount {
         case .explicit(let info):
             return info.localIdentifiers
         case .implicit:
-            guard let localIdentifiers = localIdentifiersWithMaybeSneakyTransaction else {
-                throw OWSAssertionError("Missing localIdentifiers.")
-            }
-            return localIdentifiers
+            return try registeredStateWithMaybeSneakyTransaction().localIdentifiers
         }
     }
 
     public func localIdentifiers(authedAccount: AuthedAccount, tx: DBReadTransaction) throws -> LocalIdentifiers {
-        switch authedAccount.info {
+        switch authedAccount {
         case .explicit(let info):
             return info.localIdentifiers
         case .implicit:
@@ -149,22 +167,16 @@ public protocol LocalIdentifiersSetter {
 
     /// Initialize local identifiers state after registration, linking, reregistration, or relinking.
     func initializeLocalIdentifiers(
-        e164: E164,
-        aci: Aci,
-        pni: Pni,
-        deviceId: DeviceId,
-        serverAuthToken: String,
-        tx: DBWriteTransaction
+        account: AuthedAccount.Explicit,
+        tx: DBWriteTransaction,
     )
 
     /// Change local identifiers after a change number operation.
     /// ACI provided for convenience; it should be unchanged.
     /// Server auth token is also assumed to be unchanged.
     func changeLocalNumber(
-        newE164: E164,
-        aci: Aci,
-        pni: Pni,
-        tx: DBWriteTransaction
+        phoneNumber: LocalIdentifiers.PhoneNumber,
+        tx: DBWriteTransaction,
     )
 
     /// Returns true if successful. Not successful iff the old value is the same as new value (no-op).
@@ -177,11 +189,9 @@ public protocol LocalIdentifiersSetter {
     func setIsDeregisteredOrDelinked(_ isDeregisteredOrDelinked: Bool, tx: DBWriteTransaction) -> Bool
 
     func resetForReregistration(
-        localNumber: E164,
-        localAci: Aci,
-        discoverability: PhoneNumberDiscoverability?,
-        wasPrimaryDevice: Bool,
-        tx: DBWriteTransaction
+        localIdentifiers: ReregisteringLocalIdentifiers,
+        isPrimaryDevice: Bool,
+        tx: DBWriteTransaction,
     )
 
     /// Returns true if value changed, false otherwise.

@@ -9,13 +9,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-void DispatchMainThreadSafeObjc(dispatch_block_t block)
-{
-    OWSCAssertDebug(block);
-
-    [ThreadingObjcBridge dispatchMainThreadSafe:block];
-}
-
 BOOL DispatchQueueIsCurrentQueue(dispatch_queue_t testQueue)
 {
 #pragma clang diagnostic push

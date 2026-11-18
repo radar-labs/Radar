@@ -5,6 +5,8 @@
 
 #if TESTABLE_BUILD
 
+public import LibSignalClient
+
 public class MockLocalUsernameManager: LocalUsernameManager {
     var startingUsernameState: Usernames.LocalUsernameState!
 
@@ -27,11 +29,11 @@ public class MockLocalUsernameManager: LocalUsernameManager {
     public func clearLocalUsername(tx: DBWriteTransaction) { owsFail("Not implemented!") }
     public func usernameLinkQRCodeColor(tx: DBReadTransaction) -> QRCodeColor { owsFail("Not implemented!") }
     public func setUsernameLinkQRCodeColor(color: QRCodeColor, tx: DBWriteTransaction) { owsFail("Not implemented!") }
-    public func reserveUsername(usernameCandidates: Usernames.HashedUsername.GeneratedCandidates) async -> Usernames.RemoteMutationResult<Usernames.ReservationResult> { owsFail("Not implemented!") }
-    public func confirmUsername(reservedUsername: Usernames.HashedUsername) async -> Usernames.RemoteMutationResult<Usernames.ConfirmationResult> { owsFail("Not implemented!") }
-    public func deleteUsername() async -> Usernames.RemoteMutationResult<Void> { owsFail("Not implemented!") }
-    public func rotateUsernameLink() async -> Usernames.RemoteMutationResult<Usernames.UsernameLink> { owsFail("Not implemented!") }
-    public func updateVisibleCaseOfExistingUsername(newUsername: String) async -> Usernames.RemoteMutationResult<Void> { owsFail("Not implemented!") }
+    public func reserveUsername(usernameCandidates: [LibSignalClient.Username]) async throws -> LibSignalClient.Username { owsFail("Not implemented!") }
+    public func confirmUsername(reservedUsername: LibSignalClient.Username) async throws { owsFail("Not implemented!") }
+    public func deleteUsername() async throws { owsFail("Not implemented!") }
+    public func rotateUsernameLink() async throws -> Usernames.UsernameLink { owsFail("Not implemented!") }
+    public func updateVisibleCaseOfExistingUsername(newUsername: LibSignalClient.Username) async throws { owsFail("Not implemented!") }
 }
 
 #endif

@@ -37,6 +37,26 @@
 			<string>%2$d שניות</string>
 		</dict>
 	</dict>
+	<key>ACCESSIBILITY_LABEL_MULTIPLE_ATTACHMENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>פריט מדיה %1$d</string>
+			<key>two</key>
+			<string>%1$d פריטי מדיה</string>
+			<key>many</key>
+			<string>%1$d פריטי מדיה</string>
+			<key>other</key>
+			<string>%1$d פריטי מדיה</string>
+		</dict>
+	</dict>
 	<key>ACCESSIBILITY_LABEL_SHORT_VOICE_MEMO_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -457,6 +477,86 @@
 			<string>טקסט + %1$d ימים של מדיה</string>
 		</dict>
 	</dict>
+	<key>COLLAPSE_SET_CALL_EVENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>שיחה %1$ld</string>
+			<key>two</key>
+			<string>%1$ld שיחות</string>
+			<key>many</key>
+			<string>%1$ld שיחות</string>
+			<key>other</key>
+			<string>%1$ld שיחות</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_CHAT_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>עדכון צ׳אט %1$ld</string>
+			<key>two</key>
+			<string>%1$ld עדכוני צ׳אט</string>
+			<key>many</key>
+			<string>%1$ld עדכוני צ׳אט</string>
+			<key>other</key>
+			<string>%1$ld עדכוני צ׳אט</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_GROUP_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>עדכון קבוצה %1$ld</string>
+			<key>two</key>
+			<string>%1$ld עדכוני קבוצה</string>
+			<key>many</key>
+			<string>%1$ld עדכוני קבוצה</string>
+			<key>other</key>
+			<string>%1$ld עדכוני קבוצה</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_TIMER_CHANGES_WITH_FINAL_TIMER_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>שינוי %1$ld בטיימר של הודעה נעלמת · %2$@</string>
+			<key>two</key>
+			<string>%1$ld שינויים בטיימר של הודעות נעלמות · %2$@</string>
+			<key>many</key>
+			<string>%1$ld שינויים בטיימר של הודעות נעלמות · %2$@</string>
+			<key>other</key>
+			<string>%1$ld שינויים בטיימר של הודעות נעלמות · %2$@</string>
+		</dict>
+	</dict>
 	<key>CONVERSATION_DELETE_CONFIRMATIONS_ALERT_TITLE_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -550,6 +650,26 @@
 			<string>מתוך %2$d התאמות</string>
 			<key>other</key>
 			<string>מתוך %2$d התאמות</string>
+		</dict>
+	</dict>
+	<key>CONVERSATION_SETTINGS_FORMER_MEMBERS_SECTION_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>חבר/ה %1$d לשעבר</string>
+			<key>two</key>
+			<string>%1$d חברים לשעבר</string>
+			<key>many</key>
+			<string>%1$d חברים לשעבר</string>
+			<key>other</key>
+			<string>%1$d חברים לשעבר</string>
 		</dict>
 	</dict>
 	<key>CONVERSATION_SETTINGS_MEMBERS_SECTION_TITLE_%d</key>
@@ -703,13 +823,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>קבוצות Signal מתפקדות בצורה הטובה ביותר עם חבר/ה %1$d. הוספת חברים נוספים תגרום לעיכובים בשליחה ובקבלה של הודעות.</string>
+			<string>קבוצות Radar מתפקדות בצורה הטובה ביותר עם חבר/ה %1$d. הוספת חברים נוספים תגרום לעיכובים בשליחה ובקבלה של הודעות.</string>
 			<key>two</key>
-			<string>קבוצות Signal מתפקדות בצורה הטובה ביותר עם %1$d חברים או פחות. הוספת חברים נוספים תגרום לעיכובים בשליחה ובקבלה של הודעות.</string>
+			<string>קבוצות Radar מתפקדות בצורה הטובה ביותר עם %1$d חברים או פחות. הוספת חברים נוספים תגרום לעיכובים בשליחה ובקבלה של הודעות.</string>
 			<key>many</key>
-			<string>קבוצות Signal מתפקדות בצורה הטובה ביותר עם %1$d חברים או פחות. הוספת חברים נוספים תגרום לעיכובים בשליחה ובקבלה של הודעות.</string>
+			<string>קבוצות Radar מתפקדות בצורה הטובה ביותר עם %1$d חברים או פחות. הוספת חברים נוספים תגרום לעיכובים בשליחה ובקבלה של הודעות.</string>
 			<key>other</key>
-			<string>קבוצות Signal מתפקדות בצורה הטובה ביותר עם %1$d חברים או פחות. הוספת חברים נוספים תגרום לעיכובים בשליחה ובקבלה של הודעות.</string>
+			<string>קבוצות Radar מתפקדות בצורה הטובה ביותר עם %1$d חברים או פחות. הוספת חברים נוספים תגרום לעיכובים בשליחה ובקבלה של הודעות.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -903,13 +1023,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal תתקשר ל%2$@, %3$@, ועוד %1$d</string>
+			<string>Radar תתקשר ל%2$@, %3$@, ועוד %1$d</string>
 			<key>two</key>
-			<string>Signal תתקשר ל%2$@, %3$@, ועוד %1$d</string>
+			<string>Radar תתקשר ל%2$@, %3$@, ועוד %1$d</string>
 			<key>many</key>
-			<string>Signal תתקשר ל%2$@, %3$@, ועוד %1$d</string>
+			<string>Radar תתקשר ל%2$@, %3$@, ועוד %1$d</string>
 			<key>other</key>
-			<string>Signal תתקשר ל%2$@, %3$@, ועוד %1$d</string>
+			<string>Radar תתקשר ל%2$@, %3$@, ועוד %1$d</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1263,13 +1383,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>כדי להשאיר את ״%2$@״ מחובר, צריך לפתוח את Signal במכשיר הזה תוך יום אחד.</string>
+			<string>כדי להשאיר את ״%2$@״ מחובר, צריך לפתוח את Radar במכשיר הזה תוך יום אחד.</string>
 			<key>two</key>
-			<string>כדי להשאיר את ״%2$@״ מחובר, צריך לפתוח את Signal במכשיר הזה תוך יומיים.</string>
+			<string>כדי להשאיר את ״%2$@״ מחובר, צריך לפתוח את Radar במכשיר הזה תוך יומיים.</string>
 			<key>many</key>
-			<string>כדי להשאיר את ״%2$@״ מחובר, צריך לפתוח את Signal במכשיר הזה תוך %1$d ימים.</string>
+			<string>כדי להשאיר את ״%2$@״ מחובר, צריך לפתוח את Radar במכשיר הזה תוך %1$d ימים.</string>
 			<key>other</key>
-			<string>כדי להשאיר את ״%2$@״ מחובר, צריך לפתוח את Signal במכשיר הזה תוך %1$d ימים.</string>
+			<string>כדי להשאיר את ״%2$@״ מחובר, צריך לפתוח את Radar במכשיר הזה תוך %1$d ימים.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1523,13 +1643,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>כל חברי ה–Signal · צופה %1$d</string>
+			<string>כל חברי ה–Radar · צופה %1$d</string>
 			<key>two</key>
-			<string>כל חברי ה–Signal · %1$d צופים</string>
+			<string>כל חברי ה–Radar · %1$d צופים</string>
 			<key>many</key>
-			<string>כל חברי ה–Signal · %1$d צופים</string>
+			<string>כל חברי ה–Radar · %1$d צופים</string>
 			<key>other</key>
-			<string>כל חברי ה–Signal · %1$d צופים</string>
+			<string>כל חברי ה–Radar · %1$d צופים</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1543,13 +1663,13 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>כל חברי ה–Signal · מוסתר מאדם %1$d</string>
+			<string>כל חברי ה–Radar · מוסתר מאדם %1$d</string>
 			<key>two</key>
-			<string>כל חברי ה–Signal · מוסתר מ–%1$d אנשים</string>
+			<string>כל חברי ה–Radar · מוסתר מ–%1$d אנשים</string>
 			<key>many</key>
-			<string>כל חברי ה–Signal · מוסתר מ–%1$d אנשים</string>
+			<string>כל חברי ה–Radar · מוסתר מ–%1$d אנשים</string>
 			<key>other</key>
-			<string>כל חברי ה–Signal · מוסתר מ–%1$d אנשים</string>
+			<string>כל חברי ה–Radar · מוסתר מ–%1$d אנשים</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>
@@ -1732,6 +1852,26 @@
 			<string>לבטל %1$d הזמנות שנשלחו על ידי ”%2$@“?</string>
 		</dict>
 	</dict>
+	<key>PINNED_CONVERSATION_LIMIT</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>אפשר להצמיד רק עד צ׳אט %1$d.</string>
+			<key>two</key>
+			<string>אפשר להצמיד רק עד %1$d צ׳אטים.</string>
+			<key>many</key>
+			<string>אפשר להצמיד רק עד %1$d צ׳אטים.</string>
+			<key>other</key>
+			<string>אפשר להצמיד רק עד %1$d צ׳אטים.</string>
+		</dict>
+	</dict>
 	<key>POLL_VOTE_COUNT</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -1812,10 +1952,10 @@
 			<string>נשארו לך %1$d ניסיונות</string>
 		</dict>
 	</dict>
-	<key>STORIES_SHARESHEET_PARTIAL_SEND_SUBTITLE_%d</key>
+	<key>SETTINGS_CHANGE_PHONE_NUMBER_SPLASH_CANT_CHANGE_BODY</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%1$#@text@</string>
+		<string>%#@text@</string>
 		<key>text</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -1823,13 +1963,41 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>לא ניתן לשלוח את כל הפריטים לסטורי שבחרת כי סוג הקובץ לא נתמך.</string>
+			<string>בגלל שרשמת את החשבון הזה לאחרונה, אי אפשר להחליף מספר טלפון כרגע. זמן המתנה קצר עוזר להגן על החשבון שלך.
+
+יש לנסות שוב בעוד שעה %1$d.</string>
 			<key>two</key>
-			<string>לא ניתן לשלוח את כל הפריטים לסטורי שבחרת כי סוג הקובץ לא נתמך.</string>
+			<string>בגלל שרשמת את החשבון הזה לאחרונה, אי אפשר להחליף מספר טלפון כרגע. זמן המתנה קצר עוזר להגן על החשבון שלך.
+
+יש לנסות שוב בעוד שעתיים.</string>
 			<key>many</key>
-			<string>לא ניתן לשלוח את כל הפריטים לסטורי שבחרת כי סוג הקובץ לא נתמך.</string>
+			<string>בגלל שרשמת את החשבון הזה לאחרונה, אי אפשר להחליף מספר טלפון כרגע. זמן המתנה קצר עוזר להגן על החשבון שלך.
+
+יש לנסות שוב בעוד %1$d שעות.</string>
 			<key>other</key>
-			<string>לא ניתן לשלוח את כל הפריטים לסטורי שבחרת כי סוג הקובץ לא נתמך.</string>
+			<string>בגלל שרשמת את החשבון הזה לאחרונה, אי אפשר להחליף מספר טלפון כרגע. זמן המתנה קצר עוזר להגן על החשבון שלך.
+
+יש לנסות שוב בעוד %1$d שעות.</string>
+		</dict>
+	</dict>
+	<key>STICKER_PACK_STICKER_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>סטיקר %1$d</string>
+			<key>two</key>
+			<string>%1$d סטיקרים</string>
+			<key>many</key>
+			<string>%1$d סטיקרים</string>
+			<key>other</key>
+			<string>%1$d סטיקרים</string>
 		</dict>
 	</dict>
 	<key>STORY_REPLIES_COUNT_%d</key>
@@ -1950,6 +2118,26 @@
 			<string>&lt;bold&gt;%1$d&lt;/bold&gt; צפיות</string>
 			<key>other</key>
 			<string>&lt;bold&gt;%1$d&lt;/bold&gt; צפיות</string>
+		</dict>
+	</dict>
+	<key>THREAD_DETAILS_MEMBERS_AND_INVITED_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%2$@ (+%1$ld מוזמנ/ת)</string>
+			<key>two</key>
+			<string>%2$@ (+%1$ld מוזמנים)</string>
+			<key>many</key>
+			<string>%2$@ (+%1$ld מוזמנים)</string>
+			<key>other</key>
+			<string>%2$@ (+%1$ld מוזמנים)</string>
 		</dict>
 	</dict>
 	<key>THREAD_DETAILS_MORE_MUTUAL_GROUP_%3$ld</key>
@@ -2090,6 +2278,106 @@
 			<string>שמות משתמש חייבים להכיל לפחות %1$d תווים</string>
 			<key>other</key>
 			<string>שמות משתמש חייבים להכיל לפחות %1$d תווים</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d אזכור שלך על ידי %2$@ ואחרים</string>
+			<key>two</key>
+			<string>%1$d אזכורים שלך על ידי %2$@ ואחרים</string>
+			<key>many</key>
+			<string>%1$d אזכורים שלך על ידי %2$@ ואחרים</string>
+			<key>other</key>
+			<string>%1$d אזכורים שלך על ידי %2$@ ואחרים</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d אזכור שלך על ידי %2$@ ועל ידי %3$@</string>
+			<key>two</key>
+			<string>%1$d אזכורים שלך על ידי %2$@ ועל ידי %3$@</string>
+			<key>many</key>
+			<string>%1$d אזכורים שלך על ידי %2$@ ועל ידי %3$@</string>
+			<key>other</key>
+			<string>%1$d אזכורים שלך על ידי %2$@ ועל ידי %3$@</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__messages</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d הודעה שלא נקראה</string>
+			<key>two</key>
+			<string>%1$d הודעות שלא נקראו</string>
+			<key>many</key>
+			<string>%1$d הודעות שלא נקראו</string>
+			<key>other</key>
+			<string>%1$d הודעות שלא נקראו</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d תשובה מאת %2$@ ואחרים</string>
+			<key>two</key>
+			<string>%1$d תשובות מאת %2$@ ואחרים</string>
+			<key>many</key>
+			<string>%1$d תשובות מאת %2$@ ואחרים</string>
+			<key>other</key>
+			<string>%1$d תשובות מאת %2$@ ואחרים</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d תשובה מאת %2$@ ומאת %3$@</string>
+			<key>two</key>
+			<string>%1$d תשובות מאת %2$@ ומאת %3$@</string>
+			<key>many</key>
+			<string>%1$d תשובות מאת %2$@ ומאת %3$@</string>
+			<key>other</key>
+			<string>%1$d תשובות מאת %2$@ ומאת %3$@</string>
 		</dict>
 	</dict>
 </dict>

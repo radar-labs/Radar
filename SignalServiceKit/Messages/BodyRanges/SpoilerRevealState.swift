@@ -33,7 +33,7 @@ public struct InteractionSnapshotIdentifier: Equatable, Hashable {
 
     // Not strictly an interaction, but can contain spoilers.
     public static func fromStoryMessage(_ storyMessage: StoryMessage) -> Self {
-        return  .init(timestamp: storyMessage.timestamp, authorAci: storyMessage.authorAci)
+        return .init(timestamp: storyMessage.timestamp, authorAci: storyMessage.authorAci)
     }
 }
 
@@ -41,26 +41,26 @@ public struct InteractionSnapshotIdentifier: Equatable, Hashable {
 
 @objc
 public class SpoilerRevealState: NSObject {
-    private var revealedSpoilerIdsByMessage = [InteractionSnapshotIdentifier: Set<StyleIdType>]()
+    private var revealedSpoilerIdsByMessage = [InteractionSnapshotIdentifier: Set<StyleId>]()
 
     /// Returns the set of IDs in the ordered list of spoiler ranges for a given message that
     /// should be revealed.
     public func revealedSpoilerIds(
-        interactionIdentifier: InteractionSnapshotIdentifier
-    ) -> Set<StyleIdType> {
+        interactionIdentifier: InteractionSnapshotIdentifier,
+    ) -> Set<StyleId> {
         return revealedSpoilerIdsByMessage[interactionIdentifier] ?? []
     }
 
     public func setSpoilerRevealed(
-        withID id: StyleIdType,
-        interactionIdentifier: InteractionSnapshotIdentifier
+        withID id: StyleId,
+        interactionIdentifier: InteractionSnapshotIdentifier,
     ) {
         var revealedIds = revealedSpoilerIdsByMessage[interactionIdentifier] ?? Set()
         revealedIds.insert(id)
         revealedSpoilerIdsByMessage[interactionIdentifier] = revealedIds
     }
 
-    public typealias Snapshot = [InteractionSnapshotIdentifier: Set<StyleIdType>]
+    public typealias Snapshot = [InteractionSnapshotIdentifier: Set<StyleId>]
 
     public func snapshot() -> Snapshot {
         return revealedSpoilerIdsByMessage

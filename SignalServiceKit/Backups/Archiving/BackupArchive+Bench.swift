@@ -10,15 +10,29 @@ extension BackupArchive {
     /// A `Bencher` specialized for measuring Backup archiving.
     class ArchiveBencher: Bencher {
 
-        /// Given a block that does an enumeration over db objects, wraps that enumeration to instead take
-        /// a closure with a FrameBencher that also measures the time spent enumerating.
-        func wrapEnumeration<EnumeratedInput, Output>(
-            _ enumerationFunc: (DBReadTransaction, (EnumeratedInput) throws -> Output) throws -> Void,
+        /// Wrap the given enumeration method to facilitate measurement of the
+        /// time spent.
+        ///
+        /// - Important
+        /// Callers should prefer `ArchivingContext/wrapEnumeration`.
+        ///
+        /// - Parameter enumerationBlock
+        /// A block that enumerates models and calls the block it is passed for
+        /// each model.
+        /// - Parameter perEnumerantBlock
+        /// A block called once per enumerated model. Returns `true` if
+        /// enumeration should continue; `false` otherwise.
+        func wrapEnumeration<Enumerant>(
             tx: DBReadTransaction,
-            enumerationBlock: @escaping (EnumeratedInput, FrameBencher) throws -> Output
-        ) rethrows {
+            enumerationBlock: (DBReadTransaction, (Enumerant) throws(CancellationError) -> Bool) throws(CancellationError) -> Void,
+            perEnumerantBlock: @escaping (Enumerant, FrameBencher) -> Bool,
+        ) throws(CancellationError) {
             var enumerationStepStartDate = dateProvider()
-            try enumerationFunc(tx) { enumeratedInput throws in
+            try enumerationBlock(tx) { enumeratedInput throws(CancellationError) -> Bool in
+                if Task.isCancelled {
+                    throw CancellationError()
+                }
+
                 defer {
                     // A little cheating - the "end" of this step is the "start"
                     // of the next one.
@@ -28,35 +42,12 @@ extension BackupArchive {
                 let frameBencher = FrameBencher(
                     bencher: self,
                     dateProvider: dateProvider,
-                    enumerationStepStartDate: enumerationStepStartDate
+                    enumerationStepStartDate: enumerationStepStartDate,
                 )
 
-                return try enumerationBlock(enumeratedInput, frameBencher)
-            }
-        }
-
-        /// Variant of the above where the block doesn't throw; unfortunately `rethrows`
-        /// can't cover two layers of throws variations.
-        func wrapEnumeration<EnumeratedInput, Output>(
-            _ enumerationFunc: (DBReadTransaction, (EnumeratedInput) -> Output) throws -> Void,
-            tx: DBReadTransaction,
-            enumerationBlock: @escaping (EnumeratedInput, FrameBencher) -> Output
-        ) rethrows {
-            var enumerationStepStartDate = dateProvider()
-            try enumerationFunc(tx) { enumeratedInput in
-                defer {
-                    // A little cheating - the "end" of this step is the "start"
-                    // of the next one.
-                    enumerationStepStartDate = dateProvider()
+                return autoreleasepool {
+                    perEnumerantBlock(enumeratedInput, frameBencher)
                 }
-
-                let frameBencher = FrameBencher(
-                    bencher: self,
-                    dateProvider: dateProvider,
-                    enumerationStepStartDate: enumerationStepStartDate
-                )
-
-                return enumerationBlock(enumeratedInput, frameBencher)
             }
         }
     }
@@ -107,7 +98,7 @@ extension BackupArchive {
         private func benchAction<Action: Hashable, T>(
             _ action: Action,
             actionMetricsKeyPath: ReferenceWritableKeyPath<RestoreBencher, [Action: Metrics]>,
-            block: () throws -> T
+            block: () throws -> T,
         ) rethrows -> T {
             let startDate = dateProvider()
             let result = try block()
@@ -138,7 +129,7 @@ extension BackupArchive {
 
         init(
             dateProviderMonotonic: @escaping DateProviderMonotonic,
-            memorySampler: MemorySampler
+            memorySampler: MemorySampler,
         ) {
             self.dateProvider = dateProviderMonotonic
             self.logger = PrefixedLogger(prefix: "[Backups]")
@@ -151,7 +142,7 @@ extension BackupArchive {
             _ frameBencher: FrameBencher,
             frame: BackupProto_Frame,
             frameProcessingDurationNanos: UInt64,
-            enumerationStepDurationNanos: UInt64?
+            enumerationStepDurationNanos: UInt64?,
         ) {
             memorySampler.sample()
 
@@ -175,11 +166,14 @@ extension BackupArchive {
         ///
         /// The provided block takes a ``FrameBencher`` which can itself be provided the
         /// ``BackupProto_Frame``; this is done so the return type doesn't have to be a frame.
+        ///
+        /// - Important
+        /// Callers doing archiving should prefer `ArchivingContext/processFrame`.
         func processFrame<T>(_ block: (FrameBencher) throws -> T) rethrows -> T {
             let frameBencher = FrameBencher(
                 bencher: self,
                 dateProvider: dateProvider,
-                enumerationStepStartDate: nil
+                enumerationStepStartDate: nil,
             )
 
             return try block(frameBencher)
@@ -205,7 +199,7 @@ extension BackupArchive {
             fileprivate init(
                 bencher: Bencher,
                 dateProvider: @escaping DateProviderMonotonic,
-                enumerationStepStartDate: MonotonicDate?
+                enumerationStepStartDate: MonotonicDate?,
             ) {
                 self.bencher = bencher
                 self.dateProvider = dateProvider
@@ -218,7 +212,7 @@ extension BackupArchive {
                     self,
                     frame: frame,
                     frameProcessingDurationNanos: (dateProvider() - startDate).nanoseconds,
-                    enumerationStepDurationNanos: enumerationStepStartDate.map { (startDate - $0).nanoseconds }
+                    enumerationStepDurationNanos: enumerationStepStartDate.map { (startDate - $0).nanoseconds },
                 )
             }
         }
@@ -309,12 +303,14 @@ extension BackupArchive {
             case ChatItem_ChatUpdateMessage_IndividualCall
             case ChatItem_ChatUpdateMessage_GroupCall
             case ChatItem_ChatUpdateMessage_PollTerminate
+            case ChatItem_ChatUpdateMessage_PinMessage
 
             case ChatItem_PaymentNotification
             case ChatItem_GiftBadge
             case ChatItem_ViewOnceMessage
             case ChatItem_DirectStoryReplyMessage
             case ChatItem_Poll
+            case ChatItem_AdminDeletedMessage
 
             case StickerPack
 
@@ -340,7 +336,6 @@ extension BackupArchive {
                     self = .ChatFolder
                 case nil:
                     return nil
-
                 case .recipient(let recipient):
                     switch recipient.destination {
                     case .contact:
@@ -358,7 +353,6 @@ extension BackupArchive {
                     case nil:
                         return nil
                     }
-
                 case .chatItem(let chatItem):
                     switch chatItem.item {
                     case .contactMessage:
@@ -378,24 +372,21 @@ extension BackupArchive {
                     case .poll:
                         self = .ChatItem_Poll
                     case .adminDeletedMessage:
-                        // Not modeled in this fork; not benchmarked.
-                        return nil
+                        self = .ChatItem_AdminDeletedMessage
                     case nil:
                         return nil
-
                     case .standardMessage(let standardMessage):
                         if standardMessage.hasQuote {
                             self = .ChatItem_StandardMessage_Quote
                         } else if standardMessage.hasLongText {
                             self = .ChatItem_StandardMessage_OversizeText
-                        } else if standardMessage.linkPreview.isEmpty.negated {
+                        } else if !standardMessage.linkPreview.isEmpty {
                             self = .ChatItem_StandardMessage_LinkPreview
-                        } else if standardMessage.attachments.isEmpty.negated {
+                        } else if !standardMessage.attachments.isEmpty {
                             self = .ChatItem_StandardMessage_WithAttachments
                         } else {
                             self = .ChatItem_StandardMessage
                         }
-
                     case .updateMessage(let updateMessage):
                         switch updateMessage.update {
                         case .simpleUpdate:
@@ -419,8 +410,7 @@ extension BackupArchive {
                         case .pollTerminate:
                             self = .ChatItem_ChatUpdateMessage_PollTerminate
                         case .pinMessage:
-                            // Not modeled in this fork; not benchmarked.
-                            return nil
+                            self = .ChatItem_ChatUpdateMessage_PinMessage
                         case nil:
                             return nil
                         }

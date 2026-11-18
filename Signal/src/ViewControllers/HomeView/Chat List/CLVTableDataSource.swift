@@ -6,7 +6,26 @@
 import SignalServiceKit
 public import SignalUI
 
-class CLVTableDataSource: NSObject {
+public enum ChatListMode: Int, CaseIterable {
+    case archive
+    case inbox
+}
+
+public enum ChatListSectionType: String, CaseIterable {
+    case reminders
+    case backupDownloadProgressView
+    case backupExportProgressView
+    case localFileBackupRestoreProgressView
+    case localFileBackupExportProgressView
+    case pinned
+    case unpinned
+    case archiveButton
+    case inboxFilterFooter
+}
+
+// MARK: -
+
+class CLVTableDataSource: NSObject, UITableViewDataSource, UITableViewDelegate {
     private var viewState: CLVViewState!
 
     let tableView = CLVTableView()
@@ -56,8 +75,8 @@ class CLVTableDataSource: NSObject {
             updateTimer?.invalidate()
             updateTimer = nil
             if let interval = nextUpdateAt?.timeIntervalSinceNow {
-                updateTimer = Timer.scheduledTimer(withTimeInterval: max(1, interval), repeats: false) { [weak self] (_) in
-                    if let self = self {
+                updateTimer = Timer.scheduledTimer(withTimeInterval: max(1, interval), repeats: false) { [weak self] _ in
+                    if let self {
                         for path in self.tableView.indexPathsForVisibleRows ?? [] {
                             self.updateCellContent(at: path, for: self.tableView)
                         }
@@ -99,7 +118,7 @@ class CLVTableDataSource: NSObject {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.separatorStyle = .none
-        tableView.separatorColor = Theme.tableView2SeparatorColor
+        tableView.separatorColor = OWSTableViewController2.separatorColor
         tableView.register(ChatListCell.self)
         tableView.register(ArchivedConversationsCell.self)
         tableView.register(ChatListFilterFooterCell.self)
@@ -115,7 +134,7 @@ class CLVTableDataSource: NSObject {
             return ThreadViewModel(
                 threadUniqueId: threadUniqueId,
                 forChatList: true,
-                transaction: tx
+                transaction: tx,
             )
         }
         threadViewModelCache.set(key: threadUniqueId, value: threadViewModel)
@@ -144,7 +163,7 @@ class CLVTableDataSource: NSObject {
         let newContentOffset = tableView.contentOffset
         let oldContentOffset = viewController.lastKnownTableViewContentOffset
         viewController.lastKnownTableViewContentOffset = newContentOffset
-        guard let oldContentOffset = oldContentOffset else {
+        guard let oldContentOffset else {
             return
         }
         let deltaY = (newContentOffset - oldContentOffset).y
@@ -155,8 +174,10 @@ class CLVTableDataSource: NSObject {
 
         // Debounce.
         let maxPreloadFrequency: TimeInterval = .second / 100
-        if let lastPreloadCellDate = self.lastPreloadCellDate,
-           abs(lastPreloadCellDate.timeIntervalSinceNow) < maxPreloadFrequency {
+        if
+            let lastPreloadCellDate = self.lastPreloadCellDate,
+            abs(lastPreloadCellDate.timeIntervalSinceNow) < maxPreloadFrequency
+        {
             return
         }
         lastPreloadCellDate = Date()
@@ -167,7 +188,13 @@ class CLVTableDataSource: NSObject {
         }
         let conversationIndexPaths = visibleIndexPaths.compactMap { indexPath -> IndexPath? in
             switch renderState.sections[indexPath.section].type {
-            case .reminders, .backupDownloadProgressView, .archiveButton, .inboxFilterFooter:
+            case .reminders,
+                 .backupDownloadProgressView,
+                 .backupExportProgressView,
+                 .localFileBackupRestoreProgressView,
+                 .localFileBackupExportProgressView,
+                 .archiveButton,
+                 .inboxFilterFooter:
                 return nil
             case .pinned, .unpinned:
                 return indexPath
@@ -180,8 +207,10 @@ class CLVTableDataSource: NSObject {
         var indexPathsToPreload = [IndexPath]()
         func tryToEnqueue(_ indexPath: IndexPath) {
             let rowCount = renderState.numberOfRows(in: renderState.sections[indexPath.section])
-            guard indexPath.row >= 0,
-                  indexPath.row < rowCount else {
+            guard
+                indexPath.row >= 0,
+                indexPath.row < rowCount
+            else {
                 return
             }
             indexPathsToPreload.append(indexPath)
@@ -197,8 +226,10 @@ class CLVTableDataSource: NSObject {
             // to viewport.
             for index in 0..<preloadCount {
                 let offset = +index
-                tryToEnqueue(IndexPath(row: lastIndexPath.row + offset,
-                                       section: lastIndexPath.section))
+                tryToEnqueue(IndexPath(
+                    row: lastIndexPath.row + offset,
+                    section: lastIndexPath.section,
+                ))
             }
         } else {
             guard let firstIndexPath = sortedIndexPaths.first else {
@@ -212,8 +243,10 @@ class CLVTableDataSource: NSObject {
             // to viewport.
             for index in 0..<preloadCount {
                 let offset = -index
-                tryToEnqueue(IndexPath(row: firstIndexPath.row + offset,
-                                       section: firstIndexPath.section))
+                tryToEnqueue(IndexPath(
+                    row: firstIndexPath.row + offset,
+                    section: firstIndexPath.section,
+                ))
             }
         }
 
@@ -221,51 +254,31 @@ class CLVTableDataSource: NSObject {
             preloadCellIfNecessaryAsync(indexPath: indexPath)
         }
     }
-}
 
-// MARK: -
+    // MARK: - UITableViewDelegate
 
-public enum ChatListMode: Int, CaseIterable {
-    case archive
-    case inbox
-}
-
-// MARK: -
-
-public enum ChatListSectionType: String, CaseIterable {
-    case reminders
-    case backupDownloadProgressView
-    case pinned
-    case unpinned
-    case archiveButton
-    case inboxFilterFooter
-}
-
-// MARK: -
-
-extension CLVTableDataSource: UITableViewDelegate {
-    public func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
         return UITableViewCell.EditingStyle.none
     }
 
-    public func tableView(_ tableView: UITableView, shouldBeginMultipleSelectionInteractionAt indexPath: IndexPath) -> Bool {
+    func tableView(_ tableView: UITableView, shouldBeginMultipleSelectionInteractionAt indexPath: IndexPath) -> Bool {
         return !viewState.multiSelectState.locked
     }
 
-    public func tableView(_ tableView: UITableView, willBeginEditingRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, willBeginEditingRowAt indexPath: IndexPath) {
         // editing a single row (by swiping to the left or right) calls this method
         // we have to disable the two-finger gesture for entering the multi-select mode
         viewState.multiSelectState.locked = true
     }
 
-    public func tableView(_ tableView: UITableView, didEndEditingRowAt indexPath: IndexPath?) {
+    func tableView(_ tableView: UITableView, didEndEditingRowAt indexPath: IndexPath?) {
         // this method is called if the current single row edit has ended (even without
         // explicit user-interaction eg. due to table reload).
         // we can to enable the two-finger gesture for entering the multi-select mode again
         viewState.multiSelectState.locked = false
     }
 
-    public func tableView(_ tableView: UITableView, didBeginMultipleSelectionInteractionAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, didBeginMultipleSelectionInteractionAt indexPath: IndexPath) {
         guard let viewController = self.viewController, !viewState.multiSelectState.isActive, !viewState.multiSelectState.locked else {
             return
         }
@@ -275,11 +288,11 @@ extension CLVTableDataSource: UITableViewDelegate {
         viewController.willEnterMultiselectMode(cancelCurrentEditAction: false)
     }
 
-    public func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+    func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
         return false
     }
 
-    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         let section = renderState.sections[section]
 
         // Without returning a header with a non-zero height, Grouped
@@ -288,14 +301,14 @@ extension CLVTableDataSource: UITableViewDelegate {
         return section.title == nil ? .leastNormalMagnitude : UITableView.automaticDimension
     }
 
-    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         // Without returning a footer with a non-zero height, Grouped
         // table view will use a default spacing between sections. We
         // do not want that spacing so we use the smallest possible height.
         return .leastNormalMagnitude
     }
 
-    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard let title = renderState.sections[section].title else { return UIView() }
 
         let container = UIView()
@@ -311,16 +324,16 @@ extension CLVTableDataSource: UITableViewDelegate {
         return container
     }
 
-    public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         UIView()
     }
 
-    public func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+    func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         switch renderState.sections[indexPath.section].type {
         case .reminders, .inboxFilterFooter:
             return nil
 
-        case .backupDownloadProgressView, .archiveButton:
+        case .backupDownloadProgressView, .backupExportProgressView, .localFileBackupRestoreProgressView, .localFileBackupExportProgressView, .archiveButton:
             return indexPath
 
         case .pinned, .unpinned:
@@ -333,7 +346,7 @@ extension CLVTableDataSource: UITableViewDelegate {
         }
     }
 
-    public func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         if threadIdBeingSelected == nil {
             viewState.lastSelectedThreadId = nil
         }
@@ -348,7 +361,7 @@ extension CLVTableDataSource: UITableViewDelegate {
         }
     }
 
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let viewController = self.viewController else {
             owsFailDebug("Missing viewController.")
             return
@@ -367,7 +380,21 @@ extension CLVTableDataSource: UITableViewDelegate {
 
         case .backupDownloadProgressView:
             tableView.deselectRow(at: indexPath, animated: false)
-            viewController.handleBackupDownloadProgressViewTapped()
+            viewController.handleBackupDownloadProgressViewTapped(
+                viewState.backupDownloadProgressView,
+            )
+
+        case .backupExportProgressView:
+            tableView.deselectRow(at: indexPath, animated: false)
+            viewController.handleBackupExportProgressViewTapped()
+
+        case .localFileBackupRestoreProgressView:
+            tableView.deselectRow(at: indexPath, animated: false)
+            viewController.handleLocalBackupProgressViewTapped()
+
+        case .localFileBackupExportProgressView:
+            tableView.deselectRow(at: indexPath, animated: false)
+            viewController.handleLocalBackupProgressViewTapped()
 
         case .pinned, .unpinned:
             guard let threadUniqueId = renderState.threadUniqueId(forIndexPath: indexPath) else {
@@ -390,50 +417,67 @@ extension CLVTableDataSource: UITableViewDelegate {
         }
     }
 
-    public func tableView(_ tableView: UITableView,
-                          contextMenuConfigurationForRowAt indexPath: IndexPath,
-                          point: CGPoint) -> UIContextMenuConfiguration? {
-        AssertIsOnMainThread()
-
-        guard let viewController = self.viewController else {
-            owsFailDebug("Missing viewController.")
-            return nil
-        }
-        guard viewController.canPresentPreview(fromIndexPath: indexPath) else {
-            return nil
-        }
-        guard let threadUniqueId = renderState.threadUniqueId(forIndexPath: indexPath) else {
-            return nil
-        }
-
-        return UIContextMenuConfiguration(
-            identifier: threadUniqueId as NSString,
-            previewProvider: { [weak viewController] in
-                viewController?.createPreviewController(atIndexPath: indexPath)
-            },
-            actionProvider: { _ in
-                // nil for now. But we may want to add options like "Pin" or "Mute" in the future
+    func tableView(
+        _ tableView: UITableView,
+        contextMenuConfigurationForRowAt indexPath: IndexPath,
+        point: CGPoint,
+    ) -> UIContextMenuConfiguration? {
+        switch renderState.sections[indexPath.section].type {
+        case .pinned,
+             .unpinned:
+            guard
+                let chatListViewController = viewController,
+                chatListViewController.canPresentPreview(fromIndexPath: indexPath),
+                let threadViewModel = threadViewModel(forIndexPath: indexPath)
+            else {
                 return nil
             }
-        )
+
+            return UIContextMenuConfiguration(
+                identifier: threadViewModel.threadUniqueId as NSString,
+                previewProvider: { [weak chatListViewController] in
+                    guard let chatListViewController else { return nil }
+                    return chatListViewController.createPreviewController(atIndexPath: indexPath)
+                },
+                actionProvider: { [weak chatListViewController] _ in
+                    guard let chatListViewController else { return nil }
+                    let actions = chatListViewController.contextMenuActions(threadViewModel: threadViewModel)
+                    return UIMenu(children: actions)
+                },
+            )
+        case .backupExportProgressView:
+            return UIContextMenuConfiguration(
+                actionProvider: { [weak self] _ in
+                    guard let self else { return nil }
+                    let actions = viewState.backupExportProgressView.contextMenuActions()
+                    return UIMenu(children: actions)
+                },
+            )
+        case .localFileBackupExportProgressView:
+            return UIContextMenuConfiguration(
+                actionProvider: { [weak self] _ in
+                    guard let self else { return nil }
+                    let actions = viewState.localFileBackupExportProgressView.contextMenuActions()
+                    return UIMenu(children: actions)
+                },
+            )
+        case .reminders,
+             .backupDownloadProgressView,
+             .localFileBackupRestoreProgressView,
+             .archiveButton,
+             .inboxFilterFooter:
+            return nil
+        }
     }
 
-    public func tableView(
+    func tableView(
         _ tableView: UITableView,
-        previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration
+        previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration,
     ) -> UITargetedPreview? {
-        AssertIsOnMainThread()
-
-        guard let threadId = configuration.identifier as? String else {
-            owsFailDebug("Unexpected context menu configuration identifier")
-            return nil
-        }
-        guard let indexPath = renderState.indexPath(forUniqueId: threadId) else {
-            Logger.warn("No index path for threadId: \(threadId).")
-            return nil
-        }
-        guard tableView.window != nil else {
-            Logger.warn("Dismissing tableView not in view hierarchy")
+        guard
+            let threadId = configuration.identifier as? String,
+            let indexPath = renderState.indexPath(forUniqueId: threadId)
+        else {
             return nil
         }
 
@@ -470,10 +514,10 @@ extension CLVTableDataSource: UITableViewDelegate {
         return UITargetedPreview(view: cell, parameters: params, target: target)
     }
 
-    public func tableView(
+    func tableView(
         _ tableView: UITableView,
         willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
-        animator: UIContextMenuInteractionCommitAnimating
+        animator: UIContextMenuInteractionCommitAnimating,
     ) {
         AssertIsOnMainThread()
 
@@ -490,10 +534,10 @@ extension CLVTableDataSource: UITableViewDelegate {
         }
     }
 
-    public func tableView(
+    func tableView(
         _ tableView: UITableView,
         willDisplay cell: UITableViewCell,
-        forRowAt indexPath: IndexPath
+        forRowAt indexPath: IndexPath,
     ) {
         AssertIsOnMainThread()
 
@@ -505,10 +549,10 @@ extension CLVTableDataSource: UITableViewDelegate {
         preloadCellsIfNecessary()
     }
 
-    public func tableView(
+    func tableView(
         _ tableView: UITableView,
         didEndDisplaying cell: UITableViewCell,
-        forRowAt indexPath: IndexPath
+        forRowAt indexPath: IndexPath,
     ) {
         AssertIsOnMainThread()
 
@@ -517,37 +561,27 @@ extension CLVTableDataSource: UITableViewDelegate {
         }
         viewController?.updateCellVisibility(cell: cell, isCellVisible: false)
     }
-}
 
-// MARK: -
+    // MARK: - UITableViewDataSource
 
-extension CLVTableDataSource: UITableViewDataSource {
-    public func numberOfSections(in tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         renderState.sections.count
     }
 
-    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         renderState.numberOfRows(in: renderState.sections[section])
     }
 
-    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         switch renderState.sections[indexPath.section].type {
-        case .reminders, .archiveButton, .inboxFilterFooter:
+        case .reminders, .archiveButton, .inboxFilterFooter, .backupExportProgressView, .backupDownloadProgressView, .localFileBackupRestoreProgressView, .localFileBackupExportProgressView:
             return UITableView.automaticDimension
-        case .backupDownloadProgressView:
-            guard let viewState = viewController?.viewState else {
-                return 0
-            }
-            return CLVBackupDownloadProgressView.measureHeight(
-                viewState: viewState.backupDownloadProgressViewState,
-                width: tableView.bounds.width
-            )
         case .pinned, .unpinned:
             return measureConversationCell(tableView: tableView, indexPath: indexPath)
         }
     }
 
-    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let viewController = self.viewController else {
             owsFailDebug("Missing viewController.")
             return UITableViewCell()
@@ -561,6 +595,12 @@ extension CLVTableDataSource: UITableViewDataSource {
             cell = viewController.viewState.reminderViews.reminderViewCell
         case .backupDownloadProgressView:
             cell = viewController.viewState.backupDownloadProgressView.backupDownloadProgressViewCell
+        case .backupExportProgressView:
+            cell = viewController.viewState.backupExportProgressView.backupExportProgressViewCell
+        case .localFileBackupRestoreProgressView:
+            cell = viewController.viewState.localFileBackupRestoreProgressView.localFileBackupRestoreProgressViewCell
+        case .localFileBackupExportProgressView:
+            cell = viewController.viewState.localFileBackupExportProgressView.localFileBackupExportProgressViewCell
         case .pinned, .unpinned:
             cell = buildConversationCell(tableView: tableView, indexPath: indexPath)
         case .archiveButton:
@@ -578,7 +618,7 @@ extension CLVTableDataSource: UITableViewDataSource {
             filterFooterCell.message = inboxFilterSection.message
         }
 
-        cell.tintColor = .ows_accentBlue
+        cell.tintColor = .Signal.accent
         return cell
     }
 
@@ -614,7 +654,10 @@ extension CLVTableDataSource: UITableViewDataSource {
         cell.configure(cellContentToken: contentToken, spoilerAnimationManager: viewState.spoilerAnimationManager)
         cell.useSidebarAppearance = useSideBarChatListCellAppearance
 
-        if isConversationActive(threadUniqueId: contentToken.thread.uniqueId) {
+        if
+            let homeTabBarController = viewController?.homeTabBarController,
+            homeTabBarController.selectedThread?.uniqueId == contentToken.thread.uniqueId
+        {
             tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
         } else if !viewState.multiSelectState.isActive {
             tableView.deselectRow(at: indexPath, animated: false)
@@ -622,16 +665,6 @@ extension CLVTableDataSource: UITableViewDataSource {
 
         updateAndSetRefreshTimer(for: cell)
         return cell
-    }
-
-    private func isConversationActive(threadUniqueId: String) -> Bool {
-        AssertIsOnMainThread()
-
-        guard let conversationSplitViewController = splitViewController as? ConversationSplitViewController else {
-            owsFailDebug("Missing conversationSplitViewController.")
-            return false
-        }
-        return conversationSplitViewController.selectedThread?.uniqueId == threadUniqueId
     }
 
     private func buildArchivedConversationsButtonCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
@@ -643,13 +676,19 @@ extension CLVTableDataSource: UITableViewDataSource {
 
     // MARK: - Edit Actions
 
-    public func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         // TODO: Is this method necessary?
     }
 
-    public func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         switch renderState.sections[indexPath.section].type {
-        case .reminders, .backupDownloadProgressView, .archiveButton, .inboxFilterFooter:
+        case .reminders,
+             .backupDownloadProgressView,
+             .backupExportProgressView,
+             .localFileBackupRestoreProgressView,
+             .localFileBackupExportProgressView,
+             .archiveButton,
+             .inboxFilterFooter:
             return nil
 
         case .pinned, .unpinned:
@@ -662,28 +701,34 @@ extension CLVTableDataSource: UITableViewDataSource {
                 return nil
             }
 
-            let threadUniqueId = threadViewModel.threadRecord.uniqueId
-            return viewController.trailingSwipeActionsConfiguration(for: threadViewModel, closeConversationBlock: { [weak self] in
-                guard let self else { return }
-                if self.isConversationActive(threadUniqueId: threadUniqueId) {
-                    viewController.conversationSplitViewController?.closeSelectedConversation(animated: true)
-                }
-            })
+            return viewController.trailingSwipeActionsConfiguration(threadViewModel: threadViewModel)
         }
     }
 
-    public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         switch renderState.sections[indexPath.section].type {
-        case .reminders, .backupDownloadProgressView, .archiveButton, .inboxFilterFooter:
+        case .reminders,
+             .backupDownloadProgressView,
+             .backupExportProgressView,
+             .localFileBackupRestoreProgressView,
+             .localFileBackupExportProgressView,
+             .archiveButton,
+             .inboxFilterFooter:
             return false
         case .pinned, .unpinned:
             return true
         }
     }
 
-    public func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         switch renderState.sections[indexPath.section].type {
-        case .reminders, .backupDownloadProgressView, .archiveButton, .inboxFilterFooter:
+        case .reminders,
+             .backupDownloadProgressView,
+             .backupExportProgressView,
+             .localFileBackupRestoreProgressView,
+             .localFileBackupExportProgressView,
+             .archiveButton,
+             .inboxFilterFooter:
             return nil
 
         case .pinned, .unpinned:
@@ -696,27 +741,25 @@ extension CLVTableDataSource: UITableViewDataSource {
                 return nil
             }
 
-            return viewController.leadingSwipeActionsConfiguration(for: threadViewModel)
+            return viewController.leadingSwipeActionsConfiguration(threadViewModel: threadViewModel)
         }
     }
-}
 
-// MARK: -
+    // MARK: -
 
-extension CLVTableDataSource {
     func updateAndSetRefreshTimer(for cell: ChatListCell?) {
-        if let cell = cell, let timestamp = cell.nextUpdateTimestamp {
+        if let cell, let timestamp = cell.nextUpdateTimestamp {
             if nextUpdateAt == nil || timestamp < nextUpdateAt! {
                 nextUpdateAt = timestamp
             }
         }
     }
 
-    public func stopRefreshTimer() {
+    func stopRefreshTimer() {
         nextUpdateAt = nil
     }
 
-    public func updateAndSetRefreshTimer() {
+    func updateAndSetRefreshTimer() {
         for path in tableView.indexPathsForVisibleRows ?? [] {
             updateCellContent(at: path, for: tableView)
         }
@@ -730,7 +773,7 @@ extension CLVTableDataSource {
         }
     }
 
-    public func updateCellContent(at indexPath: IndexPath, for tableView: UITableView) {
+    func updateCellContent(at indexPath: IndexPath, for tableView: UITableView) {
         AssertIsOnMainThread()
 
         guard let cell = tableView.cellForRow(at: indexPath) as? ChatListCell else { return }
@@ -742,7 +785,7 @@ extension CLVTableDataSource {
         cell.configure(
             cellContentToken: contentToken,
             spoilerAnimationManager: viewState.spoilerAnimationManager,
-            asyncAvatarLoadingAllowed: false
+            asyncAvatarLoadingAllowed: false,
         )
         cell.isCellVisible = cellWasVisible
     }
@@ -750,12 +793,12 @@ extension CLVTableDataSource {
     // This method can be called from any thread.
     private static func buildCellConfiguration(
         threadViewModel: ThreadViewModel,
-        lastReloadDate: Date?
+        lastReloadDate: Date?,
     ) -> ChatListCell.Configuration {
         owsAssertDebug(threadViewModel.chatListInfo != nil)
         let configuration = ChatListCell.Configuration(
             threadViewModel: threadViewModel,
-            lastReloadDate: lastReloadDate
+            lastReloadDate: lastReloadDate,
         )
         return configuration
     }
@@ -793,7 +836,7 @@ extension CLVTableDataSource {
     // TODO: It would be preferable to figure out some way to use ReverseDispatchQueue.
     private static let preloadSerialQueue = DispatchQueue(label: "org.signal.chat-list.preload")
 
-    fileprivate func preloadCellIfNecessaryAsync(indexPath: IndexPath) {
+    private func preloadCellIfNecessaryAsync(indexPath: IndexPath) {
         AssertIsOnMainThread()
 
         guard let viewController = self.viewController else {
@@ -838,11 +881,13 @@ extension CLVTableDataSource {
                 return ThreadViewModel(
                     threadUniqueId: threadUniqueId,
                     forChatList: true,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             }
-            let configuration = Self.buildCellConfiguration(threadViewModel: threadViewModel,
-                                                            lastReloadDate: lastReloadDate)
+            let configuration = Self.buildCellConfiguration(
+                threadViewModel: threadViewModel,
+                lastReloadDate: lastReloadDate,
+            )
             let contentToken = ChatListCell.buildCellContentToken(for: configuration)
             return (threadViewModel, contentToken)
         }.done(on: DispatchQueue.main) { (threadViewModel: ThreadViewModel, contentToken: CLVCellContentToken) in
@@ -898,7 +943,7 @@ public class CLVTableView: UITableView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override func reloadData() {
+    override public func reloadData() {
         AssertIsOnMainThread()
 
         lastReloadDate = Date()
@@ -906,12 +951,12 @@ public class CLVTableView: UITableView {
         (dataSource as? CLVTableDataSource)?.calcRefreshTimer()
     }
 
-    public override func layoutSubviews() {
+    override public func layoutSubviews() {
         super.layoutSubviews()
         updateFooterHeight()
     }
 
-    public override func adjustedContentInsetDidChange() {
+    override public func adjustedContentInsetDidChange() {
         super.adjustedContentInsetDidChange()
         updateFooterHeight()
     }
@@ -923,7 +968,7 @@ public class CLVTableView: UITableView {
         // Compute whether the total height content height (excluding the footer)
         // fits in the available space.
         var availableHeight = visibleRect.height - headerHeight
-        for section in 0 ..< numberOfSections where availableHeight > 0 {
+        for section in 0..<numberOfSections where availableHeight > 0 {
             let newValue = availableHeight - rect(forSection: section).height
             availableHeight = max(0, newValue)
         }
@@ -942,5 +987,11 @@ public class CLVTableView: UITableView {
         if footerView.frame.height != finalHeight {
             footerView.frame.height = finalHeight
         }
+    }
+}
+
+extension ChatListViewController {
+    func handleLocalBackupProgressViewTapped() {
+        SignalApp.shared.showAppSettings(mode: .backups(page: .local))
     }
 }

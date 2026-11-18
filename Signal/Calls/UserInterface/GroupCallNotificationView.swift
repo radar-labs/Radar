@@ -17,6 +17,7 @@ class GroupCallNotificationView: UIView {
         let aci: Aci
         var address: SignalServiceAddress { return SignalServiceAddress(aci) }
     }
+
     private var activeMembers = Set<ActiveMember>()
     private var membersPendingJoinNotification = Set<ActiveMember>()
     private var membersPendingLeaveNotification = Set<ActiveMember>()
@@ -63,27 +64,28 @@ class GroupCallNotificationView: UIView {
     private func presentNextNotificationIfNecessary() {
         guard !isPresentingNotification else { return }
 
-        guard let bannerView: BannerView = {
-            if membersPendingJoinNotification.count > 0 {
-                // Stop any active ringing when anyone joins the call
-                callService.audioService.stopPlayingAnySounds()
-                if !CurrentAppContext().isAppForegroundAndActive() {
-                    callService.audioService.playJoinSound()
+        guard
+            let bannerView: BannerView = {
+                if membersPendingJoinNotification.count > 0 {
+                    // Stop any active ringing when anyone joins the call
+                    callService.audioService.stopPlayingAnySounds()
+                    if !CurrentAppContext().isAppForegroundAndActive() {
+                        callService.audioService.playJoinSound()
+                    }
+                    let addresses = membersPendingJoinNotification.map { $0.address }
+                    membersPendingJoinNotification.removeAll()
+                    return BannerView(addresses: addresses, action: .join)
+                } else if membersPendingLeaveNotification.count > 0 {
+                    if !CurrentAppContext().isAppForegroundAndActive() {
+                        callService.audioService.playLeaveSound()
+                    }
+                    let addresses = membersPendingLeaveNotification.map { $0.address }
+                    membersPendingLeaveNotification.removeAll()
+                    return BannerView(addresses: addresses, action: .leave)
+                } else {
+                    return nil
                 }
-                let addresses = membersPendingJoinNotification.map { $0.address }
-                membersPendingJoinNotification.removeAll()
-                return BannerView(addresses: addresses, action: .join)
-            } else if membersPendingLeaveNotification.count > 0 {
-                if !CurrentAppContext().isAppForegroundAndActive() {
-                    callService.audioService.playLeaveSound()
-                }
-                let addresses = membersPendingLeaveNotification.map { $0.address }
-                membersPendingLeaveNotification.removeAll()
-                return BannerView(addresses: addresses, action: .leave)
-            } else {
-                return nil
-            }
-        }() else { return }
+            }() else { return }
 
         isPresentingNotification = true
 
@@ -97,7 +99,7 @@ class GroupCallNotificationView: UIView {
             to: .width,
             of: self,
             withOffset: -(layoutMargins.left + layoutMargins.right),
-            relation: .lessThanOrEqual
+            relation: .lessThanOrEqual,
         )
         NSLayoutConstraint.autoSetPriority(.defaultHigh) {
             bannerView.autoPinWidthToSuperviewMargins()
@@ -141,7 +143,7 @@ extension GroupCallNotificationView: GroupCallObserver {
         updateActiveMembers()
     }
 
-    func groupCallEnded(_ call: GroupCall, reason: GroupCallEndReason) {
+    func groupCallEnded(_ call: GroupCall, reason: CallEndReason) {
         AssertIsOnMainThread()
 
         hasJoined = false
@@ -178,36 +180,38 @@ private class BannerView: UIView {
         if displayNames.count > 2 {
             let formatText = action == .join
                 ? OWSLocalizedString(
-                    "GROUP_CALL_NOTIFICATION_MANY_JOINED_%d", tableName: "PluralAware",
-                    comment: "Copy explaining that many new users have joined the group call. Embeds {number of additional members}, {first member name}, {second member name}"
+                    "GROUP_CALL_NOTIFICATION_MANY_JOINED_%d",
+                    tableName: "PluralAware",
+                    comment: "Copy explaining that many new users have joined the group call. Embeds {number of additional members}, {first member name}, {second member name}",
                 )
                 : OWSLocalizedString(
-                    "GROUP_CALL_NOTIFICATION_MANY_LEFT_%d", tableName: "PluralAware",
-                    comment: "Copy explaining that many users have left the group call. Embeds {number of additional members}, {first member name}, {second member name}"
+                    "GROUP_CALL_NOTIFICATION_MANY_LEFT_%d",
+                    tableName: "PluralAware",
+                    comment: "Copy explaining that many users have left the group call. Embeds {number of additional members}, {first member name}, {second member name}",
                 )
             actionText = String.localizedStringWithFormat(formatText, displayNames.count - 2, displayNames[0], displayNames[1])
         } else if displayNames.count > 1 {
             let formatText = action == .join
                 ? OWSLocalizedString(
                     "GROUP_CALL_NOTIFICATION_TWO_JOINED_FORMAT",
-                    comment: "Copy explaining that two users have joined the group call. Embeds {first member name}, {second member name}"
+                    comment: "Copy explaining that two users have joined the group call. Embeds {first member name}, {second member name}",
                 )
                 : OWSLocalizedString(
                     "GROUP_CALL_NOTIFICATION_TWO_LEFT_FORMAT",
-                    comment: "Copy explaining that two users have left the group call. Embeds {first member name}, {second member name}"
+                    comment: "Copy explaining that two users have left the group call. Embeds {first member name}, {second member name}",
                 )
-            actionText = String(format: formatText, displayNames[0], displayNames[1])
+            actionText = String.nonPluralLocalizedStringWithFormat(formatText, displayNames[0], displayNames[1])
         } else {
             let formatText = action == .join
                 ? OWSLocalizedString(
                     "GROUP_CALL_NOTIFICATION_ONE_JOINED_FORMAT",
-                    comment: "Copy explaining that a user has joined the group call. Embeds {member name}"
+                    comment: "Copy explaining that a user has joined the group call. Embeds {member name}",
                 )
                 : OWSLocalizedString(
                     "GROUP_CALL_NOTIFICATION_ONE_LEFT_FORMAT",
-                    comment: "Copy explaining that a user has left the group call. Embeds {member name}"
+                    comment: "Copy explaining that a user has left the group call. Embeds {member name}",
                 )
-            actionText = String(format: formatText, displayNames[0])
+            actionText = String.nonPluralLocalizedStringWithFormat(formatText, displayNames[0])
         }
 
         let hStack = UIStackView()
@@ -235,7 +239,7 @@ private class BannerView: UIView {
             avatarView.image = SSKEnvironment.shared.avatarBuilderRef.avatarImageWithSneakyTransaction(
                 forAddress: address,
                 diameterPoints: 40,
-                localUserDisplayMode: .asUser
+                localUserDisplayMode: .asUser,
             )
         }
 
@@ -244,7 +248,7 @@ private class BannerView: UIView {
         label.setCompressionResistanceHorizontalHigh()
         label.numberOfLines = 0
         label.font = UIFont.dynamicTypeSubheadlineClamped.semibold()
-        label.textColor = .ows_white
+        label.textColor = .white
         label.text = actionText
 
         hStack.addArrangedSubview(.hStretchingSpacer())

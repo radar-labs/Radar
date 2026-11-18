@@ -6,8 +6,8 @@
 import Foundation
 import GRDB
 
-public final class SendGiftBadgeJobRecord: JobRecord, FactoryInitializableFromRecordType {
-    override class var jobRecordType: JobRecordType { .sendGiftBadge }
+public final class SendGiftBadgeJobRecord: JobRecord {
+    override public class var jobRecordType: JobRecordType { .sendGiftBadge }
 
     public let paymentProcessor: String
     public let receiptCredentialRequestContext: Data
@@ -41,7 +41,7 @@ public final class SendGiftBadgeJobRecord: JobRecord, FactoryInitializableFromRe
         threadId: String,
         messageText: String,
         failureCount: UInt = 0,
-        status: Status = .ready
+        status: Status = .ready,
     ) {
         self.paymentProcessor = paymentProcessor
         self.receiptCredentialRequestContext = receiptCredentialRequestContext
@@ -62,11 +62,11 @@ public final class SendGiftBadgeJobRecord: JobRecord, FactoryInitializableFromRe
 
         super.init(
             failureCount: failureCount,
-            status: status
+            status: status,
         )
     }
 
-    required init(forRecordTypeFactoryInitializationFrom decoder: Decoder) throws {
+    required init(inheritableDecoder decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         paymentProcessor = try container.decode(String.self, forKey: .paymentProcessor)
@@ -74,8 +74,8 @@ public final class SendGiftBadgeJobRecord: JobRecord, FactoryInitializableFromRe
         receiptCredentialRequest = try container.decode(Data.self, forKey: .receiptCredentialRequest)
         amount = try LegacySDSSerializer().deserializeLegacySDSData(
             try container.decode(Data.self, forKey: .amount),
-            propertyName: "amount"
-        )
+            ofClass: NSDecimalNumber.self,
+        ) as Decimal
         currencyCode = try container.decode(String.self, forKey: .currencyCode)
 
         paymentIntentClientSecret = try container.decodeIfPresent(String.self, forKey: .paymentIntentClientSecret)
@@ -89,18 +89,17 @@ public final class SendGiftBadgeJobRecord: JobRecord, FactoryInitializableFromRe
         threadId = try container.decode(String.self, forKey: .threadId)
         messageText = try container.decode(String.self, forKey: .messageText)
 
-        try super.init(baseClassDuringFactoryInitializationFrom: container.superDecoder())
+        try super.init(inheritableDecoder: decoder)
     }
 
-    public override func encode(to encoder: Encoder) throws {
+    override public func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
-
-        try super.encode(to: container.superEncoder())
 
         try container.encode(paymentProcessor, forKey: .paymentProcessor)
         try container.encode(receiptCredentialRequestContext, forKey: .receiptCredentialRequestContext)
         try container.encode(receiptCredentialRequest, forKey: .receiptCredentialRequest)
-        try container.encode(LegacySDSSerializer().serializeAsLegacySDSData(property: amount), forKey: .amount)
+        try container.encode(LegacySDSSerializer().serializeAsLegacySDSData(amount as NSDecimalNumber), forKey: .amount)
         try container.encode(currencyCode, forKey: .currencyCode)
 
         try container.encodeIfPresent(paymentIntentClientSecret, forKey: .paymentIntentClientSecret)

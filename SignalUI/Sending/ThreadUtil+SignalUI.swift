@@ -7,15 +7,16 @@ import Foundation
 public import SignalServiceKit
 
 extension ThreadUtil {
+
     // MARK: - Durable Message Enqueue
 
     public class func enqueueMessage(
         body messageBody: MessageBody?,
-        mediaAttachments: [SignalAttachment] = [],
+        attachments: ([SendableAttachment], isViewOnce: Bool) = ([], isViewOnce: false),
         thread: TSThread,
         quotedReplyDraft: DraftQuotedReplyModel? = nil,
         linkPreviewDraft: OWSLinkPreviewDraft? = nil,
-        persistenceCompletionHandler persistenceCompletion: PersistenceCompletion? = nil
+        persistenceCompletionHandler persistenceCompletion: PersistenceCompletion? = nil,
     ) {
         let messageTimestamp = MessageTimestampGenerator.sharedInstance.generateTimestamp()
 
@@ -30,8 +31,9 @@ extension ThreadUtil {
                 let linkPreviewDataSource = try await linkPreviewDraft.mapAsync {
                     try await DependenciesBridge.shared.linkPreviewManager.buildDataSource(from: $0)
                 }
-                let mediaAttachments = try await mediaAttachments.mapAsync {
-                    try await $0.forSending()
+                let attachmentContentValidator = DependenciesBridge.shared.attachmentContentValidator
+                let attachmentsForSending = try await attachments.0.mapAsync {
+                    try await $0.forSending(attachmentContentValidator: attachmentContentValidator)
                 }
                 let quotedReplyDraft = try await quotedReplyDraft.mapAsync {
                     try await DependenciesBridge.shared.quotedReplyManager.prepareDraftForSending($0)
@@ -42,14 +44,15 @@ extension ThreadUtil {
                         thread: thread,
                         timestamp: messageTimestamp,
                         messageBody: messageBody,
-                        mediaAttachments: mediaAttachments,
+                        mediaAttachments: attachmentsForSending,
+                        isViewOnce: attachments.isViewOnce,
                         quotedReplyDraft: quotedReplyDraft,
                         linkPreviewDataSource: linkPreviewDataSource,
-                        transaction: readTransaction
+                        transaction: readTransaction,
                     )
                 }
             } catch {
-                owsFailDebug("Failed to build message")
+                owsFailDebug("couldn't build message: \(error)")
                 return
             }
 
@@ -57,7 +60,7 @@ extension ThreadUtil {
                 unpreparedMessage,
                 benchEventId: benchEventId,
                 thread: thread,
-                persistenceCompletionHandler: persistenceCompletion
+                persistenceCompletionHandler: persistenceCompletion,
             )
         }
     }
@@ -68,7 +71,7 @@ extension ThreadUtil {
         quotedReplyEdit: MessageEdits.Edit<Void>,
         linkPreviewDraft: OWSLinkPreviewDraft?,
         editTarget: TSOutgoingMessage,
-        persistenceCompletionHandler persistenceCompletion: PersistenceCompletion? = nil
+        persistenceCompletionHandler persistenceCompletion: PersistenceCompletion? = nil,
     ) {
         AssertIsOnMainThread()
 
@@ -92,10 +95,10 @@ extension ThreadUtil {
                     messageBody: messageBody,
                     quotedReplyEdit: quotedReplyEdit,
                     linkPreviewDataSource: linkPreviewDataSource,
-                    editTarget: editTarget
+                    editTarget: editTarget,
                 )
             } catch {
-                owsFailDebug("Failed to build message")
+                owsFailDebug("couldn't build message: \(error)")
                 return
             }
 
@@ -103,7 +106,7 @@ extension ThreadUtil {
                 unpreparedMessage,
                 benchEventId: benchEventId,
                 thread: thread,
-                persistenceCompletionHandler: persistenceCompletion
+                persistenceCompletionHandler: persistenceCompletion,
             )
         }
     }
@@ -113,7 +116,7 @@ extension ThreadUtil {
     class func enqueueMessage(
         _ unpreparedMessage: UnpreparedOutgoingMessage,
         thread: TSThread,
-        persistenceCompletionHandler persistenceCompletion: PersistenceCompletion? = nil
+        persistenceCompletionHandler persistenceCompletion: PersistenceCompletion? = nil,
     ) {
         let benchEventId = sendMessageBenchEventStart(messageTimestamp: unpreparedMessage.messageTimestampForLogging)
         self.enqueueSendQueue.enqueue {
@@ -121,7 +124,7 @@ extension ThreadUtil {
                 unpreparedMessage,
                 benchEventId: benchEventId,
                 thread: thread,
-                persistenceCompletionHandler: persistenceCompletion
+                persistenceCompletionHandler: persistenceCompletion,
             )
         }
     }
@@ -131,7 +134,7 @@ extension ThreadUtil {
         _ unpreparedMessage: UnpreparedOutgoingMessage,
         benchEventId: String,
         thread: TSThread,
-        persistenceCompletionHandler persistenceCompletion: PersistenceCompletion? = nil
+        persistenceCompletionHandler persistenceCompletion: PersistenceCompletion? = nil,
     ) async {
         await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { writeTransaction in
             guard let preparedMessage = try? unpreparedMessage.prepare(tx: writeTransaction) else {
@@ -141,9 +144,9 @@ extension ThreadUtil {
             let promise = SSKEnvironment.shared.messageSenderJobQueueRef.add(
                 .promise,
                 message: preparedMessage,
-                transaction: writeTransaction
+                transaction: writeTransaction,
             )
-            if let persistenceCompletion = persistenceCompletion {
+            if let persistenceCompletion {
                 writeTransaction.addSyncCompletion {
                     Task { @MainActor in
                         persistenceCompletion()
@@ -168,7 +171,7 @@ extension ThreadUtil {
         BenchEventStart(
             title: "Send Message Milestone: Marked as Sent (\(messageTimestamp))",
             eventId: eventId,
-            logInProduction: true
+            logInProduction: true,
         )
         return eventId
     }
@@ -182,11 +185,15 @@ extension UnpreparedOutgoingMessage {
         thread: TSThread,
         timestamp: UInt64? = nil,
         messageBody: ValidatedMessageBody?,
-        mediaAttachments: [SignalAttachment.ForSending] = [],
+        mediaAttachments: [SendableAttachment.ForSending] = [],
+        isViewOnce: Bool = false,
         quotedReplyDraft: DraftQuotedReplyModel.ForSending?,
         linkPreviewDataSource: LinkPreviewDataSource?,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> UnpreparedOutgoingMessage {
+        assert(!isViewOnce || mediaAttachments.count == 1)
+        assert(!mediaAttachments.contains(where: { $0.renderingFlag == .borderless }) || mediaAttachments.count == 1)
+
         let dmConfigurationStore = DependenciesBridge.shared.disappearingMessagesConfigurationStore
         let dmConfig = dmConfigurationStore.fetchOrBuildDefault(for: .thread(thread), tx: transaction)
 
@@ -194,28 +201,14 @@ extension UnpreparedOutgoingMessage {
             && messageBody?.oversizeText == nil
             && mediaAttachments.last?.renderingFlag == .voiceMessage
 
-        var isViewOnceMessage = false
-        for attachment in mediaAttachments {
-            if attachment.isViewOnce {
-                assert(mediaAttachments.count == 1)
-                isViewOnceMessage = true
-                break
-            }
-
-            if attachment.renderingFlag == .borderless {
-                assert(mediaAttachments.count == 1)
-                break
-            }
-        }
-
         let messageBuilder: TSOutgoingMessageBuilder = .withDefaultValues(thread: thread, timestamp: timestamp)
 
         messageBuilder.setMessageBody(messageBody)
 
         messageBuilder.expiresInSeconds = dmConfig.durationSeconds
-        messageBuilder.expireTimerVersion = NSNumber.init(value: dmConfig.timerVersion)
+        messageBuilder.expireTimerVersion = NSNumber(value: dmConfig.timerVersion)
         messageBuilder.isVoiceMessage = isVoiceMessage
-        messageBuilder.isViewOnceMessage = isViewOnceMessage
+        messageBuilder.isViewOnceMessage = isViewOnce
 
         let message = messageBuilder.build(transaction: transaction)
 
@@ -226,7 +219,7 @@ extension UnpreparedOutgoingMessage {
             body: messageBody,
             unsavedBodyMediaAttachments: attachmentInfos,
             linkPreviewDraft: linkPreviewDataSource,
-            quotedReplyDraft: quotedReplyDraft
+            quotedReplyDraft: quotedReplyDraft,
         )
         return unpreparedMessage
     }
@@ -237,7 +230,7 @@ extension UnpreparedOutgoingMessage {
         messageBody: ValidatedMessageBody?,
         quotedReplyEdit: MessageEdits.Edit<Void>,
         linkPreviewDataSource: LinkPreviewDataSource?,
-        editTarget: TSOutgoingMessage
+        editTarget: TSOutgoingMessage,
     ) -> UnpreparedOutgoingMessage {
 
         let oversizeTextDataSource: AttachmentDataSource? = messageBody?.oversizeText.map { .pendingAttachment($0) }
@@ -254,7 +247,7 @@ extension UnpreparedOutgoingMessage {
             edits: edits,
             oversizeTextDataSource: oversizeTextDataSource,
             linkPreviewDraft: linkPreviewDataSource,
-            quotedReplyEdit: quotedReplyEdit
+            quotedReplyEdit: quotedReplyEdit,
         )
         return unpreparedMessage
     }

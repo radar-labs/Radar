@@ -4,66 +4,35 @@
 //
 
 import Foundation
-public import SignalServiceKit
 import LibSignalClient
+import SignalServiceKit
+import SwiftProtobuf
 
-// MARK: - DecryptableProvisioningMessage
+// MARK: -
 
-/// Protocol describing a message that can be sent and received through
-/// the ProvisioningSocket.
-public protocol DecryptableProvisioningMessage {
-
-    /// Alias for the proto type that wraps the message.
-    associatedtype Envelope: ProvisioningEnvelope
-
-    init(plaintext: Data) throws
-}
-
-/// Protocol describing the envelope that contains a `DecryptableProvisioningMessage`
-/// and can be sent and received through the ProvisioningSocket.
-public protocol ProvisioningEnvelope {
-
-    init(serializedData: Data) throws
-
-    /// Encrypted payload containing the `DecryptableProvisioningMessage`
+protocol ProvisioningEnvelope: SwiftProtobuf.Message {
     var body: Data { get }
-
-    /// The public key used to encrypt `bodyData`
     var publicKey: Data { get }
 }
 
-// MARK: - DecryptableProvisioningMessage conformance
-
-extension ProvisioningProtoProvisionEnvelope: ProvisioningEnvelope {}
-extension LinkingProvisioningMessage: DecryptableProvisioningMessage {
-    public typealias Envelope = ProvisioningProtoProvisionEnvelope
-}
-
-extension RegistrationProvisioningEnvelope: ProvisioningEnvelope {}
-extension RegistrationProvisioningMessage: DecryptableProvisioningMessage {
-    public typealias Envelope = RegistrationProvisioningEnvelope
-}
+extension ProvisioningProtos_ProvisionEnvelope: ProvisioningEnvelope {}
+extension RegistrationProtos_RegistrationProvisionEnvelope: ProvisioningEnvelope {}
 
 // MARK: - ProvisioningSocketManager
 
 @MainActor
-public protocol ProvisioningSocketManagerUIDelegate: AnyObject {
+protocol ProvisioningSocketManagerUIDelegate: AnyObject {
     func provisioningSocketManager(
         _ provisioningSocketManager: ProvisioningSocketManager,
-        didUpdateProvisioningURL url: URL
+        didUpdateProvisioningURL url: URL,
     )
 
     func provisioningSocketManagerDidPauseQRRotation(
-        _ provisioningSocketManager: ProvisioningSocketManager
+        _ provisioningSocketManager: ProvisioningSocketManager,
     )
 }
 
-public class ProvisioningSocketManager: ProvisioningSocketDelegate {
-    private struct ProvisioningUrlParams {
-        let uuid: String
-        let cipher: ProvisioningCipher
-    }
-
+class ProvisioningSocketManager: ProvisioningConnectionListener {
     private struct DecryptableProvisionEnvelope {
         private let cipher: ProvisioningCipher
         private let encryptedEnvelope: Data
@@ -73,112 +42,96 @@ public class ProvisioningSocketManager: ProvisioningSocketDelegate {
             self.encryptedEnvelope = data
         }
 
-        func decrypt<ProvisioningMessage: DecryptableProvisioningMessage>() throws -> ProvisioningMessage {
-            let envelope = try ProvisioningMessage.Envelope(serializedData: encryptedEnvelope)
-            let data = try cipher.decrypt(data: envelope.body, theirPublicKey: try PublicKey(envelope.publicKey))
-            return try ProvisioningMessage(plaintext: data)
+        func decrypt<Envelope: ProvisioningEnvelope>(_ envelopeType: Envelope.Type) throws -> Data {
+            let envelope = try Envelope(serializedBytes: encryptedEnvelope)
+            return try cipher.decrypt(data: envelope.body, theirPublicKey: try PublicKey(envelope.publicKey))
         }
     }
 
     /// Represents an attempt to communicate with the primary.
-    private struct ProvisioningUrlCommunicationAttempt {
+    private struct ProvisioningCommunicationAttempt {
         /// The socket from which we hope to receive a provisioning envelope
         /// from a primary.
-        let socket: ProvisioningSocket
+        let socket: ProvisioningConnection
         /// The cipher to be used in encrypting the provisioning envelope.
         let cipher: ProvisioningCipher
-        /// A continuation waiting for us to fetch the parameters necessary for
+        /// A continuation waiting for us to fetch the address necessary for
         /// us to construct a provisioning URL, which we will present to the
         /// primary via QR code. The provisioning URL will contain the necessary
         /// data for the primary to send us a provisioning envelope over our
         /// provisioning socket, via the server.
-        var fetchProvisioningUrlParamsContinuation: CheckedContinuation<ProvisioningUrlParams, Error>?
+        var fetchProvisioningAddressContinuation: CheckedContinuation<String, Error>?
     }
 
-    private var urlCommunicationAttempts: AtomicValue<[ProvisioningUrlCommunicationAttempt]> = AtomicValue([], lock: .init())
+    private let activeCommunicationAttempts = AtomicValue<[ObjectIdentifier: ProvisioningCommunicationAttempt]>([:], lock: .init())
+
     private var awaitProvisionEnvelopeContinuation: AtomicValue<CheckedContinuation<DecryptableProvisionEnvelope, Error>?> = AtomicValue(nil, lock: .init())
 
-    public var delegate: ProvisioningSocketManagerUIDelegate?
+    var delegate: ProvisioningSocketManagerUIDelegate?
 
     private let linkType: DeviceProvisioningURL.LinkType
-    public init(linkType: DeviceProvisioningURL.LinkType) {
+    init(linkType: DeviceProvisioningURL.LinkType) {
         self.linkType = linkType
     }
 
     // Start:
     // rotate the sockets.  Call back to delegate when the socket updates
     // Call back whit
-    public func start() {
+    func start() {
         rotate()
     }
 
-    public func reset() {
+    func reset() {
         stop()
         start()
     }
 
-    public func stop() {
+    func stop() {
         rotationTask?.cancel()
         rotationTask = nil
     }
 
-    // MARK: ProvisioningSocketDelegate
+    // MARK: ProvisioningConnectionListener
 
-    public func provisioningSocket(
-        _ provisioningSocket: ProvisioningSocket,
-        didReceiveProvisioningUuid provisioningUuid: String
+    func provisioningConnection(
+        _ connection: ProvisioningConnection,
+        didReceiveAddress address: String,
+        sendAck: @escaping () throws -> Void,
     ) {
-        urlCommunicationAttempts.update { attempts in
-            let matchingAttemptIndex = attempts.firstIndex {
-                $0.socket.id == provisioningSocket.id
-            }
-
-            guard
-                let matchingAttemptIndex,
-                let fetchParamsContinuation = attempts[matchingAttemptIndex].fetchProvisioningUrlParamsContinuation
-            else {
-                owsFailDebug("Got provisioning UUID for unknown socket!")
-                return
-            }
-
-            attempts[matchingAttemptIndex].fetchProvisioningUrlParamsContinuation = nil
-
-            fetchParamsContinuation.resume(
-                returning: ProvisioningUrlParams(
-                    uuid: provisioningUuid,
-                    cipher: attempts[matchingAttemptIndex].cipher
-                )
-            )
+        defer { try? sendAck() }
+        let continuation = self.activeCommunicationAttempts.update {
+            var communicationAttempt = $0.removeValue(forKey: ObjectIdentifier(connection))
+            owsAssertDebug(communicationAttempt != nil)
+            let continuation = communicationAttempt?.fetchProvisioningAddressContinuation.take()
+            $0[ObjectIdentifier(connection)] = communicationAttempt
+            return continuation
         }
+        continuation?.resume(returning: address)
     }
 
-    public func provisioningSocket(
-        _ provisioningSocket: ProvisioningSocket,
-        didReceiveEnvelopeData data: Data
+    func provisioningConnection(
+        _ connection: ProvisioningConnection,
+        didReceiveEnvelope envelope: Data,
+        sendAck: @escaping () throws -> Void,
     ) {
-        var cipherForSocket: ProvisioningCipher?
+        defer { try? sendAck() }
 
+        let activeCommunicationAttempts = self.activeCommunicationAttempts.get()
+
+        guard let fulfilledCommunicationAttempt = activeCommunicationAttempts[ObjectIdentifier(connection)] else {
+            owsFailDebug("invalid socket")
+            return
+        }
         /// We've gotten a provisioning message, from one of our attempts'
         /// sockets. (We don't care which one – it's whichever one the primary
         /// scanned and sent an envelope through!)
-        for attempt in urlCommunicationAttempts.get() {
-            /// After we get a provisioning message, we don't expect anything
-            /// from this or any other socket.
-            attempt.socket.disconnect(code: .normalClosure)
 
-            if provisioningSocket.id == attempt.socket.id {
-                owsAssertDebug(
-                    cipherForSocket == nil,
-                    "Extracting cipher, but unexpectedly already set from previous match!"
-                )
-
-                cipherForSocket = attempt.cipher
+        /// After we get a provisioning message, we don't expect anything
+        /// from this or any other socket.
+        for (_, obsoleteCommunicationAttempt) in activeCommunicationAttempts {
+            Task {
+                _ = try? await obsoleteCommunicationAttempt.socket.disconnect()
             }
-        }
-
-        guard let cipherForSocket else {
-            owsFailDebug("Missing cipher for socket that received envelope!")
-            return
         }
 
         awaitProvisionEnvelopeContinuation.update { existingContinuation in
@@ -188,43 +141,31 @@ public class ProvisioningSocketManager: ProvisioningSocketDelegate {
             }
 
             stop()
-            let envelope = DecryptableProvisionEnvelope(cipher: cipherForSocket, data: data)
+            let envelope = DecryptableProvisionEnvelope(cipher: fulfilledCommunicationAttempt.cipher, data: envelope)
             continuation.resume(returning: envelope)
 
             existingContinuation = nil
         }
     }
 
-    public func provisioningSocket(_ provisioningSocket: ProvisioningSocket, didError error: Error) {
-        if
-            let webSocketError = error as? WebSocketError,
-            case .closeError = webSocketError
-        {
-            Logger.info("Provisioning socket closed...")
-        } else {
-            Logger.error("\(error)")
+    func connectionWasInterrupted(_ connection: ProvisioningConnection, error: (any Error)?) {
+        Logger.warn("\(error as Optional)")
+
+        // Remove the socket from the list of active sockets -- we're done with it.
+        let communicationAttempt = self.activeCommunicationAttempts.update {
+            return $0.removeValue(forKey: ObjectIdentifier(connection))
         }
-
-        urlCommunicationAttempts.update { attempts in
-            let matchingAttemptIndex = attempts.firstIndex {
-                $0.socket.id == provisioningSocket.id
-            }
-
-            guard let matchingAttemptIndex else {
-                owsFailDebug("Got provisioning UUID for unknown socket!")
-                return
-            }
-
-            attempts[matchingAttemptIndex].fetchProvisioningUrlParamsContinuation?.resume(throwing: error)
-            attempts[matchingAttemptIndex].fetchProvisioningUrlParamsContinuation = nil
-        }
+        owsAssertDebug(communicationAttempt != nil)
+        // Throw the error via the continuation to avoid stalling if anything is waiting.
+        communicationAttempt?.fetchProvisioningAddressContinuation?.resume(throwing: error ?? OWSGenericError("unknown error"))
     }
 
     // MARK: -
 
     private static func buildProvisioningUrl(
         type: DeviceProvisioningURL.LinkType,
-        params: ProvisioningUrlParams
+        address: String,
+        publicKey: PublicKey,
     ) throws -> URL {
 
         let shouldLinkAndSync: Bool = {
@@ -251,15 +192,28 @@ public class ProvisioningSocketManager: ProvisioningSocketDelegate {
         }()
 
         var capabilities = [DeviceProvisioningURL.Capability]()
-        if shouldLinkAndSync {
-            capabilities.append(DeviceProvisioningURL.Capability.linknsync)
+        switch type {
+        case .linkDevice:
+            if shouldLinkAndSync {
+                capabilities.append(.linknsync)
+            }
+            if BuildFlags.phoneNumberlessCanBeLinkedDevice {
+                capabilities.append(.nopni)
+            }
+        case .quickRestore:
+            if
+                #available(iOS 26.0, *),
+                DeviceTransfer.platformSupportsWifiAware()
+            {
+                capabilities.append(.wifiaware)
+            }
         }
 
         return try DeviceProvisioningURL(
             type: type,
-            ephemeralDeviceId: params.uuid,
-            publicKey: params.cipher.ourPublicKey,
-            capabilities: capabilities
+            ephemeralDeviceId: address,
+            publicKey: publicKey,
+            capabilities: capabilities,
         ).buildUrl()
     }
 
@@ -271,23 +225,33 @@ public class ProvisioningSocketManager: ProvisioningSocketDelegate {
     /// A provisioning URL containing information about the now-opened
     /// provisioning socket.
     func openNewProvisioningSocket() async throws -> URL {
-        let provisioningUrlParams: ProvisioningUrlParams = try await withCheckedThrowingContinuation { paramsContinuation in
-            let newAttempt = ProvisioningUrlCommunicationAttempt(
-                socket: ProvisioningSocket(),
-                cipher: ProvisioningCipher(),
-                fetchProvisioningUrlParamsContinuation: paramsContinuation
+        let libsignalNet = DependenciesBridge.shared.libsignalNet
+
+        let ourKeyPair = IdentityKeyPair.generate()
+        let cipher = ProvisioningCipher(ourKeyPair: ourKeyPair)
+
+        let socket = try await libsignalNet.connectProvisioning()
+
+        let provisioningAddress: String = try await withCheckedThrowingContinuation { continuation in
+            let newAttempt = ProvisioningCommunicationAttempt(
+                socket: socket,
+                cipher: cipher,
+                fetchProvisioningAddressContinuation: continuation,
             )
 
-            urlCommunicationAttempts.update { $0.append(newAttempt) }
+            self.activeCommunicationAttempts.update { $0[ObjectIdentifier(socket)] = newAttempt }
 
-            newAttempt.socket.delegate = self
-            newAttempt.socket.connect()
+            socket.start(listener: self)
         }
 
-        return try Self.buildProvisioningUrl(type: linkType, params: provisioningUrlParams)
+        return try Self.buildProvisioningUrl(
+            type: linkType,
+            address: provisioningAddress,
+            publicKey: ourKeyPair.publicKey,
+        )
     }
 
-    public func waitForMessage<ProvisioningMessage: DecryptableProvisioningMessage>() async throws -> ProvisioningMessage {
+    func waitForMessageData<Envelope: ProvisioningEnvelope>(_ envelopeType: Envelope.Type) async throws -> Data {
         let decryptableProvisionEnvelope: DecryptableProvisionEnvelope = try await withCheckedThrowingContinuation { newContinuation in
             awaitProvisionEnvelopeContinuation.update { existingContinuation in
                 guard existingContinuation == nil else {
@@ -297,7 +261,7 @@ public class ProvisioningSocketManager: ProvisioningSocketDelegate {
                 existingContinuation = newContinuation
             }
         }
-        return try decryptableProvisionEnvelope.decrypt()
+        return try decryptableProvisionEnvelope.decrypt(envelopeType)
     }
 
     private var rotationTask: Task<Void, Never>?

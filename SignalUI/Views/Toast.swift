@@ -8,16 +8,39 @@ import SignalServiceKit
 
 public class ToastController: NSObject, ToastViewDelegate {
 
+    public struct Button {
+        let title: String
+        let onPrimaryAction: () -> Void
+
+        public init(title: String, onPrimaryAction: @escaping () -> Void) {
+            self.title = title
+            self.onPrimaryAction = onPrimaryAction
+        }
+    }
+
+    static let defaultToastDuration: DispatchTimeInterval = .seconds(4)
+
     static var currentToastController: ToastController?
 
     private weak var toastView: ToastView?
     private var isDismissing: Bool
     private let toastText: String
+    private let toastIcon: UIImage?
+    private let toastButton: Button?
+    private let toastDuration: DispatchTimeInterval
 
     // MARK: Initializers
 
-    public init(text: String) {
+    public init(
+        text: String,
+        image: UIImage? = nil,
+        button: Button? = nil,
+        duration: DispatchTimeInterval? = nil,
+    ) {
         self.toastText = text
+        self.toastIcon = image
+        self.toastButton = button
+        self.toastDuration = duration ?? Self.defaultToastDuration
         isDismissing = false
 
         super.init()
@@ -28,12 +51,15 @@ public class ToastController: NSObject, ToastViewDelegate {
 
     // MARK: Public
 
-    public func presentToastView(from edge: ALEdge,
-                                 of view: UIView,
-                                 inset: CGFloat,
-                                 dismissAfter: DispatchTimeInterval = .seconds(4)) {
+    public func presentToastView(
+        from edge: ALEdge,
+        of view: UIView,
+        inset: CGFloat,
+    ) {
         let toastView = ToastView()
         toastView.text = self.toastText
+        toastView.image = self.toastIcon
+        toastView.button = self.toastButton
         toastView.delegate = self
         self.toastView = toastView
 
@@ -48,7 +74,6 @@ public class ToastController: NSObject, ToastViewDelegate {
         }
 
         Logger.debug("")
-        toastView.alpha = 0
         parentView.addSubview(toastView)
         toastView.setCompressionResistanceHigh()
 
@@ -81,11 +106,9 @@ public class ToastController: NSObject, ToastViewDelegate {
         }
         type(of: self).currentToastController = self
 
-        UIView.animate(withDuration: 0.2) {
-            toastView.alpha = 1
-        }
+        toastView.animateIn()
 
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + dismissAfter) {
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + toastDuration) {
             // intentional strong reference to self.
             // As with an AlertController, the caller likely expects toast to
             // be presented and dismissed without maintaining a strong reference to ToastController
@@ -107,7 +130,7 @@ public class ToastController: NSObject, ToastViewDelegate {
             toItem: viewOwningKeyboard.keyboardLayoutGuide,
             attribute: .top,
             multiplier: 1.0,
-            constant: -8
+            constant: -8,
         )
     }
 
@@ -125,8 +148,8 @@ public class ToastController: NSObject, ToastViewDelegate {
         if
             let constraint = self.toastBottomConstraint,
             let view = self.viewToPinTo,
-            let offset = offset,
-            let toastView = toastView
+            let offset,
+            let toastView
         {
             NSLayoutConstraint.deactivate([constraint])
             let newConstraint: NSLayoutConstraint
@@ -142,12 +165,13 @@ public class ToastController: NSObject, ToastViewDelegate {
 
     // MARK: ToastViewDelegate
 
-    func didTapToastView(_ toastView: ToastView) {
+    fileprivate func didTapToastView(_ toastView: ToastView) {
         Logger.debug("")
+        self.toastButton?.onPrimaryAction()
         self.dismissToastView()
     }
 
-    func didSwipeToastView(_ toastView: ToastView) {
+    fileprivate func didSwipeToastView(_ toastView: ToastView) {
         Logger.debug("")
         self.dismissToastView()
     }
@@ -157,7 +181,7 @@ public class ToastController: NSObject, ToastViewDelegate {
     func dismissToastView() {
         Logger.debug("")
 
-        guard !isDismissing, let toastView = toastView else {
+        guard !isDismissing, let toastView else {
             return
         }
         isDismissing = true
@@ -166,23 +190,21 @@ public class ToastController: NSObject, ToastViewDelegate {
             type(of: self).currentToastController = nil
         }
 
-        UIView.animate(withDuration: 0.2,
-                       animations: {
-            toastView.alpha = 0
-        },
-                       completion: { (_) in
+        toastView.animateOut {
             toastView.removeFromSuperview()
             self.toastView = nil
-        })
+        }
     }
 }
 
-protocol ToastViewDelegate: AnyObject {
+// MARK: -
+
+private protocol ToastViewDelegate: AnyObject {
     func didTapToastView(_ toastView: ToastView)
     func didSwipeToastView(_ toastView: ToastView)
 }
 
-class ToastView: UIView {
+private class ToastView: UIView, UIGestureRecognizerDelegate {
 
     var text: String? {
         get {
@@ -192,44 +214,123 @@ class ToastView: UIView {
             label.text = newValue
         }
     }
+
+    var image: UIImage? {
+        didSet {
+            imageView.image = image
+            imageView.isHiddenInStackView = (image == nil)
+        }
+    }
+
+    var button: ToastController.Button? {
+        didSet {
+            buttonView.configuration?.title = button?.title
+            buttonView.isHiddenInStackView = (button == nil)
+        }
+    }
+
     weak var delegate: ToastViewDelegate?
 
+    private let backgroundView = UIVisualEffectView(effect: nil)
+    private let stackView: UIStackView
     private let label: UILabel
-    private let darkThemeBackgroundOverlay = UIView()
+    private let imageView = UIImageView()
+
+    private lazy var buttonView: UIButton = {
+        var configuration = UIButton.Configuration.borderless()
+        configuration.titleTextAttributesTransformer = .defaultFont(.dynamicTypeBody.bold())
+        configuration.baseForegroundColor = .white
+        configuration.contentInsets = .zero
+        let button = UIButton(configuration: configuration)
+        button.addAction(
+            UIAction { [weak self] _ in
+                guard let self else { return }
+                self.delegate?.didTapToastView(self)
+            },
+            for: .primaryActionTriggered,
+        )
+        return button
+    }()
+
+    @available(iOS 26.3, *)
+    private var glassEffect: UIGlassEffect {
+        let glassEffect = UIGlassEffect(style: .regular)
+        glassEffect.tintColor = UIColor(
+            light: UIColor(rgbHex: 0x3C3C43, alpha: 0.64),
+            dark: UIColor(rgbHex: 0xEBEBF5, alpha: 0.24),
+        )
+        return glassEffect
+    }
 
     // MARK: Initializers
 
     override init(frame: CGRect) {
         label = UILabel()
+        stackView = UIStackView(arrangedSubviews: [label])
         super.init(frame: frame)
 
-        self.layer.cornerRadius = 12
-        self.clipsToBounds = true
-        self.layoutMargins = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
+        addSubview(backgroundView)
 
-        let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
-        addSubview(blurEffectView)
-        blurEffectView.autoPinEdgesToSuperviewEdges()
+        // iOS 26.0 through 26.2 have a bug where the glass effect tint color
+        // would not be present during animations. This was fixed in 26.3.
+        if #available(iOS 26.3, *) {
+            stackView.insertArrangedSubview(imageView, at: 0)
+            imageView.autoSetDimensions(to: .square(24))
 
-        addSubview(darkThemeBackgroundOverlay)
-        darkThemeBackgroundOverlay.autoPinEdgesToSuperviewEdges()
-        darkThemeBackgroundOverlay.backgroundColor = UIColor.white.withAlphaComponent(0.10)
+            backgroundView.effect = glassEffect
+            backgroundView.contentView.layoutMargins = .init(hMargin: 20, vMargin: 14)
+            backgroundView.cornerConfiguration = .capsule(maximumRadius: 26)
 
-        label.textColor = .ows_white
-        label.font = UIFont.dynamicTypeSubheadline
+            backgroundView.autoPinHeightToSuperview()
+            backgroundView.autoPinWidthToSuperview(relation: .lessThanOrEqual)
+            backgroundView.autoHCenterInSuperview()
+
+            label.font = .dynamicTypeBody
+        } else {
+            backgroundView.effect = UIBlurEffect(style: .dark)
+            backgroundView.contentView.layoutMargins = .init(margin: 12)
+
+            backgroundView.autoPinEdgesToSuperviewEdges()
+
+            self.layer.cornerRadius = 12
+            self.clipsToBounds = true
+
+            label.font = UIFont.dynamicTypeSubheadline
+        }
+
+        if #unavailable(iOS 26.3) {
+            let darkThemeBackgroundOverlay = UIView()
+            addSubview(darkThemeBackgroundOverlay)
+            darkThemeBackgroundOverlay.autoPinEdgesToSuperviewEdges()
+            darkThemeBackgroundOverlay.backgroundColor = UIColor(
+                light: .clear,
+                dark: UIColor.white.withAlphaComponent(0.10),
+            )
+        }
+
+        imageView.tintColor = .white
+
+        label.textColor = .white
         label.numberOfLines = 0
-        self.addSubview(label)
-        label.autoPinEdgesToSuperviewMargins()
+        label.setCompressionResistanceHorizontalHigh()
+
+        stackView.addArrangedSubview(buttonView)
+        buttonView.isHiddenInStackView = true
+        buttonView.setCompressionResistanceHorizontalHigh()
+        buttonView.setContentHuggingHorizontalHigh()
+
+        stackView.axis = .horizontal
+        stackView.spacing = 12
+        stackView.alignment = .center
+        backgroundView.contentView.addSubview(stackView)
+        stackView.autoPinEdgesToSuperviewMargins()
 
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTap(gesture:)))
+        tapGesture.delegate = self
         self.addGestureRecognizer(tapGesture)
 
         let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(didSwipe(gesture:)))
         self.addGestureRecognizer(swipeGesture)
-
-        NotificationCenter.default.addObserver(self, selector: #selector(applyTheme), name: .themeDidChange, object: nil)
-        applyTheme()
-
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -237,11 +338,6 @@ class ToastView: UIView {
     }
 
     // MARK: Gestures
-
-    @objc
-    private func applyTheme() {
-        darkThemeBackgroundOverlay.isHidden = !Theme.isDarkThemeEnabled
-    }
 
     @objc
     private func didTap(gesture: UITapGestureRecognizer) {
@@ -252,23 +348,179 @@ class ToastView: UIView {
     private func didSwipe(gesture: UISwipeGestureRecognizer) {
         self.delegate?.didSwipeToastView(self)
     }
-}
 
-// MARK: -
+    // MARK: - UIGestureRecognizerDelegate
 
-public extension UIView {
-    func presentToast(text: String, fromViewController: UIViewController) {
-        fromViewController.presentToast(text: text)
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldReceive touch: UITouch,
+    ) -> Bool {
+        // The button reports its own taps to the delegate.
+        return !buttonView.bounds.contains(touch.location(in: buttonView))
+    }
+
+    // MARK: Animations
+
+    fileprivate func animateIn() {
+        let animator = UIViewPropertyAnimator(duration: 0.35, springDamping: 1, springResponse: 0.35)
+
+        if #available(iOS 26.3, *) {
+            UIView.performWithoutAnimation {
+                self.stackView.alpha = 0
+                self.transform = .scale(0.9)
+                self.backgroundView.effect = nil
+            }
+
+            animator.addAnimations {
+                self.stackView.alpha = 1
+                self.transform = .identity
+                self.backgroundView.effect = self.glassEffect
+            }
+        } else {
+            self.alpha = 0
+            animator.addAnimations {
+                self.alpha = 1
+            }
+        }
+
+        animator.startAnimation()
+    }
+
+    fileprivate func animateOut(completion: @escaping () -> Void) {
+        let animator = UIViewPropertyAnimator(duration: 0.35, springDamping: 1, springResponse: 0.35)
+        animator.addCompletion { _ in
+            completion()
+        }
+
+        if #available(iOS 26.3, *) {
+            animator.addAnimations {
+                self.stackView.alpha = 0
+                self.transform = .scale(0.9)
+                self.backgroundView.effect = nil
+            }
+        } else {
+            animator.addAnimations {
+                self.alpha = 0
+            }
+        }
+        animator.startAnimation()
     }
 }
 
 // MARK: -
 
-public extension UIViewController {
-    func presentToast(text: String, extraVInset: CGFloat = 0) {
-        let toastController = ToastController(text: text)
-        // TODO: There should be a better way to do this.
+extension UIView {
+    public func presentToast(
+        text: String,
+        image: UIImage? = nil,
+        button: ToastController.Button? = nil,
+        fromViewController: UIViewController,
+    ) {
+        fromViewController.presentToast(
+            text: text,
+            image: image,
+            button: button,
+        )
+    }
+}
+
+// MARK: -
+
+extension UIViewController {
+    public func presentToast(
+        text: String,
+        image: UIImage? = nil,
+        button: ToastController.Button? = nil,
+        extraVInset: CGFloat = 0,
+        duration: DispatchTimeInterval? = nil,
+    ) {
+        let toastController = ToastController(
+            text: text,
+            image: image,
+            button: button,
+            duration: duration,
+        )
         let bottomInset = view.safeAreaInsets.bottom + 8 + extraVInset
         toastController.presentToastView(from: .bottom, of: view, inset: bottomInset)
     }
 }
+
+// MARK: -
+
+#if DEBUG
+
+private class ToastPreviewViewController: UIViewController {
+
+    private lazy var buttonStack: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [
+            button(title: "Text only") {
+                $0.presentToast(text: "Message sent")
+            },
+            button(title: "Text and image") {
+                $0.presentToast(
+                    text: CommonStrings.copiedToClipboardToast,
+                    image: Theme.iconImage(.buttonCopy),
+                )
+            },
+            button(title: "Long text") {
+                $0.presentToast(
+                    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean id magna sed mauris eleifend pellentesque ut consequat neque. Vestibulum ac neque a diam varius fringilla lacinia et odio. Aenean non lectus eget augue tristique dictum.",
+                    image: Theme.iconImage(.checkmark),
+                )
+            },
+            button(title: "Text and button") {
+                $0.presentToast(
+                    text: "Message deleted",
+                    button: ToastController.Button(title: "Undo", onPrimaryAction: {
+                        print("Undoing!")
+                    }),
+                )
+            },
+            button(title: "Text, image, and button") {
+                $0.presentToast(
+                    text: CommonStrings.copiedToClipboardToast,
+                    image: Theme.iconImage(.buttonCopy),
+                    button: ToastController.Button(title: "Undo", onPrimaryAction: {
+                        print("Undoing!")
+                    }),
+                )
+            },
+        ])
+        stackView.axis = .vertical
+        stackView.alignment = .center
+        stackView.spacing = 16
+        return stackView
+    }()
+
+    private func button(
+        title: String,
+        handler: @escaping (ToastPreviewViewController) -> Void,
+    ) -> UIButton {
+        let button = UIButton(configuration: .mediumSecondary(title: title))
+        button.addAction(
+            UIAction { [weak self] _ in
+                guard let self else { return }
+                handler(self)
+            },
+            for: .primaryActionTriggered,
+        )
+        return button
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        view.backgroundColor = .Signal.background
+
+        view.addSubview(buttonStack)
+        buttonStack.autoPinWidthToSuperviewMargins()
+        buttonStack.autoVCenterInSuperview()
+    }
+}
+
+@available(iOS 17, *)
+#Preview("Toast") {
+    ToastPreviewViewController(nibName: nil, bundle: nil)
+}
+
+#endif

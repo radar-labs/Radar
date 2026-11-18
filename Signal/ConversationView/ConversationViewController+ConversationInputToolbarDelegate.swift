@@ -5,40 +5,46 @@
 
 import CoreServices
 import LibSignalClient
-public import Photos
-public import SignalServiceKit
-public import SignalUI
+import Photos
+import SignalServiceKit
+import SignalUI
 import UniformTypeIdentifiers
 
-extension ConversationViewController: ConversationInputToolbarDelegate {
+extension ConversationViewController {
 
-    public func isBlockedConversation() -> Bool {
+    // MARK: - ConversationInputToolbarDelegate
+
+    func isBlockedConversation() -> Bool {
         threadViewModel.isBlocked
     }
 
-    public func isGroup() -> Bool {
+    func isGroup() -> Bool {
         isGroupConversation
     }
 
-    public func viewForKeyboardLayoutGuide() -> UIView {
+    func viewForKeyboardLayoutGuide() -> UIView {
         return view
     }
 
-    public func viewForSuggestedStickersPanel() -> UIView { view }
+    func viewForSuggestedStickersPanel() -> UIView { view }
 
-    public func sendButtonPressed() {
+    func sendButtonPressed() {
         AssertIsOnMainThread()
 
         guard hasViewWillAppearEverBegun else {
             owsFailDebug("InputToolbar not yet ready.")
             return
         }
-        guard let inputToolbar = inputToolbar else {
-            owsFailDebug("Missing inputToolbar.")
+        guard let inputToolbar else {
             return
         }
 
         inputToolbar.acceptAutocorrectSuggestion()
+
+        // Guards against hardware-keyboard Return keys, which circumvent the Send button.
+        guard inputToolbar.canSendTextMessage else {
+            return
+        }
 
         guard let messageBody = inputToolbar.messageBodyForSending else {
             return
@@ -47,7 +53,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
         tryToSendTextMessage(messageBody, updateKeyboardState: true)
     }
 
-    public func messageWasSent() {
+    func messageWasSent() {
         AssertIsOnMainThread()
 
         self.lastMessageSentDate = Date()
@@ -55,8 +61,15 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
         loadCoordinator.clearUnreadMessagesIndicator()
         inputToolbar?.quotedReplyDraft = nil
 
-        if SSKEnvironment.shared.preferencesRef.soundInForeground,
-           let soundId = Sounds.systemSoundIDForSound(.standard(.messageSent), quiet: true) {
+        let shouldPlayMessageSentSound = DependenciesBridge.shared.db.read { tx in
+            let notificationPreferencesManager = DependenciesBridge.shared.notificationPreferencesManager
+            return notificationPreferencesManager.playSoundInForeground(tx: tx)
+                && notificationPreferencesManager.isMessageSentSoundEnabled(tx: tx)
+        }
+        if
+            shouldPlayMessageSentSound,
+            let soundId = Sounds.systemSoundIDForSound(.standard(.messageSent), quiet: true)
+        {
             AudioServicesPlaySystemSound(soundId)
         }
         SSKEnvironment.shared.typingIndicatorsRef.didSendOutgoingMessage(inThread: thread)
@@ -66,7 +79,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
         tryToSendTextMessage(
             messageBody,
             updateKeyboardState: updateKeyboardState,
-            untrustedThreshold: Date().addingTimeInterval(-OWSIdentityManagerImpl.Constants.defaultUntrustedInterval)
+            untrustedThreshold: Date().addingTimeInterval(-OWSIdentityManagerImpl.Constants.defaultUntrustedInterval),
         )
     }
 
@@ -77,8 +90,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
             owsFailDebug("View not yet ready.")
             return
         }
-        guard let inputToolbar = inputToolbar else {
-            owsFailDebug("Missing inputToolbar.")
+        guard let inputToolbar else {
             return
         }
 
@@ -94,9 +106,9 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
         let newUntrustedThreshold = Date()
         let didShowSNAlert = showSafetyNumberConfirmationIfNecessary(
             confirmationText: SafetyNumberStrings.confirmSendButton,
-            untrustedThreshold: untrustedThreshold
+            untrustedThreshold: untrustedThreshold,
         ) { [weak self] didConfirmIdentity in
-            guard let self = self else { return }
+            guard let self else { return }
             if didConfirmIdentity {
                 self.tryToSendTextMessage(messageBody, updateKeyboardState: false, untrustedThreshold: newUntrustedThreshold)
             }
@@ -116,7 +128,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
                 return context.editManager.validateCanSendEdit(
                     targetMessageTimestamp: editTarget.timestamp,
                     thread: self.thread,
-                    tx: transaction
+                    tx: transaction,
                 )
             }
             return nil
@@ -139,7 +151,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
                 persistenceCompletionHandler: {
                     AssertIsOnMainThread()
                     self.loadCoordinator.enqueueReload()
-                }
+                },
             )
         } else {
             ThreadUtil.enqueueMessage(
@@ -150,7 +162,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
                 persistenceCompletionHandler: {
                     AssertIsOnMainThread()
                     self.loadCoordinator.enqueueReload()
-                }
+                },
             )
         }
 
@@ -166,7 +178,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
             // Reload a fresh instance of the thread model; our models are not
             // thread-safe, so it wouldn't be safe to update the model in an
             // async write.
-            guard let thread = TSThread.anyFetch(uniqueId: thread.uniqueId, transaction: transaction) else {
+            guard let thread = TSThread.fetchViaCache(uniqueId: thread.uniqueId, transaction: transaction) else {
                 owsFailDebug("Missing thread.")
                 return
             }
@@ -174,7 +186,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
                 draftMessageBody: nil,
                 replyInfo: nil,
                 editTargetTimestamp: nil,
-                transaction: transaction
+                transaction: transaction,
             )
         }
 
@@ -185,16 +197,20 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
         NotificationCenter.default.post(name: ChatListViewController.clearSearch, object: nil)
     }
 
-    public func sendSticker(_ stickerInfo: StickerInfo) {
+    func sendSticker(_ stickerInfo: StickerInfo) {
         AssertIsOnMainThread()
 
         ImpactHapticFeedback.impactOccurred(style: .light)
 
-        ThreadUtil.enqueueMessage(withInstalledSticker: stickerInfo, thread: thread)
+        ThreadUtil.enqueueMessage(
+            withInstalledSticker: stickerInfo,
+            quotedReplyDraft: inputToolbar?.quotedReplyDraft,
+            thread: thread,
+        )
         messageWasSent()
     }
 
-    public func presentManageStickersView() {
+    func presentManageStickersView() {
         AssertIsOnMainThread()
 
         let manageStickersView = ManageStickersViewController()
@@ -202,25 +218,26 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
         presentFormSheet(navigationController, animated: true)
     }
 
-    public func updateToolbarHeight() {
+    func updateToolbarHeight() {
         guard hasViewWillAppearEverBegun else {
             owsFailDebug("InputToolbar not yet ready.")
             return
         }
         guard inputToolbar != nil else {
-            owsFailDebug("Missing inputToolbar.")
             return
         }
         updateContentInsets()
     }
 
-    public func voiceMemoGestureDidStart() {
+    func voiceMemoGestureDidStart() {
         AssertIsOnMainThread()
         Logger.info("")
 
         let kIgnoreMessageSendDoubleTapDurationSeconds: TimeInterval = 2.0
-        if let lastMessageSentDate = self.lastMessageSentDate,
-           abs(lastMessageSentDate.timeIntervalSinceNow) < kIgnoreMessageSendDoubleTapDurationSeconds {
+        if
+            let lastMessageSentDate = self.lastMessageSentDate,
+            abs(lastMessageSentDate.timeIntervalSinceNow) < kIgnoreMessageSendDoubleTapDurationSeconds
+        {
             // If users double-taps the message send button, the second tap can look like a
             // very short voice message gesture.  We want to ignore such gestures.
             cancelRecordingVoiceMessage()
@@ -230,28 +247,28 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
         checkPermissionsAndStartRecordingVoiceMessage()
     }
 
-    public func voiceMemoGestureDidComplete() {
+    func voiceMemoGestureDidComplete() {
         AssertIsOnMainThread()
         Logger.info("")
 
         finishRecordingVoiceMessage(sendImmediately: true)
     }
 
-    public func voiceMemoGestureDidLock() {
+    func voiceMemoGestureDidLock() {
         AssertIsOnMainThread()
         Logger.info("")
 
         inputToolbar?.lockVoiceMemoUI()
     }
 
-    public func voiceMemoGestureDidCancel() {
+    func voiceMemoGestureDidCancel() {
         AssertIsOnMainThread()
         Logger.info("")
 
         cancelRecordingVoiceMessage()
     }
 
-    public func voiceMemoGestureWasInterrupted() {
+    func voiceMemoGestureWasInterrupted() {
         AssertIsOnMainThread()
         Logger.info("")
 
@@ -264,15 +281,14 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
         sendVoiceMessageDraft(voiceMemoDraft)
     }
 
-    public func saveDraft() {
+    func saveDraft() {
         AssertIsOnMainThread()
 
         guard hasViewWillAppearEverBegun else {
             owsFailDebug("InputToolbar not yet ready.")
             return
         }
-        guard let inputToolbar = inputToolbar else {
-            owsFailDebug("Missing inputToolbar.")
+        guard let inputToolbar else {
             return
         }
 
@@ -285,7 +301,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
                 // Reload a fresh instance of the thread model; our models are not
                 // thread-safe, so it wouldn't be safe to update the model in an
                 // async write.
-                guard let thread = TSThread.anyFetch(uniqueId: thread.uniqueId, transaction: transaction) else {
+                guard let thread = TSThread.fetchViaCache(uniqueId: thread.uniqueId, transaction: transaction) else {
                     owsFailDebug("Missing thread.")
                     return
                 }
@@ -295,7 +311,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
                     quotedReply: quotedReply,
                     editTarget: editTarget,
                     thread: thread,
-                    transaction: transaction
+                    transaction: transaction,
                 )
 
                 // Persist the draft only if its changed. This avoids unnecessary model changes.
@@ -311,7 +327,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
                 {
                     replyInfo = ThreadReplyInfo(
                         timestamp: originalMessageTimestamp,
-                        author: aci
+                        author: aci,
                     )
                 } else {
                     replyInfo = nil
@@ -323,7 +339,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
                     draftMessageBody: currentDraft,
                     replyInfo: replyInfo,
                     editTargetTimestamp: editTargetTimestamp,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             }
         }
@@ -334,7 +350,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
         quotedReply: DraftQuotedReplyModel?,
         editTarget: TSOutgoingMessage?,
         thread: TSThread,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> Bool {
         let currentText = currentDraft?.text ?? ""
         let persistedText = thread.messageDraft ?? ""
@@ -342,15 +358,15 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
             return true
         }
 
-        let currentRanges = currentDraft?.ranges.mentions ?? [:]
-        let persistedRanges = thread.messageDraftBodyRanges?.mentions ?? [:]
+        let currentRanges = currentDraft?.ranges.orderedMentions ?? []
+        let persistedRanges = thread.messageDraftBodyRanges?.orderedMentions ?? []
         if currentRanges != persistedRanges {
             return true
         }
 
         if
             let threadTimestamp = thread.editTargetTimestamp,
-            threadTimestamp.uint64Value != editTarget?.timestamp ?? 0
+            threadTimestamp != editTarget?.timestamp ?? 0
         {
             return true
         }
@@ -367,16 +383,18 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
     }
 
     @MainActor
-    func tryToSendAttachments(
-        _ attachments: [SignalAttachment],
+    private func tryToSendAttachments(
+        _ approvedAttachments: ApprovedAttachments,
         from viewController: UIViewController,
-        messageBody: MessageBody?
-    ) async throws(SendAttachmentError) {
-        try await tryToSendAttachments(
-            attachments,
-            from: viewController,
+        messageBody: MessageBody?,
+        attachmentLimits: OutgoingAttachmentLimits,
+    ) async throws -> Bool {
+        return try await tryToSendAttachments(
+            approvedAttachments,
             messageBody: messageBody,
-            untrustedThreshold: Date().addingTimeInterval(-OWSIdentityManagerImpl.Constants.defaultUntrustedInterval)
+            from: viewController,
+            attachmentLimits: attachmentLimits,
+            untrustedThreshold: Date().addingTimeInterval(-OWSIdentityManagerImpl.Constants.defaultUntrustedInterval),
         )
     }
 
@@ -389,24 +407,32 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
 
     @MainActor
     private func tryToSendAttachments(
-        _ attachments: [SignalAttachment],
-        from viewController: UIViewController,
+        _ approvedAttachments: ApprovedAttachments,
         messageBody: MessageBody?,
-        untrustedThreshold: Date
-    ) async throws(SendAttachmentError) {
+        from viewController: UIViewController,
+        attachmentLimits: OutgoingAttachmentLimits,
+        untrustedThreshold: Date,
+    ) async throws -> Bool {
         AssertIsOnMainThread()
 
-        guard hasViewWillAppearEverBegun else {
-            throw .inputToolbarNotReady
+        guard hasViewWillAppearEverBegun, let inputToolbar else {
+            return false
         }
-        guard let inputToolbar = inputToolbar else {
-            throw .inputToolbarMissing
+
+        let imageQuality = approvedAttachments.imageQuality
+        let imageQualityLevel = ImageQualityLevel.resolvedValue(
+            imageQuality: imageQuality,
+            standardQualityLevel: attachmentLimits.standardQualityLevel,
+        )
+        let sendableAttachments = try await approvedAttachments.attachments.mapAsync {
+            return try await SendableAttachment.forPreviewableAttachment($0, imageQualityLevel: imageQualityLevel)
         }
 
         if self.isBlockedConversation() {
             let isBlocked = await self.showUnblockConversationUI()
-            guard !isBlocked else {
-                throw .conversationBlocked
+            if isBlocked {
+                // They're still blocked, so stop trying to send.
+                return false
             }
         }
 
@@ -414,28 +440,29 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
         let identityIsConfirmed = await self.showSafetyNumberConfirmationIfNecessary(
             from: viewController,
             confirmationText: SafetyNumberStrings.confirmSendButton,
-            untrustedThreshold: newUntrustedThreshold
+            untrustedThreshold: newUntrustedThreshold,
         )
 
         guard identityIsConfirmed else {
-            throw .untrustedContacts
+            // They're still untrusted, so stop trying to send.
+            return false
         }
 
         let didAddToProfileWhitelist = ThreadUtil.addThreadToProfileWhitelistIfEmptyOrPendingRequestAndSetDefaultTimerWithSneakyTransaction(self.thread)
 
-        let hasViewOnceAttachment = attachments.contains(where: { $0.isViewOnceAttachment })
+        let hasViewOnceAttachment = approvedAttachments.isViewOnce
         owsPrecondition(!hasViewOnceAttachment || messageBody == nil)
         owsPrecondition(!hasViewOnceAttachment || inputToolbar.quotedReplyDraft == nil)
 
         ThreadUtil.enqueueMessage(
             body: messageBody,
-            mediaAttachments: attachments,
+            attachments: (sendableAttachments, isViewOnce: approvedAttachments.isViewOnce),
             thread: self.thread,
             quotedReplyDraft: inputToolbar.quotedReplyDraft,
             persistenceCompletionHandler: {
                 AssertIsOnMainThread()
                 self.loadCoordinator.enqueueReload()
-            }
+            },
         )
 
         self.messageWasSent()
@@ -445,52 +472,54 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
         }
 
         NotificationCenter.default.post(name: ChatListViewController.clearSearch, object: nil)
+
+        return true
     }
 
     // MARK: - Accessory View
 
-    public func cameraButtonPressed() {
+    func cameraButtonPressed() {
         AssertIsOnMainThread()
 
         takePictureOrVideo()
     }
 
-    public func photosButtonPressed() {
+    func photosButtonPressed() {
         AssertIsOnMainThread()
 
         chooseFromLibrary()
     }
 
-    public func gifButtonPressed() {
+    func gifButtonPressed() {
         AssertIsOnMainThread()
 
         showGifPicker()
     }
 
-    public func fileButtonPressed() {
+    func fileButtonPressed() {
         AssertIsOnMainThread()
 
         showDocumentPicker()
     }
 
-    public func contactButtonPressed() {
+    func contactButtonPressed() {
         AssertIsOnMainThread()
 
         chooseContactForSending()
     }
 
-    public func locationButtonPressed() {
+    func locationButtonPressed() {
         AssertIsOnMainThread()
 
         let locationPicker = LocationPicker()
         locationPicker.delegate = self
         let navigationController = OWSNavigationController(rootViewController: locationPicker)
         navigationController.presentationController?.delegate = self
-        dismissKeyBoard()
+        dismissKeyboard()
         presentFormSheet(navigationController, animated: true)
     }
 
-    public func paymentButtonPressed() {
+    func paymentButtonPressed() {
         AssertIsOnMainThread()
 
         guard let contactThread = thread as? TSContactThread else {
@@ -498,11 +527,13 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
             return
         }
 
-        dismissKeyBoard()
+        dismissKeyboard()
 
-        if SUIEnvironment.shared.paymentsRef.isKillSwitchActive {
-            OWSActionSheets.showErrorAlert(message: OWSLocalizedString("SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH",
-                                                                      comment: "Error message indicating that payments cannot be sent because the feature is not currently available."))
+        guard SUIEnvironment.shared.paymentsRef.canUsePayments() else {
+            OWSActionSheets.showErrorAlert(message: OWSLocalizedString(
+                "SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH",
+                comment: "Error message indicating that payments cannot be sent because the feature is not currently available.",
+            ))
             return
         }
 
@@ -516,40 +547,40 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
             delegate: self,
             recipientAddress: contactThread.contactAddress,
             initialPaymentAmount: nil,
-            isOutgoingTransfer: false
+            isOutgoingTransfer: false,
         )
     }
 
-    public func pollButtonPressed() {
+    func pollButtonPressed() {
         AssertIsOnMainThread()
 
-        dismissKeyBoard()
+        dismissKeyboard()
 
-        let newPollViewController = NewPollViewController()
+        let newPollViewController = NewPollViewController2(
+            maxOptionCount: RemoteConfig.current.maxPollOptionSendCount,
+        )
         newPollViewController.sendDelegate = self
         present(OWSNavigationController(rootViewController: newPollViewController), animated: true)
     }
 
-    public func didSelectRecentPhoto(asset: PHAsset, attachment: SignalAttachment) {
+    func didSelectRecentPhoto(asset: PHAsset, attachment: PreviewableAttachment, attachmentLimits: OutgoingAttachmentLimits) {
         AssertIsOnMainThread()
 
-        dismissKeyBoard()
+        dismissKeyboard()
 
         let pickerModal = SendMediaNavigationController.showingApprovalWithPickedLibraryMedia(
             asset: asset,
             attachment: attachment,
             hasQuotedReplyDraft: inputToolbar?.quotedReplyDraft != nil,
+            attachmentLimits: attachmentLimits,
             delegate: self,
-            dataSource: self
+            dataSource: self,
         )
         let presenter = self.splitViewController ?? self
         presenter.present(pickerModal, animated: true)
     }
-}
 
-// MARK: -
-
-public extension ConversationViewController {
+    // MARK: -
 
     func showErrorAlert(attachmentError: SignalAttachmentError?) {
         AssertIsOnMainThread()
@@ -563,15 +594,14 @@ public extension ConversationViewController {
         )
     }
 
-    func showApprovalDialog(forAttachments attachments: [SignalAttachment]) {
+    func showApprovalDialog(forAttachments attachments: [PreviewableAttachment], attachmentLimits: OutgoingAttachmentLimits) {
         AssertIsOnMainThread()
 
         guard hasViewWillAppearEverBegun else {
             owsFailDebug("InputToolbar not yet ready.")
             return
         }
-        guard let inputToolbar = inputToolbar else {
-            owsFailDebug("Missing inputToolbar.")
+        guard let inputToolbar else {
             return
         }
 
@@ -579,72 +609,80 @@ public extension ConversationViewController {
             attachments: attachments,
             initialMessageBody: inputToolbar.messageBodyForSending,
             hasQuotedReplyDraft: inputToolbar.quotedReplyDraft != nil,
+            attachmentLimits: attachmentLimits,
             approvalDelegate: self,
             approvalDataSource: self,
-            stickerSheetDelegate: self
+            stickerSheetDelegate: self,
         )
         modal.modalPresentationStyle = .overCurrentContext
         let presenter = self.splitViewController ?? self
         presenter.present(modal, animated: true)
     }
-}
-
-// MARK: -
-
-fileprivate extension ConversationViewController {
 
     // MARK: - Attachment Picking: Contacts
 
-    func chooseContactForSending() {
+    private func chooseContactForSending() {
         AssertIsOnMainThread()
 
-        dismissKeyBoard()
-        SUIEnvironment.shared.contactsViewHelperRef.checkReadAuthorization(
-            purpose: .share,
-            performWhenAllowed: {
-                let contactsPicker = ContactPickerViewController(allowsMultipleSelection: false, subtitleCellType: .none)
-                contactsPicker.delegate = self
-                contactsPicker.title = OWSLocalizedString(
-                    "CONTACT_PICKER_TITLE",
-                    comment: "navbar title for contact picker when sharing a contact"
-                )
-                let sheet = OWSNavigationController(rootViewController: contactsPicker)
-                sheet.presentationController?.delegate = self
-                self.presentFormSheet(sheet, animated: true)
-            },
-            presentErrorFrom: self
-        )
+        dismissKeyboard()
+
+        if RemoteConfig.current.accountIdentifierSharingSend {
+            let contactsPicker = ContactSharingPickerViewController()
+            contactsPicker.contactSharingDelegate = self
+            let sheet = OWSNavigationController(rootViewController: contactsPicker)
+            sheet.presentationController?.delegate = self
+            presentFormSheet(sheet, animated: true)
+        } else {
+            SUIEnvironment.shared.contactsViewHelperRef.checkReadAuthorization(
+                purpose: .share,
+                performWhenAllowed: {
+                    let contactsPicker = ContactPickerViewController(allowsMultipleSelection: false, subtitleCellType: .none)
+                    contactsPicker.delegate = self
+                    contactsPicker.title = OWSLocalizedString(
+                        "CONTACT_PICKER_TITLE",
+                        comment: "navbar title for contact picker when sharing a contact",
+                    )
+                    let sheet = OWSNavigationController(rootViewController: contactsPicker)
+                    sheet.presentationController?.delegate = self
+                    self.presentFormSheet(sheet, animated: true)
+                },
+                presentErrorFrom: self,
+            )
+        }
     }
 
     // MARK: - Attachment Picking: Documents
 
-    func showDocumentPicker() {
+    private func showDocumentPicker() {
         AssertIsOnMainThread()
 
         // UIDocumentPickerViewController with asCopy true copies to a temp file within our container.
         // It uses more memory than "open" but lets us avoid working with security scoped URLs.
-        let pickerController = UIDocumentPickerViewController(forOpeningContentTypes: [.item],
-                                                              asCopy: true)
+        let pickerController = UIDocumentPickerViewController(
+            forOpeningContentTypes: [.item],
+            asCopy: true,
+        )
         pickerController.delegate = self
         pickerController.presentationController?.delegate = self
 
-        dismissKeyBoard()
+        dismissKeyboard()
         presentFormSheet(pickerController, animated: true)
     }
 
     // MARK: - Media Library
 
-    func takePictureOrVideo() {
+    private func takePictureOrVideo() {
         AssertIsOnMainThread()
 
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
         ows_askForCameraPermissions { [weak self] cameraGranted in
-            guard let self = self else { return }
+            guard let self else { return }
             guard cameraGranted else {
                 Logger.warn("camera permission denied.")
                 return
             }
             self.ows_askForMicrophonePermissions { [weak self] micGranted in
-                guard let self = self else { return }
+                guard let self else { return }
                 if !micGranted {
                     Logger.warn("proceeding, though mic permission denied.")
                     // We can still continue without mic permissions, but any captured video will
@@ -653,6 +691,7 @@ fileprivate extension ConversationViewController {
 
                 let pickerModal = SendMediaNavigationController.showingCameraFirst(
                     hasQuotedReplyDraft: self.inputToolbar?.quotedReplyDraft != nil,
+                    attachmentLimits: attachmentLimits,
                 )
                 pickerModal.sendMediaNavDelegate = self
                 pickerModal.sendMediaNavDataSource = self
@@ -663,7 +702,7 @@ fileprivate extension ConversationViewController {
                 if !pickerHidesStatusBar {
                     pickerModal.modalPresentationCapturesStatusBarAppearance = true
                 }
-                self.dismissKeyBoard()
+                self.dismissKeyboard()
                 self.present(pickerModal, animated: true) {
                     if pickerHidesStatusBar {
                         pickerModal.modalPresentationCapturesStatusBarAppearance = true
@@ -674,24 +713,23 @@ fileprivate extension ConversationViewController {
         }
     }
 
-    func chooseFromLibrary() {
+    private func chooseFromLibrary() {
         AssertIsOnMainThread()
 
         let pickerModal = SendMediaNavigationController.showingNativePicker(
             hasQuotedReplyDraft: inputToolbar?.quotedReplyDraft != nil,
+            attachmentLimits: .currentLimits(),
         )
         pickerModal.sendMediaNavDelegate = self
         pickerModal.sendMediaNavDataSource = self
 
-        self.dismissKeyBoard()
+        self.dismissKeyboard()
         let presenter = self.splitViewController ?? self
         presenter.present(pickerModal, animated: false)
     }
-}
 
-// MARK: - Attachment Picking: GIFs
+    // MARK: - Attachment Picking: GIFs
 
-public extension ConversationViewController {
     func showGifPicker() {
         let gifModal = GifPickerNavigationViewController(
             initialMessageBody: inputToolbar?.messageBodyForSending,
@@ -700,20 +738,17 @@ public extension ConversationViewController {
         gifModal.approvalDelegate = self
         gifModal.approvalDataSource = self
         gifModal.presentationController?.delegate = self
-        dismissKeyBoard()
+        dismissKeyboard()
         present(gifModal, animated: true)
     }
-}
 
-// MARK: -
+    // MARK: - LocationPickerDelegate
 
-extension ConversationViewController: LocationPickerDelegate {
-
-    public func didPickLocation(_ locationPicker: LocationPicker, location: Location) {
+    func didPickLocation(_ locationPicker: LocationPicker, location: Location) {
         AssertIsOnMainThread()
 
         Task { @MainActor in
-            let attachment: SignalAttachment
+            let attachment: SendableAttachment
             do {
                 attachment = try await location.prepareAttachment()
             } catch {
@@ -727,12 +762,12 @@ extension ConversationViewController: LocationPickerDelegate {
 
             ThreadUtil.enqueueMessage(
                 body: MessageBody(text: location.messageText, ranges: .empty),
-                mediaAttachments: [attachment],
+                attachments: ([attachment], isViewOnce: false),
                 thread: self.thread,
                 persistenceCompletionHandler: {
                     AssertIsOnMainThread()
                     self.loadCoordinator.enqueueReload()
-                }
+                },
             )
 
             self.messageWasSent()
@@ -745,20 +780,18 @@ extension ConversationViewController: LocationPickerDelegate {
         }
     }
 
-    public func locationPickerDidCancel() {
+    func locationPickerDidCancel() {
         self.dismiss(animated: true)
         self.openAttachmentKeyboard()
     }
-}
 
-// MARK: -
+    // MARK: - UIDocumentPickerDelegate
 
-extension ConversationViewController: UIDocumentPickerDelegate {
-    public func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+    func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
         self.openAttachmentKeyboard()
     }
 
-    public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentAt url: URL) {
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentAt url: URL) {
         let resourceValues: URLResourceValues?
         do {
             resourceValues = try url.resourceValues(forKeys: [.contentTypeKey, .isDirectoryKey])
@@ -772,7 +805,7 @@ extension ConversationViewController: UIDocumentPickerDelegate {
                 OWSActionSheets.showActionSheet(
                     title: OWSLocalizedString(
                         "ATTACHMENT_PICKER_DOCUMENTS_PICKED_DIRECTORY_FAILED_ALERT_TITLE",
-                        comment: "Alert title when picking a document fails because user picked a directory/bundle"
+                        comment: "Alert title when picking a document fails because user picked a directory/bundle",
                     ),
                     message: OWSLocalizedString(
                         "ATTACHMENT_PICKER_DOCUMENTS_PICKED_DIRECTORY_FAILED_ALERT_BODY",
@@ -791,11 +824,8 @@ extension ConversationViewController: UIDocumentPickerDelegate {
             return OWSLocalizedString("ATTACHMENT_DEFAULT_FILENAME", comment: "Generic filename for an attachment with no known name")
         }()
 
-        let dataSource: DataSourcePath
-        do {
-            dataSource = try DataSourcePath(fileUrl: url, shouldDeleteOnDeallocation: false)
-        } catch {
-            owsFailDebug("couldn't build data source: \(error)")
+        guard url.isFileURL else {
+            owsFailDebug("couldn't build data source")
             DispatchQueue.main.async {
                 OWSActionSheets.showActionSheet(
                     title: OWSLocalizedString(
@@ -806,42 +836,47 @@ extension ConversationViewController: UIDocumentPickerDelegate {
             }
             return
         }
+
+        let dataSource = DataSourcePath(fileUrl: url, ownership: .owned)
         dataSource.sourceFilename = filename
 
         let contentTypeIdentifier = (resourceValues?.contentType ?? .data).identifier
+
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
 
         // Although we want to be able to send higher quality attachments through
         // the document picker, it's more important that we ensure the sent format
         // is one all clients can accept (e.g., *not* QuickTime .mov).
         if SignalAttachment.videoUTISet.contains(contentTypeIdentifier) {
-            self.showApprovalDialogAfterProcessingVideo(dataSource: dataSource)
+            self.showApprovalDialogAfterProcessingVideo(dataSource: dataSource, attachmentLimits: attachmentLimits)
             return
         }
 
-        let attachment: SignalAttachment
-        do throws(SignalAttachmentError) {
-            attachment = try SignalAttachment.attachment(dataSource: dataSource, dataUTI: contentTypeIdentifier)
+        let attachment: PreviewableAttachment
+        do {
+            attachment = try PreviewableAttachment.buildAttachment(dataSource: dataSource, dataUTI: contentTypeIdentifier, attachmentLimits: attachmentLimits)
         } catch {
             DispatchQueue.main.async {
-                self.showErrorAlert(attachmentError: error)
+                self.showErrorAlert(attachmentError: error as? SignalAttachmentError)
             }
             return
         }
 
-        showApprovalDialog(forAttachments: [attachment])
+        showApprovalDialog(forAttachments: [attachment], attachmentLimits: attachmentLimits)
     }
 
-    private func showApprovalDialogAfterProcessingVideo(dataSource: DataSourcePath) {
+    private func showApprovalDialogAfterProcessingVideo(dataSource: DataSourcePath, attachmentLimits: OutgoingAttachmentLimits) {
         AssertIsOnMainThread()
 
         ModalActivityIndicatorViewController.present(
             fromViewController: self,
+            title: CommonStrings.preparingModal,
             canCancel: true,
             asyncBlock: { modalActivityIndicator in
                 do {
-                    let attachment = try await SignalAttachment.compressVideoAsMp4(dataSource: dataSource)
+                    let attachment = try await PreviewableAttachment.compressVideoAsMp4(dataSource: dataSource, attachmentLimits: attachmentLimits)
                     modalActivityIndicator.dismissIfNotCanceled(completionIfNotCanceled: {
-                        self.showApprovalDialog(forAttachments: [attachment])
+                        self.showApprovalDialog(forAttachments: [attachment], attachmentLimits: attachmentLimits)
                     })
                 } catch {
                     owsFailDebug("Error: \(error).")
@@ -852,11 +887,9 @@ extension ConversationViewController: UIDocumentPickerDelegate {
             },
         )
     }
-}
 
-// MARK: -
+    // MARK: - SendMediaNavDelegate
 
-extension ConversationViewController: SendMediaNavDelegate {
     func sendMediaNavDidCancel(_ sendMediaNavigationController: SendMediaNavigationController) {
         self.dismiss(animated: true, completion: nil)
         self.openAttachmentKeyboard()
@@ -864,68 +897,80 @@ extension ConversationViewController: SendMediaNavDelegate {
 
     func sendMediaNav(
         _ sendMediaNavigationController: SendMediaNavigationController,
-        didApproveAttachments attachments: [SignalAttachment],
-        messageBody: MessageBody?
+        didApproveAttachments approvedAttachments: ApprovedAttachments,
+        messageBody: MessageBody?,
     ) {
-        Task { @MainActor in
-            await self.sendAttachments(
-                attachments,
-                from: sendMediaNavigationController,
-                messageBody: messageBody
-            )
-        }
+        ModalActivityIndicatorViewController.present(
+            fromViewController: sendMediaNavigationController,
+            title: CommonStrings.preparingModal,
+            asyncBlock: { modal in
+                await self.sendAttachments(
+                    approvedAttachments,
+                    messageBody: messageBody,
+                    from: sendMediaNavigationController,
+                    attachmentLimits: sendMediaNavigationController.attachmentLimits,
+                )
+                modal.dismiss(completion: {
+                    self.dismiss(animated: true)
+                })
+            },
+        )
     }
 
     /// Attempts to send attachments. Handles prompting to unblock or un-verify safety numbers, as well as showing failure states.
     @MainActor
     func sendAttachments(
-        _ attachments: [SignalAttachment],
+        _ approvedAttachments: ApprovedAttachments,
+        messageBody: MessageBody?,
         from viewController: UIViewController,
-        messageBody: MessageBody?
+        attachmentLimits: OutgoingAttachmentLimits,
     ) async {
-        do throws(SendAttachmentError) {
-            try await tryToSendAttachments(
-                attachments,
+        let didSend: Bool
+        do {
+            didSend = try await tryToSendAttachments(
+                approvedAttachments,
                 from: viewController,
-                messageBody: messageBody
+                messageBody: messageBody,
+                attachmentLimits: attachmentLimits,
             )
-
-            if attachments.count == 1, let attachment = attachments.first, attachment.isBorderless {
-                // This looks like a sticker, we shouldn't clear the input toolbar.
-            } else {
-                inputToolbar?.clearTextMessage(animated: false)
-            }
-
-            // we want to already be at the bottom when the user returns, rather than have to watch
-            // the new message scroll into view.
-            scrollToBottomOfConversation(animated: true)
-            self.dismiss(animated: true)
         } catch {
-            switch error {
-            case .inputToolbarNotReady:
-                owsFailDebug("InputToolbar not yet ready.")
-            case .inputToolbarMissing:
-                owsFailDebug("Missing inputToolbar.")
-            case .conversationBlocked, .untrustedContacts:
-                // User was prompted but chose not to make changes. Stop here.
-                break
-            }
+            self.showErrorAlert(attachmentError: error as? SignalAttachmentError)
+            return
         }
+        guard didSend else {
+            return
+        }
+        if
+            approvedAttachments.attachments.count == 1,
+            let attachment = approvedAttachments.attachments.first,
+            attachment.rawValue.isBorderless
+        {
+            // This looks like a sticker, we shouldn't clear the input toolbar.
+        } else {
+            inputToolbar?.clearTextMessage(animated: false)
+        }
+
+        // we want to already be at the bottom when the user returns, rather than have to watch
+        // the new message scroll into view.
+        scrollToBottomOfConversation(animated: true)
     }
 
-    func sendMediaNav(_ sendMediaNavifationController: SendMediaNavigationController,
-                      didFinishWithTextAttachment textAttachment: UnsentTextAttachment) {
+    func sendMediaNav(
+        _ sendMediaNavifationController: SendMediaNavigationController,
+        didFinishWithTextAttachment textAttachment: UnsentTextAttachment,
+    ) {
         owsFailDebug("Can not post text stories to chat.")
     }
 
-    func sendMediaNav(_ sendMediaNavigationController: SendMediaNavigationController,
-                      didChangeMessageBody newMessageBody: MessageBody?) {
+    func sendMediaNav(
+        _ sendMediaNavigationController: SendMediaNavigationController,
+        didChangeMessageBody newMessageBody: MessageBody?,
+    ) {
         guard hasViewWillAppearEverBegun else {
             owsFailDebug("InputToolbar not yet ready.")
             return
         }
-        guard let inputToolbar = inputToolbar else {
-            owsFailDebug("Missing inputToolbar.")
+        guard let inputToolbar else {
             return
         }
 
@@ -935,11 +980,8 @@ extension ConversationViewController: SendMediaNavDelegate {
     func sendMediaNav(_ sendMediaNavigationController: SendMediaNavigationController, didChangeViewOnceState isViewOnce: Bool) {
         // We can ignore this event.
     }
-}
 
-// MARK: -
-
-extension ConversationViewController: SendMediaNavDataSource {
+    // MARK: - SendMediaNavDataSource
 
     func sendMediaNavInitialMessageBody(_ sendMediaNavigationController: SendMediaNavigationController) -> MessageBody? {
         inputToolbar?.messageBodyForSending
@@ -959,30 +1001,26 @@ extension ConversationViewController: SendMediaNavDataSource {
     func sendMediaNavMentionCacheInvalidationKey() -> String {
         return thread.uniqueId
     }
-}
 
-// MARK: - StickerPickerSheetDelegate
+    // MARK: - StickerPickerSheetDelegate
 
-extension ConversationViewController: StickerPickerSheetDelegate {
-    public func makeManageStickersViewController() -> UIViewController {
+    func makeManageStickersViewController(for stickerPickerSheet: StickerPickerSheet) -> UIViewController {
         let manageStickersView = ManageStickersViewController()
         let navigationController = OWSNavigationController(rootViewController: manageStickersView)
         return navigationController
     }
-}
 
-// MARK: - PollSendDelegate
+    // MARK: - PollSendDelegate
 
-extension ConversationViewController: PollSendDelegate {
-    public func sendPoll(question: String, options: [String], allowMultipleVotes: Bool) {
+    func sendPoll(question: String, options: [String], allowMultipleVotes: Bool) {
         ThreadUtil.enqueueMessage(
             withPoll:
-                CreatePollMessage(
-                    question: question,
-                    options: options,
-                    allowMultiple: allowMultipleVotes
-                ),
-            thread: self.thread
+            CreatePollMessage(
+                question: question,
+                options: options,
+                allowMultiple: allowMultipleVotes,
+            ),
+            thread: self.thread,
         )
     }
 }

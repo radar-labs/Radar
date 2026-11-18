@@ -19,11 +19,11 @@ public class AttachmentTransitPointer {
     public var cdnKey: String { info.cdnKey }
     public var uploadTimestamp: UInt64 { info.uploadTimestamp }
     public var lastDownloadAttemptTimestamp: UInt64? { info.lastDownloadAttemptTimestamp }
-    public var unencryptedByteCount: UInt32? { info.unencryptedByteCount }
+    public var unencryptedByteCount: UInt32 { info.unencryptedByteCount }
 
     private init(
         attachment: Attachment,
-        info: Attachment.TransitTierInfo
+        info: Attachment.TransitTierInfo,
     ) {
         self.attachment = attachment
         self.info = info
@@ -39,14 +39,14 @@ public class AttachmentTransitPointer {
         }
         self.init(
             attachment: attachment,
-            info: info
+            info: info,
         )
     }
 
     var asAnyPointer: AttachmentPointer {
         return AttachmentPointer(
             attachment: attachment,
-            source: .transitTier(self)
+            source: .transitTier(self),
         )
     }
 }

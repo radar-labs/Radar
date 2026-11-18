@@ -20,7 +20,7 @@ class LightningLogsViewController: OWSViewController {
 
         title = OWSLocalizedString(
             "SETTINGS_PAYMENTS_LIGHTNING_LOGS",
-            comment: "Label for the 'lightning logs' row in payment settings."
+            comment: "Label for the 'lightning logs' row in payment settings.",
         )
 
         view.backgroundColor = Theme.backgroundColor
@@ -54,13 +54,13 @@ class LightningLogsViewController: OWSViewController {
         exportButton = OWSFlatButton.button(
             title: OWSLocalizedString(
                 "SETTINGS_PAYMENTS_LIGHTNING_LOGS_EXPORT_BUTTON",
-                comment: "Title for the 'export lightning logs' button in the lightning logs view."
+                comment: "Title for the 'export lightning logs' button in the lightning logs view.",
             ),
             font: UIFont.dynamicTypeHeadline,
             titleColor: .white,
-            backgroundColor: .ows_accentBlue,
+            backgroundColor: .Signal.accent,
             target: self,
-            selector: #selector(didTapExport)
+            selector: #selector(didTapExport),
         )
         exportButton.layer.cornerRadius = 12
         exportButton.clipsToBounds = true
@@ -98,7 +98,7 @@ class LightningLogsViewController: OWSViewController {
         textView.text = text.isEmpty
             ? OWSLocalizedString(
                 "SETTINGS_PAYMENTS_LIGHTNING_LOGS_EMPTY",
-                comment: "Placeholder text shown when no lightning logs have been captured yet."
+                comment: "Placeholder text shown when no lightning logs have been captured yet.",
             )
             : text
         textView.scrollToBottom()
@@ -113,15 +113,15 @@ class LightningLogsViewController: OWSViewController {
             OWSActionSheets.showErrorAlert(
                 message: OWSLocalizedString(
                     "SETTINGS_PAYMENTS_LIGHTNING_LOGS_EXPORT_FAILED",
-                    comment: "Error message shown when exporting lightning logs fails."
-                )
+                    comment: "Error message shown when exporting lightning logs fails.",
+                ),
             )
             return
         }
 
         let activityVC = UIActivityViewController(
             activityItems: [logUrl],
-            applicationActivities: nil
+            applicationActivities: nil,
         )
         activityVC.popoverPresentationController?.sourceView = exportButton
         activityVC.popoverPresentationController?.sourceRect = exportButton.bounds

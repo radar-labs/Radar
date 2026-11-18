@@ -25,7 +25,7 @@ public struct LinkPreviewImageCacheKey: Hashable, Equatable {
         id: Attachment.IDType?,
         urlString: String?,
         isBlurHash: Bool = false,
-        thumbnailQuality: AttachmentThumbnailQuality
+        thumbnailQuality: AttachmentThumbnailQuality,
     ) {
         self.id = id
         self.urlString = urlString
@@ -42,14 +42,14 @@ public protocol LinkPreviewState: AnyObject {
     var imageState: LinkPreviewImageState { get }
     func imageAsync(
         thumbnailQuality: AttachmentThumbnailQuality,
-        completion: @escaping (UIImage) -> Void
+        completion: @escaping (UIImage) -> Void,
     )
     func imageCacheKey(thumbnailQuality: AttachmentThumbnailQuality) -> LinkPreviewImageCacheKey?
     var imagePixelSize: CGSize { get }
     var previewDescription: String? { get }
     var date: Date? { get }
     var isGroupInviteLink: Bool { get }
-    var activityIndicatorStyle: UIActivityIndicatorView.Style { get }
+    var isCallLink: Bool { get }
     var conversationStyle: ConversationStyle? { get }
 }
 
@@ -131,18 +131,9 @@ public class LinkPreviewLoading: LinkPreviewState {
         }
     }
 
-    public var activityIndicatorStyle: UIActivityIndicatorView.Style {
-        switch linkType {
-        case .incomingMessageGroupInviteLink:
-            return .medium
-        case .outgoingMessageGroupInviteLink:
-            return .medium
-        default:
-            return LinkPreviewView.defaultActivityIndicatorStyle
-        }
-    }
+    public var isCallLink: Bool { false }
 
-    public let conversationStyle: ConversationStyle? = nil
+    public var conversationStyle: ConversationStyle? { nil }
 }
 
 // MARK: -
@@ -187,7 +178,7 @@ public class LinkPreviewDraft: LinkPreviewState {
     }
 
     public func imageCacheKey(thumbnailQuality: AttachmentThumbnailQuality) -> LinkPreviewImageCacheKey? {
-        guard let urlString = urlString else {
+        guard let urlString else {
             owsFailDebug("Missing urlString.")
             return nil
         }
@@ -211,8 +202,10 @@ public class LinkPreviewDraft: LinkPreviewState {
             return .zero
         }
         let imagePixelSize = imageMetadata.pixelSize
-        guard imagePixelSize.width > 0,
-              imagePixelSize.height > 0 else {
+        guard
+            imagePixelSize.width > 0,
+            imagePixelSize.height > 0
+        else {
             owsFailDebug("Invalid image size.")
             return .zero
         }
@@ -225,13 +218,11 @@ public class LinkPreviewDraft: LinkPreviewState {
 
     public var date: Date? { linkPreviewDraft.date }
 
-    public let isGroupInviteLink = false
+    public var isGroupInviteLink: Bool { false }
 
-    public var activityIndicatorStyle: UIActivityIndicatorView.Style {
-        LinkPreviewView.defaultActivityIndicatorStyle
-    }
+    public var isCallLink: Bool { false }
 
-    public let conversationStyle: ConversationStyle? = nil
+    public var conversationStyle: ConversationStyle? { nil }
 }
 
 // MARK: -
@@ -248,7 +239,7 @@ public class LinkPreviewSent: LinkPreviewState {
         linkPreview: OWSLinkPreview,
         imageAttachment: ReferencedAttachment?,
         isFailedImageAttachmentDownload: Bool,
-        conversationStyle: ConversationStyle?
+        conversationStyle: ConversationStyle?,
     ) {
         self.linkPreview = linkPreview
         self.imageAttachment = imageAttachment
@@ -277,10 +268,20 @@ public class LinkPreviewSent: LinkPreviewState {
     public var title: String? { linkPreview.title?.filterForDisplay.nilIfEmpty }
 
     public var imageState: LinkPreviewImageState {
-        guard let imageAttachment = imageAttachment else {
+        guard let imageAttachment else {
             return .none
         }
-        guard let attachmentStream = imageAttachment.attachment.asStream() else {
+        if let attachmentStream = imageAttachment.attachment.asStream() {
+            switch attachmentStream.contentType {
+            case .image:
+                break
+            default:
+                return .invalid
+            }
+            return .loaded
+        } else if imageAttachment.asReferencedBackupThumbnail?.attachmentBackupThumbnail.image != nil {
+            return .loaded
+        } else {
             if let blurHash = imageAttachment.attachment.blurHash {
                 if isFailedImageAttachmentDownload {
                     return .failed(blurHash: blurHash)
@@ -291,13 +292,6 @@ public class LinkPreviewSent: LinkPreviewState {
                 return .none
             }
         }
-        switch attachmentStream.contentType {
-        case .image, .animatedImage:
-            break
-        default:
-            return .invalid
-        }
-        return .loaded
     }
 
     public func imageAsync(thumbnailQuality: AttachmentThumbnailQuality, completion: @escaping (UIImage) -> Void) {
@@ -314,30 +308,41 @@ public class LinkPreviewSent: LinkPreviewState {
                 completion(image)
             }
         case .loaded:
-            guard let attachmentStream = imageAttachment?.attachment.asStream() else {
-                owsFailDebug("Could not load image.")
-                return
-            }
-            DispatchQueue.global().async {
-                switch attachmentStream.contentType {
-                case .animatedImage:
-                    guard let image = try? attachmentStream.decryptedSDAnimatedImage() else {
-                        owsFailDebug("Could not load image")
-                        return
-                    }
-                    completion(image)
-                case .image:
-                    Task {
-                        guard let image = await attachmentStream.thumbnailImage(quality: thumbnailQuality) else {
-                            owsFailDebug("Could not load thumnail.")
+            if let attachmentStream = imageAttachment?.attachment.asStream() {
+                DispatchQueue.global().async {
+                    switch attachmentStream.contentType {
+                    case .image:
+                        guard let imageMetadata = attachmentStream.imageMetadata() else {
+                            owsFailDebug("Failed to get image metadata")
+                            return
+                        }
+
+                        let image: UIImage?
+                        if imageMetadata.isAnimated {
+                            image = try? attachmentStream.decryptedSDAnimatedImage()
+                        } else {
+                            image = attachmentStream.thumbnailImageSync(quality: thumbnailQuality)
+                        }
+
+                        guard let image else {
+                            owsFailDebug("Failed to load image")
                             return
                         }
                         completion(image)
+                    case .file, .video, .audio:
+                        owsFailDebug("Invalid image.")
+                        return
                     }
-                default:
-                    owsFailDebug("Invalid image.")
+                }
+            } else if let thumbnail = imageAttachment?.asReferencedBackupThumbnail {
+                guard let image = thumbnail.attachmentBackupThumbnail.image else {
+                    owsFailDebug("Thumbnail missing image")
                     return
                 }
+                completion(image)
+            } else {
+                owsFailDebug("Could not load image.")
+                return
             }
         }
     }
@@ -349,35 +354,27 @@ public class LinkPreviewSent: LinkPreviewState {
                 id: imageAttachment.attachment.id,
                 urlString: nil,
                 isBlurHash: true,
-                thumbnailQuality: thumbnailQuality
+                thumbnailQuality: thumbnailQuality,
             )
         }
         return .init(id: attachmentStream.id, urlString: nil, thumbnailQuality: thumbnailQuality)
     }
 
     public var imagePixelSize: CGSize {
-        switch imageState {
-        case .none, .invalid:
-            owsFailDebug("Unexpected image state")
+        if
+            let attachmentStream = imageAttachment?.attachment.asStream(),
+            let pixelSize = attachmentStream.cachedMediaSizePixels
+        {
+            return pixelSize
+        } else if
+            let attachmentReference = imageAttachment?.reference,
+            let pixelSize = attachmentReference.sourceMediaSizePixels
+        {
+            return pixelSize
+        } else if imageAttachment?.attachment.blurHash != nil {
+            return CGSize(width: 400, height: 236)
+        } else {
             return .zero
-        case let .loading(blurHash), let .failed(blurHash):
-            guard blurHash != nil else { return .zero }
-            return imageAttachment?.reference.sourceMediaSizePixels
-                // Fall back to default size to render the blurhash in.
-                ?? CGSize(width: 400, height: 236)
-        case .loaded:
-            guard let attachmentStream = imageAttachment?.attachment.asStream() else {
-                return CGSize.zero
-            }
-
-            switch attachmentStream.contentType {
-            case .image(let pixelSize):
-                return pixelSize
-            case .animatedImage(let pixelSize):
-                return pixelSize
-            case .audio, .video, .file, .invalid:
-                return .zero
-            }
         }
     }
 
@@ -385,9 +382,7 @@ public class LinkPreviewSent: LinkPreviewState {
 
     public var date: Date? { linkPreview.date }
 
-    public let isGroupInviteLink = false
+    public var isGroupInviteLink: Bool { false }
 
-    public var activityIndicatorStyle: UIActivityIndicatorView.Style {
-        LinkPreviewView.defaultActivityIndicatorStyle
-    }
+    public var isCallLink: Bool { false }
 }

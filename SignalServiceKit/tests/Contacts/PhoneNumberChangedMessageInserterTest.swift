@@ -29,9 +29,13 @@ class PhoneNumberChangedMessageInserterTest: XCTestCase {
         let bobPhoneNumber3 = E164("+16505550177")!
         let bobAddress1 = ssaCache.makeAddress(serviceId: bobAci, phoneNumber: bobPhoneNumber1)
 
-        let groupWithEveryone = TSGroupThread.forUnitTest(groupId: 1, groupMembers: [myAddress1, aliceAddress1, bobAddress1])
-        let groupWithoutAlice = TSGroupThread.forUnitTest(groupId: 2, groupMembers: [myAddress1, bobAddress1])
-        let groupArchived = TSGroupThread.forUnitTest(groupId: 3, groupMembers: [myAddress1, aliceAddress1, bobAddress1])
+        let groupWithEveryone = TSGroupThread.forUnitTest(groupId: Randomness.generateRandomBytes(32), groupMembers: [myAddress1, aliceAddress1, bobAddress1])
+        let groupWithoutAlice = TSGroupThread.forUnitTest(groupId: Randomness.generateRandomBytes(32), groupMembers: [myAddress1, bobAddress1])
+        let groupArchived = TSGroupThread.forUnitTest(
+            groupId: Randomness.generateRandomBytes(32),
+            groupMembers: [myAddress1, aliceAddress1, bobAddress1],
+            isArchived: true,
+        )
 
         let myThread = TSContactThread(contactAddress: myAddress1)
         myThread.shouldThreadBeVisible = true
@@ -51,33 +55,21 @@ class PhoneNumberChangedMessageInserterTest: XCTestCase {
                     groupMemberStore.insert(
                         fullGroupMember: TSGroupMember(
                             address: NormalizedDatabaseRecordAddress(address: fullMemberAddress)!,
-                            groupThreadId: thread.uniqueId,
-                            lastInteractionTimestamp: 0),
-                        tx: tx
+                            threadUniqueId: thread.uniqueId,
+                            lastInteractionTimestamp: 0,
+                        ),
+                        tx: tx,
                     )
                 }
             }
         }
-
-        let threadAssociatedDataStore = MockThreadAssociatedDataStore()
-        threadAssociatedDataStore.values = Dictionary(uniqueKeysWithValues: threadStore.threads.map {
-            ($0.uniqueId, ThreadAssociatedData(threadUniqueId: $0.uniqueId))
-        })
-        threadAssociatedDataStore.values[groupArchived.uniqueId] = ThreadAssociatedData(
-            threadUniqueId: groupArchived.uniqueId,
-            isArchived: true,
-            isMarkedUnread: false,
-            mutedUntilTimestamp: 0,
-            audioPlaybackRate: 1
-        )
 
         let interactionStore = MockInteractionStore()
 
         let mergeObserver = PhoneNumberChangedMessageInserter(
             groupMemberStore: groupMemberStore,
             interactionStore: interactionStore,
-            threadAssociatedDataStore: threadAssociatedDataStore,
-            threadStore: threadStore
+            threadStore: threadStore,
         )
 
         // Alice changes her number.
@@ -91,7 +83,7 @@ class PhoneNumberChangedMessageInserterTest: XCTestCase {
                     isLocalRecipient: false,
                     tx: tx,
                 ),
-                tx: tx
+                tx: tx,
             )
 
             let threadIds = interactionStore.insertedInteractions.map { $0.uniqueThreadId }
@@ -110,7 +102,7 @@ class PhoneNumberChangedMessageInserterTest: XCTestCase {
             )
             mergeObserver.didLearnAssociation(
                 mergedRecipient: mergedRecipient,
-                tx: tx
+                tx: tx,
             )
             try! mergedRecipient.oldRecipient?.delete(tx.database)
 
@@ -129,7 +121,7 @@ class PhoneNumberChangedMessageInserterTest: XCTestCase {
                     isLocalRecipient: false,
                     tx: tx,
                 ),
-                tx: tx
+                tx: tx,
             )
 
             let threadIds = interactionStore.insertedInteractions.map { $0.uniqueThreadId }
@@ -147,7 +139,7 @@ class PhoneNumberChangedMessageInserterTest: XCTestCase {
                     isLocalRecipient: true,
                     tx: tx,
                 ),
-                tx: tx
+                tx: tx,
             )
 
             let threadIds = interactionStore.insertedInteractions.map { $0.uniqueThreadId }

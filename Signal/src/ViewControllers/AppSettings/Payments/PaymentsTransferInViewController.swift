@@ -10,8 +10,8 @@ class PaymentsTransferInViewController: OWSViewController {
 
     // Radar brand accent (orange). Named `accentBlue` for historical reasons; now
     // points at the app-wide primary so this screen stays in sync with the theme.
-    private static let accentBlue = UIColor.ows_accentBlue
-    private static let grayFill   = UIColor(red: 120/255, green: 120/255, blue: 128/255, alpha: 0.16)
+    private static let accentBlue = UIColor.Signal.accent
+    private static let grayFill = UIColor(red: 120 / 255, green: 120 / 255, blue: 128 / 255, alpha: 0.16)
 
     // A BOLT11 invoice is single-use and expires, unlike the permanent lightning address, so ask
     // for a generously long window and re-mint once the current one is nearly spent.
@@ -64,21 +64,25 @@ class PaymentsTransferInViewController: OWSViewController {
 
         title = OWSLocalizedString(
             "SETTINGS_PAYMENTS_ADD_MONEY",
-            comment: "Label for 'add money' view in the payment settings."
+            comment: "Label for 'add money' view in the payment settings.",
         )
         if !isOnboarding {
             let doneButton = UIBarButtonItem(
-                barButtonSystemItem: .done, target: self, action: #selector(didTapDone)
+                barButtonSystemItem: .done,
+                target: self,
+                action: #selector(didTapDone),
             )
             doneButton.tintColor = .Signal.accent
             navigationItem.leftBarButtonItem = doneButton
         }
         navigationItem.rightBarButtonItem = UIBarButtonItem(
-            image: Theme.iconImage(.buttonShare), style: .plain,
-            target: self, action: #selector(didTapShare)
+            image: Theme.iconImage(.buttonShare),
+            style: .plain,
+            target: self,
+            action: #selector(didTapShare),
         )
 
-        view.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: true)
+        view.backgroundColor = OWSTableViewController2.tableBackgroundColor
 
         if isOnboarding {
             buildOnboardingLayout()
@@ -89,7 +93,7 @@ class PaymentsTransferInViewController: OWSViewController {
         walletObserver = NotificationCenter.default.addObserver(
             forName: PaymentsImpl.walletAddressDidLoad,
             object: nil,
-            queue: .main
+            queue: .main,
         ) { [weak self] _ in
             self?.refreshWalletAddressUI()
         }
@@ -99,7 +103,7 @@ class PaymentsTransferInViewController: OWSViewController {
         foregroundObserver = NotificationCenter.default.addObserver(
             forName: UIApplication.willEnterForegroundNotification,
             object: nil,
-            queue: .main
+            queue: .main,
         ) { [weak self] _ in
             guard let self, self.viewIfLoaded?.window != nil else { return }
             self.refreshLightningInvoiceIfExpiring()
@@ -198,7 +202,7 @@ class PaymentsTransferInViewController: OWSViewController {
         let instructionLabel = UILabel()
         instructionLabel.text = OWSLocalizedString(
             "PAYMENTS_ADD_FUNDS_INSTRUCTION",
-            comment: "Instruction shown on the Add Funds screen telling the user which address and network to use."
+            comment: "Instruction shown on the Add Funds screen telling the user which address and network to use.",
         )
         instructionLabel.font = UIFont.systemFont(ofSize: 17, weight: .medium)
         instructionLabel.textColor = Theme.primaryTextColor
@@ -359,7 +363,7 @@ class PaymentsTransferInViewController: OWSViewController {
                 }()
                 do {
                     let invoice = try await SUIEnvironment.shared.paymentsImplRef.fetchLightningInvoice(
-                        expirySecs: invoiceExpirySecs
+                        expirySecs: invoiceExpirySecs,
                     )
                     // Kept lowercase, as the SDK emits it. Uppercasing would be spec-legal (bech32
                     // is case-insensitive) and would let the QR encoder use its denser alphanumeric
@@ -455,7 +459,7 @@ class PaymentsTransferInViewController: OWSViewController {
         guard let address = SUIEnvironment.shared.paymentsRef.walletLightningAddress else {
             label.text = OWSLocalizedString(
                 "PAYMENTS_WALLET_ADDRESS_LOADING",
-                comment: "Placeholder shown in the wallet address field while the Lightning address is being loaded."
+                comment: "Placeholder shown in the wallet address field while the Lightning address is being loaded.",
             )
             label.font = UIFont.systemFont(ofSize: 17)
             label.textColor = Theme.primaryTextColor.withAlphaComponent(0.4)
@@ -464,7 +468,7 @@ class PaymentsTransferInViewController: OWSViewController {
         let atRange = (address as NSString).range(of: "@")
         if atRange.location != NSNotFound {
             let username = (address as NSString).substring(to: atRange.location)
-            let domain   = (address as NSString).substring(from: atRange.location)
+            let domain = (address as NSString).substring(from: atRange.location)
             let font = UIFont.systemFont(ofSize: 20, weight: .medium)
             let baseAttrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: Theme.primaryTextColor]
             let blueAttrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: Self.accentBlue]
@@ -483,7 +487,7 @@ class PaymentsTransferInViewController: OWSViewController {
         guard let address = onchainAddress else {
             label.text = OWSLocalizedString(
                 "PAYMENTS_WALLET_ADDRESS_LOADING",
-                comment: "Placeholder shown in the wallet address field while the Lightning address is being loaded."
+                comment: "Placeholder shown in the wallet address field while the Lightning address is being loaded.",
             )
             label.font = UIFont.systemFont(ofSize: 17)
             label.textColor = Theme.primaryTextColor.withAlphaComponent(0.4)
@@ -503,7 +507,7 @@ class PaymentsTransferInViewController: OWSViewController {
         }
         let attributed = NSMutableAttributedString()
         for (index, group) in groups.enumerated() {
-            let color = index.isMultiple(of: 2) ? Theme.primaryTextColor : Theme.ternaryTextColor
+            let color = index.isMultiple(of: 2) ? Theme.primaryTextColor : UIColor.Signal.tertiaryLabel
             if index > 0 {
                 attributed.append(NSAttributedString(string: " ", attributes: [.font: font]))
             }
@@ -532,7 +536,7 @@ class PaymentsTransferInViewController: OWSViewController {
             title: "Copy",
             systemIcon: "square.on.square",
             background: Self.grayFill,
-            foreground: Theme.primaryTextColor
+            foreground: Theme.primaryTextColor,
         )
         copyBtn.addTarget(self, action: #selector(didTapCopy), for: .touchUpInside)
 
@@ -560,7 +564,7 @@ class PaymentsTransferInViewController: OWSViewController {
         tabStack.distribution = .fillEqually
 
         let container = UIView()
-        container.backgroundColor = UIColor(red: 233/255, green: 233/255, blue: 234/255, alpha: 1)
+        container.backgroundColor = UIColor(red: 233 / 255, green: 233 / 255, blue: 234 / 255, alpha: 1)
         container.layer.cornerRadius = 24
         container.layer.masksToBounds = true
         container.addSubview(tabStack)
@@ -579,7 +583,7 @@ class PaymentsTransferInViewController: OWSViewController {
         var cfg = UIButton.Configuration.plain()
         cfg.attributedTitle = AttributedString(
             title,
-            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 13, weight: .medium)])
+            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 13, weight: .medium)]),
         )
         cfg.image = UIImage(systemName: systemIcon)
         cfg.imagePlacement = .leading
@@ -608,12 +612,12 @@ class PaymentsTransferInViewController: OWSViewController {
         title: String,
         systemIcon: String,
         background: UIColor,
-        foreground: UIColor
+        foreground: UIColor,
     ) -> UIButton {
         var cfg = UIButton.Configuration.filled()
         cfg.attributedTitle = AttributedString(
             title,
-            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 17, weight: .medium)])
+            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 17, weight: .medium)]),
         )
         cfg.image = UIImage(systemName: systemIcon)
         cfg.imagePlacement = .trailing
@@ -632,7 +636,7 @@ class PaymentsTransferInViewController: OWSViewController {
         var cfg = UIButton.Configuration.filled()
         cfg.attributedTitle = AttributedString(
             CommonStrings.continueButton,
-            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 17, weight: .bold)])
+            attributes: AttributeContainer([.font: UIFont.systemFont(ofSize: 17, weight: .bold)]),
         )
         cfg.baseBackgroundColor = Self.accentBlue
         cfg.baseForegroundColor = .white
@@ -662,7 +666,8 @@ class PaymentsTransferInViewController: OWSViewController {
         }
     }
 
-    @objc private func didTapLightningTab() {
+    @objc
+    private func didTapLightningTab() {
         guard selectedNetwork != .lightning else { return }
         selectedNetwork = .lightning
         applyTabStyling()
@@ -671,7 +676,8 @@ class PaymentsTransferInViewController: OWSViewController {
         generateQR(force: true)
     }
 
-    @objc private func didTapOnchainTab() {
+    @objc
+    private func didTapOnchainTab() {
         guard selectedNetwork != .onchain else { return }
         selectedNetwork = .onchain
         applyTabStyling()
@@ -704,7 +710,7 @@ class PaymentsTransferInViewController: OWSViewController {
                     guard self.selectedNetwork == .onchain else { return }
                     self.presentToast(text: OWSLocalizedString(
                         "PAYMENTS_ADD_FUNDS_ONCHAIN_FETCH_FAILED",
-                        comment: "Toast shown when fetching the on-chain Bitcoin receive address fails on the Add Funds screen."
+                        comment: "Toast shown when fetching the on-chain Bitcoin receive address fails on the Add Funds screen.",
                     ))
                     self.selectedNetwork = .lightning
                     self.applyTabStyling()
@@ -716,16 +722,18 @@ class PaymentsTransferInViewController: OWSViewController {
         }
     }
 
-    @objc private func didTapCopy() {
+    @objc
+    private func didTapCopy() {
         guard let address = currentDisplayedAddress() else { return }
         UIPasteboard.general.string = address
         presentToast(text: OWSLocalizedString(
             "SETTINGS_PAYMENTS_ADD_MONEY_WALLET_ADDRESS_COPIED",
-            comment: "Indicator that the payments wallet address has been copied to the pasteboard."
+            comment: "Indicator that the payments wallet address has been copied to the pasteboard.",
         ))
     }
 
-    @objc private func didTapEdit() {
+    @objc
+    private func didTapEdit() {
         guard let username = SUIEnvironment.shared.paymentsImplRef.walletLightningAddressUsername else { return }
         let vc = RadarUsernameViewController(oldUsername: username) { newUsername in
             try await SUIEnvironment.shared.paymentsImplRef.registerUsername(newUsername)
@@ -733,11 +741,13 @@ class PaymentsTransferInViewController: OWSViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
 
-    @objc private func didTapDone() {
+    @objc
+    private func didTapDone() {
         dismiss(animated: true)
     }
 
-    @objc private func didTapShare() {
+    @objc
+    private func didTapShare() {
         guard let address = currentDisplayedAddress() else { return }
         AttachmentSharing.showShareUI(for: address, sender: self)
     }

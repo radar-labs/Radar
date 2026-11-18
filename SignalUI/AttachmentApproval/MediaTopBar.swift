@@ -12,72 +12,48 @@ open class MediaTopBar: UIView {
     // sometimes doesn't work for this view because top inset gets overridden by UIKit
     // since `preservesSuperviewLayoutMargins` is set to `true`.
     public let controlsLayoutGuide = UILayoutGuide()
-    private lazy var controlsLayoutGuideTop: NSLayoutConstraint = {
-        controlsLayoutGuide.topAnchor.constraint(equalTo: topAnchor)
-    }()
-    private lazy var controlsLayoutGuideLeading: NSLayoutConstraint = {
-        controlsLayoutGuide.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor)
-    }()
-    private lazy var controlsLayoutGuideTrailing: NSLayoutConstraint = {
-        controlsLayoutGuide.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor)
-    }()
 
     override public init(frame: CGRect) {
         super.init(frame: frame)
 
-        layoutMargins = .zero
         preservesSuperviewLayoutMargins = true
+        translatesAutoresizingMaskIntoConstraints = false
+
+        // Put controls as high up as possible. VC can change this later if
+        // custom spacing is needed (eg Camera view).
+        directionalLayoutMargins.top = 0
 
         installConstraints()
     }
 
-    required public init?(coder: NSCoder) {
+    public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     private func installConstraints() {
         addLayoutGuide(controlsLayoutGuide)
-        controlsLayoutGuideTop.isActive = true
-        controlsLayoutGuideLeading.isActive = true
-        controlsLayoutGuideTrailing.isActive = true
-        controlsLayoutGuide.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-    }
 
-    public override func updateConstraints() {
-        super.updateConstraints()
+        let otherLayoutGuide: UILayoutGuide = if #available(iOS 26, *) {
+            // Avoids stoplight buttons in windowed mode on iPad.
+            layoutGuide(for: .margins(cornerAdaptation: .vertical))
+        } else {
+            layoutMarginsGuide
+        }
 
-        let isIPadUIInRegularMode = traitCollection.horizontalSizeClass == .regular && traitCollection.verticalSizeClass == .regular
-        let horizontalMargin: CGFloat = isIPadUIInRegularMode ? 12 : 0
-        let topMargin: CGFloat = {
-            // Unnecessary, but looks better with some more padding on iPad screens.
-            if isIPadUIInRegularMode {
-                return 10
-            }
-            // iPhones in landscape mode.
-            if traitCollection.verticalSizeClass == .compact {
-                return 0
-            }
-            // iPhones with a screen notch, iPads in windowed mode.
-            if UIDevice.current.hasIPhoneXNotch || UIDevice.current.isIPad {
-                return 4
-            }
-            // iPhones with a home button have their status bar hidden (safeArea.top == 0)
-            // so it's necessary to add some padding manually.
-            return 16
-        }()
-        controlsLayoutGuideLeading.constant = horizontalMargin
-        controlsLayoutGuideTrailing.constant = -horizontalMargin
-        controlsLayoutGuideTop.constant = topMargin
-    }
-
-    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        setNeedsUpdateConstraints()
+        NSLayoutConstraint.activate([
+            controlsLayoutGuide.topAnchor.constraint(equalTo: otherLayoutGuide.topAnchor),
+            controlsLayoutGuide.leadingAnchor.constraint(equalTo: otherLayoutGuide.leadingAnchor),
+            controlsLayoutGuide.trailingAnchor.constraint(equalTo: otherLayoutGuide.trailingAnchor),
+            controlsLayoutGuide.bottomAnchor.constraint(equalTo: otherLayoutGuide.bottomAnchor),
+        ])
     }
 
     public func install(in view: UIView) {
         view.addSubview(self)
-        autoPinWidthToSuperview()
-        autoPinEdge(toSuperviewSafeArea: .top)
+        NSLayoutConstraint.activate([
+            topAnchor.constraint(equalTo: view.topAnchor),
+            leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            trailingAnchor.constraint(equalTo: view.trailingAnchor),
+        ])
     }
 }

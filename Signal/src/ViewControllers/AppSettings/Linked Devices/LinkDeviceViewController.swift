@@ -38,9 +38,7 @@ class LinkDeviceViewController: OWSViewController {
 #if TESTABLE_BUILD
         navigationItem.rightBarButtonItem = .init(
             title: LocalizationNotNeeded("ENTER"),
-            style: .plain,
-            target: self,
-            action: #selector(manuallyEnterLinkURL)
+            primaryAction: UIAction { [weak self] _ in self?.manuallyEnterLinkURL() },
         )
 #endif
 
@@ -71,13 +69,13 @@ class LinkDeviceViewController: OWSViewController {
                 hero: .animation(named: animationName, height: 192),
                 title: OWSLocalizedString(
                     "LINK_DEVICE_SCANNING_INSTRUCTIONS_SHEET_TITLE",
-                    comment: "Title for QR Scanning screen instructions sheet"
+                    comment: "Title for QR Scanning screen instructions sheet",
                 ),
                 body: OWSLocalizedString(
                     "LINK_DEVICE_SCANNING_INSTRUCTIONS_SHEET_BODY",
-                    comment: "Title for QR Scanning screen instructions sheet"
+                    comment: "Title for QR Scanning screen instructions sheet",
                 ),
-                primaryButton: .dismissing(title: CommonStrings.okayButton)
+                primaryButton: .dismissing(title: CommonStrings.okayButton),
             )
 
             DispatchQueue.main.async {
@@ -108,17 +106,14 @@ class LinkDeviceViewController: OWSViewController {
 
     // MARK: -
 
-    private func confirmProvisioningWithUrl(_ deviceProvisioningUrl: DeviceProvisioningURL) {
+    private func confirmProvisioning(deviceProvisioningUrl: DeviceProvisioningURL) {
         switch deviceProvisioningUrl.linkType {
         case .linkDevice:
-            confirmProvisioning(with: deviceProvisioningUrl)
-        case .quickRestore:
-            // Ignore quick restore URLs in the link device controller
             break
+        case .quickRestore:
+            owsFailDebug("can't link with a quick restore url")
+            return
         }
-    }
-
-    private func confirmProvisioning(with deviceProvisioningUrl: DeviceProvisioningURL) {
         if
             deviceProvisioningUrl.capabilities.contains(.linknsync)
         {
@@ -138,11 +133,11 @@ class LinkDeviceViewController: OWSViewController {
         } else {
             let title = NSLocalizedString(
                 "LINK_DEVICE_PERMISSION_ALERT_TITLE",
-                comment: "confirm the users intent to link a new device"
+                comment: "confirm the users intent to link a new device",
             )
             let linkingDescription = NSLocalizedString(
                 "LINK_DEVICE_PERMISSION_ALERT_BODY",
-                comment: "confirm the users intent to link a new device"
+                comment: "confirm the users intent to link a new device",
             )
 
             let actionSheet = ActionSheetController(title: title, message: linkingDescription)
@@ -153,14 +148,14 @@ class LinkDeviceViewController: OWSViewController {
                     DispatchQueue.main.async {
                         self.popToLinkedDeviceList()
                     }
-                }
+                },
             ))
             actionSheet.addAction(ActionSheetAction(
                 title: NSLocalizedString("CONFIRM_LINK_NEW_DEVICE_ACTION", comment: "Button text"),
                 style: .default,
                 handler: { _ in
                     self.provisionWithUrl(deviceProvisioningUrl, shouldLinkNSync: false)
-                }
+                },
             ))
             safePresent(actionSheet)
         }
@@ -168,19 +163,19 @@ class LinkDeviceViewController: OWSViewController {
 
     private func provisionWithUrl(
         _ deviceProvisioningUrl: DeviceProvisioningURL,
-        shouldLinkNSync: Bool
+        shouldLinkNSync: Bool,
     ) {
         Task { [self] in
             do {
                 let (ephemeralBackupKey, tokenId) = try await context.provisioningManager.provision(
                     with: deviceProvisioningUrl,
-                    shouldLinkNSync: shouldLinkNSync
+                    shouldLinkNSync: shouldLinkNSync,
                 )
                 Logger.info("Successfully provisioned device.")
 
                 self.delegate?.didFinishLinking(
                     ephemeralBackupKey.map { ($0, tokenId) },
-                    from: self
+                    from: self,
                 )
             } catch {
                 Logger.error("Failed to provision device with error: \(error)")
@@ -197,32 +192,48 @@ class LinkDeviceViewController: OWSViewController {
         case let error as DeviceLimitExceededError:
             let actionSheet = ActionSheetController(
                 title: error.errorDescription,
-                message: error.recoverySuggestion
+                message: error.recoverySuggestion,
             )
             actionSheet.addAction(ActionSheetAction(
                 title: CommonStrings.okButton,
                 handler: { [weak self] _ in
                     self?.popToLinkedDeviceList()
-                }
+                },
+            ))
+            return actionSheet
+
+        case is ProvisioningManager.MustUpdateLinkedDeviceError:
+            let actionSheet = ActionSheetController(
+                title: OWSLocalizedString("LINKING_DEVICE_FAILED_TITLE", comment: "Alert Title"),
+                message: OWSLocalizedString(
+                    "LINKING_DEVICE_OUT_OF_DATE",
+                    comment: "Shown when trying to link a device to an account but that device is out of date and must first update its version of Signal.",
+                ),
+            )
+            actionSheet.addAction(ActionSheetAction(
+                title: CommonStrings.okButton,
+                handler: { [weak self] _ in
+                    self?.popToLinkedDeviceList()
+                },
             ))
             return actionSheet
 
         default:
             let actionSheet = ActionSheetController(
                 title: OWSLocalizedString("LINKING_DEVICE_FAILED_TITLE", comment: "Alert Title"),
-                message: error.userErrorDescription
+                message: error.userErrorDescription,
             )
             actionSheet.addAction(ActionSheetAction(
                 title: CommonStrings.retryButton,
                 style: .default,
-                handler: { action in retryBlock() }
+                handler: { action in retryBlock() },
             ))
             actionSheet.addAction(ActionSheetAction(
                 title: CommonStrings.cancelButton,
                 style: .cancel,
                 handler: { [weak self] action in
                     DispatchQueue.main.async { self?.dismiss(animated: true) }
-                }
+                },
             ))
             return actionSheet
         }
@@ -240,13 +251,12 @@ class LinkDeviceViewController: OWSViewController {
         }
     }
 
-    #if TESTABLE_BUILD
-    @objc
+#if TESTABLE_BUILD
     private func manuallyEnterLinkURL() {
         let alertController = UIAlertController(
             title: LocalizationNotNeeded("Manually enter linking code."),
             message: LocalizationNotNeeded("Copy the URL represented by the QR code into the field below."),
-            preferredStyle: .alert
+            preferredStyle: .alert,
         )
         alertController.addTextField()
         alertController.addAction(UIAlertAction(
@@ -256,24 +266,24 @@ class LinkDeviceViewController: OWSViewController {
                 guard let qrCodeString = alertController.textFields?.first?.text else { return }
                 self.qrCodeScanViewScanned(
                     qrCodeData: nil,
-                    qrCodeString: qrCodeString
+                    qrCodeString: qrCodeString,
                 )
-            }
+            },
         ))
         alertController.addAction(UIAlertAction(
             title: CommonStrings.cancelButton,
-            style: .cancel
+            style: .cancel,
         ))
         safePresent(alertController)
     }
-    #endif
+#endif
 }
 
 extension LinkDeviceViewController: QRCodeScanDelegate {
     @discardableResult
     func qrCodeScanViewScanned(
         qrCodeData: Data?,
-        qrCodeString: String?
+        qrCodeString: String?,
     ) -> QRCodeScanOutcome {
         AssertIsOnMainThread()
 
@@ -282,8 +292,8 @@ extension LinkDeviceViewController: QRCodeScanDelegate {
             return .continueScanning
         }
 
-        guard let url = DeviceProvisioningURL(urlString: qrCodeString) else {
-            Logger.error("Unable to parse provisioning params from QRCode: \(qrCodeString)")
+        guard let url = DeviceProvisioningURL(urlString: qrCodeString), url.linkType == .linkDevice else {
+            Logger.warn("couldn't parse device provisioning url from QR code")
 
             let title = NSLocalizedString("LINK_DEVICE_INVALID_CODE_TITLE", comment: "report an invalid linking code")
             let body = NSLocalizedString("LINK_DEVICE_INVALID_CODE_BODY", comment: "report an invalid linking code")
@@ -296,21 +306,21 @@ extension LinkDeviceViewController: QRCodeScanDelegate {
                     DispatchQueue.main.async {
                         self.popToLinkedDeviceList()
                     }
-                }
+                },
             ))
             actionSheet.addAction(ActionSheetAction(
                 title: NSLocalizedString("LINK_DEVICE_RESTART", comment: "attempt another linking"),
                 style: .default,
                 handler: { _ in
                     self.qrCodeScanViewController.tryToStartScanning()
-                }
+                },
             ))
             safePresent(actionSheet)
 
             return .stopScanning
         }
 
-        confirmProvisioningWithUrl(url)
+        confirmProvisioning(deviceProvisioningUrl: url)
 
         return .stopScanning
     }

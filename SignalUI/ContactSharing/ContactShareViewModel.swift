@@ -6,7 +6,7 @@
 import Contacts
 public import SignalServiceKit
 
-public class ContactShareViewModel: NSObject {
+public class ContactShareViewModel: Equatable {
 
     public let dbRecord: OWSContact
 
@@ -21,22 +21,22 @@ public class ContactShareViewModel: NSObject {
     private var cachedAvatarImage: UIImage?
 
     public var avatarImage: UIImage? {
-        if self.cachedAvatarImage != nil {
-            return self.cachedAvatarImage
+        if let cachedAvatarImage {
+            return cachedAvatarImage
         }
 
-        guard let avatarImageData = self.avatarImageData else {
+        guard let avatarImageData else {
             return nil
         }
 
-        self.cachedAvatarImage = UIImage(data: avatarImageData)
+        cachedAvatarImage = UIImage(data: avatarImageData)
         return cachedAvatarImage
     }
 
     private init(
         contactShareRecord: OWSContact,
         existingAvatarAttachment: ReferencedAttachment?,
-        avatarImageData: Data?
+        avatarImageData: Data?,
     ) {
         self.dbRecord = contactShareRecord
         self.existingAvatarAttachment = existingAvatarAttachment
@@ -46,18 +46,18 @@ public class ContactShareViewModel: NSObject {
     public convenience init(
         contactShareRecord: OWSContact,
         parentMessage: TSMessage,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) {
         if
             let parentMessageRowId = parentMessage.sqliteRowId,
-            let avatarAttachment = DependenciesBridge.shared.attachmentStore.fetchFirstReferencedAttachment(
+            let avatarAttachment = DependenciesBridge.shared.attachmentStore.fetchAnyReferencedAttachment(
                 for: .messageContactAvatar(messageRowId: parentMessageRowId),
-                tx: transaction
+                tx: transaction,
             )?.asReferencedStream
         {
             let avatarImageData: Data?
             switch avatarAttachment.attachmentStream.contentType {
-            case .file, .invalid, .video, .animatedImage, .audio:
+            case .file, .video, .audio:
                 avatarImageData = nil
             case .image:
                 avatarImageData = try? avatarAttachment.attachmentStream.decryptedRawData()
@@ -65,13 +65,13 @@ public class ContactShareViewModel: NSObject {
             self.init(
                 contactShareRecord: contactShareRecord,
                 existingAvatarAttachment: avatarAttachment,
-                avatarImageData: avatarImageData
+                avatarImageData: avatarImageData,
             )
         } else {
             self.init(
                 contactShareRecord: contactShareRecord,
                 existingAvatarAttachment: nil,
-                avatarImageData: nil
+                avatarImageData: nil,
             )
         }
     }
@@ -83,7 +83,7 @@ public class ContactShareViewModel: NSObject {
     }
 
     public func getAvatarImage(diameter: CGFloat, transaction: DBReadTransaction) -> UIImage? {
-        if let avatarImage = avatarImage {
+        if let avatarImage {
             return avatarImage
         }
 
@@ -95,8 +95,12 @@ public class ContactShareViewModel: NSObject {
         return SSKEnvironment.shared.avatarBuilderRef.defaultAvatarImage(
             personNameComponents: name.components,
             diameterPoints: UInt(diameter),
-            transaction: transaction
+            transaction: transaction,
         )
+    }
+
+    public static func ==(lhs: ContactShareViewModel, rhs: ContactShareViewModel) -> Bool {
+        lhs.dbRecord.isEqual(rhs.dbRecord)
     }
 
     // MARK: Delegated -> dbRecord
@@ -137,6 +141,14 @@ public class ContactShareViewModel: NSObject {
         }
     }
 
+    public var nickname: PersonNameComponents? {
+        return dbRecord.nickname
+    }
+
+    public var note: String? {
+        return dbRecord.note
+    }
+
     public var displayName: String {
         return dbRecord.name.displayName
     }
@@ -147,17 +159,24 @@ public class ContactShareViewModel: NSObject {
             addresses: addresses,
             emails: emails,
             phoneNumbers: phoneNumbers,
+            aci: dbRecord.aci,
+            signalNickname: dbRecord.nickname,
+            signalNote: dbRecord.note,
             existingAvatarAttachment: existingAvatarAttachment,
-            avatarImageData: avatarImageData
+            systemContactAvatarImageData: nil,
+            signalAvatarImageData: nil,
+            selectedAvatarImageData: avatarImageData,
         )
     }
 
     public func copyForRendering() -> ContactShareViewModel {
+        // for compiler enforcement
+        _ = dbRecord as NSCopying
         let newDbRecord = dbRecord.copy() as! OWSContact
         return ContactShareViewModel(
             contactShareRecord: newDbRecord,
             existingAvatarAttachment: existingAvatarAttachment,
-            avatarImageData: avatarImageData
+            avatarImageData: avatarImageData,
         )
     }
 }

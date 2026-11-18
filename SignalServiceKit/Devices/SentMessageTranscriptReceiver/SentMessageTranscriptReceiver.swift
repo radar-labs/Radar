@@ -17,7 +17,7 @@ public protocol SentMessageTranscriptReceiver {
     @discardableResult
     func process(
         _ sentMessageTranscript: SentMessageTranscript,
-        localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        registeredState: RegisteredState,
+        tx: DBWriteTransaction,
     ) -> Swift.Result<TSOutgoingMessage?, Error>
 }

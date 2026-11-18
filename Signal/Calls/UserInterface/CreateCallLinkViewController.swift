@@ -3,10 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
+import SignalRingRTC
 import SignalServiceKit
 import SignalUI
-import UIKit
 
 class CreateCallLinkViewController: InteractiveSheetViewController {
     private lazy var _navigationController = OWSNavigationController()
@@ -14,15 +13,15 @@ class CreateCallLinkViewController: InteractiveSheetViewController {
 
     override var interactiveScrollViews: [UIScrollView] { [self._callLinkViewController.tableView] }
 
-    override var sheetBackgroundColor: UIColor { Theme.tableView2PresentedBackgroundColor }
+    override var sheetBackgroundColor: UIColor { OWSTableViewController2.tableBackgroundColor }
 
     // MARK: -
 
-    init(callLink: CallLink, adminPasskey: Data, callLinkState: CallLinkState) {
+    init(callLink: CallLink, adminPasskey: Data, callLinkState: SignalServiceKit.CallLinkState) {
         self._callLinkViewController = CallLinkViewController.forJustCreated(
             callLink: callLink,
             adminPasskey: adminPasskey,
-            callLinkState: callLinkState
+            callLinkState: callLinkState,
         )
         super.init()
         self.allowsExpansion = false
@@ -31,7 +30,7 @@ class CreateCallLinkViewController: InteractiveSheetViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self._navigationController.viewControllers = [ self._callLinkViewController ]
+        self._navigationController.viewControllers = [self._callLinkViewController]
         self.addChild(self._navigationController)
         self._navigationController.didMove(toParent: self)
         self.contentView.addSubview(self._navigationController.view)
@@ -41,7 +40,7 @@ class CreateCallLinkViewController: InteractiveSheetViewController {
             action: { [unowned self] in
                 self._callLinkViewController.persistIfNeeded()
                 self.dismiss(animated: true)
-            }
+            },
         )
     }
 
@@ -55,13 +54,13 @@ class CreateCallLinkViewController: InteractiveSheetViewController {
             top: self._navigationController.navigationBar.bounds.size.height,
             left: 0,
             bottom: self.view.safeAreaInsets.bottom,
-            right: 0
+            right: 0,
         )
 
         self.minimizedHeight = (
             self._callLinkViewController.tableView.contentSize.height
-            + self._callLinkViewController.tableView.contentInset.totalHeight
-            + InteractiveSheetViewController.Constants.handleHeight
+                + self._callLinkViewController.tableView.contentInset.totalHeight
+                + InteractiveSheetViewController.Constants.handleHeight,
         )
     }
 
@@ -70,18 +69,23 @@ class CreateCallLinkViewController: InteractiveSheetViewController {
     static func createCallLinkOnServerAndPresent(from viewController: UIViewController) {
         ModalActivityIndicatorViewController.present(
             fromViewController: viewController,
+            title: OWSLocalizedString(
+                "CALL_LINK_CREATING_MODAL",
+                comment: "Displayed in a full screen modal view when creating a Call Link",
+            ),
             canCancel: true,
             presentationDelay: 0.25,
             asyncBlock: { modal in
                 do {
-                    let callLink = CallLink.generate()
+                    let rootKey = CallLinkRootKey.generate()
                     let callService = AppEnvironment.shared.callService!
-                    let createResult = try await callService.callLinkManager.createCallLink(rootKey: callLink.rootKey)
+                    let createResult = try await callService.callLinkManager.createCallLink(rootKey: rootKey)
+                    let callLink = CallLink(rootKey: createResult.callLinkState.rootKey)
                     modal.dismissIfNotCanceled {
                         viewController.present(CreateCallLinkViewController(
                             callLink: callLink,
                             adminPasskey: createResult.adminPasskey,
-                            callLinkState: createResult.callLinkState
+                            callLinkState: createResult.callLinkState,
                         ), animated: true)
                     }
                 } catch {
@@ -91,12 +95,12 @@ class CreateCallLinkViewController: InteractiveSheetViewController {
                             title: CallStrings.callLinkErrorSheetTitle,
                             message: OWSLocalizedString(
                                 "CALL_LINK_CREATION_FAILURE_SHEET_DESCRIPTION",
-                                comment: "Description of sheet presented when call link creation fails."
-                            )
+                                comment: "Description of sheet presented when call link creation fails.",
+                            ),
                         )
                     }
                 }
-            }
+            },
         )
     }
 }

@@ -9,9 +9,7 @@ import LibSignalClient
 
 extension AttachmentUploadManagerImpl {
     enum Mocks {
-        typealias NetworkManager = _AttachmentUploadManager_NetworkManagerMock
         typealias URLSession = _AttachmentUploadManager_OWSURLSessionMock
-        typealias ChatConnectionManager = _AttachmentUploadManager_ChatConnectionManagerMock
 
         typealias AttachmentEncrypter = _Upload_AttachmentEncrypterMock
         typealias FileSystem = _Upload_FileSystemMock
@@ -46,7 +44,7 @@ class _Upload_FileSystemMock: Upload.Shims.FileSystem {
 
     func deleteFile(url: URL) throws { }
 
-    public func maxFileChunkSizeBytes() -> Int { 32 }
+    func maxFileChunkSizeBytes() -> Int { 32 }
 
     func readMemoryMappedFileData(url: URL) throws -> Data {
         return Data(repeating: 0, count: size)
@@ -60,40 +58,55 @@ class _Upload_SleepTimerMock: Upload.Shims.SleepTimer {
     }
 }
 
-class _AttachmentUploadManager_NetworkManagerMock: NetworkManager {
-
-    var performRequestBlock: ((TSRequest) -> Promise<HTTPResponse>)?
-
-    override func asyncRequestImpl(_ request: TSRequest, retryPolicy: RetryPolicy) async throws -> HTTPResponse {
-        return try await performRequestBlock!(request).awaitable()
-    }
-}
-
 public class _AttachmentUploadManager_OWSURLSessionMock: BaseOWSURLSessionMock {
 
-    public var performUploadDataBlock: ((URLRequest, Data, OWSProgressSource?) async throws -> HTTPResponse)?
-    public override func performUpload(request: URLRequest, requestData: Data, progress: OWSProgressSource?) async throws -> HTTPResponse {
-        return try await performUploadDataBlock!(request, requestData, progress)
+    public var performUploadDataBlock: ((URLRequest, Data, UInt64, OWSURLSession.ProgressBlock) async throws -> HTTPResponse)?
+    override public func performUpload(request: URLRequest, requestData: Data, maxResponseSize: UInt64, progressBlock: OWSURLSession.ProgressBlock) async throws -> HTTPResponse {
+        return try await performUploadDataBlock!(request, requestData, maxResponseSize, progressBlock)
     }
 
-    public var performUploadFileBlock: ((URLRequest, URL, Bool, OWSProgressSource?) async throws -> HTTPResponse)?
-    public override func performUpload(request: URLRequest, fileUrl: URL, ignoreAppExpiry: Bool, progress: OWSProgressSource?) async throws -> HTTPResponse {
-        return try await performUploadFileBlock!(request, fileUrl, ignoreAppExpiry, progress)
-    }
-
-    public var performRequestBlock: ((URLRequest) async throws -> HTTPResponse)?
-    public override func performRequest(request: URLRequest, ignoreAppExpiry: Bool) async throws -> HTTPResponse {
-        return try await performRequestBlock!(request)
+    public var performRequestBlock: ((URLRequest, UInt64, Bool) async throws -> HTTPResponse)?
+    override public func performRequest(request: URLRequest, maxResponseSize: UInt64, ignoreAppExpiry: Bool) async throws -> HTTPResponse {
+        return try await performRequestBlock!(request, maxResponseSize, ignoreAppExpiry)
     }
 }
 
-class _AttachmentUploadManager_ChatConnectionManagerMock: ChatConnectionManagerMock {}
+final class MockAuthMessageService: AuthMessagesService {
+    let getUploadFormMock = AtomicValue<((_ uploadSize: UInt64) async throws -> UploadForm)?>(nil, lock: UnfairLock())
+
+    func getUploadForm(uploadSize: UInt64) async throws -> UploadForm {
+        return try await getUploadFormMock.get()!(uploadSize)
+    }
+
+    func sendMessage(
+        to recipient: ServiceId,
+        timestamp: UInt64,
+        contents: [SingleOutboundUnsealedMessage],
+        onlineOnly: Bool,
+        urgent: Bool,
+    ) async throws {
+        owsFail("not implemented")
+    }
+
+    func sendSyncMessage(
+        timestamp: UInt64,
+        contents: [SingleOutboundUnsealedMessage],
+        urgent: Bool,
+    ) async throws {
+        owsFail("not implemented")
+    }
+
+    func reportMessage(_ messageGuid: UUID, from source: Aci, spamToken: Data) async throws {
+        owsFail("not implemented")
+    }
+}
 
 class _AttachmentUploadManager_BackupRequestManagerMock: BackupRequestManager {
     func fetchBackupServiceAuthForRegistration(
         key: BackupKeyMaterial,
         localAci: Aci,
-        chatServiceAuth: ChatServiceAuth
+        chatServiceAuth: ChatServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> BackupServiceAuth {
         fatalError("Unimplemented for tests")
     }
@@ -102,7 +115,8 @@ class _AttachmentUploadManager_BackupRequestManagerMock: BackupRequestManager {
         for key: BackupKeyMaterial,
         localAci: Aci,
         auth: ChatServiceAuth,
-        forceRefreshUnlessCachedPaidCredential: Bool
+        forceRefreshUnlessCachedPaidCredential: Bool,
+        logger: PrefixedLogger,
     ) async throws -> BackupServiceAuth {
         fatalError("Unimplemented for tests")
     }
@@ -111,34 +125,40 @@ class _AttachmentUploadManager_BackupRequestManagerMock: BackupRequestManager {
 
     func fetchBackupUploadForm(
         backupByteLength: UInt32,
-        auth: BackupServiceAuth
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> Upload.Form {
         fatalError("Unimplemented for tests")
     }
 
-    func fetchBackupMediaAttachmentUploadForm(auth: BackupServiceAuth, logger: PrefixedLogger? = nil) async throws -> Upload.Form {
+    func fetchBackupMediaAttachmentUploadForm(
+        encryptedByteLength: UInt32,
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
+    ) async throws -> Upload.Form {
         fatalError("Unimplemented for tests")
     }
 
-    func fetchMediaTierCdnRequestMetadata(cdn: Int32, auth: BackupServiceAuth) async throws -> MediaTierReadCredential {
+    func fetchMediaTierCdnRequestMetadata(cdn: Int32, auth: BackupServiceAuth, logger: PrefixedLogger) async throws -> MediaTierReadCredential {
         fatalError("Unimplemented for tests")
     }
 
-    func fetchBackupRequestMetadata(auth: BackupServiceAuth) async throws -> BackupReadCredential {
+    func fetchBackupRequestMetadata(auth: BackupServiceAuth, logger: PrefixedLogger) async throws -> BackupReadCredential {
         fatalError("Unimplemented for tests")
     }
 
     func copyToMediaTier(
         item: BackupArchive.Request.MediaItem,
         auth: BackupServiceAuth,
-        logger: PrefixedLogger? = nil
+        logger: PrefixedLogger,
     ) async throws -> UInt32 {
         return 3
     }
 
     func copyToMediaTier(
         items: [BackupArchive.Request.MediaItem],
-        auth: BackupServiceAuth
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> [BackupArchive.Response.BatchedBackupMediaResult] {
         return []
     }
@@ -146,103 +166,47 @@ class _AttachmentUploadManager_BackupRequestManagerMock: BackupRequestManager {
     func listMediaObjects(
         cursor: String?,
         limit: UInt32?,
-        auth: BackupServiceAuth
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> BackupArchive.Response.ListMediaResult {
         fatalError("Unimplemented for tests")
     }
 
     func deleteMediaObjects(
         objects: [BackupArchive.Request.DeleteMediaTarget],
-        auth: BackupServiceAuth
+        auth: BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws {
     }
 
-    func redeemReceipt(receiptCredentialPresentation: Data) async throws {
+    func redeemReceipt(receiptCredentialPresentation: Data, logger: PrefixedLogger) async throws {
     }
 
-    func fetchSvr🐝AuthCredential(
+    func fetchSVRBAuthCredential(
         key: SignalServiceKit.MessageRootBackupKey,
         chatServiceAuth auth: SignalServiceKit.ChatServiceAuth,
-        forceRefresh: Bool
+        logger: PrefixedLogger,
     ) async throws -> LibSignalClient.Auth {
         return LibSignalClient.Auth(username: "", password: "")
     }
 }
 
-// MARK: - AttachmentStore
+// MARK: -
 
-class AttachmentStoreMock: AttachmentStoreImpl {
-
-    var mockFetcher: ((Attachment.IDType) -> Attachment)?
-
-    override func fetch(ids: [Attachment.IDType], tx: DBReadTransaction) -> [Attachment] {
-        return ids.map(mockFetcher!)
-    }
-}
-
-class AttachmentUploadStoreMock: AttachmentUploadStoreImpl {
-
-    var uploadedAttachments = [AttachmentStream]()
-
-    override func markUploadedToTransitTier(
-        attachmentStream: AttachmentStream,
-        info: Attachment.TransitTierInfo,
-        tx: SignalServiceKit.DBWriteTransaction
-    ) throws {
-        uploadedAttachments.append(attachmentStream)
-    }
-
-    override func markTransitTierUploadExpired(
-        attachment: Attachment,
-        info: Attachment.TransitTierInfo,
-        tx: DBWriteTransaction
-    ) throws {
-        // Do nothing
-    }
-
-    override func markUploadedToMediaTier(
-        attachment: Attachment,
-        mediaTierInfo: Attachment.MediaTierInfo,
-        mediaName: String,
-        tx: DBWriteTransaction
-    ) throws {}
-
-    override func markMediaTierUploadExpired(
-        attachment: Attachment,
-        tx: DBWriteTransaction
-    ) throws {}
-
-    override func markThumbnailUploadedToMediaTier(
-        attachment: Attachment,
-        thumbnailMediaTierInfo: Attachment.ThumbnailMediaTierInfo,
-        mediaName: String,
-        tx: DBWriteTransaction
-    ) throws {}
-
-    override func markThumbnailMediaTierUploadExpired(
-        attachment: Attachment,
-        tx: DBWriteTransaction
-    ) throws {}
-
-    override func upsert(record: AttachmentUploadRecord, tx: DBWriteTransaction) throws { }
-
-    func removeRecord(for attachmentId: Attachment.IDType, tx: DBWriteTransaction) throws {}
-
-    func fetchAttachmentUploadRecord(for attachmentId: Attachment.IDType, tx: DBReadTransaction) throws -> AttachmentUploadRecord? {
-        return nil
-    }
+class AttachmentUploadStoreMock: AttachmentUploadStore {
+    override func upsert(record: AttachmentUploadRecord, tx: DBWriteTransaction) { }
 
     override func removeRecord(
         for attachmentId: Attachment.IDType,
         sourceType: AttachmentUploadRecord.SourceType,
-        tx: DBWriteTransaction
-    ) throws { }
+        tx: DBWriteTransaction,
+    ) { }
 
     override func fetchAttachmentUploadRecord(
         for attachmentId: Attachment.IDType,
         sourceType: AttachmentUploadRecord.SourceType,
-        tx: DBReadTransaction
-    ) throws -> AttachmentUploadRecord? {
+        tx: DBReadTransaction,
+    ) -> AttachmentUploadRecord? {
         return nil
     }
 }

@@ -7,28 +7,53 @@ import Foundation
 import LibSignalClient
 
 /// An outgoing group v2 update.
-class OutgoingGroupUpdateMessage: TSOutgoingMessage {
-    @objc
-    private var isUpdateUrgent: Bool = false
+final class OutgoingGroupUpdateMessage: TransientOutgoingMessage {
+    override class var supportsSecureCoding: Bool { true }
 
-    @objc
-    private(set) var isDeletingAccount: Bool = false
+    required init?(coder: NSCoder) {
+        self.isDeletingAccount = coder.decodeObject(of: NSNumber.self, forKey: "isDeletingAccount")?.boolValue ?? false
+        self.isUpdateUrgent = coder.decodeObject(of: NSNumber.self, forKey: "isUpdateUrgent")?.boolValue ?? false
+        super.init(coder: coder)
+    }
+
+    override func encode(with coder: NSCoder) {
+        super.encode(with: coder)
+        coder.encode(NSNumber(value: self.isDeletingAccount), forKey: "isDeletingAccount")
+        coder.encode(NSNumber(value: self.isUpdateUrgent), forKey: "isUpdateUrgent")
+    }
+
+    override var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(super.hash)
+        hasher.combine(isDeletingAccount)
+        hasher.combine(isUpdateUrgent)
+        return hasher.finalize()
+    }
+
+    override func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard super.isEqual(object) else { return false }
+        guard self.isDeletingAccount == object.isDeletingAccount else { return false }
+        guard self.isUpdateUrgent == object.isUpdateUrgent else { return false }
+        return true
+    }
+
+    private let isUpdateUrgent: Bool
+    let isDeletingAccount: Bool
 
     init(
         in thread: TSGroupThread,
-        groupMetaMessage: TSGroupMetaMessage,
         expiresInSeconds: UInt32 = 0,
         groupChangeProtoData: Data? = nil,
         additionalRecipients: some Sequence<ServiceId>,
         isUrgent: Bool = false,
         isDeletingAccount: Bool = false,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) {
         let builder: TSOutgoingMessageBuilder = .withDefaultValues(
             thread: thread,
             expiresInSeconds: expiresInSeconds,
-            groupMetaMessage: groupMetaMessage,
-            groupChangeProtoData: groupChangeProtoData
+            groupChangeProtoData: groupChangeProtoData,
         )
         self.isUpdateUrgent = isUrgent
         self.isDeletingAccount = isDeletingAccount
@@ -37,19 +62,9 @@ class OutgoingGroupUpdateMessage: TSOutgoingMessage {
             additionalRecipients: additionalRecipients.map { ServiceIdObjC.wrapValue($0) },
             explicitRecipients: [],
             skippedRecipients: [],
-            transaction: transaction
+            transaction: transaction,
         )
     }
 
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
-
-    required init(dictionary: [String: Any]!) throws {
-        try super.init(dictionary: dictionary)
-    }
-
     override var isUrgent: Bool { self.isUpdateUrgent }
-
-    override var shouldBeSaved: Bool { false }
 }

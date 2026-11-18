@@ -9,9 +9,13 @@ extension TSMessage {
 
     /// Dangerous to use for uninserted messages; exposed only in the Signal target because most rendering
     /// uses already-inserted messages, obviating the concern.
+    /// There are some exceptions to this, such as mock messages we insert for purely UI previewing purposes.
     public func hasRenderableContent(tx: DBReadTransaction) -> Bool {
         guard let rowId = self.sqliteRowId else {
-            owsFailDebug("Checking renderable content for uninserted message!")
+            owsAssertDebug(
+                self is MockIncomingMessage || self is MockOutgoingMessage,
+                "Checking renderable content for uninserted message",
+            )
             return TSMessageBuilder.hasRenderableContent(
                 hasNonemptyBody: body?.nilIfEmpty != nil,
                 hasBodyAttachmentsOrOversizeText: false,
@@ -21,9 +25,9 @@ extension TSMessage {
                 hasSticker: messageSticker != nil,
                 hasGiftBadge: giftBadge != nil,
                 isStoryReply: isStoryReply,
-                isPaymentMessage: (self is OWSPaymentMessage || self is OWSArchivedPaymentMessage),
+                isPaymentMessage: self is OWSPaymentMessage || self is OWSArchivedPaymentMessage,
                 storyReactionEmoji: storyReactionEmoji,
-                isPoll: isPoll
+                isPoll: isPoll,
             )
         }
         return insertedMessageHasRenderableContent(rowId: rowId, tx: tx)

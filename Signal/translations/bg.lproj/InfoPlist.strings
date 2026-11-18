@@ -1,0 +1,9 @@
+NSAppleMusicUsageDescription = "Radar трябва да използва Apple Music за възпроизвеждане на прикачените мултимедийни файлове.";
+NSCameraUsageDescription = "Radar използва вашата камера за правене на снимки и за видео обаждания.";
+NSContactsUsageDescription = "Radar използва контактите ви аз намиране на потребители, които познавате. Не съхраняваме вашите контакти на сървъра.";
+NSFaceIDUsageDescription = "Заключването на екрана на Radar използва Face ID.";
+NSLocationWhenInUseUsageDescription = "Radar се нуждае от достъп до вашето местоположение за споделяне на текущото ви местоположение.";
+NSMicrophoneUsageDescription = "Radar се нуждае от достъп до микрофона ви за правене и получаване на телефонни обаждания, както и за записване на гласови съобщения.";
+NSPhotoLibraryAddUsageDescription = "Radar ще запазва снимки във вашата библиотека.";
+NSPhotoLibraryUsageDescription = "Radar ви позволява да изберете кои снимки от библиотеката си да изпращате.";
+NSLocalNetworkUsageDescription = "Radar използва локалната мрежа, за да ви позволи директно да прехвърлите акаунта си на нов телефон. Няма да се използва, освен ако изрично не изберете да започнете трансфер към ново устройство.";

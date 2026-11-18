@@ -86,7 +86,7 @@ class ChatListFilterFooterCell: UITableViewCell, ReusableTableViewCell {
 
         // Disable background highlighting.
         var backgroundConfiguration = UIBackgroundConfiguration.clear()
-        backgroundConfiguration.backgroundColor = .systemBackground
+        backgroundConfiguration.backgroundColor = .Signal.background
         self.backgroundConfiguration = backgroundConfiguration
 
         contentView.addSubview(container)

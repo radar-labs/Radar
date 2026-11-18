@@ -6,21 +6,21 @@
 import Foundation
 import GRDB
 
-public final class SessionResetJobRecord: JobRecord, FactoryInitializableFromRecordType {
-    override class var jobRecordType: JobRecordType { .sessionReset }
+public final class SessionResetJobRecord: JobRecord {
+    override public class var jobRecordType: JobRecordType { .sessionReset }
 
     public let contactThreadId: String
 
     init(
         contactThreadId: String,
         failureCount: UInt = 0,
-        status: Status = .ready
+        status: Status = .ready,
     ) {
         self.contactThreadId = contactThreadId
 
         super.init(
             failureCount: failureCount,
-            status: status
+            status: status,
         )
     }
 
@@ -28,19 +28,15 @@ public final class SessionResetJobRecord: JobRecord, FactoryInitializableFromRec
         self.init(contactThreadId: contactThread.uniqueId)
     }
 
-    required init(forRecordTypeFactoryInitializationFrom decoder: Decoder) throws {
+    required init(inheritableDecoder decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-
         contactThreadId = try container.decode(String.self, forKey: .contactThreadId)
-
-        try super.init(baseClassDuringFactoryInitializationFrom: container.superDecoder())
+        try super.init(inheritableDecoder: decoder)
     }
 
-    public override func encode(to encoder: Encoder) throws {
+    override public func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
-
-        try super.encode(to: container.superEncoder())
-
         try container.encode(contactThreadId, forKey: .contactThreadId)
     }
 }

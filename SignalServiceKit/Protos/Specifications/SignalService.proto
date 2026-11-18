@@ -201,7 +201,7 @@ message CallMessage {
 
 message DataMessage {
   enum Flags {
-    END_SESSION = 1;
+    reserved /*END_SESSION*/ 1;
     EXPIRATION_TIMER_UPDATE = 2;
     PROFILE_KEY_UPDATE = 4;
   }
@@ -237,6 +237,13 @@ message DataMessage {
       optional string suffix = 4;
       optional string middleName = 5;
       reserved /*displayName*/ 6;
+      optional string nickname = 7;
+    }
+
+    // The sharer's Signal nickname for this contact
+    message SignalNickname {
+      optional string given = 1;
+      optional string family = 2;
     }
 
     message Phone {
@@ -289,11 +296,15 @@ message DataMessage {
     }
 
     optional Name name = 1;
+    reserved 2;
     repeated Phone number = 3;
     repeated Email email = 4;
     repeated PostalAddress address = 5;
     optional Avatar avatar = 6;
     optional string organization = 7;
+    optional bytes aciBinary = 8; // 16-byte UUID
+    optional SignalNickname nickname = 9;
+    optional string note = 10;
   }
 
   message Sticker {
@@ -416,6 +427,25 @@ message DataMessage {
     optional uint32 voteCount = 4;
   }
 
+  message PinMessage {
+    optional bytes targetAuthorAciBinary = 1; // 16-byte UUID
+    optional uint64 targetSentTimestamp = 2;
+   // oneof pinDuration {
+      optional uint32 pinDurationSeconds = 3;
+      optional bool pinDurationForever = 4;
+   // }
+  }
+
+  message UnpinMessage {
+    optional bytes targetAuthorAciBinary = 1; // 16-byte UUID
+    optional uint64 targetSentTimestamp = 2;
+  }
+
+  message AdminDelete {
+    optional bytes targetAuthorAciBinary = 1; // 16-byte UUID
+    optional uint64 targetSentTimestamp = 2;
+  }
+
   optional string body = 1;
   repeated AttachmentPointer attachments = 2;
   reserved /*groupV1Context*/ 3;
@@ -441,7 +471,10 @@ message DataMessage {
   optional PollCreate pollCreate = 24;
   optional PollTerminate pollTerminate = 25;
   optional PollVote pollVote = 26;
-  // NEXT ID: 27
+  optional PinMessage pinMessage = 27;
+  optional UnpinMessage unpinMessage = 28;
+  optional AdminDelete adminDelete = 29;
+  // NEXT ID: 30
 }
 
 message NullMessage {
@@ -511,10 +544,29 @@ message SyncMessage {
   }
 
   message Blocked {
-    repeated string numbers = 1;
+    repeated string numbers = 1; // deprecated: this field will be removed in a future release.
     repeated string acis = 3;
-    repeated bytes groupIds = 2;
-    repeated bytes acisBinary = 4; // 16-byte UUID
+    repeated bytes groupIds = 2; // deprecated: this field will be removed in a future release.
+    repeated bytes acisBinary = 4; // deprecated: this field will be removed in a future release.
+
+    message BlockedE164 {
+      optional string e164 = 1;
+      optional uint64 timestamp = 2;
+    }
+
+    message BlockedAci {
+      optional bytes aciBinary = 1; // 16-byte UUID
+      optional uint64 timestamp = 2;
+    }
+
+    message BlockedGroup {
+      optional bytes groupId = 1;
+      optional uint64 timestamp = 2;
+    }
+
+    repeated BlockedE164 blockedE164s = 5;
+    repeated BlockedAci blockedAcis = 6;
+    repeated BlockedGroup blockedGroups = 7;
   }
 
   message Request {
@@ -589,7 +641,7 @@ message SyncMessage {
 
   message Keys {
     reserved /* storageService */ 1;
-    optional bytes master = 2;
+    reserved /* master */ 2;
     optional string accountEntropyPool = 3;
     optional bytes mediaRootBackupKey = 4;
   }
@@ -686,6 +738,7 @@ message SyncMessage {
     optional bytes rootKey = 1;
     optional bytes adminPasskey = 2;
     optional Type type = 3; // defaults to UPDATE
+    reserved /*epoch*/ 4;
   }
 
   message CallLogEvent {
@@ -707,24 +760,6 @@ message SyncMessage {
   }
 
   message DeleteForMe {
-    message ConversationIdentifier {
-      // oneof identifier {
-        optional string threadServiceId = 1;
-        optional bytes threadGroupId = 2;
-        optional string threadE164 = 3;
-        optional bytes threadServiceIdBinary = 4; // service ID binary (i.e. 16 byte UUID for ACI, 1 byte prefix + 16 byte UUID for PNI)
-      // }
-    }
-
-    message AddressableMessage {
-      // oneof author {
-        optional string authorServiceId = 1;
-        optional string authorE164 = 2;
-        optional bytes authorServiceIdBinary = 4; // service ID binary (i.e. 16 byte UUID for ACI, 1 byte prefix + 16 byte UUID for PNI)
-      // }
-      optional uint64 sentTimestamp = 3;
-    }
-
     message MessageDeletes {
       optional ConversationIdentifier conversation = 1;
       repeated AddressableMessage messages = 2;
@@ -763,6 +798,52 @@ message SyncMessage {
     optional uint32 deviceId = 2;
   }
 
+  message AttachmentBackfillRequest {
+    optional AddressableMessage targetMessage = 1;
+    optional ConversationIdentifier targetConversation = 2;
+  }
+
+  message AttachmentBackfillResponse {
+    message AttachmentData {
+      enum Status {
+        PENDING = 0;
+        TERMINAL_ERROR = 1;
+      }
+
+      // oneof commented out because swift generated
+      // enum with associated values can't be converted
+      // to objc representation
+      //
+      // oneof data {
+        optional AttachmentPointer attachment = 1;
+        optional Status status = 2;
+      // }
+    }
+
+    enum Error {
+      MESSAGE_NOT_FOUND = 0;
+    }
+
+    message AttachmentDataList {
+      repeated AttachmentData attachments = 1;
+    }
+
+    optional AddressableMessage targetMessage = 1;
+    optional ConversationIdentifier targetConversation = 2;
+
+    // oneof commented out because swift generated
+    // enum with associated values can't be converted
+    // to objc representation
+    //
+    // oneof data {
+      optional AttachmentDataList attachments = 3;
+      optional Error error = 4;
+    // }
+  }
+
+  message UsernameChange {
+  }
+
   optional Sent sent = 1;
   optional Contacts contacts = 2;
   reserved /*groups*/ 3;
@@ -786,6 +867,9 @@ message SyncMessage {
   optional CallLogEvent callLogEvent = 21;
   optional DeleteForMe deleteForMe = 22;
   optional DeviceNameChange deviceNameChange = 23;
+  optional AttachmentBackfillRequest attachmentBackfillRequest = 24;
+  optional AttachmentBackfillResponse attachmentBackfillResponse = 25;
+  optional UsernameChange usernameChange = 26;
 }
 
 message AttachmentPointer {
@@ -821,7 +905,12 @@ message AttachmentPointer {
   optional string blurHash = 12;
   optional uint64 uploadTimestamp = 13;
   optional uint32 cdnNumber = 14;
-  // Next ID: 21
+  // Waveform for audio attachments. Each byte represents a "bar" in the
+  // waveform, with 0 as silence 255 as loudest. At most 100 bytes/bars.
+  optional bytes audioWaveform = 21;
+  // Duration of an audio attachment, in seconds.
+  optional float audioDurationSeconds = 22;
+  // Next ID: 23
 }
 
 message GroupContextV2 {
@@ -919,4 +1008,22 @@ message BodyRange {
 message EditMessage {
   optional uint64 targetSentTimestamp = 1;
   optional DataMessage dataMessage = 2;
+}
+
+message AddressableMessage {
+  // oneof author {
+    optional string authorServiceId = 1;
+    optional string authorE164 = 2;
+    optional bytes authorServiceIdBinary = 4; // service ID binary (i.e. 16 byte UUID for ACI, 1 byte prefix + 16 byte UUID for PNI)
+  // }
+  optional uint64 sentTimestamp = 3;
+}
+
+message ConversationIdentifier {
+  // oneof identifier {
+    optional string threadServiceId = 1;
+    optional bytes threadGroupId = 2;
+    optional string threadE164 = 3;
+    optional bytes threadServiceIdBinary = 4; // service ID binary (i.e. 16 byte UUID for ACI, 1 byte prefix + 16 byte UUID for PNI)
+  // }
 }

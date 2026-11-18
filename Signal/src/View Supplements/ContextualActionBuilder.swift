@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import UIKit
 import SignalServiceKit
+import UIKit
 
 enum ContextualActionBuilder {
     typealias Handler = (_ completion: @escaping (_ success: Bool) -> Void) -> Void
@@ -12,57 +12,55 @@ enum ContextualActionBuilder {
     static func makeContextualAction(
         style: UIContextualAction.Style,
         color: UIColor,
-        image: String,
+        imageName: String,
         title: String,
-        handler: @escaping () -> Void
+        handler: @escaping Handler,
     ) -> UIContextualAction {
-        Self.makeContextualAction(
+        return makeContextualAction(
             style: style,
             color: color,
-            image: image,
-            title: title
-        ) { completion in
-            handler()
-            completion(true)
-        }
+            image: UIImage(named: imageName),
+            title: title,
+            handler: handler,
+        )
     }
 
     static func makeContextualAction(
         style: UIContextualAction.Style,
         color: UIColor,
-        image: String,
+        image: UIImage?,
         title: String,
-        handler: @escaping Handler
+        handler: @escaping Handler,
     ) -> UIContextualAction {
         // We want to always show a title with the icon. iOS 26 does this by
         // default, but previous iOS versions only does when the cell's
         // height > 91, so we generate an image with the text below it.
-        if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable {
+        if #available(iOS 26, *) {
             let action = UIContextualAction(
                 style: style,
-                title: title
+                title: title,
             ) { _, _, completion in
                 handler(completion)
             }
             action.backgroundColor = color
-            action.image = UIImage(named: image)
+            action.image = image
             return action
         } else {
             let action = UIContextualAction(
                 style: style,
-                title: nil
+                title: nil,
             ) { _, _, completion in
                 handler(completion)
             }
             action.accessibilityLabel = title
             action.backgroundColor = color
-            action.image = UIImage(named: image)?.withTitle(
+            action.image = image?.withTitle(
                 title,
                 font: .dynamicTypeFootnote.medium(),
-                color: .ows_white,
+                color: .white,
                 maxTitleWidth: 68,
                 minimumScaleFactor: CGFloat(8) / CGFloat(13),
-                spacing: 4
+                spacing: 4,
             )?.withRenderingMode(.alwaysTemplate)
 
             return action

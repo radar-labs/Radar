@@ -3,24 +3,26 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
-
 extension Stripe {
     /// Create a payment method entry with the Signal service for a subscription
     /// processed by Stripe.
     ///
     /// - Returns
     /// A Stripe secret used to authorize payment for the new subscription.
-    public static func createSignalPaymentMethodForSubscription(subscriberId: Data) async throws -> String {
-        let request = OWSRequestFactory.subscriptionCreateStripePaymentMethodRequest(subscriberID: subscriberId)
+    public static func createSignalPaymentMethodForSubscription(
+        subscriberId: Data,
+        donationPermit: DonationPermit,
+        networkManager: NetworkManager,
+    ) async throws -> String {
+        let response = try await networkManager.asyncRequest(
+            OWSRequestFactory.subscriptionCreateStripePaymentMethodRequest(
+                subscriberID: subscriberId,
+                donationPermit: donationPermit,
+            ),
+        )
 
-        let response = try await SSKEnvironment.shared.networkManagerRef
-            .asyncRequest(request, retryPolicy: .hopefullyRecoverable)
-
-        let statusCode = response.responseStatusCode
-
-        guard statusCode == 200 else {
-            throw OWSAssertionError("Got bad response code \(statusCode).")
+        guard response.responseStatusCode == 200 else {
+            throw response.asError()
         }
 
         guard let parser = response.responseBodyParamParser else {
@@ -45,7 +47,7 @@ extension Stripe {
     /// The new payment ID.
     public static func setupNewSubscription(
         clientSecret: String,
-        paymentMethod: PaymentMethod
+        paymentMethod: PaymentMethod,
     ) async throws -> ConfirmedSetupIntent {
         let paymentMethodId = try await createPaymentMethod(with: paymentMethod)
         // Pass in the correct callback URL
@@ -53,7 +55,7 @@ extension Stripe {
             mandate: paymentMethod.mandate,
             paymentMethodId: paymentMethodId,
             clientSecret: clientSecret,
-            callbackURL: paymentMethod.callbackURL
+            callbackURL: paymentMethod.callbackURL,
         )
     }
 }

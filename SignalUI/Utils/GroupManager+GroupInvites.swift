@@ -13,16 +13,15 @@ public extension GroupManager {
         groupThread: TSGroupThread,
         fromViewController: UIViewController,
         replacementAdminAci: Aci? = nil,
-        success: (() -> Void)?
+        success: (() -> Void)?,
     ) {
-
-        guard groupThread.groupModel.groupMembership.isLocalUserMemberOfAnyKind else {
-            owsFailDebug("unexpectedly trying to leave group for which we're not a member.")
-            return
-        }
+        // Note: Requests to join aren't handled by this method.
+        // Note: If we *aren't* a member, this method turns into a no-op.
+        owsAssertDebug(groupThread.groupModel.groupMembership.isLocalUserFullOrInvitedMember, "must be member")
 
         ModalActivityIndicatorViewController.present(
             fromViewController: fromViewController,
+            title: CommonStrings.updatingModal,
             canCancel: false,
             asyncBlock: { modal in
                 do {
@@ -43,37 +42,38 @@ public extension GroupManager {
                         OWSActionSheets.showActionSheet(
                             title: OWSLocalizedString(
                                 "LEAVE_GROUP_FAILED",
-                                comment: "Error indicating that a group could not be left."
-                            )
+                                comment: "Error indicating that a group could not be left.",
+                            ),
                         )
                     }
                 }
-            }
+            },
         )
     }
 
     @MainActor
     static func acceptGroupInviteWithModal(
         _ groupThread: TSGroupThread,
-        fromViewController: UIViewController
+        fromViewController: UIViewController,
     ) async throws {
         do {
             try await ModalActivityIndicatorViewController.presentAndPropagateResult(
-                from: fromViewController
+                from: fromViewController,
+                title: CommonStrings.joiningGroupModal,
             ) {
                 guard let groupModelV2 = groupThread.groupModel as? TSGroupModelV2 else {
                     throw OWSAssertionError("Invalid group model")
                 }
 
                 try await self.localAcceptInviteToGroupV2(
-                    groupModel: groupModelV2,
-                    waitForMessageProcessing: true
+                    secretParams: groupModelV2.secretParams(),
+                    waitForMessageProcessing: true,
                 )
             }
         } catch {
             OWSActionSheets.showActionSheet(title: OWSLocalizedString(
                 "GROUPS_INVITE_ACCEPT_INVITE_FAILED",
-                comment: "Error indicating that an error occurred while accepting an invite."
+                comment: "Error indicating that an error occurred while accepting an invite.",
             ))
             throw error
         }

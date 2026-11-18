@@ -5,6 +5,7 @@
 
 import Foundation
 import Intents
+public import UIKit
 import UserNotifications
 
 public class UserNotificationConfig {
@@ -23,7 +24,7 @@ public class UserNotificationConfig {
             identifier: category.rawValue,
             actions: notificationActions(for: category),
             intentIdentifiers: [],
-            options: []
+            options: [],
         )
     }
 
@@ -34,13 +35,13 @@ public class UserNotificationConfig {
                 identifier: action.rawValue,
                 title: CallStrings.callBackButtonTitle,
                 options: .foreground,
-                icon: UNNotificationActionIcon(systemImageName: "phone")
+                icon: UNNotificationActionIcon(systemImageName: "phone"),
             )
         case .markAsRead:
             return UNNotificationAction(
                 identifier: action.rawValue,
                 title: MessageStrings.markAsReadNotificationAction,
-                icon: UNNotificationActionIcon(systemImageName: "message")
+                icon: UNNotificationActionIcon(systemImageName: "message"),
             )
         case .reply:
             return UNTextInputNotificationAction(
@@ -48,19 +49,19 @@ public class UserNotificationConfig {
                 title: MessageStrings.replyNotificationAction,
                 icon: UNNotificationActionIcon(systemImageName: "arrowshape.turn.up.left"),
                 textInputButtonTitle: MessageStrings.sendButton,
-                textInputPlaceholder: ""
+                textInputPlaceholder: "",
             )
         case .showThread:
             return UNNotificationAction(
                 identifier: action.rawValue,
                 title: CallStrings.showThreadButtonTitle,
-                icon: UNNotificationActionIcon(systemImageName: "bubble.left.and.bubble.right")
+                icon: UNNotificationActionIcon(systemImageName: "bubble.left.and.bubble.right"),
             )
         case .reactWithThumbsUp:
             return UNNotificationAction(
                 identifier: action.rawValue,
                 title: MessageStrings.reactWithThumbsUpNotificationAction,
-                icon: UNNotificationActionIcon(systemImageName: "hand.thumbsup")
+                icon: UNNotificationActionIcon(systemImageName: "hand.thumbsup"),
             )
         }
     }
@@ -109,7 +110,7 @@ public class UserNotificationPresenter {
         replacingIdentifier: String? = nil,
         forceBeforeRegistered: Bool = false,
         isMainAppAndActive: Bool,
-        notificationSuppressionRule: NotificationSuppressionRule
+        notificationSuppressionRule: NotificationSuppressionRule,
     ) async {
         let tsAccountManager = DependenciesBridge.shared.tsAccountManager
         // TODO: It might make sense to have the callers check this instead. Further investigation is required.
@@ -139,10 +140,11 @@ public class UserNotificationPresenter {
         let trigger: UNNotificationTrigger?
         let checkForCancel = (
             category == .incomingMessageWithActions_CanReply
-            || category == .incomingMessageWithActions_CannotReply
-            || category == .incomingMessageWithoutActions
-            || category == .incomingReactionWithActions_CanReply
-            || category == .incomingReactionWithActions_CannotReply
+                || category == .incomingMessageWithActions_CannotReply
+                || category == .incomingMessageWithoutActions
+                || category == .incomingReactionWithActions_CanReply
+                || category == .incomingReactionWithActions_CannotReply
+                || category == .incomingReactionWithoutActions,
         )
         if checkForCancel, !isMainAppAndActive, hasReceivedSyncMessageRecentlyWithSneakyTransaction {
             assert(userInfo.threadId != nil)
@@ -180,7 +182,7 @@ public class UserNotificationPresenter {
             // Play sound and vibrate, but without a `body` no banner will show.
         }
 
-        if let threadIdentifier = threadIdentifier {
+        if let threadIdentifier {
             content.threadIdentifier = threadIdentifier
         }
 
@@ -210,10 +212,77 @@ public class UserNotificationPresenter {
         }
     }
 
+    // MARK: - Unread reminders
+
+    private static func unreadReminderIdentifier(forThreadUniqueId threadUniqueId: String) -> String {
+        return "Signal.UnreadReminder.\(threadUniqueId)"
+    }
+
+    func scheduleUnreadReminder(
+        threadUniqueId: String,
+        threadIdentifier: String?,
+        title: String?,
+        body: String,
+        initialDelay: TimeInterval,
+        latestFireDate: Date,
+        sound: Sound?,
+    ) async {
+        let content = UNMutableNotificationContent()
+        content.categoryIdentifier = AppNotificationCategory.unreadReminder.rawValue
+
+        var userInfo = AppNotificationUserInfo()
+        userInfo.threadId = threadUniqueId
+        userInfo.defaultAction = .showThread
+        content.userInfo = userInfo.build()
+
+        if let title = title?.filterForDisplay, !title.isEmpty {
+            content.title = title
+        }
+        content.body = body.filterForDisplay
+        if let threadIdentifier {
+            content.threadIdentifier = threadIdentifier
+        }
+
+        if let sound, sound != .standard(.none) {
+            content.sound = sound.notificationSound(isQuiet: false)
+        }
+
+        let identifier = Self.unreadReminderIdentifier(forThreadUniqueId: threadUniqueId)
+
+        var existingReminderFireDate: Date?
+        let allPendingRequests = await Self.notificationCenter.pendingNotificationRequests()
+        if let pendingRequest = allPendingRequests.first(where: { $0.identifier == identifier }) {
+            existingReminderFireDate = (pendingRequest.trigger as? UNTimeIntervalNotificationTrigger)?.nextTriggerDate()
+        }
+
+        cancelNotificationSync(identifier: identifier)
+
+        let effectiveFireDate = existingReminderFireDate ?? Date().addingTimeInterval(initialDelay)
+        guard effectiveFireDate < latestFireDate else {
+            Logger.info("not scheduling unread reminder that would fire too late.")
+            return
+        }
+
+        let trigger = UNTimeIntervalNotificationTrigger(
+            timeInterval: max(effectiveFireDate.timeIntervalSinceNow, 1),
+            repeats: false,
+        )
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+        do {
+            try await Self.notificationCenter.add(request)
+        } catch {
+            owsFailDebug("Error scheduling unread reminder\(error)")
+        }
+    }
+
+    func cancelUnreadReminder(threadUniqueId: String) {
+        cancelNotificationSync(identifier: Self.unreadReminderIdentifier(forThreadUniqueId: threadUniqueId))
+    }
+
     private func shouldPresentNotification(
         category: AppNotificationCategory,
         userInfo: AppNotificationUserInfo,
-        notificationSuppressionRule: NotificationSuppressionRule
+        notificationSuppressionRule: NotificationSuppressionRule,
     ) -> Bool {
         switch category {
         case .incomingMessageFromNoLongerVerifiedIdentity,
@@ -224,7 +293,11 @@ public class UserNotificationPresenter {
              .deregistration,
              .newDeviceLinked,
              .backupsEnabled,
-             .backupsMediaTierQuotaConsumed:
+             .backupsMediaTierQuotaConsumed,
+             .attachmentBackfill,
+             .nse_lowDiskSpace,
+             .nse_dbNotAvailable,
+             .nse_clockSkew:
             // Always show these notifications
             return true
 
@@ -237,9 +310,12 @@ public class UserNotificationPresenter {
              .incomingMessageWithoutActions,
              .incomingReactionWithActions_CanReply,
              .incomingReactionWithActions_CannotReply,
+             .incomingReactionWithoutActions,
              .infoOrErrorMessage,
              .pollEndNotification,
-             .pollVoteNotification:
+             .pollVoteNotification,
+             .releaseNotesMessage,
+             .unreadReminder:
             // Don't show these notifications when the thread is visible.
             if
                 let notificationThreadUniqueId = userInfo.threadId,
@@ -276,7 +352,7 @@ public class UserNotificationPresenter {
     func replaceNotification(messageId: String) async -> Bool {
         return self.cancelSync(
             notificationRequests: await getNotificationsRequests(),
-            matching: .messageIds([messageId])
+            matching: .messageIds([messageId]),
         )
     }
 
@@ -326,9 +402,11 @@ public class UserNotificationPresenter {
 
         Task {
             let shouldRemoveNotificationRequestPredicate: (UNNotificationRequest) -> Bool = { request in
-                guard let appNotificationCategory = AppNotificationCategory(
-                    rawValue: request.content.categoryIdentifier,
-                ) else {
+                guard
+                    let appNotificationCategory = AppNotificationCategory(
+                        rawValue: request.content.categoryIdentifier,
+                    )
+                else {
                     return true
                 }
 
@@ -373,7 +451,7 @@ public class UserNotificationPresenter {
     private func getNotificationsRequests() async -> [UNNotificationRequest] {
         return await (
             Self.notificationCenter.deliveredNotifications().map({ $0.request })
-            + Self.notificationCenter.pendingNotificationRequests()
+                + Self.notificationCenter.pendingNotificationRequests()
         )
     }
 
@@ -385,10 +463,11 @@ public class UserNotificationPresenter {
         let notificationRequests = await getNotificationsRequests()
         for request in notificationRequests {
             let userInfo = AppNotificationUserInfo(request.content.userInfo)
-            if let requestPollAuthor = userInfo.voteAuthorServiceIdBinary,
-               let requestPollId = userInfo.messageId,
-               requestPollAuthor == author,
-               requestPollId == pollId
+            if
+                let requestPollAuthor = userInfo.voteAuthorServiceIdBinary,
+                let requestPollId = userInfo.messageId,
+                requestPollAuthor == author,
+                requestPollId == pollId
             {
                 return true
             }
@@ -399,7 +478,7 @@ public class UserNotificationPresenter {
     @discardableResult
     private func cancelSync(
         notificationRequests: [UNNotificationRequest],
-        matching cancellationType: CancellationType
+        matching cancellationType: CancellationType,
     ) -> Bool {
         let requestMatchesPredicate: (UNNotificationRequest) -> Bool = { request in
             let userInfo = AppNotificationUserInfo(request.content.userInfo)
@@ -480,8 +559,8 @@ extension Sound {
             return UNNotificationSound.default
         }
         if
-            !FileManager.default.fileExists(atPath: (Sounds.soundsDirectory as NSString).appendingPathComponent(filename))
-            && !FileManager.default.fileExists(atPath: (Bundle.main.bundlePath as NSString).appendingPathComponent(filename))
+            !FileManager.default.fileExists(atPath: (Sounds.soundsDirectory as NSString).appendingPathComponent(filename)),
+            !FileManager.default.fileExists(atPath: (Bundle.main.bundlePath as NSString).appendingPathComponent(filename))
         {
             Logger.info("[Notification Sounds] sound file doesn't exist!")
         }

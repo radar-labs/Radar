@@ -4,11 +4,11 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
 extension ConversationViewController {
 
-    public func didTapSystemMessageItem(_ item: CVTextLabel.Item) {
+    func didTapSystemMessageItem(_ item: CVTextLabel.Item) {
         AssertIsOnMainThread()
 
         guard case .referencedUser(let referencedUserItem) = item else {
@@ -20,7 +20,7 @@ extension ConversationViewController {
 
         owsAssertDebug(
             !address.isLocalAddress,
-            "We should never have ourselves as a referenced user in a system message"
+            "We should never have ourselves as a referenced user in a system message",
         )
 
         showMemberActionSheet(forAddress: address, withHapticFeedback: true)

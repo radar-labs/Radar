@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import MobileCoin
-public import SignalServiceKit
 import BreezSdkSpark
+import MobileCoin
+public import SignalServiceKit
 
 @objc
 public protocol Payments: AnyObject {
@@ -22,18 +22,30 @@ public protocol Payments: AnyObject {
 
     func scheduleReconciliationNow(transaction: DBWriteTransaction)
 
-    func replaceAsUnidentified(paymentModel oldPaymentModel: TSPaymentModel,
-                               transaction: DBWriteTransaction)
+    func replaceAsUnidentified(
+        paymentModel oldPaymentModel: TSPaymentModel,
+        transaction: DBWriteTransaction,
+    )
 
-    func findPaymentModels(withMCLedgerBlockIndex mcLedgerBlockIndex: UInt64,
-                           mcIncomingTransactionPublicKey: Data,
-                           transaction: DBReadTransaction) -> [TSPaymentModel]
+    func findPaymentModels(
+        withMCLedgerBlockIndex mcLedgerBlockIndex: UInt64,
+        mcIncomingTransactionPublicKey: Data,
+        transaction: DBReadTransaction,
+    ) -> [TSPaymentModel]
 
     func didReceiveMCAuthError()
 
-    var isKillSwitchActive: Bool { get }
+    func canUsePayments() -> Bool
 
     func clearState(transaction: DBWriteTransaction)
+}
+
+// Radar: names used by Radar's payments UI. Upstream folded the remote kill
+// switch and the phone-number region check into `canUsePayments()`.
+extension Payments {
+    public var isKillSwitchActive: Bool { !canUsePayments() }
+
+    public var canEnablePayments: Bool { canUsePayments() }
 }
 
 // MARK: -
@@ -51,7 +63,7 @@ public protocol PaymentsSwift: Payments {
         paymentAmount: TSPaymentAmount,
         memoMessage: String?,
         isOutgoingTransfer: Bool,
-        canDefragment: Bool
+        canDefragment: Bool,
     ) async throws -> PreparedPayment
 
     func initiateOutgoingPayment(preparedPayment: PreparedPayment) async throws -> TSPaymentModel
@@ -75,8 +87,10 @@ public protocol PaymentsSwift: Payments {
 
 extension PaymentsPassphrase {
 
-    public static func parse(passphrase: String,
-                             validateWords: Bool) throws -> PaymentsPassphrase {
+    public static func parse(
+        passphrase: String,
+        validateWords: Bool,
+    ) throws -> PaymentsPassphrase {
         let words = Array(passphrase.lowercased().stripped.components(separatedBy: " ").compactMap { $0.nilIfEmpty })
         guard PaymentsConstants.supportedPassphraseWordCounts.contains(words.count) else {
             Logger.warn("words.count \(words.count) not in supported counts \(PaymentsConstants.supportedPassphraseWordCounts)")
@@ -137,11 +151,11 @@ extension MockPayments: PaymentsSwift {
 
     public var paymentsEntropy: Data? { nil }
 
-    public var walletAddressLNURL: String? { nil  }
+    public var walletAddressLNURL: String? { nil }
 
     public var walletLightningAddress: String? { nil }
 
-    public var isKillSwitchActive: Bool { false }
+    public func canUsePayments() -> Bool { false }
 
     public func warmCaches() {
         // Do nothing.
@@ -172,7 +186,7 @@ extension MockPayments: PaymentsSwift {
         paymentAmount: TSPaymentAmount,
         memoMessage: String?,
         isOutgoingTransfer: Bool,
-        canDefragment: Bool
+        canDefragment: Bool,
     ) async throws -> PreparedPayment {
         owsFail("Not implemented.")
     }
@@ -189,14 +203,18 @@ extension MockPayments: PaymentsSwift {
         owsFail("Not implemented.")
     }
 
-    public func replaceAsUnidentified(paymentModel oldPaymentModel: TSPaymentModel,
-                                      transaction: DBWriteTransaction) {
+    public func replaceAsUnidentified(
+        paymentModel oldPaymentModel: TSPaymentModel,
+        transaction: DBWriteTransaction,
+    ) {
         owsFail("Not implemented.")
     }
 
-    public func findPaymentModels(withMCLedgerBlockIndex mcLedgerBlockIndex: UInt64,
-                                  mcIncomingTransactionPublicKey: Data,
-                                  transaction: DBReadTransaction) -> [TSPaymentModel] {
+    public func findPaymentModels(
+        withMCLedgerBlockIndex mcLedgerBlockIndex: UInt64,
+        mcIncomingTransactionPublicKey: Data,
+        transaction: DBReadTransaction,
+    ) -> [TSPaymentModel] {
         owsFail("Not implemented.")
     }
 

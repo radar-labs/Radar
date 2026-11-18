@@ -17,15 +17,13 @@ final class BackupArchiveGroupUpdateProtoToSwiftConverter {
         // We should never be comparing our pni as it can change,
         // we only ever want to compare our unchanging aci.
         localUserAci: Aci,
-        partialErrors: inout [BackupArchive.RestoreFrameError<BackupArchive.ChatItemId>],
-        chatItemId: BackupArchive.ChatItemId
+        partialErrors: inout [BackupArchive.RestoreFrameError],
     ) -> BackupArchive.RestoreInteractionResult<[PersistableGroupUpdateItem]> {
         var persistableUpdates = [PersistableGroupUpdateItem]()
         for updateProto in groupUpdates {
             let result = Self.restoreGroupUpdate(
                 groupUpdate: updateProto,
                 localUserAci: localUserAci,
-                chatItemId: chatItemId
             )
             switch result.bubbleUp([PersistableGroupUpdateItem].self, partialErrors: &partialErrors) {
             case .continue(let component):
@@ -40,24 +38,20 @@ final class BackupArchiveGroupUpdateProtoToSwiftConverter {
     private static func restoreGroupUpdate(
         groupUpdate: BackupProto_GroupChangeChatUpdate.Update,
         localUserAci: Aci,
-        chatItemId: BackupArchive.ChatItemId
     ) -> BackupArchive.RestoreInteractionResult<[PersistableGroupUpdateItem]> {
         enum UnwrappedRequiredAci {
             case localUser
             case otherUser(AciUuid)
-            case invalidAci(BackupArchive.RestoreFrameError<BackupArchive.ChatItemId>)
+            case invalidAci(BackupArchive.RestoreFrameError)
         }
         func unwrapRequiredAci<Proto>(
             _ proto: Proto,
-            _ aciKeyPath: KeyPath<Proto, Data>
+            _ aciKeyPath: KeyPath<Proto, Data>,
         ) -> UnwrappedRequiredAci {
             let aciData = proto[keyPath: aciKeyPath]
 
             guard let aci = UUID(data: aciData).map({ Aci(fromUUID: $0) }) else {
-                return .invalidAci(.restoreFrameError(
-                    .invalidProtoData(.invalidAci(protoClass: Proto.self)),
-                    chatItemId
-                ))
+                return .invalidAci(.restoreFrameError(.invalidProtoData(.invalidAci(protoClass: Proto.self))))
             }
 
             if aci == localUserAci {
@@ -71,11 +65,11 @@ final class BackupArchiveGroupUpdateProtoToSwiftConverter {
             case unknown
             case localUser
             case otherUser(AciUuid)
-            case invalidAci(BackupArchive.RestoreFrameError<BackupArchive.ChatItemId>)
+            case invalidAci(BackupArchive.RestoreFrameError)
         }
         func unwrapOptionalAci<Proto>(
             _ proto: Proto,
-            _ aciKeyPath: KeyPath<Proto, Data>
+            _ aciKeyPath: KeyPath<Proto, Data>,
         ) -> UnwrappedOptionalAci {
             let aciData = proto[keyPath: aciKeyPath]
 
@@ -84,10 +78,7 @@ final class BackupArchiveGroupUpdateProtoToSwiftConverter {
             }
 
             guard let aci = UUID(data: aciData).map({ Aci(fromUUID: $0) }) else {
-                return .invalidAci(.restoreFrameError(
-                    .invalidProtoData(.invalidAci(protoClass: Proto.self)),
-                    chatItemId
-                ))
+                return .invalidAci(.restoreFrameError(.invalidProtoData(.invalidAci(protoClass: Proto.self))))
             }
 
             if aci == localUserAci {
@@ -323,13 +314,12 @@ final class BackupArchiveGroupUpdateProtoToSwiftConverter {
                 return .messageFailure([error])
             }
         case .selfInvitedOtherUserToGroupUpdate(let proto):
-            switch (try? ServiceId.parseFrom(serviceIdBinary: proto.inviteeServiceID)) {
+            switch try? ServiceId.parseFrom(serviceIdBinary: proto.inviteeServiceID) {
             case .some(let serviceId):
                 return .success([.otherUserWasInvitedByLocalUser(inviteeServiceId: serviceId.codableUppercaseString)])
             case .none:
                 return .messageFailure([.restoreFrameError(
                     .invalidProtoData(.invalidServiceId(protoClass: BackupProto_SelfInvitedOtherUserToGroupUpdate.self)),
-                    chatItemId
                 )])
             }
         case .groupUnknownInviteeUpdate(let proto):
@@ -394,7 +384,7 @@ final class BackupArchiveGroupUpdateProtoToSwiftConverter {
                 return .messageFailure([error])
             }
         case .groupMemberAddedUpdate(let proto):
-            switch (unwrapOptionalAci(proto, \.inviterAci), unwrapRequiredAci(proto, \.newMemberAci)) {
+            switch (unwrapOptionalAci(proto, \.updaterAci), unwrapRequiredAci(proto, \.newMemberAci)) {
             case (.unknown, .localUser):
                 return .success([.localUserAddedByUnknownUser])
             case (.localUser, .localUser):
@@ -444,7 +434,7 @@ final class BackupArchiveGroupUpdateProtoToSwiftConverter {
                 }()
             {
                 return .success([.otherUserInviteRevokedByLocalUser(
-                    invitee: inviteeServiceId.codableUppercaseString
+                    invitee: inviteeServiceId.codableUppercaseString,
                 )])
             } else {
                 let count = UInt(proto.invitees.count)
@@ -593,9 +583,9 @@ final class BackupArchiveGroupUpdateProtoToSwiftConverter {
             case .invalidAci(let error):
                 return .messageFailure([error])
             }
-        case .groupV2MigrationUpdate(_):
+        case .groupV2MigrationUpdate:
             return .success([.wasMigrated])
-        case .groupV2MigrationSelfInvitedUpdate(_):
+        case .groupV2MigrationSelfInvitedUpdate:
             return .success([.localUserInvitedAfterMigration])
         case .groupV2MigrationInvitedMembersUpdate(let proto):
             return .success([.otherUsersInvitedAfterMigration(count: UInt(proto.invitedMembersCount))])
@@ -603,11 +593,16 @@ final class BackupArchiveGroupUpdateProtoToSwiftConverter {
             return .success([.otherUsersDroppedAfterMigration(count: UInt(proto.droppedMembersCount))])
         case .groupSequenceOfRequestsAndCancelsUpdate(let proto):
             switch unwrapRequiredAci(proto, \.requestorAci) {
+            // iOS does not archive groupSequenceOfRequestsAndCancelsUpdate for the local user, but
+            // Desktop does, so we need to be able to handle this case and convert those updates into
+            // something iOS can display properly.
             case .localUser:
-                return .messageFailure([.restoreFrameError(
-                    .invalidProtoData(.sequenceOfRequestsAndCancelsWithLocalAci),
-                    chatItemId
-                )])
+                var items: [PersistableGroupUpdateItem] = []
+                for _ in 0..<proto.count {
+                    items.append(.localUserRequestedToJoin)
+                    items.append(.localUserRequestCanceledByLocalUser)
+                }
+                return .success(items)
             // We assume it is the tail to start out with; if we see a subsequent join request
             // from the same invite then we will mark it as not the tail.
             case .otherUser(let aci):
@@ -641,28 +636,25 @@ final class BackupArchiveGroupUpdateProtoToSwiftConverter {
                 }
             }
         case .groupMemberLabelAccessLevelChangeUpdate(let proto):
-            // Per-member labels aren't modeled in this fork; preserve the update
-            // as a generic group update rather than dropping the chat item.
+            let newAccess = proto.accessLevel.swiftAccessLevel
             switch unwrapOptionalAci(proto, \.updaterAci) {
             case .unknown:
-                return .success([.genericUpdateByUnknownUser])
+                return .success([.memberLabelsAccessChangedByUnknownUser(newAccess: newAccess)])
             case .localUser:
-                return .success([.genericUpdateByLocalUser])
+                return .success([.memberLabelsAccessChangedByLocalUser(newAccess: newAccess)])
             case .otherUser(let aci):
-                return .success([.genericUpdateByOtherUser(updaterAci: aci)])
+                return .success([.memberLabelsAccessChangedByOtherUser(updaterAci: aci, newAccess: newAccess)])
             case .invalidAci(let error):
                 return .messageFailure([error])
             }
         case .groupTerminateChangeUpdate(let proto):
-            // Group termination isn't modeled in this fork; preserve the update
-            // as a generic group update rather than dropping the chat item.
             switch unwrapOptionalAci(proto, \.updaterAci) {
             case .unknown:
-                return .success([.genericUpdateByUnknownUser])
+                return .success([.groupTerminatedByUnknownUser])
             case .localUser:
-                return .success([.genericUpdateByLocalUser])
+                return .success([.groupTerminatedByLocalUser])
             case .otherUser(let aci):
-                return .success([.genericUpdateByOtherUser(updaterAci: aci)])
+                return .success([.groupTerminatedByOtherUser(updaterAci: aci)])
             case .invalidAci(let error):
                 return .messageFailure([error])
             }

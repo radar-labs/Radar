@@ -18,13 +18,17 @@ public struct ChangedGroupModel {
     /// group change.
     public let newlyLearnedPniToAciAssociations: [Pni: Aci]
 
+    /// Whether we should update the last verified name hash because the local user changed it.
+    public let shouldUpdateLastVerifiedGroupNameHash: Bool
+
     public init(
         oldGroupModel: TSGroupModelV2,
         newGroupModel: TSGroupModelV2,
         newDisappearingMessageToken: DisappearingMessageToken?,
         updateSource: GroupUpdateSource,
         profileKeys: [Aci: Data],
-        newlyLearnedPniToAciAssociations: [Pni: Aci]
+        newlyLearnedPniToAciAssociations: [Pni: Aci],
+        shouldUpdateLastVerifiedGroupNameHash: Bool,
     ) {
         self.oldGroupModel = oldGroupModel
         self.newGroupModel = newGroupModel
@@ -32,6 +36,7 @@ public struct ChangedGroupModel {
         self.updateSource = updateSource
         self.profileKeys = profileKeys
         self.newlyLearnedPniToAciAssociations = newlyLearnedPniToAciAssociations
+        self.shouldUpdateLastVerifiedGroupNameHash = shouldUpdateLastVerifiedGroupNameHash
     }
 }
 
@@ -60,7 +65,7 @@ public class GroupsV2IncomingChanges {
         localIdentifiers: LocalIdentifiers,
         changeActionsProto: GroupsProtoGroupChangeActions,
         downloadedAvatars: GroupAvatarStateMap,
-        options: TSGroupModelOptions
+        options: TSGroupModelOptions,
     ) throws -> ChangedGroupModel {
         guard let oldGroupModel = groupThread.groupModel as? TSGroupModelV2 else {
             throw OWSAssertionError("Invalid group model.")
@@ -71,7 +76,7 @@ public class GroupsV2IncomingChanges {
         let groupV2Params = try oldGroupModel.groupV2Params()
         let (updateSource, changeAuthor) = try changeActionsProto.updateSource(
             groupV2Params: groupV2Params,
-            localIdentifiers: localIdentifiers
+            localIdentifiers: localIdentifiers,
         )
         guard let changeAuthor else {
             // Many change actions have author info, e.g. addedByUserID. But we can
@@ -99,6 +104,8 @@ public class GroupsV2IncomingChanges {
         var newMembersAccess = oldGroupAccess.members
         var newAttributesAccess = oldGroupAccess.attributes
         var newAddFromInviteLinkAccess = oldGroupAccess.addFromInviteLink
+        var newMemberLabelsAccess = oldGroupAccess.memberLabels
+        var newGroupTerminated = oldGroupModel.isTerminated
 
         if !oldGroupMembership.isMemberOfAnyKind(changeAuthor) {
             // Change author may have just added themself via a group invite link.
@@ -151,7 +158,7 @@ public class GroupsV2IncomingChanges {
         for action in changeActionsProto.addMembers {
             let didJoinFromInviteLink = action.joinFromInviteLink
 
-            if !canAddMembers && !didJoinFromInviteLink {
+            if !canAddMembers, !didJoinFromInviteLink {
                 owsFailDebug("Cannot add members.")
             }
 
@@ -164,7 +171,7 @@ public class GroupsV2IncomingChanges {
             guard let role = TSGroupMemberRole.role(for: member.role) else {
                 throw OWSAssertionError("Invalid role: \(member.role.rawValue)")
             }
-            if role == .administrator && !isChangeAuthorAdmin {
+            if role == .administrator, !isChangeAuthorAdmin {
                 owsFailDebug("Only admins can add admins.")
             }
 
@@ -200,7 +207,7 @@ public class GroupsV2IncomingChanges {
             // the service. This is one.
             let aci = try groupV2Params.aci(for: userId)
 
-            if !canRemoveMembers && aci != changeAuthor {
+            if !canRemoveMembers, aci != changeAuthor {
                 // Admin can kick any member.
                 // Any member can leave the group.
                 owsFailDebug("Cannot kick member.")
@@ -210,6 +217,7 @@ public class GroupsV2IncomingChanges {
             }
             groupMembershipBuilder.removeInvalidInvite(userId: userId)
             groupMembershipBuilder.remove(aci)
+            groupMembershipBuilder.setMemberLabel(label: nil, aci: aci)
         }
 
         for action in changeActionsProto.modifyMemberRoles {
@@ -241,6 +249,30 @@ public class GroupsV2IncomingChanges {
             }
             groupMembershipBuilder.remove(aci)
             groupMembershipBuilder.addFullMember(aci, role: role)
+        }
+
+        for action in changeActionsProto.modifyMemberLabel {
+            guard let userId = action.userID else {
+                throw OWSAssertionError("Missing userID.")
+            }
+
+            let aci = try groupV2Params.aci(for: userId)
+
+            var decryptedLabelString: String?
+            if let encryptedLabelString = action.labelString {
+                decryptedLabelString = try? groupV2Params.decryptMemberLabel(encryptedLabelString)
+            }
+
+            var decryptedLabelEmoji: String?
+            if let encryptedLabelEmoji = action.labelEmoji {
+                decryptedLabelEmoji = try? groupV2Params.decryptMemberLabelEmoji(encryptedLabelEmoji)
+            }
+
+            var memberLabel: MemberLabel?
+            if !decryptedLabelString.isEmptyOrNil, let decryptedLabelString {
+                memberLabel = MemberLabel(label: decryptedLabelString, labelEmoji: decryptedLabelEmoji)
+            }
+            groupMembershipBuilder.setMemberLabel(label: memberLabel, aci: aci)
         }
 
         for action in changeActionsProto.modifyMemberProfileKeys {
@@ -282,7 +314,7 @@ public class GroupsV2IncomingChanges {
             // the service. This is one.
             let addedByAci = try groupV2Params.aci(for: addedByUserId)
 
-            if role == .administrator && !isChangeAuthorAdmin {
+            if role == .administrator, !isChangeAuthorAdmin {
                 owsFailDebug("Only admins can add admins.")
             }
             if addedByAci != changeAuthor {
@@ -324,8 +356,10 @@ public class GroupsV2IncomingChanges {
                     owsFailDebug("Cannot revoke invitation.")
                 }
 
-                guard oldGroupMembership.hasInvalidInvite(forUserId: userId) ||
-                        oldGroupMembership.isInvitedMember(serviceId) else {
+                guard
+                    oldGroupMembership.hasInvalidInvite(forUserId: userId) ||
+                    oldGroupMembership.isInvitedMember(serviceId)
+                else {
                     throw OWSAssertionError("Invalid membership.")
                 }
                 groupMembershipBuilder.removeInvalidInvite(userId: userId)
@@ -438,7 +472,7 @@ public class GroupsV2IncomingChanges {
             // the service. This is one.
             let aci = try groupV2Params.aci(for: userId)
 
-            if !canRemoveMembers && aci != changeAuthor {
+            if !canRemoveMembers, aci != changeAuthor {
                 owsFailDebug("Cannot remove members.")
             }
 
@@ -460,7 +494,7 @@ public class GroupsV2IncomingChanges {
 
             if oldGroupModel.isJoinRequestPlaceholder {
                 // We can't check permissions using a placeholder.
-            } else if !canAddMembers && aci != changeAuthor {
+            } else if !canAddMembers, aci != changeAuthor {
                 owsFailDebug("Cannot add members.")
             }
 
@@ -477,7 +511,7 @@ public class GroupsV2IncomingChanges {
             groupMembershipBuilder.addFullMember(
                 aci,
                 role: role,
-                didJoinFromAcceptedJoinRequest: true
+                didJoinFromAcceptedJoinRequest: true,
             )
         }
 
@@ -504,6 +538,7 @@ public class GroupsV2IncomingChanges {
             groupMembershipBuilder.removeBannedMember(aci)
         }
 
+        var shouldUpdateLastVerifiedGroupNameHash = false
         if let action = changeActionsProto.modifyTitle {
             if !canEditAttributes {
                 owsFailDebug("Cannot modify title.")
@@ -511,6 +546,10 @@ public class GroupsV2IncomingChanges {
 
             // Change clears or updates the group title.
             newGroupName = groupV2Params.decryptGroupName(action.title)
+
+            if changeAuthor == localIdentifiers.aci {
+                shouldUpdateLastVerifiedGroupNameHash = true
+            }
         }
 
         if let action = changeActionsProto.modifyDescription {
@@ -576,6 +615,19 @@ public class GroupsV2IncomingChanges {
             }
         }
 
+        if let action = changeActionsProto.modifyMemberLabelAccess {
+            if !canEditAccess {
+                owsFailDebug("Cannot edit member label access")
+            }
+
+            let protoAccess = action.memberLabelAccess
+            newMemberLabelsAccess = GroupV2Access.access(forProtoAccess: protoAccess)
+
+            if newMemberLabelsAccess == .unknown {
+                owsFailDebug("Unknown member label access.")
+            }
+        }
+
         if let action = changeActionsProto.modifyAddFromInviteLinkAccess {
             if !canEditInviteLinks {
                 owsFailDebug("Cannot edit addFromInviteLink access.")
@@ -606,10 +658,15 @@ public class GroupsV2IncomingChanges {
             newIsAnnouncementsOnly = action.announcementsOnly
         }
 
-        let newGroupMembership = groupMembershipBuilder.build()
-        let newGroupAccess = GroupAccess(members: newMembersAccess, attributes: newAttributesAccess, addFromInviteLink: newAddFromInviteLinkAccess)
+        if changeActionsProto.terminateGroup != nil {
+            if !isChangeAuthorAdmin {
+                owsFailDebug("Cannot terminate group")
+            }
+            newGroupTerminated = true
+        }
 
-        GroupsV2Protos.validateInviteLinkState(inviteLinkPassword: newInviteLinkPassword, groupAccess: newGroupAccess)
+        let newGroupMembership = groupMembershipBuilder.build()
+        let newGroupAccess = GroupAccess(members: newMembersAccess, attributes: newAttributesAccess, addFromInviteLink: newAddFromInviteLinkAccess, memberLabels: newMemberLabelsAccess)
 
         var builder = oldGroupModel.asBuilder
         builder.name = newGroupName
@@ -621,6 +678,7 @@ public class GroupsV2IncomingChanges {
         builder.avatarUrlPath = newAvatarUrlPath
         builder.inviteLinkPassword = newInviteLinkPassword
         builder.isAnnouncementsOnly = newIsAnnouncementsOnly
+        builder.isTerminated = newGroupTerminated
 
         builder.didJustAddSelfViaGroupLink = didJustAddSelfViaGroupLink
 
@@ -634,7 +692,8 @@ public class GroupsV2IncomingChanges {
             newDisappearingMessageToken: newDisappearingMessageToken,
             updateSource: updateSource,
             profileKeys: profileKeys,
-            newlyLearnedPniToAciAssociations: newlyLearnedPniToAciAssociations
+            newlyLearnedPniToAciAssociations: newlyLearnedPniToAciAssociations,
+            shouldUpdateLastVerifiedGroupNameHash: shouldUpdateLastVerifiedGroupNameHash,
         )
     }
 }
@@ -692,7 +751,7 @@ private extension HasAciAndProfileKey {
             return AciProperties(
                 aci: aci,
                 aciCiphertext: aciCiphertext,
-                profileKey: profileKey
+                profileKey: profileKey,
             )
         } else if let presentationData = presentation {
             // We should only ever fall back to presentation data if a client
@@ -709,7 +768,7 @@ private extension HasAciAndProfileKey {
             return AciProperties(
                 aci: aci,
                 aciCiphertext: aciCiphertext.serialize(),
-                profileKey: profileKey
+                profileKey: profileKey,
             )
         } else {
             throw OWSAssertionError("Malformed proto!")
@@ -732,7 +791,7 @@ private extension HasPniAndAciAndProfileKey {
         return PniAndAciProperties(
             pni: pni,
             pniCiphertext: pniCiphertext,
-            aciProperties: aciProperties
+            aciProperties: aciProperties,
         )
     }
 }

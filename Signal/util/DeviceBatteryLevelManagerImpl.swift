@@ -4,6 +4,7 @@
 //
 
 public import SignalServiceKit
+import UIKit
 
 public class DeviceBatteryLevelMonitorImpl: DeviceBatteryLevelMonitor {
 
@@ -47,7 +48,7 @@ public class DeviceBatteryLevelManagerImpl: DeviceBatteryLevelManager {
             owsFailDebug("Duplicate monitoring reason!")
         }
         return DeviceBatteryLevelMonitorImpl(
-            reason: reason
+            reason: reason,
         )
     }
 

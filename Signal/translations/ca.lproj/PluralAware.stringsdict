@@ -29,6 +29,22 @@
 			<string>%2$d segons</string>
 		</dict>
 	</dict>
+	<key>ACCESSIBILITY_LABEL_MULTIPLE_ATTACHMENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d element multimèdia</string>
+			<key>other</key>
+			<string>%1$d elements multimèdia</string>
+		</dict>
+	</dict>
 	<key>ACCESSIBILITY_LABEL_SHORT_VOICE_MEMO_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -365,6 +381,70 @@
 			<string>Missatges + %1$d dies d&apos;arxius multimèdia</string>
 		</dict>
 	</dict>
+	<key>COLLAPSE_SET_CALL_EVENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld trucada</string>
+			<key>other</key>
+			<string>%1$ld trucades</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_CHAT_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld actualització de xat</string>
+			<key>other</key>
+			<string>%1$ld actualitzacions de xat</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_GROUP_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld actualització de grup</string>
+			<key>other</key>
+			<string>%1$ld actualitzacions de grup</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_TIMER_CHANGES_WITH_FINAL_TIMER_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>S&apos;ha canviat el temporitzador de %1$ld missatge a desaparèixer · %2$@</string>
+			<key>other</key>
+			<string>S&apos;ha canviat el temporitzador de %1$ld missatges a desaparèixer · %2$@</string>
+		</dict>
+	</dict>
 	<key>CONVERSATION_DELETE_CONFIRMATIONS_ALERT_TITLE_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -438,6 +518,22 @@
 			<string>coincidència</string>
 			<key>other</key>
 			<string>de %2$d coincidències</string>
+		</dict>
+	</dict>
+	<key>CONVERSATION_SETTINGS_FORMER_MEMBERS_SECTION_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d antic membre</string>
+			<key>other</key>
+			<string>%1$d antics membres</string>
 		</dict>
 	</dict>
 	<key>CONVERSATION_SETTINGS_MEMBERS_SECTION_TITLE_%d</key>
@@ -563,9 +659,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Els grups de Signal funcionen millor amb %1$d membre o menys. Afegir-n&apos;hi més causarà retards d&apos;enviament i recepció de missatges.</string>
+			<string>Els grups de Radar funcionen millor amb %1$d membre o menys. Afegir-n&apos;hi més causarà retards d&apos;enviament i recepció de missatges.</string>
 			<key>other</key>
-			<string>Els grups de Signal funcionen millor amb %1$d membres o menys. Afegir-n&apos;hi més causarà retards d&apos;enviament i recepció de missatges.</string>
+			<string>Els grups de Radar funcionen millor amb %1$d membres o menys. Afegir-n&apos;hi més causarà retards d&apos;enviament i recepció de missatges.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -723,9 +819,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal trucarà a %2$@, %3$@ i %1$d més</string>
+			<string>Radar trucarà a %2$@, %3$@ i %1$d més</string>
 			<key>other</key>
-			<string>Signal trucarà a %2$@, %3$@, i a %1$d persones més</string>
+			<string>Radar trucarà a %2$@, %3$@, i a %1$d persones més</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1011,9 +1107,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Per mantenir &quot;%2$@&quot; enllaçat, obre Signal al dispositiu en un termini d&apos;%1$d dia.</string>
+			<string>Per mantenir &quot;%2$@&quot; enllaçat, obre Radar al dispositiu en un termini d&apos;%1$d dia.</string>
 			<key>other</key>
-			<string>Per mantenir &quot;%2$@&quot; enllaçat, obre Signal al dispositiu en un termini de %1$d dies.</string>
+			<string>Per mantenir &quot;%2$@&quot; enllaçat, obre Radar al dispositiu en un termini de %1$d dies.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1219,9 +1315,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Totes les connexions de Signal · 1 espectador</string>
+			<string>Totes les connexions de Radar · 1 espectador</string>
 			<key>other</key>
-			<string>Totes les connexions de Signal · %1$d espectadors</string>
+			<string>Totes les connexions de Radar · %1$d espectadors</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1235,9 +1331,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Totes les connexions de Signal · 1 persona exclosa</string>
+			<string>Totes les connexions de Radar · 1 persona exclosa</string>
 			<key>other</key>
-			<string>Totes les connexions de Signal · %1$d persones excloses</string>
+			<string>Totes les connexions de Radar · %1$d persones excloses</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>
@@ -1384,6 +1480,22 @@
 			<string>Vols rebutjar %1$d invitacions de grup enviades per %2$@?</string>
 		</dict>
 	</dict>
+	<key>PINNED_CONVERSATION_LIMIT</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Pots fixar fins a %1$d xat.</string>
+			<key>other</key>
+			<string>Pots fixar fins a %1$d xats.</string>
+		</dict>
+	</dict>
 	<key>POLL_VOTE_COUNT</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -1448,10 +1560,10 @@
 			<string>%1$d intents</string>
 		</dict>
 	</dict>
-	<key>STORIES_SHARESHEET_PARTIAL_SEND_SUBTITLE_%d</key>
+	<key>SETTINGS_CHANGE_PHONE_NUMBER_SPLASH_CANT_CHANGE_BODY</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%1$#@text@</string>
+		<string>%#@text@</string>
 		<key>text</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -1459,9 +1571,29 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>No s&apos;han pogut enviar tots els elements a la història que has seleccionat perquè el tipus de fitxer no és compatible.</string>
+			<string>Com que has registrat aquest compte fa poc, de moment no pots canviar el teu número de telèfon. Un breu període d&apos;espera ajuda a protegir el teu compte.
+
+Torna-ho a provar d&apos;aquí a %1$d hora.</string>
 			<key>other</key>
-			<string>No s&apos;han pogut enviar tots els elements a les històries que has seleccionat perquè el tipus de fitxer no és compatible.</string>
+			<string>Com que has registrat aquest compte fa poc, de moment no pots canviar el teu número de telèfon. Un breu període d&apos;espera ajuda a protegir el teu compte.
+
+Torna-ho a provar d&apos;aquí a %1$d hores.</string>
+		</dict>
+	</dict>
+	<key>STICKER_PACK_STICKER_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d sticker</string>
+			<key>other</key>
+			<string>%1$d stickers</string>
 		</dict>
 	</dict>
 	<key>STORY_REPLIES_COUNT_%d</key>
@@ -1558,6 +1690,22 @@
 			<string>&lt;bold&gt;%1$d&lt;/bold&gt; visualització</string>
 			<key>other</key>
 			<string>&lt;bold&gt;%1$d&lt;/bold&gt; visualitzacions</string>
+		</dict>
+	</dict>
+	<key>THREAD_DETAILS_MEMBERS_AND_INVITED_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%2$@ (+%1$ld convidat)</string>
+			<key>other</key>
+			<string>%2$@ (+%1$ld convidats)</string>
 		</dict>
 	</dict>
 	<key>THREAD_DETAILS_MORE_MUTUAL_GROUP_%3$ld</key>
@@ -1670,6 +1818,86 @@
 			<string>Els àlies han de començar amb un mínim d&apos;%1$d caràcter.</string>
 			<key>other</key>
 			<string>Els àlies han de començar amb un mínim de %1$d caràcters.</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d menció de part de %2$@ i altres</string>
+			<key>other</key>
+			<string>%1$d mencions de part de %2$@ i altres</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d mencions de part de %2$@ i %3$@</string>
+			<key>other</key>
+			<string>%1$d mencions de part de %2$@ i %3$@</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__messages</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d missatge sense llegir</string>
+			<key>other</key>
+			<string>%1$d missatges sense llegir</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d resposta de %2$@ i altres</string>
+			<key>other</key>
+			<string>%1$d respostes de %2$@ i altres</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d resposta de %2$@ i %3$@</string>
+			<key>other</key>
+			<string>%1$d respostes de %2$@ i %3$@</string>
 		</dict>
 	</dict>
 </dict>

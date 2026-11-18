@@ -29,6 +29,22 @@
 			<string>%2$d saniye</string>
 		</dict>
 	</dict>
+	<key>ACCESSIBILITY_LABEL_MULTIPLE_ATTACHMENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d medya öğesi</string>
+			<key>other</key>
+			<string>%1$d medya öğesi</string>
+		</dict>
+	</dict>
 	<key>ACCESSIBILITY_LABEL_SHORT_VOICE_MEMO_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -365,6 +381,70 @@
 			<string>Metin + %1$d medya günü</string>
 		</dict>
 	</dict>
+	<key>COLLAPSE_SET_CALL_EVENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld arama</string>
+			<key>other</key>
+			<string>%1$ld arama</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_CHAT_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld sohbet güncellemesi</string>
+			<key>other</key>
+			<string>%1$ld sohbet güncellemesi</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_GROUP_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld grup güncellemesi</string>
+			<key>other</key>
+			<string>%1$ld grup güncellemesi</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_TIMER_CHANGES_WITH_FINAL_TIMER_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld kaybolan mesaj zamanlayıcısı değişikliği · %2$@</string>
+			<key>other</key>
+			<string>%1$ld kaybolan mesaj zamanlayıcısı değişikliği · %2$@</string>
+		</dict>
+	</dict>
 	<key>CONVERSATION_DELETE_CONFIRMATIONS_ALERT_TITLE_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -438,6 +518,22 @@
 			<string>eşleşme</string>
 			<key>other</key>
 			<string>%2$d eşleşme</string>
+		</dict>
+	</dict>
+	<key>CONVERSATION_SETTINGS_FORMER_MEMBERS_SECTION_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d Eski Üye</string>
+			<key>other</key>
+			<string>%1$d Eski Üye</string>
 		</dict>
 	</dict>
 	<key>CONVERSATION_SETTINGS_MEMBERS_SECTION_TITLE_%d</key>
@@ -563,9 +659,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal grupları en iyi %1$d veya daha az üyeyle çalışır. Daha fazla üye eklenmesi iletilerin alımı ve gönderiminde gecikmelere yol açabilir.</string>
+			<string>Radar grupları en iyi %1$d veya daha az üyeyle çalışır. Daha fazla üye eklenmesi iletilerin alımı ve gönderiminde gecikmelere yol açabilir.</string>
 			<key>other</key>
-			<string>Signal grupları en iyi %1$d veya daha az üyeyle çalışır. Daha fazla üye eklenmesi iletilerin alımı ve gönderiminde gecikmelere yol açabilir.</string>
+			<string>Radar grupları en iyi %1$d veya daha az üyeyle çalışır. Daha fazla üye eklenmesi iletilerin alımı ve gönderiminde gecikmelere yol açabilir.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -723,9 +819,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal %2$@, %3$@ ve %1$d diğer kişiyi arayacak</string>
+			<string>Radar %2$@, %3$@ ve %1$d diğer kişiyi arayacak</string>
 			<key>other</key>
-			<string>Signal %2$@, %3$@ ve diğer %1$d kişiyi arayacak</string>
+			<string>Radar %2$@, %3$@ ve diğer %1$d kişiyi arayacak</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1011,9 +1107,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>&quot;%2$@&quot; adresini bağlı tutmak için bu cihazda %1$d gün içinde Signal&apos;i aç.</string>
+			<string>&quot;%2$@&quot; adresini bağlı tutmak için bu cihazda %1$d gün içinde Radar&apos;i aç.</string>
 			<key>other</key>
-			<string>&quot;%2$@&quot; adresini bağlı tutmak için bu cihazda %1$d gün içinde Signal&apos;i aç.</string>
+			<string>&quot;%2$@&quot; adresini bağlı tutmak için bu cihazda %1$d gün içinde Radar&apos;i aç.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1219,9 +1315,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Tüm Signal Kişileri· %1$d Görüntüleyen</string>
+			<string>Tüm Radar Kişileri· %1$d Görüntüleyen</string>
 			<key>other</key>
-			<string>Tüm Signal Kişileri · %1$d Görüntüleyen</string>
+			<string>Tüm Radar Kişileri · %1$d Görüntüleyen</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1235,9 +1331,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Tüm Signal Kişileri · %1$d Kişi Hariç Tutuldu</string>
+			<string>Tüm Radar Kişileri · %1$d Kişi Hariç Tutuldu</string>
 			<key>other</key>
-			<string>Tüm Signal Kişileri · %1$d Kişi Hariç Tutuldu</string>
+			<string>Tüm Radar Kişileri · %1$d Kişi Hariç Tutuldu</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>
@@ -1384,6 +1480,22 @@
 			<string>&quot;%2$@&quot; tarafından gönderilen %1$d davet iptal edilsin mi?</string>
 		</dict>
 	</dict>
+	<key>PINNED_CONVERSATION_LIMIT</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Yalnızca %1$d sohbete kadar sabitleyebilirsin.</string>
+			<key>other</key>
+			<string>Yalnızca %1$d sohbete kadar sabitleyebilirsin.</string>
+		</dict>
+	</dict>
 	<key>POLL_VOTE_COUNT</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -1448,10 +1560,10 @@
 			<string>%1$d deneme</string>
 		</dict>
 	</dict>
-	<key>STORIES_SHARESHEET_PARTIAL_SEND_SUBTITLE_%d</key>
+	<key>SETTINGS_CHANGE_PHONE_NUMBER_SPLASH_CANT_CHANGE_BODY</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%1$#@text@</string>
+		<string>%#@text@</string>
 		<key>text</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -1459,9 +1571,29 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Dosya türü desteklenmediğinden, seçtiğin hikayeye tüm öğeler gönderilemedi.</string>
+			<string>Bu hesabı kısa süre önce oluşturduğun için telefon numarasını hemen değiştiremezsin. Kısa bir bekleme süresi hesabını korumana yardımcı olur.
+
+%1$d saat sonra tekrar dene.</string>
 			<key>other</key>
-			<string>Dosya türü desteklenmediğinden, seçtiğin hikayelere tüm öğeler gönderilemedi.</string>
+			<string>Bu hesabı kısa süre önce oluşturduğun için telefon numarasını hemen değiştiremezsin. Kısa bir bekleme süresi hesabını korumana yardımcı olur.
+
+%1$d saat sonra tekrar dene.</string>
+		</dict>
+	</dict>
+	<key>STICKER_PACK_STICKER_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d çıkartma</string>
+			<key>other</key>
+			<string>%1$d çıkartma</string>
 		</dict>
 	</dict>
 	<key>STORY_REPLIES_COUNT_%d</key>
@@ -1558,6 +1690,22 @@
 			<string>&lt;bold&gt;%1$d&lt;/bold&gt; görüntüleme</string>
 			<key>other</key>
 			<string>&lt;bold&gt;%1$d&lt;/bold&gt; görüntüleme</string>
+		</dict>
+	</dict>
+	<key>THREAD_DETAILS_MEMBERS_AND_INVITED_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%2$@ (+%1$ld davet edildi)</string>
+			<key>other</key>
+			<string>%2$@ (+%1$ld davet edildi)</string>
 		</dict>
 	</dict>
 	<key>THREAD_DETAILS_MORE_MUTUAL_GROUP_%3$ld</key>
@@ -1670,6 +1818,86 @@
 			<string>Kullanıcı adları en az %1$d karakterle başlamalıdır</string>
 			<key>other</key>
 			<string>Kullanıcı adları en az %1$d karakterle başlamalıdır</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ ve diğerleri tarafından %1$d senden bahsetme</string>
+			<key>other</key>
+			<string>%2$@ ve diğerleri tarafından %1$d senden bahsetme</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ ve %3$@ tarafından %1$d senden bahsetme</string>
+			<key>other</key>
+			<string>%2$@ ve %3$@ tarafından %1$d senden bahsetme</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__messages</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d okunmamış mesaj</string>
+			<key>other</key>
+			<string>%1$d okunmamış mesaj</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ ve diğerleri tarafından %1$d yanıt</string>
+			<key>other</key>
+			<string>%2$@ ve diğerleri tarafından %1$d yanıt</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ ve %3$@ tarafından %1$d yanıt</string>
+			<key>other</key>
+			<string>%2$@ ve %3$@ tarafından %1$d yanıt</string>
 		</dict>
 	</dict>
 </dict>

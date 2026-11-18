@@ -4,7 +4,7 @@
 //
 
 @objc(TSOutgoingMessageRecipientState)
-public class TSOutgoingMessageRecipientState: NSObject, NSCoding, NSCopying {
+public final class TSOutgoingMessageRecipientState: NSObject, NSSecureCoding, NSCopying {
     /// The status of the outgoing message send to this recipient.
     public private(set) var status: OWSOutgoingMessageRecipientStatus
 
@@ -55,7 +55,7 @@ public class TSOutgoingMessageRecipientState: NSObject, NSCoding, NSCopying {
             status: status,
             statusTimestamp: Date().ows_millisecondsSince1970,
             wasSentByUD: false,
-            errorCode: nil
+            errorCode: nil,
         )
     }
 
@@ -63,7 +63,7 @@ public class TSOutgoingMessageRecipientState: NSObject, NSCoding, NSCopying {
         status: OWSOutgoingMessageRecipientStatus,
         statusTimestamp: UInt64,
         wasSentByUD: Bool,
-        errorCode: Int?
+        errorCode: Int?,
     ) {
         self.status = status
         self.statusTimestamp = statusTimestamp
@@ -75,7 +75,7 @@ public class TSOutgoingMessageRecipientState: NSObject, NSCoding, NSCopying {
 
     func updateStatusIfPossible(
         _ newStatus: OWSOutgoingMessageRecipientStatus,
-        statusTimestamp: UInt64 = Date().ows_millisecondsSince1970
+        statusTimestamp: UInt64 = Date().ows_millisecondsSince1970,
     ) {
         if newStatus.priorityValue < self.status.priorityValue {
             Logger.warn("Ignoring status update to '\(newStatus)' that would move backwards from '\(self.status)'")
@@ -88,7 +88,7 @@ public class TSOutgoingMessageRecipientState: NSObject, NSCoding, NSCopying {
         }
     }
 
-    // MARK: - NSCoding
+    // MARK: - NSSecureCoding
 
     fileprivate enum CoderKeys: String {
         case status = "state"
@@ -97,9 +97,11 @@ public class TSOutgoingMessageRecipientState: NSObject, NSCoding, NSCopying {
         case errorCode
     }
 
+    public static var supportsSecureCoding: Bool { true }
+
     public required init?(coder: NSCoder) {
         guard
-            let statusRawValue = coder.decodeObject(of: NSNumber.self, forCoderKey: .status) as? UInt,
+            let statusRawValue = coder.decodeObject(of: NSNumber.self, forCoderKey: .status)?.uintValue,
             let status = OWSOutgoingMessageRecipientStatus(rawValue: statusRawValue)
         else {
             owsFailDebug("Missing or unrecognized fields!")
@@ -158,11 +160,11 @@ public class TSOutgoingMessageRecipientState: NSObject, NSCoding, NSCopying {
     // MARK: - NSCopying
 
     public func copy(with zone: NSZone? = nil) -> Any {
-        return TSOutgoingMessageRecipientState(
+        return Self(
             status: status,
             statusTimestamp: statusTimestamp,
             wasSentByUD: wasSentByUD,
-            errorCode: errorCode
+            errorCode: errorCode,
         )
     }
 }
@@ -170,16 +172,16 @@ public class TSOutgoingMessageRecipientState: NSObject, NSCoding, NSCopying {
 // MARK: -
 
 private extension NSCoder {
-    func decodeObject<DecodedObjectType: NSObject & NSCoding>(
+    func decodeObject<DecodedObjectType: NSObject & NSSecureCoding>(
         of cls: DecodedObjectType.Type,
-        forCoderKey key: TSOutgoingMessageRecipientState.CoderKeys
+        forCoderKey key: TSOutgoingMessageRecipientState.CoderKeys,
     ) -> DecodedObjectType? {
         return decodeObject(of: cls, forKey: key.rawValue)
     }
 
-    func encode<EncodedObjectType: NSObject & NSCoding>(
+    func encode<EncodedObjectType: NSObject & NSSecureCoding>(
         _ object: EncodedObjectType,
-        forCoderKey key: TSOutgoingMessageRecipientState.CoderKeys
+        forCoderKey key: TSOutgoingMessageRecipientState.CoderKeys,
     ) {
         encode(object, forKey: key.rawValue)
     }

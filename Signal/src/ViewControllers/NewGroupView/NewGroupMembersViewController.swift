@@ -11,7 +11,7 @@ public class NewGroupMembersViewController: BaseGroupMemberViewController {
 
     private var newGroupState = NewGroupState()
 
-    public override init() {
+    override public init() {
         super.init()
 
         groupMemberViewDelegate = self
@@ -19,21 +19,18 @@ public class NewGroupMembersViewController: BaseGroupMemberViewController {
 
     // MARK: - View Lifecycle
 
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
         updateBarButtons()
     }
 
     private func updateBarButtons() {
         let hasMembers = !newGroupState.recipientSet.isEmpty
-        let buttonTitle = (hasMembers
-                            ? CommonStrings.nextButton
-                            : CommonStrings.skipButton)
-        let rightBarButtonItem = UIBarButtonItem(title: buttonTitle,
-                                                 style: .plain,
-                                                 target: self,
-                                                 action: #selector(nextButtonPressed),
-                                                 accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "next"))
+        let rightBarButtonItem: UIBarButtonItem = (
+            hasMembers
+                ? .nextButton { [weak self] in self?.nextButtonPressed() }
+                : .button(title: CommonStrings.skipButton) { [weak self] in self?.nextButtonPressed() },
+        )
         rightBarButtonItem.imageInsets = UIEdgeInsets(top: 0, left: -1, bottom: 0, right: 10)
         rightBarButtonItem.accessibilityLabel
             = OWSLocalizedString("FINISH_GROUP_CREATION_LABEL", comment: "Accessibility label for finishing new group")
@@ -46,9 +43,6 @@ public class NewGroupMembersViewController: BaseGroupMemberViewController {
         }
     }
 
-    // MARK: - Actions
-
-    @objc
     private func nextButtonPressed() {
         AssertIsOnMainThread()
 
@@ -100,8 +94,10 @@ extension NewGroupMembersViewController: GroupMemberViewDelegate {
         groupMemberViewGroupMemberCount(withSelf: true) >= RemoteConfig.current.maxGroupSizeRecommended
     }
 
-    func groupMemberViewIsPreExistingMember(_ recipient: PickedRecipient,
-                                            transaction: DBReadTransaction) -> Bool {
+    func groupMemberViewIsPreExistingMember(
+        _ recipient: PickedRecipient,
+        transaction: DBReadTransaction,
+    ) -> Bool {
         false
     }
 

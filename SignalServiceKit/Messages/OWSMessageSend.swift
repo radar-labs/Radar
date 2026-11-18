@@ -8,27 +8,40 @@ import LibSignalClient
 
 /// Provides parameters required for assembling a Sealed Sender message.
 final class SealedSenderParameters {
-    let message: TSOutgoingMessage
+    let message: any SendableMessage
     let senderCertificate: SenderCertificate
-    let accessKey: OWSUDAccess?
+    let unidentifiedAccess: UnidentifiedAccess?
     let endorsement: GroupSendFullTokenBuilder?
 
+    struct UnidentifiedAccess {
+        var aci: Aci
+        var value: OWSUDAccess
+
+        init?(aci: Aci, value: OWSUDAccess?) {
+            guard let value else {
+                return nil
+            }
+            self.aci = aci
+            self.value = value
+        }
+    }
+
     init?(
-        message: TSOutgoingMessage,
+        message: any SendableMessage,
         senderCertificate: SenderCertificate,
-        accessKey: OWSUDAccess?,
-        endorsement: GroupSendFullTokenBuilder?
+        unidentifiedAccess: UnidentifiedAccess?,
+        endorsement: GroupSendFullTokenBuilder?,
     ) {
         self.message = message
         self.senderCertificate = senderCertificate
-        guard message.isStorySend || accessKey != nil || endorsement != nil else {
+        guard message.isStorySend || unidentifiedAccess != nil || endorsement != nil else {
             return nil
         }
-        self.accessKey = accessKey
+        self.unidentifiedAccess = unidentifiedAccess
         self.endorsement = endorsement
     }
 
-    /// Indicates desired behavior on the case of decryption error.
+    /// Indicates desired behavior if decryption fails.
     var contentHint: SealedSenderContentHint {
         return message.contentHint
     }
@@ -45,20 +58,22 @@ final class SealedSenderParameters {
 // to multiple recipients and therefore require multiple instances of
 // OWSMessageSend.
 final class OWSMessageSend {
-    public let message: TSOutgoingMessage
-    public let plaintextContent: Data
-    public let plaintextPayloadId: Int64?
-    public let thread: TSThread
-    public let serviceId: ServiceId
-    public let localIdentifiers: LocalIdentifiers
+    let message: any SendableMessage
+    let plaintextContent: Data
+    let plaintextPayloadId: Int64?
+    let thread: TSThread
+    let serviceId: ServiceId
+    let localIdentifiers: LocalIdentifiers
+    let localDeviceId: DeviceId
 
     init(
-        message: TSOutgoingMessage,
+        message: any SendableMessage,
         plaintextContent: Data,
         plaintextPayloadId: Int64?,
         thread: TSThread,
         serviceId: ServiceId,
-        localIdentifiers: LocalIdentifiers
+        localIdentifiers: LocalIdentifiers,
+        localDeviceId: DeviceId,
     ) {
         self.message = message
         self.plaintextContent = plaintextContent
@@ -66,6 +81,7 @@ final class OWSMessageSend {
         self.thread = thread
         self.serviceId = serviceId
         self.localIdentifiers = localIdentifiers
+        self.localDeviceId = localDeviceId
     }
 
     var isSelfSend: Bool {

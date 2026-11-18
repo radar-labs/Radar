@@ -13,6 +13,7 @@ import UIKit
 /// ColorOrGradientValue is used for rendering.
 public enum ColorOrGradientValue: CustomStringConvertible {
     case transparent
+    case blur(blurEffect: UIVisualEffect)
     case solidColor(color: UIColor)
     /// If angleRadians = 0, gradientColor1 is N.
     /// If angleRadians = PI / 2, gradientColor1 is E.
@@ -20,13 +21,15 @@ public enum ColorOrGradientValue: CustomStringConvertible {
     case gradient(
         gradientColor1: UIColor,
         gradientColor2: UIColor,
-        angleRadians: CGFloat
+        angleRadians: CGFloat,
     )
 
     public var description: String {
         switch self {
         case .transparent:
             return "[transparent]"
+        case .blur:
+            return "[blur]"
         case .solidColor(let color):
             return "[solidColor: \(color.asOWSColor)]"
         case .gradient(let gradientColor1, let gradientColor2, let angleRadians):
@@ -72,21 +75,21 @@ public extension ColorOrGradientSetting {
             return .gradient(
                 gradientColor1: gradientColor1.asUIColor,
                 gradientColor2: gradientColor2.asUIColor,
-                angleRadians: angleRadians
+                angleRadians: angleRadians,
             )
         case .themedGradient(
             let lightGradientColor1,
             let lightGradientColor2,
             let darkGradientColor1,
             let darkGradientColor2,
-            let angleRadians
+            let angleRadians,
         ):
             let gradientColor1 = shouldUseDarkColors ? darkGradientColor1 : lightGradientColor1
             let gradientColor2 = shouldUseDarkColors ? darkGradientColor2 : lightGradientColor2
             return .gradient(
                 gradientColor1: gradientColor1.asUIColor,
                 gradientColor2: gradientColor2.asUIColor,
-                angleRadians: angleRadians
+                angleRadians: angleRadians,
             )
         }
     }
@@ -96,13 +99,33 @@ public extension ColorOrGradientSetting {
 
 public extension UIColor {
     var asOWSColor: OWSColor {
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
-
-        self.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-
+        let (red, green, blue, _) = self.components() ?? (0, 0, 0, 0)
         return OWSColor(red: red.clamp01(), green: green.clamp01(), blue: blue.clamp01())
+    }
+}
+
+// MARK: -
+
+public extension ColorOrGradientValue {
+
+    func asChatUIElementTintColor() -> UIColor {
+        let bubbleColor: UIColor = {
+            switch self {
+            case .transparent, .blur:
+                return .Signal.accent
+
+            case .solidColor(let color):
+                return color
+
+            case .gradient(let gradientColor1, let gradientColor2, _):
+                return gradientColor1.midPoint(with: gradientColor2)
+            }
+        }()
+        let lightThemeFinalColor = bubbleColor.blendedWithOverlay(.white, opacity: 0.16)
+        let darkThemeFinalColor = bubbleColor.blendedWithOverlay(.black, opacity: 0.1)
+        return UIColor(
+            light: lightThemeFinalColor,
+            dark: darkThemeFinalColor,
+        )
     }
 }

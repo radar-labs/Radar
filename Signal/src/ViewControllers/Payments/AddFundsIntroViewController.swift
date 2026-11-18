@@ -30,7 +30,7 @@ struct AddFundsIntroView: View {
                 VStack(spacing: 32) {
                     Text(OWSLocalizedString(
                         "PAYMENTS_ADD_FUNDS_INTRO_TITLE",
-                        comment: "Title for the Add Funds onboarding screen."
+                        comment: "Title for the Add Funds onboarding screen.",
                     ))
                     .font(Font(UIFont.dynamicTypeFont(ofStandardSize: 28)))
                     .fontWeight(.semibold)
@@ -38,7 +38,7 @@ struct AddFundsIntroView: View {
 
                     Text(OWSLocalizedString(
                         "PAYMENTS_ADD_FUNDS_INTRO_SUBTITLE",
-                        comment: "Subtitle for the Add Funds onboarding screen explaining where to deposit from."
+                        comment: "Subtitle for the Add Funds onboarding screen explaining where to deposit from.",
                     ))
                     .font(.system(size: 17, weight: .medium))
                     .foregroundStyle(Color.Signal.secondaryLabel)
@@ -64,7 +64,7 @@ struct AddFundsIntroView: View {
             } label: {
                 Text(OWSLocalizedString(
                     "PAYMENTS_ADD_FUNDS_INTRO_SKIP",
-                    comment: "Button label to skip the Add Funds step during payments onboarding."
+                    comment: "Button label to skip the Add Funds step during payments onboarding.",
                 ))
                 .font(.headline)
                 .foregroundStyle(Color.Signal.accent)

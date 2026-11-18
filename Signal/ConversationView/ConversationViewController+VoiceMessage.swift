@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
 import SignalServiceKit
 import SignalUI
 
@@ -17,21 +16,21 @@ extension ConversationViewController {
         let inProgressVoiceMessage = VoiceMessageInProgressDraft(
             thread: thread,
             audioSession: SUIEnvironment.shared.audioSessionRef,
-            sleepManager: DependenciesBridge.shared.deviceSleepManager!
+            sleepManager: DependenciesBridge.shared.deviceSleepManager!,
         )
         viewState.inProgressVoiceMessage = inProgressVoiceMessage
 
         // Delay showing the voice memo UI for N ms to avoid a jarring transition
         // when you just tap and don't hold.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             guard self.viewState.inProgressVoiceMessage === inProgressVoiceMessage else { return }
             self.configureScrollDownButtons()
             self.inputToolbar?.showVoiceMemoUI()
         }
 
         ows_askForMicrophonePermissions { [weak self] granted in
-            guard let self = self else { return }
+            guard let self else { return }
             guard self.viewState.inProgressVoiceMessage === inProgressVoiceMessage else { return }
 
             guard granted else {
@@ -105,10 +104,17 @@ extension ConversationViewController {
     func sendVoiceMessageDraft(_ voiceMemoDraft: VoiceMessageSendableDraft) {
         inputToolbar?.hideVoiceMemoUI(animated: true)
 
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
+
         do {
-            let attachment = try voiceMemoDraft.prepareAttachment()
+            let attachment = try voiceMemoDraft.prepareAttachment(attachmentLimits: attachmentLimits)
             Task { @MainActor in
-                await self.sendAttachments([attachment], from: self, messageBody: nil)
+                await self.sendAttachments(
+                    ApprovedAttachments(nonViewOnceAttachments: [attachment], imageQuality: .standard),
+                    messageBody: nil,
+                    from: self,
+                    attachmentLimits: attachmentLimits,
+                )
                 clearVoiceMessageDraft()
             }
         } catch {

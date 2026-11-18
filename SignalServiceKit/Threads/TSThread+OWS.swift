@@ -34,6 +34,10 @@ public extension TSThread {
         return groupThread.groupModel.groupsVersion == .V2
     }
 
+    var isReleaseNotesThread: Bool {
+        self is TSReleaseNotesThread
+    }
+
     var groupModelIfGroupThread: TSGroupModel? {
         guard let groupThread = self as? TSGroupThread else {
             return nil
@@ -42,22 +46,7 @@ public extension TSThread {
     }
 
     var canSendReactionToThread: Bool {
-        guard !isGroupV1Thread else {
-            return false
-        }
-        return true
-    }
-
-    var canSendNonChatMessagesToThread: Bool {
-        guard !isGroupV1Thread else {
-            return false
-        }
-        return true
-    }
-
-    @available(swift, obsoleted: 1.0)
-    func canSendChatMessagesToThread() -> Bool {
-        canSendChatMessagesToThread(ignoreAnnouncementOnly: false)
+        return !isGroupV1Thread
     }
 
     func canSendChatMessagesToThread(ignoreAnnouncementOnly: Bool = false) -> Bool {
@@ -70,9 +59,12 @@ public extension TSThread {
             }
         }
         if let groupThread = self as? TSGroupThread {
-            guard groupThread.groupModel.groupMembership.isLocalUserFullMember else {
+            guard groupThread.groupModel.groupMembership.isLocalUserFullMember, !isTerminatedGroup else {
                 return false
             }
+        }
+        if isReleaseNotesThread {
+            return false
         }
         return true
     }
@@ -85,7 +77,7 @@ public extension TSThread {
             return false
         }
         // In "announcement-only" groups, only admins can send messages and start group calls.
-        return (groupModel.isAnnouncementsOnly && !groupModel.groupMembership.isLocalUserFullMemberAndAdministrator)
+        return groupModel.isAnnouncementsOnly && !groupModel.groupMembership.isLocalUserFullMemberAndAdministrator
     }
 
     var isAnnouncementOnlyGroupThread: Bool {
@@ -126,10 +118,12 @@ extension TSThread {
     }
 
     @objc
-    public func currentDraft(shouldFetchLatest: Bool,
-                             transaction: DBReadTransaction) -> MessageBody? {
+    public func currentDraft(
+        shouldFetchLatest: Bool,
+        transaction: DBReadTransaction,
+    ) -> MessageBody? {
         if shouldFetchLatest {
-            guard let thread = TSThread.anyFetch(uniqueId: uniqueId, transaction: transaction) else {
+            guard let thread = TSThread.fetchViaCache(uniqueId: uniqueId, transaction: transaction) else {
                 return nil
             }
             return Self.draft(forThread: thread)
@@ -149,7 +143,7 @@ extension TSThread {
     @objc
     public func editTarget(transaction: DBReadTransaction) -> TSOutgoingMessage? {
         guard
-            let editTargetTimestamp = editTargetTimestamp?.uint64Value,
+            let editTargetTimestamp,
             let localAddress = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: transaction)?.aciAddress
         else {
             return nil
@@ -158,7 +152,7 @@ extension TSThread {
             withTimestamp: editTargetTimestamp,
             threadId: uniqueId,
             author: localAddress,
-            transaction: transaction
+            transaction: transaction,
         ) as? TSOutgoingMessage
     }
 }

@@ -3,24 +3,23 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import Foundation
-public import LibSignalClient
-public import SignalServiceKit
-public import SignalUI
+import LibSignalClient
+import SignalServiceKit
+import SignalUI
 
-public enum CVAttachmentTapAction: Int {
+enum CVAttachmentTapAction: Int {
     case handledByDelegate
     case `default`
 }
 
-public protocol AudioMessageViewDelegate: AnyObject {
+protocol AudioMessageViewDelegate: AnyObject {
     func enqueueReloadWithoutCaches()
 
     typealias EndCellAnimation = () -> Void
     func beginCellAnimation(maximumDuration: TimeInterval) -> EndCellAnimation
 }
 
-public protocol CVComponentDelegate: AnyObject, AudioMessageViewDelegate, CVPollVoteDelegate {
+protocol CVComponentDelegate: AnyObject, AudioMessageViewDelegate, CVPollVoteDelegate {
 
     func enqueueReload()
 
@@ -34,41 +33,55 @@ public protocol CVComponentDelegate: AnyObject, AudioMessageViewDelegate, CVPoll
 
     func didTapSystemMessageItem(_ item: CVTextLabel.Item)
 
+    // MARK: - Collapse Sets
+
+    func didTapCollapseSet(collapseSetId: String)
+
     // MARK: - Double-Tap
 
     func didDoubleTapTextViewItem(_ itemViewModel: CVItemViewModelImpl)
 
     // MARK: - Long Press
 
-    func didLongPressTextViewItem(_ cell: CVCell,
-                                  itemViewModel: CVItemViewModelImpl,
-                                  shouldAllowReply: Bool)
+    func didLongPressTextViewItem(
+        _ cell: CVCell,
+        itemViewModel: CVItemViewModelImpl,
+        shouldAllowMessageSendActions: Bool,
+    )
 
-    func didLongPressMediaViewItem(_ cell: CVCell,
-                                   itemViewModel: CVItemViewModelImpl,
-                                   shouldAllowReply: Bool)
+    func didLongPressMediaViewItem(
+        _ cell: CVCell,
+        itemViewModel: CVItemViewModelImpl,
+        shouldAllowMessageSendActions: Bool,
+    )
 
-    func didLongPressQuote(_ cell: CVCell,
-                           itemViewModel: CVItemViewModelImpl,
-                           shouldAllowReply: Bool)
+    func didLongPressQuote(
+        _ cell: CVCell,
+        itemViewModel: CVItemViewModelImpl,
+        shouldAllowMessageSendActions: Bool,
+    )
 
-    func didLongPressSystemMessage(_ cell: CVCell,
-                                   itemViewModel: CVItemViewModelImpl)
+    func didLongPressSystemMessage(
+        _ cell: CVCell,
+        itemViewModel: CVItemViewModelImpl,
+    )
 
-    func didLongPressSticker(_ cell: CVCell,
-                             itemViewModel: CVItemViewModelImpl,
-                             shouldAllowReply: Bool)
+    func didLongPressSticker(
+        _ cell: CVCell,
+        itemViewModel: CVItemViewModelImpl,
+        shouldAllowMessageSendActions: Bool,
+    )
 
     func didLongPressPaymentMessage(
         _ cell: CVCell,
         itemViewModel: CVItemViewModelImpl,
-        shouldAllowReply: Bool
+        shouldAllowMessageSendActions: Bool,
     )
 
     func didLongPressPoll(
         _ cell: CVCell,
         itemViewModel: CVItemViewModelImpl,
-        shouldAllowReply: Bool
+        shouldAllowMessageSendActions: Bool,
     )
 
     func didChangeLongPress(_ itemViewModel: CVItemViewModelImpl)
@@ -79,9 +92,9 @@ public protocol CVComponentDelegate: AnyObject, AudioMessageViewDelegate, CVPoll
 
     // MARK: -
 
-    func willBecomeVisibleWithFailedOrPendingDownloads(_ message: TSMessage)
+    func willBecomeVisibleWithSkippedDownloads(_ message: TSMessage)
 
-    func didTapFailedOrPendingDownloads(_ message: TSMessage)
+    func didTapSkippedDownloads(_ message: TSMessage)
 
     func didCancelDownload(_ message: TSMessage, attachmentId: Attachment.IDType)
 
@@ -91,10 +104,12 @@ public protocol CVComponentDelegate: AnyObject, AudioMessageViewDelegate, CVPoll
 
     func didTapSenderAvatar(_ interaction: TSInteraction)
 
-    func shouldAllowReplyForItem(_ itemViewModel: CVItemViewModelImpl) -> Bool
+    func shouldAllowMessageSendActionsForItem(_ itemViewModel: CVItemViewModelImpl) -> Bool
 
-    func didTapReactions(reactionState: InteractionReactionState,
-                         message: TSMessage)
+    func didTapReactions(
+        reactionState: InteractionReactionState,
+        message: TSMessage,
+    )
 
     var hasPendingMessageRequest: Bool { get }
 
@@ -118,19 +133,23 @@ public protocol CVComponentDelegate: AnyObject, AudioMessageViewDelegate, CVPoll
 
     func didTapBodyMedia(
         itemViewModel: CVItemViewModelImpl,
-        attachmentStream: ReferencedAttachmentStream,
-        imageView: UIView
+        attachment: ReferencedAttachment,
+        imageView: UIView,
     )
 
     func didTapGenericAttachment(_ attachment: CVComponentGenericAttachment) -> CVAttachmentTapAction
 
     func didTapQuotedReply(_ quotedReply: QuotedReplyModel)
 
-    func didTapLinkPreview(_ linkPreview: OWSLinkPreview)
+    func didTapLinkPreview(url: URL)
 
     func didTapContactShare(_ contactShare: ContactShareViewModel)
 
     func didTapSendMessage(to phoneNumbers: [String])
+
+    func didTapSendMessage(toAci aci: Aci, sharedName: OWSContactName)
+
+    func didTapAddToGroup(aci: Aci, sharedName: OWSContactName)
 
     func didTapSendInvite(toContactShare contactShare: ContactShareViewModel)
 
@@ -138,9 +157,11 @@ public protocol CVComponentDelegate: AnyObject, AudioMessageViewDelegate, CVPoll
 
     func didTapStickerPack(_ stickerPackInfo: StickerPackInfo)
 
+    func didTapSticker(_ stickerMetadata: any StickerMetadata)
+
     func didTapPayment(_ payment: PaymentsHistoryItem)
 
-    func didTapGroupInviteLink(url: URL)
+    func didTapGroupInviteLink(url: PossibleGroupInviteLinkUrl)
 
     func didTapProxyLink(url: URL)
 
@@ -151,8 +172,6 @@ public protocol CVComponentDelegate: AnyObject, AudioMessageViewDelegate, CVPoll
     func prepareMessageDetailForInteractivePresentation(_ itemViewModel: CVItemViewModelImpl)
 
     var view: UIView! { get }
-
-    var isConversationPreview: Bool { get }
 
     var wallpaperBlurProvider: WallpaperBlurProvider? { get }
 
@@ -197,14 +216,10 @@ public protocol CVComponentDelegate: AnyObject, AudioMessageViewDelegate, CVPoll
 
     func didTapUnverifiedIdentityChange(_ address: SignalServiceAddress)
 
-    func didTapCorruptedMessage(_ message: TSErrorMessage)
-
     func didTapSessionRefreshMessage(_ message: TSErrorMessage)
 
     // See: resendGroupUpdate
     func didTapResendGroupUpdateForErrorMessage(_ errorMessage: TSErrorMessage)
-
-    func didTapShowFingerprint(_ address: SignalServiceAddress)
 
     func didTapIndividualCall(_ call: TSCall)
 
@@ -214,11 +229,11 @@ public protocol CVComponentDelegate: AnyObject, AudioMessageViewDelegate, CVPoll
 
     func didTapPendingOutgoingMessage(_ message: TSOutgoingMessage)
 
-    func didTapFailedOutgoingMessage(_ message: TSOutgoingMessage)
+    func didTapFailedMessage(_ message: TSMessage)
 
     func didTapGroupMigrationLearnMore()
 
-    func didTapGroupInviteLinkPromotion(groupModel: TSGroupModel)
+    func didTapGroupInviteLinkPromotion()
 
     func didTapViewGroupDescription(newGroupDescription: String)
 
@@ -228,12 +243,14 @@ public protocol CVComponentDelegate: AnyObject, AudioMessageViewDelegate, CVPoll
 
     func didTapShowConversationSettingsAndShowMemberRequests()
 
-    func didTapBlockRequest(groupModel: TSGroupModelV2, requesterName: String, requesterAci: Aci)
+    func didTapBlockRequest(secretParams: GroupSecretParams, requesterName: String, requesterAci: Aci)
 
     func didTapShowUpgradeAppUI()
 
-    func didTapUpdateSystemContact(_ address: SignalServiceAddress,
-                                   newNameComponents: PersonNameComponents)
+    func didTapUpdateSystemContact(
+        _ address: SignalServiceAddress,
+        newNameComponents: PersonNameComponents,
+    )
     func didTapPhoneNumberChange(aci: Aci, phoneNumberOld: String, phoneNumberNew: String)
 
     func didTapViewOnceAttachment(_ interaction: TSInteraction)
@@ -261,6 +278,12 @@ public protocol CVComponentDelegate: AnyObject, AudioMessageViewDelegate, CVPoll
 
     func didTapViewVotes(poll: OWSPoll)
     func didTapViewPoll(pollInteractionUniqueId: String)
+
+    func didTapViewPinnedMessage(pinnedMessageUniqueId: String)
+
+    func didTapSafetyTips()
+
+    func didTapReleaseNotesAnnouncementAction(action: RemoteAnnouncementModel.Manifest.Action)
 }
 
 // MARK: -
@@ -278,14 +301,13 @@ struct CVMessageAction: Equatable {
         case none
         case didTapPreviouslyVerifiedIdentityChange(address: SignalServiceAddress)
         case didTapUnverifiedIdentityChange(address: SignalServiceAddress)
-        case didTapCorruptedMessage(errorMessage: TSErrorMessage)
         case didTapSessionRefreshMessage(errorMessage: TSErrorMessage)
         case didTapResendGroupUpdate(errorMessage: TSErrorMessage)
         case didTapGroupMigrationLearnMore
         case didTapViewGroupDescription(newGroupDescription: String)
-        case didTapGroupInviteLinkPromotion(groupModel: TSGroupModel)
+        case didTapGroupInviteLinkPromotion
         case didTapShowConversationSettingsAndShowMemberRequests
-        case didTapBlockRequest(groupModel: TSGroupModelV2, requesterName: String, requesterAci: Aci)
+        case didTapBlockRequest(BlockGroupRequest)
         case didTapShowUpgradeAppUI
         case didTapUpdateSystemContact(address: SignalServiceAddress, newNameComponents: PersonNameComponents)
         case didTapPhoneNumberChange(aci: Aci, phoneNumberOld: String, phoneNumberNew: String)
@@ -293,6 +315,8 @@ struct CVMessageAction: Equatable {
         case didTapLearnMoreMissedCallFromBlockedContact(call: TSCall)
         case didTapGroupCall
         case didTapSendMessage(phoneNumbers: [String])
+        case didTapSendMessageToAci(aci: Aci, sharedName: OWSContactName)
+        case didTapAddToGroup(aci: Aci, sharedName: OWSContactName)
         case didTapSendInvite(contactShare: ContactShareViewModel)
         case didTapAddToContacts(contactShare: ContactShareViewModel)
         case didTapUnknownThreadWarningGroup
@@ -306,6 +330,23 @@ struct CVMessageAction: Equatable {
         case didTapJoinCallLinkCall(callLink: CallLink)
         case didTapViewVotes(poll: OWSPoll)
         case didTapViewPoll(pollInteractionUniqueId: String)
+        case didTapViewPinnedMessage(pinnedMessageUniqueId: String)
+        case didTapReleaseNotesAnnouncementAction(action: RemoteAnnouncementModel.Manifest.Action)
+        case didTapViewStickerPack(stickerPackInfo: StickerPackInfo)
+
+        struct BlockGroupRequest: Equatable {
+            var secretParams: GroupSecretParams
+            var requesterAci: Aci
+            var requesterName: String
+
+            static func ==(lhs: Self, rhs: Self) -> Bool {
+                return (
+                    lhs.secretParams.serialize() == rhs.secretParams.serialize()
+                        && lhs.requesterAci == rhs.requesterAci
+                        && lhs.requesterName == rhs.requesterName,
+                )
+            }
+        }
 
         func perform(delegate: CVComponentDelegate) {
             switch self {
@@ -315,8 +356,6 @@ struct CVMessageAction: Equatable {
                 delegate.didTapPreviouslyVerifiedIdentityChange(address)
             case .didTapUnverifiedIdentityChange(let address):
                 delegate.didTapUnverifiedIdentityChange(address)
-            case .didTapCorruptedMessage(let errorMessage):
-                delegate.didTapCorruptedMessage(errorMessage)
             case .didTapSessionRefreshMessage(let errorMessage):
                 delegate.didTapSessionRefreshMessage(errorMessage)
             case .didTapResendGroupUpdate(let errorMessage):
@@ -325,12 +364,12 @@ struct CVMessageAction: Equatable {
                 delegate.didTapGroupMigrationLearnMore()
             case .didTapViewGroupDescription(let newGroupDescription):
                 delegate.didTapViewGroupDescription(newGroupDescription: newGroupDescription)
-            case .didTapGroupInviteLinkPromotion(let groupModel):
-                delegate.didTapGroupInviteLinkPromotion(groupModel: groupModel)
+            case .didTapGroupInviteLinkPromotion:
+                delegate.didTapGroupInviteLinkPromotion()
             case .didTapShowConversationSettingsAndShowMemberRequests:
                 delegate.didTapShowConversationSettingsAndShowMemberRequests()
-            case .didTapBlockRequest(let groupModel, let requesterName, let requesterAci):
-                delegate.didTapBlockRequest(groupModel: groupModel, requesterName: requesterName, requesterAci: requesterAci)
+            case .didTapBlockRequest(let blockRequest):
+                delegate.didTapBlockRequest(secretParams: blockRequest.secretParams, requesterName: blockRequest.requesterName, requesterAci: blockRequest.requesterAci)
             case .didTapShowUpgradeAppUI:
                 delegate.didTapShowUpgradeAppUI()
             case .didTapUpdateSystemContact(let address, let newNameComponents):
@@ -345,6 +384,10 @@ struct CVMessageAction: Equatable {
                 delegate.didTapGroupCall()
             case .didTapSendMessage(let phoneNumbers):
                 delegate.didTapSendMessage(to: phoneNumbers)
+            case .didTapSendMessageToAci(let aci, let sharedName):
+                delegate.didTapSendMessage(toAci: aci, sharedName: sharedName)
+            case .didTapAddToGroup(let aci, let sharedName):
+                delegate.didTapAddToGroup(aci: aci, sharedName: sharedName)
             case .didTapSendInvite(let contactShare):
                 delegate.didTapSendInvite(toContactShare: contactShare)
             case .didTapAddToContacts(let contactShare):
@@ -371,6 +414,12 @@ struct CVMessageAction: Equatable {
                 delegate.didTapViewVotes(poll: poll)
             case .didTapViewPoll(let pollInteractionUniqueId):
                 delegate.didTapViewPoll(pollInteractionUniqueId: pollInteractionUniqueId)
+            case .didTapViewPinnedMessage(let pinnedMessageUniqueId):
+                delegate.didTapViewPinnedMessage(pinnedMessageUniqueId: pinnedMessageUniqueId)
+            case .didTapReleaseNotesAnnouncementAction(let action):
+                delegate.didTapReleaseNotesAnnouncementAction(action: action)
+            case .didTapViewStickerPack(let stickerPackInfo):
+                delegate.didTapStickerPack(stickerPackInfo)
             }
         }
     }

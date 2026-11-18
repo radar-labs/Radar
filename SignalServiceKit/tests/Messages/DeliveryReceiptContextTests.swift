@@ -9,18 +9,15 @@ import XCTest
 class DeliveryReceiptContextTests: SSKBaseTest {
     func testExecutesDifferentMessages() throws {
         let aliceRecipient = SignalServiceAddress(phoneNumber: "+12345678900")
-        var timestamp: UInt64?
-        write { transaction in
+        let message = write { transaction in
             let aliceContactThread = TSContactThread.getOrCreateThread(withContactAddress: aliceRecipient, transaction: transaction)
             let helloAlice = TSOutgoingMessage(in: aliceContactThread, messageBody: "Hello Alice")
             helloAlice.anyInsert(transaction: transaction)
-            timestamp = helloAlice.timestamp
+            return helloAlice
         }
-        XCTAssertNotNil(timestamp)
         write { transaction in
             var messages = [TSOutgoingMessage]()
             BatchingDeliveryReceiptContext.withDeferredUpdates(transaction: transaction) { context in
-                let message = context.messages(timestamp!, transaction: transaction)[0]
                 context.addUpdate(message: message, transaction: transaction) { m in
                     messages.append(m)
                 }
@@ -38,7 +35,7 @@ private extension TSOutgoingMessage {
     convenience init(in thread: TSThread, messageBody: String) {
         let builder: TSOutgoingMessageBuilder = .withDefaultValues(
             thread: thread,
-            messageBody: AttachmentContentValidatorMock.mockValidatedBody(messageBody)
+            messageBody: AttachmentContentValidatorMock.mockValidatedBody(messageBody),
         )
         self.init(outgoingMessageWith: builder, recipientAddressStates: [:])
     }

@@ -1,8 +1,3 @@
-//
-// Copyright 2019 Signal Messenger, LLC
-// SPDX-License-Identifier: AGPL-3.0-only
-//
-
 // DO NOT EDIT.
 // swift-format-ignore-file
 // swiftlint:disable all
@@ -17,7 +12,11 @@
 // Copyright 2019 Signal Messenger, LLC
 // SPDX-License-Identifier: AGPL-3.0-only
 
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
 import Foundation
+#endif
 import SwiftProtobuf
 
 // If the compiler emits an error on this type, it is because this file
@@ -25,12 +24,12 @@ import SwiftProtobuf
 // incompatible with the version of SwiftProtobuf to which you are linking.
 // Please ensure that you are building against the same version of the API
 // that was used to generate this file.
-fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAPIVersionCheck {
+fileprivate nonisolated struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAPIVersionCheck {
   struct _2: SwiftProtobuf.ProtobufAPIVersion_2 {}
   typealias Version = _2
 }
 
-struct GroupsProtos_AvatarUploadAttributes: Sendable {
+nonisolated struct GroupsProtos_AvatarUploadAttributes: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -55,7 +54,7 @@ struct GroupsProtos_AvatarUploadAttributes: Sendable {
 }
 
 /// Represents a member of the group.
-struct GroupsProtos_Member: Sendable {
+nonisolated struct GroupsProtos_Member: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -75,9 +74,14 @@ struct GroupsProtos_Member: Sendable {
   /// client and used by the server to populate the other fields.
   var presentation: Data = Data()
 
+  /// These two fields each decrypt to a UTF8 string
+  var labelEmoji: Data = Data()
+
+  var labelString: Data = Data()
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum Role: SwiftProtobuf.Enum, Swift.CaseIterable {
+  nonisolated enum Role: SwiftProtobuf.Enum, Swift.CaseIterable {
     typealias RawValue = Int
     case unknown // = 0
 
@@ -127,18 +131,18 @@ struct GroupsProtos_Member: Sendable {
 /// Here, "pending" refers to "pending profile key", as invited members'
 /// profile keys will be missing; to become a full member, they must add their
 /// profile key to the group.
-struct GroupsProtos_PendingMember: Sendable {
+nonisolated struct GroupsProtos_PendingMember: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// The invited member.
   var member: GroupsProtos_Member {
-    get {return _member ?? GroupsProtos_Member()}
+    get {_member ?? GroupsProtos_Member()}
     set {_member = newValue}
   }
   /// Returns true if `member` has been explicitly set.
-  var hasMember: Bool {return self._member != nil}
+  var hasMember: Bool {self._member != nil}
   /// Clears the value of `member`. Subsequent reads from it will return its default value.
   mutating func clearMember() {self._member = nil}
 
@@ -156,7 +160,7 @@ struct GroupsProtos_PendingMember: Sendable {
 }
 
 /// A user who has requested to join the group, and is pending admin approval.
-struct GroupsProtos_RequestingMember: Sendable {
+nonisolated struct GroupsProtos_RequestingMember: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -180,7 +184,7 @@ struct GroupsProtos_RequestingMember: Sendable {
 }
 
 /// A user who has been banned from the group.
-struct GroupsProtos_BannedMember: Sendable {
+nonisolated struct GroupsProtos_BannedMember: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -196,7 +200,7 @@ struct GroupsProtos_BannedMember: Sendable {
   init() {}
 }
 
-struct GroupsProtos_AccessControl: Sendable {
+nonisolated struct GroupsProtos_AccessControl: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -209,9 +213,11 @@ struct GroupsProtos_AccessControl: Sendable {
 
   var addFromInviteLink: GroupsProtos_AccessControl.AccessRequired = .unknown
 
+  var memberLabel: GroupsProtos_AccessControl.AccessRequired = .unknown
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum AccessRequired: SwiftProtobuf.Enum, Swift.CaseIterable {
+  nonisolated enum AccessRequired: SwiftProtobuf.Enum, Swift.CaseIterable {
     typealias RawValue = Int
     case unknown // = 0
     case any // = 1
@@ -264,16 +270,22 @@ struct GroupsProtos_AccessControl: Sendable {
   init() {}
 }
 
-struct GroupsProtos_Group: Sendable {
+nonisolated struct GroupsProtos_Group: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   /// `LibSignalClient.GroupPublicParams`.
-  var publicKey: Data = Data()
+  var publicKey: Data {
+    get {_storage._publicKey}
+    set {_uniqueStorage()._publicKey = newValue}
+  }
 
   /// The encrypted title of the group as a `GroupAttributeBlob`.
-  var title: Data = Data()
+  var title: Data {
+    get {_storage._title}
+    set {_uniqueStorage()._title = newValue}
+  }
 
   /// Pointer to the encrypted avatar.
   ///
@@ -281,47 +293,82 @@ struct GroupsProtos_Group: Sendable {
   ///
   /// - Note:
   /// The data downloaded from this pointer is a `GroupAttributeBlob`.
-  var avatar: String = String()
+  var avatar: String {
+    get {_storage._avatar}
+    set {_uniqueStorage()._avatar = newValue}
+  }
 
   /// The encrypted disappearing message timer of the group as a
   /// `GroupAttributeBlob`.
-  var disappearingMessagesTimer: Data = Data()
+  var disappearingMessagesTimer: Data {
+    get {_storage._disappearingMessagesTimer}
+    set {_uniqueStorage()._disappearingMessagesTimer = newValue}
+  }
 
   /// The encrypted description of the group as a `GroupAttributeBlob`.
-  var descriptionBytes: Data = Data()
+  var descriptionBytes: Data {
+    get {_storage._descriptionBytes}
+    set {_uniqueStorage()._descriptionBytes = newValue}
+  }
 
   var accessControl: GroupsProtos_AccessControl {
-    get {return _accessControl ?? GroupsProtos_AccessControl()}
-    set {_accessControl = newValue}
+    get {_storage._accessControl ?? GroupsProtos_AccessControl()}
+    set {_uniqueStorage()._accessControl = newValue}
   }
   /// Returns true if `accessControl` has been explicitly set.
-  var hasAccessControl: Bool {return self._accessControl != nil}
+  var hasAccessControl: Bool {_storage._accessControl != nil}
   /// Clears the value of `accessControl`. Subsequent reads from it will return its default value.
-  mutating func clearAccessControl() {self._accessControl = nil}
+  mutating func clearAccessControl() {_uniqueStorage()._accessControl = nil}
 
   /// The current revision number of the group.
-  var revision: UInt32 = 0
+  var revision: UInt32 {
+    get {_storage._revision}
+    set {_uniqueStorage()._revision = newValue}
+  }
 
-  var members: [GroupsProtos_Member] = []
+  var members: [GroupsProtos_Member] {
+    get {_storage._members}
+    set {_uniqueStorage()._members = newValue}
+  }
 
-  var pendingMembers: [GroupsProtos_PendingMember] = []
+  var pendingMembers: [GroupsProtos_PendingMember] {
+    get {_storage._pendingMembers}
+    set {_uniqueStorage()._pendingMembers = newValue}
+  }
 
-  var requestingMembers: [GroupsProtos_RequestingMember] = []
+  var requestingMembers: [GroupsProtos_RequestingMember] {
+    get {_storage._requestingMembers}
+    set {_uniqueStorage()._requestingMembers = newValue}
+  }
 
-  var inviteLinkPassword: Data = Data()
+  var inviteLinkPassword: Data {
+    get {_storage._inviteLinkPassword}
+    set {_uniqueStorage()._inviteLinkPassword = newValue}
+  }
 
-  var announcementsOnly: Bool = false
+  var announcementsOnly: Bool {
+    get {_storage._announcementsOnly}
+    set {_uniqueStorage()._announcementsOnly = newValue}
+  }
 
-  var bannedMembers: [GroupsProtos_BannedMember] = []
+  var bannedMembers: [GroupsProtos_BannedMember] {
+    get {_storage._bannedMembers}
+    set {_uniqueStorage()._bannedMembers = newValue}
+  }
+
+  var terminated: Bool {
+    get {_storage._terminated}
+    set {_uniqueStorage()._terminated = newValue}
+  }
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
 
-  fileprivate var _accessControl: GroupsProtos_AccessControl? = nil
+  fileprivate var _storage = _StorageClass.defaultInstance
 }
 
-struct GroupsProtos_GroupAttributeBlob: Sendable {
+nonisolated struct GroupsProtos_GroupAttributeBlob: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -362,7 +409,7 @@ struct GroupsProtos_GroupAttributeBlob: Sendable {
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum OneOf_Content: Equatable, Sendable {
+  nonisolated enum OneOf_Content: Equatable, Sendable {
     case title(String)
     case avatar(Data)
     case disappearingMessagesDuration(UInt32)
@@ -373,7 +420,7 @@ struct GroupsProtos_GroupAttributeBlob: Sendable {
   init() {}
 }
 
-struct GroupsProtos_GroupInviteLink: Sendable {
+nonisolated struct GroupsProtos_GroupInviteLink: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -390,12 +437,12 @@ struct GroupsProtos_GroupInviteLink: Sendable {
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  enum OneOf_Contents: Equatable, Sendable {
+  nonisolated enum OneOf_Contents: Equatable, Sendable {
     case contentsV1(GroupsProtos_GroupInviteLink.GroupInviteLinkContentsV1)
 
   }
 
-  struct GroupInviteLinkContentsV1: Sendable {
+  nonisolated struct GroupInviteLinkContentsV1: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
@@ -412,7 +459,7 @@ struct GroupsProtos_GroupInviteLink: Sendable {
   init() {}
 }
 
-struct GroupsProtos_GroupJoinInfo: Sendable {
+nonisolated struct GroupsProtos_GroupJoinInfo: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -438,7 +485,7 @@ struct GroupsProtos_GroupJoinInfo: Sendable {
   init() {}
 }
 
-struct GroupsProtos_GroupChange: Sendable {
+nonisolated struct GroupsProtos_GroupChange: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -453,211 +500,237 @@ struct GroupsProtos_GroupChange: Sendable {
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  struct Actions: @unchecked Sendable {
+  nonisolated struct Actions: @unchecked Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     /// Encrypted ServiceId for who made the change
     var sourceUserID: Data {
-      get {return _storage._sourceUserID}
+      get {_storage._sourceUserID}
       set {_uniqueStorage()._sourceUserID = newValue}
     }
 
     /// clients should not provide this value; the server will provide it in the response buffer to ensure the signature is binding to a particular group
     /// if clients set it during a request the server will respond with 400.
     var groupID: Data {
-      get {return _storage._groupID}
+      get {_storage._groupID}
       set {_uniqueStorage()._groupID = newValue}
     }
 
     /// The change revision number
     var revision: UInt32 {
-      get {return _storage._revision}
+      get {_storage._revision}
       set {_uniqueStorage()._revision = newValue}
     }
 
     /// Members added
     var addMembers: [GroupsProtos_GroupChange.Actions.AddMemberAction] {
-      get {return _storage._addMembers}
+      get {_storage._addMembers}
       set {_uniqueStorage()._addMembers = newValue}
     }
 
     /// Members deleted
     var deleteMembers: [GroupsProtos_GroupChange.Actions.DeleteMemberAction] {
-      get {return _storage._deleteMembers}
+      get {_storage._deleteMembers}
       set {_uniqueStorage()._deleteMembers = newValue}
     }
 
     /// Modified member roles
     var modifyMemberRoles: [GroupsProtos_GroupChange.Actions.ModifyMemberRoleAction] {
-      get {return _storage._modifyMemberRoles}
+      get {_storage._modifyMemberRoles}
       set {_uniqueStorage()._modifyMemberRoles = newValue}
     }
 
     /// Modified member profile keys
     var modifyMemberProfileKeys: [GroupsProtos_GroupChange.Actions.ModifyMemberProfileKeyAction] {
-      get {return _storage._modifyMemberProfileKeys}
+      get {_storage._modifyMemberProfileKeys}
       set {_uniqueStorage()._modifyMemberProfileKeys = newValue}
     }
 
     /// Pending members added
     var addPendingMembers: [GroupsProtos_GroupChange.Actions.AddPendingMemberAction] {
-      get {return _storage._addPendingMembers}
+      get {_storage._addPendingMembers}
       set {_uniqueStorage()._addPendingMembers = newValue}
     }
 
     /// Pending members deleted
     var deletePendingMembers: [GroupsProtos_GroupChange.Actions.DeletePendingMemberAction] {
-      get {return _storage._deletePendingMembers}
+      get {_storage._deletePendingMembers}
       set {_uniqueStorage()._deletePendingMembers = newValue}
     }
 
     /// Pending invitations accepted
     var promotePendingMembers: [GroupsProtos_GroupChange.Actions.PromotePendingMemberAction] {
-      get {return _storage._promotePendingMembers}
+      get {_storage._promotePendingMembers}
       set {_uniqueStorage()._promotePendingMembers = newValue}
     }
 
     /// Changed title
     var modifyTitle: GroupsProtos_GroupChange.Actions.ModifyTitleAction {
-      get {return _storage._modifyTitle ?? GroupsProtos_GroupChange.Actions.ModifyTitleAction()}
+      get {_storage._modifyTitle ?? GroupsProtos_GroupChange.Actions.ModifyTitleAction()}
       set {_uniqueStorage()._modifyTitle = newValue}
     }
     /// Returns true if `modifyTitle` has been explicitly set.
-    var hasModifyTitle: Bool {return _storage._modifyTitle != nil}
+    var hasModifyTitle: Bool {_storage._modifyTitle != nil}
     /// Clears the value of `modifyTitle`. Subsequent reads from it will return its default value.
     mutating func clearModifyTitle() {_uniqueStorage()._modifyTitle = nil}
 
     /// Changed avatar
     var modifyAvatar: GroupsProtos_GroupChange.Actions.ModifyAvatarAction {
-      get {return _storage._modifyAvatar ?? GroupsProtos_GroupChange.Actions.ModifyAvatarAction()}
+      get {_storage._modifyAvatar ?? GroupsProtos_GroupChange.Actions.ModifyAvatarAction()}
       set {_uniqueStorage()._modifyAvatar = newValue}
     }
     /// Returns true if `modifyAvatar` has been explicitly set.
-    var hasModifyAvatar: Bool {return _storage._modifyAvatar != nil}
+    var hasModifyAvatar: Bool {_storage._modifyAvatar != nil}
     /// Clears the value of `modifyAvatar`. Subsequent reads from it will return its default value.
     mutating func clearModifyAvatar() {_uniqueStorage()._modifyAvatar = nil}
 
     /// Changed timer
     var modifyDisappearingMessagesTimer: GroupsProtos_GroupChange.Actions.ModifyDisappearingMessagesTimerAction {
-      get {return _storage._modifyDisappearingMessagesTimer ?? GroupsProtos_GroupChange.Actions.ModifyDisappearingMessagesTimerAction()}
+      get {_storage._modifyDisappearingMessagesTimer ?? GroupsProtos_GroupChange.Actions.ModifyDisappearingMessagesTimerAction()}
       set {_uniqueStorage()._modifyDisappearingMessagesTimer = newValue}
     }
     /// Returns true if `modifyDisappearingMessagesTimer` has been explicitly set.
-    var hasModifyDisappearingMessagesTimer: Bool {return _storage._modifyDisappearingMessagesTimer != nil}
+    var hasModifyDisappearingMessagesTimer: Bool {_storage._modifyDisappearingMessagesTimer != nil}
     /// Clears the value of `modifyDisappearingMessagesTimer`. Subsequent reads from it will return its default value.
     mutating func clearModifyDisappearingMessagesTimer() {_uniqueStorage()._modifyDisappearingMessagesTimer = nil}
 
     /// Changed attributes access control
     var modifyAttributesAccess: GroupsProtos_GroupChange.Actions.ModifyAttributesAccessControlAction {
-      get {return _storage._modifyAttributesAccess ?? GroupsProtos_GroupChange.Actions.ModifyAttributesAccessControlAction()}
+      get {_storage._modifyAttributesAccess ?? GroupsProtos_GroupChange.Actions.ModifyAttributesAccessControlAction()}
       set {_uniqueStorage()._modifyAttributesAccess = newValue}
     }
     /// Returns true if `modifyAttributesAccess` has been explicitly set.
-    var hasModifyAttributesAccess: Bool {return _storage._modifyAttributesAccess != nil}
+    var hasModifyAttributesAccess: Bool {_storage._modifyAttributesAccess != nil}
     /// Clears the value of `modifyAttributesAccess`. Subsequent reads from it will return its default value.
     mutating func clearModifyAttributesAccess() {_uniqueStorage()._modifyAttributesAccess = nil}
 
     /// Changed membership access control
     var modifyMemberAccess: GroupsProtos_GroupChange.Actions.ModifyMembersAccessControlAction {
-      get {return _storage._modifyMemberAccess ?? GroupsProtos_GroupChange.Actions.ModifyMembersAccessControlAction()}
+      get {_storage._modifyMemberAccess ?? GroupsProtos_GroupChange.Actions.ModifyMembersAccessControlAction()}
       set {_uniqueStorage()._modifyMemberAccess = newValue}
     }
     /// Returns true if `modifyMemberAccess` has been explicitly set.
-    var hasModifyMemberAccess: Bool {return _storage._modifyMemberAccess != nil}
+    var hasModifyMemberAccess: Bool {_storage._modifyMemberAccess != nil}
     /// Clears the value of `modifyMemberAccess`. Subsequent reads from it will return its default value.
     mutating func clearModifyMemberAccess() {_uniqueStorage()._modifyMemberAccess = nil}
 
     /// change epoch = 1
     var modifyAddFromInviteLinkAccess: GroupsProtos_GroupChange.Actions.ModifyAddFromInviteLinkAccessControlAction {
-      get {return _storage._modifyAddFromInviteLinkAccess ?? GroupsProtos_GroupChange.Actions.ModifyAddFromInviteLinkAccessControlAction()}
+      get {_storage._modifyAddFromInviteLinkAccess ?? GroupsProtos_GroupChange.Actions.ModifyAddFromInviteLinkAccessControlAction()}
       set {_uniqueStorage()._modifyAddFromInviteLinkAccess = newValue}
     }
     /// Returns true if `modifyAddFromInviteLinkAccess` has been explicitly set.
-    var hasModifyAddFromInviteLinkAccess: Bool {return _storage._modifyAddFromInviteLinkAccess != nil}
+    var hasModifyAddFromInviteLinkAccess: Bool {_storage._modifyAddFromInviteLinkAccess != nil}
     /// Clears the value of `modifyAddFromInviteLinkAccess`. Subsequent reads from it will return its default value.
     mutating func clearModifyAddFromInviteLinkAccess() {_uniqueStorage()._modifyAddFromInviteLinkAccess = nil}
 
+    /// change epoch = 6
+    var modifyMemberLabelAccess: GroupsProtos_GroupChange.Actions.ModifyMemberLabelAccessControlAction {
+      get {_storage._modifyMemberLabelAccess ?? GroupsProtos_GroupChange.Actions.ModifyMemberLabelAccessControlAction()}
+      set {_uniqueStorage()._modifyMemberLabelAccess = newValue}
+    }
+    /// Returns true if `modifyMemberLabelAccess` has been explicitly set.
+    var hasModifyMemberLabelAccess: Bool {_storage._modifyMemberLabelAccess != nil}
+    /// Clears the value of `modifyMemberLabelAccess`. Subsequent reads from it will return its default value.
+    mutating func clearModifyMemberLabelAccess() {_uniqueStorage()._modifyMemberLabelAccess = nil}
+
     /// change epoch = 1
     var addRequestingMembers: [GroupsProtos_GroupChange.Actions.AddRequestingMemberAction] {
-      get {return _storage._addRequestingMembers}
+      get {_storage._addRequestingMembers}
       set {_uniqueStorage()._addRequestingMembers = newValue}
     }
 
     /// change epoch = 1
     var deleteRequestingMembers: [GroupsProtos_GroupChange.Actions.DeleteRequestingMemberAction] {
-      get {return _storage._deleteRequestingMembers}
+      get {_storage._deleteRequestingMembers}
       set {_uniqueStorage()._deleteRequestingMembers = newValue}
     }
 
     /// change epoch = 1
     var promoteRequestingMembers: [GroupsProtos_GroupChange.Actions.PromoteRequestingMemberAction] {
-      get {return _storage._promoteRequestingMembers}
+      get {_storage._promoteRequestingMembers}
       set {_uniqueStorage()._promoteRequestingMembers = newValue}
     }
 
     /// change epoch = 1
     var modifyInviteLinkPassword: GroupsProtos_GroupChange.Actions.ModifyInviteLinkPasswordAction {
-      get {return _storage._modifyInviteLinkPassword ?? GroupsProtos_GroupChange.Actions.ModifyInviteLinkPasswordAction()}
+      get {_storage._modifyInviteLinkPassword ?? GroupsProtos_GroupChange.Actions.ModifyInviteLinkPasswordAction()}
       set {_uniqueStorage()._modifyInviteLinkPassword = newValue}
     }
     /// Returns true if `modifyInviteLinkPassword` has been explicitly set.
-    var hasModifyInviteLinkPassword: Bool {return _storage._modifyInviteLinkPassword != nil}
+    var hasModifyInviteLinkPassword: Bool {_storage._modifyInviteLinkPassword != nil}
     /// Clears the value of `modifyInviteLinkPassword`. Subsequent reads from it will return its default value.
     mutating func clearModifyInviteLinkPassword() {_uniqueStorage()._modifyInviteLinkPassword = nil}
 
     /// change epoch = 2
     var modifyDescription: GroupsProtos_GroupChange.Actions.ModifyDescriptionAction {
-      get {return _storage._modifyDescription ?? GroupsProtos_GroupChange.Actions.ModifyDescriptionAction()}
+      get {_storage._modifyDescription ?? GroupsProtos_GroupChange.Actions.ModifyDescriptionAction()}
       set {_uniqueStorage()._modifyDescription = newValue}
     }
     /// Returns true if `modifyDescription` has been explicitly set.
-    var hasModifyDescription: Bool {return _storage._modifyDescription != nil}
+    var hasModifyDescription: Bool {_storage._modifyDescription != nil}
     /// Clears the value of `modifyDescription`. Subsequent reads from it will return its default value.
     mutating func clearModifyDescription() {_uniqueStorage()._modifyDescription = nil}
 
     /// change epoch = 3
     var modifyAnnouncementsOnly: GroupsProtos_GroupChange.Actions.ModifyAnnouncementsOnlyAction {
-      get {return _storage._modifyAnnouncementsOnly ?? GroupsProtos_GroupChange.Actions.ModifyAnnouncementsOnlyAction()}
+      get {_storage._modifyAnnouncementsOnly ?? GroupsProtos_GroupChange.Actions.ModifyAnnouncementsOnlyAction()}
       set {_uniqueStorage()._modifyAnnouncementsOnly = newValue}
     }
     /// Returns true if `modifyAnnouncementsOnly` has been explicitly set.
-    var hasModifyAnnouncementsOnly: Bool {return _storage._modifyAnnouncementsOnly != nil}
+    var hasModifyAnnouncementsOnly: Bool {_storage._modifyAnnouncementsOnly != nil}
     /// Clears the value of `modifyAnnouncementsOnly`. Subsequent reads from it will return its default value.
     mutating func clearModifyAnnouncementsOnly() {_uniqueStorage()._modifyAnnouncementsOnly = nil}
 
     /// change epoch = 4
     var addBannedMembers: [GroupsProtos_GroupChange.Actions.AddBannedMemberAction] {
-      get {return _storage._addBannedMembers}
+      get {_storage._addBannedMembers}
       set {_uniqueStorage()._addBannedMembers = newValue}
     }
 
     /// change epoch = 4
     var deleteBannedMembers: [GroupsProtos_GroupChange.Actions.DeleteBannedMemberAction] {
-      get {return _storage._deleteBannedMembers}
+      get {_storage._deleteBannedMembers}
       set {_uniqueStorage()._deleteBannedMembers = newValue}
     }
 
     /// change epoch = 5
     var promotePniPendingMembers: [GroupsProtos_GroupChange.Actions.PromoteMemberPendingPniAciProfileKeyAction] {
-      get {return _storage._promotePniPendingMembers}
+      get {_storage._promotePniPendingMembers}
       set {_uniqueStorage()._promotePniPendingMembers = newValue}
     }
 
+    /// change epoch = 6;
+    var modifyMemberLabel: [GroupsProtos_GroupChange.Actions.ModifyMemberLabelAction] {
+      get {_storage._modifyMemberLabel}
+      set {_uniqueStorage()._modifyMemberLabel = newValue}
+    }
+
+    /// change epoch = 7
+    var terminateGroup: GroupsProtos_GroupChange.Actions.TerminateGroupAction {
+      get {_storage._terminateGroup ?? GroupsProtos_GroupChange.Actions.TerminateGroupAction()}
+      set {_uniqueStorage()._terminateGroup = newValue}
+    }
+    /// Returns true if `terminateGroup` has been explicitly set.
+    var hasTerminateGroup: Bool {_storage._terminateGroup != nil}
+    /// Clears the value of `terminateGroup`. Subsequent reads from it will return its default value.
+    mutating func clearTerminateGroup() {_uniqueStorage()._terminateGroup = nil}
+
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
-    struct AddMemberAction: Sendable {
+    nonisolated struct AddMemberAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var added: GroupsProtos_Member {
-        get {return _added ?? GroupsProtos_Member()}
+        get {_added ?? GroupsProtos_Member()}
         set {_added = newValue}
       }
       /// Returns true if `added` has been explicitly set.
-      var hasAdded: Bool {return self._added != nil}
+      var hasAdded: Bool {self._added != nil}
       /// Clears the value of `added`. Subsequent reads from it will return its default value.
       mutating func clearAdded() {self._added = nil}
 
@@ -670,7 +743,7 @@ struct GroupsProtos_GroupChange: Sendable {
       fileprivate var _added: GroupsProtos_Member? = nil
     }
 
-    struct DeleteMemberAction: Sendable {
+    nonisolated struct DeleteMemberAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -682,7 +755,7 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct ModifyMemberRoleAction: Sendable {
+    nonisolated struct ModifyMemberRoleAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -696,7 +769,24 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct ModifyMemberProfileKeyAction: Sendable {
+    nonisolated struct ModifyMemberLabelAction: Sendable {
+      // SwiftProtobuf.Message conformance is added in an extension below. See the
+      // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+      // methods supported on all messages.
+
+      var userID: Data = Data()
+
+      /// These two fields each decrypt to a UTF8 string
+      var labelEmoji: Data = Data()
+
+      var labelString: Data = Data()
+
+      var unknownFields = SwiftProtobuf.UnknownStorage()
+
+      init() {}
+    }
+
+    nonisolated struct ModifyMemberProfileKeyAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -712,17 +802,17 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct AddPendingMemberAction: Sendable {
+    nonisolated struct AddPendingMemberAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var added: GroupsProtos_PendingMember {
-        get {return _added ?? GroupsProtos_PendingMember()}
+        get {_added ?? GroupsProtos_PendingMember()}
         set {_added = newValue}
       }
       /// Returns true if `added` has been explicitly set.
-      var hasAdded: Bool {return self._added != nil}
+      var hasAdded: Bool {self._added != nil}
       /// Clears the value of `added`. Subsequent reads from it will return its default value.
       mutating func clearAdded() {self._added = nil}
 
@@ -733,7 +823,7 @@ struct GroupsProtos_GroupChange: Sendable {
       fileprivate var _added: GroupsProtos_PendingMember? = nil
     }
 
-    struct DeletePendingMemberAction: Sendable {
+    nonisolated struct DeletePendingMemberAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -745,7 +835,7 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct PromotePendingMemberAction: Sendable {
+    nonisolated struct PromotePendingMemberAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -761,7 +851,7 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct PromoteMemberPendingPniAciProfileKeyAction: Sendable {
+    nonisolated struct PromoteMemberPendingPniAciProfileKeyAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -784,17 +874,17 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct AddRequestingMemberAction: Sendable {
+    nonisolated struct AddRequestingMemberAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var added: GroupsProtos_RequestingMember {
-        get {return _added ?? GroupsProtos_RequestingMember()}
+        get {_added ?? GroupsProtos_RequestingMember()}
         set {_added = newValue}
       }
       /// Returns true if `added` has been explicitly set.
-      var hasAdded: Bool {return self._added != nil}
+      var hasAdded: Bool {self._added != nil}
       /// Clears the value of `added`. Subsequent reads from it will return its default value.
       mutating func clearAdded() {self._added = nil}
 
@@ -805,7 +895,7 @@ struct GroupsProtos_GroupChange: Sendable {
       fileprivate var _added: GroupsProtos_RequestingMember? = nil
     }
 
-    struct DeleteRequestingMemberAction: Sendable {
+    nonisolated struct DeleteRequestingMemberAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -817,7 +907,7 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct PromoteRequestingMemberAction: Sendable {
+    nonisolated struct PromoteRequestingMemberAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -831,17 +921,17 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct AddBannedMemberAction: Sendable {
+    nonisolated struct AddBannedMemberAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var added: GroupsProtos_BannedMember {
-        get {return _added ?? GroupsProtos_BannedMember()}
+        get {_added ?? GroupsProtos_BannedMember()}
         set {_added = newValue}
       }
       /// Returns true if `added` has been explicitly set.
-      var hasAdded: Bool {return self._added != nil}
+      var hasAdded: Bool {self._added != nil}
       /// Clears the value of `added`. Subsequent reads from it will return its default value.
       mutating func clearAdded() {self._added = nil}
 
@@ -852,7 +942,7 @@ struct GroupsProtos_GroupChange: Sendable {
       fileprivate var _added: GroupsProtos_BannedMember? = nil
     }
 
-    struct DeleteBannedMemberAction: Sendable {
+    nonisolated struct DeleteBannedMemberAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -864,7 +954,7 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct ModifyTitleAction: Sendable {
+    nonisolated struct ModifyTitleAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -877,7 +967,7 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct ModifyAvatarAction: Sendable {
+    nonisolated struct ModifyAvatarAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -890,7 +980,7 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct ModifyDisappearingMessagesTimerAction: Sendable {
+    nonisolated struct ModifyDisappearingMessagesTimerAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -904,7 +994,7 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct ModifyAttributesAccessControlAction: Sendable {
+    nonisolated struct ModifyAttributesAccessControlAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -916,7 +1006,7 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct ModifyAvatarAccessControlAction: Sendable {
+    nonisolated struct ModifyAvatarAccessControlAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -928,7 +1018,7 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct ModifyMembersAccessControlAction: Sendable {
+    nonisolated struct ModifyMembersAccessControlAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -940,7 +1030,7 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct ModifyAddFromInviteLinkAccessControlAction: Sendable {
+    nonisolated struct ModifyAddFromInviteLinkAccessControlAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -952,7 +1042,19 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct ModifyInviteLinkPasswordAction: Sendable {
+    nonisolated struct ModifyMemberLabelAccessControlAction: Sendable {
+      // SwiftProtobuf.Message conformance is added in an extension below. See the
+      // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+      // methods supported on all messages.
+
+      var memberLabelAccess: GroupsProtos_AccessControl.AccessRequired = .unknown
+
+      var unknownFields = SwiftProtobuf.UnknownStorage()
+
+      init() {}
+    }
+
+    nonisolated struct ModifyInviteLinkPasswordAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -964,7 +1066,7 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct ModifyDescriptionAction: Sendable {
+    nonisolated struct ModifyDescriptionAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
@@ -977,12 +1079,22 @@ struct GroupsProtos_GroupChange: Sendable {
       init() {}
     }
 
-    struct ModifyAnnouncementsOnlyAction: Sendable {
+    nonisolated struct ModifyAnnouncementsOnlyAction: Sendable {
       // SwiftProtobuf.Message conformance is added in an extension below. See the
       // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
       // methods supported on all messages.
 
       var announcementsOnly: Bool = false
+
+      var unknownFields = SwiftProtobuf.UnknownStorage()
+
+      init() {}
+    }
+
+    nonisolated struct TerminateGroupAction: Sendable {
+      // SwiftProtobuf.Message conformance is added in an extension below. See the
+      // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+      // methods supported on all messages.
 
       var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -997,7 +1109,7 @@ struct GroupsProtos_GroupChange: Sendable {
   init() {}
 }
 
-struct GroupsProtos_GroupExternalCredential: Sendable {
+nonisolated struct GroupsProtos_GroupExternalCredential: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -1009,17 +1121,17 @@ struct GroupsProtos_GroupExternalCredential: Sendable {
   init() {}
 }
 
-struct GroupsProtos_GroupResponse: Sendable {
+nonisolated struct GroupsProtos_GroupResponse: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var group: GroupsProtos_Group {
-    get {return _group ?? GroupsProtos_Group()}
+    get {_group ?? GroupsProtos_Group()}
     set {_group = newValue}
   }
   /// Returns true if `group` has been explicitly set.
-  var hasGroup: Bool {return self._group != nil}
+  var hasGroup: Bool {self._group != nil}
   /// Clears the value of `group`. Subsequent reads from it will return its default value.
   mutating func clearGroup() {self._group = nil}
 
@@ -1032,7 +1144,7 @@ struct GroupsProtos_GroupResponse: Sendable {
   fileprivate var _group: GroupsProtos_Group? = nil
 }
 
-struct GroupsProtos_GroupChanges: Sendable {
+nonisolated struct GroupsProtos_GroupChanges: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -1043,50 +1155,51 @@ struct GroupsProtos_GroupChanges: Sendable {
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  struct GroupChangeState: @unchecked Sendable {
+  nonisolated struct GroupChangeState: Sendable {
     // SwiftProtobuf.Message conformance is added in an extension below. See the
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
     var groupChange: GroupsProtos_GroupChange {
-      get {return _storage._groupChange ?? GroupsProtos_GroupChange()}
-      set {_uniqueStorage()._groupChange = newValue}
+      get {_groupChange ?? GroupsProtos_GroupChange()}
+      set {_groupChange = newValue}
     }
     /// Returns true if `groupChange` has been explicitly set.
-    var hasGroupChange: Bool {return _storage._groupChange != nil}
+    var hasGroupChange: Bool {self._groupChange != nil}
     /// Clears the value of `groupChange`. Subsequent reads from it will return its default value.
-    mutating func clearGroupChange() {_uniqueStorage()._groupChange = nil}
+    mutating func clearGroupChange() {self._groupChange = nil}
 
     var groupState: GroupsProtos_Group {
-      get {return _storage._groupState ?? GroupsProtos_Group()}
-      set {_uniqueStorage()._groupState = newValue}
+      get {_groupState ?? GroupsProtos_Group()}
+      set {_groupState = newValue}
     }
     /// Returns true if `groupState` has been explicitly set.
-    var hasGroupState: Bool {return _storage._groupState != nil}
+    var hasGroupState: Bool {self._groupState != nil}
     /// Clears the value of `groupState`. Subsequent reads from it will return its default value.
-    mutating func clearGroupState() {_uniqueStorage()._groupState = nil}
+    mutating func clearGroupState() {self._groupState = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
     init() {}
 
-    fileprivate var _storage = _StorageClass.defaultInstance
+    fileprivate var _groupChange: GroupsProtos_GroupChange? = nil
+    fileprivate var _groupState: GroupsProtos_Group? = nil
   }
 
   init() {}
 }
 
-struct GroupsProtos_GroupChangeResponse: Sendable {
+nonisolated struct GroupsProtos_GroupChangeResponse: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
   var groupChange: GroupsProtos_GroupChange {
-    get {return _groupChange ?? GroupsProtos_GroupChange()}
+    get {_groupChange ?? GroupsProtos_GroupChange()}
     set {_groupChange = newValue}
   }
   /// Returns true if `groupChange` has been explicitly set.
-  var hasGroupChange: Bool {return self._groupChange != nil}
+  var hasGroupChange: Bool {self._groupChange != nil}
   /// Clears the value of `groupChange`. Subsequent reads from it will return its default value.
   mutating func clearGroupChange() {self._groupChange = nil}
 
@@ -1101,9 +1214,9 @@ struct GroupsProtos_GroupChangeResponse: Sendable {
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
-fileprivate let _protobuf_package = "GroupsProtos"
+fileprivate nonisolated let _protobuf_package = "GroupsProtos"
 
-extension GroupsProtos_AvatarUploadAttributes: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_AvatarUploadAttributes: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".AvatarUploadAttributes"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}key\0\u{1}credential\0\u{1}acl\0\u{1}algorithm\0\u{1}date\0\u{1}policy\0\u{1}signature\0")
 
@@ -1163,9 +1276,9 @@ extension GroupsProtos_AvatarUploadAttributes: SwiftProtobuf.Message, SwiftProto
   }
 }
 
-extension GroupsProtos_Member: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_Member: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Member"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}userId\0\u{1}role\0\u{1}profileKey\0\u{1}presentation\0\u{1}joinedAtRevision\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}userId\0\u{1}role\0\u{1}profileKey\0\u{1}presentation\0\u{1}joinedAtRevision\0\u{3}label_emoji\0\u{3}label_string\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1178,6 +1291,8 @@ extension GroupsProtos_Member: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
       case 3: try { try decoder.decodeSingularBytesField(value: &self.profileKey) }()
       case 4: try { try decoder.decodeSingularBytesField(value: &self.presentation) }()
       case 5: try { try decoder.decodeSingularUInt32Field(value: &self.joinedAtRevision) }()
+      case 6: try { try decoder.decodeSingularBytesField(value: &self.labelEmoji) }()
+      case 7: try { try decoder.decodeSingularBytesField(value: &self.labelString) }()
       default: break
       }
     }
@@ -1199,6 +1314,12 @@ extension GroupsProtos_Member: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
     if self.joinedAtRevision != 0 {
       try visitor.visitSingularUInt32Field(value: self.joinedAtRevision, fieldNumber: 5)
     }
+    if !self.labelEmoji.isEmpty {
+      try visitor.visitSingularBytesField(value: self.labelEmoji, fieldNumber: 6)
+    }
+    if !self.labelString.isEmpty {
+      try visitor.visitSingularBytesField(value: self.labelString, fieldNumber: 7)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1208,16 +1329,18 @@ extension GroupsProtos_Member: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
     if lhs.profileKey != rhs.profileKey {return false}
     if lhs.joinedAtRevision != rhs.joinedAtRevision {return false}
     if lhs.presentation != rhs.presentation {return false}
+    if lhs.labelEmoji != rhs.labelEmoji {return false}
+    if lhs.labelString != rhs.labelString {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension GroupsProtos_Member.Role: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_Member.Role: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0UNKNOWN\0\u{1}DEFAULT\0\u{1}ADMINISTRATOR\0")
 }
 
-extension GroupsProtos_PendingMember: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_PendingMember: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".PendingMember"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}member\0\u{1}addedByUserId\0\u{1}timestamp\0")
 
@@ -1261,7 +1384,7 @@ extension GroupsProtos_PendingMember: SwiftProtobuf.Message, SwiftProtobuf._Mess
   }
 }
 
-extension GroupsProtos_RequestingMember: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_RequestingMember: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".RequestingMember"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}userId\0\u{1}profileKey\0\u{1}presentation\0\u{1}timestamp\0")
 
@@ -1306,7 +1429,7 @@ extension GroupsProtos_RequestingMember: SwiftProtobuf.Message, SwiftProtobuf._M
   }
 }
 
-extension GroupsProtos_BannedMember: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_BannedMember: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".BannedMember"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}userId\0\u{1}bannedAtTimestamp\0")
 
@@ -1341,9 +1464,9 @@ extension GroupsProtos_BannedMember: SwiftProtobuf.Message, SwiftProtobuf._Messa
   }
 }
 
-extension GroupsProtos_AccessControl: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_AccessControl: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".AccessControl"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}attributes\0\u{1}members\0\u{1}addFromInviteLink\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}attributes\0\u{1}members\0\u{1}addFromInviteLink\0\u{3}member_label\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1354,6 +1477,7 @@ extension GroupsProtos_AccessControl: SwiftProtobuf.Message, SwiftProtobuf._Mess
       case 1: try { try decoder.decodeSingularEnumField(value: &self.attributes) }()
       case 2: try { try decoder.decodeSingularEnumField(value: &self.members) }()
       case 3: try { try decoder.decodeSingularEnumField(value: &self.addFromInviteLink) }()
+      case 4: try { try decoder.decodeSingularEnumField(value: &self.memberLabel) }()
       default: break
       }
     }
@@ -1369,6 +1493,9 @@ extension GroupsProtos_AccessControl: SwiftProtobuf.Message, SwiftProtobuf._Mess
     if self.addFromInviteLink != .unknown {
       try visitor.visitSingularEnumField(value: self.addFromInviteLink, fieldNumber: 3)
     }
+    if self.memberLabel != .unknown {
+      try visitor.visitSingularEnumField(value: self.memberLabel, fieldNumber: 4)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1376,110 +1503,178 @@ extension GroupsProtos_AccessControl: SwiftProtobuf.Message, SwiftProtobuf._Mess
     if lhs.attributes != rhs.attributes {return false}
     if lhs.members != rhs.members {return false}
     if lhs.addFromInviteLink != rhs.addFromInviteLink {return false}
+    if lhs.memberLabel != rhs.memberLabel {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension GroupsProtos_AccessControl.AccessRequired: SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_AccessControl.AccessRequired: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0UNKNOWN\0\u{1}ANY\0\u{1}MEMBER\0\u{1}ADMINISTRATOR\0\u{1}UNSATISFIABLE\0")
 }
 
-extension GroupsProtos_Group: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_Group: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Group"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}publicKey\0\u{1}title\0\u{1}avatar\0\u{1}disappearingMessagesTimer\0\u{1}accessControl\0\u{1}revision\0\u{1}members\0\u{1}pendingMembers\0\u{1}requestingMembers\0\u{1}inviteLinkPassword\0\u{1}descriptionBytes\0\u{1}announcementsOnly\0\u{1}bannedMembers\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}publicKey\0\u{1}title\0\u{1}avatar\0\u{1}disappearingMessagesTimer\0\u{1}accessControl\0\u{1}revision\0\u{1}members\0\u{1}pendingMembers\0\u{1}requestingMembers\0\u{1}inviteLinkPassword\0\u{1}descriptionBytes\0\u{1}announcementsOnly\0\u{1}bannedMembers\0\u{1}terminated\0")
+
+  fileprivate class _StorageClass {
+    var _publicKey: Data = Data()
+    var _title: Data = Data()
+    var _avatar: String = String()
+    var _disappearingMessagesTimer: Data = Data()
+    var _descriptionBytes: Data = Data()
+    var _accessControl: GroupsProtos_AccessControl? = nil
+    var _revision: UInt32 = 0
+    var _members: [GroupsProtos_Member] = []
+    var _pendingMembers: [GroupsProtos_PendingMember] = []
+    var _requestingMembers: [GroupsProtos_RequestingMember] = []
+    var _inviteLinkPassword: Data = Data()
+    var _announcementsOnly: Bool = false
+    var _bannedMembers: [GroupsProtos_BannedMember] = []
+    var _terminated: Bool = false
+
+      // This property is used as the initial default value for new instances of the type.
+      // The type itself is protecting the reference to its storage via CoW semantics.
+      // This will force a copy to be made of this reference when the first mutation occurs;
+      // hence, it is safe to mark this as `nonisolated(unsafe)`.
+      static nonisolated(unsafe) let defaultInstance = _StorageClass()
+
+    private init() {}
+
+    init(copying source: _StorageClass) {
+      _publicKey = source._publicKey
+      _title = source._title
+      _avatar = source._avatar
+      _disappearingMessagesTimer = source._disappearingMessagesTimer
+      _descriptionBytes = source._descriptionBytes
+      _accessControl = source._accessControl
+      _revision = source._revision
+      _members = source._members
+      _pendingMembers = source._pendingMembers
+      _requestingMembers = source._requestingMembers
+      _inviteLinkPassword = source._inviteLinkPassword
+      _announcementsOnly = source._announcementsOnly
+      _bannedMembers = source._bannedMembers
+      _terminated = source._terminated
+    }
+  }
+
+  fileprivate mutating func _uniqueStorage() -> _StorageClass {
+    if !isKnownUniquelyReferenced(&_storage) {
+      _storage = _StorageClass(copying: _storage)
+    }
+    return _storage
+  }
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularBytesField(value: &self.publicKey) }()
-      case 2: try { try decoder.decodeSingularBytesField(value: &self.title) }()
-      case 3: try { try decoder.decodeSingularStringField(value: &self.avatar) }()
-      case 4: try { try decoder.decodeSingularBytesField(value: &self.disappearingMessagesTimer) }()
-      case 5: try { try decoder.decodeSingularMessageField(value: &self._accessControl) }()
-      case 6: try { try decoder.decodeSingularUInt32Field(value: &self.revision) }()
-      case 7: try { try decoder.decodeRepeatedMessageField(value: &self.members) }()
-      case 8: try { try decoder.decodeRepeatedMessageField(value: &self.pendingMembers) }()
-      case 9: try { try decoder.decodeRepeatedMessageField(value: &self.requestingMembers) }()
-      case 10: try { try decoder.decodeSingularBytesField(value: &self.inviteLinkPassword) }()
-      case 11: try { try decoder.decodeSingularBytesField(value: &self.descriptionBytes) }()
-      case 12: try { try decoder.decodeSingularBoolField(value: &self.announcementsOnly) }()
-      case 13: try { try decoder.decodeRepeatedMessageField(value: &self.bannedMembers) }()
-      default: break
+    _ = _uniqueStorage()
+    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      while let fieldNumber = try decoder.nextFieldNumber() {
+        // The use of inline closures is to circumvent an issue where the compiler
+        // allocates stack space for every case branch when no optimizations are
+        // enabled. https://github.com/apple/swift-protobuf/issues/1034
+        switch fieldNumber {
+        case 1: try { try decoder.decodeSingularBytesField(value: &_storage._publicKey) }()
+        case 2: try { try decoder.decodeSingularBytesField(value: &_storage._title) }()
+        case 3: try { try decoder.decodeSingularStringField(value: &_storage._avatar) }()
+        case 4: try { try decoder.decodeSingularBytesField(value: &_storage._disappearingMessagesTimer) }()
+        case 5: try { try decoder.decodeSingularMessageField(value: &_storage._accessControl) }()
+        case 6: try { try decoder.decodeSingularUInt32Field(value: &_storage._revision) }()
+        case 7: try { try decoder.decodeRepeatedMessageField(value: &_storage._members) }()
+        case 8: try { try decoder.decodeRepeatedMessageField(value: &_storage._pendingMembers) }()
+        case 9: try { try decoder.decodeRepeatedMessageField(value: &_storage._requestingMembers) }()
+        case 10: try { try decoder.decodeSingularBytesField(value: &_storage._inviteLinkPassword) }()
+        case 11: try { try decoder.decodeSingularBytesField(value: &_storage._descriptionBytes) }()
+        case 12: try { try decoder.decodeSingularBoolField(value: &_storage._announcementsOnly) }()
+        case 13: try { try decoder.decodeRepeatedMessageField(value: &_storage._bannedMembers) }()
+        case 14: try { try decoder.decodeSingularBoolField(value: &_storage._terminated) }()
+        default: break
+        }
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every if/case branch local when no optimizations
-    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-    // https://github.com/apple/swift-protobuf/issues/1182
-    if !self.publicKey.isEmpty {
-      try visitor.visitSingularBytesField(value: self.publicKey, fieldNumber: 1)
-    }
-    if !self.title.isEmpty {
-      try visitor.visitSingularBytesField(value: self.title, fieldNumber: 2)
-    }
-    if !self.avatar.isEmpty {
-      try visitor.visitSingularStringField(value: self.avatar, fieldNumber: 3)
-    }
-    if !self.disappearingMessagesTimer.isEmpty {
-      try visitor.visitSingularBytesField(value: self.disappearingMessagesTimer, fieldNumber: 4)
-    }
-    try { if let v = self._accessControl {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
-    } }()
-    if self.revision != 0 {
-      try visitor.visitSingularUInt32Field(value: self.revision, fieldNumber: 6)
-    }
-    if !self.members.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.members, fieldNumber: 7)
-    }
-    if !self.pendingMembers.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.pendingMembers, fieldNumber: 8)
-    }
-    if !self.requestingMembers.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.requestingMembers, fieldNumber: 9)
-    }
-    if !self.inviteLinkPassword.isEmpty {
-      try visitor.visitSingularBytesField(value: self.inviteLinkPassword, fieldNumber: 10)
-    }
-    if !self.descriptionBytes.isEmpty {
-      try visitor.visitSingularBytesField(value: self.descriptionBytes, fieldNumber: 11)
-    }
-    if self.announcementsOnly != false {
-      try visitor.visitSingularBoolField(value: self.announcementsOnly, fieldNumber: 12)
-    }
-    if !self.bannedMembers.isEmpty {
-      try visitor.visitRepeatedMessageField(value: self.bannedMembers, fieldNumber: 13)
+    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every if/case branch local when no optimizations
+      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+      // https://github.com/apple/swift-protobuf/issues/1182
+      if !_storage._publicKey.isEmpty {
+        try visitor.visitSingularBytesField(value: _storage._publicKey, fieldNumber: 1)
+      }
+      if !_storage._title.isEmpty {
+        try visitor.visitSingularBytesField(value: _storage._title, fieldNumber: 2)
+      }
+      if !_storage._avatar.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._avatar, fieldNumber: 3)
+      }
+      if !_storage._disappearingMessagesTimer.isEmpty {
+        try visitor.visitSingularBytesField(value: _storage._disappearingMessagesTimer, fieldNumber: 4)
+      }
+      try { if let v = _storage._accessControl {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
+      } }()
+      if _storage._revision != 0 {
+        try visitor.visitSingularUInt32Field(value: _storage._revision, fieldNumber: 6)
+      }
+      if !_storage._members.isEmpty {
+        try visitor.visitRepeatedMessageField(value: _storage._members, fieldNumber: 7)
+      }
+      if !_storage._pendingMembers.isEmpty {
+        try visitor.visitRepeatedMessageField(value: _storage._pendingMembers, fieldNumber: 8)
+      }
+      if !_storage._requestingMembers.isEmpty {
+        try visitor.visitRepeatedMessageField(value: _storage._requestingMembers, fieldNumber: 9)
+      }
+      if !_storage._inviteLinkPassword.isEmpty {
+        try visitor.visitSingularBytesField(value: _storage._inviteLinkPassword, fieldNumber: 10)
+      }
+      if !_storage._descriptionBytes.isEmpty {
+        try visitor.visitSingularBytesField(value: _storage._descriptionBytes, fieldNumber: 11)
+      }
+      if _storage._announcementsOnly != false {
+        try visitor.visitSingularBoolField(value: _storage._announcementsOnly, fieldNumber: 12)
+      }
+      if !_storage._bannedMembers.isEmpty {
+        try visitor.visitRepeatedMessageField(value: _storage._bannedMembers, fieldNumber: 13)
+      }
+      if _storage._terminated != false {
+        try visitor.visitSingularBoolField(value: _storage._terminated, fieldNumber: 14)
+      }
     }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: GroupsProtos_Group, rhs: GroupsProtos_Group) -> Bool {
-    if lhs.publicKey != rhs.publicKey {return false}
-    if lhs.title != rhs.title {return false}
-    if lhs.avatar != rhs.avatar {return false}
-    if lhs.disappearingMessagesTimer != rhs.disappearingMessagesTimer {return false}
-    if lhs.descriptionBytes != rhs.descriptionBytes {return false}
-    if lhs._accessControl != rhs._accessControl {return false}
-    if lhs.revision != rhs.revision {return false}
-    if lhs.members != rhs.members {return false}
-    if lhs.pendingMembers != rhs.pendingMembers {return false}
-    if lhs.requestingMembers != rhs.requestingMembers {return false}
-    if lhs.inviteLinkPassword != rhs.inviteLinkPassword {return false}
-    if lhs.announcementsOnly != rhs.announcementsOnly {return false}
-    if lhs.bannedMembers != rhs.bannedMembers {return false}
+    if lhs._storage !== rhs._storage {
+      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
+        let _storage = _args.0
+        let rhs_storage = _args.1
+        if _storage._publicKey != rhs_storage._publicKey {return false}
+        if _storage._title != rhs_storage._title {return false}
+        if _storage._avatar != rhs_storage._avatar {return false}
+        if _storage._disappearingMessagesTimer != rhs_storage._disappearingMessagesTimer {return false}
+        if _storage._descriptionBytes != rhs_storage._descriptionBytes {return false}
+        if _storage._accessControl != rhs_storage._accessControl {return false}
+        if _storage._revision != rhs_storage._revision {return false}
+        if _storage._members != rhs_storage._members {return false}
+        if _storage._pendingMembers != rhs_storage._pendingMembers {return false}
+        if _storage._requestingMembers != rhs_storage._requestingMembers {return false}
+        if _storage._inviteLinkPassword != rhs_storage._inviteLinkPassword {return false}
+        if _storage._announcementsOnly != rhs_storage._announcementsOnly {return false}
+        if _storage._bannedMembers != rhs_storage._bannedMembers {return false}
+        if _storage._terminated != rhs_storage._terminated {return false}
+        return true
+      }
+      if !storagesAreEqual {return false}
+    }
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension GroupsProtos_GroupAttributeBlob: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupAttributeBlob: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".GroupAttributeBlob"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}title\0\u{1}avatar\0\u{1}disappearingMessagesDuration\0\u{1}descriptionText\0")
 
@@ -1560,7 +1755,7 @@ extension GroupsProtos_GroupAttributeBlob: SwiftProtobuf.Message, SwiftProtobuf.
   }
 }
 
-extension GroupsProtos_GroupInviteLink: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupInviteLink: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".GroupInviteLink"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}contentsV1\0")
 
@@ -1606,7 +1801,7 @@ extension GroupsProtos_GroupInviteLink: SwiftProtobuf.Message, SwiftProtobuf._Me
   }
 }
 
-extension GroupsProtos_GroupInviteLink.GroupInviteLinkContentsV1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupInviteLink.GroupInviteLinkContentsV1: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupInviteLink.protoMessageName + ".GroupInviteLinkContentsV1"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}groupMasterKey\0\u{1}inviteLinkPassword\0")
 
@@ -1641,7 +1836,7 @@ extension GroupsProtos_GroupInviteLink.GroupInviteLinkContentsV1: SwiftProtobuf.
   }
 }
 
-extension GroupsProtos_GroupJoinInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupJoinInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".GroupJoinInfo"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}publicKey\0\u{1}title\0\u{1}avatar\0\u{1}memberCount\0\u{1}addFromInviteLink\0\u{1}revision\0\u{1}pendingAdminApproval\0\u{1}descriptionBytes\0")
 
@@ -1706,7 +1901,7 @@ extension GroupsProtos_GroupJoinInfo: SwiftProtobuf.Message, SwiftProtobuf._Mess
   }
 }
 
-extension GroupsProtos_GroupChange: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".GroupChange"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}actions\0\u{1}serverSignature\0\u{1}changeEpoch\0")
 
@@ -1746,9 +1941,9 @@ extension GroupsProtos_GroupChange: SwiftProtobuf.Message, SwiftProtobuf._Messag
   }
 }
 
-extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.protoMessageName + ".Actions"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}sourceUserId\0\u{1}revision\0\u{1}addMembers\0\u{1}deleteMembers\0\u{1}modifyMemberRoles\0\u{1}modifyMemberProfileKeys\0\u{1}addPendingMembers\0\u{1}deletePendingMembers\0\u{1}promotePendingMembers\0\u{1}modifyTitle\0\u{1}modifyAvatar\0\u{1}modifyDisappearingMessagesTimer\0\u{1}modifyAttributesAccess\0\u{1}modifyMemberAccess\0\u{1}modifyAddFromInviteLinkAccess\0\u{1}addRequestingMembers\0\u{1}deleteRequestingMembers\0\u{1}promoteRequestingMembers\0\u{1}modifyInviteLinkPassword\0\u{1}modifyDescription\0\u{1}modifyAnnouncementsOnly\0\u{1}addBannedMembers\0\u{1}deleteBannedMembers\0\u{1}promotePniPendingMembers\0\u{3}group_id\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}sourceUserId\0\u{1}revision\0\u{1}addMembers\0\u{1}deleteMembers\0\u{1}modifyMemberRoles\0\u{1}modifyMemberProfileKeys\0\u{1}addPendingMembers\0\u{1}deletePendingMembers\0\u{1}promotePendingMembers\0\u{1}modifyTitle\0\u{1}modifyAvatar\0\u{1}modifyDisappearingMessagesTimer\0\u{1}modifyAttributesAccess\0\u{1}modifyMemberAccess\0\u{1}modifyAddFromInviteLinkAccess\0\u{1}addRequestingMembers\0\u{1}deleteRequestingMembers\0\u{1}promoteRequestingMembers\0\u{1}modifyInviteLinkPassword\0\u{1}modifyDescription\0\u{1}modifyAnnouncementsOnly\0\u{1}addBannedMembers\0\u{1}deleteBannedMembers\0\u{1}promotePniPendingMembers\0\u{3}group_id\0\u{1}modifyMemberLabel\0\u{3}modify_member_label_access\0\u{3}terminate_group\0")
 
   fileprivate class _StorageClass {
     var _sourceUserID: Data = Data()
@@ -1767,6 +1962,7 @@ extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf
     var _modifyAttributesAccess: GroupsProtos_GroupChange.Actions.ModifyAttributesAccessControlAction? = nil
     var _modifyMemberAccess: GroupsProtos_GroupChange.Actions.ModifyMembersAccessControlAction? = nil
     var _modifyAddFromInviteLinkAccess: GroupsProtos_GroupChange.Actions.ModifyAddFromInviteLinkAccessControlAction? = nil
+    var _modifyMemberLabelAccess: GroupsProtos_GroupChange.Actions.ModifyMemberLabelAccessControlAction? = nil
     var _addRequestingMembers: [GroupsProtos_GroupChange.Actions.AddRequestingMemberAction] = []
     var _deleteRequestingMembers: [GroupsProtos_GroupChange.Actions.DeleteRequestingMemberAction] = []
     var _promoteRequestingMembers: [GroupsProtos_GroupChange.Actions.PromoteRequestingMemberAction] = []
@@ -1776,6 +1972,8 @@ extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf
     var _addBannedMembers: [GroupsProtos_GroupChange.Actions.AddBannedMemberAction] = []
     var _deleteBannedMembers: [GroupsProtos_GroupChange.Actions.DeleteBannedMemberAction] = []
     var _promotePniPendingMembers: [GroupsProtos_GroupChange.Actions.PromoteMemberPendingPniAciProfileKeyAction] = []
+    var _modifyMemberLabel: [GroupsProtos_GroupChange.Actions.ModifyMemberLabelAction] = []
+    var _terminateGroup: GroupsProtos_GroupChange.Actions.TerminateGroupAction? = nil
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -1802,6 +2000,7 @@ extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf
       _modifyAttributesAccess = source._modifyAttributesAccess
       _modifyMemberAccess = source._modifyMemberAccess
       _modifyAddFromInviteLinkAccess = source._modifyAddFromInviteLinkAccess
+      _modifyMemberLabelAccess = source._modifyMemberLabelAccess
       _addRequestingMembers = source._addRequestingMembers
       _deleteRequestingMembers = source._deleteRequestingMembers
       _promoteRequestingMembers = source._promoteRequestingMembers
@@ -1811,6 +2010,8 @@ extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf
       _addBannedMembers = source._addBannedMembers
       _deleteBannedMembers = source._deleteBannedMembers
       _promotePniPendingMembers = source._promotePniPendingMembers
+      _modifyMemberLabel = source._modifyMemberLabel
+      _terminateGroup = source._terminateGroup
     }
   }
 
@@ -1854,6 +2055,9 @@ extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf
         case 23: try { try decoder.decodeRepeatedMessageField(value: &_storage._deleteBannedMembers) }()
         case 24: try { try decoder.decodeRepeatedMessageField(value: &_storage._promotePniPendingMembers) }()
         case 25: try { try decoder.decodeSingularBytesField(value: &_storage._groupID) }()
+        case 26: try { try decoder.decodeRepeatedMessageField(value: &_storage._modifyMemberLabel) }()
+        case 27: try { try decoder.decodeSingularMessageField(value: &_storage._modifyMemberLabelAccess) }()
+        case 28: try { try decoder.decodeSingularMessageField(value: &_storage._terminateGroup) }()
         default: break
         }
       }
@@ -1941,6 +2145,15 @@ extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf
       if !_storage._groupID.isEmpty {
         try visitor.visitSingularBytesField(value: _storage._groupID, fieldNumber: 25)
       }
+      if !_storage._modifyMemberLabel.isEmpty {
+        try visitor.visitRepeatedMessageField(value: _storage._modifyMemberLabel, fieldNumber: 26)
+      }
+      try { if let v = _storage._modifyMemberLabelAccess {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 27)
+      } }()
+      try { if let v = _storage._terminateGroup {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 28)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -1966,6 +2179,7 @@ extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf
         if _storage._modifyAttributesAccess != rhs_storage._modifyAttributesAccess {return false}
         if _storage._modifyMemberAccess != rhs_storage._modifyMemberAccess {return false}
         if _storage._modifyAddFromInviteLinkAccess != rhs_storage._modifyAddFromInviteLinkAccess {return false}
+        if _storage._modifyMemberLabelAccess != rhs_storage._modifyMemberLabelAccess {return false}
         if _storage._addRequestingMembers != rhs_storage._addRequestingMembers {return false}
         if _storage._deleteRequestingMembers != rhs_storage._deleteRequestingMembers {return false}
         if _storage._promoteRequestingMembers != rhs_storage._promoteRequestingMembers {return false}
@@ -1975,6 +2189,8 @@ extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf
         if _storage._addBannedMembers != rhs_storage._addBannedMembers {return false}
         if _storage._deleteBannedMembers != rhs_storage._deleteBannedMembers {return false}
         if _storage._promotePniPendingMembers != rhs_storage._promotePniPendingMembers {return false}
+        if _storage._modifyMemberLabel != rhs_storage._modifyMemberLabel {return false}
+        if _storage._terminateGroup != rhs_storage._terminateGroup {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -1984,7 +2200,7 @@ extension GroupsProtos_GroupChange.Actions: SwiftProtobuf.Message, SwiftProtobuf
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.AddMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.AddMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".AddMemberAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}added\0\u{1}joinFromInviteLink\0")
 
@@ -2023,7 +2239,7 @@ extension GroupsProtos_GroupChange.Actions.AddMemberAction: SwiftProtobuf.Messag
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.DeleteMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.DeleteMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".DeleteMemberAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}deletedUserId\0")
 
@@ -2053,7 +2269,7 @@ extension GroupsProtos_GroupChange.Actions.DeleteMemberAction: SwiftProtobuf.Mes
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.ModifyMemberRoleAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.ModifyMemberRoleAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".ModifyMemberRoleAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}userId\0\u{1}role\0")
 
@@ -2088,7 +2304,47 @@ extension GroupsProtos_GroupChange.Actions.ModifyMemberRoleAction: SwiftProtobuf
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.ModifyMemberProfileKeyAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.ModifyMemberLabelAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".ModifyMemberLabelAction"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}user_id\0\u{3}label_emoji\0\u{3}label_string\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularBytesField(value: &self.userID) }()
+      case 2: try { try decoder.decodeSingularBytesField(value: &self.labelEmoji) }()
+      case 3: try { try decoder.decodeSingularBytesField(value: &self.labelString) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.userID.isEmpty {
+      try visitor.visitSingularBytesField(value: self.userID, fieldNumber: 1)
+    }
+    if !self.labelEmoji.isEmpty {
+      try visitor.visitSingularBytesField(value: self.labelEmoji, fieldNumber: 2)
+    }
+    if !self.labelString.isEmpty {
+      try visitor.visitSingularBytesField(value: self.labelString, fieldNumber: 3)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: GroupsProtos_GroupChange.Actions.ModifyMemberLabelAction, rhs: GroupsProtos_GroupChange.Actions.ModifyMemberLabelAction) -> Bool {
+    if lhs.userID != rhs.userID {return false}
+    if lhs.labelEmoji != rhs.labelEmoji {return false}
+    if lhs.labelString != rhs.labelString {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension GroupsProtos_GroupChange.Actions.ModifyMemberProfileKeyAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".ModifyMemberProfileKeyAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}presentation\0\u{3}user_id\0\u{3}profile_key\0")
 
@@ -2128,7 +2384,7 @@ extension GroupsProtos_GroupChange.Actions.ModifyMemberProfileKeyAction: SwiftPr
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.AddPendingMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.AddPendingMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".AddPendingMemberAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}added\0")
 
@@ -2162,7 +2418,7 @@ extension GroupsProtos_GroupChange.Actions.AddPendingMemberAction: SwiftProtobuf
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.DeletePendingMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.DeletePendingMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".DeletePendingMemberAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}deletedUserId\0")
 
@@ -2192,7 +2448,7 @@ extension GroupsProtos_GroupChange.Actions.DeletePendingMemberAction: SwiftProto
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.PromotePendingMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.PromotePendingMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".PromotePendingMemberAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}presentation\0\u{3}user_id\0\u{3}profile_key\0")
 
@@ -2232,7 +2488,7 @@ extension GroupsProtos_GroupChange.Actions.PromotePendingMemberAction: SwiftProt
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.PromoteMemberPendingPniAciProfileKeyAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.PromoteMemberPendingPniAciProfileKeyAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".PromoteMemberPendingPniAciProfileKeyAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}presentation\0\u{3}user_id\0\u{1}pni\0\u{3}profile_key\0")
 
@@ -2277,7 +2533,7 @@ extension GroupsProtos_GroupChange.Actions.PromoteMemberPendingPniAciProfileKeyA
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.AddRequestingMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.AddRequestingMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".AddRequestingMemberAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}added\0")
 
@@ -2311,7 +2567,7 @@ extension GroupsProtos_GroupChange.Actions.AddRequestingMemberAction: SwiftProto
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.DeleteRequestingMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.DeleteRequestingMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".DeleteRequestingMemberAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}deletedUserId\0")
 
@@ -2341,7 +2597,7 @@ extension GroupsProtos_GroupChange.Actions.DeleteRequestingMemberAction: SwiftPr
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.PromoteRequestingMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.PromoteRequestingMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".PromoteRequestingMemberAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}userId\0\u{1}role\0")
 
@@ -2376,7 +2632,7 @@ extension GroupsProtos_GroupChange.Actions.PromoteRequestingMemberAction: SwiftP
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.AddBannedMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.AddBannedMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".AddBannedMemberAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}added\0")
 
@@ -2410,7 +2666,7 @@ extension GroupsProtos_GroupChange.Actions.AddBannedMemberAction: SwiftProtobuf.
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.DeleteBannedMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.DeleteBannedMemberAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".DeleteBannedMemberAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}deletedUserId\0")
 
@@ -2440,7 +2696,7 @@ extension GroupsProtos_GroupChange.Actions.DeleteBannedMemberAction: SwiftProtob
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.ModifyTitleAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.ModifyTitleAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".ModifyTitleAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}title\0")
 
@@ -2470,7 +2726,7 @@ extension GroupsProtos_GroupChange.Actions.ModifyTitleAction: SwiftProtobuf.Mess
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.ModifyAvatarAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.ModifyAvatarAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".ModifyAvatarAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}avatar\0")
 
@@ -2500,7 +2756,7 @@ extension GroupsProtos_GroupChange.Actions.ModifyAvatarAction: SwiftProtobuf.Mes
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.ModifyDisappearingMessagesTimerAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.ModifyDisappearingMessagesTimerAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".ModifyDisappearingMessagesTimerAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}timer\0")
 
@@ -2530,7 +2786,7 @@ extension GroupsProtos_GroupChange.Actions.ModifyDisappearingMessagesTimerAction
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.ModifyAttributesAccessControlAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.ModifyAttributesAccessControlAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".ModifyAttributesAccessControlAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}attributesAccess\0")
 
@@ -2560,7 +2816,7 @@ extension GroupsProtos_GroupChange.Actions.ModifyAttributesAccessControlAction: 
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.ModifyAvatarAccessControlAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.ModifyAvatarAccessControlAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".ModifyAvatarAccessControlAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}avatarAccess\0")
 
@@ -2590,7 +2846,7 @@ extension GroupsProtos_GroupChange.Actions.ModifyAvatarAccessControlAction: Swif
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.ModifyMembersAccessControlAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.ModifyMembersAccessControlAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".ModifyMembersAccessControlAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}membersAccess\0")
 
@@ -2620,7 +2876,7 @@ extension GroupsProtos_GroupChange.Actions.ModifyMembersAccessControlAction: Swi
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.ModifyAddFromInviteLinkAccessControlAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.ModifyAddFromInviteLinkAccessControlAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".ModifyAddFromInviteLinkAccessControlAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}addFromInviteLinkAccess\0")
 
@@ -2650,7 +2906,37 @@ extension GroupsProtos_GroupChange.Actions.ModifyAddFromInviteLinkAccessControlA
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.ModifyInviteLinkPasswordAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.ModifyMemberLabelAccessControlAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".ModifyMemberLabelAccessControlAction"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}member_label_access\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularEnumField(value: &self.memberLabelAccess) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.memberLabelAccess != .unknown {
+      try visitor.visitSingularEnumField(value: self.memberLabelAccess, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: GroupsProtos_GroupChange.Actions.ModifyMemberLabelAccessControlAction, rhs: GroupsProtos_GroupChange.Actions.ModifyMemberLabelAccessControlAction) -> Bool {
+    if lhs.memberLabelAccess != rhs.memberLabelAccess {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension GroupsProtos_GroupChange.Actions.ModifyInviteLinkPasswordAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".ModifyInviteLinkPasswordAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}inviteLinkPassword\0")
 
@@ -2680,7 +2966,7 @@ extension GroupsProtos_GroupChange.Actions.ModifyInviteLinkPasswordAction: Swift
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.ModifyDescriptionAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.ModifyDescriptionAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".ModifyDescriptionAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}descriptionBytes\0")
 
@@ -2710,7 +2996,7 @@ extension GroupsProtos_GroupChange.Actions.ModifyDescriptionAction: SwiftProtobu
   }
 }
 
-extension GroupsProtos_GroupChange.Actions.ModifyAnnouncementsOnlyAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.ModifyAnnouncementsOnlyAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".ModifyAnnouncementsOnlyAction"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}announcementsOnly\0")
 
@@ -2740,7 +3026,26 @@ extension GroupsProtos_GroupChange.Actions.ModifyAnnouncementsOnlyAction: SwiftP
   }
 }
 
-extension GroupsProtos_GroupExternalCredential: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChange.Actions.TerminateGroupAction: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = GroupsProtos_GroupChange.Actions.protoMessageName + ".TerminateGroupAction"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    // Load everything into unknown fields
+    while try decoder.nextFieldNumber() != nil {}
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: GroupsProtos_GroupChange.Actions.TerminateGroupAction, rhs: GroupsProtos_GroupChange.Actions.TerminateGroupAction) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+nonisolated extension GroupsProtos_GroupExternalCredential: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".GroupExternalCredential"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}token\0")
 
@@ -2770,7 +3075,7 @@ extension GroupsProtos_GroupExternalCredential: SwiftProtobuf.Message, SwiftProt
   }
 }
 
-extension GroupsProtos_GroupResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".GroupResponse"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}group\0\u{3}group_send_endorsements_response\0")
 
@@ -2809,7 +3114,7 @@ extension GroupsProtos_GroupResponse: SwiftProtobuf.Message, SwiftProtobuf._Mess
   }
 }
 
-extension GroupsProtos_GroupChanges: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChanges: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".GroupChanges"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}groupChanges\0\u{3}group_send_endorsements_response\0")
 
@@ -2844,84 +3149,46 @@ extension GroupsProtos_GroupChanges: SwiftProtobuf.Message, SwiftProtobuf._Messa
   }
 }
 
-extension GroupsProtos_GroupChanges.GroupChangeState: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChanges.GroupChangeState: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = GroupsProtos_GroupChanges.protoMessageName + ".GroupChangeState"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}groupChange\0\u{1}groupState\0")
 
-  fileprivate class _StorageClass {
-    var _groupChange: GroupsProtos_GroupChange? = nil
-    var _groupState: GroupsProtos_Group? = nil
-
-      // This property is used as the initial default value for new instances of the type.
-      // The type itself is protecting the reference to its storage via CoW semantics.
-      // This will force a copy to be made of this reference when the first mutation occurs;
-      // hence, it is safe to mark this as `nonisolated(unsafe)`.
-      static nonisolated(unsafe) let defaultInstance = _StorageClass()
-
-    private init() {}
-
-    init(copying source: _StorageClass) {
-      _groupChange = source._groupChange
-      _groupState = source._groupState
-    }
-  }
-
-  fileprivate mutating func _uniqueStorage() -> _StorageClass {
-    if !isKnownUniquelyReferenced(&_storage) {
-      _storage = _StorageClass(copying: _storage)
-    }
-    return _storage
-  }
-
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    _ = _uniqueStorage()
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      while let fieldNumber = try decoder.nextFieldNumber() {
-        // The use of inline closures is to circumvent an issue where the compiler
-        // allocates stack space for every case branch when no optimizations are
-        // enabled. https://github.com/apple/swift-protobuf/issues/1034
-        switch fieldNumber {
-        case 1: try { try decoder.decodeSingularMessageField(value: &_storage._groupChange) }()
-        case 2: try { try decoder.decodeSingularMessageField(value: &_storage._groupState) }()
-        default: break
-        }
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._groupChange) }()
+      case 2: try { try decoder.decodeSingularMessageField(value: &self._groupState) }()
+      default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every if/case branch local when no optimizations
-      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-      // https://github.com/apple/swift-protobuf/issues/1182
-      try { if let v = _storage._groupChange {
-        try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
-      } }()
-      try { if let v = _storage._groupState {
-        try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
-      } }()
-    }
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._groupChange {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._groupState {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: GroupsProtos_GroupChanges.GroupChangeState, rhs: GroupsProtos_GroupChanges.GroupChangeState) -> Bool {
-    if lhs._storage !== rhs._storage {
-      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
-        let _storage = _args.0
-        let rhs_storage = _args.1
-        if _storage._groupChange != rhs_storage._groupChange {return false}
-        if _storage._groupState != rhs_storage._groupState {return false}
-        return true
-      }
-      if !storagesAreEqual {return false}
-    }
+    if lhs._groupChange != rhs._groupChange {return false}
+    if lhs._groupState != rhs._groupState {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
 }
 
-extension GroupsProtos_GroupChangeResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+nonisolated extension GroupsProtos_GroupChangeResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".GroupChangeResponse"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}group_change\0\u{3}group_send_endorsements_response\0")
 

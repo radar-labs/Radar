@@ -6,18 +6,8 @@
 import Foundation
 import LibSignalClient
 
-@objc
-public enum RequestMakerUDAuthError: Int, Error, IsRetryableProvider {
+public enum RequestMakerUDAuthError: Error {
     case udAuthFailure
-
-    // MARK: - IsRetryableProvider
-
-    public var isRetryableProvider: Bool {
-        switch self {
-        case .udAuthFailure:
-            return true
-        }
-    }
 }
 
 // MARK: -
@@ -64,7 +54,7 @@ final class RequestMaker {
         accessKey: OWSUDAccess?,
         endorsement: GroupSendFullTokenBuilder?,
         authedAccount: AuthedAccount,
-        options: Options
+        options: Options,
     ) {
         self.label = label
         self.serviceId = serviceId
@@ -160,7 +150,7 @@ final class RequestMaker {
     }
 
     private func requestFailed(error: Error, sealedSenderAuth: SealedSenderAuth?) async throws -> Never {
-        if let sealedSenderAuth, (error.httpStatusCode == 401 || error.httpStatusCode == 403) {
+        if let sealedSenderAuth, error.httpStatusCode == 401 || error.httpStatusCode == 403 {
             // If an Access Key-authenticated request fails because of a 401/403, we
             // assume the Access Key is wrong.
             if case .accessKey(let udAccess) = sealedSenderAuth {
@@ -212,7 +202,7 @@ final class RequestMaker {
             let profileFetcher = SSKEnvironment.shared.profileFetcherRef
             _ = try? await profileFetcher.fetchProfile(
                 for: serviceId,
-                authedAccount: authedAccount
+                authedAccount: authedAccount,
             )
         }
     }

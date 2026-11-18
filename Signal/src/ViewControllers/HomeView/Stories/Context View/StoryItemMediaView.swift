@@ -6,10 +6,10 @@
 import CoreMedia
 import Foundation
 import SafariServices
+import SDWebImage
 import SignalServiceKit
 import SignalUI
 import UIKit
-import SDWebImage
 
 protocol StoryItemMediaViewDelegate: AnyObject {
     func storyItemMediaViewWantsToPause(_ storyItemMediaView: StoryItemMediaView)
@@ -21,23 +21,22 @@ protocol StoryItemMediaViewDelegate: AnyObject {
     var context: StoryContext { get }
 }
 
-class StoryItemMediaView: UIView {
+class StoryItemMediaView: UIView, VideoPlayerDelegate {
     weak var delegate: StoryItemMediaViewDelegate?
-    public private(set) var item: StoryItem
+    private(set) var item: StoryItem
 
     private let spoilerState: SpoilerRenderState
 
     private lazy var gradientProtectionView = GradientView(colors: [])
     private var gradientProtectionViewHeightConstraint: NSLayoutConstraint?
 
-    private var contextButton: ContextMenuButton!
-    private let bottomContentVStack = UIStackView()
-
+    private var contextButton: UIButton!
+    private var bottomContentVStack: UIStackView!
     init(
         item: StoryItem,
-        contextButton: ContextMenuButton,
+        contextButton: UIButton,
         spoilerState: SpoilerRenderState,
-        delegate: StoryItemMediaViewDelegate
+        delegate: StoryItemMediaViewDelegate,
     ) {
         self.item = item
         self.spoilerState = spoilerState
@@ -45,38 +44,47 @@ class StoryItemMediaView: UIView {
 
         super.init(frame: .zero)
 
-        autoPin(toAspectRatio: 9/16)
+        // Will use these margins to position avatar, contact name and timestamp at the bottom.
+        directionalLayoutMargins.leading = OWSTableViewController2.defaultHOuterMargin
+        directionalLayoutMargins.trailing = OWSTableViewController2.defaultHOuterMargin
+        if UIDevice.current.hasIPhoneXNotch || UIDevice.current.isIPad {
+            // iPhone with notch or iPad (views/replies rendered below media, media is in a card)
+            directionalLayoutMargins.bottom = OWSTableViewController2.defaultHOuterMargin + 22
+        } else {
+            // iPhone with home button (views/replies rendered on top of media, media is fullscreen)
+            directionalLayoutMargins.bottom = 80
+        }
+
+        autoPin(toAspectRatio: 9 / 16)
 
         updateMediaView()
 
         if UIDevice.current.hasIPhoneXNotch || UIDevice.current.isIPad {
-            layer.cornerRadius = 18
+            layer.cornerRadius = if #available(iOS 26, *) { 40 } else { 18 }
             clipsToBounds = true
         }
 
         addSubview(gradientProtectionView)
-        gradientProtectionView.autoPinWidthToSuperview()
-        gradientProtectionView.autoPinEdge(toSuperviewEdge: .bottom)
+        gradientProtectionView.translatesAutoresizingMaskIntoConstraints = false
 
+        bottomContentVStack = UIStackView(arrangedSubviews: [
+            captionLabel,
+            authorRow,
+        ])
         bottomContentVStack.axis = .vertical
         bottomContentVStack.spacing = 24
         addSubview(bottomContentVStack)
+        bottomContentVStack.translatesAutoresizingMaskIntoConstraints = false
 
-        bottomContentVStack.autoPinWidthToSuperview(withMargin: OWSTableViewController2.defaultHOuterMargin)
+        NSLayoutConstraint.activate([
+            gradientProtectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            gradientProtectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            gradientProtectionView.bottomAnchor.constraint(equalTo: bottomAnchor),
 
-        if UIDevice.current.hasIPhoneXNotch || UIDevice.current.isIPad {
-            // iPhone with notch or iPad (views/replies rendered below media, media is in a card)
-            bottomContentVStack.autoPinEdge(toSuperviewEdge: .bottom, withInset: OWSTableViewController2.defaultHOuterMargin + 16)
-        } else {
-            // iPhone with home button (views/replies rendered on top of media, media is fullscreen)
-            bottomContentVStack.autoPinEdge(toSuperviewEdge: .bottom, withInset: 80)
-        }
-
-        bottomContentVStack.autoPinEdge(toSuperviewEdge: .top, withInset: OWSTableViewController2.defaultHOuterMargin)
-
-        bottomContentVStack.addArrangedSubview(.vStretchingSpacer())
-        bottomContentVStack.addArrangedSubview(captionLabel)
-        bottomContentVStack.addArrangedSubview(authorRow)
+            bottomContentVStack.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
+            bottomContentVStack.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
+            bottomContentVStack.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
+        ])
 
         updateCaption()
         updateAuthorRow(newContextButton: contextButton)
@@ -97,7 +105,7 @@ class StoryItemMediaView: UIView {
         lastTruncationWidth = nil
     }
 
-    func updateItem(_ newItem: StoryItem, newContextButton: ContextMenuButton) {
+    func updateItem(_ newItem: StoryItem, newContextButton: UIButton) {
         let oldItem = self.item
         self.item = newItem
 
@@ -184,19 +192,12 @@ class StoryItemMediaView: UIView {
         if let attachmentIdToMarkViewed {
             let timestamp = Date().ows_millisecondsSince1970
             Task {
-                do {
-                    try await DependenciesBridge.shared.db.awaitableWrite { tx in
-                        guard let attachment = DependenciesBridge.shared.attachmentStore.fetch(id: attachmentIdToMarkViewed, tx: tx) else {
-                            return
-                        }
-                        try DependenciesBridge.shared.attachmentStore.markViewedFullscreen(
-                            attachment: attachment,
-                            timestamp: timestamp,
-                            tx: tx
-                        )
-                    }
-                } catch {
-                    Logger.warn("Failed to mark attachment as viewed: \(error)")
+                await DependenciesBridge.shared.db.awaitableWrite { tx in
+                    DependenciesBridge.shared.attachmentStore.markViewedFullscreen(
+                        attachmentId: attachmentIdToMarkViewed,
+                        timestamp: timestamp,
+                        tx: tx,
+                    )
                 }
             }
         }
@@ -291,7 +292,7 @@ class StoryItemMediaView: UIView {
         }
 
         // If we have a glyph count, increase the duration to allow it to be readable
-        if let glyphCount = glyphCount {
+        if let glyphCount {
             // For each bucket of glyphs after the first 15,
             // add an additional 1s of playback time.
             let fifteenGlyphBuckets = (max(0, CGFloat(glyphCount) - 15) / 15).rounded(.up)
@@ -302,8 +303,9 @@ class StoryItemMediaView: UIView {
     }
 
     var elapsedTime: CFTimeInterval? {
-        guard let currentTime = videoPlayer?.avPlayer.currentTime(),
-                let asset = videoPlayer?.avPlayer.currentItem?.asset else { return nil }
+        guard
+            let currentTime = videoPlayer?.avPlayer.currentTime(),
+            let asset = videoPlayer?.avPlayer.currentItem?.asset else { return nil }
         let loopedElapsedTime = Double(videoPlayerLoopCount) * CMTimeGetSeconds(asset.duration)
         return CMTimeGetSeconds(currentTime) + loopedElapsedTime
     }
@@ -312,7 +314,7 @@ class StoryItemMediaView: UIView {
         // Only start downloads when the user taps in the center of the view.
         let downloadHitRegion = CGRect(
             origin: CGPoint(x: frame.center.x - 30, y: frame.center.y - 30),
-            size: CGSize(square: 60)
+            size: CGSize(square: 60),
         )
         guard downloadHitRegion.contains(gesture.location(in: self)) else { return false }
         return item.startAttachmentDownloadIfNecessary(priority: .userInitiated)
@@ -320,56 +322,59 @@ class StoryItemMediaView: UIView {
 
     // MARK: - Author Row
 
-    private lazy var timestampLabel = UILabel()
+    private lazy var timestampLabel: UILabel = {
+        let label = UILabel()
+        label.font = .dynamicTypeFootnote
+        label.adjustsFontForContentSizeCategory = true
+        label.textColor = .Signal.label
+        label.layer.shadowColor = UIColor.black.cgColor
+        label.layer.shadowOpacity = 0.4
+        label.layer.shadowOffset = CGSize(width: 0, height: 1)
+        label.layer.shadowRadius = 2
+        label.setCompressionResistanceHorizontalHigh()
+        label.setContentHuggingHorizontalHigh()
+        return label
+    }()
+
     private lazy var authorRow = UIStackView()
-    private func updateAuthorRow(newContextButton contextButton: ContextMenuButton) {
+    private func updateAuthorRow(newContextButton contextButton: UIButton) {
         let (avatarView, nameLabel) = SSKEnvironment.shared.databaseStorageRef.read { (
             buildAvatarView(transaction: $0),
-            buildNameLabel(transaction: $0)
+            buildNameLabel(transaction: $0),
         ) }
 
-        let nameTrailingView: UIView
-        let nameTrailingSpacing: CGFloat
+        let nameHStack = UIStackView(arrangedSubviews: [nameLabel])
         if item.message.authorAddress.isSystemStoryAddress {
-            let icon = UIImageView(image: Theme.iconImage(.official))
-            icon.contentMode = .center
-            nameTrailingView = icon
-            nameTrailingSpacing = 3
+            nameHStack.addArrangedSubview(UIImageView(image: Theme.iconImage(.official)))
+            nameHStack.spacing = 3
+            nameHStack.alignment = .center
         } else {
-            nameTrailingView = timestampLabel
-            nameTrailingSpacing = 8
+            nameHStack.addArrangedSubview(timestampLabel)
+            nameHStack.spacing = 8
+            nameHStack.alignment = .firstBaseline
         }
 
         let metadataStackView: UIStackView
-
-        let nameHStack = UIStackView(arrangedSubviews: [
-            nameLabel,
-            nameTrailingView
-        ])
-        nameHStack.spacing = nameTrailingSpacing
-        nameHStack.axis = .horizontal
-        nameHStack.alignment = .center
-
         if
             case .privateStory(let uniqueId) = delegate?.context,
             let privateStoryThread = SSKEnvironment.shared.databaseStorageRef.read(
-                block: { TSPrivateStoryThread.anyFetchPrivateStoryThread(uniqueId: uniqueId, transaction: $0) }
+                block: { TSPrivateStoryThread.fetchPrivateStoryThreadViaCache(uniqueId: uniqueId, transaction: $0) },
             ),
-            !privateStoryThread.isMyStory {
+            !privateStoryThread.isMyStory
+        {
             // For private stories, other than "My Story", render the name of the story
 
-            let contextIcon = UIImageView()
-            contextIcon.setTemplateImageName("stories-fill-compact", tintColor: Theme.darkThemePrimaryColor)
-            contextIcon.autoSetDimensions(to: .square(16))
+            let contextIcon = UIImageView(image: UIImage(named: "stories-fill-compact"))
+            contextIcon.tintColor = .Signal.label
 
             let contextNameLabel = UILabel()
-            contextNameLabel.textColor = Theme.darkThemePrimaryColor
+            contextNameLabel.textColor = .Signal.label
             contextNameLabel.font = .dynamicTypeFootnote
             contextNameLabel.text = privateStoryThread.name
 
             let contextHStack = UIStackView(arrangedSubviews: [
                 contextIcon,
-                contextNameLabel
+                contextNameLabel,
             ])
             contextHStack.spacing = 4
             contextHStack.axis = .horizontal
@@ -384,7 +389,7 @@ class StoryItemMediaView: UIView {
             metadataStackView = nameHStack
         }
 
-        let contextButtonSize: CGFloat = 42
+        let contextButtonSize: CGSize = contextButton.systemLayoutSizeFitting(CGSize(square: .greatestFiniteMagnitude))
 
         authorRow.removeAllSubviews()
         authorRow.addArrangedSubviews([
@@ -392,44 +397,40 @@ class StoryItemMediaView: UIView {
             .spacer(withWidth: 12),
             metadataStackView,
             .hStretchingSpacer(),
-            .spacer(withWidth: contextButtonSize)
+            .spacer(withWidth: contextButtonSize.width + 12), // 12 dp spacing between text and context button
         ])
         authorRow.axis = .horizontal
         authorRow.alignment = .center
 
         self.contextButton = contextButton
-        contextButton.tintColor = Theme.darkThemePrimaryColor
-        contextButton.setImage(Theme.iconImage(.buttonMore), for: .normal)
-        contextButton.contentMode = .center
-
         authorRow.addSubview(contextButton)
-        contextButton.autoSetDimensions(to: .square(contextButtonSize))
-        contextButton.autoPinEdge(toSuperviewEdge: .trailing)
+        contextButton.setCompressionResistanceHigh()
+        contextButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            contextButton.centerYAnchor.constraint(equalTo: authorRow.centerYAnchor)
+            // Perhaps because of the way ContextButton is created,
+            // it can't size itself properly and needs to be explicitly sized.
+            contextButton.widthAnchor.constraint(equalToConstant: contextButtonSize.width),
+            contextButton.heightAnchor.constraint(equalToConstant: contextButtonSize.height),
+            contextButton.trailingAnchor.constraint(equalTo: authorRow.trailingAnchor),
+            contextButton.centerYAnchor.constraint(equalTo: authorRow.centerYAnchor),
         ])
 
-        timestampLabel.setCompressionResistanceHorizontalHigh()
-        timestampLabel.setContentHuggingHorizontalHigh()
-        timestampLabel.font = .dynamicTypeFootnote
-        timestampLabel.textColor = Theme.darkThemePrimaryColor
-        timestampLabel.alpha = 0.8
         updateTimestampText()
     }
 
     private func buildAvatarView(transaction: DBReadTransaction) -> UIView {
         let authorAvatarView = ConversationAvatarView(
-            sizeClass: .twentyEight,
+            sizeClass: .thirtySix,
             localUserDisplayMode: .asLocalUser,
             badged: false,
             shape: .circular,
-            useAutolayout: true
+            useAutolayout: true,
         )
 
         authorAvatarView.update(transaction) { config in
             config.dataSource = try? StoryUtil.authorAvatarDataSource(
                 for: item.message,
-                transaction: transaction
+                transaction: transaction,
             )
         }
 
@@ -438,7 +439,7 @@ class StoryItemMediaView: UIView {
             guard
                 let groupAvatarDataSource = try? StoryUtil.contextAvatarDataSource(
                     for: item.message,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             else {
                 owsFailDebug("Unexpectedly missing group avatar")
@@ -446,11 +447,11 @@ class StoryItemMediaView: UIView {
             }
 
             let groupAvatarView = ConversationAvatarView(
-                sizeClass: .twentyEight,
+                sizeClass: .thirtySix,
                 localUserDisplayMode: .asLocalUser,
                 badged: false,
                 shape: .circular,
-                useAutolayout: true
+                useAutolayout: true,
             )
             groupAvatarView.update(transaction) { config in
                 config.dataSource = groupAvatarDataSource
@@ -474,15 +475,19 @@ class StoryItemMediaView: UIView {
 
     private func buildNameLabel(transaction: DBReadTransaction) -> UIView {
         let label = UILabel()
-        label.textColor = Theme.darkThemePrimaryColor
-        label.font = UIFont.dynamicTypeSubheadline.semibold()
+        label.textColor = .Signal.label
+        label.font = UIFont.dynamicTypeSubheadline.bold()
         label.text = StoryUtil.authorDisplayName(
             for: item.message,
             contactsManager: SSKEnvironment.shared.contactManagerRef,
             useFullNameForLocalAddress: false,
             useShortGroupName: false,
-            transaction: transaction
+            transaction: transaction,
         )
+        label.layer.shadowColor = UIColor.black.cgColor
+        label.layer.shadowOpacity = 0.4
+        label.layer.shadowOffset = CGSize(width: 0, height: 1)
+        label.layer.shadowRadius = 2
         return label
     }
 
@@ -491,18 +496,18 @@ class StoryItemMediaView: UIView {
     private class CaptionLabel: UILabel {
 
         static let desiredFont = UIFont.systemFont(ofSize: 17)
-        static let minimumScaleFactor: CGFloat = 15/17
+        static let minimumScaleFactor: CGFloat = 15 / 17
 
         static var minimumScaleFont: UIFont { desiredFont.withSize(desiredFont.pointSize * minimumScaleFactor) }
 
         static let maxCollapsedLines = 5
 
-        public var interactionIdentifier: InteractionSnapshotIdentifier
+        var interactionIdentifier: InteractionSnapshotIdentifier
         private let spoilerState: SpoilerRenderState
 
         init(
             interactionIdentifier: InteractionSnapshotIdentifier,
-            spoilerState: SpoilerRenderState
+            spoilerState: SpoilerRenderState,
         ) {
             self.interactionIdentifier = interactionIdentifier
             self.spoilerState = spoilerState
@@ -510,7 +515,7 @@ class StoryItemMediaView: UIView {
             super.init(frame: .zero)
             spoilerConfig.animationManager = spoilerState.animationManager
 
-            super.textColor = Theme.darkThemePrimaryColor
+            super.textColor = .Signal.label
 
             super.layer.shadowRadius = 48
             super.layer.shadowOpacity = 0.8
@@ -566,7 +571,7 @@ class StoryItemMediaView: UIView {
 
         var tappableItems = [HydratedMessageBody.TappableItem]()
 
-        public func setBody(_ body: StyleOnlyMessageBody?, isTruncated: Bool) {
+        func setBody(_ body: StyleOnlyMessageBody?, isTruncated: Bool) {
             guard let body else {
                 super.attributedText = nil
                 spoilerConfig.text = nil
@@ -589,15 +594,15 @@ class StoryItemMediaView: UIView {
             spoilerConfig.text = .messageBody(hydratedBody)
 
             let revealedSpoilerIds = self.spoilerState.revealState.revealedSpoilerIds(
-                interactionIdentifier: interactionIdentifier
+                interactionIdentifier: interactionIdentifier,
             )
             let config = HydratedMessageBody.DisplayConfiguration.storyCaption(
                 font: actualFont,
-                revealedSpoilerIds: revealedSpoilerIds
+                revealedSpoilerIds: revealedSpoilerIds,
             )
             self.tappableItems = hydratedBody.tappableItems(
                 revealedSpoilerIds: revealedSpoilerIds,
-                dataDetector: nil
+                dataDetector: nil,
             )
             spoilerConfig.text = .messageBody(hydratedBody)
             spoilerConfig.displayConfig = config
@@ -605,7 +610,7 @@ class StoryItemMediaView: UIView {
                 config: config.style,
                 baseFont: config.baseFont,
                 baseTextColor: config.baseTextColor.forCurrentTheme,
-                isDarkThemeEnabled: Theme.isDarkThemeEnabled
+                isDarkThemeEnabled: Theme.isDarkThemeEnabled,
             )
 
         }
@@ -616,14 +621,14 @@ class StoryItemMediaView: UIView {
             let attributedTextForSizing = body.asAttributedStringForDisplay(
                 config: HydratedMessageBody.DisplayConfiguration.storyCaption(
                     font: Self.desiredFont,
-                    revealedSpoilerIds: Set() // irrelevant for sizing.
+                    revealedSpoilerIds: Set(), // irrelevant for sizing.
                 ).style,
-                isDarkThemeEnabled: false // irrelevant for sizing.
+                isDarkThemeEnabled: false, // irrelevant for sizing.
             )
             attributedTextForSizing.boundingRect(
                 with: bounds.size,
                 options: [.usesLineFragmentOrigin, .usesFontLeading],
-                context: drawingContext
+                context: drawingContext,
             )
             return Self.desiredFont.pointSize * drawingContext.actualScaleFactor
         }
@@ -631,7 +636,7 @@ class StoryItemMediaView: UIView {
 
     private lazy var captionLabel = CaptionLabel(
         interactionIdentifier: .fromStoryMessage(item.message),
-        spoilerState: spoilerState
+        spoilerState: spoilerState,
     )
 
     private var truncatedCaptionText: StyleOnlyMessageBody?
@@ -671,7 +676,7 @@ class StoryItemMediaView: UIView {
         if let spoilerItem {
             spoilerState.revealState.setSpoilerRevealed(
                 withID: spoilerItem.id,
-                interactionIdentifier: .fromStoryMessage(item.message)
+                interactionIdentifier: .fromStoryMessage(item.message),
             )
             updateCaption()
             return true
@@ -686,7 +691,7 @@ class StoryItemMediaView: UIView {
 
         if !isCaptionExpanded {
             guard captionLabel.bounds.contains(gesture.location(in: captionLabel)) else { return false }
-        } else if let captionBackdrop = captionBackdrop {
+        } else if let captionBackdrop {
             guard captionBackdrop.bounds.contains(gesture.location(in: captionBackdrop)) else { return false }
         } else {
             owsFailDebug("Unexpectedly missing caption backdrop")
@@ -743,14 +748,14 @@ class StoryItemMediaView: UIView {
 
         self.truncatedCaptionText = Self.truncatedCaptionText(
             fullCaptionBody: body,
-            labelSize: CGSize(width: captionLabel.bounds.width, height: .infinity)
+            labelSize: CGSize(width: captionLabel.bounds.width, height: .infinity),
         )
     }
 
     /// Nil means no truncation is necessary.
     private static func truncatedCaptionText(
         fullCaptionBody: StyleOnlyMessageBody,
-        labelSize: CGSize
+        labelSize: CGSize,
     ) -> StyleOnlyMessageBody? {
         let labelMinimumScaledFont = CaptionLabel.minimumScaleFont
 
@@ -762,11 +767,11 @@ class StoryItemMediaView: UIView {
         textStorage.addLayoutManager(layoutManager)
         let displayConfigForSizing = HydratedMessageBody.DisplayConfiguration.storyCaption(
             font: labelMinimumScaledFont,
-            revealedSpoilerIds: Set() // irrelevant for sizing
+            revealedSpoilerIds: Set(), // irrelevant for sizing
         )
         let fullCaptionText = fullCaptionBody.asAttributedStringForDisplay(
             config: displayConfigForSizing.style,
-            isDarkThemeEnabled: false // irrelevant for sizing
+            isDarkThemeEnabled: false, // irrelevant for sizing
         )
         textStorage.setAttributedString(fullCaptionText)
 
@@ -787,7 +792,7 @@ class StoryItemMediaView: UIView {
 
         let readMoreString = OWSLocalizedString(
             "STORIES_CAPTION_READ_MORE",
-            comment: "Text indication a story caption can be tapped to read more."
+            comment: "Text indication a story caption can be tapped to read more.",
         )
         let readMoreBody = StyleOnlyMessageBody(text: readMoreString, style: .bold)
         let suffix = StyleOnlyMessageBody(plaintext: "… ").addingSuffix(readMoreBody)
@@ -795,7 +800,7 @@ class StoryItemMediaView: UIView {
         var potentialTruncatedCaptionBody = fullCaptionBody
         func truncatePotentialCaptionText(to index: Int) {
             potentialTruncatedCaptionBody = potentialTruncatedCaptionBody.stripAndDropLast(
-                potentialTruncatedCaptionBody.length - index
+                potentialTruncatedCaptionBody.length - index,
             )
         }
 
@@ -838,13 +843,13 @@ class StoryItemMediaView: UIView {
             gradientProtectionViewHeightConstraint = gradientProtectionView.autoMatch(.height, to: .height, of: self, withMultiplier: 0.4)
             gradientProtectionView.colors = [
                 .clear,
-                .black.withAlphaComponent(0.8)
+                .black.withAlphaComponent(0.8),
             ]
         } else {
             gradientProtectionViewHeightConstraint = gradientProtectionView.autoMatch(.height, to: .height, of: self, withMultiplier: 0.2)
             gradientProtectionView.colors = [
                 .clear,
-                .black.withAlphaComponent(0.6)
+                .black.withAlphaComponent(0.6),
             ]
         }
     }
@@ -888,15 +893,21 @@ class StoryItemMediaView: UIView {
                 let videoView = buildVideoView(attachment: stream.attachment)
                 container.addSubview(videoView)
                 videoView.autoPinEdgesToSuperviewEdges()
-            case .animatedImage:
-                let yyImageView = buildYYImageView(attachment: stream.attachment.attachmentStream)
-                container.addSubview(yyImageView)
-                yyImageView.autoPinEdgesToSuperviewEdges()
             case .image:
-                let imageView = buildImageView(attachment: stream.attachment.attachmentStream)
+                guard let imageMetadata = stream.attachment.attachmentStream.imageMetadata() else {
+                    owsFailDebug("Failed to get image metadata")
+                    return buildContentUnavailableView()
+                }
+
+                let imageView: UIView
+                if imageMetadata.isAnimated {
+                    imageView = buildYYImageView(attachment: stream.attachment.attachmentStream)
+                } else {
+                    imageView = buildImageView(attachment: stream.attachment.attachmentStream)
+                }
                 container.addSubview(imageView)
                 imageView.autoPinEdgesToSuperviewEdges()
-            case .audio, .file, .invalid:
+            case .audio, .file:
                 owsFailDebug("Unexpected content type.")
                 return buildContentUnavailableView()
             }
@@ -912,7 +923,7 @@ class StoryItemMediaView: UIView {
 
             let view = buildDownloadStateView(
                 for: pointer.attachment,
-                downloadState: pointer.downloadState
+                downloadState: pointer.downloadState,
             )
             container.addSubview(view)
             view.autoPinEdgesToSuperviewEdges()
@@ -922,12 +933,12 @@ class StoryItemMediaView: UIView {
             return TextAttachmentView(
                 attachment: text,
                 interactionIdentifier: .fromStoryMessage(item.message),
-                spoilerState: spoilerState
+                spoilerState: spoilerState,
             )
         }
     }
 
-    public func updateMuteState() {
+    func updateMuteState() {
         videoPlayer?.isMuted = delegate?.storyItemMediaViewShouldBeMuted(self) ?? false
     }
 
@@ -960,10 +971,12 @@ class StoryItemMediaView: UIView {
             owsFailDebug("Could not load attachment.")
             return buildContentUnavailableView()
         }
-        guard image.size.width > 0,
-            image.size.height > 0 else {
-                owsFailDebug("Attachment has invalid size.")
-                return buildContentUnavailableView()
+        guard
+            image.size.width > 0,
+            image.size.height > 0
+        else {
+            owsFailDebug("Attachment has invalid size.")
+            return buildContentUnavailableView()
         }
         let animatedImageView = SDAnimatedImageView()
         animatedImageView.contentMode = .scaleAspectFit
@@ -980,10 +993,12 @@ class StoryItemMediaView: UIView {
             owsFailDebug("Could not load attachment.")
             return buildContentUnavailableView()
         }
-        guard image.size.width > 0,
-            image.size.height > 0 else {
-                owsFailDebug("Attachment has invalid size.")
-                return buildContentUnavailableView()
+        guard
+            image.size.width > 0,
+            image.size.height > 0
+        else {
+            owsFailDebug("Attachment has invalid size.")
+            return buildContentUnavailableView()
         }
 
         let imageView = UIImageView()
@@ -1024,23 +1039,20 @@ class StoryItemMediaView: UIView {
         return imageView
     }
 
-    private static let mediaCache = CVMediaCache()
     private func buildDownloadStateView(
         for pointer: AttachmentPointer,
-        downloadState: AttachmentDownloadState
+        downloadState: AttachmentDownloadState,
     ) -> UIView {
         let progressView = CVAttachmentProgressView(
             direction: .download(
-                attachmentPointer: pointer,
-                downloadState: downloadState
+                attachmentID: pointer.id,
+                downloadState: downloadState,
             ),
-            diameter: 56,
-            isDarkThemeEnabled: true,
-            mediaCache: Self.mediaCache
+            configuration: .forMediaOverlay(),
         )
 
         let manualLayoutView = OWSLayerView(frame: .zero) { layerView in
-            progressView.frame.size = progressView.layoutSize
+            progressView.frame.size = .square(56)
             progressView.center = layerView.center
         }
         manualLayoutView.addSubview(progressView)
@@ -1052,9 +1064,15 @@ class StoryItemMediaView: UIView {
         // TODO: Error state
         return UIView()
     }
+
+    // MARK: - VideoPlayerDelegate
+
+    func videoPlayerDidPlayToCompletion(_ videoPlayer: VideoPlayer) {
+        videoPlayerLoopCount += 1
+    }
 }
 
-class StoryItem: NSObject {
+class StoryItem: Equatable {
     let message: StoryMessage
     let numberOfReplies: UInt64
     enum Attachment: Equatable {
@@ -1065,7 +1083,7 @@ class StoryItem: NSObject {
             var caption: String? { reference.storyMediaCaption?.text }
             var captionStyles: [NSRangedValue<MessageBodyRanges.CollapsedStyle>] { reference.storyMediaCaption?.collapsedStyles ?? [] }
 
-            static func == (lhs: StoryItem.Attachment.Pointer, rhs: StoryItem.Attachment.Pointer) -> Bool {
+            static func ==(lhs: StoryItem.Attachment.Pointer, rhs: StoryItem.Attachment.Pointer) -> Bool {
                 return lhs.attachment.id == rhs.attachment.id
                     && lhs.reference.hasSameOwner(as: rhs.reference)
                     && lhs.downloadState == rhs.downloadState
@@ -1078,7 +1096,7 @@ class StoryItem: NSObject {
             var caption: String? { attachment.reference.storyMediaCaption?.text }
             var captionStyles: [NSRangedValue<MessageBodyRanges.CollapsedStyle>] { attachment.reference.storyMediaCaption?.collapsedStyles ?? [] }
 
-            static func == (lhs: StoryItem.Attachment.Stream, rhs: StoryItem.Attachment.Stream) -> Bool {
+            static func ==(lhs: StoryItem.Attachment.Stream, rhs: StoryItem.Attachment.Stream) -> Bool {
                 return lhs.attachment.attachmentStream.id == rhs.attachment.attachmentStream.id
                     && lhs.attachment.reference.hasSameOwner(as: rhs.attachment.reference)
             }
@@ -1088,6 +1106,7 @@ class StoryItem: NSObject {
         case stream(Stream)
         case text(PreloadedTextAttachment)
     }
+
     var attachment: Attachment
 
     init(message: StoryMessage, numberOfReplies: UInt64, attachment: Attachment) {
@@ -1112,9 +1131,7 @@ class StoryItem: NSObject {
             return nil
         }
     }
-}
 
-extension StoryItem {
     // MARK: - Downloading
 
     @discardableResult
@@ -1129,7 +1146,7 @@ extension StoryItem {
             DependenciesBridge.shared.attachmentDownloadManager.enqueueDownloadOfAttachmentsForStoryMessage(
                 message,
                 priority: priority,
-                tx: tx
+                tx: tx,
             )
             return true
         }
@@ -1143,10 +1160,10 @@ extension StoryItem {
             return false
         }
     }
-}
 
-extension StoryItemMediaView: VideoPlayerDelegate {
-    func videoPlayerDidPlayToCompletion(_ videoPlayer: VideoPlayer) {
-        videoPlayerLoopCount += 1
+    // MARK: - Equatable
+
+    static func ==(lhs: StoryItem, rhs: StoryItem) -> Bool {
+        return lhs.message.uniqueId == rhs.message.uniqueId
     }
 }

@@ -5,6 +5,7 @@
 
 import Foundation
 import SignalServiceKit
+import UIKit
 
 class MainAppContext: NSObject, AppContext {
     let type: SignalServiceKit.AppContextType = .main
@@ -12,44 +13,13 @@ class MainAppContext: NSObject, AppContext {
     let appLaunchTime: Date
 
     override init() {
-        _reportedApplicationState = AtomicValue(.inactive, lock: .init())
+        _reportedApplicationState = AtomicValue(UIApplication.shared.applicationState, lock: .init())
 
         let launchDate = Date()
         appLaunchTime = launchDate
-        _mainApplicationStateOnLaunch = UIApplication.shared.applicationState
 
         super.init()
-
-        let notificationCenter = NotificationCenter.default
-
-        notificationCenter.addObserver(
-            self,
-            selector: #selector(applicationWillEnterForeground),
-            name: UIApplication.willEnterForegroundNotification,
-            object: nil
-        )
-        notificationCenter.addObserver(
-            self,
-            selector: #selector(applicationDidEnterBackground),
-            name: UIApplication.didEnterBackgroundNotification,
-            object: nil
-        )
-        notificationCenter.addObserver(
-            self,
-            selector: #selector(applicationWillResignActive),
-            name: UIApplication.willResignActiveNotification,
-            object: nil
-        )
-        notificationCenter.addObserver(
-            self,
-            selector: #selector(applicationDidBecomeActive),
-            name: UIApplication.didBecomeActiveNotification,
-            object: nil
-        )
     }
-
-    private let _mainApplicationStateOnLaunch: UIApplication.State
-    func mainApplicationStateOnLaunch() -> UIApplication.State { _mainApplicationStateOnLaunch }
 
     private let _reportedApplicationState: AtomicValue<UIApplication.State>
     var reportedApplicationState: UIApplication.State {
@@ -60,8 +30,13 @@ class MainAppContext: NSObject, AppContext {
         }
     }
 
-    @objc
-    private func applicationWillEnterForeground(_ notification: Notification) {
+    // MARK: - Lifecycle
+
+    // These are driven by AppLifecycleManager, rather than by observing
+    // UIApplication notifications, so it can control what happens before
+    // observers are notified.
+
+    func applicationWillEnterForeground() {
         AssertIsOnMainThread()
 
         self.reportedApplicationState = .inactive
@@ -71,8 +46,7 @@ class MainAppContext: NSObject, AppContext {
         }
     }
 
-    @objc
-    private func applicationDidEnterBackground(_ notification: Notification) {
+    func applicationDidEnterBackground() {
         AssertIsOnMainThread()
 
         self.reportedApplicationState = .background
@@ -82,8 +56,7 @@ class MainAppContext: NSObject, AppContext {
         }
     }
 
-    @objc
-    private func applicationWillResignActive(_ notification: Notification) {
+    func applicationWillResignActive() {
         AssertIsOnMainThread()
 
         self.reportedApplicationState = .inactive
@@ -93,8 +66,7 @@ class MainAppContext: NSObject, AppContext {
         }
     }
 
-    @objc
-    private func applicationDidBecomeActive(_ notification: Notification) {
+    func applicationDidBecomeActive() {
         AssertIsOnMainThread()
 
         self.reportedApplicationState = .active
@@ -106,10 +78,12 @@ class MainAppContext: NSObject, AppContext {
         runAppActiveBlocks()
     }
 
-    var isMainAppAndActive: Bool { UIApplication.shared.applicationState == .active }
+    // MARK: -
+
+    var isMainAppAndActive: Bool { reportedApplicationState == .active }
 
     @MainActor
-    var isMainAppAndActiveIsolated: Bool { UIApplication.shared.applicationState == .active }
+    var isMainAppAndActiveIsolated: Bool { reportedApplicationState == .active }
 
     let isRTL: Bool = UIApplication.shared.userInterfaceLayoutDirection == .rightToLeft
 
@@ -132,11 +106,11 @@ class MainAppContext: NSObject, AppContext {
     func open(_ url: URL, completion: ((Bool) -> Void)? = nil) { UIApplication.shared.open(url, completionHandler: completion) }
 
     var isRunningTests: Bool {
-        #if TESTABLE_BUILD
+#if TESTABLE_BUILD
         return getenv("runningTests_dontStartApp") != nil
-        #else
+#else
         return false
-        #endif
+#endif
     }
 
     var frame: CGRect { self.mainWindow?.frame ?? .zero }

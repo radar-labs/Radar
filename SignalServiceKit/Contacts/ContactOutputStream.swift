@@ -18,20 +18,15 @@ final class ContactOutputStream {
         aci: Aci?,
         phoneNumber: E164?,
         signalAccount: SignalAccount?,
-        disappearingMessagesConfiguration: OWSDisappearingMessagesConfiguration?,
-        inboxPosition: Int?
+        disappearingMessagesConfiguration: DisappearingMessagesConfigurationRecord?,
+        inboxPosition: Int?,
     ) throws {
         let contactBuilder = SSKProtoContactDetails.builder()
         if let phoneNumber {
             contactBuilder.setContactE164(phoneNumber.stringValue)
         }
         if let aci {
-            if BuildFlags.serviceIdStrings {
-                contactBuilder.setAci(aci.serviceIdString)
-            }
-            if BuildFlags.serviceIdBinaryVariableOverhead {
-                contactBuilder.setAciBinary(aci.serviceIdBinary)
-            }
+            contactBuilder.setAciBinary(aci.serviceIdBinary)
         }
 
         // TODO: this should be removed after a 90-day timer from when Desktop stops
@@ -64,14 +59,14 @@ final class ContactOutputStream {
 
         let contactData: Data
         do {
-            contactData = try chunkedOutputTransform.transform(data: contactBuilder.buildSerializedData())
+            contactData = try chunkedOutputTransform.transform(data: contactBuilder.buildSerializedData(), options: [:])
         } catch {
             owsFailDebug("Couldn't serialize protobuf: \(error)")
             return // Eat the error and silently drop this entry.
         }
-        try outputStream.write(data: contactData)
+        try outputStream.write(data: contactData, options: [:])
         if let avatarJpegData {
-            try outputStream.write(data: avatarJpegData)
+            try outputStream.write(data: avatarJpegData, options: [:])
         }
     }
 }

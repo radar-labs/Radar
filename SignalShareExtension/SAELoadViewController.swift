@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import UIKit
 import PureLayout
 import SignalServiceKit
 import SignalUI
+import UIKit
 
 class SAELoadViewController: UIViewController, OWSNavigationChildController {
 
@@ -71,10 +71,10 @@ class SAELoadViewController: UIViewController, OWSNavigationChildController {
             self.navigationItem.rightBarButtonItem?.isEnabled = false
         }
 
-        self.view.backgroundColor = (
-            self.shouldMimicRecipientPicker
-            ? Theme.tableView2PresentedBackgroundColor
-            : Theme.backgroundColor
+        view.backgroundColor = (
+            shouldMimicRecipientPicker
+                ? OWSTableViewController2.tableBackgroundColor
+                : .Signal.background,
         )
 
         let activityIndicator = UIActivityIndicatorView(style: .large)
@@ -89,15 +89,17 @@ class SAELoadViewController: UIViewController, OWSNavigationChildController {
         self.view.addSubview(progressView)
         progressView.autoVCenterInSuperview()
         progressView.autoPinWidthToSuperview(withMargin: .scaleFromIPhone5(30))
-        progressView.progressTintColor = Theme.accentBlueColor
+        progressView.progressTintColor = .Signal.accent
 
         updateProgressViewVisibility()
 
         let label = UILabel()
         label.textColor = Theme.primaryTextColor
         label.font = .systemFont(ofSize: 17)
-        label.text = OWSLocalizedString("SHARE_EXTENSION_LOADING",
-                                       comment: "Indicates that the share extension is still loading.")
+        label.text = OWSLocalizedString(
+            "SHARE_EXTENSION_LOADING",
+            comment: "Indicates that the share extension is still loading.",
+        )
         self.view.addSubview(label)
         label.autoHCenterInSuperview()
         label.autoPinEdge(.top, to: .bottom, of: activityIndicator, withOffset: 12)
@@ -112,6 +114,9 @@ class SAELoadViewController: UIViewController, OWSNavigationChildController {
     var navbarBackgroundColorOverride: UIColor? {
         // The false case should be the default, but we can't access the
         // extension's default implementation here.
-        return self.shouldMimicRecipientPicker ? Theme.tableView2PresentedBackgroundColor : nil
+        if shouldMimicRecipientPicker {
+            return OWSTableViewController2.tableBackgroundColor
+        }
+        return nil
     }
 }

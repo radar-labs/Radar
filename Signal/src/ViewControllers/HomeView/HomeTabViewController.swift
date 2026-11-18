@@ -3,14 +3,15 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import SignalUI
 import SignalServiceKit
+import SignalUI
 
 protocol HomeTabViewController: UIViewController { }
 
 extension HomeTabViewController {
-    var conversationSplitViewController: ConversationSplitViewController? {
-        return splitViewController as? ConversationSplitViewController
+
+    var homeTabBarController: HomeTabBarController? {
+        tabBarController as? HomeTabBarController
     }
 
     /// - Parameter badgeColor
@@ -23,7 +24,7 @@ extension HomeTabViewController {
         badgeColor: UIColor? = nil,
         onDidDismissContextMenu: @escaping () -> Void = {},
         buildActions: (_ settingsAction: UIMenuElement) -> [UIMenuElement],
-        showAppSettings: @escaping () -> Void
+        showAppSettings: @escaping () -> Void,
     ) -> UIBarButtonItem {
         let isInFloatingSidebar = if #available(iOS 26, *) {
             splitViewController?.isCollapsed == false
@@ -35,7 +36,7 @@ extension HomeTabViewController {
         let settingsAction = UIAction(
             title: CommonStrings.openAppSettingsButton,
             image: Theme.iconImage(.contextMenuSettings),
-            handler: { _ in showAppSettings() }
+            handler: { _ in showAppSettings() },
         )
 
         let contextButton = ContextMenuButton(
@@ -45,7 +46,7 @@ extension HomeTabViewController {
         contextButton.accessibilityLabel = CommonStrings.openAppSettingsButton
 
         let sizeClass: ConversationAvatarView.Configuration.SizeClass
-        if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable {
+        if #available(iOS 26, *) {
             sizeClass = isInFloatingSidebar ? .thirtyTwo : .forty
         } else {
             sizeClass = .twentyEight
@@ -53,7 +54,7 @@ extension HomeTabViewController {
 
         let avatarView = ConversationAvatarView(
             sizeClass: sizeClass,
-            localUserDisplayMode: .asUser
+            localUserDisplayMode: .asUser,
         )
         databaseStorage.read { transaction in
             avatarView.update(transaction) { config in
@@ -68,7 +69,7 @@ extension HomeTabViewController {
             top: 0,
             leading: isInFloatingSidebar ? 2 : 0,
             bottom: 0,
-            trailing: 0
+            trailing: 0,
         ))
 
         let barButtonView: UIView
@@ -77,7 +78,11 @@ extension HomeTabViewController {
             let wrapper = UIView.container()
             wrapper.addSubview(contextButton)
             contextButton.autoPinEdgesToSuperviewEdges()
-            wrapper.addCircleBadge(color: badgeColor)
+            wrapper.addCircleBadge(
+                color: badgeColor,
+                onCircleView: avatarView,
+                circleDiameter: CGFloat(sizeClass.diameter),
+            )
             barButtonView = wrapper
         } else {
             barButtonView = contextButton
@@ -85,11 +90,9 @@ extension HomeTabViewController {
 
         let barButtonItem = UIBarButtonItem(customView: barButtonView)
         barButtonItem.accessibilityLabel = CommonStrings.openAppSettingsButton
-#if compiler(>=6.2)
         if #available(iOS 26.0, *) {
             barButtonItem.hidesSharedBackground = true
         }
-#endif
         return barButtonItem
     }
 }

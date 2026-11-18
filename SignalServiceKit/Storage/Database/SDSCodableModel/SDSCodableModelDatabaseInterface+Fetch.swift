@@ -5,12 +5,29 @@
 
 import GRDB
 
-extension SDSCodableModelDatabaseInterfaceImpl {
+extension SDSCodableModelDatabaseInterface {
+    func fetchRowId<Model: SDSCodableModel>(
+        modelType: Model.Type,
+        uniqueId: String,
+        tx: DBReadTransaction,
+    ) -> Model.RowId? {
+        owsAssertDebug(!uniqueId.isEmpty)
+        return failIfThrows {
+            return try Model.RowId.fetchOne(
+                tx.database,
+                sql: """
+                SELECT "id" FROM "\(modelType.databaseTableName)" WHERE "uniqueId" = ?
+                """,
+                arguments: [uniqueId],
+            )
+        }
+    }
+
     /// Fetch a persisted model with the given rowid if it exists.
     func fetchModel<Model: SDSCodableModel>(
         modelType: Model.Type,
         rowId: Model.RowId,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> Model? {
         return fetchModel(
             modelType: modelType,
@@ -18,7 +35,7 @@ extension SDSCodableModelDatabaseInterfaceImpl {
             SELECT * FROM \(modelType.databaseTableName) WHERE "id" = ?
             """,
             arguments: [rowId],
-            transaction: tx
+            transaction: tx,
         )
     }
 
@@ -26,7 +43,7 @@ extension SDSCodableModelDatabaseInterfaceImpl {
     func fetchModel<Model: SDSCodableModel>(
         modelType: Model.Type,
         uniqueId: String,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> Model? {
         owsAssertDebug(!uniqueId.isEmpty)
 
@@ -34,7 +51,7 @@ extension SDSCodableModelDatabaseInterfaceImpl {
             modelType: modelType,
             sql: "SELECT * FROM \(modelType.databaseTableName) WHERE uniqueId = ?",
             arguments: [uniqueId],
-            transaction: transaction
+            transaction: transaction,
         )
     }
 
@@ -42,54 +59,40 @@ extension SDSCodableModelDatabaseInterfaceImpl {
         modelType: Model.Type,
         sql: String,
         arguments: StatementArguments,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> Model? {
-        do {
+        return failIfThrows {
             let model = try modelType.fetchOne(
                 transaction.database,
                 sql: sql,
-                arguments: arguments
+                arguments: arguments,
             )
             model?.anyDidFetchOne(transaction: transaction)
             return model
-        } catch let error {
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(
-                userDefaults: CurrentAppContext().appUserDefaults(),
-                error: error
-            )
-            owsFailDebug("Failed to fetch model \(modelType): \(error.grdbErrorForLogging)")
-            return nil
         }
     }
 
     /// Fetch all persisted models of the given type.
     func fetchAllModels<Model: SDSCodableModel>(
         modelType: Model.Type,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> [Model] {
-        do {
+        return failIfThrows {
             let sql: String = """
                 SELECT * FROM \(modelType.databaseTableName)
             """
 
             return try modelType.fetchAll(
                 transaction.database,
-                sql: sql
+                sql: sql,
             )
-        } catch let error {
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(
-                userDefaults: CurrentAppContext().appUserDefaults(),
-                error: error
-            )
-            owsFailDebug("Failed to fetch \(modelType) models: \(error.grdbErrorForLogging)")
-            return []
         }
     }
 
     /// Count all persisted models of the given type.
     func countAllModels<Model: SDSCodableModel>(
         modelType: Model.Type,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> UInt {
         return modelType.ows_fetchCount(transaction.database)
     }

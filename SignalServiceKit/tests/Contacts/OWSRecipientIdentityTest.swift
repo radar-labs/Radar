@@ -12,13 +12,15 @@ import XCTest
 @testable import SignalServiceKit
 
 class OWSRecipientIdentityTest: SSKBaseTest {
-    private lazy var localAci = Aci.randomForTesting()
+    private lazy var localIdentifiers = LocalIdentifiers.forUnitTests
+    private lazy var localAci = localIdentifiers.aci
     private lazy var aliceAci = Aci.randomForTesting()
     private lazy var bobAci = Aci.randomForTesting()
     private lazy var charlieAci = Aci.randomForTesting()
     private var recipients: [ServiceId] {
         [aliceAci, bobAci, charlieAci, localAci]
     }
+
     private var groupThread: TSGroupThread!
     private var identityKeys = [ServiceId: Data]()
 
@@ -35,12 +37,8 @@ class OWSRecipientIdentityTest: SSKBaseTest {
         // Create local account.
         SSKEnvironment.shared.databaseStorageRef.write { tx in
             (DependenciesBridge.shared.registrationStateChangeManager as! RegistrationStateChangeManagerImpl).registerForTests(
-                localIdentifiers: .init(
-                    aci: localAci,
-                    pni: Pni.randomForTesting(),
-                    e164: E164("+16505550100")!
-                ),
-                tx: tx
+                localIdentifiers: .forUnitTests,
+                tx: tx,
             )
         }
         // Create recipients & identities for them.
@@ -50,14 +48,14 @@ class OWSRecipientIdentityTest: SSKBaseTest {
             for serviceId in recipients {
                 var recipient = recipientFetcher.fetchOrCreate(serviceId: serviceId, tx: tx)
                 recipientManager.markAsRegisteredAndSave(&recipient, shouldUpdateStorageService: false, tx: tx)
-                identityManager.saveIdentityKey(identityKey(serviceId), for: serviceId, tx: tx)
+                identityManager.saveIdentityKey(identityKey(serviceId), for: serviceId, shouldUpdateStorageService: false, tx: tx)
             }
 
             // Create a group with our recipients plus us.
             self.groupThread = try! GroupManager.createGroupForTests(
                 members: recipients.map { SignalServiceAddress($0) },
                 name: "Test Group",
-                transaction: tx
+                transaction: tx,
             )
         }
     }
@@ -83,7 +81,7 @@ class OWSRecipientIdentityTest: SSKBaseTest {
                     of: identityKey(recipient),
                     for: SignalServiceAddress(recipient),
                     isUserInitiatedChange: true,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
@@ -100,7 +98,7 @@ class OWSRecipientIdentityTest: SSKBaseTest {
                 of: identityKey(recipient),
                 for: SignalServiceAddress(recipient),
                 isUserInitiatedChange: true,
-                tx: tx
+                tx: tx,
             )
         }
         read { tx in
@@ -117,7 +115,7 @@ class OWSRecipientIdentityTest: SSKBaseTest {
                     of: identityKey(recipient),
                     for: SignalServiceAddress(recipient),
                     isUserInitiatedChange: true,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
@@ -130,7 +128,7 @@ class OWSRecipientIdentityTest: SSKBaseTest {
                     of: identityKey(recipient),
                     for: SignalServiceAddress(recipient),
                     isUserInitiatedChange: false,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
@@ -142,7 +140,7 @@ class OWSRecipientIdentityTest: SSKBaseTest {
         read { transaction in
             let noLongerVerifiedIdentityKeys = OWSRecipientIdentity.noLongerVerifiedIdentityKeys(
                 in: self.groupThread.uniqueId,
-                tx: transaction
+                tx: transaction,
             )
             XCTAssertEqual(Set(noLongerVerifiedIdentityKeys.keys), Set(deverifiedAcis.map { SignalServiceAddress($0) }))
         }
@@ -160,7 +158,7 @@ class OWSRecipientIdentityTest: SSKBaseTest {
                     of: identityKey(recipient),
                     for: SignalServiceAddress(recipient),
                     isUserInitiatedChange: true,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
@@ -178,7 +176,7 @@ struct RecipientIdentityTest2 {
             identityKey: IdentityKeyPair.generate().publicKey.keyBytes,
             isFirstKnownKey: true,
             createdAt: Date(timeIntervalSince1970: 1234567890),
-            verificationState: .verified
+            verificationState: .verified,
         )
         let db = InMemoryDB()
         db.write { tx in try! recipientIdentity.insert(tx.database) }
@@ -209,7 +207,7 @@ struct RecipientIdentityTest2 {
                     recordType, uniqueId, accountId, identityKey, isFirstKnownKey, createdAt, verificationState
                 ) VALUES (38, ?, ?, ?, ?, ?, ?)
                 """,
-                arguments: [uniqueId, uniqueId, identityKey, isFirstKnownKey, createdAt, verificationState]
+                arguments: [uniqueId, uniqueId, identityKey, isFirstKnownKey, createdAt, verificationState],
             )
         }
         let recipientIdentity = try #require(db.read { tx in

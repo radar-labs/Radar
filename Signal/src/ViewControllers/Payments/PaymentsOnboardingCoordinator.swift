@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import LibSignalClient
 import SignalServiceKit
 import SignalUI
 
@@ -17,12 +18,12 @@ class PaymentsOnboardingCoordinator {
     func prepareForPresentation(inNavController navController: UINavigationController) -> UIViewController {
         self.navController = navController
 
-        let existingUsername: Usernames.ParsedUsername? = SSKEnvironment.shared.databaseStorageRef.read { tx in
+        let existingUsername: UsernameComponents? = SSKEnvironment.shared.databaseStorageRef.read { tx in
             switch DependenciesBridge.shared.localUsernameManager.usernameState(tx: tx) {
             case .available(let username, _):
-                return Usernames.ParsedUsername(rawUsername: username)
+                return (try? LibSignalClient.Username(username))?.components()
             case .linkCorrupted(let username):
-                return Usernames.ParsedUsername(rawUsername: username)
+                return (try? LibSignalClient.Username(username))?.components()
             case .unset, .usernameAndLinkCorrupted:
                 return nil
             }
@@ -30,12 +31,12 @@ class PaymentsOnboardingCoordinator {
 
         let context = UsernameOnboardingViewModel.Context(
             localUsernameManager: DependenciesBridge.shared.localUsernameManager,
-            existingUsername: existingUsername
+            existingUsername: existingUsername,
         )
         return UsernameOnboardingViewController(
             context: context,
             onConfirm: { [self] in showIntro() },
-            onSkip: { [self] in showIntro() }
+            onSkip: { [self] in showIntro() },
         )
     }
 
@@ -46,7 +47,7 @@ class PaymentsOnboardingCoordinator {
 
         navController.pushViewController(
             PaymentsIntroViewController(onContinue: { [self] in showAddFundsIntro() }),
-            animated: true
+            animated: true,
         )
     }
 
@@ -64,9 +65,9 @@ class PaymentsOnboardingCoordinator {
         navController.pushViewController(
             AddFundsIntroViewController(
                 onContinue: { [self] in showAddFunds() },
-                onSkip: { [self] in showSetupComplete() }
+                onSkip: { [self] in showSetupComplete() },
             ),
-            animated: true
+            animated: true,
         )
     }
 
@@ -76,7 +77,7 @@ class PaymentsOnboardingCoordinator {
         startObservingDeposit()
         navController.pushViewController(
             PaymentsTransferInViewController(isOnboarding: true, onContinue: { [weak self] in self?.showSetupComplete() }),
-            animated: true
+            animated: true,
         )
     }
 
@@ -91,9 +92,9 @@ class PaymentsOnboardingCoordinator {
                 onDepositMore: { [weak self, weak navController] in
                     navController?.popViewController(animated: true)
                     self?.startObservingDeposit()
-                }
+                },
             ),
-            animated: true
+            animated: true,
         )
     }
 
@@ -107,7 +108,7 @@ class PaymentsOnboardingCoordinator {
                     presentingVC.dismiss(animated: true)
                 }
             }),
-            animated: true
+            animated: true,
         )
     }
 
@@ -139,12 +140,12 @@ class PaymentsOnboardingCoordinator {
         depositObserver = NotificationCenter.default.addObserver(
             forName: PaymentsImpl.incomingPaymentReceived,
             object: nil,
-            queue: .main
+            queue: .main,
         ) { [weak self] notification in
             let picoMob = notification.userInfo?["picoMob"] as? Int64 ?? 0
             let formatted = NumberFormatter.localizedString(
                 from: NSNumber(value: picoMob),
-                number: .decimal
+                number: .decimal,
             )
             Task { @MainActor [weak self] in
                 self?.showDepositReceived(amountSats: formatted)

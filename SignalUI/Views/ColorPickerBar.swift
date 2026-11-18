@@ -5,15 +5,9 @@
 
 import SignalServiceKit
 
-public protocol ColorPickerBarViewDelegate: AnyObject {
-    func colorPickerBarView(_ pickerView: ColorPickerBarView, didSelectColor color: ColorPickerBarColor)
-}
-
-// MARK: -
-
 // We represent picker colors using this (color, phase)
 // tuple so that we can consistently restore palette view state.
-public class ColorPickerBarColor {
+public struct ColorPickerBarColor {
     public let color: UIColor
 
     // Colors are chosen from a spectrum of colors.
@@ -25,20 +19,15 @@ public class ColorPickerBarColor {
         return color.cgColor
     }
 
-    init(color: UIColor, palettePhase: CGFloat) {
-        self.color = color
-        self.palettePhase = palettePhase
+    static var defaultColor: ColorPickerBarColor {
+        return ColorPickerBarColor(color: UIColor(rgbHex: 0xff0000), palettePhase: 1 / 9)
     }
 
-    class func defaultColor() -> ColorPickerBarColor {
-        return ColorPickerBarColor(color: UIColor(rgbHex: 0xff0000), palettePhase: 1/9)
-    }
-
-    class var white: ColorPickerBarColor {
+    static var white: ColorPickerBarColor {
         ColorPickerBarColor(color: .white, palettePhase: 1)
     }
 
-    class var black: ColorPickerBarColor {
+    static var black: ColorPickerBarColor {
         ColorPickerBarColor(color: .black, palettePhase: 0)
     }
 
@@ -52,7 +41,7 @@ public class ColorPickerBarColor {
             UIColor(rgbHex: 0x0000ff),
             UIColor(rgbHex: 0xff00ff),
             UIColor(rgbHex: 0xff0000),
-            UIColor(rgbHex: 0xffffff)
+            UIColor(rgbHex: 0xffffff),
         ]
     }
 
@@ -60,7 +49,7 @@ public class ColorPickerBarColor {
         return gradientUIColors.map { $0.cgColor }
     }
 
-    static func == (left: ColorPickerBarColor, right: ColorPickerBarColor) -> Bool {
+    static func ==(left: ColorPickerBarColor, right: ColorPickerBarColor) -> Bool {
         return left.palettePhase.fuzzyEquals(right.palettePhase)
     }
 }
@@ -101,10 +90,12 @@ private class ColorPreviewView: OWSLayerView {
 
         teardropLayer.fillColor = teardropColor.cgColor
 
-        layoutCallback = { (view) in
-            ColorPreviewView.updateLayers(view: view,
-                                          circleLayer: circleLayer,
-                                          teardropLayer: teardropLayer)
+        layoutCallback = { view in
+            ColorPreviewView.updateLayers(
+                view: view,
+                circleLayer: circleLayer,
+                teardropLayer: teardropLayer,
+            )
         }
 
         // The bounding rect of the teardrop + shadow is non-trivial, so
@@ -120,9 +111,11 @@ private class ColorPreviewView: OWSLayerView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    static func updateLayers(view: UIView,
-                             circleLayer: CAShapeLayer,
-                             teardropLayer: CAShapeLayer) {
+    static func updateLayers(
+        view: UIView,
+        circleLayer: CAShapeLayer,
+        teardropLayer: CAShapeLayer,
+    ) {
         let bounds = view.bounds
         let outerRadius = innerRadius + circleMargin
         let bottomEdge = CGPoint(x: bounds.center.x, y: bounds.maxY)
@@ -149,23 +142,29 @@ private class ColorPreviewView: OWSLayerView {
         let endAngle = -angle + .halfPi
 
         let teardropPath = UIBezierPath()
-        teardropPath.addArc(withCenter: circleCenter,
-                            radius: outerRadius,
-                            startAngle: startAngle,
-                            endAngle: endAngle,
-                            clockwise: true)
-        teardropPath.addArc(withCenter: teardropTipCenter,
-                            radius: teardropTipRadius,
-                            startAngle: endAngle,
-                            endAngle: startAngle,
-                            clockwise: true)
+        teardropPath.addArc(
+            withCenter: circleCenter,
+            radius: outerRadius,
+            startAngle: startAngle,
+            endAngle: endAngle,
+            clockwise: true,
+        )
+        teardropPath.addArc(
+            withCenter: teardropTipCenter,
+            radius: teardropTipRadius,
+            startAngle: endAngle,
+            endAngle: startAngle,
+            clockwise: true,
+        )
 
         teardropLayer.path = teardropPath.cgPath
         teardropLayer.frame = bounds
 
         let innerCircleSize = CGSize(square: innerRadius * 2)
-        let circleFrame = CGRect(origin: circleCenter.minus(innerCircleSize.asPoint.times(0.5)),
-                                 size: innerCircleSize)
+        let circleFrame = CGRect(
+            origin: circleCenter.minus(innerCircleSize.asPoint.times(0.5)),
+            size: innerCircleSize,
+        )
         circleLayer.path = UIBezierPath(ovalIn: circleFrame).cgPath
         circleLayer.frame = bounds
     }
@@ -173,107 +172,126 @@ private class ColorPreviewView: OWSLayerView {
 
 // MARK: -
 
-public class ColorPickerBarView: UIView {
+public class ColorPickerBar: UIControl {
 
-    public weak var delegate: ColorPickerBarViewDelegate?
+    public var uiColor: UIColor { color.color }
 
-    public var color: UIColor { selectedValue.color }
-    var selectedValue: ColorPickerBarColor {
+    var color: ColorPickerBarColor {
         didSet {
             updateState()
         }
     }
 
-    init(currentColor: ColorPickerBarColor? = nil) {
-        selectedValue = currentColor ?? ColorPickerBarColor.defaultColor()
+    init(color: ColorPickerBarColor? = nil) {
+        self.color = color ?? .defaultColor
+
         super.init(frame: .zero)
-        createContents()
-    }
 
-    @available(*, unavailable, message: "use other init() instead.")
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+        // Ideally we want the image to match bar width, but with all the margins
+        // and different screen sizes it's challenging to make this right.
+        // This estimate is good enough as we don't need designer level precision.
+        colorBarImageView.image = ColorPickerBar.buildPaletteGradientImage(width: 480)
+        colorBarImageView.translatesAutoresizingMaskIntoConstraints = false
+        colorBarImageView.clipsToBounds = true
 
-    // MARK: - Views
+        if #available(iOS 26, *) {
+            // No border, pill shape using `cornerConfiguration`.
+            addSubview(colorBarImageView)
+            colorBarImageView.cornerConfiguration = .capsule()
+            NSLayoutConstraint.activate([
+                colorBarImageView.heightAnchor.constraint(equalToConstant: LayoutMetrics.colorBarHeight),
+                colorBarImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
+                colorBarImageView.leadingAnchor.constraint(equalTo: leadingAnchor),
+                colorBarImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            ])
+        } else {
+            let borderWidth = LayoutMetrics.borderWidth
 
-    private let imageView = UIImageView()
-    private static let selectionSize: CGFloat = 22
-    private static let colorBarWidth: CGFloat = 12
-    private var selectionView: UIView = {
-        let selectionView = CircleView(diameter: selectionSize)
-        // Use separate view to create border effect because
-        // setting up border on the same view creates a weird glow around the border.
-        let borderView = CircleView(diameter: selectionSize + 1)
-        borderView.layer.borderColor = UIColor.white.cgColor
-        borderView.layer.borderWidth = 2
-        selectionView.addSubview(borderView)
-        borderView.autoHCenterInSuperview()
-        borderView.autoVCenterInSuperview()
-        return selectionView
-    }()
-    // imageWrapper is used to host the "selection view".
-    private let imageWrapper = OWSLayerView()
-    private var selectionConstraint: NSLayoutConstraint?
-    private let previewView = ColorPreviewView()
+            // Create a capsule shape that's larger than color bar by `borderWidth` in every dimension
+            // to simulate outer border appearance.
+            let backgroundPillView = PillView()
+            backgroundPillView.clipsToBounds = true
+            backgroundPillView.backgroundColor = .white
+            backgroundPillView.translatesAutoresizingMaskIntoConstraints = false
+            backgroundPillView.addSubview(colorBarImageView)
+            addSubview(backgroundPillView)
+            NSLayoutConstraint.activate([
+                backgroundPillView.heightAnchor.constraint(equalToConstant: LayoutMetrics.colorBarHeight + 2 * borderWidth),
+                backgroundPillView.centerYAnchor.constraint(equalTo: centerYAnchor),
+                backgroundPillView.leadingAnchor.constraint(equalTo: leadingAnchor),
+                backgroundPillView.trailingAnchor.constraint(equalTo: trailingAnchor),
 
-    private func createContents() {
-        isOpaque = false
-        layoutMargins.leading = 0
-        layoutMargins.trailing = 0
+                colorBarImageView.topAnchor.constraint(
+                    equalTo: backgroundPillView.topAnchor,
+                    constant: borderWidth,
+                ),
+                colorBarImageView.leadingAnchor.constraint(
+                    equalTo: backgroundPillView.leadingAnchor,
+                    constant: borderWidth,
+                ),
+                colorBarImageView.trailingAnchor.constraint(
+                    equalTo: backgroundPillView.trailingAnchor,
+                    constant: -borderWidth,
+                ),
+                colorBarImageView.bottomAnchor.constraint(
+                    equalTo: backgroundPillView.bottomAnchor,
+                    constant: -borderWidth,
+                ),
+            ])
 
-        let borderWidth: CGFloat = 2
-        let image = ColorPickerBarView.buildPaletteGradientImage()
-        imageView.image = image
-        let imageRadius = image.size.height * 0.5
-        imageView.layer.cornerRadius = imageRadius
-        imageView.clipsToBounds = true
-        addSubview(imageView)
-        imageView.autoSetDimension(.height, toSize: ColorPickerBarView.colorBarWidth)
-        imageView.autoPinEdgesToSuperviewMargins(with: UIEdgeInsets(margin: borderWidth))
-
-        // Create "outer border" that doesn't obscure any colors in the strip.
-        let imageViewBorder = PillView()
-        imageViewBorder.layer.borderWidth = borderWidth
-        imageViewBorder.layer.borderColor = UIColor.white.cgColor
-        addSubview(imageViewBorder)
-        imageViewBorder.autoPinEdges(toEdgesOf: imageView, with: UIEdgeInsets(margin: -borderWidth))
-
-        imageWrapper.layoutCallback = { [weak self] (_) in
-            guard let strongSelf = self else {
-                return
-            }
-            strongSelf.updateState()
+            // Corner rounding on the color bar.
+            colorBarImageView.layer.cornerRadius = 0.5 * LayoutMetrics.colorBarHeight
         }
-        addSubview(imageWrapper)
-        imageWrapper.autoPinEdges(toEdgesOf: imageView)
 
-        imageWrapper.addSubview(selectionView)
-        selectionView.autoVCenterInSuperview()
+        // Thumb view.
+        thumbView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(thumbView)
+        let thumbViewPositionConstraint = thumbView.centerXAnchor.constraint(equalTo: colorBarImageView.leadingAnchor)
+        NSLayoutConstraint.activate([
+            thumbView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            thumbViewPositionConstraint,
+        ])
+        self.thumbViewPositionConstraint = thumbViewPositionConstraint
 
-        // There must be a better way to pin the selection view's location,
-        // but I can't find it.
-        let selectionConstraint = NSLayoutConstraint(item: selectionView, attribute: .centerX, relatedBy: .equal,
-                                                     toItem: imageWrapper, attribute: .leading, multiplier: 1, constant: 0)
-        selectionConstraint.autoInstall()
-        self.selectionConstraint = selectionConstraint
-
+        // Preview appears above the color bar while user is touching the control.
         previewView.isHidden = true
+        previewView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(previewView)
-        previewView.autoPinEdge(.bottom, to: .top, of: imageView, withOffset: -24)
-        previewView.centerXAnchor.constraint(equalTo: selectionView.centerXAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            previewView.bottomAnchor.constraint(
+                equalTo: colorBarImageView.topAnchor,
+                constant: -24,
+            ),
+            previewView.centerXAnchor.constraint(equalTo: thumbView.centerXAnchor),
+        ])
 
         addGestureRecognizer(PermissiveGestureRecognizer(target: self, action: #selector(didTouch)))
 
         updateState()
     }
 
-    private func selectColor(atLocationX locationX: CGFloat) {
-        let palettePhase = locationX.inverseLerp(0, imageView.width, shouldClamp: true)
-        selectedValue = value(for: palettePhase)
-
-        delegate?.colorPickerBarView(self, didSelectColor: selectedValue)
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
+
+    override public var intrinsicContentSize: CGSize {
+        CGSize(width: UIView.noIntrinsicMetric, height: LayoutMetrics.thumbSize)
+    }
+
+    // MARK: - Layout
+
+    private enum LayoutMetrics {
+        static let thumbSize: CGFloat = 24
+        static let colorBarHeight: CGFloat = 16
+        static let borderWidth: CGFloat = if #available(iOS 26, *) { 0 } else { 1.5 }
+    }
+
+    private let colorBarImageView = UIImageView()
+
+    private lazy var thumbView = ThumbView(color: uiColor)
+    private var thumbViewPositionConstraint: NSLayoutConstraint?
+
+    private let previewView = ColorPreviewView()
 
     private func value(for palettePhase: CGFloat) -> ColorPickerBarColor {
         // We find the color in the palette's gradient that corresponds
@@ -308,12 +326,14 @@ public class ColorPickerBarView: UIView {
         }
         guard let segment = bestSegment else {
             owsFailDebug("Couldn't find matching segment.")
-            return ColorPickerBarColor.defaultColor()
+            return .defaultColor
         }
-        guard palettePhase >= segment.palettePhase0,
-              palettePhase <= segment.palettePhase1 else {
+        guard
+            palettePhase >= segment.palettePhase0,
+            palettePhase <= segment.palettePhase1
+        else {
             owsFailDebug("Invalid segment.")
-            return ColorPickerBarColor.defaultColor()
+            return .defaultColor
         }
         let segmentPhase = palettePhase.inverseLerp(segment.palettePhase0, segment.palettePhase1).clamp01()
         // If CAGradientLayer doesn't do naive RGB color interpolation,
@@ -323,15 +343,15 @@ public class ColorPickerBarView: UIView {
     }
 
     private func updateState() {
-        selectionView.backgroundColor = selectedValue.color
-        previewView.selectedColor = selectedValue.color
+        thumbView.color = uiColor
+        previewView.selectedColor = uiColor
 
-        guard let selectionConstraint = selectionConstraint else {
+        guard let thumbViewPositionConstraint else {
             owsFailDebug("Missing selectionConstraint.")
             return
         }
-        let selectionX = imageWrapper.width * selectedValue.palettePhase
-        selectionConstraint.constant = selectionX
+        let position = colorBarImageView.frame.width * color.palettePhase
+        thumbViewPositionConstraint.constant = position
     }
 
     // MARK: Events
@@ -348,23 +368,105 @@ public class ColorPickerBarView: UIView {
             return
         }
 
-        let location = gesture.location(in: imageView)
-        selectColor(atLocationX: location.x)
+        // We only care about `x` component. `y` can be outside of the color bar since it's pretty short in height.
+        let touchLocation = gesture.location(in: colorBarImageView)
+        let palettePhase = touchLocation.x.inverseLerp(0, colorBarImageView.bounds.width, shouldClamp: true)
+        color = value(for: palettePhase)
+
+        sendActions(for: .valueChanged)
     }
 
-    private static func buildPaletteGradientImage() -> UIImage {
-        let gradientSize = CGSize(width: UIScreen.main.bounds.width, height: colorBarWidth)
-        let gradientBounds = CGRect(origin: .zero, size: gradientSize)
-        let gradientView = UIView()
-        gradientView.frame = gradientBounds
+    private static func buildPaletteGradientImage(width: CGFloat) -> UIImage {
+        let gradientSize = CGSize(width: width, height: LayoutMetrics.colorBarHeight)
+        let gradientView = UIView(frame: CGRect(origin: .zero, size: gradientSize))
         let gradientLayer = CAGradientLayer()
         gradientView.layer.addSublayer(gradientLayer)
-        gradientLayer.frame = gradientBounds
+        gradientLayer.frame = gradientView.layer.bounds
         // See: https://github.com/signalapp/Signal-Android/blob/42e94d8f921aba212b1ffebfae4f2590a6f3385a/res/values/arrays.xml#L267-L277
         gradientLayer.colors = ColorPickerBarColor.gradientCGColors
         gradientLayer.startPoint = CGPoint.zero
         gradientLayer.endPoint = CGPoint(x: 1, y: 0)
-        return gradientView.renderAsImage(opaque: true, scale: UIScreen.main.scale)
+        let displayScale = UITraitCollection.current.displayScale
+        return gradientView.renderAsImage(opaque: true, scale: displayScale)
+    }
+
+    private class ThumbView: UIView {
+
+        var color: UIColor {
+            didSet {
+                colorCircleView.backgroundColor = color
+            }
+        }
+
+        private let colorCircleView = UIView()
+        private var backgroundView: UIView? // UIBlurEffect view on pre-iOS 26
+
+        private static let colorCircleSize: CGFloat = 10
+
+        init(color: UIColor) {
+            self.color = color
+
+            super.init(frame: .zero)
+
+            colorCircleView.backgroundColor = color
+            colorCircleView.translatesAutoresizingMaskIntoConstraints = false
+            colorCircleView.clipsToBounds = true
+
+            if #available(iOS 26, *) {
+                colorCircleView.cornerConfiguration = .capsule()
+
+                // Glass background on iOS 26+.
+                let glassEffectView = UIVisualEffectView(effect: UIGlassEffect(style: .regular))
+                glassEffectView.clipsToBounds = true
+                glassEffectView.cornerConfiguration = .capsule()
+                glassEffectView.translatesAutoresizingMaskIntoConstraints = false
+                addSubview(glassEffectView)
+                glassEffectView.contentView.addSubview(colorCircleView)
+                NSLayoutConstraint.activate([
+                    glassEffectView.topAnchor.constraint(equalTo: topAnchor),
+                    glassEffectView.leadingAnchor.constraint(equalTo: leadingAnchor),
+                    glassEffectView.trailingAnchor.constraint(equalTo: trailingAnchor),
+                    glassEffectView.bottomAnchor.constraint(equalTo: bottomAnchor),
+
+                    colorCircleView.widthAnchor.constraint(equalToConstant: Self.colorCircleSize),
+                    colorCircleView.heightAnchor.constraint(equalToConstant: Self.colorCircleSize),
+
+                    colorCircleView.centerXAnchor.constraint(equalTo: centerXAnchor),
+                    colorCircleView.centerYAnchor.constraint(equalTo: centerYAnchor),
+                ])
+            } else {
+                // Blur background on pre iOS 26.
+                let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterialLight))
+                blurEffectView.clipsToBounds = true
+                addSubview(blurEffectView)
+                blurEffectView.contentView.addSubview(colorCircleView)
+
+                backgroundView = blurEffectView
+            }
+        }
+
+        override func layoutSubviews() {
+            super.layoutSubviews()
+
+            guard #unavailable(iOS 26), let backgroundView else { return }
+
+            // No auto-layout pre-iOS 26. Set corner radius manually.
+
+            backgroundView.frame = bounds
+            backgroundView.layer.cornerRadius = 0.5 * bounds.size.smallerAxis
+
+            colorCircleView.frame.size = .square(Self.colorCircleSize)
+            colorCircleView.center = backgroundView.bounds.center
+            colorCircleView.layer.cornerRadius = 0.5 * Self.colorCircleSize
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        override var intrinsicContentSize: CGSize {
+            .square(LayoutMetrics.thumbSize)
+        }
     }
 }
 

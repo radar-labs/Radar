@@ -3,9 +3,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import CommonCrypto
+import CryptoKit
 import Foundation
-@testable import SignalServiceKit
+import Testing
 import XCTest
+@testable import SignalServiceKit
 
 class CryptographyTestsSwift: XCTestCase {
 
@@ -65,7 +68,7 @@ class CryptographyTestsSwift: XCTestCase {
     func test_paddedSizeBucketsRounding() {
         var prevBucketMax: UInt64 = 541
         for _ in 2..<401 {
-            let bucketMax = UInt64(floor(pow(1.05, ceil(log(Double(prevBucketMax) + 1)/log(1.05)))))
+            let bucketMax = UInt64(floor(pow(1.05, ceil(log(Double(prevBucketMax) + 1) / log(1.05)))))
 
             // This test is mostly reflexive, but checks rounding errors around the bucket edges.
             Assert(unpaddedSize: bucketMax, hasPaddedSize: bucketMax)
@@ -86,15 +89,15 @@ class CryptographyTestsSwift: XCTestCase {
         let encryptionMetadata = try Cryptography.encryptAttachment(at: plaintextFile, output: encryptedFile)
         let decryptionMetadata = DecryptionMetadata(
             key: encryptionMetadata.key,
-            integrityCheck: .digestSHA256Ciphertext(encryptionMetadata.digest),
-            plaintextLength: encryptionMetadata.plaintextLength
+            integrityCheck: .ciphertextDigest(encryptionMetadata.digest),
+            plaintextLength: encryptionMetadata.plaintextLength,
         )
 
         try FileManager.default.removeItem(at: plaintextFile)
         try Cryptography.decryptAttachment(
             at: encryptedFile,
             metadata: decryptionMetadata,
-            output: plaintextFile
+            output: plaintextFile,
         )
 
         let decryptedData = try Data(contentsOf: plaintextFile)
@@ -113,7 +116,7 @@ class CryptographyTestsSwift: XCTestCase {
             at: encryptedFile,
             // Only provide the key; verify that we can decrypt
             // without digest or plaintext length
-            metadata: .init(key: encryptionMetadata.key)
+            metadata: .init(key: encryptionMetadata.key),
         )
 
         XCTAssertEqual(plaintextData, decryptedData)
@@ -121,12 +124,12 @@ class CryptographyTestsSwift: XCTestCase {
         // Attempt with the digest and plaintext length; that should work too.
         let decryptionMetadata = DecryptionMetadata(
             key: encryptionMetadata.key,
-            integrityCheck: .digestSHA256Ciphertext(encryptionMetadata.digest),
-            plaintextLength: encryptionMetadata.plaintextLength
+            integrityCheck: .ciphertextDigest(encryptionMetadata.digest),
+            plaintextLength: encryptionMetadata.plaintextLength,
         )
         decryptedData = try Cryptography.decryptAttachment(
             at: encryptedFile,
-            metadata: decryptionMetadata
+            metadata: decryptionMetadata,
         )
 
         XCTAssertEqual(plaintextData, decryptedData)
@@ -145,13 +148,13 @@ class CryptographyTestsSwift: XCTestCase {
         try Randomness.generateRandomBytes(1024).write(to: plaintextFile)
         let decryptionMetadata = DecryptionMetadata(
             key: encryptionMetadata.key,
-            integrityCheck: .digestSHA256Ciphertext(encryptionMetadata.digest),
-            plaintextLength: encryptionMetadata.plaintextLength
+            integrityCheck: .ciphertextDigest(encryptionMetadata.digest),
+            plaintextLength: encryptionMetadata.plaintextLength,
         )
         try Cryptography.decryptAttachment(
             at: encryptedFile,
             metadata: decryptionMetadata,
-            output: plaintextFile
+            output: plaintextFile,
         )
 
         let decryptedData = try Data(contentsOf: plaintextFile)
@@ -169,7 +172,7 @@ class CryptographyTestsSwift: XCTestCase {
 
         let invalidMetadata = DecryptionMetadata(
             key: encryptionMetadata.key,
-            integrityCheck: .digestSHA256Ciphertext(encryptionMetadata.digest),
+            integrityCheck: .ciphertextDigest(encryptionMetadata.digest),
             plaintextLength: encryptionMetadata.encryptedLength + 1,
         )
 
@@ -179,7 +182,7 @@ class CryptographyTestsSwift: XCTestCase {
         XCTAssertThrowsError(try Cryptography.decryptAttachment(
             at: encryptedFile,
             metadata: invalidMetadata,
-            output: plaintextFile
+            output: plaintextFile,
         ))
         OWSAssertionError.test_skipAssertions = false
 
@@ -197,8 +200,8 @@ class CryptographyTestsSwift: XCTestCase {
 
         let invalidMetadata = DecryptionMetadata(
             key: .generate(),
-            integrityCheck: .digestSHA256Ciphertext(encryptionMetadata.digest),
-            plaintextLength: encryptionMetadata.plaintextLength
+            integrityCheck: .ciphertextDigest(encryptionMetadata.digest),
+            plaintextLength: encryptionMetadata.plaintextLength,
         )
 
         try FileManager.default.removeItem(at: plaintextFile)
@@ -207,7 +210,7 @@ class CryptographyTestsSwift: XCTestCase {
         XCTAssertThrowsError(try Cryptography.decryptAttachment(
             at: encryptedFile,
             metadata: invalidMetadata,
-            output: plaintextFile
+            output: plaintextFile,
         ))
         OWSAssertionError.test_skipAssertions = false
 
@@ -226,7 +229,7 @@ class CryptographyTestsSwift: XCTestCase {
         let invalidMetadata = DecryptionMetadata(
             key: encryptionMetadata.key,
             integrityCheck: nil,
-            plaintextLength: encryptionMetadata.plaintextLength
+            plaintextLength: encryptionMetadata.plaintextLength,
         )
 
         try FileManager.default.removeItem(at: plaintextFile)
@@ -235,7 +238,7 @@ class CryptographyTestsSwift: XCTestCase {
         XCTAssertThrowsError(try Cryptography.decryptAttachment(
             at: encryptedFile,
             metadata: invalidMetadata,
-            output: plaintextFile
+            output: plaintextFile,
         ))
         OWSAssertionError.test_skipAssertions = false
 
@@ -254,14 +257,14 @@ class CryptographyTestsSwift: XCTestCase {
         let metadataWithoutDigest = DecryptionMetadata(
             key: encryptionMetadata.key,
             integrityCheck: nil,
-            plaintextLength: encryptionMetadata.plaintextLength
+            plaintextLength: encryptionMetadata.plaintextLength,
         )
 
         try FileManager.default.removeItem(at: plaintextFile)
         try Cryptography.decryptFile(
             at: encryptedFile,
             metadata: metadataWithoutDigest,
-            output: plaintextFile
+            output: plaintextFile,
         )
 
         let decryptedData = try Data(contentsOf: plaintextFile)
@@ -280,12 +283,12 @@ class CryptographyTestsSwift: XCTestCase {
         try FileManager.default.removeItem(at: plaintextFile)
         let decryptionMetadata = DecryptionMetadata(
             key: encryptionMetadata.key,
-            integrityCheck: .digestSHA256Ciphertext(encryptionMetadata.digest),
-            plaintextLength: encryptionMetadata.plaintextLength
+            integrityCheck: .ciphertextDigest(encryptionMetadata.digest),
+            plaintextLength: encryptionMetadata.plaintextLength,
         )
         let decryptedData = try Cryptography.decryptAttachment(
             at: encryptedFile,
-            metadata: decryptionMetadata
+            metadata: decryptionMetadata,
         )
 
         XCTAssertEqual(plaintextData, decryptedData)
@@ -308,7 +311,7 @@ class CryptographyTestsSwift: XCTestCase {
             let encryptedFile = temporaryDirectory.appendingPathComponent(UUID().uuidString)
 
             let plaintextData = Data(
-                (0..<plaintextLength).map { _ in UInt8.random(in: 0...UInt8.max) }
+                (0..<plaintextLength).map { _ in UInt8.random(in: 0...UInt8.max) },
             )
             let paddedPlaintextData = plaintextData + (0..<10).map { _ in 0 }
             try paddedPlaintextData.write(to: plaintextFile)
@@ -319,9 +322,9 @@ class CryptographyTestsSwift: XCTestCase {
                 at: encryptedFile,
                 metadata: .init(
                     key: encryptionMetadata.key,
-                    integrityCheck: .digestSHA256Ciphertext(encryptionMetadata.digest),
+                    integrityCheck: .ciphertextDigest(encryptionMetadata.digest),
                     plaintextLength: UInt64(safeCast: plaintextLength),
-                )
+                ),
             )
 
             XCTAssertEqual(plaintextData, decryptedData)
@@ -345,7 +348,7 @@ class CryptographyTestsSwift: XCTestCase {
             let encryptedFile = temporaryDirectory.appendingPathComponent(UUID().uuidString)
 
             let plaintextData = Data(
-                (0..<plaintextLength).map { _ in UInt8.random(in: 0...UInt8.max) }
+                (0..<plaintextLength).map { _ in UInt8.random(in: 0...UInt8.max) },
             )
             try plaintextData.write(to: plaintextFile)
             let encryptionMetadata = try Cryptography.encryptAttachment(at: plaintextFile, output: encryptedFile)
@@ -363,9 +366,9 @@ class CryptographyTestsSwift: XCTestCase {
                 at: encryptedFile,
                 metadata: .init(
                     key: encryptionMetadata.key,
-                    integrityCheck: .digestSHA256Ciphertext(encryptionMetadata.digest),
-                    plaintextLength: nil
-                )
+                    integrityCheck: .ciphertextDigest(encryptionMetadata.digest),
+                    plaintextLength: nil,
+                ),
             )
 
             XCTAssertEqual(expectedPlaintextOutput, decryptedData)
@@ -429,5 +432,46 @@ class CryptographyTestsSwift: XCTestCase {
         try encryptedFileHandle.seek(toOffset: UInt64(plaintextData1.count + plaintextData2.count + plaintextData3.count))
         decryptedData = try encryptedFileHandle.read(upToCount: plaintextData4.count)
         XCTAssertEqual(plaintextData4, decryptedData)
+    }
+}
+
+struct CryptographyTest2 {
+    private func writeSampleFile(attachmentKey: AttachmentKey) throws -> URL {
+        let iv = Data(count: 16)
+        let encryptionKey = attachmentKey.encryptionKey
+        let authenticationKey = attachmentKey.authenticationKey
+        let input = Data(count: 20)
+        let output = try Cryptography.encrypt(plaintextData: input, key: encryptionKey, iv: iv)
+        let hmac = HMAC<SHA256>.authenticationCode(for: iv + output, using: SymmetricKey(data: authenticationKey))
+        let fileUrl = OWSFileSystem.temporaryFileUrl(isAvailableWhileDeviceLocked: false)
+        try (iv + output + hmac).write(to: fileUrl)
+        return fileUrl
+    }
+
+    @Test(arguments: [21, 31, 32])
+    func testPlaintextLengthGreaterThanPlaintextLength(plaintextLength: UInt64) throws {
+        let attachmentKey = AttachmentKey.generate()
+        let fileUrl = try writeSampleFile(attachmentKey: attachmentKey)
+        let fileHandle = try Cryptography.encryptedAttachmentFileHandle(
+            at: fileUrl,
+            plaintextLength: plaintextLength,
+            attachmentKey: attachmentKey,
+        )
+        #expect(throws: CryptographyError.decryptedLengthLessThanPlaintextLength) {
+            _ = try fileHandle.read(upToCount: 128)
+        }
+    }
+
+    @Test(arguments: [33, 256])
+    func testPlaintextLengthGreaterThanCiphertextLength(plaintextLength: UInt64) throws {
+        let attachmentKey = AttachmentKey.generate()
+        let fileUrl = try writeSampleFile(attachmentKey: attachmentKey)
+        #expect(throws: CryptographyError.ciphertextLengthLessThanPlaintextLength) {
+            _ = try Cryptography.encryptedAttachmentFileHandle(
+                at: fileUrl,
+                plaintextLength: plaintextLength,
+                attachmentKey: attachmentKey,
+            )
+        }
     }
 }

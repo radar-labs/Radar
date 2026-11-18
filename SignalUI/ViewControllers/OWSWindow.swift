@@ -27,7 +27,7 @@ public class OWSWindow: UIWindow {
             self,
             selector: #selector(themeDidChange),
             name: .themeDidChange,
-            object: nil
+            object: nil,
         )
 
         applyTheme()
@@ -50,7 +50,7 @@ public class OWSWindow: UIWindow {
         }
     }
 
-    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
 
         if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {

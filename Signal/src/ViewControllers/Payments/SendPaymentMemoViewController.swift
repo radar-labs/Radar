@@ -4,125 +4,114 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
-public protocol SendPaymentMemoViewDelegate: AnyObject {
+@MainActor
+protocol SendPaymentMemoViewDelegate: AnyObject {
     func didChangeMemo(memoMessage: String?)
 }
 
-// MARK: -
+class SendPaymentMemoViewController: OWSViewController, UITextFieldDelegate {
+    weak var delegate: SendPaymentMemoViewDelegate?
 
-public class SendPaymentMemoViewController: OWSViewController {
+    private lazy var memoTextField: UITextField = {
+        let textField = UITextField()
+        textField.font = .dynamicTypeBodyClamped
+        textField.textColor = .Signal.label
+        textField.rightViewMode = .always
+        textField.rightView = memoCharacterCountLabel
+        textField.placeholder = OWSLocalizedString(
+            "PAYMENTS_NEW_PAYMENT_MESSAGE_PLACEHOLDER",
+            comment: "Placeholder for the new payment or payment request message.",
+        )
+        textField.delegate = self
+        textField.addAction(
+            UIAction { [weak self] _ in self?.textFieldDidChange() },
+            for: .editingChanged,
+        )
+        return textField
+    }()
 
-    public weak var delegate: SendPaymentMemoViewDelegate?
+    private lazy var memoCharacterCountLabel: UILabel = {
+        let label = UILabel()
+        label.text = " "
+        label.font = .dynamicTypeBodyClamped.monospaced()
+        label.textColor = .Signal.tertiaryLabel
+        return label
+    }()
 
-    private let rootStack = UIStackView()
-
-    private let memoTextField = UITextField()
-    private let memoCharacterCountLabel = UILabel()
-
-    public init(memoMessage: String?) {
+    init(memoMessage: String?) {
         super.init()
 
         memoTextField.text = memoMessage
     }
 
-    open override func viewDidLoad() {
+    override open func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationItem.title = OWSLocalizedString("PAYMENTS_NEW_PAYMENT_ADD_MEMO",
-                                                 comment: "Label for the 'add memo' ui in the 'send payment' UI.")
+        navigationItem.title = OWSLocalizedString(
+            "PAYMENTS_NEW_PAYMENT_ADD_MEMO",
+            comment: "Label for the 'add memo' ui in the 'send payment' UI.",
+        )
         navigationItem.leftBarButtonItem = .cancelButton(poppingFrom: navigationController)
         navigationItem.rightBarButtonItem = .doneButton { [weak self] in
             self?.didTapDoneMemo()
         }
 
-        rootStack.axis = .vertical
-        rootStack.alignment = .fill
-        rootStack.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(rootStack)
+        view.backgroundColor = .Signal.groupedBackground
+
+        let memoFieldContainer = UIView()
+        memoFieldContainer.backgroundColor = .Signal.secondaryGroupedBackground
+        memoFieldContainer.directionalLayoutMargins = .init(
+            hMargin: OWSTableViewController2.cellHInnerMargin,
+            vMargin: OWSTableViewController2.cellVInnerMargin,
+        )
+        if #available(iOS 26, *) {
+            memoFieldContainer.cornerConfiguration = .capsule(maximumRadius: 26)
+        } else {
+            memoFieldContainer.layer.cornerRadius = 10
+        }
+        memoFieldContainer.addSubview(memoTextField)
+        memoTextField.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            rootStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            rootStack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
-            rootStack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor),
-            rootStack.bottomAnchor.constraint(equalTo: keyboardLayoutGuide.topAnchor, constant: -16),
+            memoTextField.topAnchor.constraint(equalTo: memoFieldContainer.layoutMarginsGuide.topAnchor),
+            memoTextField.leadingAnchor.constraint(equalTo: memoFieldContainer.layoutMarginsGuide.leadingAnchor),
+            memoTextField.trailingAnchor.constraint(equalTo: memoFieldContainer.layoutMarginsGuide.trailingAnchor),
+            memoTextField.bottomAnchor.constraint(equalTo: memoFieldContainer.layoutMarginsGuide.bottomAnchor),
         ])
 
-        updateContents()
+        addStaticContentStackView(
+            arrangedSubviews: [.spacer(withHeight: 16), memoFieldContainer, .vStretchingSpacer()],
+            isScrollable: true,
+            shouldAvoidKeyboard: true,
+        )
+
+        updateMemoCharacterCount()
     }
 
-    public override func viewWillAppear(_ animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         memoTextField.becomeFirstResponder()
     }
 
-    public override func viewDidAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         memoTextField.becomeFirstResponder()
     }
 
-    public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return UIDevice.current.isIPad ? .all : .portrait
-    }
-
-    private func updateContents() {
-        AssertIsOnMainThread()
-
-        rootStack.removeAllSubviews()
-
-        view.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: true)
-
-        memoTextField.backgroundColor = .clear
-        memoTextField.font = .dynamicTypeBodyClamped
-        memoTextField.textColor = Theme.primaryTextColor
-        let placeholder = NSAttributedString(string: OWSLocalizedString("PAYMENTS_NEW_PAYMENT_MESSAGE_PLACEHOLDER",
-                                                                       comment: "Placeholder for the new payment or payment request message."),
-                                             attributes: [
-                                                .foregroundColor: Theme.secondaryTextAndIconColor
-                                             ])
-        memoTextField.attributedPlaceholder = placeholder
-        memoTextField.delegate = self
-        memoTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
-
-        memoCharacterCountLabel.font = .dynamicTypeBodyClamped
-        memoCharacterCountLabel.textColor = Theme.ternaryTextColor
-
-        memoCharacterCountLabel.setCompressionResistanceHorizontalHigh()
-        memoCharacterCountLabel.setContentHuggingHorizontalHigh()
-
-        let memoRow = UIStackView(arrangedSubviews: [
-            memoTextField,
-            memoCharacterCountLabel
-        ])
-        memoRow.axis = .horizontal
-        memoRow.spacing = 8
-        memoRow.alignment = .center
-        memoRow.isLayoutMarginsRelativeArrangement = true
-        memoRow.layoutMargins = UIEdgeInsets(hMargin: 16, vMargin: 14)
-        let backgroundColor = OWSTableViewController2.cellBackgroundColor(isUsingPresentedStyle: true)
-        let backgroundView = memoRow.addBackgroundView(withBackgroundColor: backgroundColor)
-        backgroundView.layer.cornerRadius = 10
-
-        updateMemoCharacterCount()
-
-        rootStack.addArrangedSubviews([
-            UIView.spacer(withHeight: SendPaymentHelper.minTopVSpacing),
-            memoRow,
-            UIView.vStretchingSpacer()
-        ])
-    }
-
-    public override func themeDidChange() {
-        super.themeDidChange()
-
-        updateContents()
     }
 
     // MARK: -
 
     fileprivate func updateMemoCharacterCount() {
+        defer {
+            memoCharacterCountLabel.sizeToFit()
+        }
+
         guard
             let strippedMemoMessage = memoTextField.text,
             !strippedMemoMessage.isEmpty
@@ -133,11 +122,15 @@ public class SendPaymentMemoViewController: OWSViewController {
             return
         }
 
-        let format = OWSLocalizedString("PAYMENTS_NEW_PAYMENT_MESSAGE_COUNT_FORMAT",
-                                       comment: "Format for the 'message character count indicator' for the 'new payment or payment request' view. Embeds {{ %1$@ the number of characters in the message, %2$@ the maximum number of characters in the message }}.")
-        memoCharacterCountLabel.text = String(format: format,
-                                              OWSFormat.formatInt(strippedMemoMessage.count),
-                                              OWSFormat.formatInt(PaymentsImpl.maxPaymentMemoMessageLength))
+        let format = OWSLocalizedString(
+            "PAYMENTS_NEW_PAYMENT_MESSAGE_COUNT_FORMAT",
+            comment: "Format for the 'message character count indicator' for the 'new payment or payment request' view. Embeds {{ %1$@ the number of characters in the message, %2$@ the maximum number of characters in the message }}.",
+        )
+        memoCharacterCountLabel.text = String.nonPluralLocalizedStringWithFormat(
+            format,
+            OWSFormat.formatInt(strippedMemoMessage.count),
+            OWSFormat.formatInt(PaymentsImpl.maxPaymentMemoMessageLength),
+        )
     }
 
     // MARK: - Events
@@ -148,14 +141,13 @@ public class SendPaymentMemoViewController: OWSViewController {
         navigationController?.popViewController(animated: true)
     }
 
-    @objc
-    private func textFieldDidChange(_ textField: UITextField) {
+    private func textFieldDidChange() {
         updateMemoCharacterCount()
     }
-}
 
-extension SendPaymentMemoViewController: UITextFieldDelegate {
-    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString: String) -> Bool {
+    // MARK: - UITextFieldDelegate
+
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString: String) -> Bool {
         // Truncate the replacement to fit.
         let left: String = ((textField.text ?? "") as NSString).substring(to: range.location)
         let right: String = ((textField.text ?? "") as NSString).substring(from: range.location + range.length)

@@ -14,7 +14,7 @@ public class AttachmentViewOnceManagerImpl: AttachmentViewOnceManager {
     public init(
         attachmentStore: AttachmentStore,
         db: any DB,
-        interactionStore: InteractionStore
+        interactionStore: InteractionStore,
     ) {
         self.attachmentStore = attachmentStore
         self.db = db
@@ -49,15 +49,15 @@ public class AttachmentViewOnceManagerImpl: AttachmentViewOnceManager {
                 ViewOnceMessages.markAsComplete(
                     message: message,
                     sendSyncMessages: true,
-                    transaction: tx
+                    transaction: tx,
                 )
             }
         }
 
         let attachment = db.read { tx in
-            return attachmentStore.fetchFirstReferencedAttachment(
+            return attachmentStore.fetchAnyReferencedAttachment(
                 for: .messageBodyAttachment(messageRowId: messageRowId),
-                tx: tx
+                tx: tx,
             )
         }
         guard let attachmentStream = attachment?.asReferencedStream else {
@@ -67,13 +67,20 @@ public class AttachmentViewOnceManagerImpl: AttachmentViewOnceManager {
 
         let viewOnceType: ViewOnceContent.ContentType
         switch attachmentStream.attachmentStream.contentType {
-        case .file, .invalid, .audio:
+        case .file, .audio:
             owsFailDebug("Unexpected content type.")
             return nil
-        case .animatedImage:
-            viewOnceType = .animatedImage
         case .image:
-            viewOnceType = .stillImage
+            guard let imageMetadata = attachmentStream.attachmentStream.imageMetadata() else {
+                Logger.warn("View-once image with invalid image metadata")
+                return nil
+            }
+
+            if imageMetadata.isAnimated {
+                viewOnceType = .animatedImage
+            } else {
+                viewOnceType = .stillImage
+            }
         case .video where attachmentStream.reference.renderingFlag == .shouldLoop:
             viewOnceType = .loopingVideo
         case .video:
@@ -100,7 +107,10 @@ public class AttachmentViewOnceManagerImpl: AttachmentViewOnceManager {
             owsFailDebug("Missing attachment file.")
             return nil
         }
-        let tempFileUrl = OWSFileSystem.temporaryFileUrl()
+        let tempFileUrl = OWSFileSystem.temporaryFileUrl(
+            fileExtension: nil,
+            isAvailableWhileDeviceLocked: false,
+        )
         guard !OWSFileSystem.fileOrFolderExists(url: tempFileUrl) else {
             owsFailDebug("Temp file unexpectedly already exists.")
             return nil
@@ -130,8 +140,8 @@ public class AttachmentViewOnceManagerImpl: AttachmentViewOnceManager {
             type: viewOnceType,
             fileUrl: tempFileUrl,
             encryptionKey: attachmentStream.attachmentStream.attachment.encryptionKey,
-            plaintextLength: attachmentStream.attachmentStream.info.unencryptedByteCount,
-            mimeType: attachmentStream.attachmentStream.mimeType
+            plaintextLength: attachmentStream.attachmentStream.unencryptedByteCount,
+            mimeType: attachmentStream.attachmentStream.mimeType,
         )
     }
 }

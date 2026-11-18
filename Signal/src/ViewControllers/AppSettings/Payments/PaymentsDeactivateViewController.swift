@@ -4,78 +4,142 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
-public class PaymentsDeactivateViewController: OWSViewController {
+class PaymentsDeactivateViewController: OWSViewController {
 
-    var paymentBalance: PaymentBalance
+    private var paymentBalance: PaymentBalance {
+        didSet {
+            updateBalance()
+        }
+    }
 
-    public init(paymentBalance: PaymentBalance) {
+    private let balanceLabel = UILabel()
+    private var observations = [NotificationCenter.Observer]()
+
+    init(paymentBalance: PaymentBalance) {
         owsAssertDebug(paymentBalance.amount.isValidAmount(canBeEmpty: false))
 
         self.paymentBalance = paymentBalance
         super.init()
     }
 
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-
-        title = OWSLocalizedString("SETTINGS_PAYMENTS_DEACTIVATE_TITLE",
-                                  comment: "Label for the 'de-activate payments' view of the app settings.")
-
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done,
-                                                           target: self,
-                                                           action: #selector(didTapDismiss),
-                                                           accessibilityIdentifier: "dismiss")
-
-        addListeners()
-
-        updateContents()
+    deinit {
+        for observation in observations {
+            NotificationCenter.default.removeObserver(observation)
+        }
     }
 
-    public override func viewDidAppear(_ animated: Bool) {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        title = OWSLocalizedString(
+            "SETTINGS_PAYMENTS_DEACTIVATE_TITLE",
+            comment: "Label for the 'de-activate payments' view of the app settings.",
+        )
+
+        navigationItem.rightBarButtonItem = .doneButton { [weak self] in
+            self?.didTapDismiss()
+        }
+
+        view.backgroundColor = .Signal.groupedBackground
+
+        balanceLabel.font = UIFont.systemFont(ofSize: 54)
+        balanceLabel.textColor = .Signal.label
+        balanceLabel.adjustsFontSizeToFitWidth = true
+        balanceLabel.textAlignment = .center
+
+        let subtitleLabel = UILabel()
+        subtitleLabel.text = OWSLocalizedString(
+            "SETTINGS_PAYMENTS_REMAINING_BALANCE",
+            comment: "Label for the current balance in the 'deactivate payments' settings.",
+        )
+        subtitleLabel.font = .dynamicTypeBodyClamped
+        subtitleLabel.textColor = .Signal.secondaryLabel
+        subtitleLabel.textAlignment = .center
+
+        let balanceStack = UIStackView(arrangedSubviews: [balanceLabel, subtitleLabel])
+        balanceStack.axis = .vertical
+        balanceStack.spacing = 8
+        balanceStack.alignment = .center
+
+        let explanationLabel = PaymentsUI.buildTextWithLearnMoreLinkTextView(
+            text: OWSLocalizedString(
+                "SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION",
+                comment: "Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings.",
+            ),
+            font: .dynamicTypeSubheadlineClamped,
+            learnMoreUrl: URL.Support.Payments.deactivate,
+        )
+
+        let transferBalanceButton = UIButton(
+            configuration: .largePrimary(title: OWSLocalizedString(
+                "SETTINGS_PAYMENTS_DEACTIVATE_AFTER_TRANSFERRING_BALANCE",
+                comment: "Label for 'transfer balance' button in the 'deactivate payments' settings.",
+            )),
+            primaryAction: UIAction { [weak self] _ in
+                self?.didTapTransferBalanceButton()
+            },
+        )
+
+        let deactivateImmediatelyButton = UIButton(
+            configuration: .largeSecondary(title: OWSLocalizedString(
+                "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFERRING_BALANCE",
+                comment: "Label for 'deactivate payments without transferring balance' button in the 'deactivate payments' settings.",
+            )),
+            primaryAction: UIAction { [weak self] _ in
+                self?.didTapDeactivateImmediatelyButton()
+            },
+        )
+        deactivateImmediatelyButton.configuration?.baseForegroundColor = .Signal.red
+
+        let stackView = addStaticContentStackView(
+            arrangedSubviews: [
+                balanceStack,
+                explanationLabel,
+                .vStretchingSpacer(),
+                [transferBalanceButton, deactivateImmediatelyButton].enclosedInVerticalStackView(isFullWidthButtons: true),
+            ],
+            isScrollable: true,
+        )
+        stackView.setCustomSpacing(44, after: balanceStack)
+
+        addObservations()
+        updateBalance()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         SUIEnvironment.shared.paymentsSwiftRef.updateCurrentPaymentBalance()
     }
 
-    public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-
-        updateContents()
-    }
-
-    public override func themeDidChange() {
-        super.themeDidChange()
-
-        updateContents()
-    }
-
-    private func addListeners() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(arePaymentsEnabledDidChange),
+    private func addObservations() {
+        observations.append(NotificationCenter.default.addObserver(
             name: PaymentsConstants.arePaymentsEnabledDidChange,
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(currentPaymentBalanceDidChange),
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.arePaymentsEnabledDidChange()
+            }
+        })
+        observations.append(NotificationCenter.default.addObserver(
             name: PaymentsImpl.currentPaymentBalanceDidChange,
-            object: nil
-        )
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.currentPaymentBalanceDidChange()
+            }
+        })
     }
 
-    @objc
     private func arePaymentsEnabledDidChange() {
-        Logger.info("")
         dismiss(animated: true, completion: nil)
     }
 
-    @objc
     private func currentPaymentBalanceDidChange() {
-        guard let currentPaymentBalance = SUIEnvironment.shared.paymentsSwiftRef.currentPaymentBalance,
-              currentPaymentBalance.amount.isValidAmount(canBeEmpty: false) else {
+        guard
+            let currentPaymentBalance = SUIEnvironment.shared.paymentsSwiftRef.currentPaymentBalance,
+            currentPaymentBalance.amount.isValidAmount(canBeEmpty: false)
+        else {
             // We need to abort the "deactivate payments with outstanding balance"
             // flow if:
             //
@@ -85,88 +149,15 @@ public class PaymentsDeactivateViewController: OWSViewController {
             dismiss(animated: true, completion: nil)
             return
         }
-        self.paymentBalance = currentPaymentBalance
-        self.updateContents()
+        paymentBalance = currentPaymentBalance
     }
 
-    private func updateContents() {
-        let backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: true)
-        view.backgroundColor = backgroundColor
-
-        view.removeAllSubviews()
-
-        let titleLabel = UILabel()
-        titleLabel.font = UIFont.regularFont(ofSize: 54)
-        titleLabel.textColor = Theme.primaryTextColor
-        titleLabel.attributedText = PaymentsFormat.formattedBalance(paymentBalance.amount, isShortForm: false)
-        titleLabel.adjustsFontSizeToFitWidth = true
-        titleLabel.textAlignment = .center
-
-        let subtitleLabel = UILabel()
-        subtitleLabel.text = OWSLocalizedString("SETTINGS_PAYMENTS_REMAINING_BALANCE",
-                                               comment: "Label for the current balance in the 'deactivate payments' settings.")
-        subtitleLabel.font = .dynamicTypeBodyClamped
-        subtitleLabel.textColor = Theme.secondaryTextAndIconColor
-        subtitleLabel.textAlignment = .center
-
-        let explanationLabel = PaymentsViewUtils.buildTextWithLearnMoreLinkTextView(
-            text: OWSLocalizedString("SETTINGS_PAYMENTS_DEACTIVATE_WITH_BALANCE_EXPLANATION",
-                                    comment: "Explanation of the 'deactivate payments with balance' process in the 'deactivate payments' settings."),
-            font: .dynamicTypeSubheadlineClamped,
-            learnMoreUrl: URL.Support.Payments.deactivate)
-        explanationLabel.backgroundColor = backgroundColor
-        explanationLabel.textAlignment = .center
-
-        let transferBalanceButton = OWSFlatButton.button(title: OWSLocalizedString("SETTINGS_PAYMENTS_DEACTIVATE_AFTER_TRANSFERRING_BALANCE",
-                                                                                  comment: "Label for 'transfer balance' button in the 'deactivate payments' settings."),
-                                                         font: UIFont.dynamicTypeHeadline,
-                                                         titleColor: .white,
-                                                         backgroundColor: .ows_accentBlue,
-                                                         target: self,
-                                                         selector: #selector(didTapTransferBalanceButton))
-        transferBalanceButton.autoSetHeightUsingFont()
-
-        let deactivateImmediatelyButton = OWSFlatButton.button(title: OWSLocalizedString("SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFERRING_BALANCE",
-                                                                                        comment: "Label for 'deactivate payments without transferring balance' button in the 'deactivate payments' settings."),
-                                                               font: UIFont.dynamicTypeHeadline,
-                                                               titleColor: .ows_accentRed,
-                                                               backgroundColor: backgroundColor,
-                                                               target: self,
-                                                               selector: #selector(didTapDeactivateImmediatelyButton))
-        deactivateImmediatelyButton.autoSetHeightUsingFont()
-
-        let topStack = UIStackView(arrangedSubviews: [
-            titleLabel,
-            UIView.spacer(withHeight: 8),
-            subtitleLabel,
-            UIView.spacer(withHeight: 44),
-            explanationLabel
-        ])
-        topStack.axis = .vertical
-        topStack.alignment = .center
-        topStack.isLayoutMarginsRelativeArrangement = true
-        topStack.layoutMargins = UIEdgeInsets(hMargin: 20, vMargin: 0)
-
-        let stackView = UIStackView(arrangedSubviews: [
-            UIView.spacer(withHeight: 40),
-            topStack,
-            UIView.vStretchingSpacer(),
-            transferBalanceButton,
-            UIView.spacer(withHeight: 8),
-            deactivateImmediatelyButton,
-            UIView.spacer(withHeight: 8)
-        ])
-        stackView.axis = .vertical
-        stackView.alignment = .fill
-        view.addSubview(stackView)
-        stackView.autoPinWidthToSuperviewMargins()
-        stackView.autoPin(toTopLayoutGuideOf: self, withInset: 0)
-        stackView.autoPin(toBottomLayoutGuideOf: self, withInset: 0)
+    private func updateBalance() {
+        balanceLabel.attributedText = PaymentsFormat.formattedBalance(paymentBalance.amount, isShortForm: false)
     }
 
     // MARK: - Events
 
-    @objc
     private func didTapTransferBalanceButton() {
         ModalActivityIndicatorViewController.present(
             fromViewController: self,
@@ -188,33 +179,32 @@ public class PaymentsDeactivateViewController: OWSViewController {
                     modalActivityIndicator.dismiss {
                         OWSActionSheets.showErrorAlert(message: OWSLocalizedString(
                             "SETTINGS_PAYMENTS_DEACTIVATION_FAILED",
-                            comment: "Error indicating that payments could not be deactivated in the payments settings."
+                            comment: "Error indicating that payments could not be deactivated in the payments settings.",
                         ))
                     }
                 }
-            }
+            },
         )
     }
 
-    @objc
     private func didTapDeactivateImmediatelyButton() {
         let actionSheet = ActionSheetController(
             title: OWSLocalizedString(
                 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_TITLE",
-                comment: "Title for the 'deactivate payments confirmation' UI in the payment settings."
+                comment: "Title for the 'deactivate payments confirmation' UI in the payment settings.",
             ),
             message: OWSLocalizedString(
                 "SETTINGS_PAYMENTS_DEACTIVATE_WITHOUT_TRANSFER_CONFIRM_DESCRIPTION",
-                comment: "Description for the 'deactivate payments confirmation' UI in the payment settings."
-            )
+                comment: "Description for the 'deactivate payments confirmation' UI in the payment settings.",
+            ),
         )
 
         actionSheet.addAction(ActionSheetAction(
             title: OWSLocalizedString(
                 "SETTINGS_PAYMENTS_DEACTIVATE_BUTTON",
-                comment: "Label for the 'deactivate payments' button in the payment settings."
+                comment: "Label for the 'deactivate payments' button in the payment settings.",
             ),
-            style: .destructive
+            style: .destructive,
         ) { [weak self] _ in
             self?.deactivateImmediately()
         })
@@ -232,7 +222,6 @@ public class PaymentsDeactivateViewController: OWSViewController {
         }
     }
 
-    @objc
     private func didTapDismiss() {
         dismiss(animated: true, completion: nil)
     }

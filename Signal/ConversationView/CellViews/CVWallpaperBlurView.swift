@@ -4,76 +4,104 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
-public class CVWallpaperBlurView: ManualLayoutViewWithLayer {
-
-    private var isPreview = false
+class CVWallpaperBlurView: ManualLayoutViewWithLayer, CVDimmableView, OWSBubbleViewHost {
 
     private weak var provider: WallpaperBlurProvider?
+    private var isPreview = false
+    private var state: WallpaperBlurState?
+    private var isReduceTransparencyMode = false
 
     private let imageView = CVImageView()
-    private let maskLayer = CAShapeLayer()
+    private let imageViewMaskLayer = CAShapeLayer()
 
-    private var state: WallpaperBlurState?
-    private var maskCornerRadius: CGFloat = 0
+    private let maskLayer = CAShapeLayer()
+    private let strokeLayer = CAShapeLayer()
+
+    private var bubbleConfig: BubbleConfiguration?
 
     init() {
         super.init(name: "CVWallpaperBlurView")
 
-        self.clipsToBounds = true
-        self.layer.zPosition = -1
+        clipsToBounds = true
+        layer.zPosition = -1
+        strokeLayer.fillColor = nil
 
         imageView.contentMode = .scaleAspectFill
-        imageView.layer.mask = maskLayer
+        imageView.layer.mask = imageViewMaskLayer
         imageView.layer.masksToBounds = true
         addSubview(imageView)
 
-        owsAssertDebug(self.layer.delegate === self)
+        layer.addSublayer(strokeLayer)
+
+        owsAssertDebug(layer.delegate === self)
+        imageViewMaskLayer.disableAnimationsWithDelegate()
         maskLayer.disableAnimationsWithDelegate()
+        strokeLayer.disableAnimationsWithDelegate()
 
         addLayoutBlock { [weak self] _ in
             self?.applyLayout()
         }
     }
 
-    public func applyLayout() {
+    func applyLayout() {
+        guard bounds.size.isNonEmpty else { return }
+
         UIView.performWithoutAnimation {
             imageView.frame = imageViewFrame
-            maskLayer.frame = imageView.bounds
-            let maskPath = UIBezierPath(roundedRect: maskFrame, cornerRadius: maskCornerRadius)
-            maskLayer.path = maskPath.cgPath
+            imageViewMaskLayer.frame = imageView.layer.bounds
+            strokeLayer.frame = layer.bounds
+
+            if let bubbleConfig {
+                // Corners.
+                imageViewMaskLayer.path = bubbleConfig.bubblePath(for: maskFrame).cgPath
+                maskLayer.path = bubbleConfig.bubblePath(for: bounds).cgPath
+                layer.mask = maskLayer
+
+                // Stroke.
+                if
+                    let stroke = bubbleConfig.stroke,
+                    let strokePath = bubbleConfig.strokePath(for: strokeLayer.frame)
+                {
+                    strokeLayer.lineWidth = stroke.width
+                    strokeLayer.strokeColor = stroke.color.cgColor
+                    strokeLayer.path = strokePath.cgPath
+                    strokeLayer.isHidden = false
+                } else {
+                    strokeLayer.isHidden = true
+                }
+            } else {
+                imageViewMaskLayer.path = UIBezierPath(rect: maskFrame).cgPath
+                layer.mask = nil
+
+                strokeLayer.isHidden = true
+            }
         }
     }
 
-    public func configureForPreview(maskCornerRadius: CGFloat) {
+    func configure(
+        provider: WallpaperBlurProvider?,
+        bubbleConfig: BubbleConfiguration?,
+    ) {
         resetContentAndConfiguration()
 
-        self.isPreview = true
-        self.maskCornerRadius = maskCornerRadius
-
-        updateIfNecessary()
-    }
-
-    public func configure(provider: WallpaperBlurProvider,
-                          maskCornerRadius: CGFloat) {
-        resetContentAndConfiguration()
-
-        self.isPreview = false
+        self.isPreview = (provider == nil)
         // TODO: Observe provider changes.
         self.provider = provider
-        self.maskCornerRadius = maskCornerRadius
+        self.bubbleConfig = bubbleConfig
+        self.isReduceTransparencyMode = UIAccessibility.isReduceTransparencyEnabled
 
         updateIfNecessary()
     }
 
-    public func updateIfNecessary() {
-        guard !isPreview else {
-            self.backgroundColor = Theme.backgroundColor
+    func updateIfNecessary() {
+        guard isPreview == false, isReduceTransparencyMode == false else {
+            backgroundColor = Theme.backgroundColor
             imageView.isHidden = true
             return
         }
-        guard let provider = provider else {
+        guard let provider else {
             owsFailDebug("Missing provider.")
             resetContentAndConfiguration()
             return
@@ -97,16 +125,16 @@ public class CVWallpaperBlurView: ManualLayoutViewWithLayer {
     private var maskFrame: CGRect = .zero
 
     private func ensurePositioning() {
-        guard !isPreview else {
-            return
-        }
-        guard let state = self.state else {
+        guard isPreview == false, isReduceTransparencyMode == false else { return }
+
+        guard let state else {
             resetContent()
             return
         }
+
         let referenceView = state.referenceView
-        self.imageViewFrame = self.convert(referenceView.bounds, from: referenceView)
-        self.maskFrame = referenceView.convert(self.bounds, from: self)
+        imageViewFrame = convert(referenceView.bounds, from: referenceView)
+        maskFrame = referenceView.convert(bounds, from: self)
 
         applyLayout()
     }
@@ -117,21 +145,47 @@ public class CVWallpaperBlurView: ManualLayoutViewWithLayer {
         imageView.isHidden = false
         imageViewFrame = .zero
         maskFrame = .zero
+        strokeLayer.isHidden = true
         state = nil
     }
 
-    public func resetContentAndConfiguration() {
+    func resetContentAndConfiguration() {
         isPreview = false
         provider = nil
-        maskCornerRadius = 0
+        bubbleConfig = nil
+        isReduceTransparencyMode = false
 
         resetContent()
     }
 
+    @available(iOS, unavailable)
+    override func reset() {
+        fatalError("Not supported.")
+    }
+
     // MARK: - CALayerDelegate
 
-    public override func action(for layer: CALayer, forKey event: String) -> CAAction? {
+    override func action(for layer: CALayer, forKey event: String) -> CAAction? {
         // Disable all implicit CALayer animations.
         NSNull()
     }
+
+    // MARK: - CVDimmableView
+
+    var dimmerColor: UIColor = .clear
+
+    var dimsContent = false
+
+    var backgroundLayer: CALayer? { imageView.layer }
+
+    // MARK: - OWSBubbleViewHost
+
+    var maskPath: UIBezierPath {
+        guard let bubbleConfig else {
+            return UIBezierPath(rect: bounds)
+        }
+        return bubbleConfig.bubblePath(for: bounds)
+    }
+
+    var bubbleReferenceView: UIView { self }
 }

@@ -7,10 +7,14 @@ import SignalServiceKit
 import SignalUI
 
 class DataSettingsTableViewController: OWSTableViewController2 {
+    private var attachmentLimits: IncomingAttachmentLimits!
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
         title = OWSLocalizedString("SETTINGS_DATA_TITLE", comment: "The title for the data settings.")
+
+        self.attachmentLimits = IncomingAttachmentLimits.currentLimits(remoteConfig: .current)
 
         updateTableContents()
 
@@ -18,13 +22,13 @@ class DataSettingsTableViewController: OWSTableViewController2 {
             self,
             selector: #selector(preferencesDidChange),
             name: MediaBandwidthPreferences.mediaBandwidthPreferencesDidChange,
-            object: nil
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(preferencesDidChange),
-            name: CallService.callServicePreferencesDidChange,
-            object: nil
+            name: .callServicePreferencesDidChange,
+            object: nil,
         )
     }
 
@@ -35,23 +39,35 @@ class DataSettingsTableViewController: OWSTableViewController2 {
         let autoDownloadSection = OWSTableSection()
         autoDownloadSection.headerTitle = OWSLocalizedString(
             "SETTINGS_DATA_MEDIA_AUTO_DOWNLOAD_HEADER",
-            comment: "Header for the 'media auto-download' section in the data settings."
+            comment: "Header for the 'media auto-download' section in the data settings.",
         )
-        autoDownloadSection.footerTitle = OWSLocalizedString(
-            "SETTINGS_DATA_MEDIA_AUTO_DOWNLOAD_FOOTER",
-            comment: "Footer for the 'media auto-download' section in the data settings."
-        )
-
-        let mediaDownloadTypes = MediaBandwidthPreferences.MediaType.allCases.sorted {
-            $0.sortKey < $1.sortKey
+        var footerStrings = [String]()
+        footerStrings.append(String.nonPluralLocalizedStringWithFormat(
+            OWSLocalizedString(
+                "SETTINGS_DATA_MEDIA_AUTO_DOWNLOAD_FOOTER",
+                comment: "Footer for the 'media auto-download' section in the data settings. The replacement will be a formatted file size, such as '100 KB'.",
+            ),
+            AutoDownloadPolicy.Constants.alwaysLimit.formatted(.owsByteCount(fudgeBase2ToBase10: true, zeroPadFractionDigits: false)),
+        ))
+        if AutoDownloadPolicy.Constants.neverLimit < self.attachmentLimits.maxEncryptedBytes {
+            footerStrings.append(String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
+                    "SETTINGS_DATA_MEDIA_AUTO_DOWNLOAD_NEVER_FOOTER",
+                    comment: "Footer for the 'media auto-download' section in the data settings. The replacement will be a formatted file size, such as '200 MB'.",
+                ),
+                AutoDownloadPolicy.Constants.neverLimit.formatted(.owsByteCount(fudgeBase2ToBase10: true, zeroPadFractionDigits: false)),
+            ))
         }
+        autoDownloadSection.footerTitle = footerStrings.joined(separator: " ")
+
+        let mediaDownloadTypes = MediaBandwidthPreferences.MediaType.allCases
         var hasNonDefaultValue = false
         for mediaDownloadType in mediaDownloadTypes {
             let name = MediaDownloadSettingsViewController.name(forMediaDownloadType: mediaDownloadType)
             let bandwidthPreference = SSKEnvironment.shared.databaseStorageRef.read { transaction in
                 DependenciesBridge.shared.mediaBandwidthPreferenceStore.preference(
                     for: mediaDownloadType,
-                    tx: transaction
+                    tx: transaction,
                 )
             }
             let preferenceName = MediaDownloadSettingsViewController.name(forMediaBandwidthPreference: bandwidthPreference)
@@ -62,7 +78,7 @@ class DataSettingsTableViewController: OWSTableViewController2 {
 
             autoDownloadSection.add(OWSTableItem.disclosureItem(
                 withText: name,
-                accessoryText: preferenceName
+                accessoryText: preferenceName,
             ) { [weak self] in
                 self?.showMediaDownloadView(forMediaDownloadType: mediaDownloadType)
             })
@@ -70,14 +86,14 @@ class DataSettingsTableViewController: OWSTableViewController2 {
 
         let resetCopy = OWSLocalizedString(
             "SETTINGS_DATA_MEDIA_AUTO_DOWNLOAD_RESET",
-            comment: "Label for for the 'reset media auto-download settings' button in the data settings."
+            comment: "Label for for the 'reset media auto-download settings' button in the data settings.",
         )
         let resetAccessibilityIdentifier = "reset-auto-download-settings"
         if hasNonDefaultValue {
             autoDownloadSection.add(OWSTableItem.item(
                 name: resetCopy,
-                textColor: Theme.accentBlueColor,
-                accessibilityIdentifier: resetAccessibilityIdentifier
+                textColor: .Signal.accent,
+                accessibilityIdentifier: resetAccessibilityIdentifier,
             ) {
                 SSKEnvironment.shared.databaseStorageRef.asyncWrite { transaction in
                     DependenciesBridge.shared.mediaBandwidthPreferenceStore.resetPreferences(tx: transaction)
@@ -86,8 +102,8 @@ class DataSettingsTableViewController: OWSTableViewController2 {
         } else {
             autoDownloadSection.add(OWSTableItem.item(
                 name: resetCopy,
-                textColor: Theme.secondaryTextAndIconColor,
-                accessibilityIdentifier: resetAccessibilityIdentifier
+                textColor: .Signal.secondaryLabel,
+                accessibilityIdentifier: resetAccessibilityIdentifier,
             ))
         }
         contents.add(autoDownloadSection)
@@ -95,49 +111,50 @@ class DataSettingsTableViewController: OWSTableViewController2 {
         let sentMediaSection = OWSTableSection()
         sentMediaSection.headerTitle = OWSLocalizedString(
             "SETTINGS_DATA_SENT_MEDIA_SECTION_HEADER",
-            comment: "Section header for the sent media section in data settings"
+            comment: "Section header for the sent media section in data settings",
         )
         sentMediaSection.footerTitle = OWSLocalizedString(
             "SETTINGS_DATA_SENT_MEDIA_SECTION_FOOTER",
-            comment: "Section footer for the sent media section in data settings"
+            comment: "Section footer for the sent media section in data settings",
         )
         sentMediaSection.add(.disclosureItem(
             withText: OWSLocalizedString(
                 "SETTINGS_DATA_SENT_MEDIA_QUALITY_ITEM_TITLE",
-                comment: "Item title for the sent media quality setting"
+                comment: "Item title for the sent media quality setting",
             ),
-            accessoryText: SSKEnvironment.shared.databaseStorageRef.read(block: ImageQualityLevel.resolvedQuality(tx:)).localizedString,
+            accessoryText: SSKEnvironment.shared.databaseStorageRef.read(block: ImageQuality.fetchValue(tx:)).localizedString,
             actionBlock: { [weak self] in
                 self?.showSentMediaQualityPreferences()
-            }
+            },
         ))
         contents.add(sentMediaSection)
 
         let callsSection = OWSTableSection()
         callsSection.headerTitle = OWSLocalizedString(
             "SETTINGS_DATA_CALL_SECTION_HEADER",
-            comment: "Section header for the call section in data settings"
+            comment: "Section header for the call section in data settings",
         )
         callsSection.footerTitle = OWSLocalizedString(
             "SETTINGS_DATA_CALL_SECTION_FOOTER",
-            comment: "Section footer for the call section in data settings"
+            comment: "Section footer for the call section in data settings",
         )
 
         let currentCallDataPreference = SSKEnvironment.shared.databaseStorageRef.read { transaction in
-            CallService.highDataNetworkInterfaces(readTx: transaction).inverted
+            CallServiceSettingsStore().highDataNetworkInterfaces(tx: transaction).inverted
         }
         let currentCallDataPreferenceString = NetworkInterfacePreferenceViewController.name(
-            forInterfaceSet: currentCallDataPreference
+            forInterfaceSet: currentCallDataPreference,
         )
 
         callsSection.add(.disclosureItem(
             withText: OWSLocalizedString(
                 "SETTINGS_DATA_CALL_LOW_BANDWIDTH_ITEM_TITLE",
-                comment: "Item title for the low bandwidth call setting"),
+                comment: "Item title for the low bandwidth call setting",
+            ),
             accessoryText: currentCallDataPreferenceString ?? "",
             actionBlock: { [weak self] in
                 self?.showCallDataPreferences()
-            }
+            },
         ))
 
         contents.add(callsSection)
@@ -146,8 +163,9 @@ class DataSettingsTableViewController: OWSTableViewController2 {
     // MARK: - Events
 
     private func showCallDataPreferences() {
+        let callServiceSettingsStore = CallServiceSettingsStore()
         let currentLowDataPreference = SSKEnvironment.shared.databaseStorageRef.read { readTx in
-            CallService.highDataNetworkInterfaces(readTx: readTx).inverted
+            callServiceSettingsStore.highDataNetworkInterfaces(tx: readTx).inverted
         }
 
         let vc = NetworkInterfacePreferenceViewController(
@@ -157,23 +175,24 @@ class DataSettingsTableViewController: OWSTableViewController2 {
                 if self != nil {
                     SSKEnvironment.shared.databaseStorageRef.write { writeTx in
                         let newHighDataPref = newLowDataPref.inverted
-                        CallService.setHighDataInterfaces(newHighDataPref, writeTx: writeTx)
+                        callServiceSettingsStore.setHighDataInterfaces(newHighDataPref, tx: writeTx)
                     }
                 }
-            })
+            },
+        )
 
         vc.title = OWSLocalizedString(
             "SETTINGS_DATA_CALL_LOW_BANDWIDTH_ITEM_TITLE",
-            comment: "Item title for the low bandwidth call setting")
+            comment: "Item title for the low bandwidth call setting",
+        )
         navigationController?.pushViewController(vc, animated: true)
     }
 
     private func showSentMediaQualityPreferences() {
-        let vc = SentMediaQualitySettingsViewController { [weak self] isHighQuality in
+        let vc = SentMediaQualitySettingsViewController.loadWithSneakyTransaction { [weak self] imageQuality in
             guard let self else { return }
-            SSKEnvironment.shared.databaseStorageRef.write { tx in
-                ImageQualityLevel.setUserSelectedHighQuality(isHighQuality, tx: tx)
-            }
+            let databaseStorage = SSKEnvironment.shared.databaseStorageRef
+            databaseStorage.write { tx in ImageQuality.setValue(imageQuality, tx: tx) }
             self.updateTableContents()
         }
         navigationController?.pushViewController(vc, animated: true)

@@ -7,10 +7,6 @@ import XCTest
 @testable import SignalServiceKit
 
 class MessageSenderJobQueueTest: SSKBaseTest {
-    private var fakeMessageSender: FakeMessageSender {
-        SSKEnvironment.shared.messageSenderRef as! FakeMessageSender
-    }
-
     func test_messageIsSent() async throws {
         let jobQueue = MessageSenderJobQueue(appReadiness: AppReadinessMock())
         let (message, promise) = try await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
@@ -18,14 +14,14 @@ class MessageSenderJobQueueTest: SSKBaseTest {
             let jobRecord = try MessageSenderJobRecord(
                 persistedMessage: .init(
                     rowId: message.sqliteRowId!,
-                    message: message
+                    message: message,
                 ),
                 isHighPriority: false,
-                transaction: tx
+                transaction: tx,
             )
             let preparedMessage = PreparedOutgoingMessage.restore(
                 from: jobRecord,
-                tx: tx
+                tx: tx,
             )!
             let promise = jobQueue.add(.promise, message: preparedMessage, transaction: tx)
             return (message, promise)
@@ -48,14 +44,14 @@ class MessageSenderJobQueueTest: SSKBaseTest {
                 let jobRecord = try MessageSenderJobRecord(
                     persistedMessage: .init(
                         rowId: $0.sqliteRowId!,
-                        message: $0
+                        message: $0,
                     ),
                     isHighPriority: false,
-                    transaction: tx
+                    transaction: tx,
                 )
                 let preparedMessage = PreparedOutgoingMessage.restore(
                     from: jobRecord,
-                    tx: tx
+                    tx: tx,
                 )!
                 return jobQueue.add(.promise, message: preparedMessage, transaction: tx)
             }
@@ -76,9 +72,14 @@ class MessageSenderJobQueueTest: SSKBaseTest {
         let (message, promise) = await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
             let message = OutgoingMessageFactory().buildDeliveryReceipt(transaction: tx)
             let preparedMessage = PreparedOutgoingMessage.preprepared(
-                transientMessageWithoutAttachments: message
+                transientMessageWithoutAttachments: message,
             )
-            let promise = jobQueue.add(.promise, message: preparedMessage, transaction: tx)
+            let promise = jobQueue.add(
+                .promise,
+                message: preparedMessage,
+                limitToCurrentProcessLifetime: true,
+                transaction: tx,
+            )
             return (message, promise)
         }
         try await promise.awaitable()
@@ -93,14 +94,14 @@ class MessageSenderJobQueueTest: SSKBaseTest {
             let jobRecord = try MessageSenderJobRecord(
                 persistedMessage: .init(
                     rowId: message.sqliteRowId!,
-                    message: message
+                    message: message,
                 ),
                 isHighPriority: false,
-                transaction: tx
+                transaction: tx,
             )
             let preparedMessage = PreparedOutgoingMessage.restore(
                 from: jobRecord,
-                tx: tx
+                tx: tx,
             )!
             let promise = jobQueue.add(.promise, message: preparedMessage, transaction: tx)
             return (jobRecord, message, promise)
@@ -115,7 +116,7 @@ class MessageSenderJobQueueTest: SSKBaseTest {
             let retryTriggerTask = Task.detached {
                 while true {
                     try Task.checkCancellation()
-                    try await Task.sleep(nanoseconds: 500*NSEC_PER_USEC)
+                    try await Task.sleep(nanoseconds: 500 * NSEC_PER_USEC)
                     jobQueue.becameReachable()
                 }
             }
@@ -133,7 +134,7 @@ class MessageSenderJobQueueTest: SSKBaseTest {
         XCTAssertEqual(fakeMessageSender.stubbedFailingErrors.count, 0)
         XCTAssertEqual(
             fakeMessageSender.sentMessages.map { $0.uniqueId },
-            Array(repeating: message.uniqueId, count: retryCount + 1)
+            Array(repeating: message.uniqueId, count: retryCount + 1),
         )
     }
 
@@ -145,21 +146,21 @@ class MessageSenderJobQueueTest: SSKBaseTest {
             let jobRecord = try MessageSenderJobRecord(
                 persistedMessage: .init(
                     rowId: message.sqliteRowId!,
-                    message: message
+                    message: message,
                 ),
                 isHighPriority: false,
-                transaction: tx
+                transaction: tx,
             )
             let preparedMessage = PreparedOutgoingMessage.restore(
                 from: jobRecord,
-                tx: tx
+                tx: tx,
             )!
             let promise = jobQueue.add(.promise, message: preparedMessage, transaction: tx)
             return (jobRecord, message, promise)
         }
 
         // simulate permanent failure
-        let error = OWSUnretryableError()
+        let error = OWSGenericError("")
         fakeMessageSender.stubbedFailingErrors = [error]
         jobQueue.setUp()
 

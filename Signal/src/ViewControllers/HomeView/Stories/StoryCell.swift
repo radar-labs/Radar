@@ -4,9 +4,9 @@
 //
 
 import Foundation
-import UIKit
 import SignalServiceKit
 import SignalUI
+import UIKit
 
 class StoryCell: UITableViewCell {
     static let reuseIdentifier = "StoryCell"
@@ -98,7 +98,7 @@ class StoryCell: UITableViewCell {
     override func updateConfiguration(using state: UICellConfigurationState) {
         var configuration = UIBackgroundConfiguration.clear()
         if state.isSelected || state.isHighlighted {
-            configuration.backgroundColor = Theme.tableCell2SelectedBackgroundColor
+            configuration.backgroundColor = OWSTableViewController2.cellSelectedBackgroundColor
             if useSidebarAppearance {
                 configuration.cornerRadius = 24
             }
@@ -109,7 +109,7 @@ class StoryCell: UITableViewCell {
     }
 
     private var attachment: StoryThumbnailView.Attachment?
-    private var revealedSpoilerIds: Set<StyleIdType>?
+    private var revealedSpoilerIds: Set<StyleId>?
 
     func configure(with model: StoryViewModel, spoilerState: SpoilerRenderState) {
         configureSubtitle(with: model)
@@ -146,7 +146,7 @@ class StoryCell: UITableViewCell {
             let storyThumbnailView = StoryThumbnailView(
                 attachment: model.latestMessageAttachment,
                 interactionIdentifier: model.latestMessageIdentifier,
-                spoilerState: spoilerState
+                spoilerState: spoilerState,
             )
             attachmentThumbnail.addSubview(storyThumbnailView)
             storyThumbnailView.autoPinEdgesToSuperviewEdges()

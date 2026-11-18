@@ -8,23 +8,17 @@
 PROTOC=protoc --proto_path=Specifications
 WRAPPER_SCRIPT=../../Scripts/protos/ProtoWrappers.py --proto-dir=Specifications --verbose
 
-all: registration_protos signal_service_protos provisioning_protos fingerprint_protos websocket_protos signal_ios_protos storage_service_protos groups_protos device_transfer_protos session_record_protos svr_protos mobilecoin_protos backup_protos
+all: registration_protos signal_service_protos provisioning_protos fingerprint_protos signal_ios_protos storage_service_protos groups_protos device_transfer_protos session_record_protos svr_protos mobilecoin_protos backup_protos local_backup_protos call_quality_survey_protos
 
 signal_service_protos: Specifications/SignalService.proto
 	$(PROTOC) --swift_out=Generated SignalService.proto
 	$(WRAPPER_SCRIPT) --dst-dir=Generated --wrapper-prefix=SSKProto --proto-prefix=SignalServiceProtos --proto-file=SignalService.proto
 
 provisioning_protos: Specifications/Provisioning.proto
-	$(PROTOC) --swift_out=Generated Provisioning.proto
-	$(WRAPPER_SCRIPT) --dst-dir=Generated --wrapper-prefix=ProvisioningProto --proto-prefix=ProvisioningProtos --proto-file=Provisioning.proto
+	$(PROTOC) --swift_out=Generated --swift_opt=Visibility=public --swift_opt=UseAccessLevelOnImports=true Provisioning.proto
 
-fingerprint_protos: Specifications/Fingerprint.proto
-	$(PROTOC) --swift_out=Generated Fingerprint.proto
-	$(WRAPPER_SCRIPT) --dst-dir=Generated --wrapper-prefix=FingerprintProto --proto-prefix=FingerprintProtos --proto-file=Fingerprint.proto
-
-websocket_protos: Specifications/WebSocketResources.proto
-	$(PROTOC) --swift_out=Generated WebSocketResources.proto
-	$(WRAPPER_SCRIPT) --dst-dir=Generated --wrapper-prefix=WebSocketProto --proto-prefix=WebSocketProtos --proto-file=WebSocketResources.proto
+fingerprint_protos: Specifications/FingerprintProtocol.proto
+	$(PROTOC) --swift_out=Generated --swift_opt=Visibility=public --swift_opt=UseAccessLevelOnImports=true FingerprintProtocol.proto
 
 signal_ios_protos: Specifications/SignalIOS.proto
 	$(PROTOC) --swift_out=Generated SignalIOS.proto
@@ -52,7 +46,13 @@ mobilecoin_protos: Specifications/MobileCoinExternal.proto
 	$(PROTOC) --swift_out=Generated MobileCoinExternal.proto
 
 registration_protos: Specifications/Registration.proto
-	$(PROTOC) --swift_out=Generated Registration.proto
+	$(PROTOC) --swift_out=Generated --swift_opt=Visibility=public --swift_opt=UseAccessLevelOnImports=true Registration.proto
 
 backup_protos: Backups/Backup.proto
 	$(PROTOC) --swift_out=Backups --proto_path=Backups --swift_opt=Visibility=public --swift_opt=UseAccessLevelOnImports=true Backup.proto
+
+local_backup_protos: Backups/LocalBackup.proto
+	$(PROTOC) --swift_out=Backups --proto_path=Backups --swift_opt=Visibility=public --swift_opt=UseAccessLevelOnImports=true LocalBackup.proto
+
+call_quality_survey_protos: Specifications/CallQualitySurvey.proto
+	$(PROTOC) --swift_out=Generated CallQualitySurvey.proto --swift_opt=Visibility=public --swift_opt=UseAccessLevelOnImports=true

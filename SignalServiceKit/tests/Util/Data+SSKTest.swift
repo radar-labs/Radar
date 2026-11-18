@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import Testing
 import XCTest
 
 @testable import SignalServiceKit
@@ -14,7 +15,7 @@ class DataSSKTests: XCTestCase {
         let testCases: [(String, Data)] = [
             ("00010203-0405-0607-0809-0A0B0C0D0E0F", dataValue),
             // Test an unaligned load
-            ("01020304-0506-0708-090A-0B0C0D0E0F10", dataValue.dropFirst())
+            ("01020304-0506-0708-090A-0B0C0D0E0F10", dataValue.dropFirst()),
         ]
         for (expectedValue, uuidData) in testCases {
             XCTAssertEqual(UUID(data: uuidData)?.uuidString, expectedValue)
@@ -30,7 +31,7 @@ class DataSSKTests: XCTestCase {
             // Test byte ordering and considering all bytes
             (0x01_02_03_04_05_06_07_08, dataValue),
             // Test an unaligned load
-            (0x02_03_04_05_06_07_08_09, dataValue.dropFirst())
+            (0x02_03_04_05_06_07_08_09, dataValue.dropFirst()),
         ]
         for (expectedValue, bigEndianData) in testCases {
             XCTAssertEqual(UInt64(bigEndianData: bigEndianData), expectedValue)
@@ -57,5 +58,35 @@ class DataSSKTests: XCTestCase {
         XCTAssertFalse(Data([1]).ows_constantTimeIsEqual(to: Data()))
         XCTAssertFalse(Data().ows_constantTimeIsEqual(to: Data([1])))
         XCTAssertTrue(Data().ows_constantTimeIsEqual(to: Data()))
+    }
+}
+
+struct DataSSKTest {
+    @Test(arguments: [
+        ([0], 0, []),
+        ([1], 1, []),
+        ([127], 127, []),
+        ([128, 1], 128, []),
+        ([0, 0], 0, [0]),
+        ([128, 1, 2], 128, [2]),
+        ([255, 255, 255, 255, 255, 255, 255, 255, 127], UInt64(Int64.max), []),
+    ] as [([UInt8], UInt64, [UInt8])])
+    func testDecodeVarint(testCase: (inputData: [UInt8], expectedValue: UInt64, remainingData: [UInt8])) throws {
+        var inputData = Data(testCase.inputData)
+        let actualValue = try inputData.removeFirstVarint()
+        #expect(actualValue == testCase.expectedValue)
+        #expect(inputData == Data(testCase.remainingData))
+    }
+
+    @Test(arguments: [
+        ([], .truncated),
+        ([128], .truncated),
+        ([128, 128, 128, 128, 128, 128, 128, 128, 128, 128], .malformed),
+    ] as [([UInt8], Data.VarintDecodingError)])
+    func testDecodeVarintError(testCase: (inputData: [UInt8], expectedError: Data.VarintDecodingError)) throws {
+        let inputData = Data(testCase.inputData)
+        var mutableData = inputData
+        #expect(throws: testCase.expectedError, performing: { try mutableData.removeFirstVarint() })
+        #expect(mutableData == inputData)
     }
 }

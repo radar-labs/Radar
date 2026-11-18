@@ -18,23 +18,23 @@ actor CallLinkStateUpdater {
     private let authCredentialManager: any AuthCredentialManager
     private let callLinkFetcher: CallLinkFetcherImpl
     private let callLinkManager: any CallLinkManager
-    private let callLinkStore: any CallLinkRecordStore
+    private let callLinkStore: CallLinkRecordStore
     private let callRecordDeleteManager: any CallRecordDeleteManager
     private let callRecordStore: any CallRecordStore
     private let db: any DB
     private let tsAccountManager: any TSAccountManager
 
-    private var pendingUpdates: [Data: [CheckedContinuation<Void, Never>]]
+    private let updateQueue = KeyedConcurrentTaskQueue<Data>(concurrentLimitPerKey: 1)
 
     init(
         authCredentialManager: any AuthCredentialManager,
         callLinkFetcher: CallLinkFetcherImpl,
         callLinkManager: any CallLinkManager,
-        callLinkStore: any CallLinkRecordStore,
+        callLinkStore: CallLinkRecordStore,
         callRecordDeleteManager: any CallRecordDeleteManager,
         callRecordStore: any CallRecordStore,
         db: any DB,
-        tsAccountManager: any TSAccountManager
+        tsAccountManager: any TSAccountManager,
     ) {
         self.authCredentialManager = authCredentialManager
         self.callLinkFetcher = callLinkFetcher
@@ -44,8 +44,6 @@ actor CallLinkStateUpdater {
         self.callRecordStore = callRecordStore
         self.db = db
         self.tsAccountManager = tsAccountManager
-
-        self.pendingUpdates = [:]
     }
 
     /// Runs `updateAndFetch` and persists the returned value.
@@ -55,7 +53,7 @@ actor CallLinkStateUpdater {
     /// user never joins.
     func updateExclusively(
         rootKey: CallLinkRootKey,
-        updateAndFetch: (CallLinkAuthCredential) async throws -> SignalServiceKit.CallLinkState
+        updateAndFetch: (CallLinkAuthCredential, RegisteredState) async throws -> SignalServiceKit.CallLinkState,
     ) async throws -> SignalServiceKit.CallLinkState {
         return try await _updateExclusively(rootKey: rootKey, updateAndFetch: updateAndFetch)!.get()
     }
@@ -68,35 +66,25 @@ actor CallLinkStateUpdater {
 
     private func _updateExclusively(
         rootKey: CallLinkRootKey,
-        updateAndFetch: (CallLinkAuthCredential) async throws -> SignalServiceKit.CallLinkState?
+        updateAndFetch: (CallLinkAuthCredential, RegisteredState) async throws -> SignalServiceKit.CallLinkState?,
     ) async throws -> Result<SignalServiceKit.CallLinkState, CallLinkNotFoundError>? {
         let roomId = rootKey.deriveRoomId()
+        return try await updateQueue.runWithThrowingTask(forKey: roomId) {
+            return try await __updateExclusively(roomId: roomId, rootKey: rootKey, updateAndFetch: updateAndFetch)
+        }
+    }
 
-        await withCheckedContinuation { continuation in
-            if pendingUpdates[roomId] == nil {
-                pendingUpdates[roomId] = []
-                continuation.resume()
-            } else {
-                pendingUpdates[roomId]!.append(continuation)
-            }
+    private func __updateExclusively(
+        roomId: Data,
+        rootKey: CallLinkRootKey,
+        updateAndFetch: (CallLinkAuthCredential, RegisteredState) async throws -> SignalServiceKit.CallLinkState?,
+    ) async throws -> Result<SignalServiceKit.CallLinkState, CallLinkNotFoundError>? {
+        let registeredState = try tsAccountManager.registeredStateWithMaybeSneakyTransaction()
+        let oldRecord = db.read { tx -> CallLinkRecord? in
+            return callLinkStore.fetch(roomId: roomId, tx: tx)
         }
-        defer {
-            if let nextUpdate = pendingUpdates[roomId]!.first {
-                pendingUpdates[roomId] = Array(pendingUpdates[roomId]!.dropFirst())
-                nextUpdate.resume()
-            } else {
-                pendingUpdates[roomId] = nil
-            }
-        }
-
-        guard let localIdentifiers = tsAccountManager.localIdentifiersWithMaybeSneakyTransaction else {
-            throw OWSGenericError("Not registered.")
-        }
-        let oldRecord = try db.read { tx -> CallLinkRecord? in
-            return try callLinkStore.fetch(roomId: roomId, tx: tx)
-        }
-        let authCredential = try await authCredentialManager.fetchCallLinkAuthCredential(localIdentifiers: localIdentifiers)
-        let updateResult = await Result { try await updateAndFetch(authCredential) }
+        let authCredential = try await authCredentialManager.fetchCallLinkAuthCredential(localIdentifiers: registeredState.localIdentifiers)
+        let updateResult = await Result { try await updateAndFetch(authCredential, registeredState) }
 
         let updateAction: UpdateAction
         let returnResult: Result<SignalServiceKit.CallLinkState, CallLinkNotFoundError>?
@@ -115,8 +103,8 @@ actor CallLinkStateUpdater {
             throw error
         }
 
-        try await db.awaitableWrite { tx in
-            if var newRecord = try self.callLinkStore.fetch(roomId: roomId, tx: tx) {
+        await db.awaitableWrite { tx in
+            if var newRecord = self.callLinkStore.fetch(roomId: roomId, tx: tx) {
                 if !newRecord.isDeleted {
                     switch updateAction {
                     case .update(let newState):
@@ -125,17 +113,17 @@ actor CallLinkStateUpdater {
                         break
                     case .delete:
                         newRecord.markDeleted(atTimestampMs: Date.ows_millisecondTimestamp())
-                        try self.callRecordDeleteManager.deleteCallRecords(
+                        self.callRecordDeleteManager.deleteCallRecords(
                             self.callRecordStore.fetchExisting(conversationId: .callLink(callLinkRowId: newRecord.id), limit: nil, tx: tx),
                             sendSyncMessageOnDelete: true,
-                            tx: tx
+                            tx: tx,
                         )
                     }
                 }
                 if newRecord.pendingFetchCounter == oldRecord?.pendingFetchCounter {
                     newRecord.clearNeedsFetch()
                 }
-                try self.callLinkStore.update(newRecord, tx: tx)
+                self.callLinkStore.update(newRecord, tx: tx)
             }
         }
 
@@ -156,7 +144,7 @@ actor CallLinkStateUpdater {
     /// Many callers will want access to the `CallLinkState`, and they can use
     /// `try readCallLink(...).get()` to gloss over this distinction.
     func readCallLink(rootKey: CallLinkRootKey) async throws -> Result<SignalServiceKit.CallLinkState, CallLinkNotFoundError> {
-        return try await _updateExclusively(rootKey: rootKey, updateAndFetch: { authCredential in
+        return try await _updateExclusively(rootKey: rootKey, updateAndFetch: { authCredential, _ in
             return try await callLinkFetcher.readCallLink(rootKey, authCredential: authCredential)
         })!
     }
@@ -164,10 +152,10 @@ actor CallLinkStateUpdater {
     func deleteCallLink(rootKey: CallLinkRootKey, adminPasskey: Data) async throws {
         _ = try await _updateExclusively(
             rootKey: rootKey,
-            updateAndFetch: { authCredential in
+            updateAndFetch: { authCredential, _ in
                 try await callLinkManager.deleteCallLink(rootKey: rootKey, adminPasskey: adminPasskey, authCredential: authCredential)
                 return nil
-            }
+            },
         )
     }
 }

@@ -11,15 +11,18 @@ struct ProfileSheetSheetCoordinator {
     private let address: SignalServiceAddress
     private let groupViewHelper: GroupViewHelper?
     private let spoilerState: SpoilerRenderState
+    private let memberLabel: MemberLabelForRendering?
 
     init(
         address: SignalServiceAddress,
         groupViewHelper: GroupViewHelper?,
-        spoilerState: SpoilerRenderState
+        spoilerState: SpoilerRenderState,
+        memberLabel: MemberLabelForRendering? = nil,
     ) {
         self.address = address
         self.groupViewHelper = groupViewHelper
         self.spoilerState = spoilerState
+        self.memberLabel = memberLabel
     }
 
     /// Present a ``MemberActionSheet`` for other users, and present a
@@ -29,24 +32,28 @@ struct ProfileSheetSheetCoordinator {
         let thread = threadViewModel.threadRecord
 
         if thread.isNoteToSelf, let contactThread = thread as? TSContactThread {
-            ContactAboutSheet(thread: contactThread, spoilerState: spoilerState)
+            ContactAboutSheet(thread: contactThread, spoilerState: spoilerState, memberLabel: memberLabel, groupViewHelper: groupViewHelper)
                 .present(from: viewController)
             return
         }
 
-        MemberActionSheet(
+        let sheet = MemberActionSheet(
             threadViewModel: threadViewModel,
             address: address,
             groupViewHelper: groupViewHelper,
-            spoilerState: spoilerState
+            spoilerState: spoilerState,
+            memberLabel: memberLabel,
         )
-        .present(from: viewController)
+        if viewController.overrideUserInterfaceStyle == .dark {
+            sheet.overrideUserInterfaceStyle = .dark
+        }
+        sheet.present(from: viewController)
     }
 }
 
 class MemberActionSheet: OWSTableSheetViewController {
     override var sheetBackgroundColor: UIColor {
-        if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable {
+        if #available(iOS 26, *) {
             .clear
         } else {
             super.sheetBackgroundColor
@@ -60,29 +67,28 @@ class MemberActionSheet: OWSTableSheetViewController {
     var threadViewModel: ThreadViewModel
     let address: SignalServiceAddress
     let spoilerState: SpoilerRenderState
+    let memberLabel: MemberLabelForRendering?
 
     fileprivate init(
         threadViewModel: ThreadViewModel,
         address: SignalServiceAddress,
         groupViewHelper: GroupViewHelper?,
-        spoilerState: SpoilerRenderState
+        spoilerState: SpoilerRenderState,
+        memberLabel: MemberLabelForRendering?,
     ) {
         self.threadViewModel = threadViewModel
         self.groupViewHelper = groupViewHelper
         self.address = address
         self.spoilerState = spoilerState
+        self.memberLabel = memberLabel
 
-#if compiler(>=6.2)
         if #available(iOS 26.0, *) {
             super.init(visualEffect: UIGlassEffect())
             self.topCornerRadius = 40
-            self.tableViewController.backgroundStyle = .none
+            self.tableViewController.backgroundStyle = .clear
         } else {
             super.init()
         }
-#else
-        super.init()
-#endif
 
         tableViewController.defaultSeparatorInsetLeading =
             OWSTableViewController2.cellHInnerMargin + 24 + OWSTableItem.iconSpacing
@@ -91,32 +97,35 @@ class MemberActionSheet: OWSTableSheetViewController {
             self,
             selector: #selector(recipientUpdated(notification:)),
             name: .OWSContactsManagerSignalAccountsDidChange,
-            object: nil
+            object: nil,
         )
     }
 
     fileprivate static func fetchThreadViewModel(address: SignalServiceAddress) -> ThreadViewModel {
         // Avoid opening a write transaction if we can
-        guard let threadViewModel: ThreadViewModel = SSKEnvironment.shared.databaseStorageRef.read(block: { transaction in
-            guard let thread = TSContactThread.getWithContactAddress(
-                address,
-                transaction: transaction
-            ) else { return nil }
-            return ThreadViewModel(
-                thread: thread,
-                forChatList: false,
-                transaction: transaction
-            )
-        }) else {
+        guard
+            let threadViewModel: ThreadViewModel = SSKEnvironment.shared.databaseStorageRef.read(block: { transaction in
+                guard
+                    let thread = TSContactThread.getWithContactAddress(
+                        address,
+                        transaction: transaction,
+                    ) else { return nil }
+                return ThreadViewModel(
+                    thread: thread,
+                    forChatList: false,
+                    transaction: transaction,
+                )
+            })
+        else {
             return SSKEnvironment.shared.databaseStorageRef.write { transaction in
                 let thread = TSContactThread.getOrCreateThread(
                     withContactAddress: address,
-                    transaction: transaction
+                    transaction: transaction,
                 )
                 return ThreadViewModel(
                     thread: thread,
                     forChatList: false,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             }
         }
@@ -130,7 +139,7 @@ class MemberActionSheet: OWSTableSheetViewController {
         viewController.present(self, animated: true)
     }
 
-    public override func tableContents() -> OWSTableContents {
+    override func tableContents() -> OWSTableContents {
         let contents = OWSTableContents()
 
         let topSpacerSection = OWSTableSection()
@@ -144,7 +153,8 @@ class MemberActionSheet: OWSTableSheetViewController {
             for: thread,
             sizeClass: .eighty,
             options: [.message, .videoCall, .audioCall, .noBackground],
-            delegate: self
+            memberLabel: memberLabel,
+            delegate: self,
         )
 
         // If the local user, show no options.
@@ -155,10 +165,12 @@ class MemberActionSheet: OWSTableSheetViewController {
         // Nickname
         section.add(.item(
             icon: .buttonEdit,
+            tintColor: .Signal.label,
             name: OWSLocalizedString(
                 "NICKNAME_BUTTON_TITLE",
-                comment: "Title for the table cell in conversation settings for presenting the profile nickname editor."
+                comment: "Title for the table cell in conversation settings for presenting the profile nickname editor.",
             ),
+            textColor: .Signal.label,
             actionBlock: { [weak self] in
                 guard let self else { return }
                 let db = DependenciesBridge.shared.db
@@ -168,163 +180,178 @@ class MemberActionSheet: OWSTableSheetViewController {
                         for: self.address,
                         context: .init(
                             db: db,
-                            nicknameManager: DependenciesBridge.shared.nicknameManager
+                            nicknameManager: DependenciesBridge.shared.nicknameManager,
                         ),
-                        tx: tx
+                        tx: tx,
                     )
                 }
                 guard let nicknameEditor else { return }
                 let navigationController = OWSNavigationController(rootViewController: nicknameEditor)
                 self.presentFormSheet(navigationController, animated: true)
-            }
+            },
         ))
 
-        // If blocked, only show unblock as an option
-        guard !threadViewModel.isBlocked else {
+        let isBlocked = threadViewModel.isBlocked
+        if isBlocked {
             section.add(.item(
                 icon: .chatSettingsBlock,
+                tintColor: .Signal.label,
                 name: OWSLocalizedString(
                     "BLOCK_LIST_UNBLOCK_BUTTON",
-                    comment: "Button label for the 'unblock' button"
+                    comment: "Button label for the 'unblock' button",
                 ),
-                accessibilityIdentifier: "MemberActionSheet.unblock",
+                textColor: .Signal.label,
                 actionBlock: { [weak self] in
                     self?.didTapUnblockThread {}
-                }
+                },
             ))
-            return contents
+        } else {
+            section.add(.item(
+                icon: .chatSettingsBlock,
+                tintColor: .Signal.label,
+                name: OWSLocalizedString(
+                    "BLOCK_LIST_BLOCK_BUTTON",
+                    comment: "Button label for the 'block' button",
+                ),
+                textColor: .Signal.label,
+                actionBlock: { [weak self] in
+                    guard let self, let fromViewController = self.fromViewController else { return }
+                    self.dismiss(animated: true) {
+                        BlockListUIUtils.showBlockAddressActionSheet(
+                            self.address,
+                            from: fromViewController,
+                            completion: nil,
+                        )
+                    }
+                },
+            ))
         }
-
-        section.add(.item(
-            icon: .chatSettingsBlock,
-            name: OWSLocalizedString(
-                "BLOCK_LIST_BLOCK_BUTTON",
-                comment: "Button label for the 'block' button"
-            ),
-            accessibilityIdentifier: "MemberActionSheet.block",
-            actionBlock: { [weak self] in
-                guard let self = self, let fromViewController = self.fromViewController else { return }
-                self.dismiss(animated: true) {
-                    BlockListUIUtils.showBlockAddressActionSheet(
-                        self.address,
-                        from: fromViewController,
-                        completion: nil
-                    )
-                }
-            }
-        ))
 
         if let groupViewHelper = self.groupViewHelper, groupViewHelper.isFullOrInvitedMember(address) {
             if groupViewHelper.canRemoveFromGroup(address: address) {
                 section.add(.item(
                     icon: .groupMemberRemoveFromGroup,
+                    tintColor: .Signal.label,
                     name: OWSLocalizedString(
                         "CONVERSATION_SETTINGS_REMOVE_FROM_GROUP_BUTTON",
-                        comment: "Label for 'remove from group' button in conversation settings view."
+                        comment: "Label for 'remove from group' button in conversation settings view.",
                     ),
-                    accessibilityIdentifier: "MemberActionSheet.removeFromGroup",
+                    textColor: .Signal.label,
                     actionBlock: { [weak self] in
-                        guard let self = self else { return }
+                        guard let self else { return }
                         self.dismiss(animated: true) {
                             self.groupViewHelper?.presentRemoveFromGroupActionSheet(address: self.address)
                         }
-                    }
+                    },
                 ))
             }
-            if groupViewHelper.memberActionSheetCanMakeGroupAdmin(address: address) {
+            if groupViewHelper.memberActionSheetCanMakeGroupAdmin(address: address), !isBlocked {
                 section.add(.item(
                     icon: .groupMemberMakeGroupAdmin,
+                    tintColor: .Signal.label,
                     name: OWSLocalizedString(
                         "CONVERSATION_SETTINGS_MAKE_GROUP_ADMIN_BUTTON",
-                        comment: "Label for 'make group admin' button in conversation settings view."
+                        comment: "Label for 'make group admin' button in conversation settings view.",
                     ),
-                    accessibilityIdentifier: "MemberActionSheet.makeGroupAdmin",
+                    textColor: .Signal.label,
                     actionBlock: { [weak self] in
-                        guard let self = self else { return }
+                        guard let self else { return }
                         self.dismiss(animated: true) {
                             self.groupViewHelper?.memberActionSheetMakeGroupAdminWasSelected(address: self.address)
                         }
-                    }
+                    },
                 ))
             }
             if groupViewHelper.memberActionSheetCanRevokeGroupAdmin(address: address) {
                 section.add(.item(
                     icon: .groupMemberRevokeGroupAdmin,
+                    tintColor: .Signal.label,
                     name: OWSLocalizedString(
                         "CONVERSATION_SETTINGS_REVOKE_GROUP_ADMIN_BUTTON",
-                        comment: "Label for 'revoke group admin' button in conversation settings view."
+                        comment: "Label for 'revoke group admin' button in conversation settings view.",
                     ),
-                    accessibilityIdentifier: "MemberActionSheet.revokeGroupAdmin",
+                    textColor: .Signal.label,
                     actionBlock: { [weak self] in
-                        guard let self = self else { return }
+                        guard let self else { return }
                         self.dismiss(animated: true) {
-                            self.groupViewHelper?.memberActionSheetRevokeGroupAdminWasSelected(address: self.address)
+                            self.groupViewHelper?.memberActionSheetRevokeGroupAdminWasSelected(
+                                address: self.address,
+                                hasMemberLabel: self.memberLabel != nil,
+                            )
                         }
-                    }
+                    },
                 ))
             }
         }
 
-        section.add(.item(
-            icon: .groupMemberAddToGroup,
-            name: OWSLocalizedString(
-                "ADD_TO_GROUP",
-                comment: "Label for button or row which allows users to add to another group."
-            ),
-            accessibilityIdentifier: "MemberActionSheet.add_to_group",
-            actionBlock: { [weak self] in
-                guard let self = self, let fromViewController = self.fromViewController else { return }
-                self.dismiss(animated: true) {
-                    AddToGroupViewController.presentForUser(self.address, from: fromViewController)
-                }
-            }
-        ))
+        if !isBlocked {
+            section.add(.item(
+                icon: .groupMemberAddToGroup,
+                tintColor: .Signal.label,
+                name: OWSLocalizedString(
+                    "ADD_TO_GROUP",
+                    comment: "Label for button or row which allows users to add to another group.",
+                ),
+                textColor: .Signal.label,
+                actionBlock: { [weak self] in
+                    guard let self, let fromViewController = self.fromViewController else { return }
+                    self.dismiss(animated: true) {
+                        AddToGroupViewController.presentForUser(self.address, from: fromViewController)
+                    }
+                },
+            ))
+        }
 
         let isSystemContact = SSKEnvironment.shared.databaseStorageRef.read { tx in
             return SSKEnvironment.shared.contactManagerRef.fetchSignalAccount(for: address, transaction: tx) != nil
         }
-        if isSystemContact {
+        if !isBlocked, isSystemContact {
             section.add(.item(
                 icon: .contactInfoUserInContacts,
+                tintColor: .Signal.label,
                 name: OWSLocalizedString(
                     "CONVERSATION_SETTINGS_VIEW_IS_SYSTEM_CONTACT",
-                    comment: "Indicates that user is in the system contacts list."
+                    comment: "Indicates that user is in the system contacts list.",
                 ),
-                accessibilityIdentifier: "MemberActionSheet.contact",
+                textColor: .Signal.label,
                 actionBlock: { [weak self] in
                     guard let self else { return }
                     self.viewSystemContactDetails(contactAddress: self.address)
-                }
+                },
             ))
-        } else if address.phoneNumber != nil {
+        } else if !isBlocked, address.phoneNumber != nil {
             section.add(.item(
                 icon: .contactInfoAddToContacts,
+                tintColor: .Signal.label,
                 name: OWSLocalizedString(
                     "CONVERSATION_SETTINGS_ADD_TO_SYSTEM_CONTACTS",
-                    comment: "button in conversation settings view."
+                    comment: "button in conversation settings view.",
                 ),
-                accessibilityIdentifier: "MemberActionSheet.add_to_contacts",
+                textColor: .Signal.label,
                 actionBlock: { [weak self] in
                     guard let self else { return }
                     self.showAddToSystemContactsActionSheet(contactAddress: self.address)
-                }
+                },
             ))
         }
 
-        section.add(.item(
-            icon: .contactInfoSafetyNumber,
-            name: OWSLocalizedString(
-                "VERIFY_PRIVACY",
-                comment: "Label for button or row which allows users to verify the safety number of another user."
-            ),
-            accessibilityIdentifier: "MemberActionSheet.safety_number",
-            actionBlock: { [weak self] in
-                guard let self = self, let fromViewController = self.fromViewController else { return }
-                self.dismiss(animated: true) {
-                    FingerprintViewController.present(for: self.address.aci, from: fromViewController)
-                }
-            }
-        ))
+        if !isBlocked {
+            section.add(.item(
+                icon: .contactInfoSafetyNumber,
+                tintColor: .Signal.label,
+                name: OWSLocalizedString(
+                    "VERIFY_PRIVACY",
+                    comment: "Label for button or row which allows users to verify the safety number of another user.",
+                ),
+                textColor: .Signal.label,
+                actionBlock: { [weak self] in
+                    guard let self, let fromViewController = self.fromViewController else { return }
+                    self.dismiss(animated: true) {
+                        FingerprintViewController.present(for: self.address.aci, from: fromViewController)
+                    }
+                },
+            ))
+        }
 
         return contents
     }
@@ -336,7 +363,7 @@ class MemberActionSheet: OWSTableSheetViewController {
         dismiss(animated: true) {
             contactsViewHelper.presentSystemContactsFlow(
                 CreateOrEditContactFlow(address: contactAddress, editImmediately: false),
-                from: viewController
+                from: viewController,
             )
         }
     }
@@ -349,22 +376,22 @@ class MemberActionSheet: OWSTableSheetViewController {
             let actionSheet = ActionSheetController()
             let createNewTitle = OWSLocalizedString(
                 "CONVERSATION_SETTINGS_NEW_CONTACT",
-                comment: "Label for 'new contact' button in conversation settings view."
+                comment: "Label for 'new contact' button in conversation settings view.",
             )
             actionSheet.addAction(ActionSheetAction(
                 title: createNewTitle,
                 style: .default,
-                handler: {_ in
+                handler: { _ in
                     contactsViewHelper.presentSystemContactsFlow(
                         CreateOrEditContactFlow(address: contactAddress),
-                        from: viewController
+                        from: viewController,
                     )
-                }
+                },
             ))
 
             let addToExistingTitle = OWSLocalizedString(
                 "CONVERSATION_SETTINGS_ADD_TO_EXISTING_CONTACT",
-                comment: "Label for 'new contact' button in conversation settings view."
+                comment: "Label for 'new contact' button in conversation settings view.",
             )
             actionSheet.addAction(ActionSheetAction(
                 title: addToExistingTitle,
@@ -372,9 +399,9 @@ class MemberActionSheet: OWSTableSheetViewController {
                 handler: { _ in
                     contactsViewHelper.presentSystemContactsFlow(
                         AddToExistingContactFlow(address: contactAddress),
-                        from: viewController
+                        from: viewController,
                     )
-                }
+                },
             ))
             actionSheet.addAction(OWSActionSheets.cancelAction)
 
@@ -401,10 +428,11 @@ extension MemberActionSheet: ConversationHeaderDelegate {
     }
 
     func presentAvatarViewController() {
-        guard let avatarView = avatarView, avatarView.primaryImage != nil else { return }
-        guard let vc = SSKEnvironment.shared.databaseStorageRef.read(block: { readTx in
-            AvatarViewController(address: self.address, renderLocalUserAsNoteToSelf: false, readTx: readTx)
-        }) else { return }
+        guard let avatarView, avatarView.primaryImage != nil else { return }
+        guard
+            let vc = SSKEnvironment.shared.databaseStorageRef.read(block: { readTx in
+                AvatarViewController(address: self.address, renderLocalUserAsNoteToSelf: false, readTx: readTx)
+            }) else { return }
         present(vc, animated: true)
     }
 
@@ -413,7 +441,7 @@ extension MemberActionSheet: ConversationHeaderDelegate {
         let (profile, shortName) = SSKEnvironment.shared.databaseStorageRef.read { transaction in
             return (
                 SSKEnvironment.shared.profileManagerRef.userProfile(for: address, tx: transaction),
-                SSKEnvironment.shared.contactManagerRef.displayName(for: address, tx: transaction).resolvedValue(useShortNameIfAvailable: true)
+                SSKEnvironment.shared.contactManagerRef.displayName(for: address, tx: transaction).resolvedValue(useShortNameIfAvailable: true),
             )
         }
         guard let primaryBadge = profile?.primaryBadge?.badge else { return }
@@ -426,23 +454,27 @@ extension MemberActionSheet: ConversationHeaderDelegate {
         let badgeSheet = BadgeDetailsSheet(focusedBadge: primaryBadge, owner: owner)
         present(badgeSheet, animated: true, completion: nil)
     }
+
     func tappedConversationSearch() {}
     func didTapUnblockThread(completion: @escaping () -> Void) {
-        guard let fromViewController = fromViewController else { return }
+        guard let fromViewController else { return }
         dismiss(animated: true) {
             BlockListUIUtils.showUnblockAddressActionSheet(
                 self.address,
-                from: fromViewController
+                from: fromViewController,
             ) { _ in
                 completion()
             }
         }
     }
+
     func tappedButton() {
         dismiss(animated: true)
     }
+
     func didTapAddGroupDescription() {}
     var canEditConversationAttributes: Bool { false }
+    var groupDescriptionDelegate: GroupDescriptionViewControllerDelegate? { nil }
 
     var canTapThreadName: Bool { true }
 
@@ -455,6 +487,27 @@ extension MemberActionSheet: ConversationHeaderDelegate {
         dismiss(animated: true) {
             guard let fromViewController = self.fromViewController else { return }
             sheet.present(from: fromViewController)
+        }
+    }
+
+    func didTapMemberLabel() {
+        guard
+            let presenter = self.fromViewController as? MemberLabelViewControllerPresenter,
+            let groupViewHelper,
+            let groupThread = groupViewHelper.thread as? TSGroupThread,
+            let groupModel = groupThread.groupModel as? TSGroupModelV2,
+            let memberLabelCoordinator = groupViewHelper.memberLabelCoordinator
+        else {
+            return
+        }
+
+        let localUserHasMemberLabel = groupModel.groupMembership.localUserMemberLabel != nil
+        dismiss(animated: true) {
+            memberLabelCoordinator.presenter = presenter
+            memberLabelCoordinator.presentWithEducationSheet(
+                localUserHasMemberLabel: localUserHasMemberLabel,
+                canEditMemberLabel: groupViewHelper.canEditMemberLabels,
+            )
         }
     }
 }

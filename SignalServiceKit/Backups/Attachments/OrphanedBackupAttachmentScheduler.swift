@@ -22,7 +22,7 @@ public protocol OrphanedBackupAttachmentScheduler {
     /// so dequeue it for deletion.
     func didCreateOrUpdateAttachment(
         withMediaName mediaName: String,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 
     /// Orphan all existing media tier uploads for an attachment, marking them for
@@ -32,8 +32,8 @@ public protocol OrphanedBackupAttachmentScheduler {
     /// deletion automatically.
     func orphanExistingMediaTierUploads(
         of attachment: Attachment,
-        tx: DBWriteTransaction
-    ) throws
+        tx: DBWriteTransaction,
+    )
 }
 
 public class OrphanedBackupAttachmentSchedulerImpl: OrphanedBackupAttachmentScheduler {
@@ -51,39 +51,38 @@ public class OrphanedBackupAttachmentSchedulerImpl: OrphanedBackupAttachmentSche
 
     public func didCreateOrUpdateAttachment(
         withMediaName mediaName: String,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
-        try! OrphanedBackupAttachment
-            .filter(Column(OrphanedBackupAttachment.CodingKeys.mediaName) == mediaName)
-            .deleteAll(tx.database)
+        failIfThrows {
+            try OrphanedBackupAttachment
+                .filter(Column(OrphanedBackupAttachment.CodingKeys.mediaName) == mediaName)
+                .deleteAll(tx.database)
+        }
         let mediaKey = accountKeyStore.getOrGenerateMediaRootBackupKey(tx: tx)
         for type in OrphanedBackupAttachment.SizeType.allCases {
-            do {
-                let mediaId = try mediaKey.deriveMediaId(
-                    {
-                        switch type {
-                        case .fullsize:
-                            mediaName
-                        case .thumbnail:
-                            AttachmentBackupThumbnail
-                                .thumbnailMediaName(fullsizeMediaName: mediaName)
-                        }
-                    }(),
-                )
-                try! OrphanedBackupAttachment
+            let mediaId = mediaKey.deriveMediaId(
+                {
+                    switch type {
+                    case .fullsize:
+                        mediaName
+                    case .thumbnail:
+                        AttachmentBackupThumbnail
+                            .thumbnailMediaName(fullsizeMediaName: mediaName)
+                    }
+                }(),
+            )
+            failIfThrows {
+                try OrphanedBackupAttachment
                     .filter(Column(OrphanedBackupAttachment.CodingKeys.mediaId) == mediaId)
                     .deleteAll(tx.database)
-            } catch {
-                owsFailDebug("Unexpected encryption material error")
             }
-
         }
     }
 
     public func orphanExistingMediaTierUploads(
         of attachment: Attachment,
-        tx: DBWriteTransaction
-    ) throws {
+        tx: DBWriteTransaction,
+    ) {
         guard let mediaName = attachment.mediaName else {
             // If we didn't have a mediaName assigned,
             // there's no uploads to orphan (that we know of locally).
@@ -96,9 +95,9 @@ public class OrphanedBackupAttachmentSchedulerImpl: OrphanedBackupAttachmentSche
             var fullsizeOrphanRecord = OrphanedBackupAttachment.locallyOrphaned(
                 cdnNumber: cdnNumber,
                 mediaName: mediaName,
-                type: .fullsize
+                type: .fullsize,
             )
-            try orphanedBackupAttachmentStore.insert(&fullsizeOrphanRecord, tx: tx)
+            orphanedBackupAttachmentStore.insert(&fullsizeOrphanRecord, tx: tx)
         }
         if
             let thumbnailMediaTierInfo = attachment.thumbnailMediaTierInfo,
@@ -107,11 +106,11 @@ public class OrphanedBackupAttachmentSchedulerImpl: OrphanedBackupAttachmentSche
             var fullsizeOrphanRecord = OrphanedBackupAttachment.locallyOrphaned(
                 cdnNumber: cdnNumber,
                 mediaName: AttachmentBackupThumbnail.thumbnailMediaName(
-                    fullsizeMediaName: mediaName
+                    fullsizeMediaName: mediaName,
                 ),
-                type: .thumbnail
+                type: .thumbnail,
             )
-            try orphanedBackupAttachmentStore.insert(&fullsizeOrphanRecord, tx: tx)
+            orphanedBackupAttachmentStore.insert(&fullsizeOrphanRecord, tx: tx)
         }
     }
 }
@@ -124,15 +123,15 @@ open class OrphanedBackupAttachmentSchedulerMock: OrphanedBackupAttachmentSchedu
 
     open func didCreateOrUpdateAttachment(
         withMediaName mediaName: String,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         // Do nothing
     }
 
     open func orphanExistingMediaTierUploads(
         of attachment: Attachment,
-        tx: DBWriteTransaction
-    ) throws {
+        tx: DBWriteTransaction,
+    ) {
         // Do nothing
     }
 }

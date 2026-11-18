@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import SignalServiceKit
-public import SignalUI
+import SignalServiceKit
+import SignalUI
 
 extension ConversationViewController {
 
-    public func renderItem(forIndex index: NSInteger) -> CVRenderItem? {
+    func renderItem(forIndex index: NSInteger) -> CVRenderItem? {
         guard index >= 0, index < renderItems.count else {
             owsFailDebug("Invalid view item index: \(index)")
             return nil
@@ -22,13 +22,13 @@ extension ConversationViewController {
         return loadCoordinator.renderState
     }
 
-    public var renderItems: [CVRenderItem] {
+    var renderItems: [CVRenderItem] {
         AssertIsOnMainThread()
 
         return loadCoordinator.renderItems
     }
 
-    public var allIndexPaths: [IndexPath] {
+    var allIndexPaths: [IndexPath] {
         AssertIsOnMainThread()
 
         return loadCoordinator.allIndexPaths
@@ -42,16 +42,16 @@ extension ConversationViewController {
     func clearThreadUnreadFlagIfNecessary() {
         if threadViewModel.isMarkedUnread {
             SSKEnvironment.shared.databaseStorageRef.write { transaction in
-                self.threadViewModel.associatedData.updateWith(
+                self.threadViewModel.threadRecord.updateWith(
                     isMarkedUnread: false,
                     updateStorageService: true,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             }
         }
     }
 
-    public static func canCall(threadViewModel: ThreadViewModel) -> Bool {
+    static func canCall(threadViewModel: ThreadViewModel) -> Bool {
         if threadViewModel.hasPendingMessageRequest {
             return false
         }
@@ -70,11 +70,11 @@ extension ConversationViewController {
     // When performing an interactive dismiss, safe area updates rapidly in quick succession,
     // which causes this method to go haywire, recomputing insets a few times and incorrectly determining
     // that it needs to scroll as a result. To avoid this, apply a debounce to rapid updates.
-    public func updateContentInsetsDebounced() {
+    func updateContentInsetsDebounced() {
         updateContentInsetsEvent.requestNotify()
     }
 
-    internal func updateContentInsets() {
+    func updateContentInsets() {
         AssertIsOnMainThread()
 
         // Don't update the content insets if an interactive pop is in progress
@@ -150,27 +150,35 @@ extension ConversationViewController {
         }
     }
 
-    public func showUnknownThreadWarningAlert() {
+    func showUnknownThreadWarningAlert() {
         // TODO: Finalize this copy.
-        let message = (thread.isGroupThread
-                        ? OWSLocalizedString("ALERT_UNKNOWN_THREAD_WARNING_GROUP_MESSAGE",
-                                            comment: "Message for UI warning about an unknown group thread.")
-                        : OWSLocalizedString("ALERT_UNKNOWN_THREAD_WARNING_CONTACT_MESSAGE",
-                                            comment: "Message for UI warning about an unknown contact thread."))
+        let message = (
+            thread.isGroupThread
+                ? OWSLocalizedString(
+                    "ALERT_UNKNOWN_THREAD_WARNING_GROUP_MESSAGE",
+                    comment: "Message for UI warning about an unknown group thread.",
+                )
+                : OWSLocalizedString(
+                    "ALERT_UNKNOWN_THREAD_WARNING_CONTACT_MESSAGE",
+                    comment: "Message for UI warning about an unknown contact thread.",
+                ),
+        )
         let actionSheet = ActionSheetController(message: message)
         actionSheet.addAction(ActionSheetAction(
-            title: OWSLocalizedString("ALERT_UNKNOWN_THREAD_WARNING_LEARN_MORE",
-                                     comment: "Label for button to learn more about message requests."),
+            title: OWSLocalizedString(
+                "ALERT_UNKNOWN_THREAD_WARNING_LEARN_MORE",
+                comment: "Label for button to learn more about message requests.",
+            ),
             style: .default,
             handler: { _ in
                 CurrentAppContext().open(URL.Support.profilesAndMessageRequests, completion: nil)
-            }
+            },
         ))
         actionSheet.addAction(OWSActionSheets.cancelAction)
         presentActionSheet(actionSheet)
     }
 
-    public func showDeliveryIssueWarningAlert(from senderAddress: SignalServiceAddress, isKnownThread: Bool) {
+    func showDeliveryIssueWarningAlert(from senderAddress: SignalServiceAddress, isKnownThread: Bool) {
         let senderName = SSKEnvironment.shared.databaseStorageRef.read { transaction in
             SSKEnvironment.shared.contactManagerRef.displayName(for: senderAddress, tx: transaction).resolvedValue()
         }
@@ -182,7 +190,7 @@ extension ConversationViewController {
             alertMessageFormat = OWSLocalizedString("ALERT_DELIVERY_ISSUE_UNKNOWN_THREAD_MESSAGE_FORMAT", comment: "Format string for delivery issue sheet message where the original thread is unknown. Embeds {{ sender name }}.")
         }
 
-        let alertMessage = String(format: alertMessageFormat, senderName)
+        let alertMessage = String.nonPluralLocalizedStringWithFormat(alertMessageFormat, senderName)
 
         let headerImageView = UIImageView(image: .init(named: "delivery-issue"))
         headerImageView.autoSetDimension(.height, toSize: 110)
@@ -196,24 +204,23 @@ extension ConversationViewController {
 
         let actionSheet = ActionSheetController(
             title: alertTitle,
-            message: alertMessage)
+            message: alertMessage,
+        )
         actionSheet.customHeader = headerView
         actionSheet.addAction(OWSActionSheets.okayAction)
         actionSheet.addAction(
             ActionSheetAction(
                 title: CommonStrings.learnMore,
-                style: .default
+                style: .default,
             ) { _ in
                 CurrentAppContext().open(URL.Support.deliveryIssue, completion: nil)
-            }
+            },
         )
         presentActionSheet(actionSheet)
     }
-}
 
-// MARK: - ForwardMessageDelegate
+    // MARK: - ForwardMessageDelegate
 
-extension ConversationViewController: ForwardMessageDelegate {
     func forwardMessageFlowDidComplete(
         items: [ForwardMessageItem],
         recipientThreads: [TSThread],
@@ -223,32 +230,30 @@ extension ConversationViewController: ForwardMessageDelegate {
         self.uiMode = .normal
 
         self.dismiss(animated: true) {
-            ForwardMessageViewController.finalizeForward(items: items,
-                                                         recipientThreads: recipientThreads,
-                                                         fromViewController: self)
+            ForwardMessageViewController.finalizeForward(
+                items: items,
+                recipientThreads: recipientThreads,
+                fromViewController: self,
+            )
         }
     }
 
     func forwardMessageFlowDidCancel() {
         self.dismiss(animated: true)
     }
-}
 
-// MARK: - MessageActionsToolbarDelegate
+    // MARK: - MessageActionsToolbarDelegate
 
-extension ConversationViewController: MessageActionsToolbarDelegate {
-    public func messageActionsToolbar(_ messageActionsToolbar: MessageActionsToolbar, executedAction: MessageAction) {
+    func messageActionsToolbar(_ messageActionsToolbar: MessageActionsToolbar, executedAction: MessageAction) {
         executedAction.block(messageActionsToolbar)
     }
 
-    public var messageActionsToolbarSelectedInteractionCount: Int {
+    var messageActionsToolbarSelectedInteractionCount: Int {
         self.selectionState.interactionCount
     }
-}
 
-// MARK: -
+    // MARK: - GroupViewHelperDelegate
 
-extension ConversationViewController: GroupViewHelperDelegate {
     func groupViewHelperDidUpdateGroup() {
         // Do nothing.
     }
@@ -263,11 +268,9 @@ extension ConversationViewController: GroupViewHelperDelegate {
     var fromViewController: UIViewController? {
         return self
     }
-}
 
-// MARK: - UIMode
+    // MARK: - UIMode
 
-extension ConversationViewController {
     func uiModeDidChange(oldValue: ConversationUIMode) {
         if oldValue == .search {
             navigationItem.searchController = nil
@@ -279,7 +282,8 @@ extension ConversationViewController {
 
         switch uiMode {
         case .normal:
-            if navigationItem.titleView != headerView {
+            // Radar: no conversation header in the starred-messages view.
+            if !onlyStarred, navigationItem.titleView != headerView {
                 navigationItem.titleView = headerView
             }
         case .search:
@@ -291,9 +295,9 @@ extension ConversationViewController {
         updateBarButtonItems()
         ensureBottomViewType()
     }
-}
 
-extension ConversationViewController: MediaPresentationContextProvider {
+    // MARK: - MediaPresentationContextProvider
+
     func mediaPresentationContext(item: Media, in coordinateSpace: UICoordinateSpace) -> MediaPresentationContext? {
         guard case let .gallery(galleryItem) = item else {
             owsFailDebug("Unexpected media type")
@@ -322,7 +326,7 @@ extension ConversationViewController: MediaPresentationContextProvider {
             return nil
         }
 
-        guard let mediaView = messageCell.albumItemView(forAttachment: galleryItem.attachmentStream) else {
+        guard let mediaView = messageCell.albumItemView(forAttachment: galleryItem.referencedAttachment) else {
             owsFailDebug("itemView was unexpectedly nil")
             return nil
         }
@@ -390,77 +394,80 @@ extension ConversationViewController: MediaPresentationContextProvider {
             mediaView: mediaView,
             presentationFrame: presentationFrame,
             mediaViewShape: mediaViewShape,
-            clippingAreaInsets: collectionView.adjustedContentInset
+            clippingAreaInsets: collectionView.adjustedContentInset,
         )
-    }
-
-    func snapshotOverlayView(in coordinateSpace: UICoordinateSpace) -> (UIView, CGRect)? {
-        return nil
     }
 
     func mediaWillDismiss(toContext: MediaPresentationContext) {
         // To avoid flicker when transition view is animated over the message bubble,
         // we initially hide the overlaying elements and fade them in.
-        let mediaOverlayViews = toContext.mediaOverlayViews
-        for mediaOverlayView in mediaOverlayViews {
-            mediaOverlayView.alpha = 0
-        }
+        toContext.mediaOverlayViews.forEach { $0.alpha = 0 }
     }
 
     func mediaDidDismiss(toContext: MediaPresentationContext) {
         // To avoid flicker when transition view is animated over the message bubble,
         // we initially hide the overlaying elements and fade them in.
         let mediaOverlayViews = toContext.mediaOverlayViews
-        let duration: TimeInterval = kIsDebuggingMediaPresentationAnimations ? 1.5 : 0.2
         UIView.animate(
-            withDuration: duration,
+            withDuration: MediaPresentationContext.animationDuration,
             animations: {
-                for mediaOverlayView in mediaOverlayViews {
-                    mediaOverlayView.alpha = 1
-                }
-            })
+                mediaOverlayViews.forEach { $0.alpha = 1 }
+            },
+        )
     }
-}
 
-// MARK: -
+    // MARK: -
 
-public extension ConversationViewController {
     func showGroupLinkPromotionActionSheet() {
-        guard let groupThread = thread as? TSGroupThread else {
+        guard
+            let groupThread = thread as? TSGroupThread,
+            let groupModel = groupThread.groupModel as? TSGroupModelV2,
+            let secretParams = try? groupModel.secretParams()
+        else {
             owsFailDebug("Invalid thread.")
             return
         }
-        guard groupThread.isGroupV2Thread else {
+
+        if groupModel.isTerminated {
+            showUnableToTakeActionInEndedGroupSheet()
             return
         }
-        let view = GroupLinkPromotionActionSheet(groupThread: groupThread,
-                                                 conversationViewController: self)
+
+        let view = GroupLinkPromotionActionSheet(
+            secretParams: secretParams,
+            conversationViewController: self,
+        )
         view.present(fromViewController: self)
     }
-}
 
-// MARK: -
+    func showUnableToTakeActionInEndedGroupSheet() {
+        let alert = ActionSheetController(
+            title: nil,
+            message: OWSLocalizedString(
+                "END_GROUP_ACTION_ERROR",
+                comment: "Description for error sheet that says the user can no longer take this action because the group has ended.",
+            ),
+        )
 
-extension ConversationViewController: MessageDetailViewDelegate {
+        alert.addAction(OWSActionSheets.okayAction)
+        presentActionSheet(alert)
+    }
+
+    // MARK: - MessageDetailViewDelegate
 
     func detailViewMessageWasDeleted(_ messageDetailViewController: MessageDetailViewController) {
         Logger.info("")
 
         navigationController?.popToViewController(self, animated: true)
     }
-}
 
-// MARK: - MessageEditHistoryViewDelegate
+    // MARK: - MessageEditHistoryViewDelegate
 
-extension ConversationViewController: MessageEditHistoryViewDelegate {
     func editHistoryMessageWasDeleted() {
         self.dismiss(animated: true)
     }
-}
 
-// MARK: -
-
-extension ConversationViewController: LongTextViewDelegate {
+    // MARK: - LongTextViewDelegate
 
     func longTextViewMessageWasDeleted(_ longTextViewController: LongTextViewController) {
         Logger.info("")
@@ -477,24 +484,25 @@ extension ConversationViewController: LongTextViewDelegate {
         }
         if displayableBodyText.canRenderTruncatedTextInline {
             self.setTextExpanded(interactionId: itemViewModel.interaction.uniqueId)
-            self.loadCoordinator.enqueueReload(updatedInteractionIds: [itemViewModel.interaction.uniqueId],
-                                               deletedInteractionIds: [])
+            self.loadCoordinator.enqueueReload(
+                updatedInteractionIds: [itemViewModel.interaction.uniqueId],
+                deletedInteractionIds: [],
+            )
         } else {
             let viewController = LongTextViewController(
                 itemViewModel: itemViewModel,
                 threadViewModel: self.threadViewModel,
-                spoilerState: self.viewState.spoilerState
+                spoilerState: self.viewState.spoilerState,
             )
             viewController.delegate = self
             navigationController?.pushViewController(viewController, animated: true)
         }
     }
-}
 
-// MARK: -
+    // MARK: - SendPaymentViewDelegate
 
-extension ConversationViewController: SendPaymentViewDelegate {
-    public func didSendPayment(success: Bool) {
+    func didSendPayment(success: Bool) {
+        // Radar shows the payment in the chat, so don't open payment settings afterwards.
         guard success else { return }
         PaymentOnboarding.presentBiometricLockPromptIfNeeded {}
     }

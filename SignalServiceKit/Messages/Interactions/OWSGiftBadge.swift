@@ -20,45 +20,62 @@ public enum OWSGiftBadgeRedemptionState: Int {
 }
 
 @objc
-public class OWSGiftBadge: MTLModel {
-    @objc
-    public var redemptionCredential: Data?
+public final class OWSGiftBadge: NSObject, NSSecureCoding, NSCopying {
+    public static var supportsSecureCoding: Bool { true }
+
+    public init?(coder: NSCoder) {
+        self.redemptionCredential = coder.decodeObject(of: NSData.self, forKey: "redemptionCredential") as Data?
+        self.redemptionState = (coder.decodeObject(of: NSNumber.self, forKey: "redemptionState")?.intValue).flatMap(OWSGiftBadgeRedemptionState.init(rawValue:)) ?? .pending
+    }
+
+    public func encode(with coder: NSCoder) {
+        if let redemptionCredential {
+            coder.encode(redemptionCredential, forKey: "redemptionCredential")
+        }
+        coder.encode(NSNumber(value: self.redemptionState.rawValue), forKey: "redemptionState")
+    }
+
+    override public var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(redemptionCredential)
+        hasher.combine(redemptionState)
+        return hasher.finalize()
+    }
+
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard type(of: self) == type(of: object) else { return false }
+        guard self.redemptionCredential == object.redemptionCredential else { return false }
+        guard self.redemptionState == object.redemptionState else { return false }
+        return true
+    }
+
+    public func copy(with zone: NSZone? = nil) -> Any {
+        return Self(
+            redemptionCredential: redemptionCredential,
+            redemptionState: redemptionState,
+        )
+    }
 
     @objc
-    public var redemptionState: OWSGiftBadgeRedemptionState = .pending
+    public let redemptionCredential: Data?
+    public var redemptionState: OWSGiftBadgeRedemptionState
 
     public convenience init(redemptionCredential: Data) {
         self.init(
             redemptionCredential: redemptionCredential,
-            redemptionState: .pending
+            redemptionState: .pending,
         )
     }
 
     private init(
         redemptionCredential: Data?,
-        redemptionState: OWSGiftBadgeRedemptionState
+        redemptionState: OWSGiftBadgeRedemptionState,
     ) {
         self.redemptionCredential = redemptionCredential
         self.redemptionState = redemptionState
 
         super.init()
-    }
-
-    // This may seem unnecessary, but the app crashes at runtime when calling
-    // initWithCoder: if it's not present.
-    @objc
-    public override init() {
-        super.init()
-    }
-
-    @objc
-    public required init(dictionary: [String: Any]!) throws {
-        try super.init(dictionary: dictionary)
-    }
-
-    @objc
-    public required init!(coder: NSCoder) {
-        super.init(coder: coder)
     }
 
     public func getReceiptCredentialPresentation() throws -> ReceiptCredentialPresentation {
@@ -87,11 +104,11 @@ public class OWSGiftBadge: MTLModel {
 
     public class func restoreFromBackup(
         receiptCredentialPresentation: Data?,
-        redemptionState: OWSGiftBadgeRedemptionState
+        redemptionState: OWSGiftBadgeRedemptionState,
     ) -> OWSGiftBadge {
         return OWSGiftBadge(
             redemptionCredential: receiptCredentialPresentation,
-            redemptionState: redemptionState
+            redemptionState: redemptionState,
         )
     }
 

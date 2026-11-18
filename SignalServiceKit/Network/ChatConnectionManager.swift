@@ -6,7 +6,7 @@
 import Foundation
 public import LibSignalClient
 
-public protocol ChatConnectionManager {
+public protocol ChatConnectionManager: ServiceProvider {
     func updateCanOpenWebSocket()
     func waitForIdentifiedConnectionToOpen() async throws(CancellationError)
     func waitForUnidentifiedConnectionToOpen() async throws(CancellationError)
@@ -29,6 +29,10 @@ public protocol ChatConnectionManager {
     func setRegistrationOverride(_ chatServiceAuth: ChatServiceAuth) async
     func clearRegistrationOverride() async
 
+    func keyTransparencyClient() async throws -> KeyTransparency.Client
+}
+
+public protocol ServiceProvider {
     /// Access a libsignal "service" on the active unauthenticated connection.
     ///
     /// Intended to be used with code completion; ``UnauthServiceSelector``
@@ -40,10 +44,26 @@ public protocol ChatConnectionManager {
     /// *outside* the callback.
     ///
     /// This method can be called from any thread.
-    func withUnauthService<Service, Output>(
+    func withUnauthServiceImpl<Service, Output>(
         _ service: Service,
         do callback: (Service.Api) async throws -> Output,
     ) async throws -> Output where Service: UnauthServiceSelector
+
+    /// Access a libsignal "service" on the active authenticated connection.
+    ///
+    /// Intended to be used with code completion; ``AuthServiceSelector``
+    /// has static members for each valid service. See the docs for that protocol
+    /// for under-the-hood information.
+    ///
+    /// This will attempt to hold the connection open until the operation
+    /// completes, so make sure to do any complex processing of the result
+    /// *outside* the callback.
+    ///
+    /// This method can be called from any thread.
+    func withAuthServiceImpl<Service, Output>(
+        _ service: Service,
+        do callback: (Service.Api) async throws -> Output,
+    ) async throws -> Output where Service: AuthServiceSelector
 }
 
 extension ChatConnectionManager {
@@ -55,10 +75,39 @@ extension ChatConnectionManager {
     }
 }
 
+extension ServiceProvider {
+    public func withUnauthService<Service, Output>(
+        _ service: Service,
+        do callback: (Service.Api) async throws -> Output,
+    ) async throws -> Output where Service: UnauthServiceSelector {
+        return try await withUnauthServiceImpl(service, do: callback)
+    }
+
+    public func withAuthService<Service, Output>(
+        _ service: Service,
+        do callback: (Service.Api) async throws -> Output,
+    ) async throws -> Output where Service: AuthServiceSelector {
+        return try await withAuthServiceImpl(service, do: callback)
+    }
+}
+
 public class ChatConnectionManagerImpl: ChatConnectionManager {
     private let connectionIdentified: OWSAuthConnectionUsingLibSignal
     private let connectionUnidentified: OWSUnauthConnectionUsingLibSignal
-    private var connections: [OWSChatConnection] { [ connectionIdentified, connectionUnidentified ]}
+    private var connections: [OWSChatConnection] { [connectionIdentified, connectionUnidentified] }
+
+    // TODO: This is a workaround to solve the circular dependency between
+    // ChatConnectionManager and RegistrationStateChangeManager. In the event that
+    // someday RegistrationStateChangeManager is split up into smaller pieces, this
+    // can be revisited.
+    public var onRegistrationStateChange: ((_ isDelinkedOrDeregisterd: Bool, _ tx: DBWriteTransaction) -> Void)? {
+        get {
+            connectionIdentified.onRegistrationStateChange
+        }
+        set {
+            connectionIdentified.onRegistrationStateChange = newValue
+        }
+    }
 
     @MainActor
     public init(
@@ -66,10 +115,10 @@ public class ChatConnectionManagerImpl: ChatConnectionManager {
         appContext: any AppContext,
         appExpiry: AppExpiry,
         appReadiness: AppReadiness,
+        clockSkewManager: ClockSkewManager,
         db: any DB,
         inactivePrimaryDeviceStore: InactivePrimaryDeviceStore,
         libsignalNet: Net,
-        registrationStateChangeManager: RegistrationStateChangeManager,
     ) {
         self.connectionIdentified = OWSAuthConnectionUsingLibSignal(
             libsignalNet: libsignalNet,
@@ -77,18 +126,18 @@ public class ChatConnectionManagerImpl: ChatConnectionManager {
             appContext: appContext,
             appExpiry: appExpiry,
             appReadiness: appReadiness,
+            clockSkewManager: clockSkewManager,
             db: db,
             inactivePrimaryDeviceStore: inactivePrimaryDeviceStore,
-            registrationStateChangeManager: registrationStateChangeManager,
         )
         self.connectionUnidentified = OWSUnauthConnectionUsingLibSignal(
             libsignalNet: libsignalNet,
             appExpiry: appExpiry,
             appReadiness: appReadiness,
+            clockSkewManager: clockSkewManager,
             db: db,
         )
 
-        SwiftSingletons.register(self)
     }
 
     private func connection(ofType type: OWSChatConnectionType) -> OWSChatConnection {
@@ -147,8 +196,16 @@ public class ChatConnectionManagerImpl: ChatConnectionManager {
         return connectionUnidentified.currentState
     }
 
+    // MARK: -
+
+    public func keyTransparencyClient() async throws -> KeyTransparency.Client {
+        return try await connectionUnidentified.withLibsignalConnection { connection in
+            connection.keyTransparencyClient
+        }
+    }
+
     // This method can be called from any thread.
-    public func withUnauthService<Service, Output>(
+    public func withUnauthServiceImpl<Service, Output>(
         _ service: Service,
         do callback: (Service.Api) async throws -> Output,
     ) async throws -> Output where Service: UnauthServiceSelector {
@@ -157,6 +214,19 @@ public class ChatConnectionManagerImpl: ChatConnectionManager {
             try await callback(connection as! Service.Api)
         }
     }
+
+    // This method can be called from any thread.
+    public func withAuthServiceImpl<Service, Output>(
+        _ service: Service,
+        do callback: (Service.Api) async throws -> Output,
+    ) async throws -> Output where Service: AuthServiceSelector {
+        try await connectionIdentified.withLibsignalConnection { connection in
+            // This force-cast is guaranteed by AuthServiceSelector only being provided for valid service protocols.
+            try await callback(connection as! Service.Api)
+        }
+    }
+
+    // MARK: -
 
     public var hasEmptiedInitialQueue: Bool {
         get async {
@@ -174,6 +244,38 @@ public class ChatConnectionManagerImpl: ChatConnectionManager {
 }
 
 #if TESTABLE_BUILD
+
+struct MockServiceProvider: ServiceProvider {
+    private let mockServices: [Any]
+
+    init(mockServices: [Any]) {
+        self.mockServices = mockServices
+    }
+
+    func withUnauthServiceImpl<Service, Output>(
+        _ service: Service,
+        do callback: (Service.Api) async throws -> Output,
+    ) async throws -> Output where Service: UnauthServiceSelector {
+        for mockService in mockServices {
+            if let mockService = mockService as? Service.Api {
+                return try await callback(mockService)
+            }
+        }
+        owsFail("no mock service provided for \(Service.Api.self)")
+    }
+
+    func withAuthServiceImpl<Service, Output>(
+        _ service: Service,
+        do callback: (Service.Api) async throws -> Output,
+    ) async throws -> Output where Service: AuthServiceSelector {
+        for mockService in mockServices {
+            if let mockService = mockService as? Service.Api {
+                return try await callback(mockService)
+            }
+        }
+        owsFail("no mock service provided for \(Service.Api.self)")
+    }
+}
 
 public class ChatConnectionManagerMock: ChatConnectionManager {
 
@@ -222,10 +324,21 @@ public class ChatConnectionManagerMock: ChatConnectionManager {
     public func clearRegistrationOverride() async {
     }
 
-    public func withUnauthService<Service, Output>(
+    public func keyTransparencyClient() async throws -> KeyTransparency.Client {
+        fatalError("must override for tests")
+    }
+
+    public func withUnauthServiceImpl<Service, Output>(
         _ service: Service,
         do callback: (Service.Api) async throws -> Output,
     ) async throws -> Output where Service: UnauthServiceSelector {
+        fatalError("must override for tests")
+    }
+
+    public func withAuthServiceImpl<Service, Output>(
+        _ service: Service,
+        do callback: (Service.Api) async throws -> Output,
+    ) async throws -> Output where Service: AuthServiceSelector {
         fatalError("must override for tests")
     }
 }

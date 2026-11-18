@@ -70,29 +70,14 @@ public import GRDB
 /// work around these issues and ensure subclasses are correctly initialized.
 ///
 /// [0]: https://github.com/apple/swift/issues/61946
-public protocol SDSCodableModel: Encodable, FetchableRecord, PersistableRecord, SDSIdentifiableModel {
-    associatedtype CodingKeys: RawRepresentable<String>, CodingKey, ColumnExpression, CaseIterable
+public protocol SDSCodableModel: AnyObject, Encodable, FetchableRecord, PersistableRecord, SDSIdentifiableModel {
+    associatedtype CodingKeys: RawRepresentable<String>, CodingKey, ColumnExpression
     typealias Columns = CodingKeys
     typealias RowId = Int64
 
     var id: RowId? { get set }
 
-    /// For compatibility with legacy SDS codegen (see ``SDSRecord`` and
-    /// friends). Subclasses should override to differentiate their records
-    /// from parent classes.
-    ///
-    /// See ``NeedsFactoryInitializationFromRecordType`` for more details on
-    /// models with inheritance, and how that intersects with `recordType`.
-    ///
-    /// Models using ``SDSCodableModel`` that never used codegen (i.e., were
-    /// written from the start using ``SDSCodableModel``, rather than migrated)
-    /// and which do not use inheritance may set this to zero. If they choose
-    /// to do so, they may never in the future use inheritance.
-    static var recordType: UInt { get }
-
     var uniqueId: String { get }
-
-    var shouldBeSaved: Bool { get }
 
     func anyWillInsert(transaction: DBWriteTransaction)
     func anyDidInsert(transaction: DBWriteTransaction)
@@ -107,8 +92,6 @@ public protocol SDSCodableModel: Encodable, FetchableRecord, PersistableRecord, 
 public extension SDSCodableModel {
 
     var grdbId: NSNumber? { id.map { NSNumber(value: $0) } }
-
-    var shouldBeSaved: Bool { true }
 
     var sdsTableName: String { Self.databaseTableName }
 
@@ -125,18 +108,18 @@ public extension SDSCodableModel {
     static var databaseDateEncodingStrategy: DatabaseDateEncodingStrategy { .timeIntervalSince1970 }
     static var databaseDateDecodingStrategy: DatabaseDateDecodingStrategy { .timeIntervalSince1970 }
 
-    mutating func didInsert(with rowID: Int64, for column: String?) {
+    func didInsert(with rowID: Int64, for column: String?) {
         id = rowID
     }
 }
 
 public extension SDSCodableModel {
     static func anyCount(
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> UInt {
-        SDSCodableModelDatabaseInterfaceImpl().countAllModels(
+        SDSCodableModelDatabaseInterface().countAllModels(
             modelType: Self.self,
-            transaction: transaction
+            transaction: transaction,
         )
     }
 
@@ -144,12 +127,12 @@ public extension SDSCodableModel {
     /// See that class for details.
     static func anyFetch(
         rowId: Int64,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> Self? {
-        SDSCodableModelDatabaseInterfaceImpl().fetchModel(
+        SDSCodableModelDatabaseInterface().fetchModel(
             modelType: Self.self,
             rowId: rowId,
-            tx: transaction
+            tx: transaction,
         )
     }
 
@@ -157,61 +140,61 @@ public extension SDSCodableModel {
     /// See that class for details.
     static func anyFetch(
         uniqueId: String,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> Self? {
-        SDSCodableModelDatabaseInterfaceImpl().fetchModel(
+        SDSCodableModelDatabaseInterface().fetchModel(
             modelType: Self.self,
             uniqueId: uniqueId,
-            transaction: transaction
+            transaction: transaction,
         )
     }
 
     static func anyFetch(
         sql: String,
         arguments: StatementArguments = [],
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> Self? {
-        SDSCodableModelDatabaseInterfaceImpl().fetchModel(
+        SDSCodableModelDatabaseInterface().fetchModel(
             modelType: Self.self,
             sql: sql,
             arguments: arguments,
-            transaction: transaction
+            transaction: transaction,
         )
     }
 
     /// Convenience method delegating to ``SDSCodableModelDatabaseInterface``.
     /// See that class for details.
     static func anyFetchAll(
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> [Self] {
-        SDSCodableModelDatabaseInterfaceImpl().fetchAllModels(
+        SDSCodableModelDatabaseInterface().fetchAllModels(
             modelType: Self.self,
-            transaction: transaction
+            transaction: transaction,
         )
     }
 
     /// Convenience method delegating to ``SDSCodableModelDatabaseInterface``.
     /// See that class for details.
     func anyInsert(transaction: DBWriteTransaction) {
-        SDSCodableModelDatabaseInterfaceImpl().insertModel(self, transaction: transaction)
+        SDSCodableModelDatabaseInterface().insertModel(self, transaction: transaction)
     }
 
     /// Convenience method delegating to ``SDSCodableModelDatabaseInterface``.
     /// See that class for details.
     func anyUpsert(transaction: DBWriteTransaction) {
-        SDSCodableModelDatabaseInterfaceImpl().upsertModel(self, transaction: transaction)
+        SDSCodableModelDatabaseInterface().upsertModel(self, transaction: transaction)
     }
 
     /// Convenience method delegating to ``SDSCodableModelDatabaseInterface``.
     /// See that class for details.
     func anyOverwritingUpdate(transaction: DBWriteTransaction) {
-        SDSCodableModelDatabaseInterfaceImpl().overwritingUpdateModel(self, transaction: transaction)
+        SDSCodableModelDatabaseInterface().overwritingUpdateModel(self, transaction: transaction)
     }
 
     /// Convenience method delegating to ``SDSCodableModelDatabaseInterface``.
     /// See that class for details.
     func anyRemove(transaction: DBWriteTransaction) {
-        SDSCodableModelDatabaseInterfaceImpl().removeModel(self, transaction: transaction)
+        SDSCodableModelDatabaseInterface().removeModel(self, transaction: transaction)
     }
 }
 
@@ -219,10 +202,10 @@ public extension SDSCodableModel where Self: AnyObject {
     /// Convenience method delegating to ``SDSCodableModelDatabaseInterface``.
     /// See that class for details.
     func anyUpdate(transaction: DBWriteTransaction, block: (Self) -> Void) {
-        SDSCodableModelDatabaseInterfaceImpl().updateModel(
+        SDSCodableModelDatabaseInterface().updateModel(
             self,
             transaction: transaction,
-            block: block
+            block: block,
         )
     }
 }
@@ -233,13 +216,13 @@ public extension SDSCodableModel {
     static func anyEnumerate(
         transaction: DBReadTransaction,
         batchingPreference: BatchingPreference = .unbatched,
-        block: (Self, UnsafeMutablePointer<ObjCBool>) -> Void
+        block: (Self, inout Bool) -> Void,
     ) {
-        SDSCodableModelDatabaseInterfaceImpl().enumerateModels(
+        SDSCodableModelDatabaseInterface().enumerateModels(
             modelType: Self.self,
             transaction: transaction,
             batchingPreference: batchingPreference,
-            block: block
+            block: block,
         )
     }
 
@@ -249,15 +232,15 @@ public extension SDSCodableModel {
         transaction: DBReadTransaction,
         sql: String,
         arguments: StatementArguments,
-        block: (Self, UnsafeMutablePointer<ObjCBool>) -> Void
+        block: (Self, inout Bool) -> Void,
     ) {
-        SDSCodableModelDatabaseInterfaceImpl().enumerateModels(
+        SDSCodableModelDatabaseInterface().enumerateModels(
             modelType: Self.self,
             transaction: transaction,
             sql: sql,
             arguments: arguments,
             batchingPreference: .unbatched,
-            block: block
+            block: block,
         )
     }
 }

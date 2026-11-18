@@ -6,21 +6,27 @@
 import Foundation
 public import PassKit
 
-public class DonationUtilities {
-    public static var sendGiftBadgeJobQueue: SendGiftBadgeJobQueue { SSKEnvironment.shared.smJobQueuesRef.sendGiftBadgeJobQueue }
+/// An object that indicates *some* donation type is permitted.
+public struct DonationAllowedToken {
+    private let registeredState: RegisteredState
+    private let remoteConfig: RemoteConfig
+
+    public init?(registeredState: RegisteredState, remoteConfig: RemoteConfig) {
+        self.registeredState = registeredState
+        self.remoteConfig = remoteConfig
+        guard self.canDonateInAnyWay() else {
+            return nil
+        }
+    }
 
     /// Returns a set of donation payment methods available to the local user,
     /// for donating in a specific currency.
-    public static func supportedDonationPaymentMethods(
+    public func supportedPaymentMethods(
         forDonationMode donationMode: DonationMode,
         usingCurrency currencyCode: Currency.Code,
         withConfiguration configuration: DonationSubscriptionConfiguration.PaymentMethodsConfiguration,
-        localNumber: String?
     ) -> Set<DonationPaymentMethod> {
-        let generallySupportedMethods = supportedDonationPaymentMethods(
-            forDonationMode: donationMode,
-            localNumber: localNumber
-        )
+        let generallySupportedMethods = supportedPaymentMethods(forDonationMode: donationMode)
 
         let currencySupportedMethods = configuration
             .supportedPaymentMethodsByCurrency[currencyCode, default: []]
@@ -31,24 +37,21 @@ public class DonationUtilities {
     /// Returns a set of the donation payment methods available to the local
     /// user for the given donation mode, without considering what currency
     /// they will be donating in.
-    public static func supportedDonationPaymentMethods(
-        forDonationMode donationMode: DonationMode,
-        localNumber: String?
-    ) -> Set<DonationPaymentMethod> {
-        guard let localNumber else { return [] }
+    public func supportedPaymentMethods(forDonationMode donationMode: DonationMode) -> Set<DonationPaymentMethod> {
+        let localNumber = registeredState.localIdentifiers.phoneNumber
 
         let isApplePayAvailable: Bool = {
             if
                 PKPaymentAuthorizationController.canMakePayments(),
-                !RemoteConfig.current.applePayDisabledRegions.contains(e164: localNumber)
+                !remoteConfig.applePayDisabledRegions.contains(e164: localNumber)
             {
                 switch donationMode {
                 case .oneTime:
-                    return RemoteConfig.current.canDonateOneTimeWithApplePay
+                    return remoteConfig.canDonateOneTimeWithApplePay
                 case .gift:
-                    return RemoteConfig.current.canDonateGiftWithApplePay
+                    return remoteConfig.canDonateGiftWithApplePay
                 case .monthly:
-                    return RemoteConfig.current.canDonateMonthlyWithApplePay
+                    return remoteConfig.canDonateMonthlyWithApplePay
                 }
             }
 
@@ -57,15 +60,15 @@ public class DonationUtilities {
 
         let isPaypalAvailable = {
             if
-                !RemoteConfig.current.paypalDisabledRegions.contains(e164: localNumber)
+                !remoteConfig.paypalDisabledRegions.contains(e164: localNumber)
             {
                 switch donationMode {
                 case .oneTime:
-                    return RemoteConfig.current.canDonateOneTimeWithPaypal
+                    return remoteConfig.canDonateOneTimeWithPaypal
                 case .gift:
-                    return RemoteConfig.current.canDonateGiftWithPayPal
+                    return remoteConfig.canDonateGiftWithPayPal
                 case .monthly:
-                    return RemoteConfig.current.canDonateMonthlyWithPaypal
+                    return remoteConfig.canDonateMonthlyWithPaypal
                 }
             }
 
@@ -74,15 +77,15 @@ public class DonationUtilities {
 
         let isCardAvailable = {
             if
-                !RemoteConfig.current.creditAndDebitCardDisabledRegions.contains(e164: localNumber)
+                !remoteConfig.creditAndDebitCardDisabledRegions.contains(e164: localNumber)
             {
                 switch donationMode {
                 case .oneTime:
-                    return RemoteConfig.current.canDonateOneTimeWithCreditOrDebitCard
+                    return remoteConfig.canDonateOneTimeWithCreditOrDebitCard
                 case .gift:
-                    return RemoteConfig.current.canDonateGiftWithCreditOrDebitCard
+                    return remoteConfig.canDonateGiftWithCreditOrDebitCard
                 case .monthly:
-                    return RemoteConfig.current.canDonateMonthlyWithCreditOrDebitCard
+                    return remoteConfig.canDonateMonthlyWithCreditOrDebitCard
                 }
             }
 
@@ -94,7 +97,7 @@ public class DonationUtilities {
                 return true
             }
 
-            guard RemoteConfig.current.sepaEnabledRegions.contains(e164: localNumber) else {
+            guard remoteConfig.sepaEnabledRegions.contains(e164: localNumber) else {
                 return false
             }
 
@@ -111,7 +114,7 @@ public class DonationUtilities {
                 return true
             }
 
-            guard RemoteConfig.current.idealEnabledRegions.contains(e164: localNumber) else {
+            guard remoteConfig.idealEnabledRegions.contains(e164: localNumber) else {
                 return false
             }
 
@@ -149,35 +152,18 @@ public class DonationUtilities {
     }
 
     /// Can the user donate in the given donation mode?
-    public static func canDonate(
-        inMode donationMode: DonationMode,
-        tsAccountManager: TSAccountManager,
-    ) -> Bool {
-        let registrationState = tsAccountManager.registrationStateWithMaybeSneakyTransaction
-        let localNumber = tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.phoneNumber
-
-        guard registrationState.isRegistered else {
-            // Don't allow donations if unregistered.
-            return false
-        }
-
-        return !supportedDonationPaymentMethods(
-            forDonationMode: donationMode,
-            localNumber: localNumber
-        ).isEmpty
+    public func canDonate(inMode donationMode: DonationMode) -> Bool {
+        return !supportedPaymentMethods(forDonationMode: donationMode).isEmpty
     }
 
     /// Can the user donate in any donation mode?
-    public static func canDonateInAnyWay(
-        tsAccountManager: TSAccountManager,
-    ) -> Bool {
-        DonationMode.allCases.contains { mode in
-            canDonate(
-                inMode: mode,
-                tsAccountManager: tsAccountManager,
-            )
-        }
+    private func canDonateInAnyWay() -> Bool {
+        return DonationMode.allCases.contains { mode in canDonate(inMode: mode) }
     }
+}
+
+public class DonationUtilities {
+    public static var sendGiftBadgeJobQueue: SendGiftBadgeJobQueue { SSKEnvironment.shared.smJobQueuesRef.sendGiftBadgeJobQueue }
 
     public static var supportedNetworks: [PKPaymentNetwork] {
         return [
@@ -185,7 +171,7 @@ public class DonationUtilities {
             .masterCard,
             .amex,
             .discover,
-            .maestro
+            .maestro,
         ]
     }
 
@@ -219,10 +205,10 @@ public class DonationUtilities {
     /// - Returns: The first supported currency code, or `nil` if none are found.
     public static func chooseDefaultCurrency(
         preferred: [Currency.Code?],
-        supported: any Collection<Currency.Code>
+        supported: any Collection<Currency.Code>,
     ) -> Currency.Code? {
         for currency in preferred {
-            if let currency = currency, supported.contains(currency) {
+            if let currency, supported.contains(currency) {
                 return currency
             }
         }
@@ -232,14 +218,14 @@ public class DonationUtilities {
     private static func donationToSignal() -> String {
         OWSLocalizedString(
             "DONATION_VIEW_DONATION_TO_SIGNAL",
-            comment: "Text describing to the user that they're going to pay a donation to Signal"
+            comment: "Text describing to the user that they're going to pay a donation to Signal",
         )
     }
 
     private static func monthlyDonationToSignal() -> String {
         OWSLocalizedString(
             "DONATION_VIEW_MONTHLY_DONATION_TO_SIGNAL",
-            comment: "Text describing to the user that they're going to pay a monthly donation to Signal"
+            comment: "Text describing to the user that they're going to pay a monthly donation to Signal",
         )
     }
 
@@ -251,10 +237,10 @@ public class DonationUtilities {
         if isRecurring {
             let recurringSummaryItem = PKRecurringPaymentSummaryItem(
                 label: donationToSignal(),
-                amount: nsValue
+                amount: nsValue,
             )
             recurringSummaryItem.intervalUnit = .month
-            recurringSummaryItem.intervalCount = 1  // once per month
+            recurringSummaryItem.intervalCount = 1 // once per month
             paymentSummaryItem = recurringSummaryItem
         } else {
             paymentSummaryItem = PKPaymentSummaryItem(label: donationToSignal(), amount: nsValue)
@@ -269,18 +255,17 @@ public class DonationUtilities {
         request.supportedNetworks = DonationUtilities.supportedNetworks
         return request
     }
-}
 
-// MARK: - Money amounts
+    // MARK: - Money amounts
 
-/// The values in this extension are drawn largely from Stripe's documentation,
-/// which means they may not be exactly correct for PayPal transactions.
-/// However: 1) they are probably "good enough"; and 2) they should be replaced
-/// with Signal-server values fetched from a configuration endpoint like
-/// `/v1/subscription/configuration` eventually, anyway.
-public extension DonationUtilities {
+    /// The values in this section are drawn largely from Stripe's documentation,
+    /// which means they may not be exactly correct for PayPal transactions.
+    /// However: 1) they are probably "good enough"; and 2) they should be replaced
+    /// with Signal-server values fetched from a configuration endpoint like
+    /// `/v1/subscription/configuration` eventually, anyway.
+
     /// A list of currencies known not to use decimal values
-    static let zeroDecimalCurrencyCodes: Set<Currency.Code> = [
+    public static let zeroDecimalCurrencyCodes: Set<Currency.Code> = [
         "BIF",
         "CLP",
         "DJF",
@@ -296,22 +281,22 @@ public extension DonationUtilities {
         "VUV",
         "XAF",
         "XOF",
-        "XPF"
+        "XPF",
     ]
 
     /// Is an amount of money too small, given a minimum?
-    static func isBoostAmountTooSmall(_ amount: FiatMoney, minimumAmount: FiatMoney) -> Bool {
+    public static func isBoostAmountTooSmall(_ amount: FiatMoney, minimumAmount: FiatMoney) -> Bool {
         (amount.value <= 0) || (integralAmount(for: amount) < integralAmount(for: minimumAmount))
     }
 
-    static func isBoostAmountTooLarge(_ amount: FiatMoney, maximumAmount: FiatMoney) -> Bool {
+    public static func isBoostAmountTooLarge(_ amount: FiatMoney, maximumAmount: FiatMoney) -> Bool {
         return integralAmount(for: amount) > integralAmount(for: maximumAmount)
     }
 
     /// Convert the given money amount to an integer that can be passed to
     /// service APIs. Applies rounding and scaling as appropriate for the
     /// currency.
-    static func integralAmount(for amount: FiatMoney) -> UInt {
+    public static func integralAmount(for amount: FiatMoney) -> UInt {
         let scaled: Decimal
         if Self.zeroDecimalCurrencyCodes.contains(amount.currencyCode.uppercased()) {
             scaled = amount.value

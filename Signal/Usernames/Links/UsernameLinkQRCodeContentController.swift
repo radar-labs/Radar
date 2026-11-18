@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import SignalUI
 import SignalServiceKit
+import SignalUI
 
 /// A content controller supporting toggling between presenting and scanning a
 /// username link QR code.
@@ -20,24 +20,27 @@ class UsernameLinkQRCodeContentController: OWSViewController, OWSNavigationChild
         control.insertSegment(
             withTitle: OWSLocalizedString(
                 "USERNAME_LINK_QR_CODE_VIEW_TITLE_CODE",
-                comment: "A title for a view that allows you to view and interact with a QR code for your username link."
+                comment: "A title for a view that allows you to view and interact with a QR code for your username link.",
             ),
             at: 0,
-            animated: false
+            animated: false,
         )
 
         control.insertSegment(
             withTitle: OWSLocalizedString(
                 "USERNAME_LINK_QR_CODE_VIEW_TITLE_SCAN",
-                comment: "A title for a view that allows you to scan a username link QR code using the camera."
+                comment: "A title for a view that allows you to scan a username link QR code using the camera.",
             ),
             at: 1,
-            animated: false
+            animated: false,
         )
 
         control.setWidth(100, forSegmentAt: 0)
         control.setWidth(100, forSegmentAt: 1)
-        control.addTarget(self, action: #selector(configureForSelected), for: .valueChanged)
+        control.addAction(
+            UIAction { [weak self] _ in self?.configureForSelected() },
+            for: .valueChanged,
+        )
 
         return control
     }()
@@ -57,18 +60,18 @@ class UsernameLinkQRCodeContentController: OWSViewController, OWSNavigationChild
         username: String,
         usernameLink: Usernames.UsernameLink?,
         changeDelegate: UsernameChangeDelegate,
-        scanDelegate: UsernameLinkScanDelegate
+        scanDelegate: UsernameLinkScanDelegate,
     ) {
         presentQRCodeViewController = UsernameLinkPresentQRCodeViewController(
             db: db,
             localUsernameManager: localUsernameManager,
             username: username,
             usernameLink: usernameLink,
-            usernameChangeDelegate: changeDelegate
+            usernameChangeDelegate: changeDelegate,
         )
 
         scanQRCodeViewController = UsernameLinkScanQRCodeViewController(
-            scanDelegate: scanDelegate
+            scanDelegate: scanDelegate,
         )
 
         super.init()
@@ -99,7 +102,7 @@ class UsernameLinkQRCodeContentController: OWSViewController, OWSNavigationChild
     }
 
     private func setActive(
-        viewController: UIViewController & OWSNavigationChildController
+        viewController: UIViewController & OWSNavigationChildController,
     ) {
         activeViewController = viewController
 
@@ -110,7 +113,6 @@ class UsernameLinkQRCodeContentController: OWSViewController, OWSNavigationChild
 
     // MARK: Events
 
-    @objc
     private func configureForSelected() {
         guard let selectedMode = Mode(rawValue: contentSegmentedControl.selectedSegmentIndex) else {
             owsFail("Unexpected selected segment. How did this happen?")

@@ -9,17 +9,20 @@ import SignalRingRTC
 
 public class CallOfferHandlerImpl {
     private let identityManager: any OWSIdentityManager
+    private let notificationPreferencesManager: NotificationPreferencesManager
     private let notificationPresenter: NotificationPresenter
     private let profileManager: any ProfileManager
     private let tsAccountManager: any TSAccountManager
 
     public init(
         identityManager: any OWSIdentityManager,
+        notificationPreferencesManager: NotificationPreferencesManager,
         notificationPresenter: NotificationPresenter,
         profileManager: any ProfileManager,
-        tsAccountManager: any TSAccountManager
+        tsAccountManager: any TSAccountManager,
     ) {
         self.identityManager = identityManager
+        self.notificationPreferencesManager = notificationPreferencesManager
         self.notificationPresenter = notificationPresenter
         self.profileManager = profileManager
         self.tsAccountManager = tsAccountManager
@@ -38,13 +41,13 @@ public class CallOfferHandlerImpl {
         outcome: RPRecentCallType,
         callType: TSRecentCallOfferType,
         sentAtTimestamp: UInt64,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         let callEventInserter = CallEventInserter(
             thread: thread,
             callId: callId,
             offerMediaType: callType,
-            sentAtTimestamp: sentAtTimestamp
+            sentAtTimestamp: sentAtTimestamp,
         )
         callEventInserter.createOrUpdate(callType: outcome, tx: tx)
     }
@@ -56,11 +59,11 @@ public class CallOfferHandlerImpl {
         callId: UInt64,
         callType: SSKProtoCallMessageOfferType,
         sentAtTimestamp: UInt64,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> PartialResult? {
         let thread = TSContactThread.getOrCreateThread(
             withContactAddress: SignalServiceAddress(caller),
-            transaction: tx
+            transaction: tx,
         )
 
         let offerMediaType: TSRecentCallOfferType
@@ -78,7 +81,7 @@ public class CallOfferHandlerImpl {
                 outcome: outcome,
                 callType: offerMediaType,
                 sentAtTimestamp: sentAtTimestamp,
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -94,7 +97,7 @@ public class CallOfferHandlerImpl {
         let untrustedIdentity = identityManager.untrustedIdentityForSending(
             to: SignalServiceAddress(caller),
             untrustedThreshold: nil,
-            tx: tx
+            tx: tx,
         )
         if let untrustedIdentity {
             Logger.warn("missed a call due to untrusted identity")
@@ -102,7 +105,7 @@ public class CallOfferHandlerImpl {
             let notificationInfo = CallNotificationInfo(
                 groupingId: UUID(),
                 thread: thread,
-                caller: caller
+                caller: caller,
             )
 
             switch untrustedIdentity.verificationState {
@@ -113,17 +116,17 @@ public class CallOfferHandlerImpl {
                     notificationInfo: notificationInfo,
                     offerMediaType: offerMediaType,
                     sentAt: sentAtTimestamp,
-                    tx: tx
+                    tx: tx,
                 )
             case .default:
                 self.notificationPresenter.notifyUserOfMissedCallBecauseOfNewIdentity(
                     notificationInfo: notificationInfo,
-                    tx: tx
+                    tx: tx,
                 )
             case .noLongerVerified:
                 self.notificationPresenter.notifyUserOfMissedCallBecauseOfNoLongerVerifiedIdentity(
                     notificationInfo: notificationInfo,
-                    tx: tx
+                    tx: tx,
                 )
             }
 
@@ -149,7 +152,7 @@ public class CallOfferHandlerImpl {
                     hangupType: .hangupNeedPermission,
                     localDeviceId: localDeviceId.uint32Value,
                     remoteDeviceId: sourceDevice.uint32Value,
-                    tx: tx
+                    tx: tx,
                 )
             case .pni:
                 // Don't respond if they sent the offer to our PNI.
@@ -163,11 +166,21 @@ public class CallOfferHandlerImpl {
             return nil
         }
 
+        if
+            BuildFlags.improvedNotifications,
+            thread.isMuted,
+            !notificationPreferencesManager.notifyForCallsWhenMuted(thread: thread, tx: tx)
+        {
+            Logger.info("Ignoring call offer from \(caller) due to mute settings.")
+            insertMissedCallInteraction(outcome: .incomingMissed, tx: tx)
+            return nil
+        }
+
         return PartialResult(
             identityKeys: identityKeys,
             offerMediaType: offerMediaType,
             thread: thread,
-            localDeviceId: localDeviceId
+            localDeviceId: localDeviceId,
         )
     }
 
@@ -186,7 +199,7 @@ public struct CallIdentityKeys {
 extension OWSIdentityManager {
     public func getCallIdentityKeys(
         remoteAci: Aci,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> CallIdentityKeys? {
         guard let localIdentityKey = identityKeyPair(for: .aci, tx: tx)?.keyPair.identityKey else {
             owsFailDebug("missing localIdentityKey")
@@ -209,7 +222,7 @@ public enum CallHangupSender {
         hangupType: SSKProtoCallMessageHangupType,
         localDeviceId: UInt32,
         remoteDeviceId: UInt32?,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> Promise<Void> {
         let hangupBuilder = SSKProtoCallMessageHangup.builder(id: callId)
 
@@ -229,20 +242,20 @@ public enum CallHangupSender {
             return Promise(error: error)
         }
 
-        let callMessage = OWSOutgoingCallMessage(
+        let callMessage = OutgoingCallMessage(
             thread: thread,
-            hangupMessage: hangupMessage,
-            destinationDeviceId: remoteDeviceId.map(NSNumber.init(value:)),
-            transaction: tx
+            messageType: .hangupMessage(hangupMessage),
+            destinationDeviceId: remoteDeviceId,
+            tx: tx,
         )
         let preparedMessage = PreparedOutgoingMessage.preprepared(
-            transientMessageWithoutAttachments: callMessage
+            transientMessageWithoutAttachments: callMessage,
         )
         return ThreadUtil.enqueueMessagePromise(
             message: preparedMessage,
             limitToCurrentProcessLifetime: true,
             isHighPriority: true,
-            transaction: tx
+            transaction: tx,
         )
     }
 }

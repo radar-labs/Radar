@@ -4,6 +4,7 @@
 //
 
 import SignalServiceKit
+import UIKit
 
 protocol MessageActionsDelegate: AnyObject {
     func messageActionsShowDetailsForItem(_ itemViewModel: CVItemViewModelImpl)
@@ -16,99 +17,117 @@ protocol MessageActionsDelegate: AnyObject {
     func messageActionsEditItem(_ itemViewModel: CVItemViewModelImpl)
     func messageActionsShowPaymentDetails(_ itemViewModel: CVItemViewModelImpl)
     func messageActionsEndPoll(_ itemViewModel: CVItemViewModelImpl)
+    func messageActionsChangePinStatus(_ itemViewModel: CVItemViewModelImpl, pin: Bool)
+    func messageActionsViewStickerPack(_ itemViewModel: CVItemViewModelImpl)
     func messageActionsStarItem(_ itemViewModel: CVItemViewModelImpl)
 }
 
 // MARK: -
 
-struct MessageActionBuilder {
+enum MessageActionBuilder {
     static func reply(itemViewModel: CVItemViewModelImpl, delegate: MessageActionsDelegate) -> MessageAction {
-        return MessageAction(.reply,
-                             accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_REPLY", comment: "Action sheet button title"),
-                             accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "reply"),
-                             contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_REPLY", comment: "Context menu button title"),
-                             contextMenuAttributes: [],
-                             block: { [weak delegate] (_) in
-                                delegate?.messageActionsReplyToItem(itemViewModel)
+        return MessageAction(
+            .reply,
+            accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_REPLY", comment: "Action sheet button title"),
+            accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "reply"),
+            contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_REPLY", comment: "Context menu button title"),
+            contextMenuAttributes: [],
+            block: { [weak delegate] _ in
+                delegate?.messageActionsReplyToItem(itemViewModel)
 
-        })
+            },
+        )
     }
 
     static func copyText(itemViewModel: CVItemViewModelImpl, delegate: MessageActionsDelegate) -> MessageAction {
-        return MessageAction(.copy,
-                             accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_COPY_TEXT", comment: "Action sheet button title"),
-                             accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "copy_text"),
-                             contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_COPY", comment: "Context menu button title"),
-                             contextMenuAttributes: [],
-                             block: { (_) in
-                                itemViewModel.copyTextAction()
-        })
+        return MessageAction(
+            .copy,
+            accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_COPY_TEXT", comment: "Action sheet button title"),
+            accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "copy_text"),
+            contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_COPY", comment: "Context menu button title"),
+            contextMenuAttributes: [],
+            block: { _ in
+                itemViewModel.copyTextAction()
+            },
+        )
     }
 
     static func showDetails(itemViewModel: CVItemViewModelImpl, delegate: MessageActionsDelegate) -> MessageAction {
-        return MessageAction(.info,
-                             accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_DETAILS", comment: "Action sheet button title"),
-                             accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "show_details"),
-                             contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_DETAILS", comment: "Context menu button title"),
-                             contextMenuAttributes: [],
-                             block: { [weak delegate] (_) in
-                                delegate?.messageActionsShowDetailsForItem(itemViewModel)
-        })
+        return MessageAction(
+            .info,
+            accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_DETAILS", comment: "Action sheet button title"),
+            accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "show_details"),
+            contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_DETAILS", comment: "Context menu button title"),
+            contextMenuAttributes: [],
+            block: { [weak delegate] _ in
+                delegate?.messageActionsShowDetailsForItem(itemViewModel)
+            },
+        )
     }
 
     static func deleteMessage(itemViewModel: CVItemViewModelImpl, delegate: MessageActionsDelegate) -> MessageAction {
-        return MessageAction(.delete,
-                             accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_DELETE_MESSAGE", comment: "Action sheet button title"),
-                             accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "delete_message"),
-                             contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_DELETE_MESSAGE", comment: "Context menu button title"),
-                             contextMenuAttributes: [.destructive],
-                             block: { [weak delegate] (_) in
-                                delegate?.messageActionsDeleteItem(itemViewModel)
-        })
+        return MessageAction(
+            .delete,
+            accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_DELETE_MESSAGE", comment: "Action sheet button title"),
+            accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "delete_message"),
+            contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_DELETE_MESSAGE", comment: "Context menu button title"),
+            contextMenuAttributes: [.destructive],
+            block: { [weak delegate] _ in
+                delegate?.messageActionsDeleteItem(itemViewModel)
+            },
+        )
     }
 
     static func shareMedia(itemViewModel: CVItemViewModelImpl, delegate: MessageActionsDelegate) -> MessageAction {
-        return MessageAction(.share,
-                             accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_SHARE_MEDIA", comment: "Action sheet button title"),
-                             accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "share_media"),
-                             contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_SHARE_MEDIA", comment: "Context menu button title"),
-                             contextMenuAttributes: [],
-                             block: { sender in
-                                itemViewModel.shareMediaAction(sender: sender)
-        })
+        return MessageAction(
+            .share,
+            accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_SHARE_MEDIA", comment: "Action sheet button title"),
+            accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "share_media"),
+            contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_SHARE_MEDIA", comment: "Context menu button title"),
+            contextMenuAttributes: [],
+            block: { sender in
+                itemViewModel.shareMediaAction(sender: sender)
+            },
+        )
     }
 
     static func saveMedia(itemViewModel: CVItemViewModelImpl, delegate: MessageActionsDelegate) -> MessageAction {
-        return MessageAction(.save,
-                             accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_SAVE_MEDIA", comment: "Action sheet button title"),
-                             accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "save_media"),
-                             contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_SAVE_MEDIA", comment: "Context menu button title"),
-                             contextMenuAttributes: [],
-                             block: { _ in
-            itemViewModel.saveMediaAction()
-        })
+        return MessageAction(
+            .save,
+            accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_SAVE_MEDIA", comment: "Action sheet button title"),
+            accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "save_media"),
+            contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_SAVE_MEDIA", comment: "Context menu button title"),
+            contextMenuAttributes: [],
+            block: { _ in
+                itemViewModel.saveMediaAction()
+            },
+        )
     }
 
     static func forwardMessage(itemViewModel: CVItemViewModelImpl, delegate: MessageActionsDelegate) -> MessageAction {
-        return MessageAction(.forward,
-                             accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_FORWARD_MESSAGE", comment: "Action sheet button title"),
-                             accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "forward_message"),
-                             contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_FORWARD_MESSAGE", comment: "Context menu button title"),
-                             contextMenuAttributes: [],
-                             block: { [weak delegate] (_) in
-                                delegate?.messageActionsForwardItem(itemViewModel)
-        })
+        return MessageAction(
+            .forward,
+            accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_FORWARD_MESSAGE", comment: "Action sheet button title"),
+            accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "forward_message"),
+            contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_FORWARD_MESSAGE", comment: "Context menu button title"),
+            contextMenuAttributes: [],
+            block: { [weak delegate] _ in
+                delegate?.messageActionsForwardItem(itemViewModel)
+            },
+        )
     }
 
     static func selectMessage(itemViewModel: CVItemViewModelImpl, delegate: MessageActionsDelegate) -> MessageAction {
-        return MessageAction(.select,
-                             accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_SELECT_MESSAGE", comment: "Action sheet accessibility label"),
-                             accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "select_message"),
-                             contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_SELECT_MESSAGE", comment: "Context menu button title"),
-                             contextMenuAttributes: [],
-                             block: { [weak delegate] (_) in
-                                delegate?.messageActionsStartedSelect(initialItem: itemViewModel)
-        })
+        return MessageAction(
+            .select,
+            accessibilityLabel: OWSLocalizedString("MESSAGE_ACTION_SELECT_MESSAGE", comment: "Action sheet accessibility label"),
+            accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "select_message"),
+            contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_SELECT_MESSAGE", comment: "Context menu button title"),
+            contextMenuAttributes: [],
+            block: { [weak delegate] _ in
+                delegate?.messageActionsStartedSelect(initialItem: itemViewModel)
+            },
+        )
     }
 
     static func editMessage(itemViewModel: CVItemViewModelImpl, delegate: MessageActionsDelegate) -> MessageAction {
@@ -118,14 +137,15 @@ struct MessageActionBuilder {
             accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "edit_message"),
             contextMenuTitle: NSLocalizedString("CONTEXT_MENU_EDIT_MESSAGE", comment: "Context menu edit button title"),
             contextMenuAttributes: [],
-            block: { [weak delegate] (_) in
+            block: { [weak delegate] _ in
                 delegate?.messageActionsEditItem(itemViewModel)
-            })
+            },
+        )
     }
 
     static func showPaymentDetails(
         itemViewModel: CVItemViewModelImpl,
-        delegate: MessageActionsDelegate
+        delegate: MessageActionsDelegate,
     ) -> MessageAction {
         return MessageAction(
             .showPaymentDetails,
@@ -133,9 +153,9 @@ struct MessageActionBuilder {
             accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "payment_details"),
             contextMenuTitle: OWSLocalizedString("CONTEXT_MENU_PAYMENT_DETAILS", comment: "Context menu button title"),
             contextMenuAttributes: [],
-            block: { [weak delegate] (_) in
+            block: { [weak delegate] _ in
                 delegate?.messageActionsShowPaymentDetails(itemViewModel)
-            }
+            },
         )
     }
 
@@ -148,7 +168,7 @@ struct MessageActionBuilder {
             contextMenuAttributes: [],
             block: { [weak delegate] _ in
                 delegate?.messageActionsSpeakItem(itemViewModel)
-            }
+            },
         )
     }
 
@@ -161,13 +181,13 @@ struct MessageActionBuilder {
             contextMenuAttributes: [],
             block: { [weak delegate] _ in
                 delegate?.messageActionsStopSpeakingItem(itemViewModel)
-            }
+            },
         )
     }
 
     static func endPoll(
         itemViewModel: CVItemViewModelImpl,
-        delegate: MessageActionsDelegate
+        delegate: MessageActionsDelegate,
     ) -> MessageAction {
         return MessageAction(
             .endPoll,
@@ -175,31 +195,96 @@ struct MessageActionBuilder {
             accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "end_poll"),
             contextMenuTitle: OWSLocalizedString("POLL_DETAILS_END_POLL", comment: "Label for button to end a poll"),
             contextMenuAttributes: [],
-            block: { [weak delegate] (_) in
+            block: { [weak delegate] _ in
                 delegate?.messageActionsEndPoll(itemViewModel)
-            }
+            },
         )
     }
-    
-    static func star(itemViewModel: CVItemViewModelImpl, delegate: MessageActionsDelegate) -> MessageAction {
-        let isStarred = (itemViewModel.interaction as? TSMessage)?.isStarred ?? false
-        let title = isStarred ? "UNSTAR" : "STAR"
-        
-        return MessageAction(isStarred ? .unstar : .star,
-                             accessibilityLabel: OWSLocalizedString(title, comment: "Action sheet button title"),
-                             accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "star"),
-                             contextMenuTitle: OWSLocalizedString(title,  comment: "Context menu button title"),
-                             contextMenuAttributes: [],
-                             block: { [weak delegate] (_) in
-                                delegate?.messageActionsStarItem(itemViewModel)
 
-        })
+    static func changePinStatus(
+        itemViewModel: CVItemViewModelImpl,
+        footerState: CVComponentFooter.State,
+        delegate: MessageActionsDelegate,
+    ) -> MessageAction {
+
+        if footerState.isPinnedMessage {
+            return MessageAction(
+                .unpin,
+                accessibilityLabel: OWSLocalizedString("PINNED_MESSAGE_UNPIN_ACTION_TITLE", comment: "Label for button to unpin a message"),
+                accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "pin"),
+                contextMenuTitle: OWSLocalizedString("PINNED_MESSAGE_UNPIN_ACTION_TITLE", comment: "Label for button to unpin a message"),
+                contextMenuAttributes: [],
+                block: { [weak delegate] _ in
+                    delegate?.messageActionsChangePinStatus(itemViewModel, pin: false)
+                },
+            )
+        }
+        return MessageAction(
+            .pin,
+            accessibilityLabel: OWSLocalizedString("PINNED_MESSAGE_PIN_ACTION_TITLE", comment: "Label for button to pin a message"),
+            accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "pin"),
+            contextMenuTitle: OWSLocalizedString("PINNED_MESSAGE_PIN_ACTION_TITLE", comment: "Label for button to pin a message"),
+            contextMenuAttributes: [],
+            block: { [weak delegate] _ in
+                delegate?.messageActionsChangePinStatus(itemViewModel, pin: true)
+            },
+        )
     }
+
+    static func viewStickerPack(
+        itemViewModel: CVItemViewModelImpl,
+        delegate: MessageActionsDelegate,
+    ) -> MessageAction {
+        return MessageAction(
+            .viewStickerPack,
+            accessibilityLabel: OWSLocalizedString("STICKER_BUTTON_VIEW_PACK", comment: "Title for a button to view a sticker pack"),
+            accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "view_pack"),
+            contextMenuTitle: OWSLocalizedString("STICKER_BUTTON_VIEW_PACK", comment: "Title for a button to view a sticker pack"),
+            contextMenuAttributes: [],
+            block: { [weak delegate] _ in
+                delegate?.messageActionsViewStickerPack(itemViewModel)
+            },
+        )
+    }
+
+    static func star(itemViewModel: CVItemViewModelImpl, delegate: MessageActionsDelegate) -> MessageAction {
+        let isStarred: Bool = {
+            guard let message = itemViewModel.interaction as? TSMessage else {
+                return false
+            }
+            return SSKEnvironment.shared.databaseStorageRef.read { tx in message.isStarred(tx: tx) }
+        }()
+        let title = isStarred ? "UNSTAR" : "STAR"
+
+        return MessageAction(
+            isStarred ? .unstar : .star,
+            accessibilityLabel: OWSLocalizedString(title, comment: "Action sheet button title"),
+            accessibilityIdentifier: UIView.accessibilityIdentifier(containerName: "message_action", name: "star"),
+            contextMenuTitle: OWSLocalizedString(title, comment: "Context menu button title"),
+            contextMenuAttributes: [],
+            block: { [weak delegate] _ in
+                delegate?.messageActionsStarItem(itemViewModel)
+            },
+        )
+    }
+
 }
 
-class MessageActions: NSObject {
+class MessageActions {
 
-    class func textActions(itemViewModel: CVItemViewModelImpl, shouldAllowReply: Bool, delegate: MessageActionsDelegate) -> [MessageAction] {
+    private class func canLocalUserEditGroupAttributes(itemViewModel: CVItemViewModelImpl) -> Bool {
+        guard let groupModel = itemViewModel.thread.groupModelIfGroupThread as? TSGroupModelV2 else {
+            return true
+        }
+
+        if groupModel.groupMembership.isLocalUserFullMemberAndAdministrator {
+            return true
+        }
+
+        return groupModel.access.attributes != .administrator && !groupModel.isAnnouncementsOnly
+    }
+
+    class func textActions(itemViewModel: CVItemViewModelImpl, shouldAllowMessageSendActions: Bool, delegate: MessageActionsDelegate) -> [MessageAction] {
         var actions: [MessageAction] = []
 
         let showDetailsAction = MessageActionBuilder.showDetails(itemViewModel: itemViewModel, delegate: delegate)
@@ -213,11 +298,11 @@ class MessageActions: NSObject {
             actions.append(copyTextAction)
         }
 
-        if shouldAllowReply {
+        if shouldAllowMessageSendActions {
             let replyAction = MessageActionBuilder.reply(itemViewModel: itemViewModel, delegate: delegate)
             actions.append(replyAction)
         }
-        
+
         let starAction = MessageActionBuilder.star(itemViewModel: itemViewModel, delegate: delegate)
         actions.append(starAction)
 
@@ -228,7 +313,7 @@ class MessageActions: NSObject {
         let selectAction = MessageActionBuilder.selectMessage(itemViewModel: itemViewModel, delegate: delegate)
         actions.append(selectAction)
 
-        if itemViewModel.canEditMessage {
+        if itemViewModel.canEditMessage, shouldAllowMessageSendActions {
             let editAction = MessageActionBuilder.editMessage(itemViewModel: itemViewModel, delegate: delegate)
             actions.append(editAction)
         }
@@ -245,10 +330,25 @@ class MessageActions: NSObject {
             }
         }
 
+        if
+            shouldAllowMessageSendActions,
+            itemViewModel.componentState.giftBadge == nil,
+            let footerState = itemViewModel.renderItem.itemViewState.footerState,
+            canLocalUserEditGroupAttributes(itemViewModel: itemViewModel)
+        {
+            // Check can change pin
+            let pinAction = MessageActionBuilder.changePinStatus(
+                itemViewModel: itemViewModel,
+                footerState: footerState,
+                delegate: delegate,
+            )
+            actions.append(pinAction)
+        }
+
         return actions
     }
 
-    class func mediaActions(itemViewModel: CVItemViewModelImpl, shouldAllowReply: Bool, delegate: MessageActionsDelegate) -> [MessageAction] {
+    class func mediaActions(itemViewModel: CVItemViewModelImpl, shouldAllowMessageSendActions: Bool, delegate: MessageActionsDelegate) -> [MessageAction] {
         var actions: [MessageAction] = []
 
         let showDetailsAction = MessageActionBuilder.showDetails(itemViewModel: itemViewModel, delegate: delegate)
@@ -267,7 +367,7 @@ class MessageActions: NSObject {
             actions.append(saveMediaAction)
         }
 
-        if shouldAllowReply {
+        if shouldAllowMessageSendActions {
             let replyAction = MessageActionBuilder.reply(itemViewModel: itemViewModel, delegate: delegate)
             actions.append(replyAction)
         }
@@ -276,7 +376,11 @@ class MessageActions: NSObject {
             actions.append(MessageActionBuilder.forwardMessage(itemViewModel: itemViewModel, delegate: delegate))
         }
 
-        if itemViewModel.canEditMessage {
+        if itemViewModel.stickerMetadata != nil {
+            actions.append(MessageActionBuilder.viewStickerPack(itemViewModel: itemViewModel, delegate: delegate))
+        }
+
+        if itemViewModel.canEditMessage, shouldAllowMessageSendActions {
             let editAction = MessageActionBuilder.editMessage(itemViewModel: itemViewModel, delegate: delegate)
             actions.append(editAction)
         }
@@ -284,10 +388,24 @@ class MessageActions: NSObject {
         let selectAction = MessageActionBuilder.selectMessage(itemViewModel: itemViewModel, delegate: delegate)
         actions.append(selectAction)
 
+        if
+            shouldAllowMessageSendActions,
+            itemViewModel.componentState.giftBadge == nil,
+            let footerState = itemViewModel.renderItem.itemViewState.footerState,
+            canLocalUserEditGroupAttributes(itemViewModel: itemViewModel)
+        {
+            let pinAction = MessageActionBuilder.changePinStatus(
+                itemViewModel: itemViewModel,
+                footerState: footerState,
+                delegate: delegate,
+            )
+            actions.append(pinAction)
+        }
+
         return actions
     }
 
-    class func quotedMessageActions(itemViewModel: CVItemViewModelImpl, shouldAllowReply: Bool, delegate: MessageActionsDelegate) -> [MessageAction] {
+    class func quotedMessageActions(itemViewModel: CVItemViewModelImpl, shouldAllowMessageSendActions: Bool, delegate: MessageActionsDelegate) -> [MessageAction] {
         var actions: [MessageAction] = []
 
         let showDetailsAction = MessageActionBuilder.showDetails(itemViewModel: itemViewModel, delegate: delegate)
@@ -296,7 +414,12 @@ class MessageActions: NSObject {
         let deleteAction = MessageActionBuilder.deleteMessage(itemViewModel: itemViewModel, delegate: delegate)
         actions.append(deleteAction)
 
-        if shouldAllowReply {
+        if itemViewModel.canCopyOrShareOrSpeakText {
+            let copyTextAction = MessageActionBuilder.copyText(itemViewModel: itemViewModel, delegate: delegate)
+            actions.append(copyTextAction)
+        }
+
+        if shouldAllowMessageSendActions {
             let replyAction = MessageActionBuilder.reply(itemViewModel: itemViewModel, delegate: delegate)
             actions.append(replyAction)
         }
@@ -305,7 +428,7 @@ class MessageActions: NSObject {
             actions.append(MessageActionBuilder.forwardMessage(itemViewModel: itemViewModel, delegate: delegate))
         }
 
-        if itemViewModel.canEditMessage {
+        if itemViewModel.canEditMessage, shouldAllowMessageSendActions {
             let editAction = MessageActionBuilder.editMessage(itemViewModel: itemViewModel, delegate: delegate)
             actions.append(editAction)
         }
@@ -313,87 +436,133 @@ class MessageActions: NSObject {
         let selectAction = MessageActionBuilder.selectMessage(itemViewModel: itemViewModel, delegate: delegate)
         actions.append(selectAction)
 
+        if
+            shouldAllowMessageSendActions,
+            itemViewModel.componentState.giftBadge == nil,
+            let footerState = itemViewModel.renderItem.itemViewState.footerState,
+            canLocalUserEditGroupAttributes(itemViewModel: itemViewModel)
+        {
+            let pinAction = MessageActionBuilder.changePinStatus(
+                itemViewModel: itemViewModel,
+                footerState: footerState,
+                delegate: delegate,
+            )
+            actions.append(pinAction)
+        }
+
         return actions
     }
 
     class func paymentActions(
         itemViewModel: CVItemViewModelImpl,
-        shouldAllowReply: Bool,
-        delegate: MessageActionsDelegate
+        shouldAllowMessageSendActions: Bool,
+        delegate: MessageActionsDelegate,
     ) -> [MessageAction] {
         var actions: [MessageAction] = []
 
         let showDetailsAction = MessageActionBuilder.showDetails(
             itemViewModel: itemViewModel,
-            delegate: delegate
+            delegate: delegate,
         )
         actions.append(showDetailsAction)
 
         let deleteAction = MessageActionBuilder.deleteMessage(
             itemViewModel: itemViewModel,
-            delegate: delegate
+            delegate: delegate,
         )
         actions.append(deleteAction)
 
         let showPaymentDetailsAction = MessageActionBuilder.showPaymentDetails(
             itemViewModel: itemViewModel,
-            delegate: delegate
+            delegate: delegate,
         )
         actions.append(showPaymentDetailsAction)
 
-        if shouldAllowReply {
+        if shouldAllowMessageSendActions {
             let replyAction = MessageActionBuilder.reply(
                 itemViewModel: itemViewModel,
-                delegate: delegate
+                delegate: delegate,
             )
             actions.append(replyAction)
         }
 
         let selectAction = MessageActionBuilder.selectMessage(
             itemViewModel: itemViewModel,
-            delegate: delegate
+            delegate: delegate,
         )
         actions.append(selectAction)
 
+        if
+            shouldAllowMessageSendActions,
+            itemViewModel.componentState.giftBadge == nil,
+            let footerState = itemViewModel.renderItem.itemViewState.footerState,
+            canLocalUserEditGroupAttributes(itemViewModel: itemViewModel)
+        {
+            let pinAction = MessageActionBuilder.changePinStatus(
+                itemViewModel: itemViewModel,
+                footerState: footerState,
+                delegate: delegate,
+            )
+            actions.append(pinAction)
+        }
         return actions
     }
 
     class func pollActions(
         itemViewModel: CVItemViewModelImpl,
-        shouldAllowReply: Bool,
-        delegate: MessageActionsDelegate
+        shouldAllowMessageSendActions: Bool,
+        delegate: MessageActionsDelegate,
     ) -> [MessageAction] {
         var actions: [MessageAction] = []
 
         let showDetailsAction = MessageActionBuilder.showDetails(
             itemViewModel: itemViewModel,
-            delegate: delegate
+            delegate: delegate,
         )
         actions.append(showDetailsAction)
 
         let deleteAction = MessageActionBuilder.deleteMessage(
             itemViewModel: itemViewModel,
-            delegate: delegate
+            delegate: delegate,
         )
         actions.append(deleteAction)
 
-        if shouldAllowReply {
+        if shouldAllowMessageSendActions {
             let replyAction = MessageActionBuilder.reply(itemViewModel: itemViewModel, delegate: delegate)
             actions.append(replyAction)
         }
 
         let selectAction = MessageActionBuilder.selectMessage(
             itemViewModel: itemViewModel,
-            delegate: delegate
+            delegate: delegate,
         )
         actions.append(selectAction)
 
-        if let poll = itemViewModel.componentState.poll?.state.poll, poll.ownerIsLocalUser, !poll.isEnded {
+        if
+            let poll = itemViewModel.componentState.poll?.state.poll,
+            poll.ownerIsLocalUser,
+            !poll.isEnded,
+            shouldAllowMessageSendActions
+        {
             let endPollAction = MessageActionBuilder.endPoll(
                 itemViewModel: itemViewModel,
-                delegate: delegate
+                delegate: delegate,
             )
             actions.append(endPollAction)
+        }
+
+        if
+            shouldAllowMessageSendActions,
+            itemViewModel.componentState.giftBadge == nil,
+            let footerState = itemViewModel.renderItem.itemViewState.footerState,
+            canLocalUserEditGroupAttributes(itemViewModel: itemViewModel)
+        {
+            let pinAction = MessageActionBuilder.changePinStatus(
+                itemViewModel: itemViewModel,
+                footerState: footerState,
+                delegate: delegate,
+            )
+            actions.append(pinAction)
         }
 
         return actions

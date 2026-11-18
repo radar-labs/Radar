@@ -6,32 +6,27 @@
 import SignalServiceKit
 import SignalUI
 
-// MARK: -
-
 class LinkPreviewGroupLink: LinkPreviewState {
     private let linkPreview: OWSLinkPreview
-    public let linkType: LinkPreviewLinkType
+    let linkType: LinkPreviewLinkType
     private let groupInviteLinkViewModel: GroupInviteLinkViewModel
 
     private var groupInviteLinkPreview: GroupInviteLinkPreview? {
         groupInviteLinkViewModel.groupInviteLinkPreview
     }
 
-    private let _conversationStyle: ConversationStyle
-    var conversationStyle: ConversationStyle? {
-        _conversationStyle
-    }
+    let conversationStyle: ConversationStyle?
 
     init(
         linkType: LinkPreviewLinkType,
         linkPreview: OWSLinkPreview,
         groupInviteLinkViewModel: GroupInviteLinkViewModel,
-        conversationStyle: ConversationStyle
+        conversationStyle: ConversationStyle,
     ) {
         self.linkPreview = linkPreview
         self.linkType = linkType
         self.groupInviteLinkViewModel = groupInviteLinkViewModel
-        _conversationStyle = conversationStyle
+        self.conversationStyle = conversationStyle
     }
 
     var isLoaded: Bool { groupInviteLinkPreview != nil }
@@ -106,32 +101,23 @@ class LinkPreviewGroupLink: LinkPreviewState {
     }
 
     var previewDescription: String? {
-        guard let groupInviteLinkPreview = groupInviteLinkPreview else {
+        guard let groupInviteLinkPreview else {
             Logger.warn("Missing groupInviteLinkPreview.")
             return nil
         }
         let groupIndicator = OWSLocalizedString(
             "GROUP_LINK_ACTION_SHEET_VIEW_GROUP_INDICATOR",
-            comment: "Indicator for group conversations in the 'group invite link' action sheet."
+            comment: "Indicator for group conversations in the 'group invite link' action sheet.",
         )
-        let memberCount = GroupViewUtils.formatGroupMembersLabel(memberCount: Int(groupInviteLinkPreview.memberCount))
+        let memberCount = GroupViewUtils.formatGroupMembersLabel(memberCount: Int(groupInviteLinkPreview.memberCount), isTerminated: false)
         return groupIndicator + " | " + memberCount
     }
 
     var date: Date? { linkPreview.date }
 
-    let isGroupInviteLink = true
+    var isGroupInviteLink: Bool { true }
 
-    var activityIndicatorStyle: UIActivityIndicatorView.Style {
-        switch linkType {
-        case .incomingMessageGroupInviteLink:
-            return .medium
-        case .outgoingMessageGroupInviteLink:
-            return .medium
-        default:
-            return LinkPreviewView.defaultActivityIndicatorStyle
-        }
-    }
+    var isCallLink: Bool { false }
 }
 
 // MARK: -
@@ -150,7 +136,7 @@ class GroupInviteLinkViewModel: Equatable {
         url: URL,
         groupInviteLinkPreview: GroupInviteLinkPreview?,
         avatar: GroupInviteLinkCachedAvatar?,
-        isExpired: Bool
+        isExpired: Bool,
     ) {
         self.url = url
         self.groupInviteLinkPreview = groupInviteLinkPreview
@@ -158,10 +144,10 @@ class GroupInviteLinkViewModel: Equatable {
         self.isExpired = isExpired
     }
 
-    static func == (lhs: GroupInviteLinkViewModel, rhs: GroupInviteLinkViewModel) -> Bool {
+    static func ==(lhs: GroupInviteLinkViewModel, rhs: GroupInviteLinkViewModel) -> Bool {
         return lhs.url == rhs.url &&
-        lhs.groupInviteLinkPreview == rhs.groupInviteLinkPreview &&
-        lhs.avatar == rhs.avatar
+            lhs.groupInviteLinkPreview == rhs.groupInviteLinkPreview &&
+            lhs.avatar == rhs.avatar
     }
 }
 
@@ -176,16 +162,16 @@ class GroupInviteLinkCachedAvatar: Equatable {
     init(
         cacheFileUrl: URL,
         imageSizePixels: CGSize,
-        isValid: Bool
+        isValid: Bool,
     ) {
         self.cacheFileUrl = cacheFileUrl
         self.imageSizePixels = imageSizePixels
         self.isValid = isValid
     }
 
-    static func == (lhs: GroupInviteLinkCachedAvatar, rhs: GroupInviteLinkCachedAvatar) -> Bool {
+    static func ==(lhs: GroupInviteLinkCachedAvatar, rhs: GroupInviteLinkCachedAvatar) -> Bool {
         return lhs.cacheFileUrl == rhs.cacheFileUrl &&
-        lhs.imageSizePixels == rhs.imageSizePixels &&
-        lhs.isValid == rhs.isValid
+            lhs.imageSizePixels == rhs.imageSizePixels &&
+            lhs.isValid == rhs.isValid
     }
 }

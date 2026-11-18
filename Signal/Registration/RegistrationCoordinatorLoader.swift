@@ -19,7 +19,11 @@ public protocol RegistrationCoordinatorLoader {
     /// `desiredMode` may not be the mode we end up in; for example if we
     /// were in the middle of re-registration and try to change number, that will
     /// be disallowed and we will fall back to re-registration.
-    func coordinator(forDesiredMode: RegistrationMode, transaction: DBWriteTransaction) -> RegistrationCoordinator
+    func coordinator(
+        forDesiredMode: RegistrationMode,
+        transaction: DBWriteTransaction,
+        logger: PrefixedLogger,
+    ) -> RegistrationCoordinator
 
     /// If true, message processing should be paused due to an in-progress change number.
     func hasPendingChangeNumber(transaction: DBReadTransaction) -> Bool
@@ -27,23 +31,13 @@ public protocol RegistrationCoordinatorLoader {
 
 public class RegistrationCoordinatorLoaderImpl: RegistrationCoordinatorLoader {
 
-    public enum Mode: Codable {
+    public enum Mode: Codable, CustomStringConvertible {
         case registering(RegisteringState)
-        case reRegistering(ReRegisteringState)
+        case reRegistering(ReregisteringLocalIdentifiers)
         case changingNumber(ChangeNumberState)
 
         public struct RegisteringState: Codable, Equatable {
             fileprivate init() {}
-        }
-
-        public struct ReRegisteringState: Codable, Equatable {
-            public let e164: E164
-            @AciUuid public var aci: Aci
-
-            fileprivate init(e164: E164, aci: Aci) {
-                self.e164 = e164
-                self._aci = aci.codableUuid
-            }
         }
 
         public struct ChangeNumberState: Codable {
@@ -67,7 +61,7 @@ public class RegistrationCoordinatorLoaderImpl: RegistrationCoordinatorLoader {
                 oldAuthToken: String,
                 localAci: Aci,
                 localDeviceId: DeviceId,
-                pniState: PendingPniState?
+                pniState: PendingPniState?,
             ) {
                 self.oldE164 = oldE164
                 self.oldAuthToken = oldAuthToken
@@ -85,11 +79,17 @@ public class RegistrationCoordinatorLoaderImpl: RegistrationCoordinatorLoader {
                 return state.pniState != nil
             }
         }
+
+        public var description: String {
+            switch self {
+            case .registering: return "registering"
+            case .reRegistering: return "reRegistering"
+            case .changingNumber: return "changingNumber"
+            }
+        }
     }
 
-    private lazy var kvStore: KeyValueStore = {
-        KeyValueStore(collection: Constants.collectionName)
-    }()
+    private let kvStore: NewKeyValueStore = NewKeyValueStore(collection: Constants.collectionName)
 
     private let deps: RegistrationCoordinatorDependencies
 
@@ -103,14 +103,11 @@ public class RegistrationCoordinatorLoaderImpl: RegistrationCoordinatorLoader {
 
     public func coordinator(
         forDesiredMode desiredMode: RegistrationMode,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
+        logger: PrefixedLogger,
     ) -> RegistrationCoordinator {
         let mode = loadMode(transaction: transaction) ?? desiredMode.asInternalMode()
-        do {
-            try self.kvStore.setCodable(mode, key: Constants.modeKey, transaction: transaction)
-        } catch {
-            owsFailDebug("Failed to write registration mode to disk: \(error)")
-        }
+        self.kvStore.writeValueAsJSON(mode, forKey: Constants.modeKey, tx: transaction)
         if mode.hasPendingChangeNumber {
             // This should happen on app startup, but do it here too to be safe.
             deps.messagePipelineSupervisor.suspendMessageProcessingWithoutHandle(for: .pendingChangeNumber)
@@ -118,7 +115,7 @@ public class RegistrationCoordinatorLoaderImpl: RegistrationCoordinatorLoader {
         }
         let delegate = CoordinatorDelegate(loader: self)
         Logger.info("Starting registration, mode: \(mode.logString)")
-        return RegistrationCoordinatorImpl(mode: mode, loader: delegate, dependencies: deps)
+        return RegistrationCoordinatorImpl(mode: mode, loader: delegate, dependencies: deps, logger: logger)
     }
 
     public func hasPendingChangeNumber(transaction: DBReadTransaction) -> Bool {
@@ -127,7 +124,7 @@ public class RegistrationCoordinatorLoaderImpl: RegistrationCoordinatorLoader {
 
     private func loadMode(transaction: DBReadTransaction) -> Mode? {
         do {
-            return try kvStore.getCodableValue(forKey: Constants.modeKey, transaction: transaction)
+            return try kvStore.fetchJSONAsValue(Mode.self, forKey: Constants.modeKey, tx: transaction)
         } catch {
             // Failed to parse, even though we know there is something there.
             // This is BAD. We might've been in the middle of change number, which NEEDS to recover.
@@ -152,22 +149,22 @@ public class RegistrationCoordinatorLoaderImpl: RegistrationCoordinatorLoader {
         }
 
         func clearPersistedMode(transaction: DBWriteTransaction) {
-            loader.kvStore.removeValue(forKey: Constants.modeKey, transaction: transaction)
+            loader.kvStore.removeValue(forKey: Constants.modeKey, tx: transaction)
         }
 
         func savePendingChangeNumber(
             oldState: Mode.ChangeNumberState,
             pniState: Mode.ChangeNumberState.PendingPniState?,
-            transaction: DBWriteTransaction
-        ) throws -> Mode.ChangeNumberState {
+            transaction: DBWriteTransaction,
+        ) -> Mode.ChangeNumberState {
             var newState = oldState
             newState.pniState = pniState
-            try loader.kvStore.setCodable(Mode.changingNumber(newState), key: Constants.modeKey, transaction: transaction)
+            loader.kvStore.writeValueAsJSON(Mode.changingNumber(newState), forKey: Constants.modeKey, tx: transaction)
             let messagePipelineSupervisor = loader.deps.messagePipelineSupervisor
             let preKeyManager = loader.deps.preKeyManager
             transaction.addSyncCompletion {
                 let hasPendingChangeNumber = Mode.changingNumber(newState).hasPendingChangeNumber
-                if  hasPendingChangeNumber {
+                if hasPendingChangeNumber {
                     messagePipelineSupervisor.suspendMessageProcessingWithoutHandle(for: .pendingChangeNumber)
                 } else {
                     messagePipelineSupervisor.unsuspendMessageProcessing(for: .pendingChangeNumber)
@@ -191,16 +188,16 @@ extension RegistrationMode {
     fileprivate func asInternalMode() -> RegistrationCoordinatorLoaderImpl.Mode {
         switch self {
         case .registering:
-            return .registering(.init())
+            return .registering(RegistrationCoordinatorLoaderImpl.Mode.RegisteringState())
         case .reRegistering(let params):
-            return .reRegistering(.init(e164: params.e164, aci: params.aci))
+            return .reRegistering(params)
         case .changingNumber(let params):
-            return .changingNumber(.init(
+            return .changingNumber(RegistrationCoordinatorLoaderImpl.Mode.ChangeNumberState(
                 oldE164: params.oldE164,
                 oldAuthToken: params.oldAuthToken,
                 localAci: params.localAci,
                 localDeviceId: params.localDeviceId,
-                pniState: nil
+                pniState: nil,
             ))
         }
     }
@@ -213,13 +210,13 @@ extension RegistrationCoordinatorLoaderImpl.Mode {
         case .registering:
             return .registering
         case .reRegistering(let state):
-            return .reRegistering(.init(e164: state.e164, aci: state.aci))
+            return .reRegistering(state)
         case .changingNumber(let state):
-            return .changingNumber(.init(
+            return .changingNumber(RegistrationMode.ChangeNumberParams(
                 oldE164: state.oldE164,
                 oldAuthToken: state.oldAuthToken,
                 localAci: state.localAci,
-                localDeviceId: state.localDeviceId
+                localDeviceId: state.localDeviceId,
             ))
         }
     }
@@ -228,8 +225,8 @@ extension RegistrationCoordinatorLoaderImpl.Mode {
         switch self {
         case .registering:
             return "initial registration"
-        case .reRegistering(let reRegisteringState):
-            return "re-registration aci:\(reRegisteringState.aci) e164:\(reRegisteringState.e164.stringValue)"
+        case .reRegistering(let localIdentifiers):
+            return "re-registration aci:\(localIdentifiers.aci as Optional) e164:\(localIdentifiers.phoneNumber as Optional)"
         case .changingNumber(let changeNumberState):
             return "changing number: aci:\(changeNumberState.localAci) old e164:\(changeNumberState.oldE164.stringValue)"
         }
@@ -245,7 +242,7 @@ extension ChangePhoneNumberPni.PendingState {
             pniIdentityKeyPair: pniIdentityKeyPair,
             localDevicePniSignedPreKeyRecord: .success(localDevicePniSignedPreKeyRecord),
             localDevicePniPqLastResortPreKeyRecord: .success(localDevicePniPqLastResortPreKeyRecord),
-            localDevicePniRegistrationId: localDevicePniRegistrationId
+            localDevicePniRegistrationId: localDevicePniRegistrationId,
         )
     }
 }
@@ -256,9 +253,7 @@ extension RegistrationCoordinatorLoaderImpl.Mode.ChangeNumberState.PendingPniSta
     private enum CodingKeys: String, CodingKey {
         case newE164
         case pniIdentityKeyPair
-        case localDevicePniSignedPreKeyRecord // deprecated
         case localDevicePniSignedPreKeyRecordData
-        case localDevicePniPqLastResortPreKeyRecord // deprecated
         case localDevicePniPqLastResortPreKeyRecordData
         case localDevicePniRegistrationId
     }
@@ -271,11 +266,6 @@ extension RegistrationCoordinatorLoaderImpl.Mode.ChangeNumberState.PendingPniSta
 
         if let modernValue = try container.decodeIfPresent(Data.self, forKey: .localDevicePniPqLastResortPreKeyRecordData) {
             self.localDevicePniPqLastResortPreKeyRecord = .success(try LibSignalClient.KyberPreKeyRecord(bytes: modernValue))
-        } else if
-            BuildFlags.decodeDeprecatedPreKeys,
-            let deprecatedValue = try container.decodeIfPresent(KyberRecordKeyData.self, forKey: .localDevicePniPqLastResortPreKeyRecord)
-        {
-            self.localDevicePniPqLastResortPreKeyRecord = .success(try LibSignalClient.KyberPreKeyRecord(bytes: deprecatedValue.keyData))
         } else {
             // We don't want to fail the ENTIRE registration operation when this is
             // missing -- we can recover in this case, but we need to communicate the
@@ -289,19 +279,6 @@ extension RegistrationCoordinatorLoaderImpl.Mode.ChangeNumberState.PendingPniSta
 
         if let modernValue = try container.decodeIfPresent(Data.self, forKey: .localDevicePniSignedPreKeyRecordData) {
             self.localDevicePniSignedPreKeyRecord = .success(try LibSignalClient.SignedPreKeyRecord(bytes: modernValue))
-        } else if
-            BuildFlags.decodeDeprecatedPreKeys,
-            let deprecatedValue = try container.decodeIfPresent(Data.self, forKey: .localDevicePniSignedPreKeyRecord)
-        {
-            guard let signedPreKeyRecord = try NSKeyedUnarchiver.unarchivedObject(ofClass: SignalServiceKit.SignedPreKeyRecord.self, from: deprecatedValue) else {
-                throw DecodingError.dataCorruptedError(forKey: .localDevicePniSignedPreKeyRecord, in: container, debugDescription: "")
-            }
-            self.localDevicePniSignedPreKeyRecord = .success(try LibSignalClient.SignedPreKeyRecord(
-                id: UInt32(bitPattern: signedPreKeyRecord.id),
-                timestamp: signedPreKeyRecord.generatedAt.ows_millisecondsSince1970,
-                privateKey: signedPreKeyRecord.keyPair.keyPair.privateKey,
-                signature: signedPreKeyRecord.signature,
-            ))
         } else {
             // We don't want to fail the ENTIRE registration operation when this is
             // missing -- we can recover in this case, but we need to communicate the
@@ -316,7 +293,7 @@ extension RegistrationCoordinatorLoaderImpl.Mode.ChangeNumberState.PendingPniSta
         guard
             let pniIdentityKeyPair: ECKeyPair = try Self.decodeKeyedArchive(
                 fromDecodingContainer: container,
-                forKey: .pniIdentityKeyPair
+                forKey: .pniIdentityKeyPair,
             )
         else {
             throw OWSAssertionError("Unable to deserialize NSKeyedArchiver fields!")
@@ -336,21 +313,15 @@ extension RegistrationCoordinatorLoaderImpl.Mode.ChangeNumberState.PendingPniSta
         try Self.encodeKeyedArchive(
             value: pniIdentityKeyPair,
             toEncodingContainer: &container,
-            forKey: .pniIdentityKeyPair
+            forKey: .pniIdentityKeyPair,
         )
-    }
-
-    /// A shim of the former KyberPreKeyRecord that contains what's necessary to
-    /// maintain continuity with historically-encoded values.
-    private struct KyberRecordKeyData: Codable {
-        var keyData: Data
     }
 
     // MARK: NSKeyed[Un]Archiver
 
     private static func decodeKeyedArchive<T: NSObject & NSSecureCoding>(
         fromDecodingContainer decodingContainer: KeyedDecodingContainer<CodingKeys>,
-        forKey key: CodingKeys
+        forKey key: CodingKeys,
     ) throws -> T? {
         let data = try decodingContainer.decode(Data.self, forKey: key)
 
@@ -360,11 +331,11 @@ extension RegistrationCoordinatorLoaderImpl.Mode.ChangeNumberState.PendingPniSta
     private static func encodeKeyedArchive<T: NSObject & NSSecureCoding>(
         value: T,
         toEncodingContainer encodingContainer: inout KeyedEncodingContainer<CodingKeys>,
-        forKey key: CodingKeys
+        forKey key: CodingKeys,
     ) throws {
         let data = try NSKeyedArchiver.archivedData(
             withRootObject: value,
-            requiringSecureCoding: true
+            requiringSecureCoding: true,
         )
 
         try encodingContainer.encode(data, forKey: key)

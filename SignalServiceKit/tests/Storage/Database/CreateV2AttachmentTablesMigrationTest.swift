@@ -4,8 +4,8 @@
 //
 
 import GRDB
-@testable import SignalServiceKit
 public import XCTest
+@testable import SignalServiceKit
 
 public class AttachmentV2MigrationTest: XCTestCase {
 
@@ -13,11 +13,14 @@ public class AttachmentV2MigrationTest: XCTestCase {
     private var db: SDSDatabaseStorage!
 
     override public func setUp() async throws {
-        self.dbFileURL = OWSFileSystem.temporaryFileUrl()
+        self.dbFileURL = OWSFileSystem.temporaryFileUrl(
+            fileExtension: nil,
+            isAvailableWhileDeviceLocked: false,
+        )
         self.db = try SDSDatabaseStorage(
             appReadiness: AppReadinessMock(),
             databaseFileUrl: dbFileURL,
-            keychainStorage: MockKeychainStorage()
+            keychainStorage: MockKeychainStorage(),
         )
     }
 
@@ -39,7 +42,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
                 threadId: threadId1,
                 messageId: messageId,
                 attachmentId: attachmentId1,
-                tx: tx
+                tx: tx,
             )
 
             XCTAssertNotNil(try fetchAttachment(id: attachmentId1, tx: tx))
@@ -52,14 +55,14 @@ public class AttachmentV2MigrationTest: XCTestCase {
             try insertStoryMessageAttachmentReference(
                 storyMessageId: storyMessageId,
                 attachmentId: attachmentId2,
-                tx: tx
+                tx: tx,
             )
 
             XCTAssertNotNil(try fetchAttachment(id: attachmentId2, tx: tx))
             XCTAssertEqual([storyMessageId], try fetchStoryMessageAttachmentReferences(attachmentId: attachmentId2, tx: tx).map { $0["ownerRowId"] })
             XCTAssertEqual(
                 [attachmentId2],
-                try fetchStoryMessageAttachmentReferences(storyMessageId: storyMessageId, tx: tx).map { $0["attachmentRowId"] }
+                try fetchStoryMessageAttachmentReferences(storyMessageId: storyMessageId, tx: tx).map { $0["attachmentRowId"] },
             )
 
             let threadId2 = try insertThread(tx: tx)
@@ -68,7 +71,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
             try insertThreadAttachmentReference(
                 threadId: threadId2,
                 attachmentId: attachmentId3,
-                tx: tx
+                tx: tx,
             )
 
             XCTAssertNotNil(try fetchAttachment(id: attachmentId3, tx: tx))
@@ -87,21 +90,21 @@ public class AttachmentV2MigrationTest: XCTestCase {
 
             let attachmentId = try insertAttachment(
                 contentType: 1,
-                tx: tx
+                tx: tx,
             )
             try insertMessageAttachmentReference(
                 threadId: threadId,
                 messageId: messageId1,
                 attachmentId: attachmentId,
                 contentType: 1,
-                tx: tx
+                tx: tx,
             )
             try insertMessageAttachmentReference(
                 threadId: threadId,
                 messageId: messageId2,
                 attachmentId: attachmentId,
                 contentType: 1,
-                tx: tx
+                tx: tx,
             )
 
             // Ensure the content type is set.
@@ -114,7 +117,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
                 sql: """
                     UPDATE Attachment SET contentType = ? WHERE id = ?
                 """,
-                arguments: [3, attachmentId]
+                arguments: [3, attachmentId],
             )
 
             // Ensure the content type is set back on the references, too.
@@ -138,7 +141,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
                 threadId: threadId1,
                 messageId: messageId1,
                 attachmentId: attachmentId1,
-                tx: tx
+                tx: tx,
             )
 
             // Delete the thread; deletion should cascade to attachments.
@@ -157,7 +160,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
                 threadId: threadId2,
                 messageId: messageId2,
                 attachmentId: attachmentId2,
-                tx: tx
+                tx: tx,
             )
 
             // Delete the message; deletion should cascade to attachments.
@@ -174,7 +177,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
             try insertStoryMessageAttachmentReference(
                 storyMessageId: storyMessageId,
                 attachmentId: attachmentId3,
-                tx: tx
+                tx: tx,
             )
 
             // Delete the story message; deletion should cascade to attachments.
@@ -191,7 +194,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
             try insertThreadAttachmentReference(
                 threadId: threadId3,
                 attachmentId: attachmentId4,
-                tx: tx
+                tx: tx,
             )
 
             // Delete the thread; deletion should cascade to attachments.
@@ -222,23 +225,23 @@ public class AttachmentV2MigrationTest: XCTestCase {
                 threadId: messageThreadId,
                 messageId: messageId1,
                 attachmentId: attachmentId,
-                tx: tx
+                tx: tx,
             )
             try insertMessageAttachmentReference(
                 threadId: messageThreadId,
                 messageId: messageId2,
                 attachmentId: attachmentId,
-                tx: tx
+                tx: tx,
             )
             try insertStoryMessageAttachmentReference(
                 storyMessageId: storyMessageId,
                 attachmentId: attachmentId,
-                tx: tx
+                tx: tx,
             )
             try insertThreadAttachmentReference(
                 threadId: threadId,
                 attachmentId: attachmentId,
-                tx: tx
+                tx: tx,
             )
 
             // Delete the thread.
@@ -290,7 +293,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
                 threadId: threadId,
                 messageId: messageId,
                 attachmentId: attachmentId,
-                tx: tx
+                tx: tx,
             )
 
             // Delete the message; deletion should cascade to attachment.
@@ -316,7 +319,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
             let originalAttachmentId = try insertAttachment(tx: tx)
             let replyAttachmentId = try insertQuotedReplyAttachment(
                 originalAttachmentIdForQuotedReply: originalAttachmentId,
-                tx: tx
+                tx: tx,
             )
 
             // Fetch the second by the first attachment's ID.
@@ -325,7 +328,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
                 sql: """
                     SELECT * FROM Attachment WHERE originalAttachmentIdForQuotedReply = ?;
                 """,
-                arguments: [originalAttachmentId]
+                arguments: [originalAttachmentId],
             )
             XCTAssertEqual(replyAttachment?["id"], replyAttachmentId)
 
@@ -334,7 +337,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
                 sql: """
                     DELETE FROM Attachment WHERE id = ?;
                 """,
-                arguments: [originalAttachmentId]
+                arguments: [originalAttachmentId],
             )
 
             // Should not be able to find the second attachment by the original's id now.
@@ -343,7 +346,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
                 sql: """
                     SELECT * FROM Attachment WHERE originalAttachmentIdForQuotedReply = ?;
                 """,
-                arguments: [originalAttachmentId]
+                arguments: [originalAttachmentId],
             )
             XCTAssertNil(replyAttachment)
 
@@ -353,7 +356,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
                 sql: """
                     SELECT * FROM Attachment WHERE id = ?;
                 """,
-                arguments: [replyAttachmentId]
+                arguments: [replyAttachmentId],
             )
             XCTAssertNotNil(replyAttachment)
             XCTAssertNil(replyAttachment?["originalAttachmentIdForQuotedReply"])
@@ -466,7 +469,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
     private func insertAttachment(
         filepath: String = UUID().uuidString,
         contentType: Int64 = 0,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws -> Int64 {
         // Only set columns which are relevant to the SQL constraints + triggers.
         // Irrelevant columns with NOT NULL are set to arbitrary values.
@@ -487,8 +490,8 @@ public class AttachmentV2MigrationTest: XCTestCase {
             """,
             arguments: [
                 filepath,
-                contentType
-            ]
+                contentType,
+            ],
         )
         return tx.database.lastInsertedRowID
     }
@@ -496,7 +499,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
     private func insertQuotedReplyAttachment(
         filepath: String = UUID().uuidString,
         originalAttachmentIdForQuotedReply: Attachment.IDType,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws -> Int64 {
         // Only set columns which are relevant to the SQL constraints + triggers.
         // Irrelevant columns with NOT NULL are set to arbitrary values.
@@ -519,8 +522,8 @@ public class AttachmentV2MigrationTest: XCTestCase {
             """,
             arguments: [
                 filepath,
-                originalAttachmentIdForQuotedReply
-            ]
+                originalAttachmentIdForQuotedReply,
+            ],
         )
         return tx.database.lastInsertedRowID
     }
@@ -530,7 +533,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
         messageId: Int64,
         attachmentId: Int64,
         contentType: Int64 = 0,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws {
         // Only set columns which are relevant to the SQL constraints + triggers.
         // Irrelevant columns with NOT NULL are set to arbitrary values.
@@ -559,15 +562,15 @@ public class AttachmentV2MigrationTest: XCTestCase {
                 messageId,
                 attachmentId,
                 contentType,
-                threadId
-            ]
+                threadId,
+            ],
         )
     }
 
     private func insertStoryMessageAttachmentReference(
         storyMessageId: Int64,
         attachmentId: Int64,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws {
         // Only set columns which are relevant to the SQL constraints + triggers.
         // Irrelevant columns with NOT NULL are set to arbitrary values.
@@ -588,15 +591,15 @@ public class AttachmentV2MigrationTest: XCTestCase {
             """,
             arguments: [
                 storyMessageId,
-                attachmentId
-            ]
+                attachmentId,
+            ],
         )
     }
 
     private func insertThreadAttachmentReference(
         threadId: Int64,
         attachmentId: Int64,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws {
         // Only set columns which are relevant to the SQL constraints + triggers.
         // Irrelevant columns with NOT NULL are set to arbitrary values.
@@ -615,8 +618,8 @@ public class AttachmentV2MigrationTest: XCTestCase {
             """,
             arguments: [
                 threadId,
-                attachmentId
-            ]
+                attachmentId,
+            ],
         )
     }
 
@@ -628,7 +631,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
             sql: """
                 SELECT * FROM Attachment WHERE id = ?;
             """,
-            arguments: [id]
+            arguments: [id],
         )
     }
 
@@ -637,85 +640,85 @@ public class AttachmentV2MigrationTest: XCTestCase {
             tx.database,
             sql: """
                 SELECT * FROM OrphanedAttachment;
-            """
+            """,
         )
     }
 
     private func fetchMessageAttachmentReferences(
         attachmentId: Int64,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> [Row] {
         return try Row.fetchAll(
             tx.database,
             sql: """
                 SELECT * FROM MessageAttachmentReference WHERE attachmentRowId = ?;
             """,
-            arguments: [attachmentId]
+            arguments: [attachmentId],
         )
     }
 
     private func fetchMessageAttachmentReferences(
         messageId: Int64,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> [Row] {
         return try Row.fetchAll(
             tx.database,
             sql: """
                 SELECT * FROM MessageAttachmentReference WHERE ownerRowId = ?;
             """,
-            arguments: [messageId]
+            arguments: [messageId],
         )
     }
 
     private func fetchStoryMessageAttachmentReferences(
         attachmentId: Int64,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> [Row] {
         return try Row.fetchAll(
             tx.database,
             sql: """
                 SELECT * FROM StoryMessageAttachmentReference WHERE attachmentRowId = ?;
             """,
-            arguments: [attachmentId]
+            arguments: [attachmentId],
         )
     }
 
     private func fetchStoryMessageAttachmentReferences(
         storyMessageId: Int64,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> [Row] {
         return try Row.fetchAll(
             tx.database,
             sql: """
                 SELECT * FROM StoryMessageAttachmentReference WHERE ownerRowId = ?;
             """,
-            arguments: [storyMessageId]
+            arguments: [storyMessageId],
         )
     }
 
     private func fetchThreadAttachmentReferences(
         attachmentId: Int64,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> [Row] {
         return try Row.fetchAll(
             tx.database,
             sql: """
                 SELECT * FROM ThreadAttachmentReference WHERE attachmentRowId = ?;
             """,
-            arguments: [attachmentId]
+            arguments: [attachmentId],
         )
     }
 
     private func fetchThreadAttachmentReferences(
         threadId: Int64,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> [Row] {
         return try Row.fetchAll(
             tx.database,
             sql: """
                 SELECT * FROM ThreadAttachmentReference WHERE ownerRowId = ?;
             """,
-            arguments: [threadId]
+            arguments: [threadId],
         )
     }
 
@@ -733,7 +736,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
             sql: """
                 DELETE FROM model_TSThread WHERE id = ?;
             """,
-            arguments: [id]
+            arguments: [id],
         )
     }
 
@@ -749,7 +752,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
             sql: """
                 DELETE FROM model_TSInteraction WHERE id = ?;
             """,
-            arguments: [id]
+            arguments: [id],
         )
     }
 
@@ -765,7 +768,7 @@ public class AttachmentV2MigrationTest: XCTestCase {
             sql: """
                 DELETE FROM model_StoryMessage WHERE id = ?;
             """,
-            arguments: [id]
+            arguments: [id],
         )
     }
 }

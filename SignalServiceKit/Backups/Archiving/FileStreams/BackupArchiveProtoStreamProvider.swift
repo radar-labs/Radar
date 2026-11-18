@@ -5,66 +5,30 @@
 
 import LibSignalClient
 
-extension BackupArchive {
-    enum ProtoStream {
-        enum OpenOutputStreamResult<StreamMetadata> {
-            /// The contained stream was opened successfully.
-            /// - Note
-            /// Calling the contained `metadataProvider` provides point-in-time
-            /// metadata for the stream; consequently, callers likely want to
-            /// invoke it after finishing writing to the stream.
-            case success(BackupArchiveProtoOutputStream, metadataProvider: () throws -> StreamMetadata)
-            /// Unable to open a file stream due to I/O errors.
-            case unableToOpenFileStream
-        }
-
-        enum OpenInputStreamResult {
-            /// A stream was opened successfully.
-            case success(BackupArchiveProtoInputStream, rawStream: TransformingInputStream)
-            /// The provided target file was not found on disk.
-            case fileNotFound
-            /// Unable to open a file stream due to file I/O errors.
-            case unableToOpenFileStream
-            /// Unable to open an encrypted file stream due to HMAC validation
-            /// failing.
-            case hmacValidationFailedOnEncryptedFile
-        }
-    }
-}
-
 // MARK: -
 
-/// Creates streams for reading and writing to a plaintext Backup file on-disk.
+/// Creates streams for varint-prefixed, serialized-proto, plaintext Backup files.
 ///
-/// A Backup file is a sequence of concatenated serialized proto bytes delimited
-/// by varint byte sizes, which tell us how much to read into memory to
-/// deserialize the next proto. The streams provided by this type abstract over
-/// this serialized format, allowing callers instead to think in terms of
-/// "frames", or individual proto objects that we read or write individually.
-///
-/// - SeeAlso: ``BackupArchiveEncryptedProtoStreamProvider``
-public class BackupArchivePlaintextProtoStreamProvider {
-    typealias ProtoStream = BackupArchive.ProtoStream
-
-    private let genericStreamProvider: GenericStreamProvider
+/// - SeeAlso `BackupArchiveEncryptedProtoStreamProvider`
+class BackupArchivePlaintextProtoStreamProvider {
+    private let genericProtoStreamProvider: GenericProtoStreamProvider
 
     init() {
-        self.genericStreamProvider = GenericStreamProvider()
+        self.genericProtoStreamProvider = GenericProtoStreamProvider()
     }
 
     /// Open an input stream to read a plaintext backup from a file on disk. The
     /// caller becomes the owner of the stream, and is responsible for closing
     /// it once finished.
     func openPlaintextOutputFileStream(
-        exportProgress: BackupArchiveExportProgress?
-    ) -> ProtoStream.OpenOutputStreamResult<URL> {
-        let transforms: [any StreamTransform] = [
-            ChunkedOutputStreamTransform(),
-        ]
-
-        return genericStreamProvider.openOutputFileStream(
-            transforms: transforms,
-            exportProgress: exportProgress
+        exportProgress: BackupArchiveExportProgress?,
+    ) throws -> (
+        protoOutputStream: BackupArchiveProtoOutputStream,
+        fileUrl: URL,
+    ) {
+        return try genericProtoStreamProvider.openOutputFileStream(
+            additionalTransforms: [],
+            exportProgress: exportProgress,
         )
     }
 
@@ -73,56 +37,57 @@ public class BackupArchivePlaintextProtoStreamProvider {
     /// finished.
     func openPlaintextInputFileStream(
         fileUrl: URL,
-        frameRestoreProgress: BackupArchiveImportFramesProgress?
-    ) -> ProtoStream.OpenInputStreamResult {
+        frameRestoreProgress: BackupArchiveImportFramesProgress?,
+    ) throws -> BackupArchiveProtoInputStream {
         let transforms: [any StreamTransform] = [
             frameRestoreProgress.map { InputProgressStreamTransform(frameRestoreProgress: $0) },
             ChunkedInputStreamTransform(),
         ].compacted()
 
-        return genericStreamProvider.openInputFileStream(
+        let (protoInputStream, _) = try genericProtoStreamProvider.openInputFileStream(
             fileUrl: fileUrl,
-            transforms: transforms
+            transforms: transforms,
         )
+
+        return protoInputStream
     }
 }
 
-/// Creates streams for reading and writing to an encrypted Backup file on-disk.
-///
-/// A Backup file is a sequence of concatenated serialized proto bytes delimited
-/// by varint byte sizes, which tell us how much to read into memory to
-/// deserialize the next proto. The streams provided by this type abstract over
-/// this serialized format, allowing callers instead to think in terms of
-/// "frames", or individual proto objects that we read or write individually.
-///
-/// - SeeAlso: ``BackupArchivePlaintextProtoStreamProvider``
-public class BackupArchiveEncryptedProtoStreamProvider {
-    typealias ProtoStream = BackupArchive.ProtoStream
+// MARK: -
 
-    private let genericStreamProvider: GenericStreamProvider
+/// Creates streams for varint-prefixed, serialized-proto, encrypted Backup files.
+///
+/// - SeeAlso `BackupArchivePlaintextProtoStreamProvider`
+class BackupArchiveEncryptedProtoStreamProvider {
+    private let genericProtoStreamProvider: GenericProtoStreamProvider
+    private let logger = PrefixedLogger(prefix: "[Backups]")
+
     init() {
-        self.genericStreamProvider = GenericStreamProvider()
+        self.genericProtoStreamProvider = GenericProtoStreamProvider()
     }
 
     /// Open an output stream to write an encrypted backup to a file on disk.
     /// The caller owns the returned stream, and is responsible for closing it
     /// once finished.
     func openEncryptedOutputFileStream(
-        startTimestamp: Date,
+        startDate: Date,
         encryptionMetadata: BackupExportPurpose.EncryptionMetadata,
         exportProgress: BackupArchiveExportProgress?,
         attachmentByteCounter: BackupArchiveAttachmentByteCounter,
-        tx: DBReadTransaction
-    ) -> ProtoStream.OpenOutputStreamResult<Upload.EncryptedBackupUploadMetadata> {
+        estimatedUncompressedSize: UInt64?,
+        tx: DBReadTransaction,
+    ) throws -> (
+        protoOutputStream: BackupArchiveProtoOutputStream,
+        streamMetadataProvider: () throws -> Upload.EncryptedBackupUploadMetadata,
+    ) {
         let backupEncryptionKey = encryptionMetadata.encryptionKey
         do {
-            let inputTrackingTransform = MetadataStreamTransform(calculateDigest: false)
-            let outputTrackingTransform = MetadataStreamTransform(calculateDigest: true)
+            let outputTrackingTransform = MetadataStreamTransform()
+            let gzipInputCountTracker = ByteCountStreamTransform()
 
             let transforms: [any StreamTransform] = [
-                inputTrackingTransform,
-                ChunkedOutputStreamTransform(),
-                try GzipStreamTransform(.compress),
+                gzipInputCountTracker,
+                try GzipStreamTransform(.compress, estimatedTotalUncompressedLength: estimatedUncompressedSize),
                 try EncryptingStreamTransform(
                     iv: Randomness.generateRandomBytes(UInt(Cryptography.Constants.aescbcIVLength)),
                     encryptionKey: backupEncryptionKey.aesKey,
@@ -132,35 +97,34 @@ public class BackupArchiveEncryptedProtoStreamProvider {
                 outputTrackingTransform,
             ].compacted()
 
-            let outputStream: BackupArchiveProtoOutputStream
+            let protoOutputStream: BackupArchiveProtoOutputStream
             let fileUrl: URL
-            switch genericStreamProvider.openOutputFileStream(
-                transforms: transforms,
-                exportProgress: exportProgress
-            ) {
-            case .success(let _outputStream, let _fileUrlProvider):
-                outputStream = _outputStream
-                fileUrl = try! _fileUrlProvider()
-            case .unableToOpenFileStream:
-                return .unableToOpenFileStream
-            }
+            (
+                protoOutputStream,
+                fileUrl,
+            ) = try genericProtoStreamProvider.openOutputFileStream(
+                additionalTransforms: transforms,
+                exportProgress: exportProgress,
+            )
 
-            return .success(
-                outputStream,
-                metadataProvider: {
+            return (
+                protoOutputStream: protoOutputStream,
+                streamMetadataProvider: {
                     return Upload.EncryptedBackupUploadMetadata(
-                        exportStartTimestamp: startTimestamp,
+                        exportStartDate: startDate,
                         fileUrl: fileUrl,
                         digest: try outputTrackingTransform.digest(),
                         encryptedDataLength: UInt32(clamping: outputTrackingTransform.count),
-                        plaintextDataLength: UInt32(clamping: inputTrackingTransform.count),
-                        attachmentByteSize: attachmentByteCounter.attachmentByteSize(),
-                        nonceMetadata: encryptionMetadata.nonceMetadata
+                        uncompressedDataLength: UInt32(clamping: gzipInputCountTracker.count),
+                        remoteAttachmentByteSize: attachmentByteCounter.remoteAttachmentByteSize(),
+                        localAttachmentByteSize: attachmentByteCounter.localAttachmentByteSize(),
+                        nonceMetadata: encryptionMetadata.nonceMetadata,
                     )
-                }
+                },
             )
         } catch {
-            return .unableToOpenFileStream
+            logger.error("Failed to open encrypted output file stream! \(error)")
+            throw error
         }
     }
 
@@ -172,10 +136,10 @@ public class BackupArchiveEncryptedProtoStreamProvider {
         source: BackupImportSource,
         backupEncryptionKey: MessageBackupKey,
         frameRestoreProgress: BackupArchiveImportFramesProgress?,
-        tx: DBReadTransaction
-    ) -> ProtoStream.OpenInputStreamResult {
+        tx: DBReadTransaction,
+    ) throws -> BackupArchiveProtoInputStream {
         guard validateBackupHMAC(source: source, backupEncryptionKey: backupEncryptionKey, fileUrl: fileUrl, tx: tx) else {
-            return .hmacValidationFailedOnEncryptedFile
+            throw OWSGenericError("HMAC validation failed on encrypted file!")
         }
 
         do {
@@ -188,12 +152,14 @@ public class BackupArchiveEncryptedProtoStreamProvider {
                 ChunkedInputStreamTransform(),
             ].compacted()
 
-            return genericStreamProvider.openInputFileStream(
+            let (protoInputStream, _) = try genericProtoStreamProvider.openInputFileStream(
                 fileUrl: fileUrl,
-                transforms: transforms
+                transforms: transforms,
             )
+
+            return protoInputStream
         } catch {
-            return .unableToOpenFileStream
+            throw OWSGenericError("Failed to construct and open input proto stream!")
         }
     }
 
@@ -201,29 +167,24 @@ public class BackupArchiveEncryptedProtoStreamProvider {
         source: BackupImportSource,
         backupEncryptionKey: MessageBackupKey,
         fileUrl: URL,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> Bool {
         do {
-            let inputStreamResult = genericStreamProvider.openInputFileStream(
+            let (_, rawInputStream) = try genericProtoStreamProvider.openInputFileStream(
                 fileUrl: fileUrl,
                 transforms: [
                     NonceHeaderInputStreamTransform(source: source),
-                    try HmacStreamTransform(hmacKey: backupEncryptionKey.hmacKey, operation: .validate)
-                ]
+                    try HmacStreamTransform(hmacKey: backupEncryptionKey.hmacKey, operation: .validate),
+                ],
             )
 
-            switch inputStreamResult {
-            case .success(_, let rawInputStream):
-                // Read through the input stream. The HmacStreamTransform will both build
-                // an HMAC of the input data and read the HMAC from the end of the input file.
-                // Once the end of the stream is reached, the transform will compare the
-                // HMACs and throw an exception if they differ.
-                while try rawInputStream.read(maxLength: 32 * 1024).count > 0 {}
-                try rawInputStream.close()
-                return true
-            case .fileNotFound, .unableToOpenFileStream, .hmacValidationFailedOnEncryptedFile:
-                return false
-            }
+            // Read through the input stream. The HmacStreamTransform will both build
+            // an HMAC of the input data and read the HMAC from the end of the input file.
+            // Once the end of the stream is reached, the transform will compare the
+            // HMACs and throw an exception if they differ.
+            while try rawInputStream.read(maxLength: 32 * 1024).count > 0 {}
+            rawInputStream.close()
+            return true
         } catch {
             return false
         }
@@ -232,88 +193,91 @@ public class BackupArchiveEncryptedProtoStreamProvider {
 
 // MARK: -
 
-private class GenericStreamProvider {
-    typealias ProtoStream = BackupArchive.ProtoStream
-
+/// Responsible for creating input and output streams for varint-prefixed
+/// serialized-proto Backup files, with optional additional transforms.
+///
+/// - SeeAlso `BackupArchiveProtoOutputStream`
+private class GenericProtoStreamProvider {
     init() {}
 
+    /// - Important
+    /// The "varint-prefix"-ing of serialized protos is implemented via a
+    /// `ChunkedOutputStreamTransform`, which is prepended to the given
+    /// `additionalTransforms`.
     func openOutputFileStream(
-        transforms: [any StreamTransform],
-        exportProgress: BackupArchiveExportProgress?
-    ) -> ProtoStream.OpenOutputStreamResult<URL> {
-        let fileUrl = OWSFileSystem.temporaryFileUrl(isAvailableWhileDeviceLocked: true)
+        additionalTransforms: [any StreamTransform],
+        exportProgress: BackupArchiveExportProgress?,
+    ) throws -> (
+        protoOutputStream: BackupArchiveProtoOutputStream,
+        fileUrl: URL,
+    ) {
+        owsPrecondition(!additionalTransforms.contains(where: { $0 is ChunkedOutputStreamTransform }))
+
+        let transforms = [ChunkedOutputStreamTransform()] + additionalTransforms
+
+        let fileUrl = OWSFileSystem.temporaryFileUrl(
+            fileExtension: nil,
+            isAvailableWhileDeviceLocked: true,
+        )
+
         guard let outputStream = OutputStream(url: fileUrl, append: false) else {
-            return .unableToOpenFileStream
-        }
-        let outputStreamDelegate = StreamDelegate()
-        outputStream.delegate = outputStreamDelegate
-        let streamRunloop = RunLoop.current
-        outputStream.schedule(in: streamRunloop, forMode: .default)
-        outputStream.open()
-        guard outputStream.streamStatus == .open else {
-            return .unableToOpenFileStream
+            throw OWSGenericError("Failed to open output stream!")
         }
 
-        let transformingOutputStream = TransformingOutputStream(
+        outputStream.open()
+
+        guard outputStream.streamStatus == .open else {
+            throw OWSGenericError("Output stream not open after calling .open()!")
+        }
+
+        // This type requires a ChunkedOutputStreamTransform in the given
+        // transforms; enforced above.
+        let protoOutputStream = BackupArchiveProtoOutputStream(
             transforms: transforms,
             outputStream: outputStream,
-            runLoop: streamRunloop
+            exportProgress: exportProgress,
         )
 
-        let backupOutputStream = BackupArchiveProtoOutputStream(
-            outputStream: transformingOutputStream,
-            exportProgress: exportProgress
-        )
-
-        return .success(
-            backupOutputStream,
-            metadataProvider: { fileUrl }
+        return (
+            protoOutputStream: protoOutputStream,
+            fileUrl: fileUrl,
         )
     }
 
     func openInputFileStream(
         fileUrl: URL,
-        transforms: [any StreamTransform]
-    ) -> ProtoStream.OpenInputStreamResult {
+        transforms: [any StreamTransform],
+    ) throws -> (
+        protoInputStream: BackupArchiveProtoInputStream,
+        rawInputStream: TransformingInputStream,
+    ) {
         guard OWSFileSystem.fileOrFolderExists(url: fileUrl) else {
-            return .fileNotFound
+            throw OWSGenericError("Missing input file!")
         }
+
         guard let inputStream = InputStream(url: fileUrl) else {
-            return .unableToOpenFileStream
+            throw OWSGenericError("Failed to open input stream!")
         }
-        let inputStreamDelegate = StreamDelegate()
-        inputStream.delegate = inputStreamDelegate
-        let streamRunloop = RunLoop.current
-        inputStream.schedule(in: streamRunloop, forMode: .default)
+
         inputStream.open()
+
         guard inputStream.streamStatus == .open else {
-            return .unableToOpenFileStream
+            throw OWSGenericError("Input stream not open after calling .open()!")
         }
 
         let transformableInputStream = TransformingInputStream(
             transforms: transforms,
             inputStream: inputStream,
-            runLoop: streamRunloop
         )
 
-        let backupInputStream = BackupArchiveProtoInputStream(
+        let protoInputStream = BackupArchiveProtoInputStream(
             inputStream: transformableInputStream,
-            inputStreamDelegate: inputStreamDelegate
         )
 
-        return .success(backupInputStream, rawStream: transformableInputStream)
-    }
-
-    private class StreamDelegate: NSObject, Foundation.StreamDelegate {
-        private let _hadError = AtomicBool(false, lock: .sharedGlobal)
-        public var hadError: Bool { _hadError.get() }
-
-        @objc
-        public func stream(_ stream: Stream, handle eventCode: Stream.Event) {
-            if eventCode == .errorOccurred {
-                _hadError.set(true)
-            }
-        }
+        return (
+            protoInputStream: protoInputStream,
+            rawInputStream: transformableInputStream,
+        )
     }
 }
 
@@ -332,7 +296,7 @@ private class InputProgressStreamTransform: StreamTransform {
         self.frameRestoreProgress = frameRestoreProgress
     }
 
-    func transform(data: Data) throws -> Data {
+    func transform(data: Data, options: Options) throws -> Data {
         frameRestoreProgress.didReadBytes(count: data.count)
         return data
     }

@@ -16,6 +16,7 @@ enum EmojiError: Error {
 }
 
 // MARK: - Remote Model
+
 // These definitions are kept fairly lightweight since we don't control their format
 // All processing of remote data is done by converting RemoteModel items to EmojiModel items
 
@@ -52,9 +53,7 @@ enum RemoteModel {
     }
 
     static func fetchEmojiData() throws -> Data {
-        // let remoteSourceUrl = URL(string: "https://unicodey.com/emoji-data/emoji.json")!
-        // This URL has been unavailable the past couple of weeks. If you're seeing failures here, try this other one:
-        let remoteSourceUrl = URL(string: "https://raw.githubusercontent.com/iamcal/emoji-data/master/emoji.json")!
+        let remoteSourceUrl = URL(string: "https://raw.githubusercontent.com/greyson-signal/emoji-data/master/emoji.json")!
         return try Data(contentsOf: remoteSourceUrl)
     }
 }
@@ -77,7 +76,7 @@ struct EmojiModel {
             let base: Character
             let skintoneSequence: SkinToneSequence
 
-            static func < (lhs: Self, rhs: Self) -> Bool {
+            static func <(lhs: Self, rhs: Self) -> Bool {
                 for (leftElement, rightElement) in zip(lhs.skintoneSequence, rhs.skintoneSequence) {
                     if leftElement.sortId != rightElement.sortId {
                         return leftElement.sortId < rightElement.sortId
@@ -173,6 +172,12 @@ struct EmojiModel {
             case "manHeartMan": return "[.man, .man]"
             case "womanHeartWoman": return "[.woman, .woman]"
             case "handshake": return "[.rightwardsHand, .leftwardsHand]"
+            case "dancers": return "[.adult, .adult]"
+            case "menWithBunnyEarsPartying": return "[.man, .man]"
+            case "womenWithBunnyEarsPartying": return "[.woman, .woman]"
+            case "wrestlers": return "[.adult, .adult]"
+            case "manWrestling": return "[.man, .man]"
+            case "womanWrestling": return "[.woman, .woman]"
             default:
                 return nil
             }
@@ -248,7 +253,7 @@ extension EmojiGenerator {
         // Main enum: Create a string enum defining our enumNames equal to the baseEmoji string
         // e.g. case grinning = "😀"
         writeBlock(fileName: "Emoji.swift") { fileHandle in
-            fileHandle.writeLine("// swiftlint:disable all")
+            fileHandle.writeLine("// swiftformat:disable all")
             fileHandle.writeLine("")
             fileHandle.writeLine("/// A sorted representation of all available emoji")
             fileHandle.writeLine("enum Emoji: String, CaseIterable, Equatable {")
@@ -258,12 +263,12 @@ extension EmojiGenerator {
                 }
             }
             fileHandle.writeLine("}")
-            fileHandle.writeLine("// swiftlint:disable all")
+            fileHandle.writeLine("// swiftformat:disable all")
         }
     }
 
     static func writeStringConversionsFile(from emojiModel: EmojiModel) {
-        // Conversion from String: Creates an mapping from a single character emoji string to the 
+        // Conversion from String: Creates an mapping from a single character emoji string to the
         // Emoji + SkinTone components.  These components can then be uses to instantiate an
         // EmojiWithSkinTones
         // e.g.
@@ -276,7 +281,7 @@ extension EmojiGenerator {
                 fileHandle.indent {
                     fileHandle.writeLine("switch emoji {")
                     emojiModel.definitions.forEach { emojiDef in
-                        let skintoneVariants = emojiDef.variants.filter({ $0.skintoneSequence != .none})
+                        let skintoneVariants = emojiDef.variants.filter({ $0.skintoneSequence != .none })
                         if skintoneVariants.isEmpty {
                             // None of our variants have a skintone, nothing to do
                             return
@@ -336,7 +341,7 @@ extension EmojiGenerator {
                 fileHandle.indent {
                     fileHandle.writeLine("switch self {")
                     emojiModel.definitions.forEach { emojiDef in
-                        let skintoneVariants = emojiDef.variants.filter({ $0.skintoneSequence != .none})
+                        let skintoneVariants = emojiDef.variants.filter({ $0.skintoneSequence != .none })
                         if skintoneVariants.isEmpty {
                             // None of our variants have a skintone, nothing to do
                             return
@@ -373,12 +378,10 @@ extension EmojiGenerator {
             .travel,
             .objects,
             .symbols,
-            .flags
+            .flags,
         ]
 
         writeBlock(fileName: "Emoji+Category.swift") { fileHandle in
-            fileHandle.writeLine("")
-
             fileHandle.writeLine("extension Emoji {")
             fileHandle.indent {
 
@@ -513,9 +516,10 @@ extension EmojiGenerator {
 
 class WriteHandle {
     static let emojiDirectory = URL(
-        fileURLWithPath: "../Signal/Emoji",
+        fileURLWithPath: "../Signal/Emoji/Generated",
         isDirectory: true,
-        relativeTo: EmojiGenerator.pathToFolderContainingThisScript!)
+        relativeTo: EmojiGenerator.pathToFolderContainingThisScript!,
+    )
 
     let handle: FileHandle
 
@@ -574,6 +578,9 @@ extension EmojiGenerator {
         fileHandle.writeLine("")
 
         fileHandle.writeLine("// This file is generated by EmojiGenerator.swift, do not manually edit it.")
+        fileHandle.writeLine("")
+
+        fileHandle.writeLine("import SignalServiceKit")
         fileHandle.writeLine("")
 
         block(fileHandle)

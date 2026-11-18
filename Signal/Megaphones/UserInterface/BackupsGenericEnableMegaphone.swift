@@ -1,0 +1,48 @@
+//
+// Copyright 2025 Signal Messenger, LLC
+// SPDX-License-Identifier: AGPL-3.0-only
+//
+
+import Foundation
+import SignalServiceKit
+import UIKit
+
+class BackupsGenericEnableMegaphone: Megaphone {
+    init(
+        experienceUpgrade: ExperienceUpgrade,
+        fromViewController: UIViewController,
+    ) {
+        super.init(experienceUpgrade: experienceUpgrade)
+
+        titleText = OWSLocalizedString(
+            "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_TITLE",
+            comment: "Title for Backup enablement reminder megaphone",
+        )
+        bodyText = OWSLocalizedString(
+            "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_BODY",
+            comment: "Body for Backup enablement reminder megaphone",
+        )
+        image = .backupsLogo
+
+        let primaryButtonTitle = OWSLocalizedString(
+            "BACKUP_ENABLEMENT_REMINDER_MEGAPHONE_ACTION",
+            comment: "Action text for Recovery Key reminder megaphone",
+        )
+        let secondaryButtonTitle = OWSLocalizedString(
+            "BACKUP_ENABLEMENT_REMINDER_NOT_NOW_ACTION",
+            comment: "Snooze text for Backup enablement reminder megaphone",
+        )
+
+        let primaryButton = Button(title: primaryButtonTitle) { [weak self] in
+            SignalApp.shared.showAppSettings(mode: .backups())
+            self?.markAsSnoozedWithSneakyTransaction()
+        }
+
+        let secondaryButton = snoozeButton(
+            fromViewController: fromViewController,
+            snoozeTitle: secondaryButtonTitle,
+        )
+
+        buttons = [primaryButton, secondaryButton]
+    }
+}

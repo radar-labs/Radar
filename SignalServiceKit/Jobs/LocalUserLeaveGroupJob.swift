@@ -34,7 +34,7 @@ private class LocalUserLeaveGroupJobRunner: JobRunner {
             jobRecord: jobRecord,
             retryLimit: Constants.maxRetries,
             db: DependenciesBridge.shared.db,
-            block: { try await _runJobAttempt(jobRecord) }
+            block: { try await _runJobAttempt(jobRecord) },
         )
     }
 
@@ -52,8 +52,10 @@ private class LocalUserLeaveGroupJobRunner: JobRunner {
             try await GroupManager.waitForMessageFetchingAndProcessingWithTimeout()
         }
 
-        let groupThread = SSKEnvironment.shared.databaseStorageRef.read { tx in
-            return TSGroupThread.anyFetchGroupThread(uniqueId: jobRecord.threadId, transaction: tx)
+        let databaseStorage = SSKEnvironment.shared.databaseStorageRef
+
+        let groupThread = databaseStorage.read { tx in
+            return TSGroupThread.fetchGroupThreadViaCache(uniqueId: jobRecord.threadId, transaction: tx)
         }
 
         guard let groupThread, let groupModel = groupThread.groupModel as? TSGroupModelV2 else {
@@ -68,13 +70,13 @@ private class LocalUserLeaveGroupJobRunner: JobRunner {
         }
 
         do {
-            try await refreshGroupSendEndorsementsIfNeeded(threadId: groupThread.sqliteRowId!, groupModel: groupModel)
+            try await GroupManager.refreshGroupSendEndorsementsIfNeeded(groupModel: groupModel)
         } catch where !error.isNetworkFailureOrTimeout {
             Logger.warn("Tried and failed to refresh credentials; continuing anyways because credentials aren't required; error: \(error)")
         }
 
         let sendPromises = try await GroupManager.updateGroupV2(
-            groupModel: groupModel,
+            secretParams: groupModel.secretParams(),
             description: #fileID,
             isDeletingAccount: isDeletingAccount,
         ) { groupChangeSet in
@@ -92,35 +94,12 @@ private class LocalUserLeaveGroupJobRunner: JobRunner {
 
         return sendPromises
     }
-
-    private func refreshGroupSendEndorsementsIfNeeded(
-        threadId: TSGroupThread.RowId,
-        groupModel: TSGroupModelV2,
-    ) async throws {
-        // If we're not a full member, we can't fetch credentials.
-        guard groupModel.groupMembership.isLocalUserFullMember else {
-            return
-        }
-        let groupSendEndorsementStore = DependenciesBridge.shared.groupSendEndorsementStore
-        let combinedEndorsement = SSKEnvironment.shared.databaseStorageRef.read { tx in
-            return try? groupSendEndorsementStore.fetchCombinedEndorsement(groupThreadId: threadId, tx: tx)
-        }
-        // If we have recent-ish credentials, we don't need to refresh.
-        guard GroupSendEndorsements.willExpireSoon(expirationDate: combinedEndorsement?.expiration) else {
-            return
-        }
-        let secretParams = try groupModel.secretParams()
-        let groupId = try secretParams.getPublicParams().getGroupIdentifier()
-        Logger.info("Refreshing GSEs before leaving \(groupId)")
-        // Otherwise, try to refresh the credentials to use them when leaving.
-        try await SSKEnvironment.shared.groupV2UpdatesRef.refreshGroup(secretParams: secretParams)
-    }
 }
 
 public class LocalUserLeaveGroupJobQueue {
     private let jobQueueRunner: JobQueueRunner<
         JobRecordFinderImpl<LocalUserLeaveGroupJobRecord>,
-        LocalUserLeaveGroupJobRunnerFactory
+        LocalUserLeaveGroupJobRunnerFactory,
     >
     private var jobSerializer = CompletionSerializer()
     private let jobRunnerFactory: LocalUserLeaveGroupJobRunnerFactory
@@ -131,7 +110,7 @@ public class LocalUserLeaveGroupJobQueue {
             canExecuteJobsConcurrently: false,
             db: db,
             jobFinder: JobRecordFinderImpl(db: db),
-            jobRunnerFactory: self.jobRunnerFactory
+            jobRunnerFactory: self.jobRunnerFactory,
         )
         self.jobQueueRunner.listenForReachabilityChanges(reachabilityManager: reachabilityManager)
     }
@@ -150,7 +129,7 @@ public class LocalUserLeaveGroupJobQueue {
         replacementAdminAci: Aci?,
         waitForMessageProcessing: Bool,
         isDeletingAccount: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> Promise<[Promise<Void>]> {
         guard groupThread.isGroupV2Thread else {
             owsFail("[GV1] Mutations on V1 groups should be impossible!")
@@ -162,7 +141,7 @@ public class LocalUserLeaveGroupJobQueue {
                 waitForMessageProcessing: waitForMessageProcessing,
                 isDeletingAccount: isDeletingAccount,
                 future: future,
-                tx: tx
+                tx: tx,
             )
         }
     }
@@ -173,12 +152,12 @@ public class LocalUserLeaveGroupJobQueue {
         waitForMessageProcessing: Bool,
         isDeletingAccount: Bool,
         future: Future<[Promise<Void>]>,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         let jobRecord = LocalUserLeaveGroupJobRecord(
             threadId: threadId,
             replacementAdminAci: replacementAdminAci,
-            waitForMessageProcessing: waitForMessageProcessing
+            waitForMessageProcessing: waitForMessageProcessing,
         )
         jobRecord.anyInsert(transaction: tx)
         jobSerializer.addOrderedSyncCompletion(tx: tx) {

@@ -3,8 +3,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
-
 public extension OWSRequestFactory {
     enum StripePaymentMethod {
         public enum BankTransfer: String {
@@ -26,11 +24,9 @@ public extension OWSRequestFactory {
     }
 
     private enum BoostApiPaths {
-        private static let basePath = "v1/subscription/boost"
-
-        static let stripeCreatePaymentIntent = "\(basePath)/create"
-        static let paypalCreatePayment = "\(basePath)/paypal/create"
-        static let paypalConfirmPayment = "\(basePath)/paypal/confirm"
+        static let stripeCreatePaymentIntent = "v1/subscription/boost/create"
+        static let paypalCreatePayment = "v1/subscription/boost/paypal/create"
+        static let paypalConfirmPayment = "v1/subscription/boost/paypal/confirm"
     }
 
     /// A request to create a Stripe payment intent for a boost.
@@ -38,7 +34,8 @@ public extension OWSRequestFactory {
         integerMoneyValue: UInt,
         inCurrencyCode currencyCode: Currency.Code,
         level: UInt64,
-        paymentMethod: StripePaymentMethod
+        paymentMethod: StripePaymentMethod,
+        donationPermit: DonationPermit,
     ) -> TSRequest {
         var request = TSRequest(
             url: URL(string: BoostApiPaths.stripeCreatePaymentIntent)!,
@@ -47,9 +44,10 @@ public extension OWSRequestFactory {
                 "currency": currencyCode.lowercased(),
                 "amount": integerMoneyValue,
                 "level": level,
-                "paymentMethod": paymentMethod.rawValue
-            ]
+                "paymentMethod": paymentMethod.rawValue,
+            ],
         )
+        request.headers["Donation-Permit"] = donationPermit.serializedPermit.base64EncodedString()
         request.auth = .anonymous
         return request
     }
@@ -60,7 +58,7 @@ public extension OWSRequestFactory {
         inCurrencyCode currencyCode: Currency.Code,
         level: UInt64,
         returnUrl: URL,
-        cancelUrl: URL
+        cancelUrl: URL,
     ) -> TSRequest {
         var request = TSRequest(
             url: URL(string: BoostApiPaths.paypalCreatePayment)!,
@@ -70,8 +68,8 @@ public extension OWSRequestFactory {
                 "amount": integerMoneyValue,
                 "level": level,
                 "returnUrl": returnUrl.absoluteString,
-                "cancelUrl": cancelUrl.absoluteString
-            ]
+                "cancelUrl": cancelUrl.absoluteString,
+            ],
         )
         request.auth = .anonymous
         return request
@@ -84,7 +82,7 @@ public extension OWSRequestFactory {
         level: UInt64,
         payerId: String,
         paymentId: String,
-        paymentToken: String
+        paymentToken: String,
     ) -> TSRequest {
         var request = TSRequest(
             url: URL(string: BoostApiPaths.paypalConfirmPayment)!,
@@ -95,8 +93,8 @@ public extension OWSRequestFactory {
                 "level": level,
                 "payerId": payerId,
                 "paymentId": paymentId,
-                "paymentToken": paymentToken
-            ]
+                "paymentToken": paymentToken,
+            ],
         )
         request.auth = .anonymous
         return request

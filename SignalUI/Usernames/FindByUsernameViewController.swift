@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import LibSignalClient
 import SignalServiceKit
 
 protocol FindByUsernameDelegate: AnyObject {
@@ -24,7 +25,7 @@ public class FindByUsernameViewController: OWSTableViewController2 {
     private lazy var usernameTextField = OWSTextField(
         placeholder: OWSLocalizedString(
             "FIND_BY_USERNAME_PLACEHOLDER",
-            comment: "A placeholder value for the text field for finding an account by their username"
+            comment: "A placeholder value for the text field for finding an account by their username",
         ),
         returnKeyType: .done,
         autocorrectionType: .no,
@@ -34,7 +35,7 @@ public class FindByUsernameViewController: OWSTableViewController2 {
         },
         returnPressed: { [weak self] in
             self?.didTapNext()
-        }
+        },
     )
 
     private var usernameValue: String {
@@ -42,27 +43,24 @@ public class FindByUsernameViewController: OWSTableViewController2 {
         return FindByUsername.preParseUsername(textValue)
     }
 
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
         updateTableContents()
 
         title = OWSLocalizedString(
             "FIND_BY_USERNAME_TITLE",
-            comment: "Title for the view for finding accounts by their username"
+            comment: "Title for the view for finding accounts by their username",
         )
 
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: CommonStrings.nextButton,
-            style: .done,
-            target: self,
-            action: #selector(didTapNext)
-        )
+        navigationItem.rightBarButtonItem = .nextButton { [weak self] in
+            self?.didTapNext()
+        }
         navigationItem.rightBarButtonItem?.isEnabled = false
 
         shouldAvoidKeyboard = true
     }
 
-    public override func viewDidAppear(_ animated: Bool) {
+    override public func viewDidAppear(_ animated: Bool) {
         usernameTextField.becomeFirstResponder()
     }
 
@@ -82,8 +80,8 @@ public class FindByUsernameViewController: OWSTableViewController2 {
             ],
             footerTitle: OWSLocalizedString(
                 "FIND_BY_USERNAME_FOOTER",
-                comment: "A footer below the username text field describing what should be entered"
-            )
+                comment: "A footer below the username text field describing what should be entered",
+            ),
         ))
 
         guard findByUsernameDelegate?.shouldShowQRCodeButton ?? false else {
@@ -93,31 +91,39 @@ public class FindByUsernameViewController: OWSTableViewController2 {
         let qrButtonSection = OWSTableSection(items: [
             OWSTableItem(customCellBlock: { [weak self] in
                 let cell = OWSTableItem.newCell()
-                let button = OWSRoundedButton {
-                    self?.findByUsernameDelegate?.openQRCodeScanner()
-                }
-                let font = UIFont.dynamicTypeSubheadline
-                let title = NSAttributedString.composed(of: [
-                    NSAttributedString.with(image: Theme.iconImage(.qrCode), font: font),
-                    " ",
-                    OWSLocalizedString(
-                        "FIND_BY_USERNAME_SCAN_QR_CODE_BUTTON",
-                        comment: "A button below the username text field which opens a username QR code scanner"
-                    )
-                ]).styled(
-                    with: .font(font.medium()),
-                    .color(Theme.primaryTextColor)
+
+                // Font taken from UIButton.Configuration.smallSecondary
+                let buttonTitleFont = UIFont.dynamicTypeSubheadlineClamped.medium()
+                var attributedButtonTitle = AttributedString(
+                    SignalSymbol.qrCode.attributedString(
+                        dynamicTypeBaseSize: buttonTitleFont.pointSize,
+                    ),
                 )
-                button.setAttributedTitle(title, for: .normal)
-                button.backgroundColor = Theme.tableCell2PresentedBackgroundColor
-                button.dimsWhenHighlighted = true
-                button.ows_contentEdgeInsets = .init(hMargin: 16, vMargin: 6)
-                cell.addSubview(button)
-                button.autoPinEdge(toSuperviewMargin: .top)
-                button.autoPinEdge(toSuperviewMargin: .bottom)
-                button.autoCenterInSuperviewMargins()
-                button.autoPinEdge(toSuperviewMargin: .leading, relation: .greaterThanOrEqual)
-                button.autoPinEdge(toSuperviewMargin: .trailing, relation: .greaterThanOrEqual)
+                attributedButtonTitle.append(AttributedString(" "))
+                attributedButtonTitle.append(AttributedString(OWSLocalizedString(
+                    "FIND_BY_USERNAME_SCAN_QR_CODE_BUTTON",
+                    comment: "A button below the username text field which opens a username QR code scanner",
+                )))
+                var defaults = AttributeContainer()
+                defaults.font = buttonTitleFont
+                attributedButtonTitle.mergeAttributes(defaults, mergePolicy: .keepCurrent)
+
+                let button = UIButton(
+                    configuration: .smallSecondary(title: ""),
+                    primaryAction: UIAction { [weak self] _ in
+                        self?.findByUsernameDelegate?.openQRCodeScanner()
+                    },
+                )
+                button.configuration?.titleTextAttributesTransformer = nil // otherwise `attributedTitle` won't work.
+                button.configuration?.attributedTitle = attributedButtonTitle
+                button.translatesAutoresizingMaskIntoConstraints = false
+                cell.contentView.addSubview(button)
+                NSLayoutConstraint.activate([
+                    button.topAnchor.constraint(equalTo: cell.contentView.layoutMarginsGuide.topAnchor),
+                    button.leadingAnchor.constraint(greaterThanOrEqualTo: cell.contentView.layoutMarginsGuide.leadingAnchor),
+                    button.centerXAnchor.constraint(equalTo: cell.contentView.layoutMarginsGuide.centerXAnchor),
+                    button.bottomAnchor.constraint(equalTo: cell.contentView.layoutMarginsGuide.bottomAnchor),
+                ])
                 return cell
             }),
         ])
@@ -130,31 +136,31 @@ public class FindByUsernameViewController: OWSTableViewController2 {
     @objc
     private func textFieldDidChange() {
         do {
-            _ = try Usernames.HashedUsername(forUsername: self.usernameValue)
+            _ = try LibSignalClient.Username(self.usernameValue)
             navigationItem.rightBarButtonItem?.isEnabled = true
         } catch {
             navigationItem.rightBarButtonItem?.isEnabled = false
         }
     }
 
-    @objc
     private func didTapNext() {
         let usernameValue = self.usernameValue
         usernameTextField.resignFirstResponder()
-        SSKEnvironment.shared.databaseStorageRef.read { tx in
-            UsernameQuerier().queryForUsername(
-                username: usernameValue,
-                fromViewController: self,
-                tx: tx,
-                failureSheetDismissalDelegate: self,
-                onSuccess: { [weak self] aci in
-                    AssertIsOnMainThread()
-                    self?.findByUsernameDelegate?.findByUsername(address: SignalServiceAddress(aci))
-                }
-            )
+
+        Task {
+            guard
+                let aci = await UsernameQuerier().queryForUsername(
+                    username: usernameValue,
+                    fromViewController: self,
+                    failureSheetDismissalDelegate: self,
+                )
+            else {
+                return
+            }
+
+            findByUsernameDelegate?.findByUsername(address: SignalServiceAddress(aci))
         }
     }
-
 }
 
 extension FindByUsernameViewController: SheetDismissalDelegate {

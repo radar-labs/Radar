@@ -4,8 +4,8 @@
 //
 
 import Foundation
-public import SignalServiceKit
 import LibSignalClient
+public import SignalServiceKit
 
 public class ProvisioningManager {
 
@@ -28,7 +28,7 @@ public class ProvisioningManager {
         linkAndSyncManager: LinkAndSyncManager,
         profileManager: ProfileManager,
         receiptManager: Shims.ReceiptManager,
-        tsAccountManager: TSAccountManager
+        tsAccountManager: TSAccountManager,
     ) {
         self.accountKeyStore = accountKeyStore
         self.db = db
@@ -41,55 +41,76 @@ public class ProvisioningManager {
         self.tsAccountManager = tsAccountManager
     }
 
+    struct MustUpdateLinkedDeviceError: Error {
+        fileprivate init() {}
+    }
+
     public func provision(
         with deviceProvisioningUrl: DeviceProvisioningURL,
-        shouldLinkNSync: Bool
+        shouldLinkNSync: Bool,
     ) async throws -> (MessageRootBackupKey?, DeviceProvisioningTokenId) {
         struct ProvisioningState {
             var localIdentifiers: LocalIdentifiers
             var aciIdentityKeyPair: ECKeyPair
-            var pniIdentityKeyPair: ECKeyPair
+            var pniIdentityKeyPair: ECKeyPair?
             var areReadReceiptsEnabled: Bool
-            var rootKey: LinkingProvisioningMessage.RootKey
+            var aep: SignalServiceKit.AccountEntropyPool
             var mediaRootBackupKey: MediaRootBackupKey
             var profileKey: Aes256Key
         }
+        let registeredState = try tsAccountManager.registeredStateWithMaybeSneakyTransaction()
         let provisioningState = await db.awaitableWrite { tx in
-            guard let localIdentifiers = tsAccountManager.localIdentifiers(tx: tx) else { owsFail("Can't provision without an aci & phone number.")
-            }
             guard let aciIdentityKeyPair = identityManager.identityKeyPair(for: .aci, tx: tx) else {
                 owsFail("Can't provision without an aci identity.")
             }
-            guard let pniIdentityKeyPair = identityManager.identityKeyPair(for: .pni, tx: tx) else {
-                owsFail("Can't provision without a pni identity.")
-            }
+            let pniIdentityKeyPair = identityManager.identityKeyPair(for: .pni, tx: tx)
             let areReadReceiptsEnabled = receiptManager.areReadReceiptsEnabled(tx: tx)
-            let rootKey: LinkingProvisioningMessage.RootKey
             guard let accountEntropyPool = accountKeyStore.getAccountEntropyPool(tx: tx) else {
                 // This should be impossible; the only times you don't have
                 // an AEP are during registration.
                 owsFail("Can't provision without account entropy pool.")
             }
-            rootKey = .accountEntropyPool(accountEntropyPool)
             let mrbk = accountKeyStore.getOrGenerateMediaRootBackupKey(tx: tx)
             guard let profileKey = profileManager.localUserProfile(tx: tx)?.profileKey else {
                 owsFail("Can't provision without a profile key.")
             }
             return ProvisioningState(
-                localIdentifiers: localIdentifiers,
+                localIdentifiers: registeredState.localIdentifiers,
                 aciIdentityKeyPair: aciIdentityKeyPair,
                 pniIdentityKeyPair: pniIdentityKeyPair,
                 areReadReceiptsEnabled: areReadReceiptsEnabled,
-                rootKey: rootKey,
+                aep: accountEntropyPool,
                 mediaRootBackupKey: mrbk,
-                profileKey: profileKey
+                profileKey: profileKey,
             )
         }
 
         let myAci = provisioningState.localIdentifiers.aci
-        let myPhoneNumber = provisioningState.localIdentifiers.phoneNumber
-        guard let myPni = provisioningState.localIdentifiers.pni else {
-            owsFail("Can't provision without a pni.")
+
+        let accountType: LinkingProvisioningMessage.AccountType
+        switch provisioningState.localIdentifiers.accountType {
+        case .phoneNumberfull(let myPhoneNumber, let myPni):
+            guard let myE164 = E164(myPhoneNumber) else {
+                owsFail("can't provision without phone number")
+            }
+            guard let myPni else {
+                owsFail("can't provision without pni")
+            }
+            guard let pniIdentityKeyPair = provisioningState.pniIdentityKeyPair else {
+                owsFail("can't provision without pni identity key")
+            }
+            accountType = .phoneNumberfull(LinkingProvisioningMessage.PhoneNumberState(
+                phoneNumber: LocalIdentifiers.PhoneNumber(e164: myE164, pni: myPni),
+                pniIdentityKeyPair: pniIdentityKeyPair.identityKeyPair,
+            ))
+        case .phoneNumberless(let authCredentialSalt):
+            guard BuildFlags.phoneNumberlessCanLinkNewDevices else {
+                owsFail("can't provision without phone number state")
+            }
+            guard deviceProvisioningUrl.capabilities.contains(.nopni) else {
+                throw MustUpdateLinkedDeviceError()
+            }
+            accountType = .phoneNumberless(authCredentialSalt)
         }
 
         let ephemeralBackupKey: MessageRootBackupKey?
@@ -105,24 +126,22 @@ public class ProvisioningManager {
         let provisioningCode = try await deviceProvisioningService.requestDeviceProvisioningCode()
 
         let provisioningMessage = LinkingProvisioningMessage(
-            rootKey: provisioningState.rootKey,
             aci: myAci,
-            phoneNumber: myPhoneNumber,
-            pni: myPni,
             aciIdentityKeyPair: provisioningState.aciIdentityKeyPair.identityKeyPair,
-            pniIdentityKeyPair: provisioningState.pniIdentityKeyPair.identityKeyPair,
+            aep: provisioningState.aep,
+            accountType: accountType,
             profileKey: provisioningState.profileKey,
             mrbk: provisioningState.mediaRootBackupKey,
             ephemeralBackupKey: ephemeralBackupKey,
             areReadReceiptsEnabled: provisioningState.areReadReceiptsEnabled,
-            provisioningCode: provisioningCode.verificationCode
+            provisioningCode: provisioningCode.verificationCode,
         )
 
         let theirPublicKey = deviceProvisioningUrl.publicKey
         let messageBody = try provisioningMessage.buildEncryptedMessageBody(theirPublicKey: theirPublicKey)
         try await deviceProvisioningService.provisionDevice(
             messageBody: messageBody,
-            ephemeralDeviceId: deviceProvisioningUrl.ephemeralDeviceId
+            ephemeralDeviceId: deviceProvisioningUrl.ephemeralDeviceId,
         )
         return (ephemeralBackupKey, provisioningCode.tokenId)
     }

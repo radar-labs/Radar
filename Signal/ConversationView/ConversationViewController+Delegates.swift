@@ -4,80 +4,85 @@
 //
 
 import AVFoundation
-import Foundation
-public import LibSignalClient
-public import SignalServiceKit
-public import SignalUI
+import LibSignalClient
+import SignalServiceKit
+import SignalUI
 
-extension ConversationViewController: AttachmentApprovalViewControllerDelegate {
+extension ConversationViewController {
 
-    public func attachmentApproval(
+    // MARK: - AttachmentApprovalViewControllerDelegate
+
+    func attachmentApproval(
         _ attachmentApproval: AttachmentApprovalViewController,
-        didApproveAttachments attachments: [SignalAttachment],
-        messageBody: MessageBody?
+        didApproveAttachments approvedAttachments: ApprovedAttachments,
+        messageBody: MessageBody?,
     ) {
-        Task { @MainActor in
-            await self.sendAttachments(
-                attachments,
-                from: attachmentApproval,
-                messageBody: messageBody
-            )
-        }
+        ModalActivityIndicatorViewController.present(
+            fromViewController: attachmentApproval,
+            title: CommonStrings.preparingModal,
+            asyncBlock: { modal in
+                await self.sendAttachments(
+                    approvedAttachments,
+                    messageBody: messageBody,
+                    from: attachmentApproval,
+                    attachmentLimits: attachmentApproval.attachmentLimits,
+                )
+                modal.dismiss(completion: {
+                    self.dismiss(animated: true)
+                })
+            },
+        )
     }
 
-    public func attachmentApprovalDidCancel() {
+    func attachmentApprovalDidCancel() {
         dismiss(animated: true, completion: nil)
-        self.popKeyBoard()
+        popKeyBoard()
     }
 
-    public func attachmentApproval(_ attachmentApproval: AttachmentApprovalViewController,
-                                   didChangeMessageBody newMessageBody: MessageBody?) {
-        AssertIsOnMainThread()
-
+    func attachmentApproval(
+        _ attachmentApproval: AttachmentApprovalViewController,
+        didChangeMessageBody newMessageBody: MessageBody?,
+    ) {
         guard hasViewWillAppearEverBegun else {
             owsFailDebug("InputToolbar not yet ready.")
             return
         }
-        guard let inputToolbar = inputToolbar else {
-            owsFailDebug("Missing inputToolbar.")
+        guard let inputToolbar else {
             return
         }
         inputToolbar.setMessageBody(newMessageBody, animated: false)
     }
 
-    public func attachmentApproval(_ attachmentApproval: AttachmentApprovalViewController, didRemoveAttachment attachment: SignalAttachment) { }
+    func attachmentApproval(_ attachmentApproval: AttachmentApprovalViewController, didRemoveAttachment attachmentApprovalItem: AttachmentApprovalItem) { }
 
-    public func attachmentApprovalDidTapAddMore(_ attachmentApproval: AttachmentApprovalViewController) { }
+    func attachmentApprovalDidTapAddMore(_ attachmentApproval: AttachmentApprovalViewController) { }
 
-    public func attachmentApproval(_ attachmentApproval: AttachmentApprovalViewController, didChangeViewOnceState isViewOnce: Bool) { }
-}
+    func attachmentApproval(_ attachmentApproval: AttachmentApprovalViewController, didChangeViewOnceState isViewOnce: Bool) { }
 
-extension ConversationViewController: AttachmentApprovalViewControllerDataSource {
+    // MARK: - AttachmentApprovalViewControllerDataSource
 
-    public var attachmentApprovalTextInputContextIdentifier: String? { textInputContextIdentifier }
+    var attachmentApprovalTextInputContextIdentifier: String? { textInputContextIdentifier }
 
-    public var attachmentApprovalRecipientNames: [String] {
+    var attachmentApprovalRecipientNames: [String] {
         let displayName = SSKEnvironment.shared.databaseStorageRef.read { tx in SSKEnvironment.shared.contactManagerRef.displayName(for: thread, transaction: tx) }
         return [displayName]
     }
 
-    public func attachmentApprovalMentionableAcis(tx: DBReadTransaction) -> [Aci] {
+    func attachmentApprovalMentionableAcis(tx: DBReadTransaction) -> [Aci] {
         supportsMentions ? thread.recipientAddresses(with: tx).compactMap(\.aci) : []
     }
 
-    public func attachmentApprovalMentionCacheInvalidationKey() -> String {
-        return thread.uniqueId
-    }
-}
+    func attachmentApprovalMentionCacheInvalidationKey() -> String { thread.uniqueId }
 
-extension ConversationViewController: UIAdaptivePresentationControllerDelegate {
-    public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+    // MARK: - UIAdaptivePresentationControllerDelegate {
+
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
         switch presentationController.presentedViewController {
         case is GifPickerNavigationViewController, is UIDocumentPickerViewController:
             self.openAttachmentKeyboard()
         case let navigationController as OWSNavigationController:
             switch navigationController.viewControllers.first {
-            case is ContactPickerViewController, is LocationPicker:
+            case is ContactPickerViewController, is ContactSharingPickerViewController, is LocationPicker:
                 self.openAttachmentKeyboard()
             default:
                 break
@@ -86,18 +91,36 @@ extension ConversationViewController: UIAdaptivePresentationControllerDelegate {
             break
         }
     }
-}
 
-// MARK: -
+    // MARK: - ContactPickerDelegate, ContactSharingPickerDelegate
 
-extension ConversationViewController: ContactPickerDelegate {
-
-    public func contactPickerDidCancel(_: ContactPickerViewController) {
+    func contactPickerDidCancel(_: ContactPickerViewController) {
         dismiss(animated: true, completion: nil)
         self.openAttachmentKeyboard()
     }
 
-    public func contactPicker(_ contactPicker: ContactPickerViewController, didSelect systemContact: SystemContact) {
+    func contactSharingPickerDidCancel(_ picker: ContactSharingPickerViewController) {
+        dismiss(animated: true, completion: nil)
+        self.openAttachmentKeyboard()
+    }
+
+    func contactSharingPicker(
+        _ picker: ContactSharingPickerViewController,
+        didSelect contactShareDraft: ContactShareDraft,
+    ) {
+        AssertIsOnMainThread()
+
+        guard let navigationController = picker.navigationController else {
+            owsFailDebug("Missing picker.navigationController.")
+            return
+        }
+
+        let approveContactShare = ContactShareViewController(contactShareDraft: contactShareDraft)
+        approveContactShare.shareDelegate = self
+        navigationController.pushViewController(approveContactShare, animated: true)
+    }
+
+    func contactPicker(_ contactPicker: ContactPickerViewController, didSelect systemContact: SystemContact) {
         AssertIsOnMainThread()
 
         guard let cnContact = SSKEnvironment.shared.contactManagerRef.cnContact(withId: systemContact.cnContactId) else {
@@ -106,15 +129,16 @@ extension ConversationViewController: ContactPickerDelegate {
         }
 
         let contactShareDraft = SSKEnvironment.shared.databaseStorageRef.read { tx in
-            return ContactShareDraft.load(
+            return ContactShareDraft.loadWithMatchingSignalAvatar(
                 cnContact: cnContact,
                 signalContact: systemContact,
                 contactManager: SSKEnvironment.shared.contactManagerRef,
                 phoneNumberUtil: SSKEnvironment.shared.phoneNumberUtilRef,
                 profileManager: SSKEnvironment.shared.profileManagerRef,
+                recipientHidingManager: DependenciesBridge.shared.recipientHidingManager,
                 recipientManager: DependenciesBridge.shared.recipientManager,
                 tsAccountManager: DependenciesBridge.shared.tsAccountManager,
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -127,53 +151,49 @@ extension ConversationViewController: ContactPickerDelegate {
         navigationController.pushViewController(approveContactShare, animated: true)
     }
 
-    public func contactPicker(_: ContactPickerViewController, didSelectMultiple systemContacts: [SystemContact]) {
+    func contactPicker(_: ContactPickerViewController, didSelectMultiple systemContacts: [SystemContact]) {
         owsFailDebug("Multiple selection not allowed.")
         dismiss(animated: true, completion: nil)
     }
 
-    public func contactPicker(_: ContactPickerViewController, shouldSelect systemContact: SystemContact) -> Bool {
+    func contactPicker(_: ContactPickerViewController, shouldSelect systemContact: SystemContact) -> Bool {
         // Any reason to preclude contacts?
         return true
     }
-}
 
-// MARK: -
+    // MARK: - ContactShareViewControllerDelegate
 
-extension ConversationViewController: ContactShareViewControllerDelegate {
-
-    public func contactShareViewController(_ viewController: ContactShareViewController, didApproveContactShare contactShare:
-        ContactShareDraft) {
+    func contactShareViewController(
+        _ viewController: ContactShareViewController,
+        didApproveContactShare contactShare:
+        ContactShareDraft,
+    ) {
         dismiss(animated: true) {
             self.send(contactShareDraft: contactShare)
         }
     }
 
-    public func contactShareViewControllerDidCancel(_ viewController: ContactShareViewController) {
-        dismiss(animated: true, completion: nil)
-    }
-
-    public func titleForContactShareViewController(_ viewController: ContactShareViewController) -> String? {
+    func titleForContactShareViewController(_ viewController: ContactShareViewController) -> String? {
         return nil
     }
 
-    public func recipientsDescriptionForContactShareViewController(_ viewController: ContactShareViewController) -> String? {
+    func recipientsDescriptionForContactShareViewController(_ viewController: ContactShareViewController) -> String? {
         return SSKEnvironment.shared.databaseStorageRef.read { transaction in
             SSKEnvironment.shared.contactManagerRef.displayName(for: self.thread, transaction: transaction)
         }
     }
 
-    public func approvalModeForContactShareViewController(_ viewController: ContactShareViewController) -> ApprovalMode {
+    func approvalModeForContactShareViewController(_ viewController: ContactShareViewController) -> ApprovalMode {
         return .send
     }
 
-    private func send(contactShareDraft: ContactShareDraft) {
+    func send(contactShareDraft: ContactShareDraft) {
         let thread = self.thread
         SSKEnvironment.shared.databaseStorageRef.asyncWrite { transaction in
             let didAddToProfileWhitelist = ThreadUtil.addThreadToProfileWhitelistIfEmptyOrPendingRequest(
                 thread,
                 setDefaultTimerIfNecessary: true,
-                tx: transaction
+                tx: transaction,
             )
             transaction.addSyncCompletion {
                 Task { @MainActor in
@@ -187,63 +207,74 @@ extension ConversationViewController: ContactShareViewControllerDelegate {
             }
         }
     }
-}
 
-// MARK: -
+    // MARK: - ConversationHeaderViewDelegate
 
-extension ConversationViewController: ConversationHeaderViewDelegate {
-    public func didTapConversationHeaderView(_ conversationHeaderView: ConversationHeaderView) {
+    func didTapConversationHeaderView(_ conversationHeaderView: ConversationHeaderView) {
         AssertIsOnMainThread()
 
         showConversationSettings()
     }
 
-    public func didTapConversationHeaderViewAvatar(_ conversationHeaderView: ConversationHeaderView) {
+    func didTapConversationHeaderViewAvatar(_ conversationHeaderView: ConversationHeaderView) {
         AssertIsOnMainThread()
 
         if conversationHeaderView.avatarView.configuration.hasStoriesToDisplay {
             let vc = StoryPageViewController(
                 context: thread.storyContext,
-                spoilerState: spoilerState
+                spoilerState: spoilerState,
             )
             present(vc, animated: true)
         } else {
             showConversationSettings()
         }
     }
-}
 
-// MARK: -
+    // MARK: - ConversationInputTextViewDelegate
 
-extension ConversationViewController: ConversationInputTextViewDelegate {
-    public func didAttemptAttachmentPaste() {
+    func didAttemptAttachmentPaste() {
+        let attachmentLimits = OutgoingAttachmentLimits.currentLimits()
+
         // If trying to paste a sticker, forego anything async since
         // the pasteboard will be cleared as soon as paste() exits.
-        if SignalAttachment.pasteboardHasStickerAttachment() {
-            do throws(SignalAttachmentError) {
-                self.didPasteAttachments([try SignalAttachment.stickerAttachmentFromPasteboard()].compacted())
+        if PasteboardAttachment.hasStickerAttachment() {
+            do {
+                self.didPasteAttachments(
+                    [try PasteboardAttachment.loadPreviewableStickerAttachment()].compacted(),
+                    attachmentLimits: attachmentLimits,
+                )
             } catch {
-                self.showErrorAlert(attachmentError: error)
+                self.showErrorAlert(attachmentError: error as? SignalAttachmentError)
             }
             return
         }
 
-        ModalActivityIndicatorViewController.present(fromViewController: self, asyncBlock: { modal in
-            do throws(SignalAttachmentError) {
-                let attachments = try await SignalAttachment.attachmentsFromPasteboard()
-                modal.dismiss {
-                    // Note: attachment array might be nil at this point; that's fine.
-                    self.didPasteAttachments(attachments)
+        ModalActivityIndicatorViewController.present(
+            fromViewController: self,
+            title: OWSLocalizedString(
+                "ATTACHMENT_PASTING",
+                comment: "Displayed in a full screen modal when app is processing media that was pasted into message compose field.",
+            ),
+            asyncBlock: { modal in
+                do {
+                    let attachments = try await PasteboardAttachment.loadPreviewableAttachments(attachmentLimits: attachmentLimits)
+                    modal.dismiss {
+                        // Note: attachment array might be nil at this point; that's fine.
+                        self.didPasteAttachments(attachments, attachmentLimits: attachmentLimits)
+                    }
+                } catch {
+                    modal.dismiss {
+                        self.showErrorAlert(attachmentError: error as? SignalAttachmentError)
+                    }
                 }
-            } catch {
-                modal.dismiss {
-                    self.showErrorAlert(attachmentError: error)
-                }
-            }
-        })
+            },
+        )
     }
 
-    func didPasteAttachments(_ attachments: [SignalAttachment]?) {
+    func didPasteAttachments(
+        _ attachments: [PreviewableAttachment]?,
+        attachmentLimits: OutgoingAttachmentLimits,
+    ) {
         AssertIsOnMainThread()
 
         guard let attachments, attachments.count > 0 else {
@@ -253,35 +284,63 @@ extension ConversationViewController: ConversationInputTextViewDelegate {
 
         // If the thing we pasted is sticker-like, send it immediately
         // and render it borderless.
-        if attachments.count == 1, let a = attachments.first, a.isBorderless {
+        if attachments.count == 1, let a = attachments.first, a.rawValue.isBorderless {
             Task {
-                await self.sendAttachments([a], from: self, messageBody: nil)
+                await self.sendAttachments(
+                    ApprovedAttachments(nonViewOnceAttachments: [a], imageQuality: .standard),
+                    messageBody: nil,
+                    from: self,
+                    attachmentLimits: attachmentLimits,
+                )
             }
         } else {
-            dismissKeyBoard()
-            showApprovalDialog(forAttachments: attachments)
+            dismissKeyboard()
+            showApprovalDialog(forAttachments: attachments, attachmentLimits: attachmentLimits)
         }
     }
 
-    public func inputTextViewSendMessagePressed() {
+    func didAttemptAccountEntropyPoolPaste(completePaste: @escaping () -> Void) {
+        let warningSheet = BackupNeverShareRecoveryKeySheet(
+            primaryButton: .dismissing(
+                title: OWSLocalizedString(
+                    "CONVERSATION_INPUT_PASTE_RECOVERY_KEY_WARNING_SHEET_DO_NOT_SHARE_BUTTON_TITLE",
+                    comment: "Title for the button in a warning sheet shown before the user pastes their 'Recovery Key' into the chat input text field that dismisses the sheet without pasting the key.",
+                ),
+            ),
+            secondaryButton: HeroSheetViewController.Button(
+                title: OWSLocalizedString(
+                    "CONVERSATION_INPUT_PASTE_RECOVERY_KEY_WARNING_SHEET_SHARE_BUTTON_TITLE",
+                    comment: "Title for the button in a warning sheet shown before the user pastes their 'Recovery Key' into the chat input text field that acknowledges the warning and proceeds with the paste.",
+                ),
+                style: .secondaryDestructive,
+                action: .custom({ sheet in
+                    sheet.dismiss(animated: true) {
+                        completePaste()
+                    }
+                }),
+            ),
+        )
+
+        present(warningSheet, animated: true)
+    }
+
+    func inputTextViewSendMessagePressed() {
         AssertIsOnMainThread()
 
         sendButtonPressed()
     }
 
-    public func textViewDidChange(_ textView: UITextView) {
+    func textViewDidChange(_ textView: UITextView) {
         AssertIsOnMainThread()
 
         if textView.text.strippedOrNil != nil {
             SSKEnvironment.shared.typingIndicatorsRef.didStartTypingOutgoingInput(inThread: thread)
         }
     }
-}
 
-// MARK: -
+    // MARK: - ConversationSearchControllerDelegate
 
-extension ConversationViewController: ConversationSearchControllerDelegate {
-    public func didDismissSearchController(_ searchController: UISearchController) {
+    func didDismissSearchController(_ searchController: UISearchController) {
         AssertIsOnMainThread()
 
         // This method is called not only when the user taps "cancel" in the searchController, but also
@@ -294,17 +353,19 @@ extension ConversationViewController: ConversationSearchControllerDelegate {
         }
     }
 
-    public func conversationSearchController(_ conversationSearchController: ConversationSearchController,
-                                             didUpdateSearchResults resultSet: ConversationScreenSearchResultSet?) {
+    func conversationSearchController(
+        _ conversationSearchController: ConversationSearchController,
+        didUpdateSearchResults resultSet: ConversationScreenSearchResultSet?,
+    ) {
         AssertIsOnMainThread()
 
         self.lastSearchedText = resultSet?.searchText
         loadCoordinator.enqueueReload()
     }
 
-    public func conversationSearchController(
+    func conversationSearchController(
         _ conversationSearchController: ConversationSearchController,
-        didSelectMessageId messageId: String
+        didSelectMessageId messageId: String,
     ) {
         AssertIsOnMainThread()
 
@@ -312,21 +373,19 @@ extension ConversationViewController: ConversationSearchControllerDelegate {
             messageId,
             onScreenPercentage: 1,
             alignment: .centerIfNotEntirelyOnScreen,
-            isAnimated: true
+            isAnimated: true,
         )
     }
-}
 
-// MARK: -
+    // MARK: - ConversationCollectionViewDelegate
 
-extension ConversationViewController: ConversationCollectionViewDelegate {
-    public func collectionViewWillChangeSize(from oldSize: CGSize, to newSize: CGSize) {
+    func collectionViewWillChangeSize(from oldSize: CGSize, to newSize: CGSize) {
         AssertIsOnMainThread()
 
         // Do nothing.
     }
 
-    public func collectionViewDidChangeSize(from oldSize: CGSize, to newSize: CGSize) {
+    func collectionViewDidChangeSize(from oldSize: CGSize, to newSize: CGSize) {
         AssertIsOnMainThread()
 
         if oldSize.width != newSize.width {
@@ -336,17 +395,17 @@ extension ConversationViewController: ConversationCollectionViewDelegate {
         updateScrollingContent()
     }
 
-    public func collectionViewWillAnimate() {
+    func collectionViewWillAnimate() {
         AssertIsOnMainThread()
 
         scrollingAnimationDidStart()
     }
 
-    public func collectionViewShouldRecognizeSimultaneously(with otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+    func collectionViewShouldRecognizeSimultaneously(with otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return otherGestureRecognizer == collectionViewContextMenuGestureRecognizer
     }
 
-    public func scrollingAnimationDidStart() {
+    func scrollingAnimationDidStart() {
         AssertIsOnMainThread()
 
         // scrollingAnimationStartDate blocks landing of loads, so we must ensure
@@ -367,11 +426,7 @@ extension ConversationViewController: ConversationCollectionViewDelegate {
         // but we need to ensure that it is cleared in a timely way.
         scrollingAnimationDidComplete()
     }
-}
 
-// MARK: -
-
-extension ConversationViewController {
     func scrollingAnimationDidComplete() {
         AssertIsOnMainThread()
 
@@ -381,7 +436,9 @@ extension ConversationViewController {
         autoLoadMoreIfNecessary()
 
         performMessageHighlightAnimationIfNeeded()
-   }
+
+        focusVoiceoverElementAfterScroll()
+    }
 
     func resetForSizeOrOrientationChange() {
         AssertIsOnMainThread()

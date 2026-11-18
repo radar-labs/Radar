@@ -12,7 +12,7 @@ final class InactiveLinkedDeviceFinderTest: XCTestCase {
     private var mockDateProvider: DateProvider!
     private var mockDB: DB!
     private var mockDeviceStore: OWSDeviceStore!
-    private var mockDevicesService: MockDevicesService!
+    private var mockLocalIdentifiers: LocalIdentifiers = .forUnitTests
     private var mockTSAccountManager: MockTSAccountManager!
 
     private var inactiveLinkedDeviceFinder: InactiveLinkedDeviceFinderImpl!
@@ -39,66 +39,29 @@ final class InactiveLinkedDeviceFinderTest: XCTestCase {
 
         mockDB = InMemoryDB()
         mockDeviceStore = OWSDeviceStore()
-        mockDevicesService = MockDevicesService()
         mockTSAccountManager = MockTSAccountManager()
+        mockTSAccountManager.localIdentifiersMock = { [mockLocalIdentifiers] in mockLocalIdentifiers }
 
         inactiveLinkedDeviceFinder = InactiveLinkedDeviceFinderImpl(
             dateProvider: { self.mockDateProvider() },
             db: mockDB,
-            deviceService: mockDevicesService,
             deviceStore: mockDeviceStore,
             remoteConfigProvider: MockRemoteConfigProvider(),
-            tsAccountManager: mockTSAccountManager
+            tsAccountManager: mockTSAccountManager,
         )
     }
 
-    func testRefreshing() async {
-        // Skip if linked device.
-        mockTSAccountManager.registrationStateMock = { .provisioned }
-        await inactiveLinkedDeviceFinder.refreshLinkedDeviceStateIfNecessary()
-        XCTAssertEqual(mockDevicesService.refreshCount, 0)
-
-        // Make a first attempt, failing to refresh.
-        mockTSAccountManager.registrationStateMock = { .registered }
-        mockDevicesService.shouldFail = true
-        await inactiveLinkedDeviceFinder.refreshLinkedDeviceStateIfNecessary()
-        XCTAssertEqual(mockDevicesService.refreshCount, 1)
-
-        // Make a second attempt, succeeding.
-        mockTSAccountManager.registrationStateMock = { .registered }
-        mockDevicesService.shouldFail = false
-        await inactiveLinkedDeviceFinder.refreshLinkedDeviceStateIfNecessary()
-        XCTAssertEqual(mockDevicesService.refreshCount, 2)
-
-        // A third attempt should do nothing, because we just succeeded.
-        await inactiveLinkedDeviceFinder.refreshLinkedDeviceStateIfNecessary()
-        XCTAssertEqual(mockDevicesService.refreshCount, 2)
-    }
-
-    func testFetching() async {
+    func testFetching() {
         func findLeastActive() -> InactiveLinkedDevice? {
             return mockDB.read { inactiveLinkedDeviceFinder.findLeastActiveLinkedDevice(tx: $0) }
         }
 
-        // Nothing if never refreshed.
-        mockTSAccountManager.registrationStateMock = { .registered }
-        setMockDevices([
-            .primary(),
-            .fixture(name: "eye pad", lastSeenAt: inactiveLastSeenAt),
-        ])
-        XCTAssertNil(findLeastActive())
-
-        // Do a refresh...
-        mockTSAccountManager.registrationStateMock = { .registered }
-        await inactiveLinkedDeviceFinder.refreshLinkedDeviceStateIfNecessary()
-        XCTAssertEqual(mockDevicesService.refreshCount, 1)
-
         // Only include inactive devices.
-        mockTSAccountManager.registrationStateMock = { .registered }
+        mockTSAccountManager.registrationStateMock = { [mockLocalIdentifiers] in .registered(mockLocalIdentifiers) }
         setMockDevices([
             .primary(),
-            .fixture(name: "eye pad", lastSeenAt: inactiveLastSeenAt),
-            .fixture(name: "lap top", lastSeenAt: activeLastSeenAt)
+            .fixture(name: "eye pad", deviceId: 2, lastSeenAt: inactiveLastSeenAt),
+            .fixture(name: "lap top", deviceId: 3, lastSeenAt: activeLastSeenAt),
         ])
         XCTAssertEqual(
             findLeastActive()?.displayName,
@@ -106,11 +69,11 @@ final class InactiveLinkedDeviceFinderTest: XCTestCase {
         )
 
         // If multiple inactive devices, pick the "least active" one.
-        mockTSAccountManager.registrationStateMock = { .registered }
+        mockTSAccountManager.registrationStateMock = { [mockLocalIdentifiers] in .registered(mockLocalIdentifiers) }
         setMockDevices([
             .primary(),
-            .fixture(name: "🏖️", lastSeenAt: inactiveLastSeenAt.addingTimeInterval(-.second)),
-            .fixture(name: "🦩", lastSeenAt: inactiveLastSeenAt),
+            .fixture(name: "🏖️", deviceId: 4, lastSeenAt: inactiveLastSeenAt.addingTimeInterval(-.second)),
+            .fixture(name: "🦩", deviceId: 5, lastSeenAt: inactiveLastSeenAt),
         ])
         XCTAssertEqual(
             findLeastActive()?.displayName,
@@ -118,37 +81,33 @@ final class InactiveLinkedDeviceFinderTest: XCTestCase {
         )
 
         // Nothing if no linked devices.
-        mockTSAccountManager.registrationStateMock = { .registered }
+        mockTSAccountManager.registrationStateMock = { [mockLocalIdentifiers] in .registered(mockLocalIdentifiers) }
         setMockDevices([.primary()])
         XCTAssertNil(findLeastActive())
 
         // Nothing if not a primary.
-        mockTSAccountManager.registrationStateMock = { .provisioned }
+        mockTSAccountManager.registrationStateMock = { [mockLocalIdentifiers] in .provisioned(mockLocalIdentifiers) }
         setMockDevices([
             .primary(),
-            .fixture(name: "eye pad", lastSeenAt: inactiveLastSeenAt),
+            .fixture(name: "eye pad", deviceId: 6, lastSeenAt: inactiveLastSeenAt),
         ])
         XCTAssertNil(findLeastActive())
     }
 
-    func testPermanentlyDisabling() async {
-        mockTSAccountManager.registrationStateMock = { .registered }
+    func testPermanentlyDisabling() {
+        mockTSAccountManager.registrationStateMock = { [mockLocalIdentifiers] in .registered(mockLocalIdentifiers) }
         setMockDevices([
             .primary(),
-            .fixture(name: "a sedentary device", lastSeenAt: inactiveLastSeenAt),
+            .fixture(name: "a sedentary device", deviceId: 7, lastSeenAt: inactiveLastSeenAt),
         ])
 
         mockDB.write { inactiveLinkedDeviceFinder.permanentlyDisableFinders(tx: $0) }
-        await inactiveLinkedDeviceFinder.refreshLinkedDeviceStateIfNecessary()
-        XCTAssertEqual(mockDevicesService.refreshCount, 0)
-        XCTAssertFalse(mockDB.read { inactiveLinkedDeviceFinder.hasInactiveLinkedDevice(tx: $0) })
+        XCTAssertFalse(mockDB.read { inactiveLinkedDeviceFinder.findLeastActiveLinkedDevice(tx: $0) != nil })
 
         // Re-enable (only available in tests) and run more tests, to prove the
         // disabling is why the first battery passed.
         mockDB.write { inactiveLinkedDeviceFinder.reenablePermanentlyDisabledFinders(tx: $0) }
-        await inactiveLinkedDeviceFinder.refreshLinkedDeviceStateIfNecessary()
-        XCTAssertEqual(mockDevicesService.refreshCount, 1)
-        XCTAssertTrue(mockDB.read { inactiveLinkedDeviceFinder.hasInactiveLinkedDevice(tx: $0) })
+        XCTAssertTrue(mockDB.read { inactiveLinkedDeviceFinder.findLeastActiveLinkedDevice(tx: $0) != nil })
     }
 
     private func setMockDevices(_ devices: [OWSDevice]) {
@@ -170,31 +129,14 @@ private extension OWSDevice {
 
     static func fixture(
         name: String,
-        lastSeenAt: Date
+        deviceId: Int8,
+        lastSeenAt: Date,
     ) -> OWSDevice {
         return OWSDevice(
-            deviceId: DeviceId(validating: 24)!,
+            deviceId: DeviceId(validating: deviceId)!,
             createdAt: .distantPast,
             lastSeenAt: lastSeenAt,
             name: name,
         )
     }
-}
-
-// MARK: - Mocks
-
-private class MockDevicesService: OWSDeviceService {
-    var shouldFail: Bool = false
-    var refreshCount: Int = 0
-
-    func refreshDevices() async throws -> Bool {
-        refreshCount += 1
-        if shouldFail { throw OWSGenericError("") }
-
-        return true
-    }
-
-    func unlinkDevice(deviceId: DeviceId) async throws {}
-
-    func renameDevice(device: OWSDevice, newName: String) async throws(OWSDeviceRenameError) {}
 }

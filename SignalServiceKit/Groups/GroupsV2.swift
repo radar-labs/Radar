@@ -16,6 +16,7 @@ public enum GroupsV2Error: Error {
     case localUserIsNotARequestingMember
     case cantApplyChangesToPlaceholder
     case expiredGroupInviteLink
+    case terminatedGroup
     case groupBlocked
     case localUserBlockedFromJoining
 
@@ -30,26 +31,16 @@ public enum GroupsV2Error: Error {
     /// We hit a 400 while making a service request, but believe it may be
     /// recoverable.
     case serviceRequestHitRecoverable400
+
+    /// When restoring from storage service, we want to skip terminated groups.
+    case skipRestoringTerminatedGroup
 }
 
 // MARK: -
 
-@objc
-public enum GroupsV2LinkMode: UInt, CustomStringConvertible {
+public enum GroupInviteLinkMode {
+    case enabled(requireAdminApproval: Bool)
     case disabled
-    case enabledWithoutApproval
-    case enabledWithApproval
-
-    public var description: String {
-        switch self {
-        case .disabled:
-            return ".disabled"
-        case .enabledWithoutApproval:
-            return ".enabledWithoutApproval"
-        case .enabledWithApproval:
-            return ".enabledWithApproval"
-        }
-    }
 }
 
 // MARK: -
@@ -58,19 +49,14 @@ public protocol GroupsV2 {
 
     func hasProfileKeyCredential(
         for aci: Aci,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> Bool
 
     func scheduleAllGroupsV2ForProfileKeyUpdate(transaction: DBWriteTransaction)
 
-    func processProfileKeyUpdates()
+    func processProfileKeyUpdates() async throws
 
-    func updateLocalProfileKeyInGroup(groupId: Data, transaction: DBWriteTransaction)
-
-    func isGroupKnownToStorageService(
-        groupModel: TSGroupModelV2,
-        transaction: DBReadTransaction
-    ) -> Bool
+    func updateLocalProfileKeyInGroup(groupId: GroupIdentifier, tx: DBWriteTransaction)
 
     func createNewGroupOnService(
         _ newGroup: GroupsV2Protos.NewGroupParams,
@@ -80,12 +66,12 @@ public protocol GroupsV2 {
 
     func loadProfileKeyCredentials(
         for acis: [Aci],
-        forceRefresh: Bool
+        forceRefresh: Bool,
     ) async throws -> [Aci: ExpiringProfileKeyCredential]
 
     func fetchLatestSnapshot(
         secretParams: GroupSecretParams,
-        justUploadedAvatars: GroupAvatarStateMap?
+        justUploadedAvatars: GroupAvatarStateMap?,
     ) async throws -> GroupV2SnapshotResponse
 
     /// - Returns: A list of Promises for sending the group update message(s).
@@ -93,13 +79,13 @@ public protocol GroupsV2 {
     func updateGroupV2(
         secretParams: GroupSecretParams,
         isDeletingAccount: Bool,
-        changesBlock: (GroupsV2OutgoingChanges) -> Void
+        changesBlock: (GroupsV2OutgoingChanges) -> Void,
     ) async throws -> [Promise<Void>]
 
     func updateGroupWithChangeActions(
         spamReportingMetadata: GroupUpdateSpamReportingMetadata,
         changeActionsProto: GroupsProtoGroupChangeActions,
-        groupSecretParams: GroupSecretParams
+        groupSecretParams: GroupSecretParams,
     ) async throws
 
     func uploadGroupAvatar(avatarData: Data, groupSecretParams: GroupSecretParams) async throws -> String
@@ -109,28 +95,30 @@ public protocol GroupsV2 {
     // inviteLinkPassword is not necessary if we're already a member or have a pending request.
     func fetchGroupInviteLinkPreview(
         inviteLinkPassword: Data?,
-        groupSecretParams: GroupSecretParams
+        groupSecretParams: GroupSecretParams,
     ) async throws -> GroupInviteLinkPreview
 
     func fetchGroupInviteLinkPreviewAndRefreshGroup(
         inviteLinkPassword: Data?,
-        groupSecretParams: GroupSecretParams
+        groupSecretParams: GroupSecretParams,
     ) async throws -> GroupInviteLinkPreview
 
     func fetchGroupInviteLinkAvatar(
         avatarUrlPath: String,
-        groupSecretParams: GroupSecretParams
+        groupSecretParams: GroupSecretParams,
     ) async throws -> Data
 
     func fetchGroupAvatarRestoredFromBackup(
         groupModel: TSGroupModelV2,
-        avatarUrlPath: String
+        avatarUrlPath: String,
     ) async throws -> TSGroupModel.AvatarDataState
+
+    func downloadAndApplyGroupAvatarIfSkipped(_ secretParams: GroupSecretParams) async throws
 
     func joinGroupViaInviteLink(
         secretParams: GroupSecretParams,
         inviteLinkPassword: Data,
-        downloadedAvatar: (avatarUrlPath: String, avatarData: Data?)?
+        downloadedAvatar: (avatarUrlPath: String, avatarData: Data?)?,
     ) async throws
 
     func cancelRequestToJoin(groupModel: TSGroupModelV2) async throws
@@ -139,27 +127,28 @@ public protocol GroupsV2 {
 
     func groupRecordPendingStorageServiceRestore(
         masterKeyData: Data,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> StorageServiceProtoGroupV2Record?
 
     func restoreGroupFromStorageServiceIfNecessary(
         groupRecord: StorageServiceProtoGroupV2Record,
-        account: AuthedAccount,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     )
+
+    func fetchRevisionZeroGroupChangeAction(secretParams: GroupSecretParams) async throws -> GroupV2Change
 
     func fetchSomeGroupChangeActions(
         secretParams: GroupSecretParams,
-        source: GroupChangeActionFetchSource
+        source: GroupChangeActionFetchSource,
     ) async throws -> GroupChangesResponse
 
     func handleGroupSendEndorsementsResponse(
         _ groupSendEndorsementsResponse: GroupSendEndorsementsResponse,
-        groupThreadId: Int64,
+        groupRowId: GroupRecord.RowId,
         secretParams: GroupSecretParams,
         membership: GroupMembership,
         localAci: Aci,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 }
 
@@ -202,11 +191,13 @@ public struct GroupsV2BuiltGroupChange {
 // MARK: -
 
 public protocol GroupV2Updates {
+    func autoRefreshGroups() async throws
+
     func refreshGroupImpl(
         secretParams: GroupSecretParams,
         spamReportingMetadata: GroupUpdateSpamReportingMetadata,
         source: GroupChangeActionFetchSource,
-        options: TSGroupModelOptions
+        options: TSGroupModelOptions,
     ) async throws
 
     func updateGroupWithChangeActions(
@@ -215,8 +206,15 @@ public protocol GroupV2Updates {
         changeActionsProto: GroupsProtoGroupChangeActions,
         groupSendEndorsementsResponse: GroupSendEndorsementsResponse?,
         downloadedAvatars: GroupAvatarStateMap,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) throws -> TSGroupThread
+
+    func fetchAndApplyCurrentGroupV2SnapshotFromService(
+        secretParams: GroupSecretParams,
+        spamReportingMetadata: GroupUpdateSpamReportingMetadata,
+        options: TSGroupModelOptions,
+        skipTerminatedGroup: Bool,
+    ) async throws
 }
 
 extension GroupV2Updates where Self: Sendable {
@@ -224,13 +222,13 @@ extension GroupV2Updates where Self: Sendable {
         secretParams: GroupSecretParams,
         spamReportingMetadata: GroupUpdateSpamReportingMetadata = .learnedByLocallyInitatedRefresh,
         source: GroupChangeActionFetchSource = .other,
-        options: TSGroupModelOptions = []
+        options: TSGroupModelOptions = [],
     ) async throws {
         return try await refreshGroupImpl(
             secretParams: secretParams,
             spamReportingMetadata: spamReportingMetadata,
             source: source,
-            options: options
+            options: options,
         )
     }
 
@@ -249,7 +247,7 @@ extension GroupV2Updates where Self: Sendable {
                     secretParams: try GroupSecretParams(contents: groupSecretParamsData),
                     spamReportingMetadata: .learnedByLocallyInitatedRefresh,
                     source: .other,
-                    options: options
+                    options: options,
                 )
             } catch {
                 Logger.warn("Group refresh failed: \(error).")
@@ -274,7 +272,7 @@ public struct GroupV2Change {
     public init(
         snapshot: GroupV2Snapshot?,
         changeActionsProto: GroupsProtoGroupChangeActions?,
-        downloadedAvatars: GroupAvatarStateMap
+        downloadedAvatars: GroupAvatarStateMap,
     ) {
         owsPrecondition(snapshot != nil || changeActionsProto != nil)
         self.snapshot = snapshot
@@ -304,18 +302,18 @@ public struct GroupV2ContextInfo {
     public let groupId: GroupIdentifier
 
     public static func deriveFrom(masterKeyData: Data) throws -> GroupV2ContextInfo {
-        let groupSecretParams = try self.groupSecretParams(for: masterKeyData)
-        let groupIdentifier = try groupSecretParams.getPublicParams().getGroupIdentifier()
-        return GroupV2ContextInfo(
-            masterKeyData: masterKeyData,
-            groupSecretParams: groupSecretParams,
-            groupId: groupIdentifier
-        )
+        let groupMasterKey = try GroupMasterKey(contents: masterKeyData)
+        return deriveFrom(masterKey: groupMasterKey)
     }
 
-    private static func groupSecretParams(for masterKeyData: Data) throws -> GroupSecretParams {
-        let groupMasterKey = try GroupMasterKey(contents: masterKeyData)
-        return try GroupSecretParams.deriveFromMasterKey(groupMasterKey: groupMasterKey)
+    public static func deriveFrom(masterKey: GroupMasterKey) -> GroupV2ContextInfo {
+        let groupSecretParams = failIfThrows { try GroupSecretParams.deriveFromMasterKey(groupMasterKey: masterKey) }
+        let groupIdentifier = failIfThrows { try groupSecretParams.getPublicParams().getGroupIdentifier() }
+        return GroupV2ContextInfo(
+            masterKeyData: masterKey.serialize(),
+            groupSecretParams: groupSecretParams,
+            groupId: groupIdentifier,
+        )
     }
 
     private init(masterKeyData: Data, groupSecretParams: GroupSecretParams, groupId: GroupIdentifier) {
@@ -323,51 +321,6 @@ public struct GroupV2ContextInfo {
         self.groupSecretParams = groupSecretParams
         self.groupSecretParamsData = groupSecretParams.serialize()
         self.groupId = groupId
-    }
-}
-
-// MARK: -
-
-public struct GroupInviteLinkInfo {
-    public let masterKey: Data
-    public let inviteLinkPassword: Data
-
-    public init(masterKey: Data, inviteLinkPassword: Data) {
-        self.masterKey = masterKey
-        self.inviteLinkPassword = inviteLinkPassword
-    }
-
-    public static func parseFrom(_ url: URL) -> GroupInviteLinkInfo? {
-        guard GroupManager.isPossibleGroupInviteLink(url) else {
-            return nil
-        }
-        guard let protoBase64Url = url.fragment, !protoBase64Url.isEmpty else {
-            owsFailDebug("Missing encoded data.")
-            return nil
-        }
-        do {
-            let protoData = try Data.data(fromBase64Url: protoBase64Url)
-            let proto = try GroupsProtoGroupInviteLink(serializedData: protoData)
-            guard let protoContents = proto.contents else {
-                owsFailDebug("Missing proto contents.")
-                return nil
-            }
-            switch protoContents {
-            case .contentsV1(let contentsV1):
-                guard let masterKey = contentsV1.groupMasterKey, !masterKey.isEmpty else {
-                    owsFailDebug("Invalid masterKey.")
-                    return nil
-                }
-                guard let inviteLinkPassword = contentsV1.inviteLinkPassword, !inviteLinkPassword.isEmpty else {
-                    owsFailDebug("Invalid inviteLinkPassword.")
-                    return nil
-                }
-                return GroupInviteLinkInfo(masterKey: masterKey, inviteLinkPassword: inviteLinkPassword)
-            }
-        } catch {
-            owsFailDebug("Error: \(error)")
-            return nil
-        }
     }
 }
 
@@ -408,7 +361,7 @@ public struct GroupAvatarStateMap {
             switch value {
             case .available, .failedToFetchFromCDN, .missing:
                 true
-            case .lowTrustDownloadWasBlocked:
+            case .lowTrustDownloadWasBlocked, .skipped:
                 false
             }
         }
@@ -425,14 +378,14 @@ public struct GroupAvatarStateMap {
     static func from(groupModel: TSGroupModelV2) -> GroupAvatarStateMap {
         return from(
             avatarDataState: groupModel.avatarDataState,
-            avatarUrlPath: groupModel.avatarUrlPath
+            avatarUrlPath: groupModel.avatarUrlPath,
         )
     }
 
     static func from(changes: GroupsV2OutgoingChanges) -> GroupAvatarStateMap {
         return from(
             avatarDataState: AvatarDataState(avatarData: changes.newAvatarData),
-            avatarUrlPath: changes.newAvatarUrlPath
+            avatarUrlPath: changes.newAvatarUrlPath,
         )
     }
 
@@ -472,21 +425,23 @@ public class MockGroupsV2: GroupsV2 {
         owsFail("Not implemented.")
     }
 
-    public func hasProfileKeyCredential(for aci: Aci,
-                                        transaction: DBReadTransaction) -> Bool {
+    public func hasProfileKeyCredential(
+        for aci: Aci,
+        transaction: DBReadTransaction,
+    ) -> Bool {
         owsFail("Not implemented.")
     }
 
     public func loadProfileKeyCredentials(
         for acis: [Aci],
-        forceRefresh: Bool
+        forceRefresh: Bool,
     ) async throws -> [Aci: ExpiringProfileKeyCredential] {
         owsFail("Not implemented.")
     }
 
     public func fetchLatestSnapshot(
         secretParams: GroupSecretParams,
-        justUploadedAvatars: GroupAvatarStateMap?
+        justUploadedAvatars: GroupAvatarStateMap?,
     ) async throws -> GroupV2SnapshotResponse {
         owsFail("Not implemented.")
     }
@@ -494,7 +449,7 @@ public class MockGroupsV2: GroupsV2 {
     public func updateGroupV2(
         secretParams: GroupSecretParams,
         isDeletingAccount: Bool,
-        changesBlock: (GroupsV2OutgoingChanges) -> Void
+        changesBlock: (GroupsV2OutgoingChanges) -> Void,
     ) async throws -> [Promise<Void>] {
         owsFail("Not implemented.")
     }
@@ -503,34 +458,27 @@ public class MockGroupsV2: GroupsV2 {
         owsFail("Not implemented.")
     }
 
-    public func processProfileKeyUpdates() {
+    public func processProfileKeyUpdates() async throws {
         owsFail("Not implemented.")
     }
 
-    public func updateLocalProfileKeyInGroup(groupId: Data, transaction: DBWriteTransaction) {
+    public func updateLocalProfileKeyInGroup(groupId: GroupIdentifier, tx: DBWriteTransaction) {
         owsFail("Not implemented.")
     }
 
     public func updateGroupWithChangeActions(
         spamReportingMetadata: GroupUpdateSpamReportingMetadata,
         changeActionsProto: GroupsProtoGroupChangeActions,
-        groupSecretParams: GroupSecretParams
+        groupSecretParams: GroupSecretParams,
     ) async throws {
         owsFail("Not implemented.")
     }
 
     public func uploadGroupAvatar(
         avatarData: Data,
-        groupSecretParams: GroupSecretParams
+        groupSecretParams: GroupSecretParams,
     ) async throws -> String {
         owsFail("Not implemented.")
-    }
-
-    public func isGroupKnownToStorageService(
-        groupModel: TSGroupModelV2,
-        transaction: DBReadTransaction
-    ) -> Bool {
-        return true
     }
 
     public func groupRecordPendingStorageServiceRestore(masterKeyData: Data, transaction: DBReadTransaction) -> StorageServiceProtoGroupV2Record? {
@@ -539,8 +487,7 @@ public class MockGroupsV2: GroupsV2 {
 
     public func restoreGroupFromStorageServiceIfNecessary(
         groupRecord: StorageServiceProtoGroupV2Record,
-        account: AuthedAccount,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) {
         owsFail("Not implemented.")
     }
@@ -551,36 +498,40 @@ public class MockGroupsV2: GroupsV2 {
 
     public func fetchGroupInviteLinkPreview(
         inviteLinkPassword: Data?,
-        groupSecretParams: GroupSecretParams
+        groupSecretParams: GroupSecretParams,
     ) async throws -> GroupInviteLinkPreview {
         owsFail("Not implemented.")
     }
 
     public func fetchGroupInviteLinkPreviewAndRefreshGroup(
         inviteLinkPassword: Data?,
-        groupSecretParams: GroupSecretParams
+        groupSecretParams: GroupSecretParams,
     ) async throws -> GroupInviteLinkPreview {
         owsFail("Not implemented.")
     }
 
     public func fetchGroupInviteLinkAvatar(
         avatarUrlPath: String,
-        groupSecretParams: GroupSecretParams
+        groupSecretParams: GroupSecretParams,
     ) async throws -> Data {
         owsFail("Not implemented.")
     }
 
     public func fetchGroupAvatarRestoredFromBackup(
         groupModel: TSGroupModelV2,
-        avatarUrlPath: String
+        avatarUrlPath: String,
     ) async throws -> TSGroupModel.AvatarDataState {
+        owsFail("Not implemented")
+    }
+
+    public func downloadAndApplyGroupAvatarIfSkipped(_ secretParams: GroupSecretParams) async throws {
         owsFail("Not implemented")
     }
 
     public func joinGroupViaInviteLink(
         secretParams: GroupSecretParams,
         inviteLinkPassword: Data,
-        downloadedAvatar: (avatarUrlPath: String, avatarData: Data?)?
+        downloadedAvatar: (avatarUrlPath: String, avatarData: Data?)?,
     ) async throws {
         owsFail("Not implemented.")
     }
@@ -593,17 +544,21 @@ public class MockGroupsV2: GroupsV2 {
         owsFail("Not implemented")
     }
 
+    public func fetchRevisionZeroGroupChangeAction(secretParams: LibSignalClient.GroupSecretParams) async throws -> GroupV2Change {
+        owsFail("not implemented")
+    }
+
     public func fetchSomeGroupChangeActions(secretParams: GroupSecretParams, source: GroupChangeActionFetchSource) async throws -> GroupChangesResponse {
         owsFail("not implemented")
     }
 
     public func handleGroupSendEndorsementsResponse(
         _ groupSendEndorsementsResponse: GroupSendEndorsementsResponse,
-        groupThreadId: Int64,
+        groupRowId: GroupRecord.RowId,
         secretParams: GroupSecretParams,
         membership: GroupMembership,
         localAci: Aci,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         owsFail("Not implemented.")
     }
@@ -612,11 +567,24 @@ public class MockGroupsV2: GroupsV2 {
 // MARK: -
 
 public class MockGroupV2Updates: GroupV2Updates {
+    public func fetchAndApplyCurrentGroupV2SnapshotFromService(
+        secretParams: LibSignalClient.GroupSecretParams,
+        spamReportingMetadata: GroupUpdateSpamReportingMetadata,
+        options: TSGroupModelOptions,
+        skipTerminatedGroup: Bool,
+    ) async throws {
+        owsFail("Not implemented.")
+    }
+
+    public func autoRefreshGroups() async throws {
+        owsFail("Not implemented.")
+    }
+
     public func refreshGroupImpl(
         secretParams: GroupSecretParams,
         spamReportingMetadata: GroupUpdateSpamReportingMetadata,
         source: GroupChangeActionFetchSource,
-        options: TSGroupModelOptions
+        options: TSGroupModelOptions,
     ) async throws {
         owsFail("Not implemented.")
     }
@@ -627,7 +595,7 @@ public class MockGroupV2Updates: GroupV2Updates {
         changeActionsProto: GroupsProtoGroupChangeActions,
         groupSendEndorsementsResponse: GroupSendEndorsementsResponse?,
         downloadedAvatars: GroupAvatarStateMap,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) throws -> TSGroupThread {
         owsFail("Not implemented.")
     }

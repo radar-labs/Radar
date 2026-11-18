@@ -9,6 +9,7 @@ import Foundation
 private let languageMap: [String: String] = [
     "ar": "ar",
     "be-BY": "be",
+    "bg-BG": "bg",
     "bn-BD": "bn",
     "ca": "ca",
     "cs": "cs",
@@ -29,6 +30,7 @@ private let languageMap: [String: String] = [
     "it": "it",
     "ja": "ja",
     "ko": "ko",
+    "lt-LT": "lt",
     "mr-IN": "mr",
     "ms": "ms",
     "nb": "nb",
@@ -50,7 +52,7 @@ private let languageMap: [String: String] = [
     "zh-CN": "zh_CN",
     "zh-HK": "zh_HK",
     "zh-TW": "zh_TW",
-    "zh-YU": "yue"
+    "zh-YU": "yue",
 ]
 
 struct ResourceFile: TranslatableFile {
@@ -69,13 +71,18 @@ struct ResourceFile: TranslatableFile {
     func downloadAllTranslations(to repositoryURL: URL, using client: Smartling) async throws {
         try await withLimitedThrowingTaskGroup(limit: Constant.concurrentRequestLimit) { taskGroup in
             for (remoteIdentifier, localIdentifier) in languageMap {
-                let fileURL = try await client.downloadTranslatedFile(for: filename, in: remoteIdentifier)
-                let localRelativePath = relativePath(for: localIdentifier)
-                try FileManager.default.copyItem(
-                    at: fileURL,
-                    replacingItemAt: repositoryURL.appendingPathComponent(localRelativePath)
-                )
-                print("Saved \(localRelativePath)")
+                try await taskGroup.addTask {
+                    let startTime = CFAbsoluteTimeGetCurrent()
+                    let fileURL = try await client.downloadTranslatedFile(for: filename, in: remoteIdentifier)
+                    let endTime = CFAbsoluteTimeGetCurrent()
+                    let localRelativePath = relativePath(for: localIdentifier)
+                    try FileManager.default.copyItem(
+                        at: fileURL,
+                        replacingItemAt: repositoryURL.appendingPathComponent(localRelativePath),
+                    )
+                    let formattedDuration = (endTime - startTime).formatted(.number.precision(.fractionLength(1)))
+                    print("Saved \(localRelativePath) in \(formattedDuration)s")
+                }
             }
         }
     }
@@ -84,7 +91,7 @@ struct ResourceFile: TranslatableFile {
         try checkForUnusedLocalizations(
             in: repositoryURL.appendingPathComponent(relativeDirectoryPath),
             suffix: ".lproj",
-            expectedLocalizations: languageMap.map { $1 } + ["en"]
+            expectedLocalizations: languageMap.map { $1 } + ["en"],
         )
     }
 }

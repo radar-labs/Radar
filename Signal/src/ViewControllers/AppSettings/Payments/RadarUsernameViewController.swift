@@ -19,7 +19,7 @@ class RadarUsernameViewController: OWSViewController {
         clearButtonMode: .whileEditing,
         delegate: self,
         editingChanged: { [unowned self] in self.usernameDidChange() },
-        returnPressed: { [unowned self] in if self.canConfirm { self.didTapConfirm() } }
+        returnPressed: { [unowned self] in if self.canConfirm { self.didTapConfirm() } },
     )
 
     private let statusLabel = UILabel()
@@ -36,7 +36,7 @@ class RadarUsernameViewController: OWSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = OWSTableViewController2.tableBackgroundColor(isUsingPresentedStyle: true)
+        view.backgroundColor = OWSTableViewController2.tableBackgroundColor
 
         let logoView = UIImageView(image: UIImage(named: "radar-logo"))
         logoView.contentMode = .scaleAspectFit
@@ -65,7 +65,7 @@ class RadarUsernameViewController: OWSViewController {
 
         // Pill-shaped text field container
         let fieldContainer = UIView()
-        fieldContainer.backgroundColor = UIColor(red: 120/255, green: 120/255, blue: 128/255, alpha: 0.16)
+        fieldContainer.backgroundColor = UIColor(red: 120 / 255, green: 120 / 255, blue: 128 / 255, alpha: 0.16)
         fieldContainer.layer.cornerRadius = 26
         fieldContainer.autoSetDimension(.height, toSize: 52)
 
@@ -80,7 +80,7 @@ class RadarUsernameViewController: OWSViewController {
         let domainLabel = UILabel()
         domainLabel.text = "@radar.cash"
         domainLabel.font = UIFont.dynamicTypeBodyClamped.semibold()
-        domainLabel.textColor = Theme.accentBlueColor
+        domainLabel.textColor = UIColor.Signal.accent
         domainLabel.setContentHuggingHigh()
 
         let fieldRow = UIStackView(arrangedSubviews: [fieldContainer, domainLabel])
@@ -101,10 +101,10 @@ class RadarUsernameViewController: OWSViewController {
             title: "Confirm",
             font: UIFont.dynamicTypeHeadline.semibold(),
             titleColor: .white,
-            backgroundColor: .ows_accentBlue,
+            backgroundColor: .Signal.accent,
             target: self,
             selector: #selector(didTapConfirm),
-            cornerRadius: 14
+            cornerRadius: 14,
         )
         confirmButton.autoSetDimension(.height, toSize: 52)
         confirmButton.setEnabled(false)
@@ -112,10 +112,10 @@ class RadarUsernameViewController: OWSViewController {
         let skipButton = OWSFlatButton.button(
             title: "Cancel",
             font: .dynamicTypeSubheadlineClamped.semibold(),
-            titleColor: .ows_accentBlue,
+            titleColor: .Signal.accent,
             backgroundColor: .clear,
             target: self,
-            selector: #selector(didTapSkip)
+            selector: #selector(didTapSkip),
         )
         skipButton.autoSetHeightUsingFont()
 
@@ -156,8 +156,11 @@ class RadarUsernameViewController: OWSViewController {
         scrollView.showsVerticalScrollIndicator = false
 
         view.addSubview(scrollView)
-        scrollView.autoPin(toTopLayoutGuideOf: self, withInset: 0)
-        scrollView.autoPin(toBottomLayoutGuideOf: self, withInset: 0)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+        ])
         scrollView.autoPinWidthToSuperview()
 
         // Content view sized to exactly match the scroll view frame — no actual scrolling.
@@ -221,12 +224,12 @@ class RadarUsernameViewController: OWSViewController {
         statusLabel.isHidden = false
         if available {
             statusLabel.text = "✓ Username Available"
-            statusLabel.textColor = UIColor(red: 70/255, green: 184/255, blue: 39/255, alpha: 1)
+            statusLabel.textColor = UIColor(red: 70 / 255, green: 184 / 255, blue: 39 / 255, alpha: 1)
             canConfirm = true
             confirmButton.setEnabled(true)
         } else {
             statusLabel.text = "✗ Username Unavailable"
-            statusLabel.textColor = .ows_accentRed
+            statusLabel.textColor = UIColor(rgbHex: 0xF44336) // was .ows_accentRed
             canConfirm = false
             confirmButton.setEnabled(false)
         }
@@ -253,7 +256,7 @@ class RadarUsernameViewController: OWSViewController {
                         self.showErrorAlert(error)
                     }
                 }
-            }
+            },
         )
     }
 
@@ -265,7 +268,7 @@ class RadarUsernameViewController: OWSViewController {
     private func showErrorAlert(_ error: Error) {
         let alert = ActionSheetController(
             title: CommonStrings.errorAlertTitle,
-            message: error.localizedDescription
+            message: error.localizedDescription,
         )
         alert.addAction(ActionSheetAction(title: CommonStrings.okButton))
         presentActionSheet(alert)
@@ -276,13 +279,13 @@ extension RadarUsernameViewController: UITextFieldDelegate {
     func textField(
         _ textField: UITextField,
         shouldChangeCharactersIn range: NSRange,
-        replacementString string: String
+        replacementString string: String,
     ) -> Bool {
         return TextFieldHelper.textField(
             textField,
             shouldChangeCharactersInRange: range,
             replacementString: string,
-            maxGlyphCount: WalletAddressEditViewController.addressGlyphLimit
+            maxGlyphCount: WalletAddressEditViewController.addressGlyphLimit,
         )
     }
 }

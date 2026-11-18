@@ -8,23 +8,12 @@
 public struct InactiveLinkedDevice: Equatable {
     public let displayName: String
     public let expirationDate: Date
-
-    init(displayName: String, expirationDate: Date) {
-        self.displayName = displayName
-        self.expirationDate = expirationDate
-    }
 }
 
 /// Responsible for finding "inactive" linked devices, or those who have not
 /// come online in a long time and are at risk of expiring (and being unlinked)
 /// soon.
 public protocol InactiveLinkedDeviceFinder {
-    /// At most once per day, re-fetch our linked device state.
-    ///
-    /// - Note
-    /// This method does nothing if invoked from a linked device.
-    func refreshLinkedDeviceStateIfNecessary() async
-
     /// Find the user's "least active" linked device, i.e. their linked device
     /// that was last seen longest ago.
     ///
@@ -43,35 +32,23 @@ public protocol InactiveLinkedDeviceFinder {
     /// This is irreversible for the life of this app install. Use with care.
     func permanentlyDisableFinders(tx: DBWriteTransaction)
 
-    #if TESTABLE_BUILD
+#if TESTABLE_BUILD
     func reenablePermanentlyDisabledFinders(tx: DBWriteTransaction)
-    #endif
-}
-
-public extension InactiveLinkedDeviceFinder {
-    /// Whether the user has an "inactive" linked device.
-    func hasInactiveLinkedDevice(tx: DBReadTransaction) -> Bool {
-        return findLeastActiveLinkedDevice(tx: tx) != nil
-    }
+#endif
 }
 
 class InactiveLinkedDeviceFinderImpl: InactiveLinkedDeviceFinder {
     private enum Constants {
-        /// How long we should wait between device state refreshes.
-        static let intervalForDeviceRefresh: TimeInterval = .day
-
         /// How long before a device expires it is considered "inactive".
         static let intervalBeforeExpirationConsideredInactive: TimeInterval = .week
     }
 
     private enum StoreKeys {
-        static let lastRefreshedDate: String = "lastRefreshedDate"
         static let isPermanentlyDisabled: String = "isPermanentlyDisabled"
     }
 
     private let dateProvider: DateProvider
     private let db: any DB
-    private let deviceService: OWSDeviceService
     private let deviceStore: OWSDeviceStore
     private let kvStore: KeyValueStore
     private let remoteConfigProvider: any RemoteConfigProvider
@@ -85,76 +62,22 @@ class InactiveLinkedDeviceFinderImpl: InactiveLinkedDeviceFinder {
         return max(0, remoteConfigProvider.currentConfig().messageQueueTime - Constants.intervalBeforeExpirationConsideredInactive)
     }
 
-    private let logger = PrefixedLogger(prefix: "InactiveLinkedDeviceFinder")
-
     init(
         dateProvider: @escaping DateProvider,
         db: any DB,
-        deviceService: OWSDeviceService,
         deviceStore: OWSDeviceStore,
         remoteConfigProvider: any RemoteConfigProvider,
-        tsAccountManager: TSAccountManager
+        tsAccountManager: TSAccountManager,
     ) {
         self.dateProvider = dateProvider
         self.db = db
-        self.deviceService = deviceService
         self.deviceStore = deviceStore
         self.kvStore = KeyValueStore(collection: "InactiveLinkedDeviceFinderImpl")
         self.remoteConfigProvider = remoteConfigProvider
         self.tsAccountManager = tsAccountManager
     }
 
-    func refreshLinkedDeviceStateIfNecessary() async {
-        struct SkipRefreshError: Error {}
-
-        let shouldSkip = db.read { tx -> Bool in
-            if kvStore.hasValue(StoreKeys.isPermanentlyDisabled, transaction: tx) {
-                // Finder is permanently disabled, no need to refresh.
-                return true
-            }
-
-            if !tsAccountManager.registrationState(tx: tx).isRegisteredPrimaryDevice {
-                // Only refresh state on primaries.
-                return true
-            }
-
-            if
-                let lastRefreshedDate = kvStore.getDate(StoreKeys.lastRefreshedDate, transaction: tx),
-                lastRefreshedDate.addingTimeInterval(Constants.intervalForDeviceRefresh) > dateProvider()
-            {
-                // Checked less than a day ago, skip.
-                return true
-            }
-
-            return false
-        }
-
-        if shouldSkip {
-            return
-        }
-
-        do {
-            _ = try await deviceService.refreshDevices()
-
-            await db.awaitableWrite { tx in
-                self.kvStore.setDate(
-                    self.dateProvider(),
-                    key: StoreKeys.lastRefreshedDate,
-                    transaction: tx
-                )
-            }
-        } catch {
-            logger.warn("Failed to refresh devices!")
-        }
-    }
-
     func findLeastActiveLinkedDevice(tx: DBReadTransaction) -> InactiveLinkedDevice? {
-        if !kvStore.hasValue(StoreKeys.lastRefreshedDate, transaction: tx) {
-            /// Short-circuit if we've never refreshed device state. Otherwise,
-            /// we'll be querying stale data from who knows when.
-            return nil
-        }
-
         if kvStore.hasValue(StoreKeys.isPermanentlyDisabled, transaction: tx) {
             // Short-circuit if we've been disabled.
             return nil
@@ -166,7 +89,7 @@ class InactiveLinkedDeviceFinderImpl: InactiveLinkedDeviceFinder {
         }
 
         let allInactiveLinkedDevices = deviceStore.fetchAll(tx: tx)
-            .filter { !$0.isPrimaryDevice }
+            .filter { !$0.deviceId.isPrimary }
             .filter { device in
                 // Only keep devices whose inactivity date has passed.
                 let inactivityDate = device.lastSeenAt.addingTimeInterval(intervalForDeviceInactivity)
@@ -181,8 +104,8 @@ class InactiveLinkedDeviceFinderImpl: InactiveLinkedDeviceFinder {
                 return InactiveLinkedDevice(
                     displayName: device.displayName,
                     expirationDate: device.lastSeenAt.addingTimeInterval(
-                        intervalForDeviceExpiration
-                    )
+                        intervalForDeviceExpiration,
+                    ),
                 )
             }
     }

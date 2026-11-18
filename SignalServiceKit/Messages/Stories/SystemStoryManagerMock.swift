@@ -5,6 +5,8 @@
 
 import Foundation
 
+#if TESTABLE_BUILD
+
 public class SystemStoryManagerMock: SystemStoryManagerProtocol {
 
     /// In tests, set some other handler to this to return different results when the system under test calls enqueueOnboardingStoryDownload
@@ -84,35 +86,31 @@ public class SystemStoryManagerMock: SystemStoryManagerProtocol {
 
 public class OnboardingStoryManagerFilesystemMock: OnboardingStoryManagerFilesystem {
 
-    public override class func fileOrFolderExists(url: URL) -> Bool {
+    override public class func fileOrFolderExists(url: URL) -> Bool {
         return true
     }
 
-    public override class func fileSize(of: URL) throws -> UInt64 {
+    override public class func fileSize(of: URL) throws -> UInt64 {
         return 100
     }
 
-    public override class func deleteFile(url: URL) throws {
+    override public class func deleteFile(url: URL) throws {
         return
     }
 
-    public override class func moveFile(from fromUrl: URL, to toUrl: URL) throws {
+    override public class func moveFile(from fromUrl: URL, to toUrl: URL) throws {
         return
-    }
-
-    public override class func isValidImage(at url: URL) -> Bool {
-        return true
     }
 }
 
 public class OnboardingStoryManagerStoryMessageFactoryMock: OnboardingStoryManagerStoryMessageFactory {
 
-    public override class func createFromSystemAuthor(
+    override public class func createFromSystemAuthor(
         attachmentSource: AttachmentDataSource,
         timestamp: UInt64,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) throws -> StoryMessage {
-        return try StoryMessage.createAndInsert(
+        let storyMessage = StoryMessage(
             timestamp: timestamp,
             authorAci: StoryMessage.systemStoryAuthor,
             groupId: nil,
@@ -121,48 +119,40 @@ public class OnboardingStoryManagerStoryMessageFactoryMock: OnboardingStoryManag
                     allowsReplies: false,
                     receivedTimestamp: timestamp,
                     readTimestamp: nil,
-                    viewedTimestamp: nil
-                )
+                    viewedTimestamp: nil,
+                ),
             ),
+            attachment: .media,
             replyCount: 0,
-            attachmentBuilder: .withoutFinalizer(.media),
-            mediaCaption: nil,
-            shouldLoop: false,
-            transaction: transaction
         )
+        storyMessage.anyInsert(transaction: transaction)
+        return storyMessage
     }
 
-    public override class func validateAttachmentContents(
-        dataSource: any DataSource,
-        mimeType: String
+    override public class func validateOnboardingImageAttachment(
+        dataSource: DataSourcePath,
+        mimeType: String,
     ) async throws -> AttachmentDataSource {
-        struct FakePendingAttachment: PendingAttachment {
-            let blurHash: String? = nil
-            let sha256ContentHash: Data = Data()
-            let encryptedByteCount: UInt32 = 100
-            let unencryptedByteCount: UInt32 = 100
-            let mimeType: String
-            let encryptionKey: Data = Data()
-            let digestSHA256Ciphertext: Data = Data()
-            let localRelativeFilePath: String = ""
-            var renderingFlag: AttachmentReference.RenderingFlag = .default
-            let sourceFilename: String?
-            let validatedContentType: Attachment.ContentType = .file
-            let orphanRecordId: OrphanedAttachmentRecord.IDType = 1
-
-            mutating func removeBorderlessRenderingFlagIfPresent() {
-                switch renderingFlag {
-                case .borderless:
-                    renderingFlag = .default
-                default:
-                    return
-                }
-            }
-        }
-
-        return AttachmentDataSource.pendingAttachment(FakePendingAttachment(
+        let pendingAttachment = PendingAttachment(
+            plaintextHash: Data(),
+            encryptedByteCount: 100,
+            unencryptedByteCount: 100,
             mimeType: mimeType,
-            sourceFilename: dataSource.sourceFilename
-        ))
+            encryptionKey: Data(),
+            ciphertextDigest: Data(),
+            localRelativeFilePath: "",
+            renderingFlag: .default,
+            sourceFilename: dataSource.sourceFilename,
+            orphanRecordId: 1,
+            blurHash: nil,
+            mediaPixelSize: nil,
+            videoDuration: nil,
+            videoStillFrameRelativeFilePath: nil,
+            audioDuration: nil,
+            audioWaveform: nil,
+        )
+        return AttachmentDataSource.pendingAttachment(pendingAttachment)
     }
 }
+
+#endif

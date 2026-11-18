@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import AudioToolbox
 import CocoaLumberjack
 import LibSignalClient
 import SignalRingRTC
@@ -59,50 +58,54 @@ private final class DebugLogFileManager: DDLogFileManagerDefault {
     }
 }
 
-public final class ErrorLogger: DDFileLogger {
-    public static func playAlertSound() {
-        AudioServicesPlayAlertSound(SystemSoundID(1023))
-    }
-
-    public override func log(message logMessage: DDLogMessage) {
-        super.log(message: logMessage)
-        if Preferences.isAudibleErrorLoggingEnabled {
-            Self.playAlertSound()
-        }
-    }
-}
-
 public final class DebugLogger {
 
-    private init() {}
     public static var shared = DebugLogger()
+
+    private init() {}
+
+    // MARK: - Logging key
+
+    private let _loggingKey = AtomicValue<LoggingKey?>(nil, lock: .init())
+
+    /// A key used to hash sensitive identifiers in logs.
+    public var loggingKey: LoggingKey? {
+        _loggingKey.get()
+    }
+
+    public func setLoggingKey(_ loggingKey: LoggingKey?) {
+        _loggingKey.set(loggingKey)
+    }
+
+    // MARK: -
 
     public static let mainAppDebugLogsDirPath = {
         let dirPath = OWSFileSystem.cachesDirectoryPath().appendingPathComponent("Logs")
         OWSFileSystem.ensureDirectoryExists(dirPath)
         return dirPath
     }()
+
     public static let shareExtensionDebugLogsDirPath = {
         let dirPath = OWSFileSystem.appSharedDataDirectoryPath().appendingPathComponent("ShareExtensionLogs")
         OWSFileSystem.ensureDirectoryExists(dirPath)
         return dirPath
     }()
+
     public static let nseDebugLogsDirPath = {
         let dirPath = OWSFileSystem.appSharedDataDirectoryPath().appendingPathComponent("NSELogs")
         OWSFileSystem.ensureDirectoryExists(dirPath)
         return dirPath
     }()
-    #if TESTABLE_BUILD
+
+#if TESTABLE_BUILD
     public static let testDebugLogsDirPath = TestAppContext.testDebugLogsDirPath
-    #endif
+#endif
     // We don't need to include testDebugLogsDirPath when we upload debug logs.
     public static let allLogsDirPaths: [String] = [
         DebugLogger.mainAppDebugLogsDirPath,
         DebugLogger.shareExtensionDebugLogsDirPath,
         DebugLogger.nseDebugLogsDirPath,
     ]
-
-    public static let errorLogsDir = URL.init(fileURLWithPath: OWSFileSystem.cachesDirectoryPath().appendingPathComponent("ErrorLogs"))
 
     public var fileLogger: DDFileLogger?
     public var allLogFilePaths: Set<String> {
@@ -126,12 +129,6 @@ public final class DebugLogger {
         return logPathSet
     }
 
-    public func enableErrorReporting() {
-        let errorLogger = ErrorLogger(logFileManager: DDLogFileManagerDefault(logsDirectory: Self.errorLogsDir.path))
-        errorLogger.logFormatter = ScrubbingLogFormatter()
-        DDLog.add(errorLogger, with: .error)
-    }
-
     // MARK: Enable/Disable
 
     public func enableFileLogging(appContext: AppContext, canLaunchInBackground: Bool) {
@@ -139,7 +136,7 @@ public final class DebugLogger {
 
         let logFileManager = DebugLogFileManager(
             logsDirectory: logsDirPath,
-            defaultFileProtectionLevel: canLaunchInBackground ? .completeUntilFirstUserAuthentication : .completeUnlessOpen
+            defaultFileProtectionLevel: canLaunchInBackground ? .completeUntilFirstUserAuthentication : .completeUnlessOpen,
         )
 
         // Keep last 3 days of logs - or last 3 logs (if logs rollover due to max
@@ -153,7 +150,9 @@ public final class DebugLogger {
         let fileLogger = DDFileLogger(logFileManager: logFileManager)
         fileLogger.rollingFrequency = .day
         fileLogger.maximumFileSize = 12_000_000
-        fileLogger.logFormatter = ScrubbingLogFormatter()
+        fileLogger.logFormatter = ScrubbingLogFormatter(loggingKey: { [weak self] in
+            return self?.loggingKey
+        })
 
         self.fileLogger = fileLogger
         DDLog.add(fileLogger)
@@ -166,11 +165,11 @@ public final class DebugLogger {
     }
 
     public func enableTTYLoggingIfNeeded() {
-        #if DEBUG
+#if DEBUG
         guard let ttyLogger = DDTTYLogger.sharedInstance else { return }
         ttyLogger.logFormatter = LogFormatter()
         DDLog.add(ttyLogger)
-        #endif
+#endif
     }
 
     // MARK: - Handlers
@@ -193,21 +192,23 @@ public final class DebugLogger {
         }())
     }
 
-    public static func registerRingRTC() {
+    public static func registerRingRTC(appContext: any AppContext) {
         let maxLogLevel: RingRTCLogLevel
-        #if DEBUG
+#if DEBUG
         if
             let overrideLogLevelString = ProcessInfo().environment["RINGRTC_MAX_LOG_LEVEL"],
             let overrideLogLevelRaw = UInt8(overrideLogLevelString),
             let overrideLogLevel = RingRTCLogLevel(rawValue: overrideLogLevelRaw)
         {
             maxLogLevel = overrideLogLevel
+        } else if appContext.isRunningTests {
+            maxLogLevel = .warn
         } else {
             maxLogLevel = .trace
         }
-        #else
+#else
         maxLogLevel = .trace
-        #endif
+#endif
 
         RingRTCLoggerImpl(maxLogLevel: maxLogLevel).setUpRingRTCLogging(maxLogLevel: min(maxLogLevel, { () -> RingRTCLogLevel in
             if ShouldLogVerbose() {
@@ -248,7 +249,7 @@ final class LibsignalLoggerImpl: LibsignalLogger {
             flag: level.logFlag,
             file: file.map(String.init(cString:)) ?? "",
             function: "",
-            line: Int(line)
+            line: Int(line),
         )
     }
 
@@ -287,7 +288,7 @@ final class RingRTCLoggerImpl: RingRTCLogger {
             flag: level.logFlag,
             file: file,
             function: function,
-            line: Int(line)
+            line: Int(line),
         )
     }
 

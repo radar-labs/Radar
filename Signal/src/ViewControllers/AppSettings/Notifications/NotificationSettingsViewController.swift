@@ -24,144 +24,361 @@ class NotificationSettingsViewController: OWSTableViewController2 {
     func updateTableContents() {
         let contents = OWSTableContents()
 
+        contents.add(buildSoundsSection())
+        contents.add(buildNotificationsSection())
+        if BuildFlags.improvedNotifications {
+            contents.add(buildUnreadRemindersSection())
+            contents.add(buildReactionsSection())
+        }
+        contents.add(buildContactJoinedSignalSection())
+        contents.add(buildAppBadgeSection())
+        contents.add(buildReregisterPushSection())
+        contents.add(buildPushRelaySection())
+        contents.add(buildResetSection())
+
+        self.contents = contents
+    }
+
+    private func buildSoundsSection() -> OWSTableSection {
+        let db = DependenciesBridge.shared.db
+        let notificationPreferencesManager = DependenciesBridge.shared.notificationPreferencesManager
         let soundsSection = OWSTableSection()
         soundsSection.headerTitle = OWSLocalizedString(
             "SETTINGS_SECTION_SOUNDS",
-            comment: "Header Label for the sounds section of settings views."
+            comment: "Header Label for the sounds section of settings views.",
         )
         soundsSection.add(.item(
             name: OWSLocalizedString(
                 "SETTINGS_ITEM_NOTIFICATION_SOUND",
-                comment: "Label for settings view that allows user to change the notification sound."
+                comment: "Label for settings view that allows user to change the notification sound.",
             ),
-            accessoryText: Sounds.globalNotificationSound.displayName,
+            accessoryText: db.read { tx in
+                notificationPreferencesManager.globalNotificationSound(tx: tx).displayName
+            },
             actionBlock: { [weak self] in
                 let vc = NotificationSettingsSoundViewController { self?.updateTableContents() }
                 self?.present(OWSNavigationController(rootViewController: vc), animated: true)
-            }
+            },
         ))
         soundsSection.add(.switch(
             withText: OWSLocalizedString(
                 "NOTIFICATIONS_SECTION_INAPP",
-                comment: "Table cell switch label. When disabled, Signal will not play notification sounds while the app is in the foreground."
+                comment: "Table cell switch label. When disabled, Signal will not play notification sounds while the app is in the foreground.",
             ),
-            isOn: { SSKEnvironment.shared.preferencesRef.soundInForeground },
-            target: self,
-            selector: #selector(didToggleSoundNotificationsSwitch)
+            isOn: {
+                db.read { tx in
+                    notificationPreferencesManager.playSoundInForeground(tx: tx)
+                }
+            },
+            actionBlock: { [weak self] uiSwitch in
+                self?.didToggleSoundNotifications(uiSwitch)
+            },
         ))
-        contents.add(soundsSection)
+        let messageSentSoundEnabled = db.read { tx in
+            notificationPreferencesManager.playSoundInForeground(tx: tx)
+        }
+        soundsSection.add(.switch(
+            withText: OWSLocalizedString(
+                "SETTINGS_MESSAGE_SENT_SOUND",
+                comment: "Setting for enabling & disabling the sound effect played when a message is sent.",
+            ),
+            textColor: messageSentSoundEnabled ? nil : UIColor.Signal.secondaryLabel,
+            isOn: {
+                messageSentSoundEnabled && db.read { tx in
+                    notificationPreferencesManager.isMessageSentSoundEnabled(tx: tx)
+                }
+            },
+            isEnabled: { messageSentSoundEnabled },
+            actionBlock: { [weak self] uiSwitch in
+                self?.didToggleMessageSentSound(uiSwitch)
+            },
+        ))
+        return soundsSection
+    }
 
-        let notificationContentSection = OWSTableSection()
-        notificationContentSection.headerTitle = OWSLocalizedString(
-            "SETTINGS_NOTIFICATION_CONTENT_TITLE",
-            comment: "table section header"
+    private func buildNotificationsSection() -> OWSTableSection {
+        let notificationsSection = OWSTableSection()
+        notificationsSection.headerTitle = OWSLocalizedString(
+            "SETTINGS_NOTIFICATIONS",
+            comment: "The title for the notification settings.",
         )
-        notificationContentSection.footerTitle = OWSLocalizedString(
+        notificationsSection.footerTitle = OWSLocalizedString(
             "SETTINGS_NOTIFICATION_CONTENT_DESCRIPTION",
-            comment: "table section footer"
+            comment: "table section footer",
         )
-        notificationContentSection.add(.disclosureItem(
+        notificationsSection.add(.disclosureItem(
             withText: OWSLocalizedString("NOTIFICATIONS_SHOW", comment: ""),
-            accessoryText: SSKEnvironment.shared.databaseStorageRef.read { tx in
-                return SSKEnvironment.shared.preferencesRef.notificationPreviewType(tx: tx).displayName
+            accessoryText: DependenciesBridge.shared.db.read { tx in
+                return DependenciesBridge.shared.notificationPreferencesManager.previewType(tx: tx).displayName
             },
             actionBlock: { [weak self] in
                 let vc = NotificationSettingsContentViewController()
                 self?.navigationController?.pushViewController(vc, animated: true)
-            }
+            },
         ))
-        contents.add(notificationContentSection)
+        if BuildFlags.improvedNotifications {
+            notificationsSection.add(.disclosureItem(
+                withText: NotificationSettingsWhileMutedViewController.titleString,
+                accessoryText: DependenciesBridge.shared.db.read { tx in
+                    DependenciesBridge.shared.notificationPreferencesManager.whileMutedEnabledString(tx: tx)
+                },
+                actionBlock: { [weak self] in
+                    let vc = NotificationSettingsWhileMutedViewController()
+                    self?.navigationController?.pushViewController(vc, animated: true)
+                },
+            ))
+        }
+        return notificationsSection
+    }
 
-        let badgeCountSection = OWSTableSection()
-        badgeCountSection.headerTitle = OWSLocalizedString(
-            "SETTINGS_NOTIFICATION_BADGE_COUNT_TITLE",
-            comment: "table section header"
+    private func buildUnreadRemindersSection() -> OWSTableSection {
+        let db = DependenciesBridge.shared.db
+        let notificationPreferencesManager = DependenciesBridge.shared.notificationPreferencesManager
+        let unreadRemindersSection = OWSTableSection()
+        unreadRemindersSection.footerTitle = OWSLocalizedString(
+            "SETTINGS_NOTIFICATIONS_UNREAD_REMINDERS_FOOTER",
+            comment: "Explanation for the switch controlling whether reminders about unread messages in muted chats are shown.",
         )
-        badgeCountSection.add(.switch(
+        unreadRemindersSection.add(.switch(
+            withText: OWSLocalizedString(
+                "SETTINGS_NOTIFICATIONS_UNREAD_REMINDERS",
+                comment: "Label for the switch controlling whether reminders about unread messages in muted chats are shown.",
+            ),
+            isOn: {
+                db.read { tx in
+                    notificationPreferencesManager.globalShowUnreadReminders(tx: tx)
+                }
+            },
+            actionBlock: { uiSwitch in
+                db.write { tx in
+                    DependenciesBridge.shared.unreadReminderManager.setGlobalShowUnreadReminders(
+                        uiSwitch.isOn,
+                        updateStorageService: true,
+                        tx: tx,
+                    )
+                }
+            },
+        ))
+        return unreadRemindersSection
+    }
+
+    private func buildReactionsSection() -> OWSTableSection {
+        let db = DependenciesBridge.shared.db
+        let notificationPreferencesManager = DependenciesBridge.shared.notificationPreferencesManager
+        let reactionsSection = OWSTableSection()
+        reactionsSection.footerTitle = OWSLocalizedString(
+            "SETTINGS_NOTIFICATIONS_REACTIONS_FOOTER",
+            comment: "Explanation for the switch controlling whether reactions to your messages generate notifications.",
+        )
+        reactionsSection.add(.switch(
+            withText: OWSLocalizedString(
+                "SETTINGS_NOTIFICATIONS_REACTIONS",
+                comment: "Label for a switch controlling whether reactions to your messages generate notifications.",
+            ),
+            isOn: {
+                db.read { tx in
+                    notificationPreferencesManager.areReactionNotificationsEnabled(tx: tx)
+                }
+            },
+            actionBlock: { uiSwitch in
+                db.write { tx in
+                    notificationPreferencesManager.setAreReactionNotificationsEnabled(
+                        uiSwitch.isOn,
+                        updateStorageService: true,
+                        tx: tx,
+                    )
+                }
+            },
+        ))
+        return reactionsSection
+    }
+
+    private func buildAppBadgeSection() -> OWSTableSection {
+        let db = DependenciesBridge.shared.db
+        let appBadgeSection = OWSTableSection()
+        appBadgeSection.headerTitle = OWSLocalizedString(
+            "SETTINGS_NOTIFICATIONS_APP_BADGE_SECTION",
+            comment: "Header for the section of notification settings controlling the app icon's badge.",
+        )
+        if BuildFlags.improvedNotifications {
+            appBadgeSection.add(.disclosureItem(
+                withText: OWSLocalizedString(
+                    "SETTINGS_NOTIFICATION_BADGE_COUNT",
+                    comment: "Label for the setting controlling whether the app icon badge counts unread messages or unread chats.",
+                ),
+                accessoryText: db.read { tx in
+                    DependenciesBridge.shared.notificationPreferencesManager.badgeCountType(tx: tx).title
+                },
+                actionBlock: { [weak self] in
+                    let vc = NotificationSettingsBadgeCountViewController()
+                    self?.navigationController?.pushViewController(vc, animated: true)
+                },
+            ))
+        }
+        appBadgeSection.add(.switch(
             withText: OWSLocalizedString(
                 "SETTINGS_NOTIFICATION_BADGE_COUNT_INCLUDES_MUTED_CONVERSATIONS",
-                comment: "A setting controlling whether muted conversations are shown in the badge count"
+                comment: "A setting controlling whether muted conversations are shown in the badge count",
             ),
             isOn: {
-                SSKEnvironment.shared.databaseStorageRef.read { SSKPreferences.includeMutedThreadsInBadgeCount(transaction: $0) }
+                db.read { tx in
+                    DependenciesBridge.shared.notificationPreferencesManager.includeMutedThreadsInBadgeCount(tx: tx)
+                }
             },
-            target: self,
-            selector: #selector(didToggleIncludesMutedConversationsInBadgeCountSwitch)
+            actionBlock: { [weak self] uiSwitch in
+                self?.didToggleIncludesMutedConversationsInBadgeCount(uiSwitch)
+            },
         ))
-        contents.add(badgeCountSection)
+        return appBadgeSection
+    }
 
-        let notifyWhenSection = OWSTableSection()
-        notifyWhenSection.headerTitle = OWSLocalizedString(
-            "SETTINGS_NOTIFICATION_NOTIFY_WHEN_TITLE",
-            comment: "table section header"
+    private func buildContactJoinedSignalSection() -> OWSTableSection {
+        let contactJoinedSignalSection = OWSTableSection()
+        contactJoinedSignalSection.footerTitle = OWSLocalizedString(
+            "SETTINGS_NOTIFICATIONS_CONTACT_JOINED_SIGNAL_FOOTER",
+            comment: "Explanation for the switch controlling whether a notification is shown when a phone contact joins Signal.",
         )
-        notifyWhenSection.add(.switch(
+        contactJoinedSignalSection.add(.switch(
             withText: OWSLocalizedString(
                 "SETTINGS_NOTIFICATION_EVENTS_CONTACT_JOINED_SIGNAL",
-                comment: "When the local device discovers a contact has recently installed signal, the app can generates a message encouraging the local user to say hello. Turning this switch off disables that feature."
+                comment: "When the local device discovers a contact has recently installed signal, the app can generates a message encouraging the local user to say hello. Turning this switch off disables that feature.",
             ),
             isOn: {
-                SSKEnvironment.shared.databaseStorageRef.read { SSKEnvironment.shared.preferencesRef.shouldNotifyOfNewAccounts(transaction: $0) }
+                DependenciesBridge.shared.db.read { tx in
+                    DependenciesBridge.shared.notificationPreferencesManager.shouldNotifyOfNewAccounts(tx: tx)
+                }
             },
-            target: self,
-            selector: #selector(didToggleshouldNotifyOfNewAccountsSwitch)
+            actionBlock: { [weak self] uiSwitch in
+                self?.didToggleshouldNotifyOfNewAccounts(uiSwitch)
+            },
         ))
-        contents.add(notifyWhenSection)
+        return contactJoinedSignalSection
+    }
 
+    private func buildReregisterPushSection() -> OWSTableSection {
         let reregisterPushSection = OWSTableSection()
         reregisterPushSection.add(.item(
             name: OWSLocalizedString("REREGISTER_FOR_PUSH", comment: ""),
             actionBlock: { [weak self] in
                 self?.syncPushTokens()
-            }
+            },
         ))
-        contents.add(reregisterPushSection)
+        return reregisterPushSection
+    }
 
+    /// Radar: the push notification relay (APNs via push.radar.chat).
+    private func buildPushRelaySection() -> OWSTableSection {
         let pushRelaySection = OWSTableSection()
         pushRelaySection.headerTitle = OWSLocalizedString(
             "RADAR_PUSH_RELAY_SECTION_HEADER",
-            comment: "Header for the Radar push notification relay setting section."
+            comment: "Header for the Radar push notification relay setting section.",
         )
         pushRelaySection.footerTitle = OWSLocalizedString(
             "RADAR_PUSH_RELAY_FOOTER",
-            comment: "Footer explaining what the Radar push relay does and the implications of disabling it."
+            comment: "Footer explaining what the Radar push relay does and the implications of disabling it.",
         )
         pushRelaySection.add(.switch(
             withText: OWSLocalizedString(
                 "RADAR_PUSH_RELAY_TOGGLE_LABEL",
-                comment: "Label for the switch that enables/disables the Radar push notification relay."
+                comment: "Label for the switch that enables/disables the Radar push notification relay.",
             ),
             isOn: { RadarPushRelay.isEnabled() },
-            target: self,
-            selector: #selector(didTogglePushRelaySwitch)
+            actionBlock: { uiSwitch in
+                let newValue = uiSwitch.isOn
+                Task { await RadarPushRelay.setEnabled(newValue) }
+            },
         ))
-        contents.add(pushRelaySection)
-
-        self.contents = contents
+        return pushRelaySection
     }
 
-    @objc
-    private func didToggleSoundNotificationsSwitch(_ sender: UISwitch) {
-        SSKEnvironment.shared.preferencesRef.setSoundInForeground(sender.isOn)
+    private func buildResetSection() -> OWSTableSection {
+        let resetSection = OWSTableSection()
+        resetSection.footerTitle = OWSLocalizedString(
+            "SETTINGS_NOTIFICATIONS_RESET_FOOTER",
+            comment: "Explanation for the button that resets all notification settings.",
+        )
+        resetSection.add(.item(
+            name: OWSLocalizedString(
+                "SETTINGS_NOTIFICATIONS_RESET",
+                comment: "Label for a button that resets all notification settings to their defaults.",
+            ),
+            textColor: .Signal.red,
+            actionBlock: { [weak self] in
+                self?.didTapResetNotificationSettings()
+            },
+        ))
+        return resetSection
     }
 
-    @objc
-    private func didToggleIncludesMutedConversationsInBadgeCountSwitch(_ sender: UISwitch) {
-        SSKEnvironment.shared.databaseStorageRef.write { tx in SSKPreferences.setIncludeMutedThreadsInBadgeCount(sender.isOn, transaction: tx) }
+    private func didTapResetNotificationSettings() {
+        let actionSheet = ActionSheetController(message: OWSLocalizedString(
+            "SETTINGS_NOTIFICATIONS_RESET_CONFIRMATION_MESSAGE",
+            comment: "Question confirming that notification settings should be reset.",
+        ))
+        actionSheet.addAction(ActionSheetAction(
+            title: OWSLocalizedString(
+                "SETTINGS_NOTIFICATIONS_RESET_CONFIRMATION_ACTION",
+                comment: "Label for the button that confirms notification settings should be reset.",
+            ),
+            style: .destructive,
+            handler: { [weak self] _ in
+                guard let self else { return }
+                ModalActivityIndicatorViewController.present(
+                    fromViewController: self,
+                    canCancel: false,
+                    asyncBlock: { [weak self] modal in
+                        await self?.resetNotificationSettings()
+                        modal.dismiss()
+                    },
+                )
+            },
+        ))
+        actionSheet.addAction(OWSActionSheets.cancelAction)
+        presentActionSheet(actionSheet)
+    }
+
+    @MainActor
+    private func resetNotificationSettings() async {
+        let notificationPreferencesManager = DependenciesBridge.shared.notificationPreferencesManager
+        await DependenciesBridge.shared.db.awaitableWrite { tx in
+            notificationPreferencesManager.resetAll(tx: tx)
+        }
+        AppEnvironment.shared.badgeManager.invalidateBadgeValue()
+        // The notification preview preference affects how calls are presented
+        AppEnvironment.shared.callService.rebuildCallUIAdapter()
+        updateTableContents()
+    }
+
+    private func didToggleSoundNotifications(_ sender: UISwitch) {
+        DependenciesBridge.shared.db.write { tx in
+            DependenciesBridge.shared.notificationPreferencesManager.setPlaySoundInForeground(sender.isOn, tx: tx)
+        }
+        // Reload table, since the value of this setting affects others (i.e., message sent sound).
+        updateTableContents()
+    }
+
+    private func didToggleMessageSentSound(_ sender: UISwitch) {
+        DependenciesBridge.shared.db.write { tx in
+            DependenciesBridge.shared.notificationPreferencesManager.setIsMessageSentSoundEnabled(sender.isOn, tx: tx)
+        }
+    }
+
+    private func didToggleIncludesMutedConversationsInBadgeCount(_ sender: UISwitch) {
+        DependenciesBridge.shared.db.write { tx in
+            DependenciesBridge.shared.notificationPreferencesManager.setIncludeMutedThreadsInBadgeCount(sender.isOn, tx: tx)
+        }
         AppEnvironment.shared.badgeManager.invalidateBadgeValue()
     }
 
-    @objc
-    private func didToggleshouldNotifyOfNewAccountsSwitch(_ sender: UISwitch) {
-        let currentValue = SSKEnvironment.shared.databaseStorageRef.read { SSKEnvironment.shared.preferencesRef.shouldNotifyOfNewAccounts(transaction: $0) }
+    private func didToggleshouldNotifyOfNewAccounts(_ sender: UISwitch) {
+        let notificationPreferencesManager = DependenciesBridge.shared.notificationPreferencesManager
+        let currentValue = DependenciesBridge.shared.db.read { tx in
+            notificationPreferencesManager.shouldNotifyOfNewAccounts(tx: tx)
+        }
         guard currentValue != sender.isOn else { return }
-        SSKEnvironment.shared.databaseStorageRef.write { SSKEnvironment.shared.preferencesRef.setShouldNotifyOfNewAccounts(sender.isOn, transaction: $0) }
-    }
-
-    @objc
-    private func didTogglePushRelaySwitch(_ sender: UISwitch) {
-        let newValue = sender.isOn
-        Task { await RadarPushRelay.setEnabled(newValue) }
+        DependenciesBridge.shared.db.write { tx in
+            notificationPreferencesManager.setShouldNotifyOfNewAccounts(sender.isOn, tx: tx)
+        }
     }
 
     private func syncPushTokens() {
@@ -171,12 +388,12 @@ class NotificationSettingsViewController: OWSTableViewController2 {
                 try await job.run()
                 OWSActionSheets.showActionSheet(title: OWSLocalizedString(
                     "PUSH_REGISTER_SUCCESS",
-                    comment: "Title of alert shown when push tokens sync job succeeds."
+                    comment: "Title of alert shown when push tokens sync job succeeds.",
                 ))
             } catch {
                 OWSActionSheets.showActionSheet(title: OWSLocalizedString(
                     "REGISTRATION_BODY",
-                    comment: "Title of alert shown when push tokens sync job fails."
+                    comment: "Title of alert shown when push tokens sync job fails.",
                 ))
             }
         }

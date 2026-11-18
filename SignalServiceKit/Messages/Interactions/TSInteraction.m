@@ -4,7 +4,6 @@
 //
 
 #import "TSInteraction.h"
-#import "TSThread.h"
 #import <SignalServiceKit/SignalServiceKit-Swift.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -36,6 +35,10 @@ NSString *NSStringFromOWSInteractionType(OWSInteractionType value)
             return @"OWSInteractionType_UnknownThreadWarning";
         case OWSInteractionType_DefaultDisappearingMessageTimer:
             return @"OWSInteractionType_DefaultDisappearingMessageTimer";
+        case OWSInteractionType_CollapseSet:
+            return @"OWSInteractionType_CollapseSet";
+        case OWSInteractionType_ReleaseNotesMessage:
+            return @"OWSInteractionType_ReleaseNotesMessage";
     }
 }
 
@@ -56,7 +59,7 @@ NSString *NSStringFromOWSInteractionType(OWSInteractionType value)
 - (instancetype)initWithCustomUniqueId:(NSString *)uniqueId
                              timestamp:(uint64_t)timestamp
                    receivedAtTimestamp:(uint64_t)receivedAtTimestamp
-                                thread:(TSThread *)thread
+                        threadUniqueId:(NSString *)threadUniqueId
 {
     self = [super initWithUniqueId:uniqueId];
 
@@ -66,7 +69,7 @@ NSString *NSStringFromOWSInteractionType(OWSInteractionType value)
 
     _timestamp = timestamp;
     _receivedAtTimestamp = receivedAtTimestamp;
-    _uniqueThreadId = thread.uniqueId;
+    _uniqueThreadId = threadUniqueId;
 
     return self;
 }
@@ -125,21 +128,39 @@ NSString *NSStringFromOWSInteractionType(OWSInteractionType value)
 
 // --- CODE GENERATION MARKER
 
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [self encodeIdsWithCoder:coder];
+    [coder encodeObject:[self valueForKey:@"receivedAtTimestamp"] forKey:@"receivedAtTimestamp"];
+    [coder encodeObject:[self valueForKey:@"sortId"] forKey:@"sortId"];
+    [coder encodeObject:[self valueForKey:@"timestamp"] forKey:@"timestamp"];
+    NSString *uniqueThreadId = self.uniqueThreadId;
+    if (uniqueThreadId != nil) {
+        [coder encodeObject:uniqueThreadId forKey:@"uniqueThreadId"];
+    }
+}
+
 - (nullable instancetype)initWithCoder:(NSCoder *)coder
 {
     self = [super initWithCoder:coder];
     if (!self) {
-        return nil;
+        return self;
     }
+    self->_receivedAtTimestamp = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                                  forKey:@"receivedAtTimestamp"] unsignedLongLongValue];
+    self->_sortId = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class] forKey:@"sortId"] unsignedLongValue];
+    self->_timestamp = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                        forKey:@"timestamp"] unsignedLongLongValue];
+    self->_uniqueThreadId = [coder decodeObjectOfClass:[NSString class] forKey:@"uniqueThreadId"];
 
     // Previously the receivedAtTimestamp field lived on TSMessage, but we've moved it up
     // to the TSInteraction superclass.
     if (_receivedAtTimestamp == 0) {
         // Upgrade from the older "TSMessage.receivedAtDate" and "TSMessage.receivedAt" properties if
         // necessary.
-        NSDate *receivedAtDate = [coder decodeObjectForKey:@"receivedAtDate"];
+        NSDate *receivedAtDate = [coder decodeObjectOfClass:[NSDate class] forKey:@"receivedAtDate"];
         if (!receivedAtDate) {
-            receivedAtDate = [coder decodeObjectForKey:@"receivedAt"];
+            receivedAtDate = [coder decodeObjectOfClass:[NSDate class] forKey:@"receivedAt"];
         }
 
         if (receivedAtDate) {
@@ -155,6 +176,37 @@ NSString *NSStringFromOWSInteractionType(OWSInteractionType value)
     return self;
 }
 
+- (NSUInteger)hash
+{
+    NSUInteger result = [super hash];
+    result ^= self.receivedAtTimestamp;
+    result ^= self.sortId;
+    result ^= self.timestamp;
+    result ^= self.uniqueThreadId.hash;
+    return result;
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (![super isEqual:other]) {
+        return NO;
+    }
+    TSInteraction *typedOther = (TSInteraction *)other;
+    if (self.receivedAtTimestamp != typedOther.receivedAtTimestamp) {
+        return NO;
+    }
+    if (self.sortId != typedOther.sortId) {
+        return NO;
+    }
+    if (self.timestamp != typedOther.timestamp) {
+        return NO;
+    }
+    if (![NSObject isObject:self.uniqueThreadId equalToObject:typedOther.uniqueThreadId]) {
+        return NO;
+    }
+    return YES;
+}
+
 #pragma mark Thread
 
 - (nullable TSThread *)threadWithTx:(DBReadTransaction *)tx
@@ -166,7 +218,7 @@ NSString *NSStringFromOWSInteractionType(OWSInteractionType value)
     }
 
     // However, it's also possible that the thread doesn't exist.
-    return [TSThread anyFetchWithUniqueId:self.uniqueThreadId transaction:tx];
+    return [TSThread fetchViaCacheObjCWithUniqueId:self.uniqueThreadId transaction:tx];
 }
 
 #pragma mark Date operations
@@ -183,8 +235,6 @@ NSString *NSStringFromOWSInteractionType(OWSInteractionType value)
 
 - (OWSInteractionType)interactionType
 {
-    OWSFailDebug(@"unknown interaction type.");
-
     return OWSInteractionType_Unknown;
 }
 

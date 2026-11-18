@@ -20,13 +20,13 @@ class MediaPageViewController: UIPageViewController {
         initialMediaAttachment: ReferencedAttachment,
         thread: TSThread,
         spoilerState: SpoilerRenderState,
-        showingSingleMessage: Bool = false
+        showingSingleMessage: Bool = false,
     ) {
         self.init(
             initialMediaAttachment: initialMediaAttachment,
             mediaGallery: MediaGallery(thread: thread, mediaCategory: .photoVideo, spoilerState: spoilerState),
             spoilerState: spoilerState,
-            showingSingleMessage: showingSingleMessage
+            showingSingleMessage: showingSingleMessage,
         )
     }
 
@@ -34,7 +34,7 @@ class MediaPageViewController: UIPageViewController {
         initialMediaAttachment: ReferencedAttachment,
         mediaGallery: MediaGallery,
         spoilerState: SpoilerRenderState,
-        showingSingleMessage: Bool = false
+        showingSingleMessage: Bool = false,
     ) {
         self.mediaGallery = mediaGallery
         self.spoilerState = spoilerState
@@ -52,7 +52,7 @@ class MediaPageViewController: UIPageViewController {
         super.init(
             transitionStyle: .scroll,
             navigationOrientation: .horizontal,
-            options: [.interPageSpacing: 20]
+            options: [.interPageSpacing: 20],
         )
 
         extendedLayoutIncludesOpaqueBars = true
@@ -61,37 +61,57 @@ class MediaPageViewController: UIPageViewController {
         dataSource = self
         delegate = self
         transitioningDelegate = self
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(Self.newAttachmentsAvailable(_:)),
+            name: MediaGalleryChangeInfo.newAttachmentsAvailableNotification,
+            object: nil,
+        )
     }
 
-    @available(*, unavailable, message: "Unimplemented")
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     // MARK: - Controls
 
-    private var needsCompactToolbars: Bool {
-        traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .compact
-    }
-
     // Top Bar
-    private lazy var topPanel = buildChromePanelView()
-    private var topBarVerticalPositionConstraint: NSLayoutConstraint?
-    private var topBarHeightConstraint: NSLayoutConstraint?
-    private var topBarHeight: CGFloat { needsCompactToolbars ? 32 : 44 }
+    private lazy var topPanel: UIView = {
+        let view = UIView()
+        view.preservesSuperviewLayoutMargins = true
+
+        // iOS 26: Transparent bar with glass backgrounds for controls.
+        // Pre-iOS 26: blur background.
+        if #unavailable(iOS 26) {
+            let blurBackgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterial))
+            blurBackgroundView.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(blurBackgroundView)
+            NSLayoutConstraint.activate([
+                blurBackgroundView.topAnchor.constraint(equalTo: view.topAnchor),
+                blurBackgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                blurBackgroundView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                blurBackgroundView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            ])
+        }
+        return view
+    }()
+
+    private var navigationBarVerticalPositionConstraint: NSLayoutConstraint?
 
     // Bottom Bar
     private lazy var bottomMediaPanel = MediaControlPanelView(
         mediaGallery: mediaGallery,
         delegate: self,
         spoilerState: spoilerState,
-        isLandscapeLayout: traitCollection.verticalSizeClass == .compact
     )
 
     // MARK: UIViewController
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        guard !Theme.isDarkThemeEnabled else {
+        guard Theme.forceDarkThemeForMedia else { return .default }
+
+        if Theme.isDarkThemeEnabled {
             return .lightContent
         }
 
@@ -121,7 +141,10 @@ class MediaPageViewController: UIPageViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = Theme.darkThemeBackgroundColor
+        if Theme.forceDarkThemeForMedia {
+            overrideUserInterfaceStyle = .dark
+        }
+        view.backgroundColor = .Signal.mediaBackground
 
         mediaInteractiveDismiss.addGestureRecognizer(to: view)
 
@@ -131,31 +154,55 @@ class MediaPageViewController: UIPageViewController {
         // Use UINavigation bar to ensure position of the < back button matches exactly of one in the presenting VC.
         let navigationBar = UINavigationBar()
         navigationBar.delegate = self
-        navigationBar.tintColor = Theme.darkThemePrimaryColor
+        navigationBar.tintColor = .Signal.label
+        navigationBar.isUserInteractionEnabled = true
         let appearance = UINavigationBarAppearance()
         appearance.configureWithTransparentBackground()
         navigationBar.standardAppearance = appearance
         navigationBar.compactAppearance = appearance
         navigationBar.scrollEdgeAppearance = appearance
-        navigationBar.overrideUserInterfaceStyle = .dark
-        navigationBar.setItems([ UINavigationItem(title: ""), navigationItem ], animated: false)
+        navigationBar.setItems([UINavigationItem(title: ""), navigationItem], animated: false)
+        navigationBar.translatesAutoresizingMaskIntoConstraints = false
         topPanel.addSubview(navigationBar)
-        navigationBar.autoPinEdge(toSuperviewSafeArea: .leading)
-        navigationBar.autoPinEdge(toSuperviewSafeArea: .trailing)
-        navigationBar.autoPinEdge(toSuperviewEdge: .bottom)
+
         // See `viewSafeAreaInsetsDidChange` why this is needed.
-        topBarVerticalPositionConstraint = navigationBar.autoPinEdge(toSuperviewEdge: .top)
-        topBarHeightConstraint = navigationBar.autoSetDimension(.height, toSize: topBarHeight)
+        navigationBarVerticalPositionConstraint = navigationBar.topAnchor.constraint(equalTo: topPanel.topAnchor)
+        NSLayoutConstraint.activate([
+            navigationBarVerticalPositionConstraint!,
+            navigationBar.bottomAnchor.constraint(equalTo: topPanel.bottomAnchor),
+        ])
+
+        // On iOS 26 navigation bar extends all the way to left and right screen edges even in landscape.
+        if #available(iOS 26, *) {
+            NSLayoutConstraint.activate([
+                navigationBar.leadingAnchor.constraint(equalTo: topPanel.leadingAnchor),
+                navigationBar.trailingAnchor.constraint(equalTo: topPanel.trailingAnchor),
+            ])
+        } else {
+            NSLayoutConstraint.activate([
+                navigationBar.leadingAnchor.constraint(equalTo: topPanel.safeAreaLayoutGuide.leadingAnchor),
+                navigationBar.trailingAnchor.constraint(equalTo: topPanel.safeAreaLayoutGuide.trailingAnchor),
+            ])
+        }
+
+        // Add top panel and constrain it to view's leading, top and trailing edges.
+        // Navigation bar (set up above) determines this panel's height.
+        topPanel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(topPanel)
-        topPanel.autoPinWidthToSuperview()
-        topPanel.autoPinEdge(toSuperviewEdge: .top)
-        updateContextMenuButtonIcon()
+        NSLayoutConstraint.activate([
+            topPanel.topAnchor.constraint(equalTo: view.topAnchor),
+            topPanel.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            topPanel.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+        ])
 
         // Bottom panel
+        bottomMediaPanel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(bottomMediaPanel)
-        bottomMediaPanel.autoPinEdgesToSuperviewEdges(with: .zero, excludingEdge: .top)
-
-        updateControlsForCurrentOrientation()
+        NSLayoutConstraint.activate([
+            bottomMediaPanel.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            bottomMediaPanel.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            bottomMediaPanel.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
 
         // Load initial page and update all UI to reflect it.
         setCurrentItem(initialGalleryItem, direction: .forward, shouldAutoPlayVideo: true, animated: false)
@@ -173,24 +220,33 @@ class MediaPageViewController: UIPageViewController {
         if traitCollection.verticalSizeClass != previousTraitCollection?.verticalSizeClass {
             updateControlsForCurrentOrientation()
         }
-        if let topBarHeightConstraint {
-            topBarHeightConstraint.constant = topBarHeight
-        }
-        updateContextMenuButtonIcon()
     }
 
     override func viewSafeAreaInsetsDidChange() {
         super.viewSafeAreaInsetsDidChange()
-        if let topBarVerticalPositionConstraint {
+        if let navigationBarVerticalPositionConstraint {
             // On iPhones with a Dynamic Island standard position of a navigation bar is bottom of the status bar,
-            // which is ~5 dp smaller than the top safe area (https://useyourloaf.com/blog/iphone-14-screen-sizes/) .
+            // which is ~5 dp smaller than the top safe area inset (https://useyourloaf.com/blog/iphone-14-screen-sizes/) .
             // Since it is not possible to constrain top edge of our manually maintained navigation bar to that position
-            // the workaround is to detect exactly safe area of 59 points and decrease it.
+            // the workaround is to detect when top safe area inset is larger than the status bar height and adjust as needed.
             var topInset = view.safeAreaInsets.top
-            if topInset == 59 {
-                topInset -= 5 + .hairlineWidth
+            if
+                #unavailable(iOS 26),
+                let statusBarHeight = view.window?.windowScene?.statusBarManager?.statusBarFrame.height,
+                statusBarHeight < topInset
+            {
+                topInset = statusBarHeight
+                if #available(iOS 18, *) {
+                    topInset += (2 + hairlineWidth)
+                } else if #available(iOS 16, *) {
+                    topInset -= hairlineWidth
+                }
             }
-            topBarVerticalPositionConstraint.constant = topInset
+            // On iOS 26 in landscape the navigation bar is offset 24 dp from the screen top edge.
+            if #available(iOS 26, *), topInset.isZero {
+                topInset = 24
+            }
+            navigationBarVerticalPositionConstraint.constant = topInset
         }
     }
 
@@ -205,16 +261,22 @@ class MediaPageViewController: UIPageViewController {
 
     private func buildGalleryPage(galleryItem: MediaGalleryItem) -> MediaItemViewController {
         if let cachedPage = cachedPages[galleryItem] {
-            Logger.debug("cache hit.")
             return cachedPage
         }
-
-        Logger.debug("cache miss.")
-
         let viewController = MediaItemViewController(galleryItem: galleryItem)
         viewController.delegate = self
         cachedPages[galleryItem] = viewController
         return viewController
+    }
+
+    private func replaceCurrentItem(item: MediaGalleryItem) {
+        guard let currentViewController else { return }
+        currentViewController.replaceGalleryItem(item: item)
+        updateControlsForCurrentOrientation()
+        didTransitionToNewPage(
+            animated: true,
+            direction: nil,
+        )
     }
 
     private var currentViewController: MediaItemViewController? {
@@ -233,7 +295,7 @@ class MediaPageViewController: UIPageViewController {
         _ item: MediaGalleryItem,
         direction: UIPageViewController.NavigationDirection,
         shouldAutoPlayVideo: Bool = false,
-        animated: Bool
+        animated: Bool,
     ) {
         if let previousPage = viewControllers?.first as? MediaItemViewController {
             previousPage.videoPlaybackStatusObserver = nil
@@ -242,13 +304,13 @@ class MediaPageViewController: UIPageViewController {
         }
 
         let mediaPage = buildGalleryPage(galleryItem: item)
-        mediaPage.shouldAutoPlayVideo = true
+        mediaPage.shouldAutoPlayVideo = item.isVideoReadyToPlay
         setViewControllers([mediaPage], direction: direction, animated: animated) { _ in
             self.didTransitionToNewPage(animated: animated, direction: direction)
         }
     }
 
-    private func didTransitionToNewPage(animated: Bool, direction: UIPageViewController.NavigationDirection) {
+    private func didTransitionToNewPage(animated: Bool, direction: UIPageViewController.NavigationDirection?) {
         guard let currentViewController else {
             owsFailBeta("No MediaItemViewController")
             return
@@ -258,13 +320,13 @@ class MediaPageViewController: UIPageViewController {
             currentViewController.galleryItem,
             videoPlayer: currentViewController.videoPlayer,
             transitionDirection: direction,
-            animated: animated
+            animated: animated,
         )
 
         updateScreenTitle(using: currentViewController.galleryItem)
-        updateContextMenuActions()
         currentViewController.videoPlaybackStatusObserver = bottomMediaPanel
         showOrHideTopAndBottomPanelsAsNecessary(animated: animated)
+        updateControlsForCurrentOrientation()
     }
 
     // MARK: Show / hide toolbars
@@ -285,119 +347,98 @@ class MediaPageViewController: UIPageViewController {
     private func showOrHideTopAndBottomPanelsAsNecessary(animated: Bool) {
         topPanel.setIsHidden(shouldHideToolbars, animated: animated)
         bottomMediaPanel.setIsHidden(shouldHideToolbars || bottomMediaPanel.shouldBeHidden, animated: animated)
+        if #available(iOS 26, *) {
+            let targetColor: UIColor = shouldHideToolbars ? .black : .Signal.mediaBackground
+            if animated {
+                let animator = UIViewPropertyAnimator(duration: 0.2, curve: .easeInOut)
+                animator.addAnimations {
+                    self.view.backgroundColor = targetColor
+                }
+                animator.startAnimation()
+            } else {
+                view.backgroundColor = targetColor
+            }
+        }
     }
 
     private var shouldHideStatusBar: Bool {
-        guard !UIDevice.current.isIPad else { return shouldHideToolbars }
+        guard traitCollection.userInterfaceIdiom == .phone else { return shouldHideToolbars }
         return shouldHideToolbars || traitCollection.verticalSizeClass == .compact
     }
 
     private func updateControlsForCurrentOrientation() {
-        bottomMediaPanel.isLandscapeLayout = traitCollection.verticalSizeClass == .compact
-
         // Bottom bar might be hidden while in landscape and visible in portrait, for the same media.
         showOrHideTopAndBottomPanelsAsNecessary(animated: false)
 
-        if bottomMediaPanel.isLandscapeLayout {
+        if traitCollection.verticalSizeClass == .compact {
             // Order of buttons is reversed: first button in array is the outermost in the navbar.
-            navigationItem.rightBarButtonItems = [ contextMenuBarButton, barButtonForwardMedia, barButtonShareMedia ]
+            navigationItem.rightBarButtonItems = [buildContextMenuBarButton(), barButtonForwardMedia, barButtonShareMedia]
         } else {
-            navigationItem.rightBarButtonItems = [ contextMenuBarButton ]
+            navigationItem.rightBarButtonItems = [buildContextMenuBarButton()]
         }
     }
 
     // MARK: Context Menu
 
-    private lazy var contextMenuBarButton: UIBarButtonItem = {
-        let contextButton = ContextMenuButton(empty: ())
-        contextButton.overrideUserInterfaceStyle = .dark
-        return UIBarButtonItem(customView: contextButton)
-    }()
-
-    private func updateContextMenuButtonIcon() {
-        guard let button = contextMenuBarButton.customView as? UIButton else {
-            owsFailDebug("button is nil")
-            return
-        }
-        let imageResourceName = needsCompactToolbars ? "more-circle-20" : "more-circle"
-        let buttonImage = UIImage(imageLiteralResourceName: imageResourceName)
-        button.setImage(buttonImage, for: .normal)
-    }
-
-    private func updateContextMenuActions() {
-        guard let contextMenuButton = contextMenuBarButton.customView as? ContextMenuButton else {
-            owsFailDebug("contextMenuButton == nil")
-            return
-        }
-
-        var contextMenuActions = [UIAction]()
-        // TODO: Video Playback Speed
-        // TODO: Edit
-        contextMenuActions.append(UIAction(
-            title: OWSLocalizedString(
-                "MEDIA_VIEWER_SAVE_MEDIA_ACTION",
-                comment: "Context menu item in media viewer. Refers to saving currently displayed photo/video to the Photos app."
+    private func buildContextMenuBarButton() -> UIBarButtonItem {
+        .contextMenuButton(actions: [
+            // TODO: Video Playback Speed
+            // TODO: Edit
+            UIAction(
+                title: OWSLocalizedString(
+                    "MEDIA_VIEWER_SAVE_MEDIA_ACTION",
+                    comment: "Context menu item in media viewer. Refers to saving currently displayed photo/video to the Photos app.",
+                ),
+                image: Theme.iconImage(.contextMenuSave),
+                attributes:
+                currentItem.referencedAttachment.asReferencedStream == nil ? .disabled : [],
+                handler: { [weak self] _ in
+                    self?.saveCurrentMediaToPhotos()
+                },
             ),
-            image: Theme.iconImage(.contextMenuSave),
-            handler: { [weak self] _ in
-                self?.saveCurrentMediaToPhotos()
-            }
-        ))
-        contextMenuActions.append(UIAction(
-            title: OWSLocalizedString(
-                "MEDIA_VIEWER_GO_TO_MESSAGE_ACTION",
-                comment: "Context menu item in media viewer. Refers to scrolling the conversation to the currently displayed photo/video."
+            UIAction(
+                title: OWSLocalizedString(
+                    "MEDIA_VIEWER_GO_TO_MESSAGE_ACTION",
+                    comment: "Context menu item in media viewer. Refers to scrolling the conversation to the currently displayed photo/video.",
+                ),
+                image: Theme.iconImage(.buttonMessage),
+                handler: { [weak self] _ in
+                    self?.presentConversationForCurrentMedia()
+                },
             ),
-            image: Theme.iconImage(.buttonMessage),
-            handler: { [weak self] _ in
-                self?.presentConversationForCurrentMedia()
-            }
-        ))
-        contextMenuActions.append(UIAction(
-            title: OWSLocalizedString(
-                "MEDIA_VIEWER_DELETE_MEDIA_ACTION",
-                comment: "Context menu item in media viewer. Refers to deleting currently displayed photo/video."
+            UIAction(
+                title: OWSLocalizedString(
+                    "MEDIA_VIEWER_DELETE_MEDIA_ACTION",
+                    comment: "Context menu item in media viewer. Refers to deleting currently displayed photo/video.",
+                ),
+                image: Theme.iconImage(.contextMenuDelete),
+                attributes: .destructive,
+                handler: { [weak self] _ in
+                    self?.deleteCurrentMedia()
+                },
             ),
-            image: Theme.iconImage(.contextMenuDelete),
-            attributes: .destructive,
-            handler: { [weak self] _ in
-                self?.deleteCurrentMedia()
-            }
-        ))
-        contextMenuButton.setActions(actions: contextMenuActions)
+        ])
     }
 
     // MARK: Bar Buttons
 
-    private lazy var barButtonShareMedia = UIBarButtonItem(
-        image: Theme.iconImage(.buttonShare),
-        landscapeImagePhone: UIImage(imageLiteralResourceName: "share-20"),
-        style: .plain,
-        target: self,
-        action: #selector(didPressShare)
-    )
+    private lazy var barButtonShareMedia: UIBarButtonItem = {
+        let button = UIBarButtonItem.button(icon: .buttonShare) { [weak self] in
+            self?.didPressShare()
+        }
+        button.landscapeImagePhone = UIImage(imageLiteralResourceName: "share-20")
+        return button
+    }()
 
-    private lazy var barButtonForwardMedia = UIBarButtonItem(
-        image: Theme.iconImage(.buttonForward),
-        landscapeImagePhone: UIImage(imageLiteralResourceName: "forward-20"),
-        style: .plain,
-        target: self,
-        action: #selector(didPressForward)
-    )
+    private lazy var barButtonForwardMedia: UIBarButtonItem = {
+        let button = UIBarButtonItem.button(icon: .buttonForward) { [weak self] in
+            self?.didPressForward()
+        }
+        button.landscapeImagePhone = UIImage(imageLiteralResourceName: "forward-20")
+        return button
+    }()
 
     // MARK: Helpers
-
-    private func buildChromePanelView() -> UIView {
-        let view = UIView()
-        view.tintColor = Theme.darkThemePrimaryColor
-        view.preservesSuperviewLayoutMargins = true
-
-        let blurEffect = UIBlurEffect(style: .systemChromeMaterialDark)
-        let blurBackgroundView = UIVisualEffectView(effect: blurEffect)
-        view.addSubview(blurBackgroundView)
-        blurBackgroundView.autoPinEdgesToSuperviewEdges()
-        return view
-    }
 
     private func dismissSelf(animated isAnimated: Bool, completion: (() -> Void)? = nil) {
         guard let currentViewController else { return }
@@ -413,14 +454,12 @@ class MediaPageViewController: UIPageViewController {
 
     // MARK: Actions
 
-    @objc
     private func didTapBackButton(_ sender: Any) {
         Logger.debug("")
         dismissSelf(animated: true)
     }
 
-    @objc
-    private func didPressShare(_ sender: Any) {
+    private func didPressShare() {
         shareCurrentMedia(fromNavigationBar: true)
     }
 
@@ -428,8 +467,7 @@ class MediaPageViewController: UIPageViewController {
     /// item.
     ///
     /// Skips any media that we do not have downloaded.
-    @objc
-    private func didPressForward(_ sender: Any) {
+    private func didPressForward() {
         forwardCurrentMedia()
     }
 
@@ -469,7 +507,7 @@ class MediaPageViewController: UIPageViewController {
                 forAttachmentStreams: mediaAttachmentStreams,
                 fromMessage: messageForCurrentItem,
                 from: self,
-                delegate: self
+                delegate: self,
             )
         default:
             // If we are forwarding multiple items, warn the user first.
@@ -477,17 +515,17 @@ class MediaPageViewController: UIPageViewController {
             let titleFormatString = OWSLocalizedString(
                 "MEDIA_PAGE_FORWARD_MEDIA_CONFIRM_TITLE_%d",
                 tableName: "PluralAware",
-                comment: "Text confirming the user wants to forward media. Embeds {{ %1$@ the number of media to be forwarded }}."
+                comment: "Text confirming the user wants to forward media. Embeds {{ %1$@ the number of media to be forwarded }}.",
             )
 
             OWSActionSheets.showConfirmationAlert(
                 message: OWSLocalizedString(
                     "MEDIA_PAGE_FORWARD_MEDIA_CONFIRM_MESSAGE",
-                    comment: "Text explaining that the user will forward all media from a message."
+                    comment: "Text explaining that the user will forward all media from a message.",
                 ),
                 proceedTitle: String.localizedStringWithFormat(
                     titleFormatString,
-                    mediaCount
+                    mediaCount,
                 ),
                 proceedAction: { [weak self] _ in
                     guard let self else { return }
@@ -496,17 +534,22 @@ class MediaPageViewController: UIPageViewController {
                         forAttachmentStreams: mediaAttachmentStreams,
                         fromMessage: messageForCurrentItem,
                         from: self,
-                        delegate: self
+                        delegate: self,
                     )
-                }
+                },
             )
         }
     }
 
     private func shareCurrentMedia(fromNavigationBar: Bool) {
         guard let currentViewController else { return }
+        guard let stream = currentViewController.galleryItem.referencedAttachment.asReferencedStream else {
+            // TODO: [MediaGallery]: Handle undownloaded media
+            owsFailDebug("Cannot share undownloaded media")
+            return
+        }
         guard
-            let attachmentStream = (try? [currentViewController.galleryItem.attachmentStream].asShareableAttachments())?.first
+            let attachmentStream = (try? [stream].asShareableAttachments())?.first
         else {
             return
         }
@@ -514,13 +557,37 @@ class MediaPageViewController: UIPageViewController {
         AttachmentSharing.showShareUI(for: attachmentStream, sender: sender)
     }
 
+    @objc
+    private func newAttachmentsAvailable(_ notification: Notification) {
+        AssertIsOnMainThread()
+        let incomingNewAttachments = notification.object as! [MediaGalleryChangeInfo]
+        guard
+            incomingNewAttachments.first(where: {
+                $0.referenceId == currentItem.referencedAttachment.reference.referenceId
+            }) != nil
+        else {
+            return
+        }
+
+        if
+            let newItem = mediaGallery.reloadGalleryItem(item: currentItem),
+            newItem.referencedAttachment.reference.referenceId == currentItem.referencedAttachment.reference.referenceId
+        {
+            replaceCurrentItem(item: newItem)
+        }
+    }
+
     // MARK: -
 
     private func saveCurrentMediaToPhotos() {
         guard let mediaItem = currentItem else { return }
-
+        guard let stream = mediaItem.referencedAttachment.asReferencedStream else {
+            // TODO: [MediaGallery]: Handle undownloaded media
+            owsFailDebug("Cannot share undownloaded media")
+            return
+        }
         AttachmentSaving.saveToPhotoLibrary(
-            referencedAttachmentStreams: [mediaItem.attachmentStream]
+            referencedAttachmentStreams: [stream],
         )
     }
 
@@ -531,7 +598,7 @@ class MediaPageViewController: UIPageViewController {
             SignalApp.shared.presentConversationForThread(
                 threadUniqueId: mediaItem.message.uniqueThreadId,
                 focusMessageId: mediaItem.message.uniqueId,
-                animated: true
+                animated: true,
             )
         }
     }
@@ -540,8 +607,10 @@ class MediaPageViewController: UIPageViewController {
         guard let mediaItem = currentItem else { return }
 
         let actionSheet = ActionSheetController(title: nil, message: nil)
-        let deleteAction = ActionSheetAction(title: CommonStrings.deleteButton,
-                                             style: .destructive) { _ in
+        let deleteAction = ActionSheetAction(
+            title: CommonStrings.deleteButton,
+            style: .destructive,
+        ) { _ in
             self.mediaGallery.delete(items: [mediaItem], initiatedBy: self)
         }
         actionSheet.addAction(OWSActionSheets.cancelAction)
@@ -560,6 +629,11 @@ class MediaPageViewController: UIPageViewController {
             }
         case is TSOutgoingMessage:
             return CommonStrings.you
+        case is TSReleaseNotesMessage:
+            return OWSLocalizedString(
+                "RELEASE_NOTES_CHANNEL_NAME",
+                comment: "Display name for the release notes channel",
+            )
         default:
             owsFailDebug("Unknown message type: \(type(of: message))")
             return ""
@@ -576,43 +650,81 @@ class MediaPageViewController: UIPageViewController {
 
     private lazy var headerNameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Theme.darkThemePrimaryColor
-        label.font = UIFont.regularFont(ofSize: 17)
         label.textAlignment = .center
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.8
-
+        label.textColor = .Signal.label
+        if #available(iOS 26, *) {
+            label.font = .dynamicTypeSubheadlineClamped.semibold()
+            // "semibold" fonts aren't dynamic anymore - have to track changes manually.
+            label.registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (label: UILabel, _) in
+                label.font = .dynamicTypeSubheadlineClamped.semibold()
+            }
+        } else {
+            label.font = UIFont.regularFont(ofSize: 15)
+            label.adjustsFontSizeToFitWidth = true
+            label.minimumScaleFactor = 0.8
+        }
         return label
     }()
 
     private lazy var headerDateLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Theme.darkThemePrimaryColor
-        label.font = UIFont.regularFont(ofSize: 12)
         label.textAlignment = .center
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.8
-
+        label.textColor = .Signal.label
+        if #available(iOS 26, *) {
+            label.font = .dynamicTypeCaption1Clamped
+            label.adjustsFontForContentSizeCategory = true
+        } else {
+            label.font = .regularFont(ofSize: 11)
+            label.adjustsFontSizeToFitWidth = true
+            label.minimumScaleFactor = 0.8
+        }
         return label
     }()
 
     private lazy var headerView: UIView = {
-        let stackView = UIStackView(arrangedSubviews: [ headerNameLabel, headerDateLabel ])
+        let stackView = UIStackView(arrangedSubviews: [headerNameLabel, headerDateLabel])
         stackView.axis = .vertical
-        stackView.alignment = .center
-        stackView.spacing = 0
-        stackView.distribution = .fillProportionally
+        stackView.translatesAutoresizingMaskIntoConstraints = false
 
         let containerView = UIView()
-        containerView.layoutMargins = UIEdgeInsets(top: 2, left: 0, bottom: 4, right: 0)
-        containerView.addSubview(stackView)
+        if #available(iOS 26, *) {
+            // Can't return `glassEffectView` as `headerView` because UINavigationBar stretches it to fill width.
+            let glassEffect = UIGlassEffect(style: .regular)
+            glassEffect.isInteractive = true
+            let glassEffectView = UIVisualEffectView(effect: glassEffect)
+            glassEffectView.cornerConfiguration = .capsule()
+            glassEffectView.translatesAutoresizingMaskIntoConstraints = false
+            glassEffectView.contentView.addSubview(stackView)
 
-        stackView.autoPinEdge(toSuperviewMargin: .top, relation: .greaterThanOrEqual)
-        stackView.autoPinEdge(toSuperviewMargin: .trailing, relation: .greaterThanOrEqual)
-        stackView.autoPinEdge(toSuperviewMargin: .bottom, relation: .greaterThanOrEqual)
-        stackView.autoPinEdge(toSuperviewMargin: .leading, relation: .greaterThanOrEqual)
-        stackView.setContentHuggingHigh()
-        stackView.autoCenterInSuperview()
+            let contentInset = UIEdgeInsets(hMargin: 24, vMargin: 4)
+            NSLayoutConstraint.activate([
+                stackView.topAnchor.constraint(greaterThanOrEqualTo: glassEffectView.topAnchor, constant: contentInset.top),
+                stackView.centerYAnchor.constraint(equalTo: glassEffectView.centerYAnchor),
+                stackView.leadingAnchor.constraint(equalTo: glassEffectView.leadingAnchor, constant: contentInset.leading),
+                stackView.trailingAnchor.constraint(equalTo: glassEffectView.trailingAnchor, constant: -contentInset.trailing),
+            ])
+
+            containerView.addSubview(glassEffectView)
+            NSLayoutConstraint.activate([
+                glassEffectView.topAnchor.constraint(equalTo: containerView.topAnchor),
+                glassEffectView.leadingAnchor.constraint(greaterThanOrEqualTo: containerView.leadingAnchor),
+                glassEffectView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+                glassEffectView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+            ])
+
+            // On iOS 26 navigation bar is transparent and can accomodate `titleView` of any height.
+            // Set minimum height to default 44pts thus allowing it to grow with font size.
+            containerView.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
+        } else {
+            containerView.addSubview(stackView)
+            NSLayoutConstraint.activate([
+                stackView.topAnchor.constraint(greaterThanOrEqualTo: containerView.topAnchor),
+                stackView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+
+                stackView.leadingAnchor.constraint(greaterThanOrEqualTo: containerView.leadingAnchor),
+                stackView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            ])
+        }
 
         return containerView
     }()
@@ -630,11 +742,12 @@ extension MediaPageViewController: UIPageViewControllerDelegate {
 
     func pageViewController(
         _ pageViewController: UIPageViewController,
-        willTransitionTo pendingViewControllers: [UIViewController]
+        willTransitionTo pendingViewControllers: [UIViewController],
     ) {
-        guard let currentPage = pageViewController.viewControllers?.first as? MediaItemViewController,
-              let newPage = pendingViewControllers.first as? MediaItemViewController else
-        {
+        guard
+            let currentPage = pageViewController.viewControllers?.first as? MediaItemViewController,
+            let newPage = pendingViewControllers.first as? MediaItemViewController
+        else {
             return
         }
         if currentPage.galleryItem.orderingKey < newPage.galleryItem.orderingKey {
@@ -648,7 +761,7 @@ extension MediaPageViewController: UIPageViewControllerDelegate {
         _ pageViewController: UIPageViewController,
         didFinishAnimating finished: Bool,
         previousViewControllers: [UIViewController],
-        transitionCompleted: Bool
+        transitionCompleted: Bool,
     ) {
         if let previousPage = previousViewControllers.first as? MediaItemViewController {
             previousPage.zoomOut(animated: false)
@@ -752,7 +865,7 @@ extension MediaPageViewController: MediaGalleryDelegate {
     }
 
     func didReloadAllSectionsInMediaGallery(_ mediaGallery: MediaGallery) {
-        let attachment = currentItem.attachmentStream
+        let attachment = currentItem.referencedAttachment
         guard let reloadedItem = mediaGallery.ensureLoadedForDetailView(focusedAttachment: attachment) else {
             // Assume the item was deleted.
             dismissSelf(animated: true)
@@ -819,6 +932,7 @@ extension MediaPageViewController: MediaControlPanelDelegate {
 }
 
 extension MediaPageViewController: MediaPresentationContextProvider {
+
     func mediaPresentationContext(item: Media, in coordinateSpace: UICoordinateSpace) -> MediaPresentationContext? {
         guard let mediaView = currentViewController?.mediaView else { return nil }
 
@@ -827,36 +941,39 @@ extension MediaPageViewController: MediaPresentationContextProvider {
             return nil
         }
 
+        view.layoutIfNeeded()
+
+        let backgroundColor: UIColor = if #available(iOS 26, *) { .Signal.mediaBackground } else { .black }
         return MediaPresentationContext(
             mediaView: mediaView,
-            presentationFrame: mediaView.frame
+            presentationFrame: mediaView.frame,
+            backgroundColor: backgroundColor,
         )
     }
 
-    func snapshotOverlayView(in coordinateSpace: UICoordinateSpace) -> (UIView, CGRect)? {
-        guard !shouldHideToolbars else { return nil }
-        guard let snapshotView = view.snapshotView(afterScreenUpdates: true) else { return nil }
+    func mediaWillPresent(toContext: MediaPresentationContext) {
+        view.backgroundColor = .clear
+    }
 
-        // Apply masking to only show top and bottom panels.
-        let maskLayer = CAShapeLayer()
-        maskLayer.frame = snapshotView.layer.bounds
-        let path = UIBezierPath()
-        path.append(UIBezierPath(rect: topPanel.frame))
-        path.append(UIBezierPath(rect: bottomMediaPanel.frame))
-        maskLayer.path = path.cgPath
-        snapshotView.layer.mask = maskLayer
+    func mediaDidPresent(toContext: MediaPresentationContext) {
+        view.backgroundColor = .Signal.mediaBackground
+    }
 
-        let presentationFrame = coordinateSpace.convert(snapshotView.frame, from: view.superview!)
+    func mediaWillDismiss(fromContext: MediaPresentationContext) {
+        view.backgroundColor = .clear
+    }
 
-        return (snapshotView, presentationFrame)
+    func mediaDidDismiss(fromContext: MediaPresentationContext) {
+        view.backgroundColor = .Signal.mediaBackground
     }
 }
 
 extension MediaPageViewController: UIViewControllerTransitioningDelegate {
-    public func animationController(
+    func animationController(
         forPresented presented: UIViewController,
         presenting: UIViewController,
-        source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        source: UIViewController,
+    ) -> UIViewControllerAnimatedTransitioning? {
         guard self == presented else {
             owsFailDebug("unexpected presented: \(presented)")
             return nil
@@ -865,7 +982,7 @@ extension MediaPageViewController: UIViewControllerTransitioningDelegate {
         return MediaZoomAnimationController(galleryItem: currentItem)
     }
 
-    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         guard self == dismissed else {
             owsFailDebug("unexpected dismissed: \(dismissed)")
             return nil
@@ -873,16 +990,17 @@ extension MediaPageViewController: UIViewControllerTransitioningDelegate {
 
         let animationController = MediaDismissAnimationController(
             galleryItem: currentItem,
-            interactionController: mediaInteractiveDismiss
+            interactionController: mediaInteractiveDismiss,
         )
         mediaInteractiveDismiss.interactiveDismissDelegate = animationController
 
         return animationController
     }
 
-    public func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-        guard let animationController = animator as? MediaDismissAnimationController,
-              animationController.interactionController.interactionInProgress
+    func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+        guard
+            let animationController = animator as? MediaDismissAnimationController,
+            animationController.interactionController.interactionInProgress
         else {
             return nil
         }
@@ -891,17 +1009,17 @@ extension MediaPageViewController: UIViewControllerTransitioningDelegate {
 }
 
 extension MediaPageViewController: ForwardMessageDelegate {
-    public func forwardMessageFlowDidComplete(items: [ForwardMessageItem], recipientThreads: [TSThread]) {
+    func forwardMessageFlowDidComplete(items: [ForwardMessageItem], recipientThreads: [TSThread]) {
         dismiss(animated: true) {
             ForwardMessageViewController.finalizeForward(
                 items: items,
                 recipientThreads: recipientThreads,
-                fromViewController: self
+                fromViewController: self,
             )
         }
     }
 
-    public func forwardMessageFlowDidCancel() {
+    func forwardMessageFlowDidCancel() {
         dismiss(animated: true)
     }
 }

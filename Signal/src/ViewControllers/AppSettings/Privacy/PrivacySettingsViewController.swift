@@ -18,7 +18,7 @@ class PrivacySettingsViewController: OWSTableViewController2 {
             self,
             selector: #selector(updateTableContents),
             name: .syncManagerConfigurationSyncDidComplete,
-            object: nil
+            object: nil,
         )
     }
 
@@ -32,23 +32,24 @@ class PrivacySettingsViewController: OWSTableViewController2 {
     private func updateTableContents() {
         let contents = OWSTableContents()
 
-        let whoCanSection = OWSTableSection()
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
 
-        whoCanSection.add(.disclosureItem(
-            withText: OWSLocalizedString(
-                "SETTINGS_PHONE_NUMBER_PRIVACY_TITLE",
-                comment: "The title for phone number privacy settings."),
-            actionBlock: { [weak self] in
-                let vc = PhoneNumberPrivacySettingsViewController()
-                self?.navigationController?.pushViewController(vc, animated: true)
-            }
-        ))
-        whoCanSection.footerTitle = OWSLocalizedString(
-            "SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL",
-            comment: "Description label for Phone Number Privacy"
-        )
-
-        if !whoCanSection.items.isEmpty {
+        if tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.hasPhoneNumber == true {
+            let whoCanSection = OWSTableSection()
+            whoCanSection.add(.disclosureItem(
+                withText: OWSLocalizedString(
+                    "SETTINGS_PHONE_NUMBER_PRIVACY_TITLE",
+                    comment: "The title for phone number privacy settings.",
+                ),
+                actionBlock: { [weak self] in
+                    let vc = PhoneNumberPrivacySettingsViewController()
+                    self?.navigationController?.pushViewController(vc, animated: true)
+                },
+            ))
+            whoCanSection.footerTitle = OWSLocalizedString(
+                "SETTINGS_PHONE_NUMBER_PRIVACY_DESCRIPTION_LABEL",
+                comment: "Description label for Phone Number Privacy",
+            )
             contents.add(whoCanSection)
         }
 
@@ -56,44 +57,49 @@ class PrivacySettingsViewController: OWSTableViewController2 {
         blockedSection.add(.disclosureItem(
             withText: OWSLocalizedString(
                 "SETTINGS_BLOCK_LIST_TITLE",
-                comment: "Label for the block list section of the settings view"
+                comment: "Label for the block list section of the settings view",
             ),
             actionBlock: { [weak self] in
                 let vc = BlockListViewController()
                 self?.navigationController?.pushViewController(vc, animated: true)
-            }
+            },
         ))
         contents.add(blockedSection)
 
         let messagingSection = OWSTableSection()
         messagingSection.footerTitle = OWSLocalizedString(
             "SETTINGS_MESSAGING_FOOTER",
-            comment: "Explanation for the 'messaging' privacy settings."
+            comment: "Explanation for the 'messaging' privacy settings.",
         )
         messagingSection.add(.switch(
             withText: OWSLocalizedString(
                 "SETTINGS_READ_RECEIPT",
-                comment: "Label for the 'read receipts' setting."
+                comment: "Label for the 'read receipts' setting.",
             ),
-            isOn: { SSKEnvironment.shared.receiptManagerRef.areReadReceiptsEnabled() },
-            target: self,
-            selector: #selector(didToggleReadReceiptsSwitch)
+            isOn: {
+                let databaseStorage = SSKEnvironment.shared.databaseStorageRef
+                return databaseStorage.read(block: OWSReceiptManager.areReadReceiptsEnabled(transaction:))
+            },
+            actionBlock: { [weak self] uiSwitch in
+                self?.didToggleReadReceipts(uiSwitch)
+            },
         ))
         messagingSection.add(.switch(
             withText: OWSLocalizedString(
                 "SETTINGS_TYPING_INDICATORS",
-                comment: "Label for the 'typing indicators' setting."
+                comment: "Label for the 'typing indicators' setting.",
             ),
             isOn: { SSKEnvironment.shared.typingIndicatorsRef.areTypingIndicatorsEnabled() },
-            target: self,
-            selector: #selector(didToggleTypingIndicatorsSwitch)
+            actionBlock: { [weak self] uiSwitch in
+                self?.didToggleTypingIndicators(uiSwitch)
+            },
         ))
         contents.add(messagingSection)
 
         let disappearingMessagesSection = OWSTableSection()
         disappearingMessagesSection.footerTitle = OWSLocalizedString(
             "SETTINGS_DISAPPEARING_MESSAGES_FOOTER",
-            comment: "Explanation for the 'disappearing messages' privacy settings."
+            comment: "Explanation for the 'disappearing messages' privacy settings.",
         )
         let disappearingMessagesConfiguration = SSKEnvironment.shared.databaseStorageRef.read { tx in
             let dmConfigurationStore = DependenciesBridge.shared.disappearingMessagesConfigurationStore
@@ -101,41 +107,57 @@ class PrivacySettingsViewController: OWSTableViewController2 {
         }
         disappearingMessagesSection.add(.init(
             customCellBlock: { [weak self] in
-                guard let self = self else { return UITableViewCell() }
+                guard let self else { return UITableViewCell() }
                 let cell = OWSTableItem.buildCell(
                     itemName: OWSLocalizedString(
                         "SETTINGS_DISAPPEARING_MESSAGES",
-                        comment: "Label for the 'disappearing messages' privacy settings."
+                        comment: "Label for the 'disappearing messages' privacy settings.",
                     ),
                     accessoryText: disappearingMessagesConfiguration.isEnabled
                         ? DateUtil.formatDuration(seconds: disappearingMessagesConfiguration.durationSeconds, useShortFormat: true)
                         : CommonStrings.switchOff,
                     accessoryType: .disclosureIndicator,
-                    accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "disappearing_messages")
+                    accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "disappearing_messages"),
                 )
                 return cell
-            }, actionBlock: { [weak self] in
-                let vc = DisappearingMessagesTimerSettingsViewController(
+            },
+            actionBlock: { [weak self] in
+                guard let self else { return }
+
+                DisappearingMessagesTimerSettingsViewController.present(
+                    fromViewController: self,
                     initialConfiguration: disappearingMessagesConfiguration,
                     settingsMode: .universal,
-                ) { configuration in
-                    if self != nil {
-                        SSKEnvironment.shared.databaseStorageRef.write { transaction in
-                            configuration.anyUpsert(transaction: transaction)
+                ) { [weak self] configuration in
+                    guard let self else { return }
+
+                    let db = DependenciesBridge.shared.db
+                    let storageServiceManager = SSKEnvironment.shared.storageServiceManagerRef
+
+                    db.write { transaction in
+                        var configuration = configuration
+                        if configuration.id == nil {
+                            failIfThrows {
+                                try configuration.insert(transaction.database)
+                            }
+                        } else {
+                            failIfThrows {
+                                try configuration.update(transaction.database)
+                            }
                         }
-                        SSKEnvironment.shared.storageServiceManagerRef.recordPendingLocalAccountUpdates()
                     }
-                    self?.updateTableContents()
+                    storageServiceManager.recordPendingLocalAccountUpdates()
+
+                    self.updateTableContents()
                 }
-                self?.presentFormSheet(OWSNavigationController(rootViewController: vc), animated: true)
-            }
+            },
         ))
         contents.add(disappearingMessagesSection)
 
         let appSecuritySection = OWSTableSection()
         appSecuritySection.headerTitle = OWSLocalizedString("SETTINGS_SECURITY_TITLE", comment: "Section header")
 
-        switch DeviceOwnerAuthenticationType.current {
+        switch LocalDeviceAuthentication.AuthenticationType.current {
         case .unknown:
             appSecuritySection.footerTitle = OWSLocalizedString("SETTINGS_SECURITY_DETAIL", comment: "Section footer")
         case .passcode:
@@ -151,28 +173,30 @@ class PrivacySettingsViewController: OWSTableViewController2 {
         appSecuritySection.add(.switch(
             withText: OWSLocalizedString("SETTINGS_SCREEN_SECURITY", comment: ""),
             isOn: { SSKEnvironment.shared.preferencesRef.isScreenSecurityEnabled },
-            target: self,
-            selector: #selector(didToggleScreenSecuritySwitch)
+            actionBlock: { [weak self] uiSwitch in
+                self?.didToggleScreenSecurity(uiSwitch)
+            },
         ))
         appSecuritySection.add(.switch(
             withText: OWSLocalizedString(
                 "SETTINGS_SCREEN_LOCK_SWITCH_LABEL",
-                comment: "Label for the 'enable screen lock' switch of the privacy settings."
+                comment: "Label for the 'enable screen lock' switch of the privacy settings.",
             ),
             isOn: { ScreenLock.shared.isScreenLockEnabled() },
-            target: self,
-            selector: #selector(didToggleScreenLockSwitch)
+            actionBlock: { [weak self] uiSwitch in
+                self?.didToggleScreenLock(uiSwitch)
+            },
         ))
         if ScreenLock.shared.isScreenLockEnabled() {
             appSecuritySection.add(.disclosureItem(
                 withText: OWSLocalizedString(
                     "SETTINGS_SCREEN_LOCK_ACTIVITY_TIMEOUT",
-                    comment: "Label for the 'screen lock activity timeout' setting of the privacy settings."
+                    comment: "Label for the 'screen lock activity timeout' setting of the privacy settings.",
                 ),
                 accessoryText: formatScreenLockTimeout(ScreenLock.shared.screenLockTimeout()),
                 actionBlock: { [weak self] in
                     self?.showScreenLockTimeoutPicker()
-                }
+                },
             ))
         }
         contents.add(appSecuritySection)
@@ -181,7 +205,7 @@ class PrivacySettingsViewController: OWSTableViewController2 {
         let paymentsSection = OWSTableSection()
         paymentsSection.headerTitle = OWSLocalizedString("SETTINGS_PAYMENTS_SECURITY_TITLE", comment: "Title for the payments section in the app’s privacy settings tableview")
 
-        switch DeviceOwnerAuthenticationType.current {
+        switch LocalDeviceAuthentication.AuthenticationType.current {
         case .unknown:
             paymentsSection.footerTitle = OWSLocalizedString("SETTINGS_PAYMENTS_SECURITY_DETAIL", comment: "Caption for footer label beneath the payments lock privacy toggle for a biometry type that is unknown.")
         case .passcode:
@@ -197,83 +221,129 @@ class PrivacySettingsViewController: OWSTableViewController2 {
         paymentsSection.add(.switch(
             withText: OWSLocalizedString(
                 "SETTINGS_PAYMENTS_LOCK_SWITCH_LABEL",
-                comment: "Label for UISwitch based payments-lock setting that when enabled requires biometric-authentication (or passcode) to transfer funds or view the recovery phrase."
+                comment: "Label for UISwitch based payments-lock setting that when enabled requires biometric-authentication (or passcode) to transfer funds or view the recovery phrase.",
             ),
             isOn: { SSKEnvironment.shared.owsPaymentsLockRef.isPaymentsLockEnabled() },
-            target: self,
-            selector: #selector(didTogglePaymentsLockSwitch)
+            actionBlock: { [weak self] uiSwitch in
+                self?.didTogglePaymentsLock(uiSwitch)
+            },
         ))
         contents.add(paymentsSection)
 
         let callsSection = OWSTableSection()
         callsSection.headerTitle = OWSLocalizedString(
             "SETTINGS_SECTION_TITLE_CALLING",
-            comment: "settings topic header for table section"
+            comment: "settings topic header for table section",
         )
         callsSection.footerTitle = OWSLocalizedString(
             "SETTINGS_SECTION_FOOTER_CALLING",
-            comment: "Footer for table section"
+            comment: "Footer for table section",
         )
         callsSection.add(.switch(
             withText: OWSLocalizedString(
                 "SETTINGS_PRIVACY_CALLKIT_SYSTEM_CALL_LOG_PREFERENCE_TITLE",
-                comment: "Short table cell label"
+                comment: "Short table cell label",
             ),
             isOn: {
-                return SSKEnvironment.shared.databaseStorageRef.read(block: SSKEnvironment.shared.preferencesRef.isSystemCallLogEnabled(tx:))
+                SSKEnvironment.shared.databaseStorageRef.read { tx in
+                    SSKEnvironment.shared.preferencesRef.isSystemCallLogEnabledOrDefault(tx: tx)
+                }
             },
-            target: self,
-            selector: #selector(didToggleEnableSystemCallLogSwitch)
+            actionBlock: { [weak self] uiSwitch in
+                self?.didToggleEnableSystemCallLog(uiSwitch)
+            },
         ))
         contents.add(callsSection)
 
         let advancedSection = OWSTableSection()
         advancedSection.footerTitle = OWSLocalizedString(
             "SETTINGS_PRIVACY_ADVANCED_FOOTER",
-            comment: "Footer for table section"
+            comment: "Footer for table section",
         )
         advancedSection.add(.disclosureItem(
             withText: OWSLocalizedString(
                 "SETTINGS_PRIVACY_ADVANCED_TITLE",
-                comment: "Title for the advanced privacy settings"
+                comment: "Title for the advanced privacy settings",
             ),
             actionBlock: { [weak self] in
                 let vc = AdvancedPrivacySettingsViewController()
                 self?.navigationController?.pushViewController(vc, animated: true)
-            }
+            },
         ))
         contents.add(advancedSection)
 
         self.contents = contents
     }
 
-    @objc
-    private func didToggleReadReceiptsSwitch(_ sender: UISwitch) {
+    private func didToggleReadReceipts(_ sender: UISwitch) {
         SSKEnvironment.shared.receiptManagerRef.setAreReadReceiptsEnabledWithSneakyTransactionAndSyncConfiguration(sender.isOn)
     }
 
-    @objc
-    private func didToggleTypingIndicatorsSwitch(_ sender: UISwitch) {
+    private func didToggleTypingIndicators(_ sender: UISwitch) {
         SSKEnvironment.shared.typingIndicatorsRef.setTypingIndicatorsEnabledAndSendSyncMessage(value: sender.isOn)
     }
 
-    @objc
-    private func didToggleScreenSecuritySwitch(_ sender: UISwitch) {
+    private func didToggleScreenSecurity(_ sender: UISwitch) {
         SSKEnvironment.shared.preferencesRef.setIsScreenSecurityEnabled(sender.isOn)
     }
 
-    @objc
-    private func didToggleScreenLockSwitch(_ sender: UISwitch) {
-        ScreenLock.shared.setIsScreenLockEnabled(sender.isOn)
-        updateTableContents()
+    private func didToggleScreenLock(_ sender: UISwitch) {
+        if sender.isOn {
+            // Enabling screen lock only strengthens it; no authentication needed.
+            ScreenLock.shared.setIsScreenLockEnabled(true)
+            updateTableContents()
+        } else {
+            // Require unlock to disable screen lock.
+            authenticateToWeakenScreenLock { [weak self] in
+                ScreenLock.shared.setIsScreenLockEnabled(false)
+                self?.updateTableContents()
+            }
+        }
     }
 
-    @objc
-    private func didTogglePaymentsLockSwitch(_ sender: UISwitch) {
+    /// Requires device owner authentication before weakening screen lock.
+    private func authenticateToWeakenScreenLock(success: @escaping () -> Void) {
+        // If there's no passcode, there's nothing to authenticate against.
+        switch LocalDeviceAuthentication(useCase: .changeScreenLockSettings).checkCanAttempt() {
+        case .failure(.notConfigured):
+            success()
+            return
+        case .success, .failure:
+            break
+        }
+
+        Task { @MainActor [weak self] in
+            switch await ScreenLock.shared.tryToUnlockScreenLockSettings() {
+            case .success:
+                success()
+            case .failure(let localizedErrorMessage):
+                self?.updateTableContents()
+                self?.showScreenLockAuthFailureAlert(message: localizedErrorMessage)
+            case .unexpectedFailure:
+                self?.updateTableContents()
+                self?.showScreenLockAuthFailureAlert(
+                    message: DeviceAuthenticationErrorMessage.unknownError,
+                )
+            case .cancel:
+                // The user backed out; there's no error to report.
+                self?.updateTableContents()
+            }
+        }
+    }
+
+    private func showScreenLockAuthFailureAlert(message: String) {
+        OWSActionSheets.showActionSheet(
+            title: DeviceAuthenticationErrorMessage.errorSheetTitle,
+            message: message,
+            fromViewController: self,
+        )
+    }
+
+    private func didTogglePaymentsLock(_ sender: UISwitch) {
         // Require unlock to disable payments lock
         if SSKEnvironment.shared.owsPaymentsLockRef.isPaymentsLockEnabled() {
             SSKEnvironment.shared.owsPaymentsLockRef.tryToUnlock { [weak self] outcome in
-                guard let self = self else { return }
+                guard let self else { return }
                 guard case .success = outcome else {
                     self.updateTableContents()
                     PaymentActionSheets.showBiometryAuthFailedActionSheet()
@@ -295,16 +365,21 @@ class PrivacySettingsViewController: OWSTableViewController2 {
     private func showScreenLockTimeoutPicker() {
         let actionSheet = ActionSheetController(title: OWSLocalizedString(
             "SETTINGS_SCREEN_LOCK_ACTIVITY_TIMEOUT",
-            comment: "Label for the 'screen lock activity timeout' setting of the privacy settings."
+            comment: "Label for the 'screen lock activity timeout' setting of the privacy settings.",
         ))
 
         for timeout in ScreenLock.shared.screenLockTimeouts {
             actionSheet.addAction(.init(
                 title: formatScreenLockTimeout(timeout, useShortFormat: false),
                 handler: { [weak self] _ in
-                    ScreenLock.shared.setScreenLockTimeout(timeout)
-                    self?.updateTableContents()
-                }
+                    guard let self else { return }
+                    // Lengthening the timeout weakens screen lock just as
+                    // disabling it does, so require unlock for any change.
+                    self.authenticateToWeakenScreenLock { [weak self] in
+                        ScreenLock.shared.setScreenLockTimeout(timeout)
+                        self?.updateTableContents()
+                    }
+                },
             ))
         }
 
@@ -317,17 +392,22 @@ class PrivacySettingsViewController: OWSTableViewController2 {
         guard value > 0 else {
             return OWSLocalizedString(
                 "SCREEN_LOCK_ACTIVITY_TIMEOUT_NONE",
-                comment: "Indicates a delay of zero seconds, and that 'screen lock activity' will timeout immediately."
+                comment: "Indicates a delay of zero seconds, and that 'screen lock activity' will timeout immediately.",
             )
         }
         return DateUtil.formatDuration(seconds: UInt32(value), useShortFormat: useShortFormat)
     }
 
-    @objc
-    private func didToggleEnableSystemCallLogSwitch(_ sender: UISwitch) {
-        SSKEnvironment.shared.preferencesRef.setIsSystemCallLogEnabled(sender.isOn)
+    private func didToggleEnableSystemCallLog(_ sender: UISwitch) {
+        let callService = AppEnvironment.shared.callService!
+        let db = DependenciesBridge.shared.db
+        let preferences = SSKEnvironment.shared.preferencesRef
+
+        db.write { tx in
+            preferences.setIsSystemCallLogEnabled(sender.isOn, tx: tx)
+        }
 
         // rebuild callUIAdapter since CallKit configuration changed.
-        AppEnvironment.shared.callService.rebuildCallUIAdapter()
+        callService.rebuildCallUIAdapter()
     }
 }

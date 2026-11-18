@@ -124,6 +124,60 @@ NSString *NSStringFromTSPaymentFailure(TSPaymentFailure value)
     return self;
 }
 
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [coder encodeObject:[self valueForKey:@"currency"] forKey:@"currency"];
+    [coder encodeObject:[self valueForKey:@"picoMob"] forKey:@"picoMob"];
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super init];
+    if (!self) {
+        return self;
+    }
+    self->_currency = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                       forKey:@"currency"] unsignedIntegerValue];
+    self->_picoMob = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class] forKey:@"picoMob"] unsignedLongLongValue];
+    return self;
+}
+
+- (NSUInteger)hash
+{
+    NSUInteger result = 0;
+    result ^= self.currency;
+    result ^= self.picoMob;
+    return result;
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (![other isMemberOfClass:self.class]) {
+        return NO;
+    }
+    TSPaymentAmount *typedOther = (TSPaymentAmount *)other;
+    if (self.currency != typedOther.currency) {
+        return NO;
+    }
+    if (self.picoMob != typedOther.picoMob) {
+        return NO;
+    }
+    return YES;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    TSPaymentAmount *result = [[[self class] allocWithZone:zone] init];
+    result->_currency = self.currency;
+    result->_picoMob = self.picoMob;
+    return result;
+}
+
 @end
 
 #pragma mark -
@@ -145,6 +199,29 @@ NSString *NSStringFromTSPaymentFailure(TSPaymentFailure value)
     OWSAssertDebug(self.isValid);
 
     return self;
+}
+
+- (NSUInteger)hash
+{
+    NSUInteger result = 0;
+    result ^= self.currency;
+    result ^= self.mobileCoinPublicAddressData.hash;
+    return result;
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (![other isMemberOfClass:self.class]) {
+        return NO;
+    }
+    TSPaymentAddress *typedOther = (TSPaymentAddress *)other;
+    if (self.currency != typedOther.currency) {
+        return NO;
+    }
+    if (![NSObject isObject:self.mobileCoinPublicAddressData equalToObject:typedOther.mobileCoinPublicAddressData]) {
+        return NO;
+    }
+    return YES;
 }
 
 @end
@@ -169,6 +246,65 @@ NSString *NSStringFromTSPaymentFailure(TSPaymentFailure value)
     return self;
 }
 
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    NSData *mcReceiptData = self.mcReceiptData;
+    if (mcReceiptData != nil) {
+        [coder encodeObject:mcReceiptData forKey:@"mcReceiptData"];
+    }
+    NSString *memoMessage = self.memoMessage;
+    if (memoMessage != nil) {
+        [coder encodeObject:memoMessage forKey:@"memoMessage"];
+    }
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super init];
+    if (!self) {
+        return self;
+    }
+    self->_mcReceiptData = [coder decodeObjectOfClass:[NSData class] forKey:@"mcReceiptData"];
+    self->_memoMessage = [coder decodeObjectOfClass:[NSString class] forKey:@"memoMessage"];
+    return self;
+}
+
+- (NSUInteger)hash
+{
+    NSUInteger result = 0;
+    result ^= self.mcReceiptData.hash;
+    result ^= self.memoMessage.hash;
+    return result;
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (![other isMemberOfClass:self.class]) {
+        return NO;
+    }
+    TSPaymentNotification *typedOther = (TSPaymentNotification *)other;
+    if (![NSObject isObject:self.mcReceiptData equalToObject:typedOther.mcReceiptData]) {
+        return NO;
+    }
+    if (![NSObject isObject:self.memoMessage equalToObject:typedOther.memoMessage]) {
+        return NO;
+    }
+    return YES;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    TSPaymentNotification *result = [[[self class] allocWithZone:zone] init];
+    result->_mcReceiptData = self.mcReceiptData;
+    result->_memoMessage = self.memoMessage;
+    return result;
+}
+
 @end
 
 #pragma mark -
@@ -188,6 +324,75 @@ NSString *NSStringFromTSPaymentFailure(TSPaymentFailure value)
     _note = note;
 
     return self;
+}
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    NSString *amount = self.amount;
+    if (amount != nil) {
+        [coder encodeObject:amount forKey:@"amount"];
+    }
+    NSString *fee = self.fee;
+    if (fee != nil) {
+        [coder encodeObject:fee forKey:@"fee"];
+    }
+    NSString *note = self.note;
+    if (note != nil) {
+        [coder encodeObject:note forKey:@"note"];
+    }
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super init];
+    if (!self) {
+        return self;
+    }
+    self->_amount = [coder decodeObjectOfClass:[NSString class] forKey:@"amount"];
+    self->_fee = [coder decodeObjectOfClass:[NSString class] forKey:@"fee"];
+    self->_note = [coder decodeObjectOfClass:[NSString class] forKey:@"note"];
+    return self;
+}
+
+- (NSUInteger)hash
+{
+    NSUInteger result = 0;
+    result ^= self.amount.hash;
+    result ^= self.fee.hash;
+    result ^= self.note.hash;
+    return result;
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (![other isMemberOfClass:self.class]) {
+        return NO;
+    }
+    TSArchivedPaymentInfo *typedOther = (TSArchivedPaymentInfo *)other;
+    if (![NSObject isObject:self.amount equalToObject:typedOther.amount]) {
+        return NO;
+    }
+    if (![NSObject isObject:self.fee equalToObject:typedOther.fee]) {
+        return NO;
+    }
+    if (![NSObject isObject:self.note equalToObject:typedOther.note]) {
+        return NO;
+    }
+    return YES;
+}
+
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    TSArchivedPaymentInfo *result = [[[self class] allocWithZone:zone] init];
+    result->_amount = self.amount;
+    result->_fee = self.fee;
+    result->_note = self.note;
+    return result;
 }
 
 @end

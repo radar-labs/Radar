@@ -37,9 +37,11 @@ public struct SpamReportingTokenRecord: Codable, FetchableRecord, PersistableRec
 
     public static func reportingToken(
         for sourceAci: Aci,
-        database: Database
-    ) throws -> SpamReportingToken? {
-        try Self.fetchOne(database, key: sourceAci.rawUUID)?.spamReportingToken
+        database: Database,
+    ) -> SpamReportingToken? {
+        return failIfThrows {
+            return try Self.fetchOne(database, key: sourceAci.rawUUID)
+        }?.spamReportingToken
     }
 }
 
@@ -50,7 +52,7 @@ public struct SpamReportingTokenRecord: Codable, FetchableRecord, PersistableRec
 extension SpamReportingTokenRecord {
     public static let persistenceConflictPolicy = PersistenceConflictPolicy(
         insert: .replace,
-        update: .replace
+        update: .replace,
     )
 
     public func upsert(_ db: Database) throws { try insert(db) }

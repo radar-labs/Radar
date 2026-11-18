@@ -30,7 +30,7 @@ struct PaymentsIntroView: View {
 
                 Text(OWSLocalizedString(
                     "PAYMENTS_INTRO_TITLE",
-                    comment: "Title for the Payments introduction screen shown during onboarding."
+                    comment: "Title for the Payments introduction screen shown during onboarding.",
                 ))
                 .font(Font(UIFont.dynamicTypeFont(ofStandardSize: 28)))
                 .fontWeight(.semibold)
@@ -42,7 +42,7 @@ struct PaymentsIntroView: View {
 
                 Text(OWSLocalizedString(
                     "PAYMENTS_INTRO_SUBTITLE",
-                    comment: "Subtitle for the Payments introduction screen."
+                    comment: "Subtitle for the Payments introduction screen.",
                 ))
                 .font(.system(size: 20, weight: .medium))
                 .foregroundStyle(Color.Signal.accent)
@@ -53,7 +53,7 @@ struct PaymentsIntroView: View {
 
                 Text(OWSLocalizedString(
                     "PAYMENTS_INTRO_BODY",
-                    comment: "Body text for the Payments introduction screen explaining the Bitcoin Lightning Network."
+                    comment: "Body text for the Payments introduction screen explaining the Bitcoin Lightning Network.",
                 ))
                 .font(.body)
                 .foregroundStyle(Color.Signal.secondaryLabel)

@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import SignalUI
 import SignalServiceKit
+import SignalUI
 
 protocol AvatarViewPresentationContextProvider: MediaPresentationContextProvider {
     var conversationAvatarView: ConversationAvatarView? { get }
@@ -39,11 +39,7 @@ extension AvatarViewPresentationContextProvider {
         return MediaPresentationContext(
             mediaView: mediaView,
             presentationFrame: presentationFrame,
-            mediaViewShape: mediaViewShape
+            mediaViewShape: mediaViewShape,
         )
-    }
-
-    func snapshotOverlayView(in coordinateSpace: UICoordinateSpace) -> (UIView, CGRect)? {
-        return nil
     }
 }

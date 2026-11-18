@@ -10,7 +10,7 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
     private enum UsernameLinkState {
         case available(
             usernameLink: Usernames.UsernameLink,
-            qrCode: UIImage
+            qrCode: UIImage,
         )
         case resetting
         case corrupted
@@ -25,14 +25,14 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
         }
 
         static func forUsernameLink(
-            usernameLink: Usernames.UsernameLink
+            usernameLink: Usernames.UsernameLink,
         ) -> UsernameLinkState {
             if
                 let qrCode = QRCodeGenerator().generateQRCode(url: usernameLink.url)
             {
                 return .available(
                     usernameLink: usernameLink,
-                    qrCode: qrCode
+                    qrCode: qrCode,
                 )
             }
 
@@ -72,7 +72,7 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
         localUsernameManager: LocalUsernameManager,
         username: String,
         usernameLink: Usernames.UsernameLink?,
-        usernameChangeDelegate: UsernameChangeDelegate
+        usernameChangeDelegate: UsernameChangeDelegate,
     ) {
         self.db = db
         self.localUsernameManager = localUsernameManager
@@ -119,7 +119,7 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
         let qrCodeView: QRCodeView = {
             let qrCodeView = QRCodeView(
                 qrCodeTintColor: qrCodeColor,
-                contentInset: 16
+                contentInset: 16,
             )
 
             switch usernameLinkState {
@@ -135,49 +135,47 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
             return qrCodeView
         }()
 
-        let copyUsernameButton: UIButton = {
-            let button = OWSButton(block: { [weak self] in
+        var buttonConfiguration = UIButton.Configuration.plain()
+        buttonConfiguration.title = username
+        buttonConfiguration.titleTextAttributesTransformer = .defaultFont(.dynamicTypeHeadlineClamped.semibold())
+        buttonConfiguration.image = Theme.iconImage(.buttonCopy)
+        buttonConfiguration.imagePadding = 6
+        buttonConfiguration.imagePlacement = .leading
+        buttonConfiguration.baseForegroundColor = qrCodeColor.username
+        let copyUsernameButton = UIButton(
+            configuration: buttonConfiguration,
+            primaryAction: UIAction { [weak self] _ in
                 guard let self else { return }
 
                 UIPasteboard.general.string = self.username
                 self.showUsernameCopiedToast()
-            })
-
-            button.setTitle(username, for: .normal)
-            button.setTitleColor(qrCodeColor.username, for: .normal)
-            button.titleLabel!.font = .dynamicTypeHeadline.semibold()
-
-            button.setTemplateImage(
-                Theme.iconImage(.buttonCopy),
-                tintColor: qrCodeColor.username
-            )
-
-            button.imageView!.autoSetDimensions(to: .square(24))
-            button.ows_titleEdgeInsets = UIEdgeInsets(top: 0, leading: 6, bottom: 0, trailing: 0)
-            button.configureForMultilineTitle()
-
-            button.dimsWhenHighlighted = true
-
-            return button
-        }()
+            },
+        )
 
         let wrapperView = UIView()
         wrapperView.backgroundColor = qrCodeColor.background
         wrapperView.layer.cornerRadius = 24
-        wrapperView.layoutMargins = UIEdgeInsets(hMargin: 40, vMargin: 32)
 
         wrapperView.addSubview(qrCodeView)
         wrapperView.addSubview(copyUsernameButton)
 
-        qrCodeView.autoPinTopToSuperviewMargin()
-        qrCodeView.autoSetDimensions(to: .square(214))
-        qrCodeView.autoHCenterInSuperview()
+        qrCodeView.translatesAutoresizingMaskIntoConstraints = false
+        copyUsernameButton.translatesAutoresizingMaskIntoConstraints = false
 
-        qrCodeView.autoPinEdge(.bottom, to: .top, of: copyUsernameButton, withOffset: -16)
+        let qrCodeViewMargin: CGFloat = 32
+        let buttonVMargin: CGFloat = 16
+        NSLayoutConstraint.activate([
+            qrCodeView.widthAnchor.constraint(equalToConstant: 214),
+            qrCodeView.heightAnchor.constraint(equalTo: qrCodeView.widthAnchor),
+            qrCodeView.topAnchor.constraint(equalTo: wrapperView.topAnchor, constant: qrCodeViewMargin),
+            qrCodeView.leadingAnchor.constraint(equalTo: wrapperView.leadingAnchor, constant: qrCodeViewMargin),
+            qrCodeView.centerXAnchor.constraint(equalTo: wrapperView.centerXAnchor),
 
-        copyUsernameButton.autoPinLeadingToSuperviewMargin()
-        copyUsernameButton.autoPinTrailingToSuperviewMargin()
-        copyUsernameButton.autoPinBottomToSuperviewMargin()
+            copyUsernameButton.topAnchor.constraint(equalTo: qrCodeView.bottomAnchor, constant: buttonVMargin),
+            copyUsernameButton.leadingAnchor.constraint(greaterThanOrEqualTo: qrCodeView.leadingAnchor, constant: 16),
+            copyUsernameButton.centerXAnchor.constraint(equalTo: wrapperView.centerXAnchor),
+            copyUsernameButton.bottomAnchor.constraint(equalTo: wrapperView.bottomAnchor, constant: -buttonVMargin),
+        ])
 
         return wrapperView
     }
@@ -187,12 +185,10 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
     private func buildActionButton(
         title: String,
         icon: ThemeIcon,
-        block: @escaping (SettingsHeaderButton) -> Void
+        block: @escaping (SettingsHeaderButton) -> Void,
     ) -> SettingsHeaderButton {
 
         let button = SettingsHeaderButton(title: title.capitalized, icon: icon)
-        button.buttonBackgroundColor = Self.cellBackgroundColor(isUsingPresentedStyle: true)
-        button.selectedButtonBackgroundColor = Self.cellSelectedBackgroundColor()
         button.addActionHandler({ [weak button] in
             guard let button else { return }
             block(button)
@@ -201,7 +197,7 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
         button.autoSetDimension(
             .width,
             toSize: 100,
-            relation: .greaterThanOrEqual
+            relation: .greaterThanOrEqual,
         )
 
         return button
@@ -211,7 +207,7 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
         let usernameLinkButton = buildActionButton(
             title: OWSLocalizedString(
                 "USERNAME_LINK_SHEET_BUTTON",
-                comment: "Title for a button to open a sheet for copying and sharing your username link."
+                comment: "Title for a button to open a sheet for copying and sharing your username link.",
             ),
             icon: .buttonLink,
             block: { [weak self] _ in
@@ -226,34 +222,34 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
                             self.dismiss(animated: true) {
                                 self.showUsernameLinkCopiedToast()
                             }
-                        }
+                        },
                     )
                     shareSheet.dismissalDelegate = self
                     self.present(
                         shareSheet,
-                        animated: true
+                        animated: true,
                     )
                 case .resetting, .corrupted:
                     break
                 }
-            }
+            },
         )
 
         let shareQRCodeButton = buildActionButton(
             title: OWSLocalizedString(
                 "USERNAME_LINK_QR_CODE_VIEW_SHARE_BUTTON",
-                comment: "Title for a button to share your username link QR code. Lowercase styling is intentional."
+                comment: "Title for a button to share your username link QR code. Lowercase styling is intentional.",
             ),
             icon: .buttonShare,
             block: { [weak self] actionButton in
                 self?.shareQRCode(sourceView: actionButton)
-            }
+            },
         )
 
         let colorQRCodeButton = buildActionButton(
             title: OWSLocalizedString(
                 "USERNAME_LINK_QR_CODE_VIEW_COLOR_BUTTON",
-                comment: "Title for a button to pick the color of your username link QR code. Lowercase styling is intentional."
+                comment: "Title for a button to pick the color of your username link QR code. Lowercase styling is intentional.",
             ),
             icon: .chatSettingsWallpaper,
             block: { [weak self] _ in
@@ -266,20 +262,20 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
                     currentColor: self.qrCodeColor,
                     username: self.username,
                     qrCode: qrCodeImage,
-                    delegate: self
+                    delegate: self,
                 )
 
                 self.presentFormSheet(
                     OWSNavigationController(rootViewController: colorPickerVC),
-                    animated: true
+                    animated: true,
                 )
-            }
+            },
         )
 
         let stackView = CenteringStackView(centeredSubviews: [
             usernameLinkButton,
             shareQRCodeButton,
-            colorQRCodeButton
+            colorQRCodeButton,
         ])
 
         shareQRCodeButton.autoPinWidth(toWidthOf: colorQRCodeButton)
@@ -344,12 +340,13 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
         let instructionsLabel = UILabel()
         stackView.addArrangedSubview(instructionsLabel)
         instructionsLabel.font = .systemFont(ofSize: 14)
-        instructionsLabel.textColor = Theme.lightThemeSecondaryTextAndIconColor
+        instructionsLabel.textColor = .Signal.secondaryLabel
+            .resolvedColor(with: UITraitCollection(userInterfaceStyle: .light))
         instructionsLabel.numberOfLines = 0
         instructionsLabel.textAlignment = .center
         instructionsLabel.text = OWSLocalizedString(
             "USERNAME_QR_CODE_EXPORT_INSTRUCTIONS",
-            comment: "Instructions that appear below the username QR code on a sharable exported image."
+            comment: "Instructions that appear below the username QR code on a sharable exported image.",
         )
 
         canvas.setNeedsLayout()
@@ -362,7 +359,7 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
             sourceView: sourceView,
             completion: { [weak self] in
                 self?.setMaxBrightness()
-            }
+            },
         )
     }
 
@@ -373,12 +370,11 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
         label.font = .dynamicTypeCaption1
         label.numberOfLines = 0
         label.textAlignment = .center
-        label.textColor = Theme.secondaryTextAndIconColor
+        label.textColor = .Signal.secondaryLabel
         label.text = OWSLocalizedString(
             "USERNAME_LINK_QR_CODE_VIEW_DISCLAIMER_LABEL",
-            comment: "Text for a label explaining what the username link and QR code give others access to."
+            comment: "Text for a label explaining what the username link and QR code give others access to.",
         )
-
         return label
     }
 
@@ -387,41 +383,29 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
     private var resetButtonString: String {
         return OWSLocalizedString(
             "USERNAME_LINK_QR_CODE_VIEW_RESET_BUTTON_TITLE",
-            comment: "Title for a button that allows users to reset their username link and QR code."
+            comment: "Title for a button that allows users to reset their username link and QR code.",
         )
     }
 
     private func buildResetButtonView() -> UIView {
-        let button = OWSRoundedButton { [weak self] in
-            self?.tappedResetButton()
-        }
+        let button = UIButton(
+            configuration: .smallSecondary(title: resetButtonString),
+            primaryAction: UIAction { [weak self] _ in
+                self?.didTapResetButton()
+            },
+        )
 
-        button.setTitle(resetButtonString, for: .normal)
-
-        button.ows_contentEdgeInsets = UIEdgeInsets(hMargin: 16, vMargin: 6)
-        button.backgroundColor = Theme.isDarkThemeEnabled ? .ows_gray80 : .ows_whiteAlpha70
-        button.titleLabel!.font = .dynamicTypeSubheadline.bold()
-        button.setTitleColor(Theme.primaryTextColor, for: .normal)
-
-        button.configureForMultilineTitle()
-
-        button.dimsWhenHighlighted = true
-        button.dimsWhenDisabled = true
-
-        switch usernameLinkState {
-        case .resetting:
+        if case .resetting = usernameLinkState {
             button.isEnabled = false
-        case .available, .corrupted:
-            button.isEnabled = true
         }
 
         return CenteringStackView(centeredSubviews: [button])
     }
 
-    private func tappedResetButton() {
+    private func didTapResetButton() {
         let actionSheet = ActionSheetController(message: OWSLocalizedString(
             "USERNAME_LINK_QR_CODE_VIEW_RESET_SHEET_MESSAGE",
-            comment: "A message explaining what will happen if the user resets their QR code."
+            comment: "A message explaining what will happen if the user resets their QR code.",
         ))
 
         actionSheet.addAction(ActionSheetAction(
@@ -429,12 +413,12 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
             style: .destructive,
             handler: { [weak self] _ in
                 self?.resetUsernameLink()
-            }
+            },
         ))
 
         actionSheet.addAction(ActionSheetAction(
             title: CommonStrings.cancelButton,
-            style: .cancel
+            style: .cancel,
         ))
 
         actionSheet.dismissalDelegate = self
@@ -451,14 +435,14 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
                     self?.qrCodeView = self?.buildQRCodeView()
                     return self?.qrCodeView
                 },
-                margins: UIEdgeInsets(top: 32, leading: 48, bottom: 12, trailing: 48)
+                margins: UIEdgeInsets(top: 32, leading: 48, bottom: 12, trailing: 48),
             ),
             .itemWrappingView(
                 viewBlock: { [weak self] in
                     return self?.buildActionButtonsView()
                 },
-                margins: UIEdgeInsets(top: 12, leading: 16, bottom: 20, trailing: 16)
-            )
+                margins: UIEdgeInsets(top: 12, leading: 16, bottom: 20, trailing: 16),
+            ),
         ])
 
         let bottomSection = OWSTableSection(items: [
@@ -466,14 +450,14 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
                 viewBlock: { [weak self] in
                     self?.buildDisclaimerLabel()
                 },
-                margins: UIEdgeInsets(top: 12, leading: 32, bottom: 12, trailing: 32)
+                margins: UIEdgeInsets(top: 12, leading: 32, bottom: 12, trailing: 32),
             ),
             .itemWrappingView(
                 viewBlock: { [weak self] in
                     self?.buildResetButtonView()
                 },
-                margins: UIEdgeInsets(top: 12, leading: 32, bottom: 24, trailing: 32)
-            )
+                margins: UIEdgeInsets(top: 12, leading: 32, bottom: 24, trailing: 32),
+            ),
         ])
 
         topSection.hasSeparators = false
@@ -485,7 +469,7 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
         defaultSpacingBetweenSections = 0
         contents = OWSTableContents(sections: [
             topSection,
-            bottomSection
+            bottomSection,
         ])
     }
 
@@ -508,7 +492,7 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
     }
 
     override func viewWillAppear(_ animated: Bool) {
-         if shouldResetLinkOnAppear {
+        if shouldResetLinkOnAppear {
             shouldResetLinkOnAppear = false
 
             // If we have no username link to start, immediately kick off a
@@ -600,16 +584,18 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
             reloadTableContents()
         }
 
-        Guarantee.wrapAsync {
-            await self.localUsernameManager.rotateUsernameLink()
-        }.map(on: DispatchQueue.main) { remoteMutationResult -> Usernames.RemoteMutationResult<Usernames.UsernameLink> in
+        Task {
+            let result = await Result(catching: {
+                _ = try await self.localUsernameManager.rotateUsernameLink()
+            })
+
             let latestUsernameState: Usernames.LocalUsernameState = self.db.read { tx in
                 self.localUsernameManager.usernameState(tx: tx)
             }
 
             if let usernameLink = latestUsernameState.usernameLink {
                 self.usernameLinkState = .forUsernameLink(
-                    usernameLink: usernameLink
+                    usernameLink: usernameLink,
                 )
             } else {
                 self.usernameLinkState = .corrupted
@@ -617,47 +603,49 @@ class UsernameLinkPresentQRCodeViewController: OWSTableViewController2 {
 
             self.reloadTableContents()
 
-            self.usernameChangeDelegate?.usernameStateDidChange(
-                newState: latestUsernameState
-            )
+            self.usernameChangeDelegate?.usernameStateDidChange(newState: latestUsernameState)
 
-            return remoteMutationResult
-        }.done(on: DispatchQueue.main) { remoteMutationResult in
-            switch remoteMutationResult {
+            switch result {
             case .success:
                 OWSActionSheets.showActionSheet(
                     message: OWSLocalizedString(
                         "USERNAME_LINK_QR_CODE_VIEW_RESET_SUCCESSFUL",
-                        comment: "Text presenting an action sheet notifying the user their QR code and link were reset."
+                        comment: "Text presenting an action sheet notifying the user their QR code and link were reset.",
                     ),
                     fromViewController: self,
-                    dismissalDelegate: self
+                    dismissalDelegate: self,
                 )
             case .failure:
                 OWSActionSheets.showActionSheet(
                     message: OWSLocalizedString(
                         "USERNAME_LINK_QR_CODE_VIEW_LINK_NOT_SET",
-                        comment: "Text presented in an action sheet notifying the user their qr code and link are not set."
+                        comment: "Text presented in an action sheet notifying the user their qr code and link are not set.",
                     ),
                     fromViewController: self,
-                    dismissalDelegate: self
+                    dismissalDelegate: self,
                 )
             }
         }
     }
 
     private func showUsernameCopiedToast() {
-        self.presentToast(text: OWSLocalizedString(
-            "USERNAME_LINK_QR_CODE_VIEW_USERNAME_COPIED",
-            comment: "Text presented in a toast notifying the user that their username was copied to the system clipboard."
-        ))
+        self.presentToast(
+            text: OWSLocalizedString(
+                "USERNAME_LINK_QR_CODE_VIEW_USERNAME_COPIED",
+                comment: "Text presented in a toast notifying the user that their username was copied to the system clipboard.",
+            ),
+            image: .copy,
+        )
     }
 
     private func showUsernameLinkCopiedToast() {
-        self.presentToast(text: OWSLocalizedString(
-            "USERNAME_LINK_QR_CODE_VIEW_USERNAME_LINK_COPIED",
-            comment: "Text presented in a toast notifying the user that their username link was copied to the system clipboard."
-        ))
+        self.presentToast(
+            text: OWSLocalizedString(
+                "USERNAME_LINK_QR_CODE_VIEW_USERNAME_LINK_COPIED",
+                comment: "Text presented in a toast notifying the user that their username link was copied to the system clipboard.",
+            ),
+            image: .copy,
+        )
     }
 
     override func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)? = nil) {
@@ -677,7 +665,7 @@ extension UsernameLinkPresentQRCodeViewController: UsernameLinkQRCodeColorPicker
         db.write { tx in
             localUsernameManager.setUsernameLinkQRCodeColor(
                 color: color,
-                tx: tx
+                tx: tx,
             )
         }
 

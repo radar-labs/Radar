@@ -14,8 +14,8 @@ public enum Upload {
         public static let uploadAttachmentIDKey = "UploadAttachmentIDKey"
 
         /// If within this window, we can reause existing attachment transit tier uploads for resending.
-        public static let uploadReuseWindow: TimeInterval = 60 * 60 * 24 * 3 // 3 days
-        public static let uploadFormReuseWindow: TimeInterval = 60 * 60 * 24 * 6 // 6 days
+        public static let uploadReuseWindow: TimeInterval = 3 * .day
+        public static let uploadFormReuseWindow: TimeInterval = 6 * .day
 
         public static let maxUploadAttempts = 5
     }
@@ -43,9 +43,6 @@ public enum Upload {
 
     public enum FailureMode: Equatable {
         public enum RetryMode: Equatable {
-            /// This was a temporary failure, such as a network
-            /// timeout, so an immediate retry should be possible
-            case immediately
             /// The remote server sent back a retry-after header that should be honored
             /// when attempting a backoff before retry
             case afterServerRequestedDelay(TimeInterval)
@@ -76,26 +73,19 @@ public enum Upload {
         // Contains the number of bytes the upload endpoint has received.  This
         // can be 0 bytes, which is effectively a new upload, but can use the
         // existing upload form.
-        case uploaded(Int)
+        case uploaded(UInt64)
     }
 
-    public enum Error: Swift.Error, IsRetryableProvider, LocalizedError, Equatable {
+    public enum Error: Swift.Error, LocalizedError, Equatable {
         case invalidUploadURL
         case networkError
         case networkTimeout
         case uploadFailure(recovery: FailureMode)
-        case partialUpload(bytesUploaded: UInt32)
+        case partialUpload(bytesUploaded: UInt64)
         case unsupportedEndpoint
         case unexpectedResponseStatusCode(Int)
         case missingFile
         case unknown
-
-        public var isRetryableProvider: Bool {
-            switch self {
-            case .invalidUploadURL, .uploadFailure, .partialUpload, .unsupportedEndpoint, .unexpectedResponseStatusCode, .networkTimeout, .networkError, .missingFile, .unknown:
-                return false
-            }
-        }
 
         public var errorDescription: String? {
             localizedDescription
@@ -104,14 +94,14 @@ public enum Upload {
         public var localizedDescription: String {
             return OWSLocalizedString(
                 "ERROR_MESSAGE_ATTACHMENT_UPLOAD_FAILED",
-                comment: "Error message indicating that attachment upload(s) failed."
+                comment: "Error message indicating that attachment upload(s) failed.",
             )
         }
     }
 
     public struct EncryptedBackupUploadMetadata: UploadMetadata {
         /// When we started the export of this backup.
-        public let exportStartTimestamp: Date
+        public let exportStartDate: Date
 
         /// File URL of the data consisting of "iv  + encrypted data + hmac"
         public let fileUrl: URL
@@ -122,22 +112,22 @@ public enum Upload {
         /// The length of the encrypted data, consiting of "iv  + encrypted data + hmac"
         public let encryptedDataLength: UInt32
 
-        /// The length of the unencrypted data
-        public let plaintextDataLength: UInt32
+        /// Size of the last unencrypted backup before compression
+        public let uncompressedDataLength: UInt32
 
-        /// The total size of all backup-able attachments in the backup.
+        /// The total size of all remote backup-able attachments in the backup.
         /// Does NOT take into account current backup plan state; just per-attachment
         /// backup eligibility.
-        public let attachmentByteSize: UInt64
+        public let remoteAttachmentByteSize: UInt64
 
-        /// Metadata related to the SVR🐝 nonce used for forward secrecy that should be persisted
+        /// The total size of all attachments that will be copied into a local file backup.
+        /// This means they are downloaded onto the device, and have a local key stored
+        /// in the proto.
+        public let localAttachmentByteSize: UInt64
+
+        /// Metadata related to the SVRB nonce used for forward secrecy that should be persisted
         /// after upload success.
         let nonceMetadata: BackupExportPurpose.NonceMetadata?
-
-        /// We don't enforce a size limit locally for backups; we let the server
-        /// enforce the limit and fail the upload if we surpass it.
-        public static var maxUploadSizeBytes: UInt { .max }
-        public static var maxPlaintextSizeBytes: UInt { .max }
     }
 
     public struct LocalUploadMetadata: AttachmentUploadMetadata, Codable {
@@ -157,9 +147,6 @@ public enum Upload {
         public let plaintextDataLength: UInt32
 
         public var isReusedTransitTierUpload: Bool { false }
-
-        public static var maxUploadSizeBytes: UInt { OWSMediaUtils.kMaxAttachmentUploadSizeBytes }
-        public static var maxPlaintextSizeBytes: UInt { OWSMediaUtils.kMaxFileSizeGeneric }
     }
 
     public struct LinkNSyncUploadMetadata: UploadMetadata {
@@ -167,11 +154,6 @@ public enum Upload {
         public let fileUrl: URL
         /// The length of the file.
         public let encryptedDataLength: UInt32
-
-        /// We don't enforce a size limit locally for backups; we let the server
-        /// enforce the limit and fail the upload if we surpass it.
-        public static var maxUploadSizeBytes: UInt { .max }
-        public static var maxPlaintextSizeBytes: UInt { .max }
     }
 
     public struct ReusedUploadMetadata: AttachmentUploadMetadata {
@@ -192,9 +174,6 @@ public enum Upload {
         public let encryptedDataLength: UInt32
 
         public var isReusedTransitTierUpload: Bool { true }
-
-        public static var maxUploadSizeBytes: UInt { OWSMediaUtils.kMaxAttachmentUploadSizeBytes }
-        public static var maxPlaintextSizeBytes: UInt { OWSMediaUtils.kMaxFileSizeGeneric }
     }
 
     public struct Result<Metadata: UploadMetadata> {
@@ -241,7 +220,7 @@ extension Upload.LocalUploadMetadata {
 
     static func validateAndBuild(
         fileUrl: URL,
-        metadata: EncryptionMetadata
+        metadata: EncryptionMetadata,
     ) throws -> Upload.LocalUploadMetadata {
         guard
             let encryptedLength = UInt32(exactly: metadata.encryptedLength),
@@ -252,13 +231,6 @@ extension Upload.LocalUploadMetadata {
             throw OWSAssertionError("Invalid length.")
         }
 
-        guard
-            plaintextLength <= Self.maxPlaintextSizeBytes,
-            encryptedLength <= Self.maxUploadSizeBytes
-        else {
-            throw OWSAssertionError("Data is too large: \(encryptedLength).")
-        }
-
         let digest = metadata.digest
 
         return Upload.LocalUploadMetadata(
@@ -266,7 +238,7 @@ extension Upload.LocalUploadMetadata {
             key: metadata.key.combinedKey,
             digest: digest,
             encryptedDataLength: encryptedLength,
-            plaintextDataLength: plaintextLength
+            plaintextDataLength: plaintextLength,
         )
     }
 }
@@ -275,7 +247,7 @@ extension UploadEndpoint {
     func readUploadFileChunk(
         fileSystem: Upload.Shims.FileSystem,
         url: URL,
-        startIndex chunkStartIndex: Int
+        startIndex chunkStartIndex: UInt64,
     ) throws(Upload.Error) -> (data: Data, truncated: Bool) {
         guard fileSystem.fileOrFolderExists(url: url) else {
             throw .missingFile
@@ -289,11 +261,11 @@ extension UploadEndpoint {
             throw .missingFile
         }
 
-        let remainingData = fileData.dropFirst(chunkStartIndex)
+        let remainingData = fileData.dropFirst(Int(chunkStartIndex))
         let dataChunk = remainingData.prefix(fileSystem.maxFileChunkSizeBytes())
         return (
             dataChunk,
-            dataChunk.count != remainingData.count
+            dataChunk.count != remainingData.count,
         )
     }
 }

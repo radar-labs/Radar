@@ -9,6 +9,10 @@ import LibSignalClient
 
 public class RemoteConfig {
 
+    enum Constants {
+        static let phoneNumberlessCallingCode = 99999
+    }
+
     public static var current: RemoteConfig {
         return SSKEnvironment.shared.remoteConfigManagerRef.currentConfig()
     }
@@ -38,7 +42,11 @@ public class RemoteConfig {
     ) {
         self.lastKnownClockSkew = clockSkew
         self.valueFlags = valueFlags
-        self.paymentsDisabledRegions = Self.parsePhoneNumberRegions(valueFlags: valueFlags, flag: .paymentsDisabledRegions)
+        self.paymentsDisabledRegions = Self.parsePhoneNumberRegions(
+            valueFlags: valueFlags,
+            flag: .paymentsDisabledRegions,
+            defaultValue: "98,963,53,850,7",
+        )
         self.applePayDisabledRegions = Self.parsePhoneNumberRegions(valueFlags: valueFlags, flag: .applePayDisabledRegions)
         self.creditAndDebitCardDisabledRegions = Self.parsePhoneNumberRegions(valueFlags: valueFlags, flag: .creditAndDebitCardDisabledRegions)
         self.paypalDisabledRegions = Self.parsePhoneNumberRegions(valueFlags: valueFlags, flag: .paypalDisabledRegions)
@@ -60,7 +68,7 @@ public class RemoteConfig {
     /// - Parameter newClockSkew: The new clock skew; always used. Even when
     /// `newValueFlags` is nil, the HTTP 304 response has a new clock skew.
     func merging(newValueFlags: [String: String]?, newClockSkew: TimeInterval) -> RemoteConfig {
-        if var newValueFlags = newValueFlags {
+        if var newValueFlags {
             for flag in IsEnabledFlag.allCases {
                 if flag.isHotSwappable { continue }
                 newValueFlags[flag.rawValue] = self.valueFlags[flag.rawValue]
@@ -78,6 +86,8 @@ public class RemoteConfig {
             return RemoteConfig(clockSkew: newClockSkew, valueFlags: self.valueFlags)
         }
     }
+
+    // MARK: -
 
     public func netConfig() -> [String: String] {
         return Dictionary(
@@ -97,6 +107,8 @@ public class RemoteConfig {
         )
     }
 
+    // MARK: -
+
     public var maxGroupSizeRecommended: UInt {
         getUIntValue(forFlag: .maxGroupSizeRecommended, defaultValue: 151)
     }
@@ -109,9 +121,17 @@ public class RemoteConfig {
         maxGroupSizeHardLimit
     }
 
+    public var maxGroupCallRingSize: UInt {
+        getUIntValue(forFlag: .maxGroupCallRingSize, defaultValue: 16)
+    }
+
+    // MARK: -
+
     public var cdsSyncInterval: TimeInterval {
         interval(.cdsSyncInterval, defaultInterval: .day * 2)
     }
+
+    // MARK: -
 
     public var automaticSessionResetKillSwitch: Bool {
         return isEnabled(.automaticSessionResetKillSwitch)
@@ -125,9 +145,13 @@ public class RemoteConfig {
         interval(.reactiveProfileKeyAttemptInterval, defaultInterval: .hour)
     }
 
+    // MARK: -
+
     public var paymentsResetKillSwitch: Bool {
         isEnabled(.paymentsResetKillSwitch)
     }
+
+    // MARK: -
 
     public var canDonateOneTimeWithApplePay: Bool {
         !isEnabled(.applePayOneTimeDonationKillSwitch)
@@ -165,11 +189,12 @@ public class RemoteConfig {
         !isEnabled(.paypalMonthlyDonationKillSwitch)
     }
 
-    public func standardMediaQualityLevel(localPhoneNumber: String?) -> ImageQualityLevel? {
-        let rawValue: String = ValueFlag.standardMediaQualityLevel.rawValue
+    // MARK: -
+
+    public func standardMediaQualityLevel(callingCode: PhoneNumberUtil.LocalCallingCode?) -> ImageQualityLevel? {
         guard
-            let csvString = valueFlags[rawValue],
-            let stringValue = Self.countryCodeValue(csvString: csvString, csvDescription: rawValue, localPhoneNumber: localPhoneNumber),
+            let csvString = self.value(.standardMediaQualityLevel),
+            let stringValue = Self.countryCodeValue(csvString: csvString, callingCode: callingCode),
             let uintValue = UInt(stringValue),
             let defaultMediaQuality = ImageQualityLevel(rawValue: uintValue)
         else {
@@ -178,13 +203,7 @@ public class RemoteConfig {
         return defaultMediaQuality
     }
 
-    fileprivate static func parsePhoneNumberRegions(
-        valueFlags: [String: String],
-        flag: ValueFlag
-    ) -> PhoneNumberRegions {
-        guard let valueList = valueFlags[flag.rawValue] else { return [] }
-        return PhoneNumberRegions(fromRemoteConfig: valueList)
-    }
+    // MARK: -
 
     public var messageResendKillSwitch: Bool {
         isEnabled(.messageResendKillSwitch)
@@ -198,17 +217,19 @@ public class RemoteConfig {
         interval(.messageSendLogEntryLifetime, defaultInterval: 2 * .week)
     }
 
+    // MARK: -
+
     public var maxSenderKeyAge: TimeInterval {
         return Double(getStringConvertibleValue(forFlag: .maxSenderKeyAge, defaultValue: 2 * UInt64.weekInMs)) / 1000
     }
 
-    public var maxGroupCallRingSize: UInt {
-        getUIntValue(forFlag: .maxGroupCallRingSize, defaultValue: 16)
-    }
+    // MARK: -
 
     public var enableAutoAPNSRotation: Bool {
         return isEnabled(.enableAutoAPNSRotation, defaultValue: false)
     }
+
+    // MARK: -
 
     /// The minimum length for a valid nickname, in Unicode codepoints.
     public var minNicknameLength: UInt32 {
@@ -220,33 +241,55 @@ public class RemoteConfig {
         getUInt32Value(forFlag: .maxNicknameLength, defaultValue: 32)
     }
 
-    public var attachmentMaxEncryptedBytes: UInt {
-        return getUIntValue(forFlag: .attachmentMaxEncryptedBytes, defaultValue: 100 * 1024 * 1024)
+    // MARK: -
+
+    /// Most of our code uses UInt32; add a large bound smaller than that.
+    private static let attachmentHardLimit: UInt64 = 1_610_612_736
+
+    public var attachmentMaxEncryptedBytes: UInt64 {
+        return min(Self.attachmentHardLimit, getUInt64Value(
+            forFlag: .attachmentMaxEncryptedBytes,
+            defaultValue: 100 * 1024 * 1024,
+        ))
     }
 
-    public var attachmentMaxEncryptedReceiveBytes: UInt {
-        // TODO: Use the Remote Config value and new fallback value.
-        return self.attachmentMaxEncryptedBytes
+    public var attachmentMaxEncryptedReceiveBytes: UInt64 {
+        let maxEncryptedBytes = self.attachmentMaxEncryptedBytes
+        return min(Self.attachmentHardLimit, getUInt64Value(
+            forFlag: .attachmentMaxEncryptedReceiveBytes,
+            defaultValue: IncomingAttachmentLimits.addingFudgeFactor(toByteCount: maxEncryptedBytes) ?? .max,
+        ))
     }
 
-    public var attachmentMaxPlaintextVideoBytes: UInt64 {
-        if BuildFlags.useNewAttachmentLimits {
-            return PaddingBucket.forEncryptedSizeLimit(UInt64(safeCast: self.attachmentMaxEncryptedBytes)).plaintextSize
-        } else {
-            return UInt64(safeCast: OWSMediaUtils.kMaxFileSizeVideo)
-        }
+    public var videoAttachmentMaxEncryptedBytes: UInt64 {
+        return min(Self.attachmentHardLimit, getUInt64Value(
+            forFlag: .videoAttachmentMaxEncryptedBytes,
+            defaultValue: self.attachmentMaxEncryptedBytes,
+        ))
     }
 
-    public var tsAttachmentMigrationBatchDelayMs: UInt64 {
-        getUInt64Value(forFlag: .tsAttachmentMigrationBatchDelayMs, defaultValue: 50)
+    public var backupAttachmentMaxEncryptedBytes: UInt64 {
+        return min(Self.attachmentHardLimit, getUInt64Value(
+            forFlag: .backupAttachmentMaxEncryptedBytes,
+            defaultValue: self.attachmentMaxEncryptedBytes,
+        ))
     }
+
+    public var backupMaxThumbnailFileSize: UInt32 {
+        return getUInt32Value(
+            forFlag: .maxThumbnailFileSizeBytes,
+            defaultValue: AttachmentThumbnailQuality.backupThumbnailMaxSizeBytes,
+        )
+    }
+
+    // MARK: -
 
     public var backupListMediaDefaultRefreshInterval: TimeInterval {
         let defaultValue: UInt64
         if BuildFlags.Backups.useLowerDefaultListMediaRefreshInterval {
             defaultValue = .dayInMs
         } else {
-            defaultValue = .dayInMs * 7
+            defaultValue = .weekInMs
         }
 
         let intervalMs = getUInt64Value(forFlag: .backupListMediaDefaultRefreshIntervalMs, defaultValue: defaultValue)
@@ -262,23 +305,28 @@ public class RemoteConfig {
         getUInt32Value(forFlag: .mediaTierFallbackCdnNumber, defaultValue: 3)
     }
 
-    // Hardcoded value (but lives alongside `attachmentMaxEncryptedBytes`).
-    public var maxMediaTierThumbnailDownloadSizeBytes: UInt = 1024 * 8
+    // MARK: -
 
     public var enableGifSearch: Bool {
         return isEnabled(.enableGifSearch, defaultValue: true)
     }
 
+    // MARK: -
+
     public var shouldCheckForServiceExtensionFailures: Bool {
         return !isEnabled(.serviceExtensionFailureKillSwitch)
     }
 
+    // MARK: -
+
     public var backgroundRefreshInterval: TimeInterval {
         return TimeInterval(getUIntValue(
             forFlag: .backgroundRefreshInterval,
-            defaultValue: UInt(TimeInterval.day)
+            defaultValue: UInt(TimeInterval.day),
         ))
     }
+
+    // MARK: -
 
     public var messageQueueTime: TimeInterval {
         return interval(.messageQueueTimeInSeconds, defaultInterval: 45 * .day)
@@ -288,37 +336,148 @@ public class RemoteConfig {
         return UInt64(messageQueueTime * Double(MSEC_PER_SEC))
     }
 
-    public var shouldRunTSAttachmentMigrationInBGProcessingTask: Bool {
-        return !isEnabled(.tsAttachmentMigrationBGProcessingTaskKillSwitch)
+    // MARK: -
+
+    public var pinnedThreadLimit: UInt {
+        return getUIntValue(
+            forFlag: .pinnedThreadLimit,
+            defaultValue: 4,
+        )
     }
 
-    public var shouldRunTSAttachmentMigrationInMainAppBackground: Bool {
-        return !isEnabled(.tsAttachmentMigrationMainAppBackgroundKillSwitch)
+    public var pinnedMessageLimit: UInt {
+        return getUIntValue(
+            forFlag: .pinnedMessageLimit,
+            defaultValue: UInt(3),
+        )
     }
 
-    public var backupSettingsKillSwitch: Bool {
-        return isEnabled(.backupSettingsKillSwitch)
+    // MARK: -
+
+    public var normalDeleteMaxAgeInSeconds: TimeInterval {
+        return TimeInterval(getUInt64Value(
+            forFlag: .normalDeleteMaxAgeInSeconds,
+            defaultValue: UInt64.dayInMs / UInt64(MSEC_PER_SEC),
+        ))
+    }
+
+    public var adminDeleteMaxAgeInSeconds: TimeInterval {
+        return TimeInterval(getUInt64Value(
+            forFlag: .adminDeleteMaxAgeInSeconds,
+            defaultValue: UInt64.dayInMs / UInt64(MSEC_PER_SEC),
+        ))
+    }
+
+    // MARK: -
+
+    public var postRegistrationChangeNumberWaitingPeriodInSeconds: TimeInterval {
+        return TimeInterval(getUInt64Value(
+            forFlag: .postRegistrationWaitingPeriodSeconds,
+            defaultValue: UInt64.hourInMs / UInt64(MSEC_PER_SEC),
+        ))
+    }
+
+    // MARK: -
+
+    /// The maximum number of options in a poll we create.
+    public var maxPollOptionSendCount: Int {
+        let value = getUInt32Value(forFlag: .maxPollOptionSendCount, defaultValue: 10)
+        return Int(value)
+    }
+
+    /// The maximum number of options we accept in an incoming poll.
+    public var maxPollOptionReceiveCount: Int {
+        let value = getUInt32Value(forFlag: .maxPollOptionReceiveCount, defaultValue: 10)
+        return Int(value)
+    }
+
+    // MARK: -
+
+    public var wifiAwareDeviceTransferEnabled: Bool {
+        return !isEnabled(.wifiAwareDeviceTransferKillSwitch, defaultValue: false) && BuildFlags.wifiAwareDeviceTransfer
+    }
+
+    // MARK: -
+
+    public var accountIdentifierSharingSend: Bool {
+        return BuildFlags.accountIdentifierSharingSend || isEnabled(.contactSharingV2)
+    }
+
+    // MARK: - RingRTC
+
+    /// How many successful calls per million should show a call quality survey for the user's region
+    public func callQualitySurveyPPM(localIdentifiers: LocalIdentifiers) -> UInt64 {
+        let defaultValue: UInt64 = 10_000
+        let string = Self.countryCodeBucketValue(
+            csvString: getStringConvertibleValue(
+                forFlag: .callQualitySurveyPPM,
+                defaultValue: "*:\(defaultValue)",
+            ),
+            localIdentifiers: localIdentifiers,
+        )
+        guard let string else { return defaultValue }
+        return UInt64(string) ?? defaultValue
+    }
+
+    public var ringrtcDredDuration: UInt8 {
+        getUInt8Value(forFlag: .ringrtcDredDuration, defaultValue: 0)
     }
 
     public var ringrtcNwPathMonitorTrial: Bool {
         return !isEnabled(.ringrtcNwPathMonitorTrialKillSwitch, defaultValue: false)
     }
 
-    public var pollCreate: Bool {
-        guard BuildFlags.pollSend else {
-            return false
-        }
-        return !isEnabled(.pollCreateKillSwitch)
+    public var ringrtcVp9Enabled: Bool {
+        return isEnabled(.ringrtcVp9Enabled, defaultValue: false)
     }
 
-    public var pollReceive: Bool {
-        guard BuildFlags.pollReceive else {
-            return false
+    /// List of "device models" hardware identifiers deny-listed for which
+    /// RingRTC should avoid encoding VP9.
+    ///
+    /// Compare entries to the value of `String(sysctlKey: "hw.machine")`.
+    public var ringrtcVp9DeviceModelEncodeDenylist: [String] {
+        guard let valueFlag = valueFlags[ValueFlag.ringrtcVp9DeviceModelDenylist.rawValue] else {
+            return []
         }
-        return !isEnabled(.pollReceiveKillSwitch)
+
+        return valueFlag.split(separator: ".").map { String($0) }
     }
 
-    #if TESTABLE_BUILD
+    /// List of "device models" hardware identifiers deny-listed for which
+    /// RingRTC should avoid decoding VP9.
+    ///
+    /// Compare entries to the value of `String(sysctlKey: "hw.machine")`.
+    public var ringrtcVp9DeviceModelDecodeDenylist: [String] {
+        guard let valueFlag = valueFlags[ValueFlag.ringrtcVp9DeviceModelDecodeDenylist.rawValue] else {
+            return []
+        }
+
+        return valueFlag.split(separator: ".").map { String($0) }
+    }
+
+    /// SVC toggle.
+    public var ringrtcSvcEnabled: Bool {
+        return isEnabled(.ringrtcSvcEnabled, defaultValue: false)
+    }
+
+    /// When SVC is enabled, this value will be used to identify the required SVC mode.
+    public var ringrtcSvcMode: String {
+        return getStringConvertibleValue(forFlag: .ringrtcSvcMode, defaultValue: "L3T3_KEY")
+    }
+
+    /// When SVC is enabled, this value will be used to identify the required screenshare SVC mode.
+    public var ringrtcSvcModeForScreenshare: String {
+        return getStringConvertibleValue(forFlag: .ringrtcSvcModeForScreenshare, defaultValue: "L1T3")
+    }
+
+    /// When SVC is enabled, the maximum bandwidth will be set to this value.
+    public var ringrtcSvcMaxBitrateBps: UInt32 {
+        return getUInt32Value(forFlag: .ringrtcSvcMaxBitrateBps, defaultValue: 0)
+    }
+
+    // MARK: -
+
+#if TESTABLE_BUILD
     public var testHotSwappable: Bool? {
         if self.valueFlags[IsEnabledFlag.hotSwappable.rawValue] != nil {
             return isEnabled(.hotSwappable)
@@ -340,43 +499,65 @@ public class RemoteConfig {
     public var testNonSwappableValue: String? {
         return value(.nonSwappable)
     }
-    #endif
+#endif
 
-    // MARK: UInt values
+    // MARK: - UInt values
 
     private func getUIntValue(
         forFlag flag: ValueFlag,
-        defaultValue: UInt
+        defaultValue: UInt,
     ) -> UInt {
         getStringConvertibleValue(
             forFlag: flag,
-            defaultValue: defaultValue
+            defaultValue: defaultValue,
+        )
+    }
+
+    private func getUInt8Value(
+        forFlag flag: ValueFlag,
+        defaultValue: UInt8,
+    ) -> UInt8 {
+        getStringConvertibleValue(
+            forFlag: flag,
+            defaultValue: defaultValue,
         )
     }
 
     private func getUInt32Value(
         forFlag flag: ValueFlag,
-        defaultValue: UInt32
+        defaultValue: UInt32,
     ) -> UInt32 {
         getStringConvertibleValue(
             forFlag: flag,
-            defaultValue: defaultValue
+            defaultValue: defaultValue,
         )
     }
 
     private func getUInt64Value(
         forFlag flag: ValueFlag,
-        defaultValue: UInt64
+        defaultValue: UInt64,
     ) -> UInt64 {
         getStringConvertibleValue(
             forFlag: flag,
-            defaultValue: defaultValue
+            defaultValue: defaultValue,
+        )
+    }
+
+    // MARK: - Float values
+
+    private func getDoubleValue(
+        forFlag flag: ValueFlag,
+        defaultValue: Double,
+    ) -> Double {
+        getStringConvertibleValue(
+            forFlag: flag,
+            defaultValue: defaultValue,
         )
     }
 
     private func getStringConvertibleValue<V>(
         forFlag flag: ValueFlag,
-        defaultValue: V
+        defaultValue: V,
     ) -> V where V: LosslessStringConvertible {
         guard let stringValue: String = value(flag) else {
             return defaultValue
@@ -392,14 +573,32 @@ public class RemoteConfig {
 
     // MARK: - Country code buckets
 
+    fileprivate static func parsePhoneNumberRegions(
+        valueFlags: [String: String],
+        flag: ValueFlag,
+        defaultValue: String = "",
+    ) -> PhoneNumberRegions {
+        let regions = PhoneNumberRegions.parseRemoteConfigRegions(valueFlags[flag.rawValue] ?? defaultValue)
+        return PhoneNumberRegions(regions)
+    }
+
+    private static func countryCodeBucketValue(csvString: String, localIdentifiers: LocalIdentifiers) -> String? {
+        let phoneNumberUtil = SSKEnvironment.shared.phoneNumberUtilRef
+        let callingCode = phoneNumberUtil.localCallingCode(localIdentifiers: localIdentifiers)
+        return countryCodeValue(csvString: csvString, callingCode: callingCode)
+    }
+
     /// Determine if a country-code-dependent flag is enabled for the current
     /// user, given a country-code CSV and key.
     ///
     /// - Parameter csvString: a CSV containing `<country-code>:<parts-per-million>` pairs
     /// - Parameter key: a key to use as part of bucketing
-    static func isCountryCodeBucketEnabled(csvString: String, key: String, csvDescription: String, localIdentifiers: LocalIdentifiers) -> Bool {
+    public static func isCountryCodeBucketEnabled(csvString: String, key: String, localIdentifiers: LocalIdentifiers) -> Bool {
         guard
-            let countryCodeValue = countryCodeValue(csvString: csvString, csvDescription: csvDescription, localPhoneNumber: localIdentifiers.phoneNumber),
+            let countryCodeValue = countryCodeBucketValue(
+                csvString: csvString,
+                localIdentifiers: localIdentifiers,
+            ),
             let countEnabled = UInt64(countryCodeValue)
         else {
             return false
@@ -408,44 +607,36 @@ public class RemoteConfig {
         return isBucketEnabled(key: key, countEnabled: countEnabled, bucketSize: 1_000_000, localAci: localIdentifiers.aci)
     }
 
-    private static func isCountryCodeBucketEnabled(flag: ValueFlag, valueFlags: [String: String], localIdentifiers: LocalIdentifiers) -> Bool {
-        let rawValue = flag.rawValue
-        guard let csvString = valueFlags[rawValue] else { return false }
-
-        return isCountryCodeBucketEnabled(csvString: csvString, key: rawValue, csvDescription: rawValue, localIdentifiers: localIdentifiers)
-    }
-
     /// Given a CSV of `<country-code>:<value>` pairs, extract the `<value>`
-    /// corresponding to the current user's country.
-    private static func countryCodeValue(csvString: String, csvDescription: String, localPhoneNumber: String?) -> String? {
-        guard !csvString.isEmpty else { return nil }
-
-        // The value should always be a comma-separated list of country codes
-        // colon-separated from a value. There all may be an optional be a wildcard
-        // "*" country code that any unspecified country codes should use. If
-        // neither the local country code or the wildcard is specified, we assume
-        // the value is not set.
+    /// corresponding to the current user's country. The value should always be
+    /// a comma-separated list of country codes colon-separated from a value.
+    /// There may be an optional "*" wildcard country code that any unspecified
+    /// country codes should use. If we can't parse the country code from our
+    /// own phone number, we fall back to this wildcard value.
+    private static func countryCodeValue(csvString: String, callingCode: PhoneNumberUtil.LocalCallingCode?) -> String? {
         let callingCodeToValueMap = csvString
             .components(separatedBy: ",")
             .reduce(into: [String: String]()) { result, value in
                 let components = value.components(separatedBy: ":")
-                guard components.count == 2 else { return owsFailDebug("Invalid \(csvDescription) value \(value)") }
+                guard components.count == 2 else {
+                    owsFailDebug("malformed country-code:value remote config value")
+                    return
+                }
                 let callingCode = components[0]
                 let countryValue = components[1]
                 result[callingCode] = countryValue
             }
 
-        guard !callingCodeToValueMap.isEmpty else { return nil }
-
-        guard
-            let localPhoneNumber,
-            let localCallingCode = SSKEnvironment.shared.phoneNumberUtilRef.parseE164(localPhoneNumber)?.getCallingCode()
-        else {
-            owsFailDebug("Invalid local number")
-            return nil
+        let resolvedCallingCode: String?
+        switch callingCode {
+        case .phoneNumberfull(.some(let callingCode)):
+            resolvedCallingCode = String(callingCode)
+        case .phoneNumberless:
+            resolvedCallingCode = String(Constants.phoneNumberlessCallingCode)
+        case .phoneNumberfull(.none), nil:
+            resolvedCallingCode = nil
         }
-
-        return callingCodeToValueMap[String(localCallingCode)] ?? callingCodeToValueMap["*"]
+        return resolvedCallingCode.flatMap({ callingCodeToValueMap[$0] }) ?? callingCodeToValueMap["*"]
     }
 
     private static func isBucketEnabled(key: String, countEnabled: UInt64, bucketSize: UInt64, localAci: Aci) -> Bool {
@@ -476,7 +667,7 @@ public class RemoteConfig {
         return interval
     }
 
-    fileprivate func isEnabled(_ flag: IsEnabledFlag, defaultValue: Bool = false) -> Bool {
+    private func isEnabled(_ flag: IsEnabledFlag, defaultValue: Bool = false) -> Bool {
         switch valueFlags[flag.rawValue] {
         case nil:
             return defaultValue
@@ -504,6 +695,8 @@ public class RemoteConfig {
         return valueFlags[flag.rawValue]
     }
 
+    // MARK: -
+
     public func debugDescriptions() -> [String: String] {
         return self.valueFlags
     }
@@ -522,10 +715,10 @@ private enum IsEnabledFlag: String, FlagType {
     case applePayMonthlyDonationKillSwitch = "ios.applePayMonthlyDonationKillSwitch"
     case applePayOneTimeDonationKillSwitch = "ios.applePayOneTimeDonationKillSwitch"
     case automaticSessionResetKillSwitch = "ios.automaticSessionResetKillSwitch"
-    case backupSettingsKillSwitch = "ios.backupSettingsKillSwitch"
     case cardGiftDonationKillSwitch = "ios.cardGiftDonationKillSwitch"
     case cardMonthlyDonationKillSwitch = "ios.cardMonthlyDonationKillSwitch"
     case cardOneTimeDonationKillSwitch = "ios.cardOneTimeDonationKillSwitch"
+    case contactSharingV2 = "ios.contactSharingV2.2"
     case enableAutoAPNSRotation = "ios.enableAutoAPNSRotation"
     case enableGifSearch = "global.gifSearch"
     case messageResendKillSwitch = "ios.messageResendKillSwitch"
@@ -533,17 +726,16 @@ private enum IsEnabledFlag: String, FlagType {
     case paypalGiftDonationKillSwitch = "ios.paypalGiftDonationKillSwitch"
     case paypalMonthlyDonationKillSwitch = "ios.paypalMonthlyDonationKillSwitch"
     case paypalOneTimeDonationKillSwitch = "ios.paypalOneTimeDonationKillSwitch"
-    case pollCreateKillSwitch = "ios.pollCreateKillSwitch"
-    case pollReceiveKillSwitch = "ios.pollReceiveKillSwitch"
     case ringrtcNwPathMonitorTrialKillSwitch = "ios.ringrtcNwPathMonitorTrialKillSwitch"
+    case ringrtcSvcEnabled = "ios.ringrtcSvcEnabled"
+    case ringrtcVp9Enabled = "ios.ringrtcVp9Enabled.2"
     case serviceExtensionFailureKillSwitch = "ios.serviceExtensionFailureKillSwitch"
-    case tsAttachmentMigrationBGProcessingTaskKillSwitch = "ios.tsAttachmentMigrationBGProcessingTaskKillSwitch"
-    case tsAttachmentMigrationMainAppBackgroundKillSwitch = "ios.tsAttachmentMigrationMainAppBackgroundKillSwitch"
+    case wifiAwareDeviceTransferKillSwitch = "ios.wifiAwareDeviceTransferKillSwitch"
 
-    #if TESTABLE_BUILD
+#if TESTABLE_BUILD
     case hotSwappable = "test.hotSwappable.enabled"
     case nonSwappable = "test.nonSwappable.enabled"
-    #endif
+#endif
 
     var isHotSwappable: Bool {
         switch self {
@@ -551,10 +743,10 @@ private enum IsEnabledFlag: String, FlagType {
         case .applePayMonthlyDonationKillSwitch: false
         case .applePayOneTimeDonationKillSwitch: false
         case .automaticSessionResetKillSwitch: false
-        case .backupSettingsKillSwitch: true
         case .cardGiftDonationKillSwitch: false
         case .cardMonthlyDonationKillSwitch: false
         case .cardOneTimeDonationKillSwitch: false
+        case .contactSharingV2: false
         case .enableAutoAPNSRotation: false
         case .enableGifSearch: false
         case .messageResendKillSwitch: false
@@ -562,26 +754,30 @@ private enum IsEnabledFlag: String, FlagType {
         case .paypalGiftDonationKillSwitch: false
         case .paypalMonthlyDonationKillSwitch: false
         case .paypalOneTimeDonationKillSwitch: false
-        case .pollCreateKillSwitch: true
-        case .pollReceiveKillSwitch: true
         case .ringrtcNwPathMonitorTrialKillSwitch: true // cached during launch, so not hot-swapped in practice
+        case .ringrtcSvcEnabled: false
+        case .ringrtcVp9Enabled: true
         case .serviceExtensionFailureKillSwitch: true
-        case .tsAttachmentMigrationBGProcessingTaskKillSwitch: true
-        case .tsAttachmentMigrationMainAppBackgroundKillSwitch: true
-
-        #if TESTABLE_BUILD
+        case .wifiAwareDeviceTransferKillSwitch: true
+#if TESTABLE_BUILD
         case .hotSwappable: true
         case .nonSwappable: false
-        #endif
+#endif
         }
     }
 }
 
 private enum ValueFlag: String, FlagType {
+    case adminDeleteMaxAgeInSeconds = "global.adminDeleteMaxAgeInSeconds"
     case applePayDisabledRegions = "global.donations.apayDisabledRegions"
     case attachmentMaxEncryptedBytes = "global.attachments.maxBytes"
+    case attachmentMaxEncryptedReceiveBytes = "global.attachments.maxReceiveBytes"
     case automaticSessionResetAttemptInterval = "ios.automaticSessionResetAttemptInterval"
     case backgroundRefreshInterval = "ios.backgroundRefreshInterval"
+    case backupAttachmentMaxEncryptedBytes = "ios.backupAttachments.maxBytes"
+    case backupListMediaDefaultRefreshIntervalMs = "ios.backupListMediaDefaultRefreshIntervalMs"
+    case backupListMediaOutOfQuotaRefreshIntervalMs = "ios.backupListMediaOutOfQuotaRefreshIntervalMs"
+    case callQualitySurveyPPM = "ios.callQualitySurveyPPM"
     case cdsSyncInterval = "cds.syncInterval.seconds"
     case clientExpiration = "ios.clientExpiration"
     case creditAndDebitCardDisabledRegions = "global.donations.ccDisabledRegions"
@@ -590,32 +786,49 @@ private enum ValueFlag: String, FlagType {
     case maxGroupSizeHardLimit = "global.groupsv2.groupSizeHardLimit"
     case maxGroupSizeRecommended = "global.groupsv2.maxGroupSize"
     case maxNicknameLength = "global.nicknames.max"
+    case maxPollOptionReceiveCount = "ios.polls.maxReceiveOptionCount"
+    case maxPollOptionSendCount = "ios.polls.maxSendOptionCount"
     case maxSenderKeyAge = "ios.maxSenderKeyAge"
+    case maxThumbnailFileSizeBytes = "global.backups.maxThumbnailFileSizeBytes"
     case mediaTierFallbackCdnNumber = "global.backups.mediaTierFallbackCdnNumber"
     case messageQueueTimeInSeconds = "global.messageQueueTimeInSeconds"
     case messageSendLogEntryLifetime = "ios.messageSendLogEntryLifetime"
     case minNicknameLength = "global.nicknames.min"
+    case normalDeleteMaxAgeInSeconds = "global.normalDeleteMaxAgeInSeconds"
     case paymentsDisabledRegions = "global.payments.disabledRegions"
     case paypalDisabledRegions = "global.donations.paypalDisabledRegions"
+    case pinnedMessageLimit = "global.pinnedMessageLimit"
+    case pinnedThreadLimit = "global.pinnedChatLimit"
+    case postRegistrationWaitingPeriodSeconds = "global.changeNumber.postRegistrationWaitingPeriodSeconds"
     case reactiveProfileKeyAttemptInterval = "ios.reactiveProfileKeyAttemptInterval"
     case replaceableInteractionExpiration = "ios.replaceableInteractionExpiration"
+    case ringrtcDredDuration = "ios.ringrtcDredDuration"
+    case ringrtcSvcMaxBitrateBps = "ios.ringrtcSvcMaxBitrateBps"
+    case ringrtcSvcMode = "ios.ringrtcSvcMode"
+    case ringrtcSvcModeForScreenshare = "ios.ringrtcSvcModeForScreenshare"
+    case ringrtcVp9DeviceModelDecodeDenylist = "ios.ringrtcVp9DeviceModelDecodeDenylist"
+    case ringrtcVp9DeviceModelDenylist = "ios.ringrtcVp9DeviceModelDenylist"
     case sepaEnabledRegions = "global.donations.sepaEnabledRegions"
     case standardMediaQualityLevel = "ios.standardMediaQualityLevel"
-    case tsAttachmentMigrationBatchDelayMs = "ios.tsAttachmentMigrationBatchDelayMs"
-    case backupListMediaDefaultRefreshIntervalMs = "ios.backupListMediaDefaultRefreshIntervalMs"
-    case backupListMediaOutOfQuotaRefreshIntervalMs = "ios.backupListMediaOutOfQuotaRefreshIntervalMs"
+    case videoAttachmentMaxEncryptedBytes = "ios.videoAttachments.maxBytes"
 
-    #if TESTABLE_BUILD
+#if TESTABLE_BUILD
     case hotSwappable = "test.hotSwappable.value"
     case nonSwappable = "test.nonSwappable.value"
-    #endif
+#endif
 
     var isHotSwappable: Bool {
         switch self {
+        case .adminDeleteMaxAgeInSeconds: true
         case .applePayDisabledRegions: true
-        case .attachmentMaxEncryptedBytes: false
+        case .attachmentMaxEncryptedBytes: true
+        case .attachmentMaxEncryptedReceiveBytes: true
         case .automaticSessionResetAttemptInterval: true
         case .backgroundRefreshInterval: true
+        case .backupAttachmentMaxEncryptedBytes: true
+        case .backupListMediaDefaultRefreshIntervalMs: true
+        case .backupListMediaOutOfQuotaRefreshIntervalMs: true
+        case .callQualitySurveyPPM: true
         case .cdsSyncInterval: false
         case .clientExpiration: true
         case .creditAndDebitCardDisabledRegions: true
@@ -624,25 +837,35 @@ private enum ValueFlag: String, FlagType {
         case .maxGroupSizeHardLimit: true
         case .maxGroupSizeRecommended: true
         case .maxNicknameLength: false
+        case .maxPollOptionReceiveCount: true
+        case .maxPollOptionSendCount: true
         case .maxSenderKeyAge: true
+        case .maxThumbnailFileSizeBytes: true
         case .mediaTierFallbackCdnNumber: true
         case .messageQueueTimeInSeconds: false
         case .messageSendLogEntryLifetime: false
         case .minNicknameLength: false
+        case .normalDeleteMaxAgeInSeconds: true
         case .paymentsDisabledRegions: true
         case .paypalDisabledRegions: true
+        case .pinnedMessageLimit: true
+        case .pinnedThreadLimit: true
+        case .postRegistrationWaitingPeriodSeconds: true
         case .reactiveProfileKeyAttemptInterval: true
         case .replaceableInteractionExpiration: false
+        case .ringrtcDredDuration: true
+        case .ringrtcSvcMaxBitrateBps: true
+        case .ringrtcSvcMode: true
+        case .ringrtcSvcModeForScreenshare: true
+        case .ringrtcVp9DeviceModelDecodeDenylist: true
+        case .ringrtcVp9DeviceModelDenylist: true
         case .sepaEnabledRegions: true
-        case .standardMediaQualityLevel: false
-        case .tsAttachmentMigrationBatchDelayMs: true
-        case .backupListMediaDefaultRefreshIntervalMs: true
-        case .backupListMediaOutOfQuotaRefreshIntervalMs: true
-
-        #if TESTABLE_BUILD
+        case .standardMediaQualityLevel: true
+        case .videoAttachmentMaxEncryptedBytes: true
+#if TESTABLE_BUILD
         case .hotSwappable: true
         case .nonSwappable: false
-        #endif
+#endif
         }
     }
 }
@@ -695,7 +918,7 @@ class RemoteConfigProviderImpl: RemoteConfigProvider {
         return result
     }
 
-    public func currentConfig() -> RemoteConfig {
+    func currentConfig() -> RemoteConfig {
         return cachedConfig ?? .emptyConfig
     }
 
@@ -707,7 +930,7 @@ class RemoteConfigProviderImpl: RemoteConfigProvider {
         }
     }
 
-    public func warmCaches(tx: DBReadTransaction) -> RemoteConfig {
+    func warmCaches(tx: DBReadTransaction) -> RemoteConfig {
         let (clockSkew, valueFlags) = { () -> (TimeInterval?, [String: String]?) in
             guard self.tsAccountManager.registrationState(tx: tx).isRegistered else {
                 return (nil, nil)
@@ -752,6 +975,9 @@ public protocol RemoteConfigManager: RemoteConfigProvider {
     /// Refresh the remote config from the server if it's been too long since we
     /// last fetched it.
     func refreshIfNeeded() async throws
+
+    /// Forcibly refresh the remote config.
+    func forceRefresh() async throws
 }
 
 // MARK: -
@@ -760,6 +986,7 @@ public protocol RemoteConfigManager: RemoteConfigProvider {
 
 public class StubbableRemoteConfigManager: MockRemoteConfigProvider, RemoteConfigManager {
     public func refreshIfNeeded() async throws {}
+    public func forceRefresh() async throws {}
 }
 
 #endif
@@ -806,7 +1033,7 @@ public class RemoteConfigManagerImpl: RemoteConfigManager {
                 self,
                 selector: #selector(self.registrationStateDidChange),
                 name: .registrationStateDidChange,
-                object: nil
+                object: nil,
             )
         }
     }
@@ -859,7 +1086,10 @@ public class RemoteConfigManagerImpl: RemoteConfigManager {
             }
             refreshImmediately = false
 
-            try await Retry.performWithBackoff(maxAttempts: Int.max, maxAverageBackoff: 14.1 * .minute) {
+            try await Retry.performWithBackoff(
+                maxAttempts: Int.max,
+                maxAverageBackoff: 14.1 * .minute,
+            ) {
                 do {
                     try await self.refreshIfNeeded()
                 } catch {
@@ -875,8 +1105,19 @@ public class RemoteConfigManagerImpl: RemoteConfigManager {
         return (lastFetchDate ?? .distantPast).addingTimeInterval(Self.refreshInterval)
     }
 
+    public func forceRefresh() async throws {
+        try await refreshTaskQueue.runWithThrowingTask {
+            do {
+                try await self._refresh()
+            } catch {
+                Logger.warn("\(error)")
+                throw error
+            }
+        }
+    }
+
     public func refreshIfNeeded() async throws {
-        try await refreshTaskQueue.run {
+        try await refreshTaskQueue.runWithThrowingTask {
             let nextFetchDate = self.fetchNextFetchDate()
             guard self.dateProvider() > nextFetchDate else {
                 return
@@ -906,7 +1147,7 @@ public class RemoteConfigManagerImpl: RemoteConfigManager {
         owsAssertDebug(serverEpochTimeMs != nil, "Must have X-Signal-Timestamp.")
 
         let clockSkew: TimeInterval
-        if let serverEpochTimeMs = serverEpochTimeMs {
+        if let serverEpochTimeMs {
             let dateAccordingToServer = Date(timeIntervalSince1970: TimeInterval(serverEpochTimeMs) / 1000)
             clockSkew = dateAccordingToServer.timeIntervalSince(Date())
         } else {
@@ -1056,7 +1297,7 @@ private extension KeyValueStore {
             Self.remoteConfigIsEnabledFlagsKey,
             keyClass: NSString.self,
             objectClass: NSNumber.self,
-            transaction: transaction
+            transaction: transaction,
         ) as [String: NSNumber]?
         return decodedValue?.mapValues { $0.boolValue }
     }
@@ -1070,12 +1311,16 @@ private extension KeyValueStore {
             Self.remoteConfigValueFlagsKey,
             keyClass: NSString.self,
             objectClass: NSString.self,
-            transaction: transaction
+            transaction: transaction,
         ) as [String: String]?
     }
 
     func setRemoteConfigValueFlags(_ newValue: [String: String], transaction: DBWriteTransaction) {
-        return setObject(newValue, key: Self.remoteConfigValueFlagsKey, transaction: transaction)
+        return setObject(
+            newValue as [NSString: NSString] as NSDictionary,
+            key: Self.remoteConfigValueFlagsKey,
+            transaction: transaction,
+        )
     }
 
     // MARK: - Remote Config Time Gated Flags
@@ -1087,7 +1332,7 @@ private extension KeyValueStore {
             Self.remoteConfigTimeGatedFlagsKey,
             keyClass: NSString.self,
             objectClass: NSDate.self,
-            transaction: transaction
+            transaction: transaction,
         ) as [String: Date]?
     }
 

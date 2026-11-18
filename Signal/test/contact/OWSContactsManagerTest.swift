@@ -14,6 +14,7 @@ class OWSContactsManagerTest: SignalBaseTest {
 
     private let mockUsernameLookupMananger: MockUsernameLookupManager = .init()
     private let mockNicknameManager = MockNicknameManager()
+    private let mockAciContactShareNameManager = MockAciContactShareNameManager()
     private let mockRecipientDatabaseTable = RecipientDatabaseTable()
 
     override func setUp() {
@@ -23,7 +24,7 @@ class OWSContactsManagerTest: SignalBaseTest {
         SSKEnvironment.shared.databaseStorageRef.write { tx in
             (DependenciesBridge.shared.registrationStateChangeManager as! RegistrationStateChangeManagerImpl).registerForTests(
                 localIdentifiers: .forUnitTests,
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -38,10 +39,14 @@ class OWSContactsManagerTest: SignalBaseTest {
 
     private func makeContactsManager() -> OWSContactsManager {
         return OWSContactsManager(
+            aciContactShareNameManager: mockAciContactShareNameManager,
             appReadiness: AppReadinessMock(),
             nicknameManager: mockNicknameManager,
+            notificationPreferencesManager: NotificationPreferencesManager(
+                storageServiceManager: FakeStorageServiceManager(),
+            ),
             recipientDatabaseTable: mockRecipientDatabaseTable,
-            usernameLookupManager: mockUsernameLookupMananger
+            usernameLookupManager: mockUsernameLookupMananger,
         )
     }
 
@@ -60,7 +65,7 @@ class OWSContactsManagerTest: SignalBaseTest {
                 recipientManager.markAsRegisteredAndSave(
                     &recipient,
                     shouldUpdateStorageService: false,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
@@ -77,7 +82,7 @@ class OWSContactsManagerTest: SignalBaseTest {
     private func makeAccount(
         serviceId: ServiceId,
         phoneNumber: E164,
-        fullName: String
+        fullName: String,
     ) -> SignalAccount {
         let parts = fullName.components(separatedBy: " ")
         return SignalAccount(
@@ -89,7 +94,7 @@ class OWSContactsManagerTest: SignalBaseTest {
             familyName: parts.dropFirst().first ?? "",
             nickname: "",
             fullName: fullName,
-            contactAvatarHash: nil
+            contactAvatarHash: nil,
         )
     }
 
@@ -109,7 +114,8 @@ class OWSContactsManagerTest: SignalBaseTest {
             badges: [],
             lastFetchDate: nil,
             lastMessagingDate: nil,
-            isPhoneNumberShared: nil
+            isPhoneNumberShared: nil,
+            hasPaymentAddress: nil,
         )
     }
 
@@ -129,13 +135,13 @@ class OWSContactsManagerTest: SignalBaseTest {
             recipientRowID: aliceRecipientRowID,
             givenName: "Alice",
             familyName: "Doe",
-            note: nil
+            note: nil,
         )
         let bobNickname = NicknameRecord(
             recipientRowID: bobRecipientRowID,
             givenName: "Bob",
             familyName: nil,
-            note: nil
+            note: nil,
         )
 
         self.dbV2.write { tx in
@@ -147,7 +153,7 @@ class OWSContactsManagerTest: SignalBaseTest {
             let contactsManager = SSKEnvironment.shared.contactManagerRef as! OWSContactsManager
             let actual = contactsManager.displayNames(
                 for: [aliceAddress, bobAddress],
-                tx: tx
+                tx: tx,
             ).map { $0.resolvedValue() }
             let expected = ["Alice Doe", "Bob"]
             XCTAssertEqual(actual, expected)
@@ -189,7 +195,7 @@ class OWSContactsManagerTest: SignalBaseTest {
     func testGetDisplayNamesWithPhoneNumbers() {
         let addresses = [
             SignalServiceAddress(phoneNumber: "+17035559900"),
-            SignalServiceAddress(phoneNumber: "+17035559901")
+            SignalServiceAddress(phoneNumber: "+17035559901"),
         ]
         // Prevent default fake name from being used.
         (SSKEnvironment.shared.profileManagerRef as! OWSFakeProfileManager).fakeUserProfiles = [:]
@@ -222,6 +228,122 @@ class OWSContactsManagerTest: SignalBaseTest {
             let actual = contactsManager.displayNames(for: addresses, tx: transaction).map { $0.resolvedValue() }
             let expected = ["alice", "bob"]
             XCTAssertEqual(actual, expected)
+        }
+    }
+
+    func testGetDisplayNamesWithAciContactShareNames() {
+        let aliceAddress = SignalServiceAddress(Aci.randomForTesting())
+        let bobAddress = SignalServiceAddress(Aci.randomForTesting())
+
+        let aliceRecipient = makeAndInsertRecipient(address: aliceAddress)
+        let bobRecipient = makeAndInsertRecipient(address: bobAddress)
+
+        dbV2.write { tx in
+            mockAciContactShareNameManager.saveName(
+                givenName: "Alice",
+                familyName: "Aliceson",
+                recipient: aliceRecipient,
+                allowOverwrite: true,
+                updateStorageService: false,
+                tx: tx,
+            )
+            mockAciContactShareNameManager.saveName(
+                givenName: "Bob",
+                familyName: nil,
+                recipient: bobRecipient,
+                allowOverwrite: true,
+                updateStorageService: false,
+                tx: tx,
+            )
+        }
+
+        // Prevent default fake names from being used.
+        (SSKEnvironment.shared.profileManagerRef as! OWSFakeProfileManager).fakeUserProfiles = [:]
+
+        dbV2.read { tx in
+            let contactsManager = SSKEnvironment.shared.contactManagerRef as! OWSContactsManager
+            let actual = contactsManager.displayNames(for: [aliceAddress, bobAddress], tx: tx).map { $0.resolvedValue() }
+            let expected = ["Alice Aliceson", "Bob"]
+            XCTAssertEqual(actual, expected)
+        }
+    }
+
+    func testProfileNameTakesPrecedenceOverAciContactShareName() {
+        let address = SignalServiceAddress(Aci.randomForTesting())
+        let recipient = makeAndInsertRecipient(address: address)
+
+        dbV2.write { tx in
+            mockAciContactShareNameManager.saveName(
+                givenName: "Shared",
+                familyName: "Name",
+                recipient: recipient,
+                allowOverwrite: true,
+                updateStorageService: false,
+                tx: tx,
+            )
+        }
+
+        (SSKEnvironment.shared.profileManagerRef as! OWSFakeProfileManager).fakeUserProfiles = [
+            address: makeUserProfile(givenName: "Alice", familyName: "Aliceson"),
+        ]
+
+        dbV2.read { tx in
+            let contactsManager = SSKEnvironment.shared.contactManagerRef as! OWSContactsManager
+            let actual = contactsManager.displayNames(for: [address], tx: tx).map { $0.resolvedValue() }
+            XCTAssertEqual(actual, ["Alice Aliceson"])
+        }
+    }
+
+    func testAciContactShareNameTakesPrecedenceOverPhoneNumber() {
+        let aci = Aci.randomForTesting()
+        let address = SignalServiceAddress(serviceId: aci, phoneNumber: "+16505550100")
+        let recipient = makeAndInsertRecipient(address: address)
+
+        dbV2.write { tx in
+            mockAciContactShareNameManager.saveName(
+                givenName: "Shared",
+                familyName: "Name",
+                recipient: recipient,
+                allowOverwrite: true,
+                updateStorageService: false,
+                tx: tx,
+            )
+        }
+
+        // Prevent default fake names from being used.
+        (SSKEnvironment.shared.profileManagerRef as! OWSFakeProfileManager).fakeUserProfiles = [:]
+
+        dbV2.read { tx in
+            let contactsManager = SSKEnvironment.shared.contactManagerRef as! OWSContactsManager
+            let actual = contactsManager.displayNames(for: [address], tx: tx).map { $0.resolvedValue() }
+            XCTAssertEqual(actual, ["Shared Name"])
+        }
+    }
+
+    func testAciContactShareNameTakesPrecedenceOverUsername() {
+        let aci = Aci.randomForTesting()
+        let address = SignalServiceAddress(aci)
+        let recipient = makeAndInsertRecipient(address: address)
+
+        dbV2.write { tx in
+            mockAciContactShareNameManager.saveName(
+                givenName: "Shared",
+                familyName: "Name",
+                recipient: recipient,
+                allowOverwrite: true,
+                updateStorageService: false,
+                tx: tx,
+            )
+            mockUsernameLookupMananger.saveUsername("shared.01", forAci: aci, transaction: tx)
+        }
+
+        // Prevent default fake names from being used.
+        (SSKEnvironment.shared.profileManagerRef as! OWSFakeProfileManager).fakeUserProfiles = [:]
+
+        dbV2.read { tx in
+            let contactsManager = SSKEnvironment.shared.contactManagerRef as! OWSContactsManager
+            let actual = contactsManager.displayNames(for: [address], tx: tx).map { $0.resolvedValue() }
+            XCTAssertEqual(actual, ["Shared Name"])
         }
     }
 
@@ -274,7 +396,7 @@ class OWSContactsManagerTest: SignalBaseTest {
             recipientRowID: feliciaRowID,
             givenName: "Felicia",
             familyName: "Felicity",
-            note: nil
+            note: nil,
         )
         dbV2.write { tx in
             mockNicknameManager.insert(feliciaNickname, tx: tx)

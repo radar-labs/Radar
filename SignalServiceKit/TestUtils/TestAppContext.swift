@@ -3,14 +3,15 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
-
 #if TESTABLE_BUILD
+
+import Foundation
+public import UIKit
 
 @objc
 public class TestAppContext: NSObject, AppContext {
     public static var testDebugLogsDirPath: String {
-        let dirPath = OWSTemporaryDirectory().appendingPathComponent("TestLogs")
+        let dirPath = OWSFileSystem.temporaryFilePath(isAvailableWhileDeviceLocked: false).appendingPathComponent("TestLogs")
         OWSFileSystem.ensureDirectoryExists(dirPath)
         return dirPath
     }
@@ -25,7 +26,7 @@ public class TestAppContext: NSObject, AppContext {
     public var mainWindow: UIWindow?
     public let appLaunchTime: Date
 
-    public override init() {
+    override public init() {
         // Avoid using OWSTemporaryDirectory(); it can consult the current app context.
         let dirName = "ows_temp_\(UUID().uuidString)"
         let temporaryDirectory = NSTemporaryDirectory().appendingPathComponent(dirName)
@@ -51,7 +52,6 @@ public class TestAppContext: NSObject, AppContext {
     public let type: SignalServiceKit.AppContextType = .main
     public let isMainAppAndActive: Bool = true
     public let isMainAppAndActiveIsolated: Bool = true
-    public func mainApplicationStateOnLaunch() -> UIApplication.State { .inactive }
     public let isRTL: Bool = false
     public func isInBackground() -> Bool { false }
     public func isAppForegroundAndActive() -> Bool { true }

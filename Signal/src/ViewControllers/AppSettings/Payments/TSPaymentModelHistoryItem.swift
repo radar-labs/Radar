@@ -12,13 +12,8 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
 
     public let displayName: String
 
-    init(paymentModel: TSPaymentModel, displayName: String) {
-        self.paymentModel = paymentModel
-        self.displayName = displayName
-    }
-
     public var address: SignalServiceAddress? {
-        paymentModel.senderOrRecipientAci.map { SignalServiceAddress($0.wrappedAciValue) }
+        paymentModel.senderOrRecipientAci.map { SignalServiceAddress($0) }
     }
 
     public var isIncoming: Bool {
@@ -53,7 +48,6 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
         guard let fee = paymentModel.mobileCoin?.feeAmount else { return nil }
         return PaymentsFormat.formattedBalance(fee).string
     }
-    
 
     public var paymentType: TSPaymentType {
         paymentModel.paymentType
@@ -123,23 +117,26 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
         }
         return PaymentsFormat.formattedBalance(totalAmount, withSpace: true).string
     }
-    
+
     public var formattedFiatPaymentAmount: String? {
         guard !PaymentsDisplayPreferences.shared.isBalanceHidden else {
             return nil
         }
         let localCurrencyCode = SSKEnvironment.shared.paymentsCurrenciesRef.currentCurrencyCode
-        guard let currencyConversionInfo = SSKEnvironment.shared.paymentsCurrenciesRef.conversionInfo(forCurrencyCode: localCurrencyCode)  else {
+        guard let currencyConversionInfo = SSKEnvironment.shared.paymentsCurrenciesRef.conversionInfo(forCurrencyCode: localCurrencyCode) else {
             return nil
         }
-        
+
         guard
             let paymentAmount = self.paymentModel.paymentAmount,
-            let fiatAmountString = PaymentsFormat.formatAsFiatCurrency(paymentAmount: paymentAmount,
-                                                                       currencyConversionInfo: currencyConversionInfo) else {
+            let fiatAmountString = PaymentsFormat.formatAsFiatCurrency(
+                paymentAmount: paymentAmount,
+                currencyConversionInfo: currencyConversionInfo,
+            )
+        else {
             return nil
         }
-        
+
         return "\(fiatAmountString) \(localCurrencyCode)"
     }
 
@@ -148,14 +145,15 @@ public struct PaymentsHistoryModelItem: PaymentsHistoryItem {
     }
 
     public func markAsRead(tx: DBWriteTransaction) {
-        PaymentsViewUtils.markPaymentAsRead(paymentModel, transaction: tx)
+        PaymentUtils.markPaymentAsRead(paymentModel, transaction: tx)
     }
 
     public func reload(tx: DBReadTransaction) -> Self? {
-        guard let newPaymentModel = TSPaymentModel.anyFetch(
-            uniqueId: paymentModel.uniqueId,
-            transaction: tx
-        ) else { return nil }
+        guard
+            let newPaymentModel = TSPaymentModel.anyFetch(
+                uniqueId: paymentModel.uniqueId,
+                transaction: tx,
+            ) else { return nil }
 
         return .init(paymentModel: newPaymentModel, displayName: displayName)
     }

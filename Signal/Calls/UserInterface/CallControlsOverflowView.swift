@@ -5,6 +5,7 @@
 
 import SignalRingRTC
 import SignalServiceKit
+import UIKit
 
 class CallControlsOverflowView: UIView {
     private lazy var reactionPicker: MessageReactionPicker = {
@@ -12,8 +13,8 @@ class CallControlsOverflowView: UIView {
             selectedEmoji: nil,
             delegate: self,
             style: .contextMenu(allowGlass: false),
-            forceDarkTheme: true
         )
+        picker.overrideUserInterfaceStyle = .dark
         picker.translatesAutoresizingMaskIntoConstraints = false
         picker.isHidden = true
         return picker
@@ -26,14 +27,14 @@ class CallControlsOverflowView: UIView {
         var isHandRaised: Bool {
             didSet {
                 if isHandRaised {
-                    self.raiseHandLabel.text =  OWSLocalizedString(
+                    self.raiseHandLabel.text = OWSLocalizedString(
                         "CALL_LOWER_HAND_BUTTON_LABEL",
-                        comment: "Label on button for lowering hand in call."
+                        comment: "Label on button for lowering hand in call.",
                     )
                 } else {
-                    self.raiseHandLabel.text =  OWSLocalizedString(
+                    self.raiseHandLabel.text = OWSLocalizedString(
                         "CALL_RAISE_HAND_BUTTON_LABEL",
-                        comment: "Label on button for raising hand in call."
+                        comment: "Label on button for raising hand in call.",
                     )
                 }
             }
@@ -80,9 +81,9 @@ class CallControlsOverflowView: UIView {
 
             let backgroundView = self.addBackgroundView(
                 withBackgroundColor: .ows_gray75,
-                cornerRadius: Constants.stackViewCornerRadius
+                cornerRadius: Constants.stackViewCornerRadius,
             )
-            backgroundView.layer.shadowColor = UIColor.ows_black.cgColor
+            backgroundView.layer.shadowColor = UIColor.black.cgColor
             backgroundView.layer.shadowRadius = Constants.stackViewBackgroundViewShadowRadius
             backgroundView.layer.shadowOpacity = Constants.stackViewBackgroundViewShadowOpacity
             backgroundView.layer.shadowOffset = .zero
@@ -90,7 +91,7 @@ class CallControlsOverflowView: UIView {
             let shadowView = UIView()
             shadowView.backgroundColor = .ows_gray75
             shadowView.layer.cornerRadius = Constants.stackViewCornerRadius
-            shadowView.layer.shadowColor = UIColor.ows_black.cgColor
+            shadowView.layer.shadowColor = UIColor.black.cgColor
             shadowView.layer.shadowRadius = Constants.stackViewShadowRadius
             shadowView.layer.shadowOpacity = Constants.stackViewShadowOpacity
             shadowView.layer.shadowOffset = Constants.stackViewShadowOffset
@@ -121,7 +122,7 @@ class CallControlsOverflowView: UIView {
         reactionsSink: ReactionsSink,
         raiseHandSender: RaiseHandSender,
         emojiPickerSheetPresenter: EmojiPickerSheetPresenter,
-        callControlsOverflowPresenter: CallControlsOverflowPresenter
+        callControlsOverflowPresenter: CallControlsOverflowPresenter,
     ) {
         self.call = call
         self.reactionSender = reactionSender
@@ -144,9 +145,12 @@ class CallControlsOverflowView: UIView {
             buttonStack.topAnchor.constraint(equalTo: reactionPicker.bottomAnchor, constant: Constants.spacingBetweenEmojiPickerAndStackView),
             buttonStack.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             buttonStack.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            buttonStack.bottomAnchor.constraint(equalTo: self.bottomAnchor)
+            buttonStack.bottomAnchor.constraint(equalTo: self.bottomAnchor),
         ])
-        buttonStack.raiseHandButton.addTarget(self, action: #selector(CallControlsOverflowView.didTapRaiseHandButton), for: .touchUpInside)
+        buttonStack.raiseHandButton.addAction(
+            UIAction { [weak self] _ in self?.didTapRaiseHandButton() },
+            for: .primaryActionTriggered,
+        )
     }
 
     // MARK: - Constants
@@ -215,7 +219,7 @@ class CallControlsOverflowView: UIView {
             duration: Constants.animationDuration,
             completion: { [weak self] in
                 self?.callControlsOverflowPresenter?.callControlsOverflowDidDisappear()
-            }
+            },
         )
         buttonStack.alpha = 1
         buttonStack.backgroundColor = .ows_gray75
@@ -239,31 +243,26 @@ extension CallControlsOverflowView: MessageReactionPickerDelegate {
         self.react(with: reaction)
     }
 
-    func didSelectAnyEmoji() {
+    func didSelectShowFullEmojiPicker() {
         let sheet = EmojiPickerSheet(
             message: nil,
-            forceDarkTheme: true,
-            reactionPickerConfigurationListener: self
+            reactionPickerConfigurationListener: self,
         ) { [weak self] selectedEmoji in
             guard let selectedEmoji else { return }
             self?.react(with: selectedEmoji.rawValue)
         }
+        sheet.overrideUserInterfaceStyle = .dark
         emojiPickerSheetPresenter?.present(
             sheet: sheet,
-            animated: true
+            animated: true,
         )
     }
 
     private func react(with reaction: String) {
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
         self.callControlsOverflowPresenter?.willSendReaction()
         self.reactionSender.react(value: reaction)
-        let localAci = SSKEnvironment.shared.databaseStorageRef.read { tx in
-            DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: tx)?.aci
-        }
-        guard let localAci else {
-            owsFailDebug("Local user is in call but doesn't have ACI!")
-            return
-        }
+        let localAci = tsAccountManager.mustBeRegisteredStateWithMaybeSneakyTransaction().localIdentifiers.aci
         // Locally-sent reactions do not come in via the API, so we add them here.
         self.reactionsSink.addReactions(
             reactions: [
@@ -271,9 +270,9 @@ extension CallControlsOverflowView: MessageReactionPickerDelegate {
                     emoji: reaction,
                     name: CommonStrings.you,
                     aci: localAci,
-                    timestamp: Date.timeIntervalSinceReferenceDate
-                )
-            ]
+                    timestamp: Date.timeIntervalSinceReferenceDate,
+                ),
+            ],
         )
     }
 }
@@ -317,7 +316,7 @@ protocol RaiseHandSender {
 extension SignalRingRTC.GroupCall: RaiseHandSender {}
 
 extension CallControlsOverflowView {
-    @objc
+
     private func didTapRaiseHandButton() {
         self.callControlsOverflowPresenter?.didTapRaiseOrLowerHand()
         self.raiseHandSender.raiseHand(raise: !self.isLocalHandRaised)

@@ -10,7 +10,6 @@ extension RPRecentCallType: Codable { }
 extension TSErrorMessageType: Codable { }
 extension TSInfoMessageType: Codable { }
 extension OWSVerificationState: Codable { }
-extension TSGroupMetaMessage: Codable { }
 extension SDSRecordType: Codable { }
 extension TSRecentCallOfferType: Codable { }
 extension TSPaymentCurrency: Codable { }

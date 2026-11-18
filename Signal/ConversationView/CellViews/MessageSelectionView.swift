@@ -4,63 +4,43 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
-public class MessageSelectionView: ManualLayoutView {
+/// ManualLayoutView wrapper around SelectionIndicatorView.
+class MessageSelectionView: ManualLayoutView {
 
-    public var isSelected: Bool = false {
-        didSet {
-            selectedView.isHidden = !isSelected
-            unselectedView.isHidden = isSelected
+    private let selectionIndicatorView = SelectionIndicatorView(style: .list)
+
+    var isSelected: Bool {
+        get {
+            selectionIndicatorView.isSelected
+        }
+        set {
+            selectionIndicatorView.isSelected = newValue
         }
     }
 
-    public init() {
+    init() {
         super.init(name: "MessageSelectionView")
 
-        addSubviewToFillSuperviewEdges(backgroundView)
-        addSubviewToCenterOnSuperview(selectedView, size: Self.uiSize)
-        addSubviewToCenterOnSuperview(unselectedView, size: Self.uiSize)
-
-        selectedView.isHidden = true
+        addSubviewToFillSuperviewEdges(selectionIndicatorView)
     }
 
-    public static var totalSize: CGSize {
-        CGSize(square: ConversationStyle.selectionViewWidth)
-    }
-    private static var uiSize: CGSize {
-        CGSize(square: ConversationStyle.selectionViewWidth - 2)
+    static var preferredSize: CGSize {
+        CGSize(square: SelectionIndicatorView.preferredSize)
     }
 
-    private let selectedView: CVImageView = {
-        let checkmarkView = CVImageView()
-        checkmarkView.setTemplateImage(Theme.iconImage(.checkCircleFill), tintColor: .white)
-        return checkmarkView
-    }()
-
-    private let unselectedView: CircleView = {
-        let circleView = CircleView(diameter: MessageSelectionView.uiSize.width)
-        circleView.layer.borderWidth = 1.5
-        return circleView
-    }()
-
-    private let backgroundView: UIView = {
-        ManualLayoutViewWithLayer.circleView(name: "selection background")
-    }()
-
-    public func updateStyle(conversationStyle: ConversationStyle) {
-        AssertIsOnMainThread()
-
-        if conversationStyle.isDarkThemeEnabled || conversationStyle.hasWallpaper {
-            selectedView.tintColor = .ows_white
-            unselectedView.layer.borderColor = UIColor.ows_white.cgColor
-            backgroundView.backgroundColor = UIColor.ows_black.withAlphaComponent(0.2)
-            backgroundView.isHidden = (!conversationStyle.hasWallpaper ||
-                                        !conversationStyle.isWallpaperPhoto)
+    func updateStyle(conversationStyle: ConversationStyle) {
+        selectionIndicatorView.fillColor = conversationStyle.chatColorValue.asChatUIElementTintColor()
+        // Less transparent empty circle when there's a wallpaper and we're in light theme
+        // to improve legibility over darker wallpapers.
+        if
+            conversationStyle.isDarkThemeEnabled == false,
+            conversationStyle.hasWallpaper
+        {
+            selectionIndicatorView.unselectedListIndicatorColor = UIColor(rgbHex: 0x808080, alpha: 0.5)
         } else {
-            selectedView.tintColor = .ows_accentBlue
-            unselectedView.layer.borderColor = UIColor.ows_gray25.cgColor
-            backgroundView.isHidden = true
+            selectionIndicatorView.unselectedListIndicatorColor = nil // reset to default
         }
     }
 }

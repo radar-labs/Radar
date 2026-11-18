@@ -4,40 +4,33 @@
 //
 
 import Foundation
+import GRDB
 
-public protocol PinnedThreadStore {
+struct PinnedThreadStore {
 
-    func pinnedThreadIds(tx: DBReadTransaction) -> [String]
-
-    func isThreadPinned(_ thread: TSThread, tx: DBReadTransaction) -> Bool
-}
-
-/// Only to be used by PinnedThreadStoreManager
-public protocol PinnedThreadStoreWrite: PinnedThreadStore {
-
-    func updatePinnedThreadIds(_ pinnedThreadIds: [String], tx: DBWriteTransaction)
-}
-
-public class PinnedThreadStoreImpl: PinnedThreadStoreWrite {
-
-    private static let pinnedThreadIdsKey = "pinnedThreadIds"
-
-    private let keyValueStore: KeyValueStore
-
-    public init() {
-        self.keyValueStore = KeyValueStore(collection: "PinnedConversationManager")
+    init() {
     }
 
-    public func pinnedThreadIds(tx: DBReadTransaction) -> [String] {
-        return keyValueStore.getStringArray(Self.pinnedThreadIdsKey, transaction: tx) ?? []
+    func fetchPinnedThreadRecords(tx: DBReadTransaction) -> [PinnedThreadRecord] {
+        return failIfThrows {
+            return try PinnedThreadRecord.orderByPrimaryKey().fetchAll(tx.database)
+        }
     }
 
-    public func isThreadPinned(_ thread: TSThread, tx: DBReadTransaction) -> Bool {
-        return pinnedThreadIds(tx: tx).contains(thread.uniqueId)
-    }
-
-    public func updatePinnedThreadIds(_ pinnedThreadIds: [String], tx: DBWriteTransaction) {
-        let pinnedThreadIds: [String] = Array(pinnedThreadIds.prefix(PinnedThreads.maxPinnedThreads))
-        keyValueStore.setObject(pinnedThreadIds, key: Self.pinnedThreadIdsKey, transaction: tx)
+    func fetchPinnedThreadRecord(
+        forThreadId threadId: PinnedThreadId,
+        tx: DBReadTransaction,
+    ) -> PinnedThreadRecord? {
+        var queryRequest = PinnedThreadRecord.all()
+        switch threadId {
+        case .releaseNotes:
+            let constantId = PinnedThreadRecord.ConstantId.releaseNotes
+            queryRequest = queryRequest.filter(PinnedThreadRecord.Columns.constantId == constantId.rawValue)
+        case .groupId(let value):
+            queryRequest = queryRequest.filter(PinnedThreadRecord.Columns.groupId == value)
+        case .recipientId(let value):
+            queryRequest = queryRequest.filter(PinnedThreadRecord.Columns.recipientId == value)
+        }
+        return failIfThrows { try queryRequest.fetchOne(tx.database) }
     }
 }

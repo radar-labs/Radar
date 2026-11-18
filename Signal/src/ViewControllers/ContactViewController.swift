@@ -4,13 +4,15 @@
 //
 
 import ContactsUI
+import LibSignalClient
 import MessageUI
 import SignalServiceKit
 import SignalUI
 
-class ContactViewController: OWSTableViewController2 {
+class ContactViewController: OWSTableViewController2, ContactShareViewHelperDelegate {
 
-    private enum ContactViewMode {
+    private enum ContactViewMode: Equatable {
+        case aciShare(aci: Aci)
         case systemContactWithSignal
         case systemContactWithoutSignal
         case nonSystemContact
@@ -21,7 +23,7 @@ class ContactViewController: OWSTableViewController2 {
         didSet {
             AssertIsOnMainThread()
 
-            if oldValue != viewMode && isViewLoaded {
+            if oldValue != viewMode, isViewLoaded {
                 updateContent()
             }
         }
@@ -41,19 +43,23 @@ class ContactViewController: OWSTableViewController2 {
     init(contactShare: ContactShareViewModel) {
         self.contactShare = contactShare
         let phoneNumberPartition = Self.phoneNumberPartition(for: contactShare)
-        self.viewMode = Self.viewMode(for: phoneNumberPartition)
+        self.viewMode = Self.viewMode(for: contactShare, phoneNumberPartition: phoneNumberPartition)
         self.sendablePhoneNumbers = phoneNumberPartition.sendablePhoneNumbers
 
         super.init()
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(updateMode),
-                                               name: .OWSContactsManagerSignalAccountsDidChange,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(updateMode),
-                                               name: SSKReachability.owsReachabilityDidChange,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateMode),
+            name: .OWSContactsManagerSignalAccountsDidChange,
+            object: nil,
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateMode),
+            name: SSKReachability.owsReachabilityDidChange,
+            object: nil,
+        )
     }
 
     override func viewDidLoad() {
@@ -76,12 +82,18 @@ class ContactViewController: OWSTableViewController2 {
         return SSKEnvironment.shared.databaseStorageRef.read(block: contactShare.dbRecord.phoneNumberPartition(tx:))
     }
 
-    private static func viewMode(for phoneNumberPartition: OWSContact.PhoneNumberPartition) -> ContactViewMode {
+    private static func viewMode(
+        for contactShare: ContactShareViewModel,
+        phoneNumberPartition: OWSContact.PhoneNumberPartition,
+    ) -> ContactViewMode {
+        if let aci = contactShare.dbRecord.aci {
+            return .aciShare(aci: aci)
+        }
         return phoneNumberPartition.map(
             ifSendablePhoneNumbers: { _ in .systemContactWithSignal },
             elseIfInvitablePhoneNumbers: { _ in .systemContactWithoutSignal },
             elseIfAddablePhoneNumbers: { _ in .nonSystemContact },
-            elseIfNoPhoneNumbers: { .noPhoneNumber }
+            elseIfNoPhoneNumbers: { .noPhoneNumber },
         )
     }
 
@@ -90,8 +102,8 @@ class ContactViewController: OWSTableViewController2 {
         AssertIsOnMainThread()
 
         let phoneNumberPartition = Self.phoneNumberPartition(for: contactShare)
-        viewMode = Self.viewMode(for: phoneNumberPartition)
         sendablePhoneNumbers = phoneNumberPartition.sendablePhoneNumbers
+        viewMode = Self.viewMode(for: contactShare, phoneNumberPartition: phoneNumberPartition)
     }
 
     private func showInviteToSignal() -> Bool {
@@ -103,12 +115,29 @@ class ContactViewController: OWSTableViewController2 {
         }
     }
 
-    private func showAddToContacts() -> Bool {
-        switch viewMode {
-        case .nonSystemContact:
-            return true
-        default:
+    private var isLocalUser: Bool {
+        guard let localIdentifiers = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction else {
             return false
+        }
+        if let sharedAci {
+            return sharedAci == localIdentifiers.aci
+        }
+        return sendablePhoneNumbers.contains(where: localIdentifiers.contains(phoneNumber:))
+    }
+
+    private func canAddToGroup(aci: Aci) -> Bool {
+        return SSKEnvironment.shared.databaseStorageRef.read { tx in
+            return ThreadFinder().existsGroupThread(transaction: tx)
+                && !SSKEnvironment.shared.blockingManagerRef.isAddressBlocked(SignalServiceAddress(aci), transaction: tx)
+        }
+    }
+
+    private var sharedAci: Aci? {
+        switch viewMode {
+        case .aciShare(let aci):
+            return aci
+        case .systemContactWithSignal, .systemContactWithoutSignal, .nonSystemContact, .noPhoneNumber:
+            return nil
         }
     }
 
@@ -116,6 +145,7 @@ class ContactViewController: OWSTableViewController2 {
         AssertIsOnMainThread()
 
         var sections = [OWSTableSection]()
+        let isLocalUser = self.isLocalUser
 
         // Header
         let headerSection = OWSTableSection(items: [], headerView: buildHeaderView())
@@ -124,69 +154,82 @@ class ContactViewController: OWSTableViewController2 {
         // Contact Actions
         let actionsSection = OWSTableSection()
 
-        // Message, Video, Audio buttons for Signal contacts as a horizontal stack of buttons
-        if viewMode == .systemContactWithSignal {
-            let buttonMessage = SettingsHeaderButton(
-                title: OWSLocalizedString(
-                    "CONVERSATION_SETTINGS_MESSAGE_BUTTON",
-                    comment: "Button to message the chat"
-                ).capitalized,
-                icon: .settingsChats
-            ) { [weak self] in
-                self?.didPressSendMessage()
-            }
-            let buttonVideoCall = SettingsHeaderButton(
-                title: OWSLocalizedString(
-                    "CONVERSATION_SETTINGS_VIDEO_CALL_BUTTON",
-                    comment: "Button to start a video call"
-                ).capitalized,
-                icon: .buttonVideoCall
-            ) { [weak self] in
-                self?.didPressVideoCall()
-            }
-            let buttonAudioCall = SettingsHeaderButton(
-                title: OWSLocalizedString(
-                    "CONVERSATION_SETTINGS_VOICE_CALL_BUTTON",
-                    comment: "Button to start a voice call"
-                ).capitalized,
-                icon: .buttonVoiceCall
-            ) { [weak self] in
-                self?.didPressAudioCall()
-            }
-            let buttonStack = UIStackView(arrangedSubviews: [ buttonMessage, buttonVideoCall, buttonAudioCall ])
-            buttonStack.axis = .horizontal
-            buttonStack.spacing = 8
-            buttonStack.distribution = .fillEqually
-
-            let sectionHeaderView = UIView()
-            sectionHeaderView.addSubview(buttonStack)
-            buttonStack.autoPinHeightToSuperview()
-            buttonStack.autoHCenterInSuperview()
-            buttonStack.autoPinWidthToSuperviewMargins(relation: .lessThanOrEqual)
-            actionsSection.customHeaderView = sectionHeaderView
-        }
-
         if showInviteToSignal() {
             actionsSection.add(.disclosureItem(
                 icon: .settingsInvite,
                 withText: OWSLocalizedString("ACTION_INVITE", comment: ""),
                 actionBlock: { [weak self] in
                     self?.didPressInvite()
-                }
+                },
             ))
         }
 
-        if showAddToContacts() {
+        actionsSection.add(.disclosureItem(
+            icon: .contactInfoAddToContacts,
+            withText: OWSLocalizedString(
+                "CONVERSATION_VIEW_ADD_TO_CONTACTS_OFFER",
+                comment: "",
+            )
+            ,
+            actionBlock: { [weak self] in
+                self?.didPressAddToContacts()
+            },
+        ))
+
+        if let sharedAci, !isLocalUser, canAddToGroup(aci: sharedAci) {
             actionsSection.add(.disclosureItem(
-                icon: .contactInfoAddToContacts,
-                withText: OWSLocalizedString(
-                    "CONVERSATION_VIEW_ADD_TO_CONTACTS_OFFER",
-                    comment: "")
-                ,
+                icon: .contactInfoAddToGroup,
+                withText: OWSLocalizedString("ADD_TO_GROUP_TITLE", comment: "Title of the 'add to group' view."),
                 actionBlock: { [weak self] in
-                    self?.didPressAddToContacts()
-                }
+                    self?.didPressAddToGroup(aci: sharedAci)
+                },
             ))
+        }
+
+        // Message, Video, Audio buttons for Signal contacts as a horizontal stack of buttons
+        if sharedAci != nil || viewMode == .systemContactWithSignal {
+            let buttonMessage = SettingsHeaderButton(
+                title: OWSLocalizedString(
+                    "CONVERSATION_SETTINGS_MESSAGE_BUTTON",
+                    comment: "Button to message the chat",
+                ).capitalized,
+                icon: .settingsChats,
+            ) { [weak self] in
+                self?.didPressSendMessage()
+            }
+            let buttonVideoCall = SettingsHeaderButton(
+                title: OWSLocalizedString(
+                    "CONVERSATION_SETTINGS_VIDEO_CALL_BUTTON",
+                    comment: "Button to start a video call",
+                ).capitalized,
+                icon: .buttonVideoCall,
+            ) { [weak self] in
+                self?.didPressVideoCall()
+            }
+            let buttonAudioCall = SettingsHeaderButton(
+                title: OWSLocalizedString(
+                    "CONVERSATION_SETTINGS_VOICE_CALL_BUTTON",
+                    comment: "Button to start a voice call",
+                ).capitalized,
+                icon: .buttonVoiceCall,
+            ) { [weak self] in
+                self?.didPressAudioCall()
+            }
+            let buttonStack = UIStackView(arrangedSubviews: isLocalUser ? [buttonMessage] : [buttonMessage, buttonVideoCall, buttonAudioCall])
+            buttonStack.axis = .horizontal
+            buttonStack.spacing = 8
+            buttonStack.distribution = .fillEqually
+
+            let sectionHeaderView = UIView()
+            sectionHeaderView.addSubview(buttonStack)
+            buttonStack.autoPinEdge(toSuperviewEdge: .top)
+            buttonStack.autoPinEdge(
+                toSuperviewEdge: .bottom,
+                withInset: actionsSection.items.isEmpty ? 0 : defaultSpacingBetweenSections ?? 0,
+            )
+            buttonStack.autoHCenterInSuperview()
+            buttonStack.autoPinWidthToSuperviewMargins(relation: .lessThanOrEqual)
+            actionsSection.customHeaderView = sectionHeaderView
         }
 
         if actionsSection.customHeaderView != nil || !actionsSection.items.isEmpty {
@@ -196,35 +239,35 @@ class ContactViewController: OWSTableViewController2 {
         // Contact Info
         let infoSection = OWSTableSection()
         infoSection.add(items: contactShare.phoneNumbers.map({ phoneNumber in
-            return OWSTableItem(
-                customCellBlock: {
-                    return Self.buildPhoneNumberCell(phoneNumber)
-                },
-                actionBlock: { [weak self] in
-                    self?.didPressPhoneNumber(phoneNumber: phoneNumber)
-                }
-            )
+            let menuActions = phoneNumberMenuActions(phoneNumber: phoneNumber)
+            return OWSTableItem(customCellBlock: {
+                return Self.buildPhoneNumberCell(phoneNumber, menuActions: menuActions)
+            })
         }))
         infoSection.add(items: contactShare.emails.map({ email in
-            return OWSTableItem(
-                customCellBlock: {
-                    return Self.buildEmailCell(email)
-                },
-                actionBlock: { [weak self] in
-                    self?.didPressEmail(email: email)
-                }
-            )
+            let menuActions = emailMenuActions(email: email)
+            return OWSTableItem(customCellBlock: {
+                return Self.buildEmailCell(email, menuActions: menuActions)
+            })
         }))
         infoSection.add(items: contactShare.addresses.map({ address in
-            return OWSTableItem(
-                customCellBlock: {
-                    return Self.buildAddressCell(address)
-                },
-                actionBlock: { [weak self] in
-                    self?.didPressAddress(address: address)
-                }
-            )
+            let menuActions = addressMenuActions(address: address)
+            return OWSTableItem(customCellBlock: {
+                return Self.buildAddressCell(address, menuActions: menuActions)
+            })
         }))
+        if let nickname = contactShare.nickname {
+            let menuActions = [copyAction(text: OWSFormat.formatNameComponents(nickname))]
+            infoSection.add(OWSTableItem(customCellBlock: {
+                return Self.buildNicknameCell(nickname, menuActions: menuActions)
+            }))
+        }
+        if let note = contactShare.note {
+            let menuActions = [copyAction(text: note)]
+            infoSection.add(OWSTableItem(customCellBlock: {
+                return Self.buildNoteCell(note, menuActions: menuActions)
+            }))
+        }
         sections.append(infoSection)
 
         contents = OWSTableContents(sections: sections)
@@ -268,19 +311,21 @@ class ContactViewController: OWSTableViewController2 {
         // 26pt with default size
         let fontPointSize = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .title1).pointSize - 2
         nameLabel.font = UIFont.semiboldFont(ofSize: fontPointSize)
-        nameLabel.textColor = Theme.primaryTextColor
+        nameLabel.textColor = .Signal.label
         nameLabel.lineBreakMode = .byWordWrapping
         nameLabel.textAlignment = .center
         nameLabel.numberOfLines = 5
         verticalContentStack.addArrangedSubview(nameLabel)
 
         // Organization Name
-        if let organizationName = contactShare.name.organizationName?.ows_stripped().nilIfEmpty,
-           contactShare.name.hasAnyNamePart {
+        if
+            let organizationName = contactShare.name.organizationName?.ows_stripped().nilIfEmpty,
+            contactShare.name.hasAnyNamePart
+        {
             let label = UILabel()
             label.text = organizationName
             label.font = .dynamicTypeSubheadline
-            label.textColor = Theme.secondaryTextAndIconColor
+            label.textColor = .Signal.secondaryLabel
             label.lineBreakMode = .byWordWrapping
             label.textAlignment = .center
             label.numberOfLines = 3
@@ -292,117 +337,127 @@ class ContactViewController: OWSTableViewController2 {
 
     // MARK: Custom cells
 
-    private class func buildTableViewCellWith(_ fieldContentView: UIView) -> UITableViewCell {
+    private class func buildTableViewCellWith(_ fieldContentView: UIView, menuActions: [UIMenuElement]) -> UITableViewCell {
         let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
         cell.contentView.addSubview(fieldContentView)
         fieldContentView.autoPinHeightToSuperview(withMargin: 10)
         fieldContentView.autoPinWidthToSuperviewMargins()
+
+        let contextMenuButton = ContextMenuButton(actions: menuActions)
+        contextMenuButton.accessibilityLabel = fieldContentView.subviews
+            .compactMap { $0.accessibilityLabel?.strippedOrNil }
+            .joined(separator: ", ")
+        cell.addSubview(contextMenuButton)
+        contextMenuButton.autoPinEdgesToSuperviewEdges()
+
         return cell
     }
 
-    private class func buildPhoneNumberCell(_ phoneNumber: OWSContactPhoneNumber) -> UITableViewCell {
+    private class func buildPhoneNumberCell(_ phoneNumber: OWSContactPhoneNumber, menuActions: [UIMenuElement]) -> UITableViewCell {
         let fieldContentView = ContactFieldViewHelper.contactFieldView(forPhoneNumber: phoneNumber)
-        return buildTableViewCellWith(fieldContentView)
+        return buildTableViewCellWith(fieldContentView, menuActions: menuActions)
     }
 
-    private class func buildEmailCell(_ email: OWSContactEmail) -> UITableViewCell {
+    private class func buildEmailCell(_ email: OWSContactEmail, menuActions: [UIMenuElement]) -> UITableViewCell {
         let fieldContentView = ContactFieldViewHelper.contactFieldView(forEmail: email)
-        return buildTableViewCellWith(fieldContentView)
+        return buildTableViewCellWith(fieldContentView, menuActions: menuActions)
     }
 
-    private class func buildAddressCell(_ address: OWSContactAddress) -> UITableViewCell {
+    private class func buildAddressCell(_ address: OWSContactAddress, menuActions: [UIMenuElement]) -> UITableViewCell {
         let fieldContentView = ContactFieldViewHelper.contactFieldView(forAddress: address)
-        return buildTableViewCellWith(fieldContentView)
+        return buildTableViewCellWith(fieldContentView, menuActions: menuActions)
     }
-}
 
-// MARK: Actions
+    private class func buildNicknameCell(_ nickname: PersonNameComponents, menuActions: [UIMenuElement]) -> UITableViewCell {
+        let fieldContentView = ContactFieldViewHelper.contactFieldView(forNickname: nickname)
+        return buildTableViewCellWith(fieldContentView, menuActions: menuActions)
+    }
 
-extension ContactViewController {
+    private class func buildNoteCell(_ note: String, menuActions: [UIMenuElement]) -> UITableViewCell {
+        let fieldContentView = ContactFieldViewHelper.contactFieldView(forNote: note)
+        return buildTableViewCellWith(fieldContentView, menuActions: menuActions)
+    }
+
+    // MARK: Actions
 
     private func didPressSendMessage() {
-        Logger.info("")
-
-        contactShareViewHelper.sendMessage(to: sendablePhoneNumbers, from: self)
+        if let sharedAci {
+            contactShareViewHelper.sendMessage(toAci: sharedAci, sharedName: contactShare.dbRecord.name)
+        } else {
+            contactShareViewHelper.sendMessage(to: sendablePhoneNumbers, from: self)
+        }
     }
 
     private func didPressAudioCall() {
-        Logger.info("")
-
-        contactShareViewHelper.audioCall(to: sendablePhoneNumbers, from: self)
+        if let sharedAci {
+            contactShareViewHelper.audioCall(toAci: sharedAci, sharedName: contactShare.dbRecord.name)
+        } else {
+            contactShareViewHelper.audioCall(to: sendablePhoneNumbers, from: self)
+        }
     }
 
     private func didPressVideoCall() {
-        Logger.info("")
-
-        contactShareViewHelper.videoCall(to: sendablePhoneNumbers, from: self)
+        if let sharedAci {
+            contactShareViewHelper.videoCall(toAci: sharedAci, sharedName: contactShare.dbRecord.name)
+        } else {
+            contactShareViewHelper.videoCall(to: sendablePhoneNumbers, from: self)
+        }
     }
 
     private func didPressInvite() {
-        Logger.info("")
-
         contactShareViewHelper.showInviteContact(contactShare: contactShare, from: self)
     }
 
     private func didPressAddToContacts() {
-        Logger.info("")
-
         contactShareViewHelper.showAddToContactsPrompt(contactShare: contactShare, from: self)
     }
 
-    private func didPressPhoneNumber(phoneNumber: OWSContactPhoneNumber) {
-        Logger.info("")
+    private func didPressAddToGroup(aci: Aci) {
+        contactShareViewHelper.showAddToGroup(aci: aci, sharedName: contactShare.dbRecord.name, fromViewController: self)
+    }
 
-        let actionSheet = ActionSheetController(title: nil, message: nil)
+    private func phoneNumberMenuActions(phoneNumber: OWSContactPhoneNumber) -> [UIMenuElement] {
+        return [
+            UIDeferredMenuElement.uncached { [weak self] completion in
+                completion(self?.signalPhoneNumberActions(phoneNumber: phoneNumber) ?? [])
+            },
+            copyAction(text: phoneNumber.phoneNumber),
+        ]
+    }
 
-        if let phoneNumber = phoneNumber.e164 {
-            let isRegistered = sendablePhoneNumbers.contains(phoneNumber)
-            if isRegistered {
-                func addAction(title: String, action: ConversationViewAction) {
-                    actionSheet.addAction(ActionSheetAction(
-                        title: title,
-                        style: .default,
-                        handler: { _ in
-                            let address = SignalServiceAddress(phoneNumber: phoneNumber)
-                            SignalApp.shared.presentConversationForAddress(address, action: action, animated: true)
-                        }
-                    ))
-                }
-                addAction(title: CommonStrings.sendMessage, action: .compose)
-                addAction(
-                    title: OWSLocalizedString(
-                        "ACTION_VOICE_CALL",
-                        comment: "Label for 'voice call' button in contact view."
-                    ),
-                    action: .voiceCall
-                )
-                addAction(
-                    title: OWSLocalizedString(
-                        "ACTION_VIDEO_CALL",
-                        comment: "Label for 'video call' button in contact view."
-                    ),
-                    action: .voiceCall
-                )
-            } else {
-                // TODO: We could offer callPhoneNumberWithSystemCall.
+    private func signalPhoneNumberActions(phoneNumber: OWSContactPhoneNumber) -> [UIMenuElement] {
+        guard let e164 = phoneNumber.e164, sendablePhoneNumbers.contains(e164) else {
+            // TODO: We could offer callPhoneNumberWithSystemCall.
+            return []
+        }
+        func action(title: String, icon: ThemeIcon, action: ConversationViewAction) -> UIAction {
+            return UIAction(title: title, image: Theme.iconImage(icon)) { _ in
+                let address = SignalServiceAddress(phoneNumber: e164)
+                SignalApp.shared.presentConversationForAddress(address, action: action, animated: true)
             }
         }
-        actionSheet.addAction(ActionSheetAction(
-            title: OWSLocalizedString(
-                "EDIT_ITEM_COPY_ACTION",
-                comment: "Short name for edit menu item to copy contents of media message."
+        return [
+            action(title: CommonStrings.sendMessage, icon: .contextMenuMessage, action: .compose),
+            action(
+                title: OWSLocalizedString(
+                    "ACTION_VOICE_CALL",
+                    comment: "Label for 'voice call' button in contact view.",
+                ),
+                icon: .contextMenuVoiceCall,
+                action: .voiceCall,
             ),
-            style: .default
-        ) { _ in
-            UIPasteboard.general.string = phoneNumber.phoneNumber
-        })
-        actionSheet.addAction(OWSActionSheets.cancelAction)
-        presentActionSheet(actionSheet)
+            action(
+                title: OWSLocalizedString(
+                    "ACTION_VIDEO_CALL",
+                    comment: "Label for 'video call' button in contact view.",
+                ),
+                icon: .contextMenuVideoCall,
+                action: .videoCall,
+            ),
+        ]
     }
 
     private func callPhoneNumberWithSystemCall(phoneNumber: OWSContactPhoneNumber) {
-        Logger.info("")
-
         guard let url = NSURL(string: "tel:\(phoneNumber.phoneNumber)") else {
             owsFailDebug("could not open phone number.")
             return
@@ -410,35 +465,22 @@ extension ContactViewController {
         UIApplication.shared.open(url as URL, options: [:])
     }
 
-    private func didPressEmail(email: OWSContactEmail) {
-        Logger.info("")
-
-        let actionSheet = ActionSheetController(title: nil, message: nil)
-        actionSheet.addAction(ActionSheetAction(
-            title: OWSLocalizedString(
-                "CONTACT_VIEW_OPEN_EMAIL_IN_EMAIL_APP",
-                comment: "Label for 'open email in email app' button in contact view."
-            ),
-            style: .default
-        ) { [weak self] _ in
-            self?.openEmailInEmailApp(email: email)
-        })
-        actionSheet.addAction(ActionSheetAction(
-            title: OWSLocalizedString(
-                "EDIT_ITEM_COPY_ACTION",
-                comment: "Short name for edit menu item to copy contents of media message."
-            ),
-            style: .default
-        ) { _ in
-            UIPasteboard.general.string = email.email
-        })
-        actionSheet.addAction(OWSActionSheets.cancelAction)
-        presentActionSheet(actionSheet)
+    private func emailMenuActions(email: OWSContactEmail) -> [UIMenuElement] {
+        return [
+            UIAction(
+                title: OWSLocalizedString(
+                    "CONTACT_VIEW_OPEN_EMAIL_IN_EMAIL_APP",
+                    comment: "Label for 'open email in email app' button in contact view.",
+                ),
+                image: Theme.iconImage(.contextMenuOpenInChat),
+            ) { [weak self] _ in
+                self?.openEmailInEmailApp(email: email)
+            },
+            copyAction(text: email.email),
+        ]
     }
 
     private func openEmailInEmailApp(email: OWSContactEmail) {
-        Logger.info("")
-
         guard let url = NSURL(string: "mailto:\(email.email)") else {
             owsFailDebug("could not open email.")
             return
@@ -446,36 +488,34 @@ extension ContactViewController {
         UIApplication.shared.open(url as URL, options: [:])
     }
 
-    private func didPressAddress(address: OWSContactAddress) {
-        Logger.info("")
-
-        let actionSheet = ActionSheetController(title: nil, message: nil)
-        actionSheet.addAction(ActionSheetAction(
-            title: OWSLocalizedString(
-                "CONTACT_VIEW_OPEN_ADDRESS_IN_MAPS_APP",
-                comment: "Label for 'open address in maps app' button in contact view."
-            ),
-            style: .default
-        ) { [weak self] _ in
-            self?.openAddressInMaps(address: address)
-        })
-        actionSheet.addAction(ActionSheetAction(
+    private func copyAction(text: String) -> UIAction {
+        return UIAction(
             title: OWSLocalizedString(
                 "EDIT_ITEM_COPY_ACTION",
-                comment: "Short name for edit menu item to copy contents of media message."
+                comment: "Short name for edit menu item to copy contents of media message.",
             ),
-            style: .default
-        ) { [weak self] _ in
-            guard let self else { return }
-            UIPasteboard.general.string = self.formatAddressForQuery(address: address)
-        })
-        actionSheet.addAction(OWSActionSheets.cancelAction)
-        presentActionSheet(actionSheet)
+            image: Theme.iconImage(.contextMenuCopy),
+        ) { _ in
+            UIPasteboard.general.string = text
+        }
+    }
+
+    private func addressMenuActions(address: OWSContactAddress) -> [UIMenuElement] {
+        return [
+            UIAction(
+                title: OWSLocalizedString(
+                    "CONTACT_VIEW_OPEN_ADDRESS_IN_MAPS_APP",
+                    comment: "Label for 'open address in maps app' button in contact view.",
+                ),
+                image: Theme.iconImage(.contextMenuOpenInChat),
+            ) { [weak self] _ in
+                self?.openAddressInMaps(address: address)
+            },
+            copyAction(text: formatAddressForQuery(address: address)),
+        ]
     }
 
     private func openAddressInMaps(address: OWSContactAddress) {
-        Logger.info("")
-
         let mapAddress = formatAddressForQuery(address: address)
         guard let escapedMapAddress = mapAddress.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             owsFailDebug("could not open address.")
@@ -492,11 +532,9 @@ extension ContactViewController {
     }
 
     private func formatAddressForQuery(address: OWSContactAddress) -> String {
-        Logger.info("")
-
         // Open address in Apple Maps app.
         var addressParts = [String]()
-        let addAddressPart: ((String?) -> Void) = { (part) in
+        let addAddressPart: ((String?) -> Void) = { part in
             guard let part, !part.isEmpty else { return }
 
             addressParts.append(part)
@@ -509,9 +547,8 @@ extension ContactViewController {
         addAddressPart(address.country)
         return addressParts.joined(separator: ", ")
     }
-}
 
-extension ContactViewController: ContactShareViewHelperDelegate {
+    // MARK: - ContactShareViewHelperDelegate
 
     func didCreateOrEditContact() {
         updateContent()

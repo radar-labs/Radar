@@ -14,13 +14,20 @@ public class StoryManager {
         cacheAreViewReceiptsEnabled()
 
         appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
-            SSKEnvironment.shared.databaseStorageRef.asyncWrite { transaction in
-                // Create My Story thread if necessary
-                TSPrivateStoryThread.getOrCreateMyStory(transaction: transaction)
+            let db = DependenciesBridge.shared.db
+            let storageServiceManager = SSKEnvironment.shared.storageServiceManagerRef
+            let privateStoryThreadDeletionManager = DependenciesBridge.shared.privateStoryThreadDeletionManager
+
+            db.asyncWrite { tx in
+                if TSPrivateStoryThread.getMyStory(transaction: tx) == nil {
+                    let myStory = TSPrivateStoryThread.getOrCreateMyStory(transaction: tx)
+                    storageServiceManager.recordPendingUpdates(
+                        updatedStoryDistributionListIds: [myStory.distributionListIdentifier!],
+                    )
+                }
 
                 if CurrentAppContext().isMainApp {
-                    DependenciesBridge.shared.privateStoryThreadDeletionManager
-                        .cleanUpDeletedTimestamps(tx: transaction)
+                    privateStoryThreadDeletionManager.cleanUpDeletedTimestamps(tx: tx)
                 }
             }
         }
@@ -31,41 +38,42 @@ public class StoryManager {
         timestamp: UInt64,
         author: Aci,
         localIdentifiers: LocalIdentifiers,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) throws {
-        guard StoryFinder.story(
-            timestamp: timestamp,
-            author: author,
-            transaction: transaction
-        ) == nil else {
-            Logger.warn("Dropping story message with duplicate timestamp \(timestamp) from author \(author)")
-            return
+        guard
+            StoryFinder.story(
+                timestamp: timestamp,
+                author: author,
+                transaction: transaction,
+            ) == nil
+        else {
+            throw OWSGenericError("duplicate [timestamp \(timestamp), author \(author)]")
         }
 
         guard !SSKEnvironment.shared.blockingManagerRef.isAddressBlocked(SignalServiceAddress(author), transaction: transaction) else {
-            Logger.warn("Dropping story message with timestamp \(timestamp) from blocked or hidden author \(author)")
-            return
+            throw OWSGenericError("blocked author [timestamp \(timestamp), author \(author)]")
         }
 
         if DependenciesBridge.shared.recipientHidingManager.isHiddenAddress(SignalServiceAddress(author), tx: transaction) {
-            Logger.warn("Dropping story message with timestamp \(timestamp) from hidden author \(author)")
-            return
+            throw OWSGenericError("hidden author [timestamp \(timestamp), author \(author)]")
         }
 
         if let masterKey = storyMessage.group?.masterKey {
             let contextInfo = try GroupV2ContextInfo.deriveFrom(masterKeyData: masterKey)
 
-            guard !SSKEnvironment.shared.blockingManagerRef.isGroupIdBlocked(contextInfo.groupId, transaction: transaction) else {
-                Logger.warn("Dropping story message with timestamp \(timestamp) in blocked group")
-                return
+            if SSKEnvironment.shared.blockingManagerRef.isGroupIdBlocked(contextInfo.groupId, transaction: transaction) {
+                throw OWSGenericError("blocked group [timestamp \(timestamp), author \(author)]")
             }
 
             guard
-                let groupThread = TSGroupThread.fetch(groupId: contextInfo.groupId.serialize(), transaction: transaction),
+                let groupThread = TSGroupThread.fetchThread(forGroupId: contextInfo.groupId, tx: transaction),
                 groupThread.groupMembership.isFullMember(author)
             else {
-                Logger.warn("Dropping story message with timestamp \(timestamp) from author \(author) not in group")
-                return
+                throw OWSGenericError("not in group [timestamp \(timestamp), author \(author)]")
+            }
+
+            if groupThread.isTerminatedGroup {
+                throw OWSGenericError("terminated group [timestamp \(timestamp), author \(author)]")
             }
 
             if
@@ -73,14 +81,13 @@ public class StoryManager {
                 groupModel.isAnnouncementsOnly,
                 !groupModel.groupMembership.isFullMemberAndAdministrator(author)
             {
-                Logger.warn("Dropping story message with timestamp \(timestamp) from non-admin author \(author) in announcement only group")
-                return
+                throw OWSGenericError("not admin [timestamp \(timestamp), author \(author)]")
             }
 
         } else {
-            guard SSKEnvironment.shared.profileManagerRef.isUser(inProfileWhitelist: SignalServiceAddress(author), transaction: transaction) else {
-                Logger.warn("Dropping story message with timestamp \(timestamp) from unapproved author \(author).")
-                return
+            let profileManager = SSKEnvironment.shared.profileManagerRef
+            guard profileManager.isUser(inProfileWhitelist: SignalServiceAddress(author), transaction: transaction) else {
+                throw OWSGenericError("not signal connection [timestamp \(timestamp), author \(author)]")
             }
         }
 
@@ -92,18 +99,18 @@ public class StoryManager {
                 shouldFetchProfile: true,
                 userProfileWriter: .localUser,
                 localIdentifiers: localIdentifiers,
-                authedAccount: .implicit(),
-                tx: transaction
+                authedAccount: .implicit,
+                tx: transaction,
             )
         }
 
-        guard let message = try StoryMessage.create(
+        let message = try StoryMessage.create(
             withIncomingStoryMessage: storyMessage,
             timestamp: timestamp,
             receivedTimestamp: Date().ows_millisecondsSince1970,
             author: author,
-            transaction: transaction
-        ) else { return }
+            transaction: transaction,
+        )
 
         switch message.context {
         case .authorAci(let authorAci):
@@ -115,29 +122,35 @@ public class StoryManager {
 
         startAutomaticDownloadIfNecessary(for: message, transaction: transaction)
 
-        SSKEnvironment.shared.disappearingMessagesJobRef.scheduleRun(by: message.timestamp + storyLifetimeMillis)
+        // We have a new story message, so make sure our expiration job knows
+        // about it.
+        transaction.addSyncCompletion {
+            DependenciesBridge.shared.storyMessageExpirationJob.restart()
+        }
 
         SSKEnvironment.shared.earlyMessageManagerRef.applyPendingMessages(for: message, transaction: transaction)
     }
 
     public class func processStoryMessageTranscript(
         _ proto: SSKProtoSyncMessageSent,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) throws {
         let existingStory = StoryFinder.story(
             timestamp: proto.timestamp,
             author: DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: transaction)!.aci,
-            transaction: transaction
+            transaction: transaction,
         )
 
         if proto.isRecipientUpdate {
-            if let existingStory = existingStory {
+            if let existingStory {
                 existingStory.updateRecipients(proto.storyMessageRecipients, transaction: transaction)
 
                 // If there are no recipients remaining for a private story, delete the story model
-                if existingStory.groupId == nil,
-                   case .outgoing(let recipientStates) = existingStory.manifest,
-                   recipientStates.values.flatMap({ $0.contexts }).isEmpty {
+                if
+                    existingStory.groupId == nil,
+                    case .outgoing(let recipientStates) = existingStory.manifest,
+                    recipientStates.values.flatMap({ $0.contexts }).isEmpty
+                {
                     Logger.info("Deleting story with timestamp \(existingStory.timestamp) with no remaining contexts")
                     existingStory.anyRemove(transaction: transaction)
                 }
@@ -149,7 +162,11 @@ public class StoryManager {
 
             DependenciesBridge.shared.attachmentDownloadManager.enqueueDownloadOfAttachmentsForStoryMessage(message, tx: transaction)
 
-            SSKEnvironment.shared.disappearingMessagesJobRef.scheduleRun(by: message.timestamp + storyLifetimeMillis)
+            // We have a new story message, so make sure our expiration job
+            // knows about it.
+            transaction.addSyncCompletion {
+                DependenciesBridge.shared.storyMessageExpirationJob.restart()
+            }
 
             SSKEnvironment.shared.earlyMessageManagerRef.applyPendingMessages(for: message, transaction: transaction)
         } else {
@@ -169,11 +186,6 @@ public class StoryManager {
         }
     }
 
-    public class func nextExpirationTimestamp(transaction: DBReadTransaction) -> UInt64? {
-        guard let timestamp = StoryFinder.oldestExpirableTimestamp(transaction: transaction) else { return nil }
-        return timestamp + storyLifetimeMillis
-    }
-
     private static let hasSetMyStoriesPrivacyKey = "hasSetMyStoriesPrivacyKey"
 
     public class func hasSetMyStoriesPrivacy(transaction: DBReadTransaction) -> Bool {
@@ -183,7 +195,7 @@ public class StoryManager {
     public class func setHasSetMyStoriesPrivacy(
         _ hasSet: Bool,
         shouldUpdateStorageService: Bool,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) {
         guard hasSet != hasSetMyStoriesPrivacy(transaction: transaction) else {
             // Don't trigger account record updates unneccesarily!
@@ -208,9 +220,9 @@ public class StoryManager {
         case .media:
             let attachment = message.id.map { rowId in
                 return DependenciesBridge.shared.attachmentStore
-                    .fetchFirstReferencedAttachment(
+                    .fetchAnyReferencedAttachment(
                         for: .storyMessageMedia(storyMessageRowId: rowId),
-                        tx: transaction
+                        tx: transaction,
                     )?.attachment
             } ?? nil
             if attachment?.asStream() != nil {
@@ -256,7 +268,7 @@ public class StoryManager {
             }
 
             if unviewedDownloadedStoriesForContext >= perContextAutomaticDownloadLimit {
-                stop.pointee = true
+                stop = true
             }
         }
 
@@ -267,11 +279,14 @@ public class StoryManager {
 
         // See if the context has been recently active
 
-        let pinnedThreads = DependenciesBridge.shared.pinnedThreadManager.pinnedThreads(tx: transaction)
+        let pinnedThreads = DependenciesBridge.shared.pinnedThreadManager.pinnedThreads(
+            filterToVisible: true,
+            tx: transaction,
+        )
         let recentlyInteractedThreads = ThreadFinder().threadsWithRecentInteractions(limit: recentContextAutomaticDownloadLimit, transaction: transaction)
         let recentlyViewedContexts = StoryFinder.associatedDatasWithRecentlyViewedStories(
             limit: Int(recentContextAutomaticDownloadLimit),
-            transaction: transaction
+            transaction: transaction,
         ).map(\.sourceContext.asStoryContext)
         let autoDownloadContexts = (pinnedThreads + recentlyInteractedThreads).map { $0.storyContext } + recentlyViewedContexts
 
@@ -285,13 +300,13 @@ public class StoryManager {
     }
 
     // Exposed for testing
-    internal class func enqueueDownloadOfAttachmentsForStoryMessage(
+    class func enqueueDownloadOfAttachmentsForStoryMessage(
         _ message: StoryMessage,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         DependenciesBridge.shared.attachmentDownloadManager.enqueueDownloadOfAttachmentsForStoryMessage(
             message,
-            tx: tx
+            tx: tx,
         )
     }
 }
@@ -426,36 +441,17 @@ public extension StoryContext {
         }
     }
 
-    func threadUniqueId(transaction: DBReadTransaction) -> String? {
-        switch self {
-        case .groupId(let data):
-            return TSGroupThread.threadId(
-                forGroupId: data,
-                transaction: transaction
-            )
-        case .authorAci(let authorAci):
-            return TSContactThread.getWithContactAddress(
-                SignalServiceAddress(authorAci),
-                transaction: transaction
-            )?.uniqueId
-        case .privateStory(let uniqueId):
-            return uniqueId
-        case .none:
-            return nil
-        }
-    }
-
     func thread(transaction: DBReadTransaction) -> TSThread? {
         switch self {
         case .groupId(let data):
-            return TSGroupThread.fetch(groupId: data, transaction: transaction)
+            return TSGroupThread.fetchThread(forGroupIdData: data, tx: transaction)
         case .authorAci(let authorAci):
             return TSContactThread.getWithContactAddress(
                 SignalServiceAddress(authorAci),
-                transaction: transaction
+                transaction: transaction,
             )
         case .privateStory(let uniqueId):
-            return TSPrivateStoryThread.anyFetchPrivateStoryThread(uniqueId: uniqueId, transaction: transaction)
+            return TSPrivateStoryThread.fetchPrivateStoryThreadViaCache(uniqueId: uniqueId, transaction: transaction)
         case .none:
             return nil
         }
@@ -471,7 +467,7 @@ public extension StoryContext {
     }
 
     func isHidden(
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> Bool {
         if self == .authorAci(StoryMessage.systemStoryAuthor) {
             return SSKEnvironment.shared.systemStoryManagerRef.areSystemStoriesHidden(transaction: transaction)

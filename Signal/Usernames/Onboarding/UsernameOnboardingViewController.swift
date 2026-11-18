@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import LibSignalClient
 import SignalServiceKit
 import SignalUI
 import SwiftUI
@@ -13,12 +14,12 @@ class UsernameOnboardingViewController: HostingController<UsernameOnboardingView
     init(
         context: UsernameOnboardingViewModel.Context,
         onConfirm: @escaping () -> Void,
-        onSkip: @escaping () -> Void
+        onSkip: @escaping () -> Void,
     ) {
         let viewModel = UsernameOnboardingViewModel(context: context, onConfirm: onConfirm)
         super.init(wrappedView: UsernameOnboardingView(
             viewModel: viewModel,
-            onSkip: onSkip
+            onSkip: onSkip,
         ))
         OWSTableViewController2.removeBackButtonText(viewController: self)
     }
@@ -30,7 +31,17 @@ class UsernameOnboardingViewController: HostingController<UsernameOnboardingView
 class UsernameOnboardingViewModel: ObservableObject {
     struct Context {
         let localUsernameManager: LocalUsernameManager
-        let existingUsername: Usernames.ParsedUsername?
+        let existingUsername: UsernameComponents?
+    }
+
+    /// A username the server reserved for us. `LibSignalClient.Username`
+    /// isn't `Equatable`, so compare by value.
+    struct ReservedUsername: Equatable {
+        let username: LibSignalClient.Username
+
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            lhs.username.value == rhs.username.value
+        }
     }
 
     enum State: Equatable {
@@ -39,7 +50,7 @@ class UsernameOnboardingViewModel: ObservableObject {
         case cannotStartWithDigit
         case invalidCharacters
         case checking
-        case available(username: Usernames.ParsedUsername, hashedUsername: Usernames.HashedUsername)
+        case available(ReservedUsername)
         case unavailable
         case rateLimited
         case networkError
@@ -64,10 +75,10 @@ class UsernameOnboardingViewModel: ObservableObject {
         self.isDisplayingExistingUsername = context.existingUsername != nil
     }
 
-    var existingUsername: Usernames.ParsedUsername? { context.existingUsername }
+    var existingUsername: UsernameComponents? { context.existingUsername }
 
-    var confirmedUsername: Usernames.HashedUsername? {
-        if case .available(_, let hashed) = state { return hashed }
+    var confirmedUsername: LibSignalClient.Username? {
+        if case .available(let reserved) = state { return reserved.username }
         return nil
     }
 
@@ -85,22 +96,20 @@ class UsernameOnboardingViewModel: ObservableObject {
     }
 
     func confirmUsername() async {
-        guard case .available(_, let hashedUsername) = state else { return }
+        guard case .available(let reserved) = state else { return }
         reservationTask?.cancel()
         state = .confirming
 
-        let result = await context.localUsernameManager.confirmUsername(reservedUsername: hashedUsername)
-
-        switch result {
-        case .success(.success):
+        do {
+            try await context.localUsernameManager.confirmUsername(reservedUsername: reserved.username)
             onConfirm()
-        case .success(.rejected):
+        } catch SignalError.usernameNotAvailable, SignalError.usernameReservationNotFound {
             state = .unavailable
-        case .success(.rateLimited):
+        } catch SignalError.rateLimitedError(retryAfter: _, message: _) {
             state = .rateLimited
-        case .failure(.networkError):
+        } catch let error where error.isNetworkFailureOrTimeout {
             state = .networkError
-        case .failure(.otherError):
+        } catch {
             state = .unknownError
         }
     }
@@ -145,15 +154,15 @@ class UsernameOnboardingViewModel: ObservableObject {
     }
 
     private func attemptReservation(forNickname nickname: String, desiredDiscriminator: String) async {
-        typealias CandidateError = Usernames.HashedUsername.CandidateGenerationError
+        typealias CandidateError = Usernames.CandidateGenerationError
 
-        let candidates: Usernames.HashedUsername.GeneratedCandidates
+        let candidates: [LibSignalClient.Username]
         do {
-            candidates = try Usernames.HashedUsername.generateCandidates(
+            candidates = try Usernames.generateCandidates(
                 forNickname: nickname,
                 minNicknameLength: minNicknameLength,
                 maxNicknameLength: maxNicknameLength,
-                desiredDiscriminator: desiredDiscriminator.isEmpty ? nil : desiredDiscriminator
+                desiredDiscriminator: desiredDiscriminator.isEmpty ? nil : desiredDiscriminator,
             )
         } catch CandidateError.nicknameTooShort {
             state = .tooShort
@@ -169,20 +178,22 @@ class UsernameOnboardingViewModel: ObservableObject {
             return
         }
 
-        let result = await context.localUsernameManager.reserveUsername(usernameCandidates: candidates)
+        let result = await Result(catching: {
+            try await self.context.localUsernameManager.reserveUsername(usernameCandidates: candidates)
+        })
         guard !Task.isCancelled else { return }
 
         switch result {
-        case .success(.successful(let parsedUsername, let hashedUsername)):
-            discriminatorInput = parsedUsername.discriminator
-            state = .available(username: parsedUsername, hashedUsername: hashedUsername)
-        case .success(.rejected):
+        case .success(let username):
+            discriminatorInput = username.components().discriminator
+            state = .available(ReservedUsername(username: username))
+        case .failure(SignalError.usernameNotAvailable(_)):
             state = .unavailable
-        case .success(.rateLimited):
+        case .failure(SignalError.rateLimitedError(retryAfter: _, message: _)):
             state = .rateLimited
-        case .failure(.networkError):
+        case .failure(let error) where error.isNetworkFailureOrTimeout:
             state = .networkError
-        case .failure(.otherError):
+        case .failure:
             state = .unknownError
         }
     }
@@ -205,7 +216,7 @@ struct UsernameOnboardingView: View {
                 Spacer().frame(height: 28)
                 Text(OWSLocalizedString(
                     "USERNAME_ONBOARDING_TITLE",
-                    comment: "Title for the username setup screen shown during onboarding."
+                    comment: "Title for the username setup screen shown during onboarding.",
                 ))
                 .font(Font(UIFont.dynamicTypeFont(ofStandardSize: 26)))
                 .fontWeight(.semibold)
@@ -218,7 +229,7 @@ struct UsernameOnboardingView: View {
                 if viewModel.isDisplayingExistingUsername, let existing = viewModel.existingUsername {
                     Text(OWSLocalizedString(
                         "USERNAME_ONBOARDING_EXISTING_SUBTITLE",
-                        comment: "Subtitle shown on the username screen during onboarding when the user already has a username."
+                        comment: "Subtitle shown on the username screen during onboarding when the user already has a username.",
                     ))
                     .font(.body)
                     .foregroundStyle(Color.Signal.secondaryLabel)
@@ -230,7 +241,7 @@ struct UsernameOnboardingView: View {
                 } else {
                     Text(OWSLocalizedString(
                         "USERNAME_ONBOARDING_SUBTITLE",
-                        comment: "Subtitle for the username setup screen during onboarding, explaining what usernames are used for on Radar and Signal."
+                        comment: "Subtitle for the username setup screen during onboarding, explaining what usernames are used for on Radar and Signal.",
                     ))
                     .font(.body)
                     .foregroundStyle(Color.Signal.secondaryLabel)
@@ -258,7 +269,7 @@ struct UsernameOnboardingView: View {
                 Button(action: viewModel.editUsername) {
                     Text(OWSLocalizedString(
                         "USERNAME_ONBOARDING_EDIT_BUTTON",
-                        comment: "Button label to edit the username on the existing username screen during onboarding."
+                        comment: "Button label to edit the username on the existing username screen during onboarding.",
                     ))
                     .font(.headline)
                     .foregroundStyle(Color.Signal.accent)
@@ -270,7 +281,7 @@ struct UsernameOnboardingView: View {
                 } label: {
                     Text(OWSLocalizedString(
                         "USERNAME_ONBOARDING_CONFIRM_BUTTON",
-                        comment: "Button label to confirm the chosen username on the username setup screen during onboarding."
+                        comment: "Button label to confirm the chosen username on the username setup screen during onboarding.",
                     ))
                 }
                 .buttonStyle(Registration.UI.LargePrimaryButtonStyle())
@@ -307,7 +318,7 @@ struct UsernameOnboardingView: View {
 
     // MARK: Existing Username Display
 
-    private func existingUsernameRow(username: Usernames.ParsedUsername) -> some View {
+    private func existingUsernameRow(username: UsernameComponents) -> some View {
         HStack(spacing: 0) {
             Text(username.nickname)
                 .font(.system(size: 17, weight: .medium))
@@ -337,12 +348,12 @@ struct UsernameOnboardingView: View {
             TextField(
                 OWSLocalizedString(
                     "USERNAME_SELECTION_TEXT_FIELD_PLACEHOLDER",
-                    comment: "The placeholder text for a text field where users type a desired username."
+                    comment: "The placeholder text for a text field where users type a desired username.",
                 ),
                 text: Binding(
                     get: { viewModel.nickname },
-                    set: { viewModel.nicknameDidChange($0) }
-                )
+                    set: { viewModel.nicknameDidChange($0) },
+                ),
             )
             .focused($nicknameFocused)
             .autocorrectionDisabled()
@@ -369,7 +380,7 @@ struct UsernameOnboardingView: View {
                 set: { newValue in
                     let filtered = String(newValue.filter { $0.isNumber }.prefix(2))
                     viewModel.discriminatorDidChange(filtered)
-                }
+                },
             ))
             .focused($discriminatorFocused)
             .keyboardType(.numberPad)
@@ -392,7 +403,7 @@ struct UsernameOnboardingView: View {
                 Label {
                     Text(OWSLocalizedString(
                         "USERNAME_ONBOARDING_AVAILABLE_STATUS",
-                        comment: "Status label shown when the entered username is available to claim."
+                        comment: "Status label shown when the entered username is available to claim.",
                     ))
                 } icon: {
                     Image(systemName: "checkmark")
@@ -405,7 +416,7 @@ struct UsernameOnboardingView: View {
                 Label {
                     Text(OWSLocalizedString(
                         "USERNAME_SELECTION_NOT_AVAILABLE_ERROR_MESSAGE",
-                        comment: "An error message shown when the user wants to set their username to an unavailable value."
+                        comment: "An error message shown when the user wants to set their username to an unavailable value.",
                     ))
                 } icon: {
                     Image(systemName: "xmark")
@@ -419,9 +430,9 @@ struct UsernameOnboardingView: View {
                     OWSLocalizedString(
                         "USERNAME_SELECTION_TOO_SHORT_ERROR_MESSAGE_%d",
                         tableName: "PluralAware",
-                        comment: "An error message shown when the user has typed a username that is below the minimum character limit. Embeds {{ %d the minimum character count }}."
+                        comment: "An error message shown when the user has typed a username that is below the minimum character limit. Embeds {{ %d the minimum character count }}.",
                     ),
-                    Int(RemoteConfig.current.minNicknameLength)
+                    Int(RemoteConfig.current.minNicknameLength),
                 ))
                 .foregroundStyle(Color.Signal.red)
                 .font(.subheadline)
@@ -429,7 +440,7 @@ struct UsernameOnboardingView: View {
             case .cannotStartWithDigit:
                 Text(OWSLocalizedString(
                     "USERNAME_SELECTION_CANNOT_START_WITH_DIGIT_ERROR_MESSAGE",
-                    comment: "An error message shown when the user has typed a username that starts with a digit, which is invalid."
+                    comment: "An error message shown when the user has typed a username that starts with a digit, which is invalid.",
                 ))
                 .foregroundStyle(Color.Signal.red)
                 .font(.subheadline)
@@ -437,7 +448,7 @@ struct UsernameOnboardingView: View {
             case .invalidCharacters:
                 Text(OWSLocalizedString(
                     "USERNAME_SELECTION_INVALID_CHARACTERS_ERROR_MESSAGE",
-                    comment: "An error message shown when the user has typed a username that has invalid characters. The character ranges \"a-z\", \"0-9\", \"_\" should not be translated, as they are literal."
+                    comment: "An error message shown when the user has typed a username that has invalid characters. The character ranges \"a-z\", \"0-9\", \"_\" should not be translated, as they are literal.",
                 ))
                 .foregroundStyle(Color.Signal.red)
                 .font(.subheadline)
@@ -445,15 +456,18 @@ struct UsernameOnboardingView: View {
             case .rateLimited:
                 Text(OWSLocalizedString(
                     "USERNAME_SELECTION_RESERVATION_RATE_LIMITED_ERROR_MESSAGE",
-                    comment: "An error message shown when the user has attempted too many username reservations."
+                    comment: "An error message shown when the user has attempted too many username reservations.",
                 ))
                 .foregroundStyle(Color.Signal.red)
                 .font(.subheadline)
 
             case .networkError:
-                Text(Usernames.RemoteMutationError.networkError.localizedDescription)
-                    .foregroundStyle(Color.Signal.red)
-                    .font(.subheadline)
+                Text(OWSLocalizedString(
+                    "USERNAMES_REMOTE_MUTATION_ERROR_DESCRIPTION",
+                    comment: "An error message indicating that a usernames-related requeset failed because of a network error.",
+                ))
+                .foregroundStyle(Color.Signal.red)
+                .font(.subheadline)
 
             case .unknownError:
                 Text(CommonStrings.somethingWentWrongTryAgainLaterError)
@@ -482,9 +496,9 @@ struct UsernameOnboardingView: View {
     UsernameOnboardingView(
         viewModel: UsernameOnboardingViewModel(context: .init(
             localUsernameManager: DependenciesBridge.shared.localUsernameManager,
-            existingUsername: nil
+            existingUsername: nil,
         ), onConfirm: {}),
-        onSkip: {}
+        onSkip: {},
     )
 }
 
@@ -492,9 +506,9 @@ struct UsernameOnboardingView: View {
     UsernameOnboardingView(
         viewModel: UsernameOnboardingViewModel(context: .init(
             localUsernameManager: DependenciesBridge.shared.localUsernameManager,
-            existingUsername: Usernames.ParsedUsername(rawUsername: "myname.67")
+            existingUsername: (try? LibSignalClient.Username("myname.67"))?.components(),
         ), onConfirm: {}),
-        onSkip: {}
+        onSkip: {},
     )
 }
 

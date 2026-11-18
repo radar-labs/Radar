@@ -11,35 +11,35 @@ import Foundation
 /// The keys in this store are thread unique ids _OR_ "defaultKey". The
 /// values are either `PaletteChatColor.rawValue` or `CustomChatColor.Key`.
 public class ChatColorSettingStore {
-    private let settingStore: KeyValueStore
+    private let settingStore: NewKeyValueStore
     /// The keys in this store are `CustomChatColor.Key`. The values are
     /// `CustomChatColor`s.
-    private let customColorsStore: KeyValueStore
+    private let customColorsStore: NewKeyValueStore
 
     private let wallpaperStore: WallpaperStore
 
     public init(
-        wallpaperStore: WallpaperStore
+        wallpaperStore: WallpaperStore,
     ) {
-        self.settingStore = KeyValueStore(collection: "chatColorSettingStore")
-        self.customColorsStore = KeyValueStore(collection: "customColorsStore.3")
+        self.settingStore = NewKeyValueStore(collection: "chatColorSettingStore")
+        self.customColorsStore = NewKeyValueStore(collection: "customColorsStore.3")
         self.wallpaperStore = wallpaperStore
     }
 
     public func fetchAllScopeKeys(tx: DBReadTransaction) -> [String] {
-        return settingStore.allKeys(transaction: tx)
+        return settingStore.fetchKeys(tx: tx)
     }
 
     public func fetchRawSetting(for scopeKey: String, tx: DBReadTransaction) -> String? {
-        return settingStore.getString(scopeKey, transaction: tx)
+        return settingStore.fetchValue(String.self, forKey: scopeKey, tx: tx)
     }
 
     public func setRawSetting(_ rawValue: String?, for scopeKey: String, tx: DBWriteTransaction) {
-        settingStore.setString(rawValue, key: scopeKey, transaction: tx)
+        settingStore.writeValue(rawValue, forKey: scopeKey, tx: tx)
     }
 
     public func resetAllSettings(tx: DBWriteTransaction) {
-        settingStore.removeAll(transaction: tx)
+        settingStore.removeAll(tx: tx)
         postChatColorsDidChangeNotification(for: nil, tx: tx)
     }
 
@@ -50,7 +50,7 @@ public class ChatColorSettingStore {
 
     public func fetchCustomValues(tx: DBReadTransaction) -> [(key: CustomChatColor.Key, value: CustomChatColor)] {
         var customChatColors = [(key: CustomChatColor.Key, value: CustomChatColor)]()
-        for key in customColorsStore.allKeys(transaction: tx) {
+        for key in customColorsStore.fetchKeys(tx: tx) {
             let colorKey = CustomChatColor.Key(rawValue: key)
             guard let colorValue = fetchCustomValue(for: colorKey, tx: tx) else { continue }
             customChatColors.append((colorKey, colorValue))
@@ -60,7 +60,7 @@ public class ChatColorSettingStore {
 
     public func fetchCustomValue(for key: CustomChatColor.Key, tx: DBReadTransaction) -> CustomChatColor? {
         do {
-            return try customColorsStore.getCodableValue(forKey: key.rawValue, transaction: tx)
+            return try customColorsStore.fetchJSONAsValue(CustomChatColor.self, forKey: key.rawValue, tx: tx)
         } catch {
             owsFailDebug("Couldn't decode custom color: \(error)")
             return nil
@@ -68,16 +68,12 @@ public class ChatColorSettingStore {
     }
 
     public func upsertCustomValue(_ value: CustomChatColor, for key: CustomChatColor.Key, tx: DBWriteTransaction) {
-        do {
-            try customColorsStore.setCodable(value, key: key.rawValue, transaction: tx)
-        } catch {
-            owsFailDebug("Couldn't save custom color: \(error)")
-        }
+        customColorsStore.writeValueAsJSON(value, forKey: key.rawValue, tx: tx)
         postChatColorsDidChangeNotification(for: nil, tx: tx)
     }
 
     public func deleteCustomValue(for key: CustomChatColor.Key, tx: DBWriteTransaction) {
-        customColorsStore.removeValue(forKey: key.rawValue, transaction: tx)
+        customColorsStore.removeValue(forKey: key.rawValue, tx: tx)
         postChatColorsDidChangeNotification(for: nil, tx: tx)
     }
 
@@ -105,7 +101,7 @@ public class ChatColorSettingStore {
     public func resolvedChatColor(
         for thread: TSThread?,
         previewWallpaper: Wallpaper? = nil,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> ColorOrGradientSetting {
         if let threadColor = chatColorSetting(for: thread, tx: tx).constantColor {
             return threadColor
@@ -133,7 +129,7 @@ public class ChatColorSettingStore {
     private func autoChatColor(
         for thread: TSThread?,
         previewWallpaper: Wallpaper?,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> ColorOrGradientSetting {
         if let previewColor = previewWallpaper?.defaultChatColor {
             // If editing the local thread
@@ -195,7 +191,7 @@ public class ChatColorSettingStore {
     public func setChatColorSetting(
         _ value: ChatColorSetting,
         for thread: TSThread?,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         self.setRawSetting({ () -> String? in
             switch value {

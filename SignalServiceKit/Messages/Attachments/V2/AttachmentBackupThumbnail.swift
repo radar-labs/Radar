@@ -4,6 +4,7 @@
 //
 
 import Foundation
+public import UIKit
 
 public class AttachmentBackupThumbnail {
     public let attachment: Attachment
@@ -21,7 +22,7 @@ public class AttachmentBackupThumbnail {
 
     private init(
         attachment: Attachment,
-        localRelativeFilePathThumbnail: String
+        localRelativeFilePathThumbnail: String,
     ) {
         self.attachment = attachment
         self.localRelativeFilePathThumbnail = localRelativeFilePathThumbnail
@@ -35,7 +36,7 @@ public class AttachmentBackupThumbnail {
         }
         self.init(
             attachment: attachment,
-            localRelativeFilePathThumbnail: thumbnailPath
+            localRelativeFilePathThumbnail: thumbnailPath,
         )
     }
 
@@ -47,7 +48,7 @@ public class AttachmentBackupThumbnail {
         // hmac and digest are validated at download time; no need to revalidate every read.
         return try Cryptography.decryptFileWithoutValidating(
             at: fileURL,
-            metadata: DecryptionMetadata(key: AttachmentKey(combinedKey: attachment.encryptionKey))
+            metadata: DecryptionMetadata(key: AttachmentKey(combinedKey: attachment.encryptionKey)),
         )
     }
 
@@ -63,12 +64,13 @@ public class AttachmentBackupThumbnail {
         }
 
         switch stream.contentType {
-        case .invalid, .file, .audio:
+        case .file, .audio:
             return false
-        case .image(let pixelSize):
+        case .image:
             // If the image itself is small enough to fit the thumbnail
             // size, and is already the right format (webP) no need for a thumbnail.
             if
+                let pixelSize = stream.cachedMediaSizePixels,
                 attachment.mimeType == MimeType.imageWebp.rawValue,
                 pixelSize.largerAxis <= AttachmentThumbnailQuality.backupThumbnailDimensionPixels
             {
@@ -76,7 +78,7 @@ public class AttachmentBackupThumbnail {
             } else {
                 return true
             }
-        case .video, .animatedImage:
+        case .video:
             // Visual but require conversion to still image.
             return true
         }

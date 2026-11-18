@@ -10,8 +10,8 @@ final class BackupArchiveSimpleChatUpdateArchiver {
     typealias ArchiveChatUpdateMessageResult = BackupArchive.ArchiveInteractionResult<Details>
     typealias RestoreChatUpdateMessageResult = BackupArchive.RestoreInteractionResult<Void>
 
-    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError<BackupArchive.InteractionUniqueId>
-    private typealias RestoreFrameError = BackupArchive.RestoreFrameError<BackupArchive.ChatItemId>
+    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError
+    private typealias RestoreFrameError = BackupArchive.RestoreFrameError
 
     private let logger = PrefixedLogger(prefix: "[Backups]")
 
@@ -26,17 +26,13 @@ final class BackupArchiveSimpleChatUpdateArchiver {
     func archiveSimpleChatUpdate(
         infoMessage: TSInfoMessage,
         threadInfo: BackupArchive.ChatArchivingContext.CachedThreadInfo,
-        context: BackupArchive.ChatArchivingContext
+        context: BackupArchive.ChatArchivingContext,
     ) -> ArchiveChatUpdateMessageResult {
         func messageFailure(
             _ error: ArchiveFrameError.ErrorType,
-            line: UInt = #line
+            line: UInt = #line,
         ) -> ArchiveChatUpdateMessageResult {
-            return .messageFailure([.archiveFrameError(
-                error,
-                infoMessage.uniqueInteractionId,
-                line: line
-            )])
+            return .messageFailure([.archiveFrameError(error, line: line)])
         }
 
         /// To whom we should attribute this update.
@@ -56,30 +52,31 @@ final class BackupArchiveSimpleChatUpdateArchiver {
 
         switch infoMessage.messageType {
         case
-                .userNotRegistered,
-                .typeUnsupportedMessage,
-                .typeGroupQuit,
-                .addToContactsOffer,
-                .addUserToProfileWhitelistOffer,
-                .addGroupToProfileWhitelistOffer,
-                .syncedThread:
+            .userNotRegistered,
+            .typeUnsupportedMessage,
+            .typeGroupQuit,
+            .addToContactsOffer,
+            .addUserToProfileWhitelistOffer,
+            .addGroupToProfileWhitelistOffer,
+            .syncedThread:
             // Skipped legacy types
             fallthrough
         case .recipientHidden:
             // Specifically-skipped and specially-handled type
             fallthrough
         case
-                .typeGroupUpdate,
-                .typeDisappearingMessagesUpdate,
-                .profileUpdate,
-                .threadMerge,
-                .sessionSwitchover,
-                .learnedProfileName,
-                .typeEndPoll:
+            .typeGroupUpdate,
+            .typeDisappearingMessagesUpdate,
+            .profileUpdate,
+            .threadMerge,
+            .sessionSwitchover,
+            .learnedProfileName,
+            .typeEndPoll,
+            .typePinnedMessage:
             // Non-simple chat update types
-            return .completeFailure(.fatalArchiveError(
-                .developerError(OWSAssertionError("Unexpected info message type: \(infoMessage.messageType)"))
-            ))
+            return .completeFailure(.fatalArchiveError(.developerError(
+                message: "Unexpected info message type: \(infoMessage.messageType)",
+            )))
         case .verificationStateChange:
             guard let verificationStateChangeMessage = infoMessage as? OWSVerificationStateChangeMessage else {
                 return messageFailure(.verificationStateChangeNotExpectedSDSRecordType)
@@ -216,30 +213,25 @@ final class BackupArchiveSimpleChatUpdateArchiver {
             author: updateAuthorAddress,
             directionalDetails: .directionless(BackupProto_ChatItem.DirectionlessMessageDetails()),
             dateCreated: infoMessage.timestamp,
-            expireStartDate: nil,
-            expiresInMs: nil,
             isSealedSender: false,
             chatItemType: .updateMessage(chatUpdateMessage),
             isSmsPreviouslyRestoredFromBackup: false,
             threadInfo: threadInfo,
-            context: context.recipientContext
+            pinMessageDetails: nil,
+            context: context.recipientContext,
         )
     }
 
     func archiveSimpleChatUpdate(
         errorMessage: TSErrorMessage,
         threadInfo: BackupArchive.ChatArchivingContext.CachedThreadInfo,
-        context: BackupArchive.ChatArchivingContext
+        context: BackupArchive.ChatArchivingContext,
     ) -> ArchiveChatUpdateMessageResult {
         func messageFailure(
             _ error: ArchiveFrameError.ErrorType,
-            line: UInt = #line
+            line: UInt = #line,
         ) -> ArchiveChatUpdateMessageResult {
-            return .messageFailure([.archiveFrameError(
-                error,
-                errorMessage.uniqueInteractionId,
-                line: line
-            )])
+            return .messageFailure([.archiveFrameError(error, line: line)])
         }
 
         let updateAuthor: Details.AuthorAddress
@@ -299,13 +291,12 @@ final class BackupArchiveSimpleChatUpdateArchiver {
             author: updateAuthor,
             directionalDetails: .directionless(BackupProto_ChatItem.DirectionlessMessageDetails()),
             dateCreated: errorMessage.timestamp,
-            expireStartDate: nil,
-            expiresInMs: nil,
             isSealedSender: false,
             chatItemType: .updateMessage(chatUpdateMessage),
             isSmsPreviouslyRestoredFromBackup: false,
             threadInfo: threadInfo,
-            context: context.recipientContext
+            pinMessageDetails: nil,
+            context: context.recipientContext,
         )
     }
 
@@ -315,17 +306,13 @@ final class BackupArchiveSimpleChatUpdateArchiver {
         _ simpleChatUpdate: BackupProto_SimpleChatUpdate,
         chatItem: BackupProto_ChatItem,
         chatThread: BackupArchive.ChatThread,
-        context: BackupArchive.ChatItemRestoringContext
+        context: BackupArchive.ChatItemRestoringContext,
     ) -> RestoreChatUpdateMessageResult {
         func invalidProtoData(
             _ error: RestoreFrameError.ErrorType.InvalidProtoDataError,
-            line: UInt = #line
+            line: UInt = #line,
         ) -> RestoreChatUpdateMessageResult {
-            return .messageFailure([.restoreFrameError(
-                .invalidProtoData(error),
-                chatItem.id,
-                line: line
-            )])
+            return .messageFailure([.restoreFrameError(.invalidProtoData(error), line: line)])
         }
 
         enum SimpleChatUpdateInteraction {
@@ -340,7 +327,7 @@ final class BackupArchiveSimpleChatUpdateArchiver {
         switch simpleChatUpdate.type {
         case .unknown, .UNRECOGNIZED:
             return .unrecognizedEnum(BackupArchive.UnrecognizedEnumError(
-                enumType: BackupProto_SimpleChatUpdate.TypeEnum.self
+                enumType: BackupProto_SimpleChatUpdate.TypeEnum.self,
             ))
         case .joinedSignal:
             simpleChatUpdateInteraction = .simpleInfoMessage(.userJoinedSignal)
@@ -348,12 +335,12 @@ final class BackupArchiveSimpleChatUpdateArchiver {
             guard let verificationRecipient = context.recipientContext[chatItem.authorRecipientId] else {
                 return invalidProtoData(.recipientIdNotFound(chatItem.authorRecipientId))
             }
-            let contactAddress: BackupArchive.InteropAddress
+            let authorAddress: SignalServiceAddress
             switch verificationRecipient {
-            case .contact(let _contactAddress):
-                contactAddress = _contactAddress.asInteropAddress()
+            case .contact(let contactAddress):
+                authorAddress = contactAddress.asSignalServiceAddress()
             case .localAddress:
-                contactAddress = context.recipientContext.localIdentifiers.aciAddress
+                authorAddress = context.recipientContext.localIdentifiers.aciAddress
             case .releaseNotesChannel, .callLink, .distributionList, .group:
                 return invalidProtoData(.verificationStateChangeNotFromContact)
             }
@@ -363,22 +350,22 @@ final class BackupArchiveSimpleChatUpdateArchiver {
                 timestamp: chatItem.dateSent,
                 // We'll use the author of this chat item as the user whose
                 // identity key changed.
-                address: contactAddress,
+                address: authorAddress,
                 // We'll fudge and conservatively say that the identity was not
                 // previously verified since we don't have it tracked in the
                 // backup and it only affects the action shown for the message.
-                wasIdentityVerified: false
+                wasIdentityVerified: false,
             ))
         case .identityVerified, .identityDefault:
             guard let verificationRecipient = context.recipientContext[chatItem.authorRecipientId] else {
                 return invalidProtoData(.recipientIdNotFound(chatItem.authorRecipientId))
             }
-            let contactAddress: BackupArchive.InteropAddress
+            let authorAddress: SignalServiceAddress
             switch verificationRecipient {
-            case .contact(let _contactAddress):
-                contactAddress = _contactAddress.asInteropAddress()
+            case .contact(let contactAddress):
+                authorAddress = contactAddress.asSignalServiceAddress()
             case .localAddress:
-                contactAddress = context.recipientContext.localIdentifiers.aciAddress
+                authorAddress = context.recipientContext.localIdentifiers.aciAddress
             case .releaseNotesChannel, .callLink, .distributionList, .group:
                 return invalidProtoData(.verificationStateChangeNotFromContact)
             }
@@ -394,12 +381,12 @@ final class BackupArchiveSimpleChatUpdateArchiver {
                 timestamp: chatItem.dateSent,
                 // We'll use the author of this chat item as the user whose
                 // verification state changed.
-                recipientAddress: contactAddress,
+                recipientAddress: authorAddress,
                 verificationState: verificationState,
                 // We don't know which device this update originated on, so
                 // we'll pretend it was the local. This only affects the way the
                 // message is displayed.
-                isLocalChange: true
+                isLocalChange: true,
             ))
         case .changeNumber:
             guard let verificationRecipient = context.recipientContext[chatItem.authorRecipientId] else {
@@ -417,7 +404,7 @@ final class BackupArchiveSimpleChatUpdateArchiver {
                 timestamp: chatItem.dateSent,
                 aci: aci,
                 oldNumber: nil,
-                newNumber: nil
+                newNumber: nil,
             ))
         case .releaseChannelDonationRequest:
             // TODO: [Backups] Add support (and a test case!) for this once we've implemented the Release Notes channel.
@@ -440,18 +427,18 @@ final class BackupArchiveSimpleChatUpdateArchiver {
         case .chatSessionRefresh:
             simpleChatUpdateInteraction = .errorMessage(.sessionRefresh(
                 thread: thread,
-                timestamp: chatItem.dateSent
+                timestamp: chatItem.dateSent,
             ))
         case .badDecrypt:
             guard let senderRecipient = context.recipientContext[chatItem.authorRecipientId] else {
                 return invalidProtoData(.recipientIdNotFound(chatItem.authorRecipientId))
             }
-            let contactAddress: BackupArchive.InteropAddress
+            let authorAddress: SignalServiceAddress
             switch senderRecipient {
             case .localAddress:
-                contactAddress = context.recipientContext.localIdentifiers.aciAddress
-            case .contact(let _contactAddress):
-                contactAddress = _contactAddress.asInteropAddress()
+                authorAddress = context.recipientContext.localIdentifiers.aciAddress
+            case .contact(let contactAddress):
+                authorAddress = contactAddress.asSignalServiceAddress()
             case .releaseNotesChannel, .group, .distributionList, .callLink:
                 return invalidProtoData(.decryptionErrorNotFromContact)
             }
@@ -459,7 +446,7 @@ final class BackupArchiveSimpleChatUpdateArchiver {
             simpleChatUpdateInteraction = .errorMessage(.failedDecryption(
                 thread: thread,
                 timestamp: chatItem.dateSent,
-                sender: contactAddress
+                sender: authorAddress,
             ))
         case .paymentsActivated:
             let senderAci: Aci
@@ -478,7 +465,7 @@ final class BackupArchiveSimpleChatUpdateArchiver {
             simpleChatUpdateInteraction = .prebuiltInfoMessage(.paymentsActivatedMessage(
                 thread: thread,
                 timestamp: chatItem.dateSent,
-                senderAci: senderAci
+                senderAci: senderAci,
             ))
         case .paymentActivationRequest:
             let senderAci: Aci
@@ -497,7 +484,7 @@ final class BackupArchiveSimpleChatUpdateArchiver {
             simpleChatUpdateInteraction = .prebuiltInfoMessage(.paymentsActivationRequestMessage(
                 thread: thread,
                 timestamp: chatItem.dateSent,
-                senderAci: senderAci
+                senderAci: senderAci,
             ))
         case .unsupportedProtocolMessage:
             let senderAddress: SignalServiceAddress?
@@ -507,7 +494,7 @@ final class BackupArchiveSimpleChatUpdateArchiver {
             case .localAddress:
                 senderAddress = nil
             case .contact(let contactAddress):
-                senderAddress = contactAddress.asInteropAddress()
+                senderAddress = contactAddress.asSignalServiceAddress()
             case .releaseNotesChannel, .group, .distributionList, .callLink:
                 return invalidProtoData(.unsupportedProtocolVersionNotFromContact)
             }
@@ -520,7 +507,7 @@ final class BackupArchiveSimpleChatUpdateArchiver {
                 // protocol version for this message in the backup. Setting it
                 // to the highest we can insert into the DB ensures this message
                 // will always show "unknown protocol version", but that's fine.
-                protocolVersion: UInt(Int64.max)
+                protocolVersion: UInt(Int64.max),
             ))
         case .reportedSpam:
             simpleChatUpdateInteraction = .simpleInfoMessage(.reportedSpam)
@@ -547,17 +534,17 @@ final class BackupArchiveSimpleChatUpdateArchiver {
             let infoMessage = TSInfoMessage(
                 thread: thread,
                 messageType: infoMessageType,
-                timestamp: chatItem.dateSent
+                timestamp: chatItem.dateSent,
             )
             do {
                 try interactionStore.insert(
                     infoMessage,
                     in: chatThread,
                     chatId: chatItem.typedChatId,
-                    context: context
+                    context: context,
                 )
             } catch let error {
-                return .messageFailure([.restoreFrameError(.databaseInsertionFailed(error), chatItem.id)])
+                return .messageFailure([.restoreFrameError(.databaseInsertionFailed(error))])
             }
         case .prebuiltInfoMessage(let infoMessage):
             do {
@@ -565,10 +552,10 @@ final class BackupArchiveSimpleChatUpdateArchiver {
                     infoMessage,
                     in: chatThread,
                     chatId: chatItem.typedChatId,
-                    context: context
+                    context: context,
                 )
             } catch let error {
-                return .messageFailure([.restoreFrameError(.databaseInsertionFailed(error), chatItem.id)])
+                return .messageFailure([.restoreFrameError(.databaseInsertionFailed(error))])
             }
         case .errorMessage(let errorMessage):
             do {
@@ -576,10 +563,10 @@ final class BackupArchiveSimpleChatUpdateArchiver {
                     errorMessage,
                     in: chatThread,
                     chatId: chatItem.typedChatId,
-                    context: context
+                    context: context,
                 )
             } catch let error {
-                return .messageFailure([.restoreFrameError(.databaseInsertionFailed(error), chatItem.id)])
+                return .messageFailure([.restoreFrameError(.databaseInsertionFailed(error))])
             }
         }
 

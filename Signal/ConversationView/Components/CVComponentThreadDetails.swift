@@ -3,26 +3,24 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
-import SignalServiceKit
-public import SignalUI
 import Lottie
+import SignalServiceKit
+import SignalUI
 
-public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
+class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
 
-    public var componentKey: CVComponentKey { .threadDetails }
+    var componentKey: CVComponentKey { .threadDetails }
 
-    public var cellReuseIdentifier: CVCellReuseIdentifier {
+    var cellReuseIdentifier: CVCellReuseIdentifier {
         CVCellReuseIdentifier.threadDetails
     }
 
-    public let isDedicatedCell = false
+    let isDedicatedCell = false
 
     private let threadDetails: CVComponentState.ThreadDetails
 
     private var avatarDataSource: ConversationAvatarDataSource? { threadDetails.avatarDataSource }
     private var titleText: String { threadDetails.titleText }
-    private var bioText: String? { threadDetails.bioText }
     private var groupDescriptionText: String? { threadDetails.groupDescriptionText }
 
     private var canTapTitle: Bool {
@@ -35,23 +33,27 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
         super.init(itemModel: itemModel)
     }
 
-    public func configureCellRootComponent(cellView: UIView,
-                                           cellMeasurement: CVCellMeasurement,
-                                           componentDelegate: CVComponentDelegate,
-                                           messageSwipeActionState: CVMessageSwipeActionState,
-                                           componentView: CVComponentView) {
-        Self.configureCellRootComponent(rootComponent: self,
-                                        cellView: cellView,
-                                        cellMeasurement: cellMeasurement,
-                                        componentDelegate: componentDelegate,
-                                        componentView: componentView)
+    func configureCellRootComponent(
+        cellView: UIView,
+        cellMeasurement: CVCellMeasurement,
+        componentDelegate: CVComponentDelegate,
+        messageSwipeActionState: CVMessageSwipeActionState,
+        componentView: CVComponentView,
+    ) {
+        Self.configureCellRootComponent(
+            rootComponent: self,
+            cellView: cellView,
+            cellMeasurement: cellMeasurement,
+            componentDelegate: componentDelegate,
+            componentView: componentView,
+        )
     }
 
-    public func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
+    func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
         CVComponentViewThreadDetails()
     }
 
-    public override func wallpaperBlurView(componentView: CVComponentView) -> CVWallpaperBlurView? {
+    override func wallpaperBlurView(componentView: CVComponentView) -> CVWallpaperBlurView? {
         guard let componentView = componentView as? CVComponentViewThreadDetails else {
             owsFailDebug("Unexpected componentView.")
             return nil
@@ -59,9 +61,11 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
         return componentView.wallpaperBlurView
     }
 
-    public func configureForRendering(componentView componentViewParam: CVComponentView,
-                                      cellMeasurement: CVCellMeasurement,
-                                      componentDelegate: CVComponentDelegate) {
+    func configureForRendering(
+        componentView componentViewParam: CVComponentView,
+        cellMeasurement: CVCellMeasurement,
+        componentDelegate: CVComponentDelegate,
+    ) {
         guard let componentView = componentViewParam as? CVComponentViewThreadDetails else {
             owsFailDebug("Unexpected componentView.")
             componentViewParam.reset()
@@ -101,21 +105,21 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
                 subviews = [lottieView]
             } else {
                 let unblurAvatarIconView = CVImageView()
-                unblurAvatarIconView.setTemplateImageName("tap-outline-24", tintColor: .ows_white)
+                unblurAvatarIconView.setTemplateImageName("tap-outline-24", tintColor: .white)
                 unblurAvatarSubviewInfos.append(CGSize.square(24).asManualSubviewInfo(hasFixedSize: true))
 
                 let unblurAvatarLabelConfig = CVLabelConfig.unstyledText(
                     OWSLocalizedString(
                         "THREAD_DETAILS_TAP_TO_UNBLUR_AVATAR",
-                        comment: "Indicator that a blurred avatar can be revealed by tapping."
+                        comment: "Indicator that a blurred avatar can be revealed by tapping.",
                     ),
                     font: UIFont.dynamicTypeSubheadlineClamped,
-                    textColor: .ows_white
+                    textColor: .white,
                 )
                 let maxWidth = CGFloat(avatarSizeClass.diameter) - 12
                 let unblurAvatarLabelSize = CVText.measureLabel(
                     config: unblurAvatarLabelConfig,
-                    maxWidth: maxWidth
+                    maxWidth: maxWidth,
                 )
                 unblurAvatarSubviewInfos.append(unblurAvatarLabelSize.asManualSubviewInfo)
                 let unblurAvatarLabel = CVLabel()
@@ -127,51 +131,100 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
                 axis: .vertical,
                 alignment: .center,
                 spacing: 8,
-                layoutMargins: .zero
+                layoutMargins: .zero,
             )
             let unblurAvatarStackMeasurement = ManualStackView.measure(
                 config: unblurAvatarStackConfig,
-                subviewInfos: unblurAvatarSubviewInfos
+                subviewInfos: unblurAvatarSubviewInfos,
             )
 
             let unblurAvatarStack = ManualStackView(name: "unblurAvatarStack")
             unblurAvatarStack.configure(
                 config: unblurAvatarStackConfig,
                 measurement: unblurAvatarStackMeasurement,
-                subviews: subviews
+                subviews: subviews,
             )
             avatarWrapper.addSubviewToCenterOnSuperview(
                 unblurAvatarStack,
-                size: unblurAvatarStackMeasurement.measuredSize
+                size: unblurAvatarStackMeasurement.measuredSize,
             )
         } else {
             innerViews.append(avatarView)
         }
         innerViews.append(UIView.spacer(withHeight: vSpacingTitle))
 
-        if conversationStyle.hasWallpaper {
+        let titleButton = componentView.titleButton
+        titleLabelConfig.applyForRendering(button: titleButton)
+        configureTitleAction(button: titleButton, delegate: componentDelegate)
+        innerViews.append(titleButton)
+
+        let groupInfoWrapper = ManualLayoutViewWithLayer(name: "groupWrapper")
+
+        // Unique background for release notes channel,
+        // blurred background for when there's wallpaper,
+        // frame with rounded corners otherwise.
+        let cornerRadius: CGFloat = 40
+        if thread.isReleaseNotesThread {
+            if Theme.isDarkThemeEnabled {
+                groupInfoWrapper.backgroundColor = UIColor(rgbHex: 0x2F3240, alpha: 1)
+            } else {
+                groupInfoWrapper.backgroundColor = UIColor(rgbHex: 0xF6F7FF, alpha: 1)
+            }
+            groupInfoWrapper.layer.cornerRadius = cornerRadius
+            groupInfoWrapper.layer.borderWidth = 2
+            groupInfoWrapper.layer.borderColor = UIColor.Signal.tertiaryFill.cgColor
+        } else if conversationStyle.hasWallpaper {
             let wallpaperBlurView = componentView.ensureWallpaperBlurView()
             configureWallpaperBlurView(
                 wallpaperBlurView: wallpaperBlurView,
-                maskCornerRadius: 24,
-                componentDelegate: componentDelegate
+                componentDelegate: componentDelegate,
+                bubbleConfig: BubbleConfiguration(
+                    corners: .uniform(cornerRadius),
+                    stroke: ConversationStyle.bubbleStroke(isDarkThemeEnabled: isDarkThemeEnabled),
+                ),
             )
-            innerStackView.addSubviewToFillSuperviewEdges(wallpaperBlurView)
+            groupInfoWrapper.addSubviewToFillSuperviewEdges(wallpaperBlurView)
+        } else {
+            groupInfoWrapper.layer.cornerRadius = cornerRadius
+            groupInfoWrapper.layer.borderWidth = 2
+            groupInfoWrapper.layer.borderColor = UIColor.Signal.tertiaryFill.cgColor
         }
 
-        let titleButton = componentView.titleButton
-        titleLabelConfig.applyForRendering(button: titleButton)
-        self.configureTitleAction(button: titleButton, delegate: componentDelegate)
-        innerViews.append(titleButton)
+        if let safetySection = threadDetails.safetySection {
+            if safetySection.shouldShowProfileNamesEducation {
+                innerViews.append(UIView.spacer(withHeight: vSpacingNotVerifiedLabel))
 
-        if let bioText = self.bioText {
-            let bioLabel = componentView.bioLabel
-            bioLabelConfig(text: bioText).applyForRendering(label: bioLabel)
-            innerViews.append(UIView.spacer(withHeight: vSpacingSubtitle))
-            innerViews.append(bioLabel)
+                var buttonConfiguration = headerButtonConfigurationBase()
+                buttonConfiguration.baseBackgroundColor = .Signal.warningLabel.withAlphaComponent(0.2)
+                buttonConfiguration.contentInsets = notVerifiedButtonContentInsets
+                let nameNotVerifiedButton = UIButton(
+                    configuration: buttonConfiguration,
+                    primaryAction: UIAction { _ in
+                        componentDelegate.didTapNameEducation(type: safetySection.threadType)
+                    },
+                )
+
+                let nameNotVerifiedButtonLabelConfig = nameNotVerifiedConfig()
+                nameNotVerifiedButtonLabelConfig.applyForRendering(button: nameNotVerifiedButton)
+
+                innerViews.append(nameNotVerifiedButton)
+
+                componentView.profileNamesEducationButton = nameNotVerifiedButton
+            } else if safetySection.isOfficialChat {
+                innerViews.append(UIView.spacer(withHeight: vSpacingNotVerifiedLabel))
+
+                let officialLabel = componentView.officialLabel
+                let officialLabelConfig = officialLabelConfig()
+                officialLabelConfig.applyForRendering(label: officialLabel)
+                officialLabel.backgroundColor = UIColor.Signal.officialLabelBackground
+                officialLabel.layer.cornerRadius = 14
+                officialLabel.layer.masksToBounds = true
+                innerViews.append(officialLabel)
+            }
         }
 
-        if let groupDescriptionText = self.groupDescriptionText {
+        if let groupDescriptionText {
+            innerViews.append(UIView.spacer(withHeight: vSpacingSafetySectionDefault))
             let groupDescriptionPreviewView = componentView.groupDescriptionPreviewView
             let config = groupDescriptionTextLabelConfig(text: groupDescriptionText)
             groupDescriptionPreviewView.apply(config: config)
@@ -179,150 +232,124 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
             innerViews.append(groupDescriptionPreviewView)
         }
 
-        let namesEducationLabel = componentView.profileNamesEducationLabel
-        let detailsButton = componentView.detailsButton
-        let mutualGroupsLabel = componentView.mutualGroupsLabel
-        let showTipsButton = componentView.showTipsButton
-
-        let groupInfoWrapper = ManualLayoutViewWithLayer(name: "groupWrapper")
-        var groupInfoSubviewInfos = [ManualStackSubviewInfo]()
-        var groupInfoSubviews: [UIView] = []
-
         if let safetySection = threadDetails.safetySection {
-            if safetySection.shouldShowLowTrustWarning {
-                let reviewCarefullyLabel = componentView.reviewCarefullyLabel
-                groupInfoSubviews.append(reviewCarefullyLabel)
-                let config = self.reviewCarefullyConfig()
-                config.applyForRendering(label: reviewCarefullyLabel)
-                groupInfoSubviewInfos.append(reviewCarefullyLabel.sizeThatFitsMaxSize.asManualSubviewInfo)
-            }
-
-            innerViews.append(UIView.spacer(withHeight: vSpacingSafetySection(hasWallpaper: conversationStyle.hasWallpaper)))
-
-            if conversationStyle.hasWallpaper {
-                // Add divider before mutual groups
-                let divider = UIView()
-                divider.autoSetDimension(.width, toSize: cellMeasurement.cellSize.width)
-                divider.autoSetDimension(.height, toSize: 1)
-                divider.backgroundColor = UIColor(
-                    white: Theme.isDarkThemeEnabled ? 1 : 0,
-                    alpha: 0.12
-                )
-                innerViews.append(divider)
-            } else {
-                groupInfoWrapper.layer.cornerRadius = 18
-                groupInfoWrapper.layer.borderWidth = 2
-                if Theme.isDarkThemeEnabled {
-                    groupInfoWrapper.layer.borderColor = nil
-                    groupInfoWrapper.backgroundColor = UIColor(white: 1, alpha: 0.08)
-                } else {
-                    groupInfoWrapper.layer.borderColor = UIColor(white: 0, alpha: 0.06).cgColor
-                    groupInfoWrapper.backgroundColor = Theme.backgroundColor
-                    groupInfoWrapper.setShadow(radius: 4, opacity: 0.04, offset: .init(width: 0, height: 2))
-                    groupInfoWrapper.setShadow(radius: 4, opacity: 0.04, offset: .init(width: 0, height: 2))
-                }
-            }
-            innerViews.append(groupInfoWrapper)
-
-            let maxWidth = cellMeasurement.cellSize.width
-            - outerStackConfig.layoutMargins.totalWidth
-            - innerStackConfig.layoutMargins.totalWidth
-            - (hPaddingSafetySection * 2)
-
-            if safetySection.shouldShowProfileNamesEducation {
-                groupInfoSubviews.append(namesEducationLabel)
-                let config = namesEducationConfig(type: safetySection.threadType)
-                config.applyForRendering(button: namesEducationLabel)
-                namesEducationLabel.block = { [weak componentDelegate] in
-                    componentDelegate?.didTapNameEducation(type: safetySection.threadType)
-                }
-
-                let size = CVText.measureLabel(config: config, maxWidth: maxWidth)
-                groupInfoSubviewInfos.append(size.asManualSubviewInfo)
-            }
-
             if let detailsText = safetySection.detailsText {
-                groupInfoSubviews.append(detailsButton)
-                let config = mutualGroupsLabelConfig(attributedText: detailsText)
+                let detailsButton = componentView.detailsButton
+                let config = otherDetailsLabelConfig(attributedText: detailsText)
                 config.applyForRendering(button: detailsButton)
+
                 // Tap to see member count
+                detailsButton.removeAction(identifiedBy: Self.detailsButtonActionIdentifier, for: .primaryActionTriggered)
                 if safetySection.threadType == .group {
-                    detailsButton.block = { [weak componentDelegate] in
-                        componentDelegate?.didTapShowConversationSettings()
-                    }
+                    detailsButton.addAction(
+                        UIAction(identifier: Self.detailsButtonActionIdentifier) { [weak componentDelegate] _ in
+                            componentDelegate?.didTapShowConversationSettings()
+                        },
+                        for: .primaryActionTriggered,
+                    )
                 }
 
-                let size = CVText.measureLabel(config: config, maxWidth: maxWidth)
-                groupInfoSubviewInfos.append(size.asManualSubviewInfo)
+                innerViews.append(UIView.spacer(withHeight: vSpacingSafetySectionDefault))
+                innerViews.append(detailsButton)
             }
 
             if let mutualGroupsText = safetySection.mutualGroupsText {
-                let mutualGroupsLabelConfig = mutualGroupsLabelConfig(attributedText: mutualGroupsText)
+                let mutualGroupsLabel = componentView.mutualGroupsLabel
+                let mutualGroupsLabelConfig = otherDetailsLabelConfig(attributedText: mutualGroupsText)
                 mutualGroupsLabelConfig.applyForRendering(label: mutualGroupsLabel)
-                let mutualGroupsLabelSize = CVText.measureLabel(config: mutualGroupsLabelConfig, maxWidth: maxWidth)
-                groupInfoSubviewInfos.append(mutualGroupsLabelSize.asManualSubviewInfo)
-                groupInfoSubviews.append(mutualGroupsLabel)
+                mutualGroupsLabel.accessibilityLabel = safetySection.mutualGroupsAccessibilityText
+
+                innerViews.append(UIView.spacer(withHeight: vSpacingSafetySectionDefault))
+                innerViews.append(mutualGroupsLabel)
             }
 
             if safetySection.shouldShowSafetyTipsButton {
-                groupInfoSubviews.append(showTipsButton)
-                let safetyButtonLabelConfig = safetyTipsConfig()
-                safetyButtonLabelConfig.applyForRendering(button: showTipsButton)
-                showTipsButton.backgroundColor = Theme.isDarkThemeEnabled ? .ows_gray60 : .ows_gray05
-                showTipsButton.ows_contentEdgeInsets = .init(hMargin: 12.0, vMargin: 8.0)
-                showTipsButton.dimsWhenHighlighted = true
-                showTipsButton.block = { [weak self] in
-                    self?.didShowTips(type: safetySection.threadType)
-                }
-                groupInfoSubviewInfos.append(showTipsButton.sizeThatFitsMaxSize.asManualSubviewInfo)
+                var buttonConfiguration = headerButtonConfigurationBase()
+                buttonConfiguration.contentInsets = safetyButtonContentInsets
+                buttonConfiguration.baseBackgroundColor =
+                    conversationStyle.hasWallpaper ? .Signal.MaterialBase.button : .Signal.secondaryFill
+                let showTipsButton = UIButton(
+                    configuration: buttonConfiguration,
+                    primaryAction: UIAction { _ in
+                        componentDelegate.didTapSafetyTips()
+                    },
+                )
+
+                let safetyTipsButtonLabelConfig = safetyTipsButtonLabelConfig()
+                safetyTipsButtonLabelConfig.applyForRendering(button: showTipsButton)
+
+                innerViews.append(UIView.spacer(withHeight: vSpacingSafetyButton))
+                innerViews.append(showTipsButton)
+
+                componentView.showTipsButton = showTipsButton
             }
-
-            let groupInfoStackMeasurement = ManualStackView.measure(
-                config: groupStackConfig,
-                subviewInfos: groupInfoSubviewInfos
-            )
-
-            let groupInfoStack = ManualStackView(name: "groupInfoStack")
-            groupInfoStack.configure(
-                config: groupStackConfig,
-                measurement: groupInfoStackMeasurement,
-                subviews: groupInfoSubviews
-            )
-            groupInfoWrapper.addSubviewToCenterOnSuperview(
-                groupInfoStack,
-                size: groupInfoStackMeasurement.measuredSize
-            )
-        } else {
-            innerViews.append(UIView.spacer(withHeight: minBottomPadding))
         }
 
-        innerStackView.configure(config: innerStackConfig,
-                                 cellMeasurement: cellMeasurement,
-                                 measurementKey: Self.measurementKey_innerStack,
-                                 subviews: innerViews)
-        let outerViews = [ innerStackView ]
-        outerStackView.configure(config: outerStackConfig,
-                                 cellMeasurement: cellMeasurement,
-                                 measurementKey: Self.measurementKey_outerStack,
-                                 subviews: outerViews)
+        innerStackView.configure(
+            config: innerStackConfig,
+            cellMeasurement: cellMeasurement,
+            measurementKey: Self.measurementKey_innerStack,
+            subviews: innerViews,
+        )
+
+        let groupInfoView = ManualLayoutView(name: "groupInfoView")
+        groupInfoView.addSubview(groupInfoWrapper)
+
+        groupInfoView.addSubviewToCenterOnSuperviewWithDesiredSize(innerStackView)
+        groupInfoView.addLayoutBlock({ [weak self] _ in
+            guard let self, let superview = groupInfoWrapper.superview else {
+                return
+            }
+
+            let outlineViewWidth = innerStackView.frame.width + hPaddingGroupDetails * 2
+
+            let adjustedContainerSize = CGSize(
+                width: outlineViewWidth,
+                height: superview.bounds.height - vOffsetThreadDetailsOutline,
+            )
+
+            let originShift = (superview.width - outlineViewWidth) / 2
+
+            let subviewFrame = CGRect(
+                origin: CGPoint(x: originShift, y: superview.bounds.origin.y + vOffsetThreadDetailsOutline),
+                size: adjustedContainerSize,
+            )
+
+            ManualLayoutView.setSubviewFrame(subview: groupInfoWrapper, frame: subviewFrame)
+        })
+
+        let outerViews = [groupInfoView]
+        outerStackView.configure(
+            config: outerStackConfig,
+            cellMeasurement: cellMeasurement,
+            measurementKey: Self.measurementKey_outerStack,
+            subviews: outerViews,
+        )
     }
 
     private var titleLabelConfig: CVLabelConfig {
-        let font = UIFont.dynamicTypeTitle1.semibold()
+        let font = UIFont.dynamicTypeTitle3.semibold()
         let textColor = Theme.primaryTextColor
         let attributedString = NSMutableAttributedString(string: titleText, attributes: [
             .font: font,
             .foregroundColor: textColor,
         ])
 
-        if threadDetails.shouldShowVerifiedBadge {
+        if threadDetails.shouldShowContactIcon {
+            let contactIcon = SignalSymbol.personCircle.attributedString(
+                dynamicTypeBaseSize: 20,
+                weight: .bold,
+                leadingCharacter: .space,
+            )
+            attributedString.append(contactIcon)
+        } else if threadDetails.shouldShowVerifiedBadge {
             attributedString.append(" ")
             let verifiedBadgeImage = Theme.iconImage(.official)
             let verifiedBadgeAttachment = NSAttributedString.with(
                 image: verifiedBadgeImage,
                 font: .dynamicTypeTitle3,
                 centerVerticallyRelativeTo: font,
-                heightReference: .pointSize
+                heightReference: .pointSize,
             )
             attributedString.append(verifiedBadgeAttachment)
         }
@@ -330,185 +357,127 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
         if canTapTitle {
             attributedString.append(
                 SignalSymbol.chevronTrailing(for: titleText).attributedString(
-                    dynamicTypeBaseSize: 24,
+                    dynamicTypeBaseSize: 20,
                     leadingCharacter: .nonBreakingSpace,
-                    attributes: [.foregroundColor: UIColor.Signal.secondaryLabel]
-                )
+                    attributes: [.foregroundColor: UIColor.Signal.secondaryLabel],
+                ),
             )
         }
 
-        return CVLabelConfig.init(
+        return CVLabelConfig(
             text: .attributedText(attributedString),
             displayConfig: .forUnstyledText(font: font, textColor: textColor),
             font: font,
             textColor: textColor,
             numberOfLines: 0,
             lineBreakMode: .byWordWrapping,
-            textAlignment: .center
+            textAlignment: .center,
         )
     }
 
-    private func configureTitleAction(
-        button: OWSButton,
-        delegate: CVComponentDelegate?
-    ) {
+    private static var titleActionIdentifier =
+        UIAction.Identifier("CVComponentThreadDetails.titleAction")
+    private static var detailsButtonActionIdentifier =
+        UIAction.Identifier("CVComponentThreadDetails.detailsButtonAction")
+
+    private func configureTitleAction(button: CVButton, delegate: CVComponentDelegate?) {
         guard
             canTapTitle,
             let contactThread = thread as? TSContactThread
         else {
             button.isEnabled = false
-            button.dimsWhenHighlighted = false
-            button.block = {}
+            button.removeAction(identifiedBy: Self.titleActionIdentifier, for: .primaryActionTriggered)
             return
         }
 
-        button.dimsWhenHighlighted = true
-        button.block = { [weak delegate] in
-            delegate?.didTapContactName(thread: contactThread)
-        }
+        button.addAction(
+            UIAction(
+                identifier: Self.titleActionIdentifier,
+                handler: { [weak delegate] _ in
+                    delegate?.didTapContactName(thread: contactThread)
+                },
+            ),
+            for: .primaryActionTriggered,
+        )
         button.isEnabled = true
     }
 
-    private func bioLabelConfig(text: String) -> CVLabelConfig {
-        CVLabelConfig.unstyledText(
-            text,
-            font: .dynamicTypeSubheadline,
-            textColor: Theme.primaryTextColor,
-            numberOfLines: 0,
-            lineBreakMode: .byWordWrapping,
-            textAlignment: .center
-        )
-    }
-
-    private static var mutualGroupsFont: UIFont { .dynamicTypeSubheadline }
-    private static var mutualGroupsTextColor: UIColor { Theme.primaryTextColor }
+    private static var otherDetailsFont: UIFont { .dynamicTypeSubheadline }
+    private static var otherDetailsTextColor: UIColor { Theme.primaryTextColor }
 
     private static var underlineColor: UIColor { UIColor.Signal.transparentSeparator }
 
-    private static var reviewCarefullyFont: UIFont { .dynamicTypeSubheadline.semibold() }
-    private static var reviewCarefullyTextColor: UIColor { UIColor(rgbHex: 0xA88746) }
-
-    private func reviewCarefullyConfig() -> CVLabelConfig {
-        CVLabelConfig.init(
-            text: .attributedText(
-                .composed(of: [
-                    NSAttributedString.with(
-                        image: UIImage(named: "error-triangle-fill-compact")!,
-                        font: .dynamicTypeCallout,
-                        centerVerticallyRelativeTo: Self.reviewCarefullyFont,
-                        heightReference: .pointSize
-                    ),
-                    SignalSymbol.LeadingCharacter.nonBreakingSpace.rawValue,
-                    OWSLocalizedString(
-                        "SYSTEM_MESSAGE_UNKNOWN_THREAD_REVIEW_CAREFULLY_WARNING",
-                        comment: "Indicator warning about an unknown contact thread"
-                    ),
-                ]).styled(with: .alignment(.center))
-            ),
-            displayConfig: .forUnstyledText(
-                font: Self.reviewCarefullyFont,
-                textColor: Self.reviewCarefullyTextColor
-            ),
-            font: Self.reviewCarefullyFont,
-            textColor: Self.reviewCarefullyTextColor,
-            numberOfLines: 0
-        )
-    }
-
-    private func namesEducationIcon(type: SafetyTipsType) -> UIImage {
-        switch type {
-        case .contact:
-            return UIImage(named: "person-questionmark-compact")!
-        case .group:
-            return UIImage(named: "group-questionmark-compact")!
-        }
-    }
-
-    private func underlinedNamesEducationString(type: SafetyTipsType) -> NSAttributedString {
-        let (subject, predicate): (String, String) = switch type {
-        case .contact:
-            (
-                OWSLocalizedString(
-                    "THREAD_DETAILS_PROFILE_NAMES_ARE_NOT_VERIFIED_SUBJECT",
-                    comment: "Label displayed below profiles. This is the subject part of the sentence 'Profile names are not verified'. It is embedded into THREAD_DETAILS_PROFILE_NAMES_ARE_NOT_VERIFIED_PREDICATE."
-                ),
-                OWSLocalizedString(
-                    "THREAD_DETAILS_PROFILE_NAMES_ARE_NOT_VERIFIED_PREDICATE",
-                    comment: "Label displayed below profiles. This is the predicate part of the sentence 'Profile names are not verified'. Embeds {{ THREAD_DETAILS_PROFILE_NAMES_ARE_NOT_VERIFIED_SUBJECT }}"
-                )
-            )
-        case .group:
-            (
-                OWSLocalizedString(
-                    "THREAD_DETAILS_GROUP_NAMES_ARE_NOT_VERIFIED_SUBJECT",
-                    comment: "Label displayed below group info. This is the subject part of the sentence 'Group names are not verified'. It is embedded into THREAD_DETAILS_GROUP_NAMES_ARE_NOT_VERIFIED_PREDICATE."
-                ),
-                OWSLocalizedString(
-                    "THREAD_DETAILS_GROUP_NAMES_ARE_NOT_VERIFIED_PREDICATE",
-                    comment: "Label displayed below group info. This is the predicate part of the sentence 'Group names are not verified'. Embeds {{ THREAD_DETAILS_GROUP_NAMES_ARE_NOT_VERIFIED_SUBJECT }}"
-                )
-            )
-        }
-
-        let formattedString = String(format: predicate, subject)
-        let subjectRange = NSString(string: formattedString).range(of: subject)
-        let attributedString = NSMutableAttributedString(string: formattedString)
-        attributedString.addAttributes(
-            [
-                .underlineStyle: NSUnderlineStyle.single.rawValue,
-                .underlineColor: Self.underlineColor,
-            ],
-            range: subjectRange
-        )
-        return attributedString
-    }
-
-    private func namesEducationConfig(type: SafetyTipsType) -> CVLabelConfig {
-        CVLabelConfig(
-            text: .attributedText(
-                .composed(of: [
-                    NSAttributedString.with(
-                        image: self.namesEducationIcon(type: type),
-                        font: .dynamicTypeCallout,
-                        centerVerticallyRelativeTo: Self.mutualGroupsFont,
-                        heightReference: .pointSize
-                    ),
-                    SignalSymbol.LeadingCharacter.nonBreakingSpace.rawValue,
-                    self.underlinedNamesEducationString(type: type)
-                ]).styled(with: .alignment(.center))
-            ),
-            displayConfig: .forUnstyledText(
-                font: Self.mutualGroupsFont,
-                textColor: Self.mutualGroupsTextColor
-            ),
-            font: Self.mutualGroupsFont,
-            textColor: Self.mutualGroupsTextColor,
-            numberOfLines: 0
-        )
-    }
-
-    private func mutualGroupsLabelConfig(attributedText: NSAttributedString) -> CVLabelConfig {
+    private func otherDetailsLabelConfig(attributedText: NSAttributedString) -> CVLabelConfig {
         CVLabelConfig(
             text: .attributedText(attributedText),
             displayConfig: .forUnstyledText(
-                font: Self.mutualGroupsFont,
-                textColor: Self.mutualGroupsTextColor
+                font: Self.otherDetailsFont,
+                textColor: Self.otherDetailsTextColor,
             ),
-            font: Self.mutualGroupsFont,
-            textColor: Self.mutualGroupsTextColor,
+            font: Self.otherDetailsFont,
+            textColor: Self.otherDetailsTextColor,
             numberOfLines: 0,
             lineBreakMode: .byWordWrapping,
-            textAlignment: .center
+            textAlignment: .center,
         )
     }
-    private func safetyTipsConfig() -> CVLabelConfig {
+
+    private func nameNotVerifiedConfig() -> CVLabelConfig {
+        let symbol = SignalSymbol.personQuestionWide.attributedString(dynamicTypeBaseSize: UIFont.dynamicTypeCalloutClamped.pointSize)
+        let notVerifiedString = NSAttributedString.composed(
+            of: [
+                symbol,
+                SignalSymbol.LeadingCharacter.space.rawValue,
+                OWSLocalizedString(
+                    "THREAD_DETAILS_PROFILE_NAMES_ARE_NOT_VERIFIED_SUBJECT",
+                    comment: "Label displayed below profiles",
+                ),
+            ],
+        )
+        return CVLabelConfig(
+            text: .attributedText(notVerifiedString),
+            displayConfig: .forUnstyledText(
+                font: .dynamicTypeCallout.medium(),
+                textColor: UIColor.Signal.warningLabel,
+            ),
+            font: .dynamicTypeCallout.medium(),
+            textColor: UIColor.Signal.warningLabel,
+            numberOfLines: 0,
+            lineBreakMode: .byWordWrapping,
+        )
+    }
+
+    private func officialLabelConfig() -> CVLabelConfig {
+        let symbol = SignalSymbol.officialBadge.attributedString(dynamicTypeBaseSize: UIFont.dynamicTypeCalloutClamped.pointSize)
+        let notVerifiedString = NSAttributedString.composed(
+            of: [
+                symbol,
+                SignalSymbol.LeadingCharacter.space.rawValue,
+                OWSLocalizedString("RELEASE_NOTES_CHANNEL_OFFICIAL_LABEL", comment: "Label displayed in thread details of the release notes chat"),
+            ],
+        )
+        return CVLabelConfig(
+            text: .attributedText(notVerifiedString),
+            displayConfig: .forUnstyledText(
+                font: .dynamicTypeCallout.medium(),
+                textColor: UIColor.Signal.officialLabel,
+            ),
+            font: .dynamicTypeCallout.medium(),
+            textColor: UIColor.Signal.officialLabel,
+            numberOfLines: 0,
+            lineBreakMode: .byWordWrapping,
+            textAlignment: .center,
+        )
+    }
+
+    private func safetyTipsButtonLabelConfig() -> CVLabelConfig {
         CVLabelConfig.unstyledText(
             OWSLocalizedString(
                 "SAFETY_TIPS_BUTTON_ACTION_TITLE",
-                comment: "Title for Safety Tips button in thread details."
+                comment: "Title for Safety Tips button in thread details.",
             ),
-            font: UIFont.dynamicTypeCaption1.medium(),
-            textColor: Theme.isDarkThemeEnabled ? .ows_white : .ows_black
+            font: UIFont.dynamicTypeSubheadline.semibold(),
+            textColor: Theme.primaryTextColor,
         )
     }
 
@@ -519,29 +488,34 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
             textColor: Theme.primaryTextColor,
             numberOfLines: 2,
             lineBreakMode: .byTruncatingTail,
-            textAlignment: .center
+            textAlignment: .center,
         )
     }
 
-    private static let avatarSizeClass = ConversationAvatarView.Configuration.SizeClass.eightyEight
+    private static let avatarSizeClass = ConversationAvatarView.Configuration.SizeClass.seventyFour
     private var avatarSizeClass: ConversationAvatarView.Configuration.SizeClass { Self.avatarSizeClass }
 
     static func buildComponentState(
         thread: TSThread,
         transaction: DBReadTransaction,
-        avatarBuilder: CVAvatarBuilder
+        avatarBuilder: CVAvatarBuilder,
     ) -> CVComponentState.ThreadDetails {
         if let contactThread = thread as? TSContactThread {
             return buildComponentState(
                 contactThread: contactThread,
                 transaction: transaction,
-                avatarBuilder: avatarBuilder
+                avatarBuilder: avatarBuilder,
             )
         } else if let groupThread = thread as? TSGroupThread {
             return buildComponentState(
                 groupThread: groupThread,
                 transaction: transaction,
-                avatarBuilder: avatarBuilder
+                avatarBuilder: avatarBuilder,
+            )
+        } else if let releaseNotesThread = thread as? TSReleaseNotesThread {
+            return buildComponentState(
+                releaseNotesThread: releaseNotesThread,
+                transaction: transaction,
             )
         } else {
             owsFailDebug("Invalid thread.")
@@ -551,9 +525,9 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
                 isAvatarBeingDownloaded: false,
                 titleText: TSGroupThread.defaultGroupName,
                 shouldShowVerifiedBadge: false,
-                bioText: nil,
+                shouldShowContactIcon: false,
                 safetySection: nil,
-                groupDescriptionText: nil
+                groupDescriptionText: nil,
             )
         }
     }
@@ -561,26 +535,26 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
     private static func buildComponentState(
         contactThread: TSContactThread,
         transaction: DBReadTransaction,
-        avatarBuilder: CVAvatarBuilder
+        avatarBuilder: CVAvatarBuilder,
     ) -> CVComponentState.ThreadDetails {
 
         let avatarDataSource = avatarBuilder.buildAvatarDataSource(
             forAddress: contactThread.contactAddress,
             includingBadge: true,
             localUserDisplayMode: .noteToSelf,
-            diameterPoints: avatarSizeClass.diameter
+            diameterPoints: avatarSizeClass.diameter,
         )
 
         let contactManager = SSKEnvironment.shared.contactManagerImplRef
         let isAvatarBlurred = contactManager.shouldBlurContactAvatar(
             address: contactThread.contactAddress,
-            tx: transaction
+            tx: transaction,
         )
         let isAvatarBeingDownloaded = contactManager.avatarAddressesToShowDownloadingSpinner.contains(contactThread.contactAddress)
 
         let displayName = SSKEnvironment.shared.contactManagerRef.displayName(
             for: contactThread.contactAddress,
-            tx: transaction
+            tx: transaction,
         )
 
         let titleText = { () -> String in
@@ -593,20 +567,13 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
 
         let shouldShowVerifiedBadge = contactThread.isNoteToSelf
 
-        let bioText = { () -> String? in
-            if contactThread.isNoteToSelf {
-                return nil
-            }
-            let profileManager = SSKEnvironment.shared.profileManagerRef
-            let userProfile = profileManager.userProfile(for: contactThread.contactAddress, tx: transaction)
-            return userProfile?.bioForDisplay
-        }()
-
         let safetySection = Self.buildContactSafetySection(
             for: displayName,
             in: contactThread,
-            tx: transaction
+            tx: transaction,
         )
+
+        let isSystemContact = SSKEnvironment.shared.contactManagerRef.fetchSignalAccount(for: contactThread.contactAddress, transaction: transaction) != nil
 
         return CVComponentState.ThreadDetails(
             avatarDataSource: avatarDataSource,
@@ -614,28 +581,29 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
             isAvatarBeingDownloaded: isAvatarBeingDownloaded,
             titleText: titleText,
             shouldShowVerifiedBadge: shouldShowVerifiedBadge,
-            bioText: bioText,
+            shouldShowContactIcon: isSystemContact,
             safetySection: safetySection,
-            groupDescriptionText: nil
+            groupDescriptionText: nil,
         )
     }
 
     private static func buildComponentState(
         groupThread: TSGroupThread,
         transaction: DBReadTransaction,
-        avatarBuilder: CVAvatarBuilder
+        avatarBuilder: CVAvatarBuilder,
     ) -> CVComponentState.ThreadDetails {
         // If we need to reload this cell to reflect changes to any of the
-        // state captured here, we need update the didThreadDetailsChange().        
+        // state captured here, we need update the didThreadDetailsChange().
 
         let avatarDataSource = avatarBuilder.buildAvatarDataSource(
             forGroupThread: groupThread,
-            diameterPoints: avatarSizeClass.diameter)
+            diameterPoints: avatarSizeClass.diameter,
+        )
 
         let contactManager = SSKEnvironment.shared.contactManagerImplRef
         let isAvatarBlurred = contactManager.shouldBlurGroupAvatar(
             groupId: groupThread.groupId,
-            tx: transaction
+            tx: transaction,
         )
         let isAvatarBeingDownloaded = contactManager.avatarGroupIdsToShowDownloadingSpinner.contains(groupThread.groupId)
 
@@ -643,7 +611,7 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
 
         let safetySection = Self.buildGroupsSafetySection(
             from: groupThread,
-            tx: transaction
+            tx: transaction,
         )
         let descriptionText: String? = {
             guard let groupModelV2 = groupThread.groupModel as? TSGroupModelV2 else { return nil }
@@ -656,18 +624,53 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
             isAvatarBeingDownloaded: isAvatarBeingDownloaded,
             titleText: titleText,
             shouldShowVerifiedBadge: false,
-            bioText: nil,
+            shouldShowContactIcon: false,
             safetySection: safetySection,
-            groupDescriptionText: descriptionText
+            groupDescriptionText: descriptionText,
         )
     }
 
-    private let vSpacingTitle: CGFloat = 12
-    private let vSpacingSubtitle: CGFloat = 2
-    private let hPaddingSafetySection: CGFloat = 24
-    private func vSpacingSafetySection(hasWallpaper: Bool) -> CGFloat {
-        hasWallpaper ? 12 : 16
+    private static func buildComponentState(
+        releaseNotesThread: TSReleaseNotesThread,
+        transaction: DBReadTransaction,
+    ) -> CVComponentState.ThreadDetails {
+
+        let titleText = OWSLocalizedString(
+            "RELEASE_NOTES_CHANNEL_NAME",
+            comment: "Display name for the release notes channel",
+        )
+
+        let safetySection = Self.buildReleaseNotesSafetySection(from: releaseNotesThread, tx: transaction)
+
+        return CVComponentState.ThreadDetails(
+            avatarDataSource: .asset(avatar: AvatarBuilder.releaseNotesIcon(), badge: nil),
+            isAvatarBlurred: false,
+            isAvatarBeingDownloaded: false,
+            titleText: titleText,
+            shouldShowVerifiedBadge: true,
+            shouldShowContactIcon: false,
+            safetySection: safetySection,
+            groupDescriptionText: nil,
+        )
     }
+
+    private let vSpacingTitle: CGFloat = 8
+    private let vSpacingNotVerifiedLabel: CGFloat = 6
+    private let vSpacingSafetyButton: CGFloat = 16
+    private let vSpacingSafetySectionDefault: CGFloat = 8
+
+    private let safetyButtonContentInsets = NSDirectionalEdgeInsets(hMargin: 12, vMargin: 5)
+    private let notVerifiedButtonContentInsets = NSDirectionalEdgeInsets(hMargin: 12, vMargin: 2)
+    private func headerButtonConfigurationBase() -> UIButton.Configuration {
+        var configuration = UIButton.Configuration.filled()
+        configuration.cornerStyle = .capsule
+        return configuration
+    }
+
+    private let hPaddingGroupDetails: CGFloat = 25
+
+    private let vOffsetThreadDetailsOutline: CGFloat = 16
+
     private let minBottomPadding: CGFloat = 4
 
     private var outerStackConfig: CVStackViewConfig {
@@ -675,7 +678,7 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
             axis: .vertical,
             alignment: .fill,
             spacing: 0,
-            layoutMargins: UIEdgeInsets(top: 8, left: 32, bottom: 16, right: 32)
+            layoutMargins: UIEdgeInsets(top: 8, left: 0, bottom: 16, right: 0),
         )
     }
 
@@ -684,132 +687,108 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
             axis: .vertical,
             alignment: .center,
             spacing: 0,
-            layoutMargins: UIEdgeInsets(top: 20, leading: 16, bottom: 8, trailing: 16)
-        )
-    }
-
-    private var groupStackConfig: CVStackViewConfig {
-        ManualStackView.Config(
-            axis: .vertical,
-            alignment: .center,
-            spacing: 12,
-            layoutMargins: .init(hMargin: hPaddingSafetySection, vMargin: 16)
+            layoutMargins: UIEdgeInsets(top: 0, left: 0, bottom: 24, right: 0),
         )
     }
 
     private static let measurementKey_outerStack = "CVComponentThreadDetails.measurementKey_outerStack"
     private static let measurementKey_innerStack = "CVComponentThreadDetails.measurementKey_innerStack"
 
-    public func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
+    func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
         owsAssertDebug(maxWidth > 0)
 
         var innerSubviewInfos = [ManualStackSubviewInfo]()
 
-        let maxContentWidth = maxWidth - (outerStackConfig.layoutMargins.totalWidth +
-                                            innerStackConfig.layoutMargins.totalWidth)
+        let maxContentWidth = min(maxWidth, 276) - (hPaddingGroupDetails * 2)
 
         innerSubviewInfos.append(avatarSizeClass.size.asManualSubviewInfo)
         innerSubviewInfos.append(CGSize(square: vSpacingTitle).asManualSubviewInfo)
 
-        let titleSize = CVText.measureLabel(config: titleLabelConfig, maxWidth: maxContentWidth)
+        var titleSize = CVText.measureLabel(config: titleLabelConfig, maxWidth: maxContentWidth)
+        titleSize.width += 8
         innerSubviewInfos.append(titleSize.asManualSubviewInfo)
 
-        if let bioText = self.bioText {
-            let bioSize = CVText.measureLabel(config: bioLabelConfig(text: bioText),
-                                              maxWidth: maxContentWidth)
-            innerSubviewInfos.append(CGSize(square: vSpacingSubtitle).asManualSubviewInfo)
-            innerSubviewInfos.append(bioSize.asManualSubviewInfo)
+        if let safetySection = threadDetails.safetySection {
+            if safetySection.shouldShowProfileNamesEducation {
+                innerSubviewInfos.append(CGSize(square: vSpacingNotVerifiedLabel).asManualSubviewInfo)
+                let buttonSize = CVText.measureLabel(
+                    config: nameNotVerifiedConfig(),
+                    maxWidth: maxContentWidth,
+                ) + notVerifiedButtonContentInsets.asSize
+                innerSubviewInfos.append(buttonSize.asManualSubviewInfo)
+            } else if safetySection.isOfficialChat {
+                innerSubviewInfos.append(CGSize(square: vSpacingNotVerifiedLabel).asManualSubviewInfo)
+                let buttonSize = CVText.measureLabel(
+                    config: officialLabelConfig(),
+                    maxWidth: maxContentWidth,
+                ) + notVerifiedButtonContentInsets.asSize
+                innerSubviewInfos.append(buttonSize.asManualSubviewInfo)
+            }
         }
 
-        if let groupDescriptionText = self.groupDescriptionText {
+        if let groupDescriptionText {
+            innerSubviewInfos.append(CGSize(square: vSpacingSafetySectionDefault).asManualSubviewInfo)
             var groupDescriptionSize = CVText.measureLabel(
                 config: groupDescriptionTextLabelConfig(text: groupDescriptionText),
-                maxWidth: maxContentWidth
+                maxWidth: maxContentWidth,
             )
             groupDescriptionSize.width = maxContentWidth
             innerSubviewInfos.append(groupDescriptionSize.asManualSubviewInfo(hasFixedWidth: true))
         }
 
-        let maxGroupWidth = maxContentWidth - hPaddingSafetySection * 2
-        var groupInfoSubviewInfos = [ManualStackSubviewInfo]()
-
         if let safetySection = threadDetails.safetySection {
-            if safetySection.shouldShowLowTrustWarning {
-                let reviewCarefullySize = CVText.measureLabel(
-                    config: self.reviewCarefullyConfig(),
-                    maxWidth: maxGroupWidth
-                )
-                groupInfoSubviewInfos.append(reviewCarefullySize.asManualSubviewInfo)
-            }
-
-            innerSubviewInfos.append(CGSize(square: vSpacingSafetySection(hasWallpaper: conversationStyle.hasWallpaper)).asManualSubviewInfo)
-
-            let mutualGroupsSize: CGSize
-            if conversationStyle.hasWallpaper {
-                innerSubviewInfos.append(CGSize(width: maxContentWidth - 16, height: 1).asManualSubviewInfo)
-            }
-
-            if safetySection.shouldShowProfileNamesEducation {
-                let size = CVText.measureLabel(
-                    config: self.namesEducationConfig(type: safetySection.threadType),
-                    maxWidth: maxGroupWidth
-                )
-                groupInfoSubviewInfos.append(size.asManualSubviewInfo)
-            }
-
             if let detailsText = safetySection.detailsText {
+                innerSubviewInfos.append(CGSize(square: vSpacingSafetySectionDefault).asManualSubviewInfo)
                 let size = CVText.measureLabel(
-                    config: mutualGroupsLabelConfig(attributedText: detailsText),
-                    maxWidth: maxGroupWidth
+                    config: otherDetailsLabelConfig(attributedText: detailsText),
+                    maxWidth: maxContentWidth,
                 )
-                groupInfoSubviewInfos.append(size.asManualSubviewInfo)
+                innerSubviewInfos.append(size.asManualSubviewInfo)
             }
 
             if let mutualGroupsText = safetySection.mutualGroupsText {
+                innerSubviewInfos.append(CGSize(square: vSpacingSafetySectionDefault).asManualSubviewInfo)
                 let groupLabelSize = CVText.measureLabel(
-                    config: mutualGroupsLabelConfig(attributedText: mutualGroupsText),
-                    maxWidth: maxGroupWidth
+                    config: otherDetailsLabelConfig(attributedText: mutualGroupsText),
+                    maxWidth: maxContentWidth,
                 )
-                groupInfoSubviewInfos.append(groupLabelSize.asManualSubviewInfo)
+                innerSubviewInfos.append(groupLabelSize.asManualSubviewInfo)
             }
 
             if safetySection.shouldShowSafetyTipsButton {
-                let safetyTipSize = CVText.measureLabel(
-                    config: safetyTipsConfig(),
-                    maxWidth: maxGroupWidth
-                )
-                groupInfoSubviewInfos.append(safetyTipSize.asManualSubviewInfo)
+                innerSubviewInfos.append(CGSize(square: vSpacingSafetyButton).asManualSubviewInfo)
+                let buttonSize = CVText.measureLabel(
+                    config: safetyTipsButtonLabelConfig(),
+                    maxWidth: maxContentWidth,
+                ) + safetyButtonContentInsets.asSize
+                innerSubviewInfos.append(buttonSize.asManualSubviewInfo)
             }
-
-            mutualGroupsSize = ManualStackView.measure(
-                config: groupStackConfig,
-                subviewInfos: groupInfoSubviewInfos
-            ).measuredSize
-            innerSubviewInfos.append(mutualGroupsSize.asManualSubviewInfo)
-        } else {
-            innerSubviewInfos.append(CGSize(square: minBottomPadding).asManualSubviewInfo)
         }
 
-        let innerStackMeasurement = ManualStackView.measure(config: innerStackConfig,
-                                                            measurementBuilder: measurementBuilder,
-                                                            measurementKey: Self.measurementKey_innerStack,
-                                                            subviewInfos: innerSubviewInfos)
-        let outerSubviewInfos = [ innerStackMeasurement.measuredSize.asManualSubviewInfo ]
-        let outerStackMeasurement = ManualStackView.measure(config: outerStackConfig,
-                                                            measurementBuilder: measurementBuilder,
-                                                            measurementKey: Self.measurementKey_outerStack,
-                                                            subviewInfos: outerSubviewInfos,
-                                                            maxWidth: maxWidth)
+        let innerStackMeasurement = ManualStackView.measure(
+            config: innerStackConfig,
+            measurementBuilder: measurementBuilder,
+            measurementKey: Self.measurementKey_innerStack,
+            subviewInfos: innerSubviewInfos,
+        )
+        let outerSubviewInfos = [innerStackMeasurement.measuredSize.asManualSubviewInfo]
+        let outerStackMeasurement = ManualStackView.measure(
+            config: outerStackConfig,
+            measurementBuilder: measurementBuilder,
+            measurementKey: Self.measurementKey_outerStack,
+            subviewInfos: outerSubviewInfos,
+            maxWidth: maxWidth,
+        )
         return outerStackMeasurement.measuredSize
     }
 
     // MARK: - Events
 
-    public override func handleTap(
+    override func handleTap(
         sender: UIGestureRecognizer,
         componentDelegate: CVComponentDelegate,
         componentView: CVComponentView,
-        renderItem: CVRenderItem
+        renderItem: CVRenderItem,
     ) -> Bool {
         guard let componentView = componentView as? CVComponentViewThreadDetails else {
             owsFailDebug("Unexpected componentView.")
@@ -828,9 +807,10 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
         if let safetySection = threadDetails.safetySection {
             if
                 safetySection.shouldShowSafetyTipsButton,
-                componentView.showTipsButton.bounds.contains(sender.location(in: componentView.showTipsButton))
+                let showTipsButton = componentView.showTipsButton,
+                showTipsButton.bounds.contains(sender.location(in: componentView.showTipsButton))
             {
-                didShowTips(type: safetySection.threadType)
+                componentDelegate.didTapSafetyTips()
                 return true
             }
 
@@ -845,7 +825,8 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
 
             if
                 safetySection.shouldShowProfileNamesEducation,
-                componentView.profileNamesEducationLabel.bounds.contains(sender.location(in: componentView.profileNamesEducationLabel))
+                let profileNamesEducationButton = componentView.profileNamesEducationButton,
+                profileNamesEducationButton.bounds.contains(sender.location(in: componentView.profileNamesEducationButton))
             {
                 componentDelegate.didTapNameEducation(type: safetySection.threadType)
                 return true
@@ -872,7 +853,7 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
 
     // Used for rendering some portion of an Conversation View item.
     // It could be the entire item or some part thereof.
-    public class CVComponentViewThreadDetails: NSObject, CVComponentView {
+    class CVComponentViewThreadDetails: CVComponentView {
 
         fileprivate var avatarView: ConversationAvatarView?
 
@@ -880,13 +861,16 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
         fileprivate let titleButton = CVButton()
         fileprivate let bioLabel = CVLabel()
 
+        fileprivate var profileNamesEducationButton: UIButton?
+        fileprivate let officialLabel = CVLabel()
+
         fileprivate let reviewCarefullyLabel = CVLabel()
-        fileprivate let profileNamesEducationLabel = CVButton()
         fileprivate let detailsButton = CVButton()
         fileprivate let mutualGroupsLabel = CVLabel()
-        fileprivate let showTipsButton = OWSRoundedButton()
+        fileprivate var showTipsButton: UIButton?
+
         fileprivate let groupDescriptionPreviewView = GroupDescriptionPreviewView(
-            shouldDeactivateConstraints: true
+            shouldDeactivateConstraints: true,
         )
 
         fileprivate let outerStackView = ManualStackView(name: "Thread details outer")
@@ -902,47 +886,55 @@ public class CVComponentThreadDetails: CVComponentBase, CVRootComponent {
             return wallpaperBlurView
         }
 
-        public var isDedicatedCellView = false
+        var isDedicatedCellView = false
 
-        public var rootView: UIView {
+        var rootView: UIView {
             outerStackView
         }
 
         // MARK: -
 
-        public func setIsCellVisible(_ isCellVisible: Bool) {}
+        func setIsCellVisible(_ isCellVisible: Bool) {}
 
-        public func reset() {
+        func reset() {
             outerStackView.reset()
             innerStackView.reset()
+            innerStackView.removeFromSuperview()
 
             titleLabel.text = nil
             titleButton.reset()
             bioLabel.text = nil
             reviewCarefullyLabel.text = nil
-            profileNamesEducationLabel.reset()
             detailsButton.reset()
             mutualGroupsLabel.text = nil
             groupDescriptionPreviewView.descriptionText = nil
             avatarView = nil
 
             wallpaperBlurView?.removeFromSuperview()
-            wallpaperBlurView?.resetContentAndConfiguration()
         }
 
     }
-}
 
-extension CVComponentThreadDetails {
+    // MARK: -
 
-    private func didShowTips(type: SafetyTipsType) {
-        let viewController = SafetyTipsViewController(type: type)
-        UIApplication.shared.frontmostViewController?.present(viewController, animated: true)
+    private static func buildReleaseNotesSafetySection(
+        from releaseNotesThread: TSReleaseNotesThread,
+        tx: DBReadTransaction,
+    ) -> CVComponentState.ThreadDetails.SafetySection {
+        return .init(
+            shouldShowProfileNamesEducation: false,
+            detailsText: NSAttributedString(string: OWSLocalizedString("RELEASE_NOTES_DETAILS", comment: "Details text for the thread details view of the release notes channel")),
+            mutualGroupsText: nil,
+            mutualGroupsAccessibilityText: nil,
+            threadType: .contact,
+            shouldShowSafetyTipsButton: false,
+            isOfficialChat: true,
+        )
     }
 
     private static func buildGroupsSafetySection(
         from groupThread: TSGroupThread,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> CVComponentState.ThreadDetails.SafetySection {
         let accountManager = DependenciesBridge.shared.tsAccountManager
 
@@ -964,58 +956,58 @@ extension CVComponentThreadDetails {
 
         let formatString: String
         var underlinedPortion: String?
-        var arguments: [CVarArg] = sortedMemberNames
+        var arguments: [String] = sortedMemberNames
         switch (sortedMemberNames.count, localUserIsAMember) {
         case (0, _):
             formatString = OWSLocalizedString(
                 "THREAD_DETAILS_NO_MEMBERS",
-                comment: "Label for a group with no members or no members but yourself"
+                comment: "Label for a group with no members or no members but yourself",
             )
         case (1, false):
             formatString = OWSLocalizedString(
                 "THREAD_DETAILS_ONE_MEMBER",
-                comment: "Label for a group with one member (not counting yourself), displaying their name"
+                comment: "Label for a group with one member (not counting yourself), displaying their name",
             )
         case (1, true):
             formatString = OWSLocalizedString(
                 "THREAD_DETAILS_ONE_MEMBER_AND_YOURSELF",
-                comment: "Label for a group you are in with one other member, listing their name and yourself"
+                comment: "Label for a group you are in with one other member, listing their name and yourself",
             )
         case (2, false):
             formatString = OWSLocalizedString(
                 "THREAD_DETAILS_TWO_MEMBERS",
-                comment: "Label for a group you are not in which has two members, listing their names"
+                comment: "Label for a group you are not in which has two members, listing their names",
             )
         case (2, true):
             formatString = OWSLocalizedString(
                 "THREAD_DETAILS_TWO_MEMBERS_AND_YOURSELF",
-                comment: "Label for a group you are in which has two other members, listing their names and yourself"
+                comment: "Label for a group you are in which has two other members, listing their names and yourself",
             )
         case (3, false):
             formatString = OWSLocalizedString(
                 "THREAD_DETAILS_THREE_MEMBERS",
-                comment: "Label for a group you are not in which has three members, listing their names"
+                comment: "Label for a group you are not in which has three members, listing their names",
             )
         case (3, true):
             formatString = OWSLocalizedString(
                 "THREAD_DETAILS_THREE_MEMBERS_AND_YOURSELF",
-                comment: "Label for a group you are in which has three other members, listing their names and yourself"
+                comment: "Label for a group you are in which has three other members, listing their names and yourself",
             )
         case (4, false):
             formatString = OWSLocalizedString(
                 "THREAD_DETAILS_FOUR_MEMBERS",
-                comment: "Label for a group you are not in which has four members, listing their names"
+                comment: "Label for a group you are not in which has four members, listing their names",
             )
         default:
             formatString = OWSLocalizedString(
                 "THREAD_DETAILS_MANY_MEMBERS",
-                comment: "Label for a group with more than four members, listing the first three members' names and embedding THREAD_DETAILS_OTHER_MEMBERS_COUNT_%ld as a count of other members"
+                comment: "Label for a group with more than four members, listing the first three members' names and embedding THREAD_DETAILS_OTHER_MEMBERS_COUNT_%ld as a count of other members",
             )
 
             let otherMembersFormat = OWSLocalizedString(
                 "THREAD_DETAILS_OTHER_MEMBERS_COUNT_%ld",
                 tableName: "PluralAware",
-                comment: "The number of other members in a group. Embedded into the last parameter of THREAD_DETAILS_MANY_MEMBERS"
+                comment: "The number of other members in a group. Embedded into the last parameter of THREAD_DETAILS_MANY_MEMBERS",
             )
 
             let firstThreeMembers = Array(arguments.prefix(3))
@@ -1027,10 +1019,21 @@ extension CVComponentThreadDetails {
             arguments = firstThreeMembers + [otherMembersString]
         }
 
-        let membersString = String(
-            format: formatString,
-            arguments: arguments
+        var membersString = String.nonPluralLocalizedStringWithFormat(
+            formatString,
+            arguments: arguments,
         )
+
+        let invitedMembersCount = groupMembership.invitedMembers.count
+        if invitedMembersCount > 0 {
+            let membersAndInvitedFormat = OWSLocalizedString(
+                "THREAD_DETAILS_MEMBERS_AND_INVITED_%ld",
+                tableName: "PluralAware",
+                comment: "Label for a group with invited members who have not yet joined. Embeds {{ number of invited members }} and {{ list of group members, e.g. THREAD_DETAILS_TWO_MEMBERS }}.",
+            )
+            membersString = String.localizedStringWithFormat(membersAndInvitedFormat, invitedMembersCount, membersString)
+        }
+
         let membersAttributedString: NSAttributedString
         if let underlinedPortion {
             let underlinedRange = NSString(string: membersString).range(of: underlinedPortion)
@@ -1040,7 +1043,7 @@ extension CVComponentThreadDetails {
                     .underlineStyle: NSUnderlineStyle.single.rawValue,
                     .underlineColor: Self.underlineColor,
                 ],
-                range: underlinedRange
+                range: underlinedRange,
             )
             membersAttributedString = attributedString
         } else {
@@ -1050,34 +1053,44 @@ extension CVComponentThreadDetails {
         let membersAttributedText = NSAttributedString.composed(of: [
             NSAttributedString.with(
                 image: UIImage(named: "group-resizable")!,
-                font: Self.mutualGroupsFont
+                font: Self.otherDetailsFont,
             ),
             "  ",
             membersAttributedString,
         ]).styled(
-            with: .font(Self.mutualGroupsFont),
-            .color(Self.mutualGroupsTextColor)
+            with: .font(Self.otherDetailsFont),
+            .color(Self.otherDetailsTextColor),
         )
 
-        let shouldShowUnknownThreadWarning = SSKEnvironment.shared.contactManagerImplRef.isLowTrustGroup(groupThread: groupThread, tx: tx)
+        let isGroupNameVerified = { () -> Bool in
+            guard let groupId = try? groupThread.groupIdentifier else {
+                return false
+            }
+            guard let groupRecord = GroupStore().fetchGroup(forGroupId: groupId, tx: tx) else {
+                return false
+            }
+            return groupRecord.isGroupNameVerified(groupName: groupThread.groupNameOrDefault)
+        }()
+        let shouldShowUnknownThreadWarning = !isGroupNameVerified
 
         return .init(
-            shouldShowLowTrustWarning: shouldShowUnknownThreadWarning,
             shouldShowProfileNamesEducation: shouldShowUnknownThreadWarning,
             detailsText: membersAttributedText,
             mutualGroupsText: nil,
+            mutualGroupsAccessibilityText: nil,
             threadType: .group,
-            shouldShowSafetyTipsButton: shouldShowUnknownThreadWarning && groupThread.hasPendingMessageRequest(transaction: tx)
+            shouldShowSafetyTipsButton: shouldShowUnknownThreadWarning && groupThread.hasPendingMessageRequest(transaction: tx),
+            isOfficialChat: false,
         )
     }
 
     private static func buildContactSafetySection(
         for displayName: DisplayName,
         in contactThread: TSContactThread,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> CVComponentState.ThreadDetails.SafetySection? {
         switch displayName {
-        case .nickname, .systemContactName, .profileName:
+        case .nickname, .systemContactName, .profileName, .sharedName:
             break
         case .phoneNumber, .username, .deletedAccount, .unknown:
             // If the display name is a phone number or username, you started a
@@ -1088,66 +1101,62 @@ extension CVComponentThreadDetails {
 
         guard !contactThread.isNoteToSelf else {
             return .init(
-                shouldShowLowTrustWarning: false,
                 shouldShowProfileNamesEducation: false,
                 detailsText: nil,
                 mutualGroupsText: OWSLocalizedString(
                     "THREAD_DETAILS_NOTE_TO_SELF_EXPLANATION",
-                    comment: "Subtitle appearing at the top of the users 'note to self' conversation"
+                    comment: "Subtitle appearing at the top of the users 'note to self' conversation",
                 ).styled(
                     with: .font(.dynamicTypeSubheadline),
-                    .color(UIColor.Signal.label)
+                    .color(UIColor.Signal.label),
                 ),
+                mutualGroupsAccessibilityText: nil,
                 threadType: .contact,
-                shouldShowSafetyTipsButton: false
+                shouldShowSafetyTipsButton: false,
+                isOfficialChat: false,
             )
         }
 
-        let groupThreads = TSGroupThread.groupThreads(with: contactThread.contactAddress, transaction: tx)
-        let mutualGroupNames = groupThreads.filter { $0.groupModel.groupMembership.isLocalUserFullMember && $0.shouldThreadBeVisible }.map { $0.groupNameOrDefault }
+        let mutualGroupNames = TSGroupThread
+            .mutualVisibleGroupThreads(withFullMember: contactThread.contactAddress, tx: tx)
+            .map { $0.groupNameOrDefault }
 
         let isMessageRequest = contactThread.hasPendingMessageRequest(transaction: tx)
 
-        let shouldShowUnknownThreadWarning = SSKEnvironment.shared.contactManagerImplRef.isLowTrustContact(
-            contactThread: contactThread,
-            tx: tx
-        )
-
-        // We need these to be CVarArgs for them to format appropriately.
-        let groupNamesFormatArg: [CVarArg] = mutualGroupNames
+        let groupNamesFormatArg: [String] = mutualGroupNames
         let formattedString: String
         switch mutualGroupNames.count {
         case 0:
-            formattedString = String(
-                format: OWSLocalizedString(
+            formattedString = String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
                     "THREAD_DETAILS_ZERO_MUTUAL_GROUPS",
-                    comment: "A string indicating there are no mutual groups the user shares with this contact"
+                    comment: "A string indicating there are no mutual groups the user shares with this contact",
                 ),
-                groupNamesFormatArg,
+                arguments: groupNamesFormatArg,
             )
         case 1:
-            formattedString = String(
-                format: OWSLocalizedString(
+            formattedString = String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
                     "THREAD_DETAILS_ONE_MUTUAL_GROUP",
-                    comment: "A string indicating a mutual group the user shares with this contact. Embeds {{mutual group name}}"
+                    comment: "A string indicating a mutual group the user shares with this contact. Embeds {{mutual group name}}",
                 ),
-                groupNamesFormatArg,
+                arguments: groupNamesFormatArg,
             )
         case 2:
-            formattedString = String(
-                format: OWSLocalizedString(
+            formattedString = String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
                     "THREAD_DETAILS_TWO_MUTUAL_GROUP",
-                    comment: "A string indicating two mutual groups the user shares with this contact. Embeds {{mutual group name}}"
+                    comment: "A string indicating two mutual groups the user shares with this contact. Embeds {{mutual group name}}",
                 ),
-                groupNamesFormatArg,
+                arguments: groupNamesFormatArg,
             )
         case 3:
-            formattedString = String(
-                format: OWSLocalizedString(
+            formattedString = String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
                     "THREAD_DETAILS_THREE_MUTUAL_GROUP",
-                    comment: "A string indicating three mutual groups the user shares with this contact. Embeds {{mutual group name}}"
+                    comment: "A string indicating three mutual groups the user shares with this contact. Embeds {{mutual group name}}",
                 ),
-                groupNamesFormatArg,
+                arguments: groupNamesFormatArg,
             )
         default:
             // For this string, we want to use the first two groups' names
@@ -1160,7 +1169,7 @@ extension CVComponentThreadDetails {
                 OWSLocalizedString(
                     "THREAD_DETAILS_MORE_MUTUAL_GROUP_%3$ld",
                     tableName: "PluralAware",
-                    comment: "A string indicating two mutual groups the user shares with this contact and that there are more unlisted. Embeds {{group name, group name, number of other groups}}"
+                    comment: "A string indicating two mutual groups the user shares with this contact and that there are more unlisted. Embeds {{group name, group name, number of other groups}}",
                 ),
                 formatArgs,
             )
@@ -1178,35 +1187,39 @@ extension CVComponentThreadDetails {
                 return nil
             }
             return NSAttributedString.composed(of: [
-                NSAttributedString.with(image: Theme.iconImage(.contactInfoPhone), font: Self.mutualGroupsFont),
+                NSAttributedString.with(image: Theme.iconImage(.contactInfoPhone), font: Self.otherDetailsFont),
                 "  ",
                 formattedPhoneNumber,
             ])
         }()
 
-        let isPhoneContact = phoneNumberString != nil
-        let shouldShowProfileNamesEducation = if isPhoneContact {
-            false
+        let isSystemContact = SSKEnvironment.shared.contactManagerRef.fetchSignalAccount(for: contactThread.contactAddress, transaction: tx) != nil
+        let shouldShowProfileNamesEducation: Bool
+        if isMessageRequest {
+            shouldShowProfileNamesEducation = true
         } else if case .nickname = displayName {
-            false
+            shouldShowProfileNamesEducation = false
+        } else if isSystemContact {
+            shouldShowProfileNamesEducation = false
         } else {
-            true
+            shouldShowProfileNamesEducation = true
         }
 
         return .init(
-            shouldShowLowTrustWarning: shouldShowUnknownThreadWarning,
             shouldShowProfileNamesEducation: shouldShowProfileNamesEducation,
             detailsText: phoneNumberString,
             mutualGroupsText: NSAttributedString.composed(of: [
                 NSAttributedString.with(
                     image: UIImage(named: "group-resizable")!,
-                    font: Self.mutualGroupsFont
+                    font: Self.otherDetailsFont,
                 ),
                 "  ",
                 formattedString,
             ]),
+            mutualGroupsAccessibilityText: formattedString,
             threadType: .contact,
-            shouldShowSafetyTipsButton: isMessageRequest
+            shouldShowSafetyTipsButton: isMessageRequest,
+            isOfficialChat: false,
         )
     }
 }

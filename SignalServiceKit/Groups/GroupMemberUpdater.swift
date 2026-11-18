@@ -7,14 +7,18 @@ import Foundation
 import LibSignalClient
 
 public protocol GroupMemberUpdater {
-    func updateRecords(groupThread: TSGroupThread, transaction: DBWriteTransaction)
+    func updateRecords(
+        groupThreadUniqueId: String,
+        groupMembership: GroupMembership,
+        transaction: DBWriteTransaction,
+    )
 }
 
 protocol GroupMemberUpdaterTemporaryShims {
     func fetchLatestInteractionTimestamp(
         groupThreadId: String,
         groupMemberAddress: SignalServiceAddress,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> UInt64?
 
     func didUpdateRecords(groupThreadId: String, transaction: DBWriteTransaction)
@@ -28,15 +32,19 @@ class GroupMemberUpdaterImpl: GroupMemberUpdater {
     init(
         temporaryShims: GroupMemberUpdaterTemporaryShims,
         groupMemberStore: GroupMemberStore,
-        signalServiceAddressCache: SignalServiceAddressCache
+        signalServiceAddressCache: SignalServiceAddressCache,
     ) {
         self.temporaryShims = temporaryShims
         self.groupMemberStore = groupMemberStore
         self.signalServiceAddressCache = signalServiceAddressCache
     }
 
-    func updateRecords(groupThread: TSGroupThread, transaction: DBWriteTransaction) {
-        let groupThreadId = groupThread.uniqueId
+    func updateRecords(
+        groupThreadUniqueId: String,
+        groupMembership: GroupMembership,
+        transaction: DBWriteTransaction,
+    ) {
+        let groupThreadId = groupThreadUniqueId
 
         var groupMembersToRemove = [TSGroupMember]()
         var groupMembersToInsert = [TSGroupMember]()
@@ -61,20 +69,20 @@ class GroupMemberUpdaterImpl: GroupMemberUpdater {
         // from disk, so it may have outdated phone number information. Re-create
         // each address without specifying a phone number to ensure that we only
         // use values contained in the cache.
-        var expectedAddresses = Set(groupThread.groupMembership.fullMembers.lazy.map { address in
+        var expectedAddresses = Set(groupMembership.fullMembers.lazy.map { address in
             address.withNormalizedPhoneNumberAndServiceId(cache: self.signalServiceAddressCache)
         })
 
         for groupMember in groupMemberStore.sortedFullGroupMembers(in: groupThreadId, tx: transaction) {
             let oldAddress = PersistableDatabaseRecordAddress(
                 serviceId: groupMember.serviceId,
-                phoneNumber: groupMember.phoneNumber
+                phoneNumber: groupMember.phoneNumber,
             )
 
             let expectedAddress = expectedAddresses.remove(SignalServiceAddress(
                 serviceId: oldAddress.serviceId,
                 phoneNumber: oldAddress.phoneNumber,
-                cache: signalServiceAddressCache
+                cache: signalServiceAddressCache,
             ))
 
             let newAddress = NormalizedDatabaseRecordAddress(address: expectedAddress)
@@ -91,8 +99,8 @@ class GroupMemberUpdaterImpl: GroupMemberUpdater {
                 // It needs to be updated, so copy fields from the removed group member.
                 groupMembersToInsert.append(TSGroupMember(
                     address: newAddress,
-                    groupThreadId: groupThreadId,
-                    lastInteractionTimestamp: groupMember.lastInteractionTimestamp
+                    threadUniqueId: groupThreadId,
+                    lastInteractionTimestamp: groupMember.lastInteractionTimestamp,
                 ))
             }
         }
@@ -107,12 +115,12 @@ class GroupMemberUpdaterImpl: GroupMemberUpdater {
             let latestInteractionTimestamp = temporaryShims.fetchLatestInteractionTimestamp(
                 groupThreadId: groupThreadId,
                 groupMemberAddress: expectedAddress,
-                transaction: transaction
+                transaction: transaction,
             )
             groupMembersToInsert.append(TSGroupMember(
                 address: newAddress,
-                groupThreadId: groupThreadId,
-                lastInteractionTimestamp: latestInteractionTimestamp ?? 0
+                threadUniqueId: groupThreadId,
+                lastInteractionTimestamp: latestInteractionTimestamp ?? 0,
             ))
         }
 
@@ -133,12 +141,12 @@ class GroupMemberUpdaterTemporaryShimsImpl: GroupMemberUpdaterTemporaryShims {
     func fetchLatestInteractionTimestamp(
         groupThreadId: String,
         groupMemberAddress: SignalServiceAddress,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> UInt64? {
         let interactionFinder = InteractionFinder(threadUniqueId: groupThreadId)
         return interactionFinder.latestInteraction(
             from: groupMemberAddress,
-            transaction: transaction
+            transaction: transaction,
         )?.timestamp
     }
 
@@ -148,3 +156,13 @@ class GroupMemberUpdaterTemporaryShimsImpl: GroupMemberUpdaterTemporaryShims {
         }
     }
 }
+
+#if TESTABLE_BUILD
+
+class MockGroupMemberUpdater: GroupMemberUpdater {
+    func updateRecords(groupThreadUniqueId: String, groupMembership: GroupMembership, transaction: DBWriteTransaction) {
+        owsFail("not implemented")
+    }
+}
+
+#endif

@@ -4,6 +4,7 @@
 //
 
 import Foundation
+public import UIKit
 
 public struct UnsentTextAttachment {
     public let body: StyleOnlyMessageBody?
@@ -24,7 +25,7 @@ public struct UnsentTextAttachment {
         textForegroundColor: UIColor,
         textBackgroundColor: UIColor?,
         background: TextAttachment.Background,
-        linkPreviewDraft: OWSLinkPreviewDraft?
+        linkPreviewDraft: OWSLinkPreviewDraft?,
     ) {
         self.body = body
         self.textStyle = textStyle
@@ -39,7 +40,7 @@ public struct UnsentTextAttachment {
         if let linkPreview = linkPreviewDraft {
             do {
                 validatedLinkPreview = try await DependenciesBridge.shared.linkPreviewManager.buildDataSource(
-                    from: linkPreview
+                    from: linkPreview,
                 )
             } catch LinkPreviewError.featureDisabled {
                 validatedLinkPreview = .init(
@@ -47,7 +48,7 @@ public struct UnsentTextAttachment {
                         urlString: linkPreview.urlString,
                         title: nil,
                         previewDescription: nil,
-                        date: nil
+                        date: nil,
                     ),
                     imageDataSource: nil,
                     isForwarded: linkPreview.isForwarded,
@@ -70,7 +71,7 @@ public struct UnsentTextAttachment {
             textForegroundColor: self.textForegroundColor,
             textBackgroundColor: self.textBackgroundColor,
             background: self.background,
-            linkPreviewDraft: validatedLinkPreview
+            linkPreviewDraft: validatedLinkPreview,
         )
     }
 
@@ -85,45 +86,6 @@ public struct UnsentTextAttachment {
 
         public var textContent: TextAttachment.TextContent {
             return TextAttachment.textContent(body: body, textStyle: textStyle)
-        }
-
-        public func buildTextAttachment(
-            transaction: DBWriteTransaction
-        ) -> OwnedAttachmentBuilder<TextAttachment>? {
-            var linkPreviewBuilder: OwnedAttachmentBuilder<OWSLinkPreview>?
-            if let linkPreview = linkPreviewDraft {
-                do {
-                    linkPreviewBuilder = try DependenciesBridge.shared.linkPreviewManager.buildLinkPreview(
-                        from: linkPreview,
-                        tx: transaction
-                    )
-                } catch LinkPreviewError.featureDisabled {
-                    linkPreviewBuilder = .withoutFinalizer(OWSLinkPreview(urlString: linkPreview.metadata.urlString))
-                } catch {
-                    Logger.error("Failed to generate link preview.")
-                }
-            }
-
-            guard linkPreviewBuilder != nil || !(body?.isEmpty ?? true) else {
-                owsFailDebug("Empty content")
-                return nil
-            }
-
-            func buildTextAttachment(linkPreview: OWSLinkPreview?) -> TextAttachment {
-                return TextAttachment(
-                    body: body,
-                    textStyle: textStyle,
-                    textForegroundColor: textForegroundColor,
-                    textBackgroundColor: textBackgroundColor,
-                    background: background,
-                    linkPreview: linkPreview
-                )
-            }
-            if let linkPreviewBuilder {
-                return linkPreviewBuilder.wrap(buildTextAttachment(linkPreview:))
-            } else {
-                return .withoutFinalizer(buildTextAttachment(linkPreview: nil))
-            }
         }
     }
 }
@@ -142,6 +104,7 @@ public struct TextAttachment: Codable, Equatable {
         case script = 3
         case condensed = 4
     }
+
     private let textStyle: TextStyle
 
     public enum TextContent {
@@ -158,9 +121,9 @@ public struct TextAttachment: Codable, Equatable {
 
     fileprivate static func textContent(
         body: StyleOnlyMessageBody?,
-        textStyle: TextStyle
+        textStyle: TextStyle,
     ) -> TextContent {
-        guard let body, body.isEmpty.negated else {
+        guard let body, !body.isEmpty else {
             return .empty
         }
         switch textStyle {
@@ -217,6 +180,7 @@ public struct TextAttachment: Codable, Equatable {
             }
         }
     }
+
     private let rawBackground: RawBackground
 
     public enum Background {
@@ -228,17 +192,20 @@ public struct TextAttachment: Codable, Equatable {
                 self.locations = locations
                 self.angle = angle
             }
+
             public init(colors: [UIColor]) {
                 let locations: [CGFloat] = colors.enumerated().map { element in
                     return CGFloat(element.offset) / CGFloat(colors.count - 1)
                 }
                 self.init(colors: colors, locations: locations, angle: 180)
             }
+
             public let colors: [UIColor]
             public let locations: [CGFloat]
             public let angle: UInt32
         }
     }
+
     public var background: Background {
         switch rawBackground {
         case .color(let hex):
@@ -247,7 +214,7 @@ public struct TextAttachment: Codable, Equatable {
             return .gradient(.init(
                 colors: rawGradient.colors.map { UIColor(argbHex: $0) },
                 locations: rawGradient.positions.map { CGFloat($0) },
-                angle: rawGradient.angle
+                angle: rawGradient.angle,
             ))
         }
     }
@@ -256,7 +223,7 @@ public struct TextAttachment: Codable, Equatable {
         from proto: SSKProtoTextAttachment,
         bodyRanges: [SSKProtoBodyRange],
         linkPreview: OWSLinkPreview?,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) throws {
         self.body = proto.text?.nilIfEmpty.map { StyleOnlyMessageBody(text: $0, protos: bodyRanges) }
 
@@ -292,17 +259,17 @@ public struct TextAttachment: Codable, Equatable {
         if let gradient = proto.gradient {
             let colors: [UInt32]
             let positions: [Float]
-            if !gradient.colors.isEmpty && !gradient.positions.isEmpty {
+            if !gradient.colors.isEmpty, !gradient.positions.isEmpty {
                 colors = Array(gradient.colors.prefix(Constants.maxGradientPoints))
                 positions = Array(gradient.positions.prefix(Constants.maxGradientPoints).map({ $0.isNaN ? 0 : $0 }))
             } else {
-                colors = [ gradient.startColor, gradient.endColor ]
-                positions = [ 0, 1 ]
+                colors = [gradient.startColor, gradient.endColor]
+                positions = [0, 1]
             }
             rawBackground = .gradient(raw: .init(
                 colors: colors,
                 positions: positions,
-                angle: gradient.angle
+                angle: gradient.angle,
             ))
         } else if proto.hasColor {
             rawBackground = .color(hex: proto.color)
@@ -316,7 +283,7 @@ public struct TextAttachment: Codable, Equatable {
     public func buildProto(
         parentStoryMessage: StoryMessage,
         bodyRangeHandler: ([SSKProtoBodyRange]) -> Void,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) throws -> SSKProtoTextAttachment {
         let builder = SSKProtoTextAttachment.builder()
 
@@ -336,11 +303,11 @@ public struct TextAttachment: Codable, Equatable {
         }()
         builder.setTextStyle(textStyle)
 
-        if let textForegroundColorHex = textForegroundColorHex {
+        if let textForegroundColorHex {
             builder.setTextForegroundColor(textForegroundColorHex)
         }
 
-        if let textBackgroundColorHex = textBackgroundColorHex {
+        if let textBackgroundColorHex {
             builder.setTextBackgroundColor(textBackgroundColorHex)
         }
 
@@ -351,11 +318,11 @@ public struct TextAttachment: Codable, Equatable {
             builder.setGradient(raw.buildProto())
         }
 
-        if let preview = preview {
+        if let preview {
             let previewProto = try DependenciesBridge.shared.linkPreviewManager.buildProtoForSending(
                 preview,
                 parentStoryMessage: parentStoryMessage,
-                tx: transaction
+                tx: transaction,
             )
             builder.setPreview(previewProto)
         }
@@ -369,7 +336,7 @@ public struct TextAttachment: Codable, Equatable {
         textForegroundColor: UIColor,
         textBackgroundColor: UIColor?,
         background: Background,
-        linkPreview: OWSLinkPreview?
+        linkPreview: OWSLinkPreview?,
     ) {
         self.body = body
         self.textStyle = textStyle
@@ -381,9 +348,11 @@ public struct TextAttachment: Codable, Equatable {
                 return .color(hex: color.argbHex)
 
             case .gradient(let gradient):
-                return .gradient(raw: .init(colors: gradient.colors.map { $0.argbHex },
-                                            positions: gradient.locations.map { Float($0) },
-                                            angle: gradient.angle))
+                return .gradient(raw: .init(
+                    colors: gradient.colors.map { $0.argbHex },
+                    positions: gradient.locations.map { Float($0) },
+                    angle: gradient.angle,
+                ))
             }
         }()
         self.preview = linkPreview
@@ -394,7 +363,7 @@ public struct TextAttachment: Codable, Equatable {
     public func asUnsentAttachment() -> UnsentTextAttachment {
         var linkPreviewDraft: OWSLinkPreviewDraft?
         if
-            let preview = preview,
+            let preview,
             let urlString = preview.urlString,
             let url = URL(string: urlString)
         {
@@ -402,7 +371,7 @@ public struct TextAttachment: Codable, Equatable {
                 url: url,
                 title: preview.title,
                 // This code path is only used for forwarding
-                isForwarded: true
+                isForwarded: true,
             )
         }
         return UnsentTextAttachment(
@@ -411,7 +380,7 @@ public struct TextAttachment: Codable, Equatable {
             textForegroundColor: textForegroundColor ?? .white,
             textBackgroundColor: textBackgroundColor,
             background: background,
-            linkPreviewDraft: linkPreviewDraft
+            linkPreviewDraft: linkPreviewDraft,
         )
     }
 

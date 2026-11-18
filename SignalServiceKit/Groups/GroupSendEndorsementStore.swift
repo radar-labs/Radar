@@ -7,90 +7,75 @@ import Foundation
 import GRDB
 import LibSignalClient
 
-protocol GroupSendEndorsementStore {
-    func fetchCombinedEndorsement(groupThreadId: Int64, tx: DBReadTransaction) throws -> CombinedGroupSendEndorsementRecord?
-    func fetchIndividualEndorsements(groupThreadId: Int64, tx: DBReadTransaction) throws -> [IndividualGroupSendEndorsementRecord]
-    func fetchIndividualEndorsement(groupThreadId: Int64, recipientId: SignalRecipient.RowId, tx: DBReadTransaction) throws -> IndividualGroupSendEndorsementRecord?
-    func deleteEndorsements(groupThreadId: Int64, tx: DBWriteTransaction)
-    func insertCombinedEndorsement(_ endorsementRecord: CombinedGroupSendEndorsementRecord, tx: DBWriteTransaction)
-    func insertIndividualEndorsement(_ endorsementRecord: IndividualGroupSendEndorsementRecord, tx: DBWriteTransaction)
-}
-
-extension GroupSendEndorsementStore {
+public struct GroupSendEndorsementStore {
     func saveEndorsements(
-        groupThreadId: Int64,
+        groupRowId: GroupRecord.RowId,
         expiration: Date,
         combinedEndorsement: GroupSendEndorsement,
         individualEndorsements: [(recipientId: Int64, individualEndorsement: GroupSendEndorsement)],
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
-        deleteEndorsements(groupThreadId: groupThreadId, tx: tx)
+        deleteEndorsements(groupRowId: groupRowId, tx: tx)
         insertCombinedEndorsement(CombinedGroupSendEndorsementRecord(
-            threadId: groupThreadId,
+            groupRowId: groupRowId,
             endorsement: combinedEndorsement.serialize(),
-            expiration: expiration
+            expiration: expiration,
         ), tx: tx)
         for (recipientId, individualEndorsement) in individualEndorsements {
             insertIndividualEndorsement(IndividualGroupSendEndorsementRecord(
-                threadId: groupThreadId,
+                groupRowId: groupRowId,
                 recipientId: recipientId,
-                endorsement: individualEndorsement.serialize()
+                endorsement: individualEndorsement.serialize(),
             ), tx: tx)
         }
     }
-}
 
-class GroupSendEndorsementStoreImpl: GroupSendEndorsementStore {
-    func fetchCombinedEndorsement(groupThreadId: Int64, tx: DBReadTransaction) throws -> CombinedGroupSendEndorsementRecord? {
-        do {
-            return try CombinedGroupSendEndorsementRecord.fetchOne(tx.database, key: groupThreadId)
-        } catch {
-            throw error.grdbErrorForLogging
+    func fetchCombinedEndorsement(groupRowId: GroupRecord.RowId, tx: DBReadTransaction) -> CombinedGroupSendEndorsementRecord? {
+        return failIfThrows {
+            return try CombinedGroupSendEndorsementRecord.fetchOne(tx.database, key: groupRowId)
         }
     }
 
-    func fetchIndividualEndorsements(groupThreadId: Int64, tx: DBReadTransaction) throws -> [IndividualGroupSendEndorsementRecord] {
-        do {
+    public func fetchNextExpiringCombinedEndorsement(tx: DBReadTransaction) -> CombinedGroupSendEndorsementRecord? {
+        return failIfThrows {
+            return try CombinedGroupSendEndorsementRecord
+                .order(Column(CombinedGroupSendEndorsementRecord.CodingKeys.expiration).asc)
+                .fetchOne(tx.database)
+        }
+    }
+
+    func fetchIndividualEndorsements(groupRowId: CombinedGroupSendEndorsementRecord.RowId, tx: DBReadTransaction) -> [IndividualGroupSendEndorsementRecord] {
+        return failIfThrows {
             return try IndividualGroupSendEndorsementRecord
-                .filter(Column(IndividualGroupSendEndorsementRecord.CodingKeys.threadId) == groupThreadId)
+                .filter(Column(IndividualGroupSendEndorsementRecord.CodingKeys.groupRowId) == groupRowId)
                 .fetchAll(tx.database)
-        } catch {
-            throw error.grdbErrorForLogging
         }
     }
 
-    func fetchIndividualEndorsement(groupThreadId: Int64, recipientId: SignalRecipient.RowId, tx: DBReadTransaction) throws -> IndividualGroupSendEndorsementRecord? {
-        do {
+    func fetchIndividualEndorsement(groupRowId: CombinedGroupSendEndorsementRecord.RowId, recipientId: SignalRecipient.RowId, tx: DBReadTransaction) -> IndividualGroupSendEndorsementRecord? {
+        return failIfThrows {
             return try IndividualGroupSendEndorsementRecord
-                .filter(Column(IndividualGroupSendEndorsementRecord.CodingKeys.threadId) == groupThreadId)
+                .filter(Column(IndividualGroupSendEndorsementRecord.CodingKeys.groupRowId) == groupRowId)
                 .filter(Column(IndividualGroupSendEndorsementRecord.CodingKeys.recipientId) == recipientId)
                 .fetchOne(tx.database)
-        } catch {
-            throw error.grdbErrorForLogging
         }
     }
 
-    func deleteEndorsements(groupThreadId: Int64, tx: DBWriteTransaction) {
-        do {
-            try CombinedGroupSendEndorsementRecord.deleteOne(tx.database, key: groupThreadId)
-        } catch {
-            owsFail("Couldn't delete records: \(error.grdbErrorForLogging)")
+    public func deleteEndorsements(groupRowId: CombinedGroupSendEndorsementRecord.RowId, tx: DBWriteTransaction) {
+        failIfThrows {
+            try CombinedGroupSendEndorsementRecord.deleteOne(tx.database, key: groupRowId)
         }
     }
 
     func insertCombinedEndorsement(_ endorsementRecord: CombinedGroupSendEndorsementRecord, tx: DBWriteTransaction) {
-        do {
+        failIfThrows {
             try endorsementRecord.insert(tx.database)
-        } catch {
-            owsFail("Couldn't insert record: \(error.grdbErrorForLogging)")
         }
     }
 
     func insertIndividualEndorsement(_ endorsementRecord: IndividualGroupSendEndorsementRecord, tx: DBWriteTransaction) {
-        do {
+        failIfThrows {
             try endorsementRecord.insert(tx.database)
-        } catch {
-            owsFail("Couldn't insert record: \(error.grdbErrorForLogging)")
         }
     }
 }

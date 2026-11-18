@@ -65,7 +65,7 @@ class BackupSubscriptionRedeemer {
                         task.cancel()
                     }
                 }
-            }
+            },
         ))
     }
 
@@ -82,7 +82,7 @@ class BackupSubscriptionRedeemer {
 
         let retryDelay: TimeInterval = OWSOperation.retryIntervalForExponentialBackoff(
             failureCount: transientFailureCount,
-            maxAverageBackoff: .day
+            maxAverageBackoff: .day,
         )
 
         do {
@@ -99,43 +99,37 @@ class BackupSubscriptionRedeemer {
 
         switch await _redeemBackupReceiptCredential(context: context) {
         case .success:
-            do {
-                try await db.awaitableWriteWithRollbackIfThrows { tx in
-                    context.delete(tx: tx)
+            await db.awaitableWrite { tx in
+                context.delete(tx: tx)
 
-                    /// We're now a paid-tier Backups user according to the server.
-                    /// If our local thinks we're free-tier, upgrade it.
-                    switch backupPlanManager.backupPlan(tx: tx) {
-                    case .free:
-                        // "Optimize Media" is off by default when you first upgrade.
-                        try backupPlanManager.setBackupPlan(
-                            .paid(optimizeLocalStorage: false),
-                            tx: tx
-                        )
-                    case .disabled, .disabling:
-                        // Don't sneakily enable Backups!
-                        break
-                    case .paid, .paidExpiringSoon, .paidAsTester:
-                        break
-                    }
-
-                    /// Clear out any cached Backup auth credentials, since we
-                    /// may now be able to fetch credentials with a higher level
-                    /// of access than we had cached.
-                    authCredentialStore.removeAllBackupAuthCredentials(tx: tx)
-
-                    /// We've successfully redeemed, so any "already redeemed"
-                    /// errors are by definition obsolete.
-                    backupSubscriptionIssueStore.setStopWarningIAPSubscriptionAlreadyRedeemed(tx: tx)
+                /// We're now a paid-tier Backups user according to the server.
+                /// If our local thinks we're free-tier, upgrade it.
+                switch backupPlanManager.backupPlan(tx: tx) {
+                case .free:
+                    // "Optimize Media" is off by default when you first upgrade.
+                    backupPlanManager.setBackupPlan(
+                        .paid(optimizeLocalStorage: false),
+                        tx: tx,
+                    )
+                case .disabled, .disabling:
+                    // Don't sneakily enable Backups!
+                    break
+                case .paid, .paidExpiringSoon, .paidAsTester:
+                    break
                 }
 
-                logger.info("Redemption successful!")
-            } catch {
-                owsFailDebug("Failed to set BackupPlan! \(error)")
+                /// Clear out any cached Backup auth credentials, since we
+                /// may now be able to fetch credentials with a higher level
+                /// of access than we had cached.
+                authCredentialStore.removeAllBackupAuthCredentials(tx: tx)
 
-                await db.awaitableWrite { context.delete(tx: $0) }
-                throw TerminalRedemptionError()
+                // We successfully redeemed, so warnings related to our IAP
+                // subscription are now obsolete.
+                backupSubscriptionIssueStore.setShouldWarnIAPSubscriptionExpired(false, tx: tx)
+                backupSubscriptionIssueStore.setStopWarningIAPSubscriptionExpiringSoon(tx: tx)
+                backupSubscriptionIssueStore.setStopWarningIAPSubscriptionAlreadyRedeemed(tx: tx)
             }
+            logger.info("Redemption successful!")
 
         case .needsReattempt:
             // Try again, without a delay.
@@ -204,13 +198,13 @@ class BackupSubscriptionRedeemer {
 
             let (
                 receiptCredentialRequestContext,
-                receiptCredentialRequest
+                receiptCredentialRequest,
             ) = ReceiptCredentialManager.generateReceiptRequest()
 
             await db.awaitableWrite { tx in
                 context.attemptState = .receiptCredentialRequesting(
                     request: receiptCredentialRequest,
-                    context: receiptCredentialRequestContext
+                    context: receiptCredentialRequestContext,
                 )
                 context.upsert(tx: tx)
             }
@@ -218,7 +212,7 @@ class BackupSubscriptionRedeemer {
 
         case .receiptCredentialRequesting(
             let receiptCredentialRequest,
-            let receiptCredentialRequestContext
+            let receiptCredentialRequestContext,
         ):
             logger.info("Requesting receipt credential.")
 
@@ -233,10 +227,10 @@ class BackupSubscriptionRedeemer {
                         /// We'll accept either receipt level here to handle
                         /// things like clock skew, although we're generally
                         /// expecting a paid-tier receipt credential.
-                        return (
+                        return
                             receiptLevel == Constants.paidTierBackupReceiptLevel
-                            || receiptLevel == Constants.freeTierBackupReceiptLevel
-                        )
+                                || receiptLevel == Constants.freeTierBackupReceiptLevel
+
                     },
                     context: receiptCredentialRequestContext,
                 )
@@ -272,10 +266,10 @@ class BackupSubscriptionRedeemer {
                 case .paymentStillProcessing:
                     return .paymentStillProcessing
                 case
-                        .paymentFailed,
-                        .localValidationFailed,
-                        .serverValidationFailed,
-                        .paymentNotFound:
+                    .paymentFailed,
+                    .localValidationFailed,
+                    .serverValidationFailed,
+                    .paymentNotFound:
                     owsFailDebug(
                         "Unexpected error code requesting receipt credentials! \(error.errorCode)",
                         logger: logger,
@@ -287,7 +281,7 @@ class BackupSubscriptionRedeemer {
             } catch let error {
                 owsFailDebug(
                     "Unexpected error requesting receipt credential: \(error)",
-                    logger: logger
+                    logger: logger,
                 )
                 return .redemptionUnsuccessful
             }
@@ -304,12 +298,12 @@ class BackupSubscriptionRedeemer {
             let presentation: ReceiptCredentialPresentation
             do {
                 presentation = try ReceiptCredentialManager.generateReceiptCredentialPresentation(
-                    receiptCredential: receiptCredential
+                    receiptCredential: receiptCredential,
                 )
             } catch let error {
                 owsFailDebug(
                     "Failed to generate receipt credential presentation: \(error)",
-                    logger: logger
+                    logger: logger,
                 )
                 return .redemptionUnsuccessful
             }
@@ -318,9 +312,9 @@ class BackupSubscriptionRedeemer {
             do {
                 response = try await networkManager.asyncRequest(
                     .backupRedeemReceiptCredential(
-                        receiptCredentialPresentation: presentation
+                        receiptCredentialPresentation: presentation,
                     ),
-                    retryPolicy: .hopefullyRecoverable
+                    retryPolicy: .hopefullyRecoverable,
                 )
             } catch where error.isNetworkFailureOrTimeout || error.is5xxServiceResponse {
                 return .networkError
@@ -344,7 +338,7 @@ class BackupSubscriptionRedeemer {
             } catch {
                 owsFailDebug(
                     "Unexpected error: \(error)",
-                    logger: logger
+                    logger: logger,
                 )
                 return .redemptionUnsuccessful
             }
@@ -357,7 +351,7 @@ class BackupSubscriptionRedeemer {
             default:
                 owsFailDebug(
                     "Unexpected response status code: \(response.responseStatusCode)",
-                    logger: logger
+                    logger: logger,
                 )
                 return .redemptionUnsuccessful
             }
@@ -369,7 +363,7 @@ class BackupSubscriptionRedeemer {
 
 private extension TSRequest {
     static func backupRedeemReceiptCredential(
-        receiptCredentialPresentation: ReceiptCredentialPresentation
+        receiptCredentialPresentation: ReceiptCredentialPresentation,
     ) -> TSRequest {
         return TSRequest(
             url: URL(string: "v1/archives/redeem-receipt")!,
@@ -377,7 +371,7 @@ private extension TSRequest {
             parameters: [
                 "receiptCredentialPresentation": receiptCredentialPresentation
                     .serialize().base64EncodedString(),
-            ]
+            ],
         )
     }
 }

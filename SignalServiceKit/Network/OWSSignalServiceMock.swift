@@ -30,7 +30,7 @@ public class OWSSignalServiceMock: OWSSignalServiceProtocol {
             baseUrl: signalServiceInfo.baseUrl,
             frontingInfo: nil,
             securityPolicy: .systemDefault,
-            extraHeaders: [:]
+            extraHeaders: [:],
         )
     }
 
@@ -40,21 +40,16 @@ public class OWSSignalServiceMock: OWSSignalServiceProtocol {
         for signalServiceInfo: SignalServiceInfo,
         endpoint: OWSURLSessionEndpoint,
         configuration: URLSessionConfiguration?,
-        maxResponseSize: Int?
     ) -> OWSURLSessionProtocol {
         return mockUrlSessionBuilder?(signalServiceInfo, endpoint, configuration) ?? BaseOWSURLSessionMock(
             endpoint: endpoint,
             configuration: .default,
-            maxResponseSize: maxResponseSize
         )
     }
 
     public var mockCDNUrlSessionBuilder: ((_ cdnNumber: UInt32) -> BaseOWSURLSessionMock)?
 
-    public func sharedUrlSessionForCdn(
-        cdnNumber: UInt32,
-        maxResponseSize: UInt?
-    ) async -> OWSURLSessionProtocol {
+    public func sharedUrlSessionForCdn(cdnNumber: UInt32) async -> OWSURLSessionProtocol {
         let baseUrl: URL
         switch cdnNumber {
         case 0:
@@ -70,10 +65,9 @@ public class OWSSignalServiceMock: OWSSignalServiceProtocol {
                 baseUrl: baseUrl,
                 frontingInfo: nil,
                 securityPolicy: .systemDefault,
-                extraHeaders: [:]
+                extraHeaders: [:],
             ),
             configuration: .default,
-            maxResponseSize: maxResponseSize.map(Int.init(clamping:))
         )
     }
 }

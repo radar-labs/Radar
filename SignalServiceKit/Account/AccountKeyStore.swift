@@ -1,0 +1,139 @@
+//
+// Copyright 2025 Signal Messenger, LLC
+// SPDX-License-Identifier: AGPL-3.0-only
+//
+
+import Foundation
+public import LibSignalClient
+
+public class AccountKeyStore {
+    private enum Keys {
+        static let aepKeyName = "aep"
+        static let mrbkKeyName = "mrbk"
+    }
+
+    public enum Constants {
+        static let mediaRootBackupKeyLength: UInt = 32 /* bytes */
+    }
+
+    private let aepKvStore: NewKeyValueStore
+    private let mrbkKvStore: NewKeyValueStore
+    private let syncStore: NewKeyValueStore
+
+    private let backupSettingsStore: BackupSettingsStore
+
+    public init(
+        backupSettingsStore: BackupSettingsStore,
+    ) {
+        self.mrbkKvStore = NewKeyValueStore(collection: "MediaRootBackupKey")
+        self.aepKvStore = NewKeyValueStore(collection: "AccountEntropyPool")
+        self.syncStore = NewKeyValueStore(collection: "AccountKey.Sync")
+        self.backupSettingsStore = backupSettingsStore
+    }
+
+    // MARK: -
+
+    /// Manages the "Media Root Backup Key" a.k.a. "MRBK" a.k.a. "Mr Burger King".
+    /// This is a key we generate once and use forever that is used to derive encryption keys
+    /// for all backed-up media.
+    /// The MRBK is _not_ derived from the AccountEntropyPool any of its derivatives;
+    /// instead we store the MRBK in the backup proto itself. This avoids needing to rotate
+    /// media uploads if the AEP ever changes; the MRBK can be left the same and
+    /// put into the new backup generated with the new backups keys.
+
+    /// Get the already-generated MRBK. Returns nil if none has been set. If you require an MRBK
+    /// (e.g. you are creating a backup), use ``getOrGenerateMediaRootBackupKey``.
+    public func getMediaRootBackupKey(tx: DBReadTransaction) -> MediaRootBackupKey? {
+        guard let data = mrbkKvStore.fetchValue(Data.self, forKey: Keys.mrbkKeyName, tx: tx) else {
+            return nil
+        }
+        do {
+            return try MediaRootBackupKey(backupKey: BackupKey(contents: data))
+        } catch {
+            owsFailDebug("Failed to instantiate MediaRootBackupKey")
+        }
+        return nil
+    }
+
+    /// Get the already-generated MRBK or, if one has not been generated, generate one.
+    /// WARNING: this method should only be called _after_ restoring or choosing not to restore
+    /// from an existing backup; calling this generates a new key and invalidates all media backups.
+    public func getOrGenerateMediaRootBackupKey(tx: DBWriteTransaction) -> MediaRootBackupKey {
+        if let value = getMediaRootBackupKey(tx: tx) {
+            return value
+        }
+        let newValue = MediaRootBackupKey(backupKey: .generateRandom())
+        mrbkKvStore.writeValue(newValue.serialize(), forKey: Keys.mrbkKeyName, tx: tx)
+        return newValue
+    }
+
+    public func wipeMediaRootBackupKeyFromFailedProvisioning(tx: DBWriteTransaction) {
+        mrbkKvStore.removeValue(forKey: Keys.mrbkKeyName, tx: tx)
+    }
+
+    public func setMediaRootBackupKey(_ mrbk: MediaRootBackupKey, tx: DBWriteTransaction) {
+        mrbkKvStore.writeValue(mrbk.serialize(), forKey: Keys.mrbkKeyName, tx: tx)
+    }
+
+    // MARK: -
+
+    public func getMessageRootBackupKey(
+        aci: Aci,
+        tx: DBReadTransaction,
+    ) -> MessageRootBackupKey? {
+        guard let aep = getAccountEntropyPool(tx: tx) else { return nil }
+        return MessageRootBackupKey(accountEntropyPool: aep, aci: aci)
+    }
+
+    // MARK: -
+
+    public func getAccountEntropyPool(tx: DBReadTransaction) -> SignalServiceKit.AccountEntropyPool? {
+        guard let accountEntropyPool = aepKvStore.fetchValue(String.self, forKey: Keys.aepKeyName, tx: tx) else {
+            return nil
+        }
+        do {
+            return try AccountEntropyPool(key: accountEntropyPool)
+        } catch {
+            owsFailDebug("Failed to instantiate AccountEntropyPool")
+        }
+        return nil
+    }
+
+    /// Persist the given `AccountEntropyPool`, without side effects.
+    ///
+    /// - Warning
+    /// Rotating the `AccountEntropyPool` has external side-effects. Callers of
+    /// this method should be careful that those side-effects have been managed,
+    /// either by the caller or something upstream of the caller.
+    ///
+    /// Callers who are unsure should refer to ``AccountEntropyPoolManager``.
+    public func setAccountEntropyPool(_ accountEntropyPool: AccountEntropyPool, tx: DBWriteTransaction) {
+        // Setting the AEP means we need to set our Backup-ID again.
+        backupSettingsStore.setHaveSetBackupID(haveSetBackupID: false, tx: tx)
+
+        aepKvStore.writeValue(accountEntropyPool.rawString, forKey: Keys.aepKeyName, tx: tx)
+
+        // When we rotate the AEP, our LoggingKey (downstream of the Master Key)
+        // also rotates and we need to keep that in sync.
+        let loggingKey = accountEntropyPool.getMasterKey().deriveLoggingKey()
+        tx.addSyncCompletion {
+            DebugLogger.shared.setLoggingKey(loggingKey)
+        }
+    }
+
+    // MARK: -
+
+    private static let isWaitingForKeysSyncKey = "isWaitingForKeysSync"
+
+    func isWaitingForKeysSyncMessage(tx: DBReadTransaction) -> Bool {
+        return syncStore.fetchValue(Bool.self, forKey: Self.isWaitingForKeysSyncKey, tx: tx) == true
+    }
+
+    func setWaitingForKeysSyncMessage(_ isWaitingForKeysSyncMessage: Bool, tx: DBWriteTransaction) {
+        if isWaitingForKeysSyncMessage {
+            syncStore.writeValue(true, forKey: Self.isWaitingForKeysSyncKey, tx: tx)
+        } else {
+            syncStore.removeValue(forKey: Self.isWaitingForKeysSyncKey, tx: tx)
+        }
+    }
+}

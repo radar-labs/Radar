@@ -4,9 +4,9 @@
 //
 
 import Foundation
+import LibSignalClient
 import SignalRingRTC
 import SignalServiceKit
-import LibSignalClient
 import SignalUI
 import UIKit
 
@@ -22,9 +22,7 @@ protocol CallDrawerSheetDataSource {
     typealias JoinedMember = CallDrawerSheet.JoinedMember
 
     func unsortedMembers(tx: DBReadTransaction) -> [JoinedMember]
-
     func raisedHandMemberIds() -> [JoinedMember.ID]
-    func raiseHand(raise: Bool)
 
     func addObserver(_ observer: any CallDrawerSheetDataSourceObserver, syncStateImmediately: Bool)
     func removeObserver(_ observer: any CallDrawerSheetDataSourceObserver)
@@ -32,7 +30,7 @@ protocol CallDrawerSheetDataSource {
 
 // MARK: - Group Call data source
 
-final class GroupCallSheetDataSource<Call: GroupCall>: CallDrawerSheetDataSource {
+final class GroupCallSheetDataSource<Call: GroupCall>: CallDrawerSheetDataSource, GroupCallObserver {
     private let ringRtcCall: SignalRingRTC.GroupCall
     private let groupCall: Call
 
@@ -64,40 +62,69 @@ final class GroupCallSheetDataSource<Call: GroupCall>: CallDrawerSheetDataSource
     }
 
     func unsortedMembers(tx: DBReadTransaction) -> [JoinedMember] {
+        let avatarBuilder = SSKEnvironment.shared.avatarBuilderRef
+        let contactManager = SSKEnvironment.shared.contactManagerRef
         let tsAccountManager = DependenciesBridge.shared.tsAccountManager
-        guard let localIdentifiers = tsAccountManager.localIdentifiers(tx: tx) else {
-            return []
+
+        let registeredState = tsAccountManager.mustBeRegisteredState(tx: tx)
+        let localIdentifiers = registeredState.localIdentifiers
+
+        func avatarImage(aci: Aci) -> UIImage? {
+            return avatarBuilder.avatarImage(
+                forAddress: SignalServiceAddress(aci),
+                diameterPoints: 36,
+                localUserDisplayMode: .asLocalUser,
+                transaction: tx,
+            )
+        }
+
+        func names(aci: Aci) -> (
+            resolved: String,
+            comparable: DisplayName.ComparableValue,
+            isUnknown: Bool,
+        ) {
+            let resolvedName: String
+            let comparableName: DisplayName.ComparableValue
+            let isUnknown: Bool
+            if aci == localIdentifiers.aci {
+                resolvedName = OWSLocalizedString(
+                    "GROUP_CALL_YOU_ON_ANOTHER_DEVICE",
+                    comment: "Text describing the local user in the group call members sheet when connected from another device.",
+                )
+                comparableName = .nameValue(resolvedName)
+                isUnknown = false
+            } else {
+                let displayName = contactManager.displayName(for: SignalServiceAddress(aci), tx: tx)
+                resolvedName = displayName.resolvedValue(config: config.displayNameConfig)
+                comparableName = displayName.comparableValue(config: config)
+                isUnknown = switch displayName {
+                case .nickname, .systemContactName, .profileName, .sharedName, .phoneNumber, .username:
+                    false
+                case .unknown, .deletedAccount:
+                    true
+                }
+            }
+
+            return (resolvedName, comparableName, isUnknown)
         }
 
         var members = [JoinedMember]()
         let config: DisplayName.ComparableValue.Config = .current()
         if self.ringRtcCall.localDeviceState.joinState == .joined {
             members += self.ringRtcCall.remoteDeviceStates.values.map { member in
-                let resolvedName: String
-                let comparableName: DisplayName.ComparableValue
-                if member.aci == localIdentifiers.aci {
-                    resolvedName = OWSLocalizedString(
-                        "GROUP_CALL_YOU_ON_ANOTHER_DEVICE",
-                        comment: "Text describing the local user in the group call members sheet when connected from another device."
-                    )
-                    comparableName = .nameValue(resolvedName)
-                } else {
-                    let displayName = SSKEnvironment.shared.contactManagerRef.displayName(for: member.address, tx: tx)
-                    resolvedName = displayName.resolvedValue(config: config.displayNameConfig)
-                    comparableName = displayName.comparableValue(config: config)
-                }
-
+                let (resolvedName, comparableName, isUnknown) = names(aci: member.aci)
                 return JoinedMember(
                     id: .demuxID(member.demuxId),
-                    serviceId: member.aci,
+                    aci: member.aci,
                     displayName: resolvedName,
                     comparableName: comparableName,
+                    avatarImage: avatarImage(aci: member.aci),
                     demuxID: member.demuxId,
                     isLocalUser: false,
-                    isUnknown: false,
+                    isUnknown: isUnknown,
                     isAudioMuted: member.audioMuted,
                     isVideoMuted: member.videoMuted,
-                    isPresenting: member.presenting
+                    isPresenting: member.presenting,
                 )
             }
 
@@ -109,55 +136,48 @@ final class GroupCallSheetDataSource<Call: GroupCall>: CallDrawerSheetDataSource
                 id = .demuxID(localDemuxId)
                 demuxId = localDemuxId
             } else {
-                id = .serviceId(localIdentifiers.aci)
+                id = .aci(localIdentifiers.aci)
                 demuxId = nil
             }
             members.append(JoinedMember(
                 id: id,
-                serviceId: localIdentifiers.aci,
+                aci: localIdentifiers.aci,
                 displayName: displayName,
                 comparableName: comparableName,
+                avatarImage: avatarImage(aci: localIdentifiers.aci),
                 demuxID: demuxId,
                 isLocalUser: true,
                 isUnknown: false,
                 isAudioMuted: self.ringRtcCall.isOutgoingAudioMuted,
                 isVideoMuted: self.ringRtcCall.isOutgoingVideoMuted,
-                isPresenting: false
+                isPresenting: false,
             ))
         } else {
             // If we're not yet in the call, `remoteDeviceStates` will not exist.
             // We can get the list of joined members still, provided we are connected.
             members += self.ringRtcCall.peekInfo?.joinedMembers.map { aciUuid in
                 let aci = Aci(fromUUID: aciUuid)
-                let address = SignalServiceAddress(aci)
-                let displayName = SSKEnvironment.shared.contactManagerRef.displayName(for: address, tx: tx)
-                let isUnknown = switch displayName {
-                case .nickname, .systemContactName, .profileName, .phoneNumber, .username:
-                    false
-                case .unknown, .deletedAccount:
-                    true
-                }
+                let (resolvedName, comparableName, isUnknown) = names(aci: aci)
                 return JoinedMember(
-                    id: .serviceId(aci),
-                    serviceId: aci,
-                    displayName: displayName.resolvedValue(config: config.displayNameConfig),
-                    comparableName: displayName.comparableValue(config: config),
+                    id: .aci(aci),
+                    aci: aci,
+                    displayName: resolvedName,
+                    comparableName: comparableName,
+                    avatarImage: avatarImage(aci: aci),
                     demuxID: nil,
                     isLocalUser: false,
                     isUnknown: isUnknown,
                     isAudioMuted: nil,
                     isVideoMuted: nil,
-                    isPresenting: nil
+                    isPresenting: nil,
                 )
             } ?? []
         }
         return members
     }
-}
 
-// MARK: GroupCallObserver
+    // MARK: GroupCallObserver
 
-extension GroupCallSheetDataSource: GroupCallObserver {
     func groupCallLocalDeviceStateChanged(_ call: GroupCall) {
         AssertIsOnMainThread()
         observers.elements.forEach { $0.callSheetMembershipDidChange(self) }
@@ -173,7 +193,7 @@ extension GroupCallSheetDataSource: GroupCallObserver {
         observers.elements.forEach { $0.callSheetMembershipDidChange(self) }
     }
 
-    func groupCallEnded(_ call: GroupCall, reason: GroupCallEndReason) {
+    func groupCallEnded(_ call: GroupCall, reason: CallEndReason) {
         AssertIsOnMainThread()
         observers.elements.forEach { $0.callSheetMembershipDidChange(self) }
     }
@@ -181,10 +201,6 @@ extension GroupCallSheetDataSource: GroupCallObserver {
     func groupCallReceivedRaisedHands(_ call: GroupCall, raisedHands: [DemuxId]) {
         AssertIsOnMainThread()
         observers.elements.forEach { $0.callSheetRaisedHandsDidChange(self) }
-    }
-
-    func raiseHand(raise: Bool) {
-        ringRtcCall.raiseHand(raise: raise)
     }
 }
 
@@ -202,7 +218,7 @@ extension CallLinkSheetDataSource {
     }
 
     var isAdmin: Bool {
-        self.groupCall.adminPasskey != nil
+        self.groupCall.isAdmin
     }
 
     var adminPasskey: Data? {
@@ -233,7 +249,7 @@ class IndividualCallSheetDataSource: CallDrawerSheetDataSource {
     init(
         thread: TSContactThread,
         call: SignalCall,
-        individualCall: IndividualCall
+        individualCall: IndividualCall,
     ) {
         self.call = call
         self.thread = thread
@@ -242,52 +258,64 @@ class IndividualCallSheetDataSource: CallDrawerSheetDataSource {
     }
 
     func unsortedMembers(tx: DBReadTransaction) -> [JoinedMember] {
+        let avatarBuilder = SSKEnvironment.shared.avatarBuilderRef
+        let contactManager = SSKEnvironment.shared.contactManagerRef
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+
+        let registeredState = tsAccountManager.mustBeRegisteredState(tx: tx)
+
+        func avatarImage(aci: Aci) -> UIImage? {
+            return avatarBuilder.avatarImage(
+                forAddress: SignalServiceAddress(aci),
+                diameterPoints: 36,
+                localUserDisplayMode: .asLocalUser,
+                transaction: tx,
+            )
+        }
+
         var members = [JoinedMember]()
 
-        if let remoteServiceId = thread.contactAddress.serviceId {
-            let remoteDisplayName = SSKEnvironment.shared.contactManagerRef.displayName(
+        if let remoteAci = thread.contactAddress.serviceId as? Aci {
+            let remoteDisplayName = contactManager.displayName(
                 for: thread.contactAddress,
-                tx: tx
+                tx: tx,
             ).resolvedValue()
             let remoteComparableName: DisplayName.ComparableValue = .nameValue(remoteDisplayName)
             members.append(JoinedMember(
-                id: .serviceId(remoteServiceId),
-                serviceId: remoteServiceId,
+                id: .aci(remoteAci),
+                aci: remoteAci,
                 displayName: remoteDisplayName,
                 comparableName: remoteComparableName,
+                avatarImage: avatarImage(aci: remoteAci),
                 demuxID: nil,
                 isLocalUser: false,
                 isUnknown: false,
                 isAudioMuted: self.individualCall.isRemoteAudioMuted,
-                isVideoMuted: self.individualCall.isRemoteVideoEnabled.negated,
-                isPresenting: self.individualCall.isRemoteSharingScreen
+                isVideoMuted: !self.individualCall.isRemoteVideoEnabled,
+                isPresenting: self.individualCall.isRemoteSharingScreen,
             ))
         }
 
         // Add yourself
         let displayName = CommonStrings.you
         let comparableName: DisplayName.ComparableValue = .nameValue(displayName)
-        if let localAci = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: tx)?.aci {
-            members.append(JoinedMember(
-                id: .serviceId(localAci),
-                serviceId: localAci,
-                displayName: displayName,
-                comparableName: comparableName,
-                demuxID: nil,
-                isLocalUser: true,
-                isUnknown: false,
-                isAudioMuted: self.call.isOutgoingAudioMuted,
-                isVideoMuted: self.call.isOutgoingVideoMuted,
-                isPresenting: false
-            ))
-        }
+        members.append(JoinedMember(
+            id: .aci(registeredState.localIdentifiers.aci),
+            aci: registeredState.localIdentifiers.aci,
+            displayName: displayName,
+            comparableName: comparableName,
+            avatarImage: avatarImage(aci: registeredState.localIdentifiers.aci),
+            demuxID: nil,
+            isLocalUser: true,
+            isUnknown: false,
+            isAudioMuted: self.call.isOutgoingAudioMuted,
+            isVideoMuted: self.call.isOutgoingVideoMuted,
+            isPresenting: false,
+        ))
         return members
     }
 
-    func raisedHandMemberIds() -> [JoinedMember.ID] {[]}
-    func raiseHand(raise: Bool) {
-        owsFailDebug("Should not be able to raise hand in individual call")
-    }
+    func raisedHandMemberIds() -> [JoinedMember.ID] { [] }
 
     private var observers: WeakArray<any CallDrawerSheetDataSourceObserver> = []
     func addObserver(_ observer: any CallDrawerSheetDataSourceObserver, syncStateImmediately: Bool = false) {

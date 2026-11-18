@@ -12,7 +12,7 @@ public final class LightningLogger: BreezSdkSpark.Logger, @unchecked Sendable {
     public static let shared = LightningLogger()
 
     public static let didAppendLogEntryNotification = Notification.Name(
-        "LightningLoggerDidAppendLogEntryNotification"
+        "LightningLoggerDidAppendLogEntryNotification",
     )
 
     private static let maxBufferedEntries = 10_000
@@ -51,7 +51,7 @@ public final class LightningLogger: BreezSdkSpark.Logger, @unchecked Sendable {
             DispatchQueue.main.async {
                 NotificationCenter.default.post(
                     name: Self.didAppendLogEntryNotification,
-                    object: nil
+                    object: nil,
                 )
             }
         }

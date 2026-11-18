@@ -12,22 +12,19 @@ public final class TransformingOutputStream: OutputStreamable {
 
     private let transforms: [any StreamTransform]
     private let outputStream: OutputStreamable
-    private let runLoop: RunLoop?
 
     public init(
         transforms: [any StreamTransform],
         outputStream: OutputStreamable,
-        runLoop: RunLoop? = nil
     ) {
         self.transforms = transforms
         self.outputStream = outputStream
-        self.runLoop = runLoop
     }
 
-    public func write(data: Data) throws {
-        let data = try transforms.reduce(data) { try $1.transform(data: $0) }
+    public func write(data: Data, options: StreamTransform.Options) throws {
+        let data = try transforms.reduce(data) { try $1.transform(data: $0, options: options) }
         if data.count > 0 {
-            try outputStream.write(data: data)
+            try outputStream.write(data: data, options: options)
         }
     }
 
@@ -37,7 +34,7 @@ public final class TransformingOutputStream: OutputStreamable {
         while hasPendingBytes {
             let footerData = try transforms.readNextRemainingBytes()
             if footerData.count > 0 {
-                try outputStream.write(data: footerData)
+                try outputStream.write(data: footerData, options: [:])
             }
         }
     }
@@ -49,15 +46,11 @@ public final class TransformingOutputStream: OutputStreamable {
     public var hasPendingBytes: Bool {
         return
             transforms.contains { $0.hasPendingBytes }
-            || transforms.compactMap { $0 as? FinalizableStreamTransform }.contains { !$0.hasFinalized }
+                || transforms.compactMap { $0 as? FinalizableStreamTransform }.contains { !$0.hasFinalized }
     }
 
     public func close() throws {
         try finalizeAndWriteFooter()
-
-        if let runLoop {
-            outputStream.remove(from: runLoop, forMode: .default)
-        }
         try outputStream.close()
     }
 

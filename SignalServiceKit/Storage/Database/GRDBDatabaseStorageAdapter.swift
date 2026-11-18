@@ -104,15 +104,11 @@ public class GRDBDatabaseStorageAdapter {
     private let checkpointState = AtomicValue<CheckpointState>(CheckpointState(), lock: .init())
 
     private struct CheckpointState {
-        /// The number of writes we can perform until our next checkpoint attempt.
-        var budget: Int = 1
+        var counter = 0
 
-        /// The last time we successfully performed a truncating checkpoint.
-        ///
-        /// We use CLOCK_UPTIME_RAW here to match the one used by `asyncAfter`.
-        var lastCheckpointTimestamp: UInt64?
+        var workItem: DispatchWorkItem?
 
-        static func currentTimestamp() -> UInt64 { clock_gettime_nsec_np(CLOCK_UPTIME_RAW) }
+        var backgroundTask: OWSBackgroundTask?
     }
 
     private let databaseChangeObserver: DatabaseChangeObserver
@@ -128,7 +124,7 @@ public class GRDBDatabaseStorageAdapter {
     init(
         databaseChangeObserver: DatabaseChangeObserver,
         databaseFileUrl: URL,
-        keyFetcher: GRDBKeyFetcher
+        keyFetcher: GRDBKeyFetcher,
     ) throws {
         self.databaseChangeObserver = databaseChangeObserver
         self.databaseFileUrl = databaseFileUrl
@@ -154,7 +150,7 @@ public class GRDBDatabaseStorageAdapter {
             queue: .main,
             block: { [weak self] token in
                 self?.primaryDBFolderNameDidChange(darwinNotificationToken: token)
-            }
+            },
         )
     }
 
@@ -306,7 +302,7 @@ extension GRDBDatabaseStorageAdapter {
 
 extension GRDBDatabaseStorageAdapter {
 
-    #if TESTABLE_BUILD
+#if TESTABLE_BUILD
     // TODO: We could eventually eliminate all nested transactions.
     private static let detectNestedTransactions = false
 
@@ -314,12 +310,12 @@ extension GRDBDatabaseStorageAdapter {
     // These checks can also be used to detect unexpected "sneaky" transactions.
     @ThreadBacked(key: "canOpenTransaction", defaultValue: true)
     public static var canOpenTransaction: Bool
-    #endif
+#endif
 
     @discardableResult
     public func read<T>(block: (DBReadTransaction) throws -> T) throws -> T {
 
-        #if TESTABLE_BUILD
+#if TESTABLE_BUILD
         owsAssertDebug(Self.canOpenTransaction)
         // Check for nested tractions.
         if Self.detectNestedTransactions {
@@ -331,7 +327,7 @@ extension GRDBDatabaseStorageAdapter {
                 Self.canOpenTransaction = true
             }
         }
-        #endif
+#endif
 
         return try pool.read { database in
             try autoreleasepool {
@@ -342,7 +338,7 @@ extension GRDBDatabaseStorageAdapter {
 
     public func read(block: (DBReadTransaction) -> Void) throws {
 
-        #if TESTABLE_BUILD
+#if TESTABLE_BUILD
         owsAssertDebug(Self.canOpenTransaction)
         if Self.detectNestedTransactions {
             // Check for nested tractions.
@@ -353,7 +349,7 @@ extension GRDBDatabaseStorageAdapter {
                 Self.canOpenTransaction = true
             }
         }
-        #endif
+#endif
 
         try pool.read { database in
             autoreleasepool {
@@ -363,7 +359,7 @@ extension GRDBDatabaseStorageAdapter {
     }
 
     public func writeWithTxCompletion(block: (DBWriteTransaction) -> Database.TransactionCompletion) throws {
-        #if TESTABLE_BUILD
+#if TESTABLE_BUILD
         owsAssertDebug(Self.canOpenTransaction)
         // Check for nested tractions.
         if Self.detectNestedTransactions {
@@ -375,9 +371,16 @@ extension GRDBDatabaseStorageAdapter {
                 Self.canOpenTransaction = true
             }
         }
-        #endif
+#endif
 
         var txCompletionBlocks: [DBWriteTransaction.CompletionBlock]!
+
+        let counter = checkpointState.update {
+            $0.workItem?.cancel()
+            $0.workItem = nil
+            $0.counter += 1
+            return $0.counter
+        }
 
         try pool.writeWithoutTransaction { database in
             try database.inTransaction { () -> Database.TransactionCompletion in
@@ -393,42 +396,31 @@ extension GRDBDatabaseStorageAdapter {
             }
         }
 
-        checkpointState.update { mutableState in
-            mutableState.budget -= 1
-            if mutableState.budget == 0 {
-                scheduleCheckpoint(lastCheckpointTimestamp: mutableState.lastCheckpointTimestamp)
-            }
-        }
-
         for block in txCompletionBlocks {
             block()
         }
-    }
 
-    private func scheduleCheckpoint(lastCheckpointTimestamp: UInt64?) {
-        let checkpointDelay: UInt64
-        if let lastCheckpointTimestamp {
-            // Limit checkpoint frequency by time so that heavy write activity won't
-            // bog down other threads trying to write.
-            let minimumCheckpointInterval: UInt64 = 250 * NSEC_PER_MSEC
-            let nextCheckpointTimestamp = lastCheckpointTimestamp + minimumCheckpointInterval
-            let currentTimestamp = CheckpointState.currentTimestamp()
-            if nextCheckpointTimestamp > currentTimestamp {
-                checkpointDelay = nextCheckpointTimestamp - currentTimestamp
-            } else {
-                checkpointDelay = 0
+        checkpointState.update {
+            guard $0.counter == counter else {
+                return
             }
-        } else {
-            checkpointDelay = 0
-        }
-        let backgroundTask = OWSBackgroundTask(label: #function)
-        checkpointQueue.asyncAfter(deadline: .init(uptimeNanoseconds: checkpointDelay)) { [weak self] in
-            self?.tryToCheckpoint()
-            backgroundTask.end()
+            $0.workItem?.cancel()
+            $0.workItem = scheduleCheckpoint(counter: counter)
+            if $0.backgroundTask == nil {
+                $0.backgroundTask = OWSBackgroundTask(label: "database checkpoint")
+            }
         }
     }
 
-    private func tryToCheckpoint() {
+    private func scheduleCheckpoint(counter: Int) -> DispatchWorkItem {
+        let checkpointBlock = DispatchWorkItem { [weak self] in
+            self?.tryToCheckpoint(counter: counter)
+        }
+        checkpointQueue.asyncAfter(deadline: .now() + .milliseconds(750), execute: checkpointBlock)
+        return checkpointBlock
+    }
+
+    private func tryToCheckpoint(counter: Int) {
         // What Is Checkpointing?
         //
         // Checkpointing is the process of integrating the WAL into the main
@@ -508,18 +500,6 @@ extension GRDBDatabaseStorageAdapter {
         // - Always (not including auto-checkpointing) use truncate checkpoints to
         // limit WAL size.
         //
-        // - It's expensive and unnecessary to do a checkpoint on every write, so
-        // we only checkpoint once every N writes. We always checkpoint after the
-        // first write. Large (in terms of file size) writes should be rare, so WAL
-        // file size should be bounded and quite small.
-        //
-        // - Use a "budget" to tracking the urgency of trying to perform a
-        // checkpoint after the next write. When the budget reaches zero, we should
-        // try after the next write. Successes bump up the budget considerably,
-        // failures bump it up a little.
-        //
-        // - Retry more often after failures, via the budget.
-        //
         // What could go wrong:
         //
         // - Checkpointing could be expensive in some cases, causing blocking. This
@@ -540,8 +520,7 @@ extension GRDBDatabaseStorageAdapter {
         //
         // - We might not be checkpointing often enough, or we might be
         // checkpointing too often. Either way, it's about balancing overall perf
-        // with the perf cost of the next successful checkpoint. We can tune this
-        // behavior using the "checkpoint budget".
+        // with the perf cost of the next successful checkpoint.
         //
         // Reference
         //
@@ -562,32 +541,40 @@ extension GRDBDatabaseStorageAdapter {
         }
 
         pool.writeWithoutTransaction { database in
-            guard database.sqliteConnection != nil else {
-                Logger.warn("Skipping checkpoint for database that's already closed.")
+            let (shouldCheckpoint, backgroundTask) = checkpointState.update {
+                let shouldCheckpoint = $0.counter == counter
+                var backgroundTask: OWSBackgroundTask?
+                if shouldCheckpoint {
+                    backgroundTask = $0.backgroundTask.take()
+                }
+                return (shouldCheckpoint, backgroundTask)
+            }
+            defer {
+                backgroundTask?.end()
+            }
+            guard shouldCheckpoint else {
+                Logger.warn("skipping checkpoint that's been canceled")
                 return
             }
-            Bench(title: "Checkpoint", logIfLongerThan: 0.25, logInProduction: true) {
-                do {
-                    try database.checkpoint(.truncate)
-
-                    // If the checkpoint succeeded, wait N writes before performing another checkpoint.
-                    let currentTimestamp = CheckpointState.currentTimestamp()
-                    checkpointState.update { mutableState in
-                        mutableState.budget = 32
-                        mutableState.lastCheckpointTimestamp = currentTimestamp
-                    }
-                } catch {
-                    if (error as? DatabaseError)?.resultCode == .SQLITE_BUSY {
-                        // It is expected that the busy-handler (aka busyMode callback)
-                        // will abort checkpoints if there is contention.
-                    } else {
-                        owsFailDebug("Checkpoint failed. Error: \(error.grdbErrorForLogging)")
-                    }
-
-                    // If the checkpoint failed, try again after a few more writes.
-                    checkpointState.update { mutableState in
-                        mutableState.budget = 5
-                    }
+            guard database.sqliteConnection != nil else {
+                Logger.warn("skipping checkpoint for database that's already closed.")
+                return
+            }
+            let timedResult = withDuration { _ = try database.checkpoint(.truncate) }
+            if timedResult.duration > 0.25 {
+                Logger.warn("slow checkpoint: \(timedResult.formattedDuration)")
+            }
+            do {
+                try timedResult.value.get()
+                if DebugFlags.internalLogging {
+                    Logger.info("checkpointed w/counter \(counter) in \(timedResult.formattedDuration)")
+                }
+            } catch {
+                if (error as? DatabaseError)?.resultCode == .SQLITE_BUSY {
+                    // It is expected that the busy-handler (aka busyMode callback)
+                    // will abort checkpoints if there is contention.
+                } else {
+                    owsFailDebug("couldn't checkpoint: \(error.grdbErrorForLogging)")
                 }
             }
         }
@@ -615,7 +602,8 @@ private func dbQueryLog(_ value: String) {
     let finalValue = re.stringByReplacingMatches(
         in: filteredValue,
         range: filteredValue.entireRange,
-        withTemplate: " ")
+        withTemplate: " ",
+    )
 
     Logger.debug(finalValue)
 }
@@ -646,16 +634,18 @@ private struct GRDBStorage {
         var coordinatorError: NSError?
         var newPool: DatabasePool?
         var dbError: Error?
-        coordinator.coordinate(writingItemAt: dbURL,
-                               options: .forMerging,
-                               error: &coordinatorError,
-                               byAccessor: { url in
-            do {
-                newPool = try DatabasePool(path: url.path, configuration: poolConfiguration)
-            } catch {
-                dbError = error
-            }
-        })
+        coordinator.coordinate(
+            writingItemAt: dbURL,
+            options: .forMerging,
+            error: &coordinatorError,
+            byAccessor: { url in
+                do {
+                    newPool = try DatabasePool(path: url.path, configuration: poolConfiguration)
+                } catch {
+                    dbError = error
+                }
+            },
+        )
         if let error = dbError ?? coordinatorError {
             throw error
         }
@@ -685,9 +675,9 @@ private struct GRDBStorage {
         configuration.readonly = false
         configuration.foreignKeysEnabled = true // Default is already true
 
-        #if DEBUG
+#if DEBUG
         configuration.publicStatementArguments = true
-        #endif
+#endif
 
         // TODO: We should set this to `false` (or simply remove this line, as `false` is the default).
         // Historically, we took advantage of SQLite's old permissive behavior, but the SQLite
@@ -722,11 +712,11 @@ private struct GRDBStorage {
         configuration.prepareDatabase { db in
             try GRDBDatabaseStorageAdapter.prepareDatabase(db: db, keyFetcher: keyFetcher)
 
-            #if DEBUG
-            #if false
-                db.trace { dbQueryLog("\($0)") }
-            #endif
-            #endif
+#if DEBUG
+#if false
+            db.trace { dbQueryLog("\($0)") }
+#endif
+#endif
         }
         configuration.defaultTransactionKind = .immediate
         configuration.allowsUnsafeTransactions = true
@@ -799,7 +789,7 @@ public struct GRDBKeyFetcher {
 
 // MARK: -
 
-fileprivate extension URL {
+private extension URL {
     func appendingPathString(_ string: String) -> URL? {
         guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
             return nil
@@ -873,7 +863,6 @@ extension GRDBDatabaseStorageAdapter {
     }
 
     /// Run database integrity checks and log their results.
-    @discardableResult
     public static func checkIntegrity(databaseStorage: SDSDatabaseStorage) -> SqliteUtil.IntegrityCheckResult {
         func read<T>(block: (Database) -> T) -> T {
             return databaseStorage.read { block($0.database) }
@@ -929,7 +918,7 @@ extension GRDBDatabaseStorageAdapter {
             // Set checkpointTimeout flag.
             // If we hit the timeout, we get back SQLITE_BUSY, which is ignored below.
             owsAssertDebug(GRDBStorage.checkpointTimeout == nil)
-            GRDBStorage.checkpointTimeout = 3000  // 3s
+            GRDBStorage.checkpointTimeout = 3000 // 3s
             owsAssertDebug(GRDBStorage.checkpointTimeout != nil)
             defer {
                 // Clear checkpointTimeout flag.
@@ -938,11 +927,11 @@ extension GRDBDatabaseStorageAdapter {
                 owsAssertDebug(GRDBStorage.checkpointTimeout == nil)
             }
 
-            #if TESTABLE_BUILD
+#if TESTABLE_BUILD
             let startTime = CACurrentMediaTime()
-            #endif
+#endif
             try pool.writeWithoutTransaction { db in
-                #if TESTABLE_BUILD
+#if TESTABLE_BUILD
                 let startElapsedSeconds: TimeInterval = CACurrentMediaTime() - startTime
                 let slowStartSeconds: TimeInterval = TimeInterval(GRDBStorage.maxBusyTimeoutMs) / 1000
                 if startElapsedSeconds > slowStartSeconds * 2 {
@@ -950,7 +939,7 @@ extension GRDBDatabaseStorageAdapter {
                     let formattedTime = String(format: "%0.2fms", startElapsedSeconds * 1000)
                     owsFailDebug("Slow checkpoint start: \(formattedTime)")
                 }
-                #endif
+#endif
 
                 do {
                     try db.checkpoint(.truncate)
@@ -969,6 +958,9 @@ extension GRDBDatabaseStorageAdapter {
 }
 
 // MARK: -
+
+public struct ConstraintError: Error {
+}
 
 extension GRDB.DatabaseError {
     public var forLogging: Self {

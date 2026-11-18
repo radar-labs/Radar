@@ -13,24 +13,6 @@ public protocol UserErrorDescriptionProvider {
 // MARK: -
 
 extension Error {
-    public var hasUserErrorDescription: Bool {
-        if self is UserErrorDescriptionProvider {
-            return true
-        }
-        if (self as NSError) is UserErrorDescriptionProvider {
-            return true
-        }
-        if let error = self as? LocalizedError,
-           nil != error.errorDescription {
-            return true
-        }
-        if let error = (self as NSError) as? LocalizedError,
-           nil != error.errorDescription {
-            return true
-        }
-        return false
-    }
-
     public var userErrorDescription: String {
         // Error and NSError have a special relationship.
         // They can be "cast" back and forth, but are separate objects.
@@ -53,12 +35,16 @@ extension Error {
         if let error = (self as NSError) as? UserErrorDescriptionProvider {
             return error.localizedDescription
         }
-        if let error = self as? LocalizedError,
-           let errorDescription = error.errorDescription {
+        if
+            let error = self as? LocalizedError,
+            let errorDescription = error.errorDescription
+        {
             return errorDescription
         }
-        if let error = (self as NSError) as? LocalizedError,
-           let errorDescription = error.errorDescription {
+        if
+            let error = (self as NSError) as? LocalizedError,
+            let errorDescription = error.errorDescription
+        {
             return errorDescription
         }
         if CurrentAppContext().isRunningTests {

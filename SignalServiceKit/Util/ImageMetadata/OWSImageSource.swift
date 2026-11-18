@@ -3,8 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import ImageIO
 import Foundation
+import ImageIO
+public import UIKit
 
 import SDWebImage
 
@@ -15,9 +16,6 @@ public protocol OWSImageSource {
     func readData(byteOffset: Int, byteLength: Int) throws -> Data
 
     func cgImageSource() throws -> CGImageSource?
-
-    /// Potentially expensive, should be avoided if possible.
-    func readIntoMemory() throws -> Data
 }
 
 public struct DataImageSource: OWSImageSource {
@@ -47,10 +45,6 @@ public struct DataImageSource: OWSImageSource {
     public func cgImageSource() throws -> CGImageSource? {
         return CGImageSourceCreateWithData(self.rawValue as CFData, nil)
     }
-
-    public func readIntoMemory() throws -> Data {
-        return self.rawValue
-    }
 }
 
 extension OWSImageSource {
@@ -58,7 +52,7 @@ extension OWSImageSource {
         return imageMetadata() != nil
     }
 
-    fileprivate func ows_guessHighEfficiencyImageFormat() -> ImageFormat? {
+    private func ows_guessHighEfficiencyImageFormat() -> ImageFormat? {
         // A HEIF image file has the first 16 bytes like
         // 0000 0018 6674 7970 6865 6963 0000 0000
         // so in this case the 5th to 12th bytes shall make a string of "ftypheic"
@@ -76,13 +70,14 @@ extension OWSImageSource {
 
         // These are the brands of HEIF formatted files that are renderable by CoreGraphics
         let heifBrandHeaderHeic = Data("ftypheic\0".utf8)
+        let heifBrandHeaderHeix = Data("ftypheix\0".utf8)
         let heifBrandHeaderHeif = Data("ftypmif1\0".utf8)
         let heifBrandHeaderHeifStream = Data("ftypmsf1\0".utf8)
 
         // Pull the string from the header and compare it with the supported formats
         let header = try? readData(byteOffset: heifHeaderStartsAt, byteLength: totalHeaderLength)
 
-        if header == heifBrandHeaderHeic {
+        if header == heifBrandHeaderHeic || header == heifBrandHeaderHeix {
             return .heic
         } else if header == heifBrandHeaderHeif || header == heifBrandHeaderHeifStream {
             return .heif
@@ -91,7 +86,7 @@ extension OWSImageSource {
         }
     }
 
-    fileprivate func ows_guessImageFormat() -> ImageFormat? {
+    private func ows_guessImageFormat() -> ImageFormat? {
         guard byteLength >= 2 else {
             return nil
         }
@@ -106,7 +101,7 @@ extension OWSImageSource {
         case Data([0x42, 0x4d]):
             return .bmp
         case Data([0x4d, 0x4d]), // Motorola byte order TIFF
-            Data([0x49, 0x49]): // Intel byte order TIFF
+             Data([0x49, 0x49]): // Intel byte order TIFF
             return .tiff
         case Data([0x52, 0x49]):
             // First two letters of RIFF tag.
@@ -116,168 +111,33 @@ extension OWSImageSource {
         }
     }
 
-    /// Determine whether something is an animated PNG.
-    ///
-    /// Does this by checking that the `acTL` chunk appears before any `IDAT` chunk.
-    /// See [the APNG spec][0] for more.
-    ///
-    /// [0]: https://wiki.mozilla.org/APNG_Specification
-    ///
-    /// - Returns:
-    ///   `true` if the contents appear to be an APNG.
-    ///   `false` if the contents are a still PNG.
-    ///   `nil` if the contents are invalid.
-    func isAnimatedPng() -> Bool? {
-        let actl = "acTL".data(using: .ascii)
-        let idat = "IDAT".data(using: .ascii)
-
-        do {
-            let chunker = try PngChunker(source: self)
-            while let chunk = try chunker.next() {
-                if chunk.type == actl {
-                    return true
-                } else if chunk.type == idat {
-                    return false
-                }
-            }
-        } catch {
-            Logger.warn("Error: \(error)")
-        }
-
-        return nil
-    }
-
     // MARK: - Image Metadata
 
     /// load image metadata about the current object
-    public func imageMetadata(ignorePerTypeFileSizeLimits: Bool = false) -> ImageMetadata? {
-        let result = _imageMetadataResult(ignorePerTypeFileSizeLimits: ignorePerTypeFileSizeLimits)
-        switch result {
-        case .invalid:
-            return nil
-        case .valid(let imageMetadata):
-            return imageMetadata
-        case .genericSizeLimitExceeded:
-            return nil
-        case .imageTypeSizeLimitExceeded:
+    public func imageMetadata() -> ImageMetadata? {
+        // The largest image we should be able to handle in most places. This must
+        // be larger than the largest animated image (so that we can check if it's
+        // animated); it must also be larger than the largest image we support in
+        // the image editor. We can handle images larger than this by resizing them
+        // to fit within the dimensions for the highest quality.
+        let byteLimit = 72_000_000
+        assert(byteLimit >= OWSMediaUtils.kMaxFileSizeAnimatedImage)
+        assert(byteLimit >= 4 * Int(ImageQualityTier.seven.maxEdgeSize) ^ 2 + 50_000)
+        guard byteLength < byteLimit else {
             return nil
         }
-    }
-
-    /// Load image metadata about the current Data object.
-    /// Returns nil if metadata could not be determined.
-    public func imageMetadataResult() -> ImageMetadataResult {
-        return _imageMetadataResult(ignorePerTypeFileSizeLimits: false)
-    }
-
-    private func _imageMetadataResult(ignorePerTypeFileSizeLimits: Bool) -> ImageMetadataResult {
-        guard byteLength < OWSMediaUtils.kMaxFileSizeGeneric else {
-            return .genericSizeLimitExceeded
-        }
-
         let imageFormat = ows_guessImageFormat()
         guard let imageFormat else {
             Logger.warn("Image does not have valid format.")
-            return .invalid
+            return nil
         }
-
-        let isAnimated: Bool
-        switch imageFormat {
-        case .gif:
-            // TODO: We currently treat all GIFs as animated. We could reflect the actual image content.
-            isAnimated = true
-        case .webp:
-            let webpMetadata = metadataForWebp
-            guard webpMetadata.isValid else {
-                Logger.warn("Image does not have valid webpMetadata.")
-                return .invalid
-            }
-            isAnimated = webpMetadata.frameCount > 1
-        case .png:
-            guard let isAnimatedPng = isAnimatedPng() else {
-                Logger.warn("Could not determine if png is animated.")
-                return .invalid
-            }
-            isAnimated = isAnimatedPng
-        default:
-            isAnimated = false
-        }
-
-        if !ignorePerTypeFileSizeLimits {
-            if isAnimated, byteLength > OWSMediaUtils.kMaxFileSizeAnimatedImage {
-                Logger.warn("Oversize image.")
-                return .imageTypeSizeLimitExceeded
-            } else if !isAnimated, byteLength > OWSMediaUtils.kMaxFileSizeImage {
-                Logger.warn("Oversize image.")
-                return .imageTypeSizeLimitExceeded
-            }
-        }
-
-        let metadata = imageMetadata(withIsAnimated: isAnimated, imageFormat: imageFormat)
-
-        guard let metadata else {
-            return .invalid
-        }
-
-        return .valid(metadata)
-    }
-
-    fileprivate func imageMetadata(withIsAnimated isAnimated: Bool, imageFormat: ImageFormat) -> ImageMetadata? {
-        if imageFormat == .webp {
-            let imageSize = sizeForWebpData
-            guard isImageSizeValid(imageSize, depthBytes: 1, isAnimated: isAnimated) else {
-                Logger.warn("Image does not have valid dimensions: \(imageSize)")
-                return nil
-            }
-            return .init(imageFormat: imageFormat, pixelSize: imageSize, hasAlpha: true, isAnimated: isAnimated)
-        }
-
         guard let imageSource = try? self.cgImageSource() else {
             Logger.warn("Could not build imageSource.")
             return nil
         }
-        return imageMetadataWithImageSource(imageSource, imageFormat: imageFormat, isAnimated: isAnimated)
-    }
-
-    // MARK: - WEBP
-
-    public func stillForWebpData() -> UIImage? {
-        guard ows_guessImageFormat() == .webp else {
-            owsFailDebug("Invalid webp image.")
-            return nil
-        }
-
-        guard let data = try? self.readIntoMemory() else {
-            return nil
-        }
-
-        return UIImage.sd_image(with: data)
-    }
-
-    fileprivate var sizeForWebpData: CGSize {
-        let webpMetadata = metadataForWebp
-        guard webpMetadata.isValid else {
-            return .zero
-        }
-        return .init(width: CGFloat(webpMetadata.canvasWidth), height: CGFloat(webpMetadata.canvasHeight))
-    }
-
-    fileprivate var metadataForWebp: WebpMetadata {
-        guard let data = try? self.readIntoMemory() else {
-            return WebpMetadata(isValid: false, canvasWidth: 0, canvasHeight: 0, frameCount: 0)
-        }
-        guard let image = SDAnimatedImage(data: data) else {
-            return WebpMetadata(isValid: false, canvasWidth: 0, canvasHeight: 0, frameCount: 0)
-        }
-
-        let count = image.sd_imageFrameCount
-        let height = image.pixelHeight
-        let width = image.pixelWidth
-        return WebpMetadata(
-            isValid: width > 0 && height > 0 && count > 0,
-            canvasWidth: UInt32(width),
-            canvasHeight: UInt32(height),
-            frameCount: UInt32(count)
+        return imageMetadataWithImageSource(
+            imageSource,
+            imageFormat: imageFormat,
         )
     }
 }
@@ -293,7 +153,7 @@ private func applyImageOrientation(_ orientation: CGImagePropertyOrientation, to
     }
 }
 
-private func isImageSizeValid(_ imageSize: CGSize, depthBytes: CGFloat, isAnimated: Bool) -> Bool {
+private func isImageSizeValid(_ imageSize: CGSize, depthBytes: CGFloat) -> Bool {
     if imageSize.width < 1 || imageSize.height < 1 || depthBytes < 1 {
         // Invalid metadata.
         return false
@@ -305,7 +165,7 @@ private func isImageSizeValid(_ imageSize: CGSize, depthBytes: CGFloat, isAnimat
     let actualBytes = imageSize.width * imageSize.height * bytesPerPixel
 
     let expectedBytesPerPixel: CGFloat = 4
-    let maxValidImageDimension = CGFloat(isAnimated ? OWSMediaUtils.kMaxAnimatedImageDimensions : OWSMediaUtils.kMaxStillImageDimensions)
+    let maxValidImageDimension = OWSMediaUtils.kMaxImageDimensions
     let maxBytes = maxValidImageDimension * maxValidImageDimension * expectedBytesPerPixel
 
     if actualBytes > maxBytes {
@@ -316,7 +176,7 @@ private func isImageSizeValid(_ imageSize: CGSize, depthBytes: CGFloat, isAnimat
     return true
 }
 
-private func imageMetadataWithImageSource(_ imageSource: CGImageSource, imageFormat: ImageFormat, isAnimated: Bool) -> ImageMetadata? {
+private func imageMetadataWithImageSource(_ imageSource: CGImageSource, imageFormat: ImageFormat) -> ImageMetadata? {
     let options = [kCGImageSourceShouldCache as String: false]
     guard let imageProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, options as CFDictionary) as? [String: AnyObject] else {
         Logger.warn("Missing imageProperties.")
@@ -362,10 +222,28 @@ private func imageMetadataWithImageSource(_ imageSource: CGImageSource, imageFor
         return nil
     }
 
-    guard isImageSizeValid(pixelSize, depthBytes: depthBytes, isAnimated: isAnimated) else {
+    guard isImageSizeValid(pixelSize, depthBytes: depthBytes) else {
         Logger.warn("Image does not have valid dimensions: \(pixelSize).")
         return nil
     }
 
+    let frameCount = CGImageSourceGetCount(imageSource)
+    let isAnimated = frameCount > 1
+
     return .init(imageFormat: imageFormat, pixelSize: pixelSize, hasAlpha: hasAlpha.boolValue, isAnimated: isAnimated)
+}
+
+private struct WebpMetadata {
+    let canvasWidth: Int
+    let canvasHeight: Int
+    let frameCount: UInt
+
+    init?(canvasWidth: Int, canvasHeight: Int, frameCount: UInt) {
+        guard canvasWidth > 0, canvasHeight > 0, frameCount > 0 else {
+            return nil
+        }
+        self.canvasWidth = canvasWidth
+        self.canvasHeight = canvasHeight
+        self.frameCount = frameCount
+    }
 }

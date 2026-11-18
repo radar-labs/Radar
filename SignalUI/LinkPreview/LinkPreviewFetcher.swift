@@ -32,19 +32,22 @@ public class LinkPreviewFetcherImpl: LinkPreviewFetcher {
     private let groupsV2: any GroupsV2
     private let linkPreviewSettingStore: LinkPreviewSettingStore
     private let tsAccountManager: any TSAccountManager
+    private let stickerManager: StickerManager
 
     public init(
         authCredentialManager: any AuthCredentialManager,
         db: any DB,
         groupsV2: any GroupsV2,
         linkPreviewSettingStore: LinkPreviewSettingStore,
-        tsAccountManager: any TSAccountManager
+        tsAccountManager: any TSAccountManager,
+        stickerManager: StickerManager,
     ) {
         self.authCredentialManager = authCredentialManager
         self.db = db
         self.groupsV2 = groupsV2
         self.linkPreviewSettingStore = linkPreviewSettingStore
         self.tsAccountManager = tsAccountManager
+        self.stickerManager = stickerManager
     }
 
     public func fetchLinkPreview(for url: URL) async throws -> OWSLinkPreviewDraft {
@@ -56,7 +59,7 @@ public class LinkPreviewFetcherImpl: LinkPreviewFetcher {
         let linkPreviewDraft: OWSLinkPreviewDraft?
         if StickerPackInfo.isStickerPackShare(url) {
             linkPreviewDraft = try await self.linkPreviewDraft(forStickerShare: url)
-        } else if GroupManager.isPossibleGroupInviteLink(url) {
+        } else if let url = PossibleGroupInviteLinkUrl.parseFrom(url) {
             linkPreviewDraft = try await self.linkPreviewDraft(forGroupInviteLink: url)
         } else if let callLink = CallLink(url: url) {
             let linkName = try await self.fetchName(forCallLink: callLink)
@@ -91,6 +94,7 @@ public class LinkPreviewFetcherImpl: LinkPreviewFetcher {
             if
                 let imageUrlString = content.ogImageUrlString ?? content.faviconUrlString,
                 let imageUrl = URL(string: imageUrlString, relativeTo: respondingUrl),
+                LinkPreviewHelper.isPermittedLinkPreviewUrl(imageUrl),
                 let imageData = try? await self.fetchImageResource(from: imageUrl)
             {
                 previewThumbnail = await Self.previewThumbnail(srcImageData: imageData)
@@ -141,7 +145,6 @@ public class LinkPreviewFetcherImpl: LinkPreviewFetcher {
             securityPolicy: OWSURLSession.defaultSecurityPolicy,
             configuration: sessionConfig,
             extraHeaders: extraHeaders,
-            maxResponseSize: Self.maxFetchedContentSize
         )
         urlSession.allowRedirects = true
         urlSession.customRedirectHandler = { request in
@@ -168,17 +171,18 @@ public class LinkPreviewFetcherImpl: LinkPreviewFetcher {
     func fetchStringOrImageResource(from url: URL) async throws -> StringOrImageResource {
         let response: HTTPResponse
         do {
-            response = try await self.buildOWSURLSession().performRequest(url.absoluteString, method: .get, ignoreAppExpiry: true)
+            response = try await self.buildOWSURLSession().performRequest(url.absoluteString, method: .get, maxResponseSize: Self.maxFetchedContentSize, ignoreAppExpiry: true)
         } catch {
             Logger.warn("Invalid response: \(error.shortDescription).")
             throw LinkPreviewError.fetchFailure
         }
         let statusCode = response.responseStatusCode
-        guard statusCode >= 200 && statusCode < 300 else {
+        guard statusCode >= 200, statusCode < 300 else {
             Logger.warn("Invalid response: \(statusCode).")
             throw LinkPreviewError.fetchFailure
         }
 
+        // TODO: Add support for HEIC, HEIF, JPEG XL, etc.
         if
             let mimeType = response.headers.value(forHeader: "Content-Type"),
             MimeTypeUtil.isSupportedImageMimeType(mimeType)
@@ -200,13 +204,13 @@ public class LinkPreviewFetcherImpl: LinkPreviewFetcher {
     private func fetchImageResource(from url: URL) async throws -> Data {
         let response: HTTPResponse
         do {
-            response = try await self.buildOWSURLSession().performRequest(url.absoluteString, method: .get, ignoreAppExpiry: true)
+            response = try await self.buildOWSURLSession().performRequest(url.absoluteString, method: .get, maxResponseSize: Self.maxFetchedContentSize, ignoreAppExpiry: true)
         } catch {
             Logger.warn("Invalid response: \(error.shortDescription).")
             throw LinkPreviewError.fetchFailure
         }
         let statusCode = response.responseStatusCode
-        guard statusCode >= 200 && statusCode < 300 else {
+        guard statusCode >= 200, statusCode < 300 else {
             Logger.warn("Invalid response: \(statusCode).")
             throw LinkPreviewError.fetchFailure
         }
@@ -219,7 +223,7 @@ public class LinkPreviewFetcherImpl: LinkPreviewFetcher {
 
     // MARK: - Private, Constants
 
-    private static let maxFetchedContentSize = 2 * 1024 * 1024
+    private static let maxFetchedContentSize: UInt64 = 2 * 1024 * 1024
 
     // MARK: - Preview Thumbnails
 
@@ -229,7 +233,7 @@ public class LinkPreviewFetcherImpl: LinkPreviewFetcher {
     }
 
     private static func previewThumbnail(srcImageData: Data?) async -> PreviewThumbnail? {
-        guard let srcImageData = srcImageData else {
+        guard let srcImageData else {
             return nil
         }
         let imageSource = DataImageSource(srcImageData)
@@ -238,65 +242,48 @@ public class LinkPreviewFetcherImpl: LinkPreviewFetcher {
             return nil
         }
         let imageFormat = imageMetadata.imageFormat
+        let imageSize = imageMetadata.pixelSize
 
         let maxImageSize: CGFloat = 2400
+        let isOriginalValid: Bool = (
+            imageSize.width <= maxImageSize
+                && imageSize.height <= maxImageSize
+                && !imageMetadata.isAnimated
+                && (imageMetadata.imageFormat == .jpeg || imageMetadata.imageFormat == .png),
+        )
 
-        switch imageFormat {
-        case .webp:
-            guard let stillImage = imageSource.stillForWebpData() else {
-                owsFailDebug("Couldn't derive still image for Webp.")
+        if isOriginalValid {
+            // If we don't need to resize or convert the file format,
+            // return the original data.
+            return PreviewThumbnail(imageData: srcImageData, mimetype: imageFormat.mimeType.rawValue)
+        }
+
+        let cgImageSource = CGImageSourceCreateWithData(
+            srcImageData as CFData,
+            [kCGImageSourceShouldCache: false] as CFDictionary,
+        )
+        guard let cgImageSource else {
+            Logger.warn("couldn't parse image")
+            return nil
+        }
+        let dstImage = NormalizedImage.loadImage(imageSource: cgImageSource, maxPixelSize: maxImageSize)
+        guard let dstImage else {
+            Logger.warn("couldn't load/resize image")
+            return nil
+        }
+
+        if imageMetadata.hasAlpha {
+            guard let dstData = UIImage(cgImage: dstImage).pngData() else {
+                owsFailDebug("Could not write resized image to PNG.")
                 return nil
             }
-
-            var stillThumbnail = stillImage
-            let imageSize = stillImage.pixelSize
-            let shouldResize = imageSize.width > maxImageSize || imageSize.height > maxImageSize
-            if shouldResize {
-                guard let resizedImage = stillImage.resized(maxDimensionPixels: maxImageSize) else {
-                    owsFailDebug("Couldn't resize image.")
-                    return nil
-                }
-                stillThumbnail = resizedImage
-            }
-
-            guard let stillData = stillThumbnail.pngData() else {
-                owsFailDebug("Couldn't derive still image for Webp.")
+            return PreviewThumbnail(imageData: dstData, mimetype: MimeType.imagePng.rawValue)
+        } else {
+            guard let dstData = UIImage(cgImage: dstImage).jpegDataSafe(compressionQuality: 0.8) else {
+                owsFailDebug("Could not write resized image to JPEG.")
                 return nil
             }
-            return PreviewThumbnail(imageData: stillData, mimetype: MimeType.imagePng.rawValue)
-        default:
-            let mimeType = imageFormat.mimeType
-
-            let imageSize = imageMetadata.pixelSize
-            let shouldResize = imageSize.width > maxImageSize || imageSize.height > maxImageSize
-            if (imageMetadata.imageFormat == .jpeg || imageMetadata.imageFormat == .png), !shouldResize {
-                // If we don't need to resize or convert the file format,
-                // return the original data.
-                return PreviewThumbnail(imageData: srcImageData, mimetype: mimeType.rawValue)
-            }
-
-            guard let srcImage = UIImage(data: srcImageData) else {
-                owsFailDebug("Could not parse image.")
-                return nil
-            }
-
-            guard let dstImage = srcImage.resized(maxDimensionPixels: maxImageSize) else {
-                owsFailDebug("Could not resize image.")
-                return nil
-            }
-            if imageMetadata.hasAlpha {
-                guard let dstData = dstImage.pngData() else {
-                    owsFailDebug("Could not write resized image to PNG.")
-                    return nil
-                }
-                return PreviewThumbnail(imageData: dstData, mimetype: MimeType.imagePng.rawValue)
-            } else {
-                guard let dstData = dstImage.jpegData(compressionQuality: 0.8) else {
-                    owsFailDebug("Could not write resized image to JPEG.")
-                    return nil
-                }
-                return PreviewThumbnail(imageData: dstData, mimetype: MimeType.imageJpeg.rawValue)
-            }
+            return PreviewThumbnail(imageData: dstData, mimetype: MimeType.imageJpeg.rawValue)
         }
     }
 
@@ -308,10 +295,9 @@ public class LinkPreviewFetcherImpl: LinkPreviewFetcher {
             throw LinkPreviewError.invalidPreview
         }
         // tryToDownloadStickerPack will use locally saved data if possible...
-        let stickerPack = try await StickerManager.tryToDownloadStickerPack(stickerPackInfo: stickerPackInfo).awaitable()
+        let stickerPack = try await stickerManager.tryToDownloadStickerPack(stickerPackInfo: stickerPackInfo).awaitable()
         let title = stickerPack.title?.filterForDisplay.nilIfEmpty
-        let coverUrl = try await StickerManager.tryToDownloadSticker(stickerPack: stickerPack, stickerInfo: stickerPack.coverInfo).awaitable()
-        let coverData = try Data(contentsOf: coverUrl)
+        let coverData = try await stickerManager.tryToDownloadSticker(stickerInfo: stickerPack.coverInfo).awaitable()
         let previewThumbnail = await Self.previewThumbnail(srcImageData: coverData)
 
         guard title != nil || previewThumbnail != nil else {
@@ -323,21 +309,24 @@ public class LinkPreviewFetcherImpl: LinkPreviewFetcher {
             title: title,
             imageData: previewThumbnail?.imageData,
             imageMimeType: previewThumbnail?.mimetype,
-            isForwarded: false
+            isForwarded: false,
         )
     }
 
     // MARK: - Group Invite Links
 
-    private func linkPreviewDraft(forGroupInviteLink url: URL) async throws -> OWSLinkPreviewDraft? {
-        guard let groupInviteLinkInfo = GroupInviteLinkInfo.parseFrom(url) else {
-            Logger.error("Could not parse URL.")
+    private func linkPreviewDraft(forGroupInviteLink url: PossibleGroupInviteLinkUrl) async throws -> OWSLinkPreviewDraft? {
+        let groupInviteLink: GroupInviteLink
+        do {
+            groupInviteLink = try GroupInviteLink.parseFrom(url)
+        } catch {
+            Logger.warn("couldn't parse URL: \(error)")
             throw LinkPreviewError.invalidPreview
         }
-        let groupV2ContextInfo = try GroupV2ContextInfo.deriveFrom(masterKeyData: groupInviteLinkInfo.masterKey)
+        let groupV2ContextInfo = GroupV2ContextInfo.deriveFrom(masterKey: groupInviteLink.masterKey)
         let groupInviteLinkPreview = try await self.groupsV2.fetchGroupInviteLinkPreview(
-            inviteLinkPassword: groupInviteLinkInfo.inviteLinkPassword,
-            groupSecretParams: groupV2ContextInfo.groupSecretParams
+            inviteLinkPassword: groupInviteLink.inviteLinkPassword,
+            groupSecretParams: groupV2ContextInfo.groupSecretParams,
         )
         let previewThumbnail: PreviewThumbnail? = await {
             guard let avatarUrlPath = groupInviteLinkPreview.avatarUrlPath else {
@@ -347,7 +336,7 @@ public class LinkPreviewFetcherImpl: LinkPreviewFetcher {
             do {
                 avatarData = try await self.groupsV2.fetchGroupInviteLinkAvatar(
                     avatarUrlPath: avatarUrlPath,
-                    groupSecretParams: groupV2ContextInfo.groupSecretParams
+                    groupSecretParams: groupV2ContextInfo.groupSecretParams,
                 )
             } catch {
                 owsFailDebugUnlessNetworkFailure(error)
@@ -362,7 +351,7 @@ public class LinkPreviewFetcherImpl: LinkPreviewFetcher {
         }
 
         return OWSLinkPreviewDraft(
-            url: url,
+            url: url.rawValue,
             title: title,
             imageData: previewThumbnail?.imageData,
             imageMimeType: previewThumbnail?.mimetype,
@@ -373,17 +362,18 @@ public class LinkPreviewFetcherImpl: LinkPreviewFetcher {
     // MARK: - Call Links
 
     private func fetchName(forCallLink callLink: CallLink) async throws -> String? {
-        let localIdentifiers = tsAccountManager.localIdentifiersWithMaybeSneakyTransaction!
+        let registeredState = try tsAccountManager.registeredStateWithMaybeSneakyTransaction()
+        let localIdentifiers = registeredState.localIdentifiers
         let authCredential = try await authCredentialManager.fetchCallLinkAuthCredential(localIdentifiers: localIdentifiers)
         let callLinkState = try await CallLinkFetcherImpl().readCallLink(callLink.rootKey, authCredential: authCredential)
         return callLinkState.name
     }
 }
 
-fileprivate extension HTMLMetadata {
+private extension HTMLMetadata {
     var dateForLinkPreview: Date? {
         [ogPublishDateString, articlePublishDateString, ogModifiedDateString, articleModifiedDateString]
-            .first(where: {$0 != nil})?
+            .first(where: { $0 != nil })?
             .flatMap {
                 guard
                     let date = Date.ows_parseFromISO8601String($0),

@@ -7,8 +7,12 @@ import LibSignalClient
 import SignalServiceKit
 import SignalUI
 
+@MainActor
 protocol ReplaceAdminViewControllerDelegate: AnyObject {
-    func replaceAdmin(newAdminAci: Aci)
+    func replaceAdminView(
+        _ replaceAdminViewController: ReplaceAdminViewController,
+        didSelectNewAdminAci replacementAdminAci: Aci,
+    )
 }
 
 // MARK: -
@@ -19,8 +23,10 @@ class ReplaceAdminViewController: OWSTableViewController2 {
 
     private let candidates: Set<SignalServiceAddress>
 
-    init(candidates: Set<SignalServiceAddress>,
-         replaceAdminViewControllerDelegate: ReplaceAdminViewControllerDelegate) {
+    init(
+        candidates: Set<SignalServiceAddress>,
+        replaceAdminViewControllerDelegate: ReplaceAdminViewControllerDelegate,
+    ) {
         assert(!candidates.isEmpty)
 
         self.candidates = candidates
@@ -31,11 +37,23 @@ class ReplaceAdminViewController: OWSTableViewController2 {
 
     // MARK: - View Lifecycle
 
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
 
-        title = OWSLocalizedString("REPLACE_ADMIN_VIEW_TITLE",
-                                  comment: "The title for the 'replace group admin' view.")
+        title = OWSLocalizedString(
+            "REPLACE_ADMIN_VIEW_TITLE",
+            comment: "The title for the 'replace group admin' view.",
+        )
+
+        if #available(iOS 26, *) {
+            navigationItem.leftBarButtonItem = .systemItem(.close) { [weak self] in
+                self?.dismiss(animated: true)
+            }
+        } else {
+            navigationItem.leftBarButtonItem = .button(title: CommonStrings.cancelButton) { [weak self] in
+                self?.dismiss(animated: true)
+            }
+        }
 
         tableView.register(ContactTableViewCell.self, forCellReuseIdentifier: ContactTableViewCell.reuseIdentifier)
 
@@ -57,21 +75,12 @@ class ReplaceAdminViewController: OWSTableViewController2 {
                         owsFailDebug("Missing cell.")
                         return UITableViewCell()
                     }
-
-                    SSKEnvironment.shared.databaseStorageRef.read { transaction in
-                        let configuration = ContactCellConfiguration(address: address, localUserDisplayMode: .asUser)
-                        let imageView = CVImageView()
-                        imageView.setTemplateImageName(Theme.iconName(.circle), tintColor: .ows_gray25)
-                        configuration.accessoryView = ContactCellAccessoryView(accessoryView: imageView, size: .square(24))
-
-                        cell.configure(configuration: configuration, transaction: transaction)
-                    }
-
+                    cell.configureWithSneakyTransaction(address: address, localUserDisplayMode: .asUser)
                     return cell
                 },
                 actionBlock: { [weak self] in
                     self?.candidateWasSelected(candidate: address)
-                }
+                },
             ))
         }
 
@@ -86,6 +95,9 @@ class ReplaceAdminViewController: OWSTableViewController2 {
             return
         }
 
-        replaceAdminViewControllerDelegate?.replaceAdmin(newAdminAci: replacementAdminAci)
+        replaceAdminViewControllerDelegate?.replaceAdminView(
+            self,
+            didSelectNewAdminAci: replacementAdminAci,
+        )
     }
 }

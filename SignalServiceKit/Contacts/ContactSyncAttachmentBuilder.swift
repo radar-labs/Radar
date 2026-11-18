@@ -10,7 +10,7 @@ import LibSignalClient
 enum ContactSyncAttachmentBuilder {
     static func buildAttachmentFile(
         contactsManager: OWSContactsManager,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> URL? {
         let tsAccountManager = DependenciesBridge.shared.tsAccountManager
         guard let localAddress = tsAccountManager.localIdentifiers(tx: tx)?.aciAddress else {
@@ -18,7 +18,10 @@ enum ContactSyncAttachmentBuilder {
             return nil
         }
 
-        let fileUrl = OWSFileSystem.temporaryFileUrl(isAvailableWhileDeviceLocked: true)
+        let fileUrl = OWSFileSystem.temporaryFileUrl(
+            fileExtension: nil,
+            isAvailableWhileDeviceLocked: true,
+        )
         guard let outputStream = OutputStream(url: fileUrl, append: false) else {
             owsFailDebug("Could not open outputStream.")
             return nil
@@ -41,7 +44,7 @@ enum ContactSyncAttachmentBuilder {
                 to: ContactOutputStream(outputStream: outputStream),
                 localAddress: localAddress,
                 contactsManager: contactsManager,
-                tx: tx
+                tx: tx,
             )
         } catch {
             owsFailDebug("Could not write contacts sync stream: \(error)")
@@ -60,7 +63,7 @@ enum ContactSyncAttachmentBuilder {
         to contactOutputStream: ContactOutputStream,
         localAddress: SignalServiceAddress,
         contactsManager: OWSContactsManager,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws {
         let threadFinder = ThreadFinder()
         var threadPositions = [Int64: Int]()
@@ -71,7 +74,7 @@ enum ContactSyncAttachmentBuilder {
         let localAccount = localAccountToSync(localAddress: localAddress)
         let otherAccounts = SignalAccount.anyFetchAll(transaction: tx)
         let signalAccounts = [localAccount] + otherAccounts.sorted(
-            by: { ($0.recipientPhoneNumber ?? "") < ($1.recipientPhoneNumber ?? "") }
+            by: { ($0.recipientPhoneNumber ?? "") < ($1.recipientPhoneNumber ?? "") },
         )
 
         // De-duplicate threads by their address. This de-duping works correctly
@@ -98,7 +101,7 @@ enum ContactSyncAttachmentBuilder {
                     contactThread: contactThread,
                     signalAccount: signalAccount,
                     inboxPosition: inboxPosition,
-                    tx: tx
+                    tx: tx,
                 )
                 seenAddresses.insert(signalRecipient.address)
             }
@@ -119,7 +122,7 @@ enum ContactSyncAttachmentBuilder {
                     contactThread: contactThread,
                     signalAccount: nil,
                     inboxPosition: inboxPosition,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
@@ -131,7 +134,7 @@ enum ContactSyncAttachmentBuilder {
         contactThread: TSContactThread?,
         signalAccount: SignalAccount?,
         inboxPosition: Int?,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws {
         let dmStore = DependenciesBridge.shared.disappearingMessagesConfigurationStore
         let dmConfiguration = contactThread.map { dmStore.fetchOrBuildDefault(for: .thread($0), tx: tx) }
@@ -141,7 +144,7 @@ enum ContactSyncAttachmentBuilder {
             phoneNumber: address.e164,
             signalAccount: signalAccount,
             disappearingMessagesConfiguration: dmConfiguration,
-            inboxPosition: inboxPosition
+            inboxPosition: inboxPosition,
         )
     }
 
@@ -163,10 +166,10 @@ enum ContactSyncAttachmentBuilder {
 
 private class OWSStreamDelegate: NSObject, StreamDelegate {
     private let _hadError = AtomicBool(false, lock: .sharedGlobal)
-    public var hadError: Bool { _hadError.get() }
+    var hadError: Bool { _hadError.get() }
 
     @objc
-    public func stream(_ stream: Stream, handle eventCode: Stream.Event) {
+    func stream(_ stream: Stream, handle eventCode: Stream.Event) {
         if eventCode == .errorOccurred {
             _hadError.set(true)
         }

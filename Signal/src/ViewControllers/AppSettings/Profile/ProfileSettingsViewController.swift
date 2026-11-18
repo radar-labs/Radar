@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import LibSignalClient
 import SignalServiceKit
 import SignalUI
 
@@ -73,11 +74,11 @@ class ProfileSettingsViewController: OWSTableViewController2 {
 
         var hasUnsavedChanges: Bool {
             givenName.hasUnsavedChanges
-            || familyName.hasUnsavedChanges
-            || bio.hasUnsavedChanges
-            || bioEmoji.hasUnsavedChanges
-            || avatarData.hasUnsavedChanges
-            || visibleBadgeIds.hasUnsavedChanges
+                || familyName.hasUnsavedChanges
+                || bio.hasUnsavedChanges
+                || bioEmoji.hasUnsavedChanges
+                || avatarData.hasUnsavedChanges
+                || visibleBadgeIds.hasUnsavedChanges
         }
     }
 
@@ -89,12 +90,12 @@ class ProfileSettingsViewController: OWSTableViewController2 {
     private var shouldShowUsernameLinkTooltip: Bool = false
     private var currentUsernameLinkTooltip: UsernameLinkTooltipView?
 
-    weak private var usernameChangeDelegate: UsernameChangeDelegate?
-    weak private var usernameLinkScanDelegate: UsernameLinkScanDelegate?
+    private weak var usernameChangeDelegate: UsernameChangeDelegate?
+    private weak var usernameLinkScanDelegate: UsernameLinkScanDelegate?
 
     init(
         usernameChangeDelegate: UsernameChangeDelegate,
-        usernameLinkScanDelegate: UsernameLinkScanDelegate
+        usernameLinkScanDelegate: UsernameLinkScanDelegate,
     ) {
         self.usernameChangeDelegate = usernameChangeDelegate
         self.usernameLinkScanDelegate = usernameLinkScanDelegate
@@ -116,8 +117,8 @@ class ProfileSettingsViewController: OWSTableViewController2 {
         let localProfile: OWSUserProfile
         (localProfile, displayBadgesOnProfile) = databaseStorage.read { tx in (
             profileManager.localUserProfile(tx: tx)!,
-            DonationSubscriptionManager.displayBadgesOnProfile(transaction: tx),
-        )}
+            DependenciesBridge.shared.donationSubscriptionManager.displayBadgesOnProfile(tx: tx),
+        ) }
 
         allBadges = localProfile.badges
         let visibleBadgeIds = localProfile.visibleBadges.map { $0.badgeId }
@@ -127,7 +128,7 @@ class ProfileSettingsViewController: OWSTableViewController2 {
             bio: .init(oldValue: localProfile.bio, changedValue: .noChange),
             bioEmoji: .init(oldValue: localProfile.bioEmoji, changedValue: .noChange),
             avatarData: .init(oldValue: localProfile.loadAvatarData(), changedValue: .noChange),
-            visibleBadgeIds: .init(oldValue: visibleBadgeIds, changedValue: .noChange)
+            visibleBadgeIds: .init(oldValue: visibleBadgeIds, changedValue: .noChange),
         )
 
         SSKEnvironment.shared.databaseStorageRef.read { tx -> Void in
@@ -140,13 +141,9 @@ class ProfileSettingsViewController: OWSTableViewController2 {
         updateTableContents()
     }
 
-    override var preferredNavigationBarStyle: OWSNavigationBarStyle {
-        return .blur
-    }
+    override var preferredNavigationBarStyle: OWSNavigationBarStyle { .blur }
 
-    override var navbarBackgroundColorOverride: UIColor? {
-        return tableBackgroundColor
-    }
+    override var navbarBackgroundColorOverride: UIColor? { OWSTableViewController2.tableBackgroundColor }
 
     private var fullName: String? {
         let givenName = profileValues.givenName.currentValue
@@ -171,7 +168,7 @@ class ProfileSettingsViewController: OWSTableViewController2 {
             }, actionBlock: nil),
             OWSTableItem(customCellBlock: { [weak self] in
                 self?.createChangeAvatarCell() ?? UITableViewCell()
-            }, actionBlock: nil)
+            }, actionBlock: nil),
         ])
         avatarSection.hasBackground = false
         contents.add(avatarSection)
@@ -179,53 +176,53 @@ class ProfileSettingsViewController: OWSTableViewController2 {
         let mainSection = OWSTableSection()
         mainSection.footerTitle = OWSLocalizedString(
             "PROFILE_VIEW_PROFILE_DESCRIPTION",
-            comment: "Description of the user profile."
+            comment: "Description of the user profile.",
         )
         mainSection.add(.disclosureItem(
             icon: .profileName,
             withText: fullName ?? OWSLocalizedString(
                 "PROFILE_SETTINGS_NAME_PLACEHOLDER",
-                comment: "Placeholder when the user doesn't have a 'name' defined for profile settings screen."
+                comment: "Placeholder when the user doesn't have a 'name' defined for profile settings screen.",
             ),
             actionBlock: { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 let vc = ProfileNameViewController(
                     givenName: self.profileValues.givenName.currentValue,
                     familyName: self.profileValues.familyName.currentValue,
-                    profileDelegate: self
+                    profileDelegate: self,
                 )
                 self.presentFormSheet(OWSNavigationController(rootViewController: vc), animated: true)
-            }
+            },
         ))
 
         mainSection.add(.disclosureItem(
             icon: .profileAbout,
             withText: OWSUserProfile.bioForDisplay(
                 bio: profileValues.bio.currentValue,
-                bioEmoji: profileValues.bioEmoji.currentValue
+                bioEmoji: profileValues.bioEmoji.currentValue,
             ) ?? OWSLocalizedString(
                 "PROFILE_SETTINGS_BIO_PLACEHOLDER",
-                comment: "Placeholder when the user doesn't have an 'about' for profile settings screen."
+                comment: "Placeholder when the user doesn't have an 'about' for profile settings screen.",
             ),
             actionBlock: { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
                 let vc = ProfileBioViewController(
                     bio: self.profileValues.bio.currentValue,
                     bioEmoji: self.profileValues.bioEmoji.currentValue,
-                    profileDelegate: self
+                    profileDelegate: self,
                 )
                 self.presentFormSheet(OWSNavigationController(rootViewController: vc), animated: true)
-            }
+            },
         ))
         if !allBadges.isEmpty {
             mainSection.add(.disclosureItem(
                 icon: .profileBadges,
                 withText: OWSLocalizedString(
                     "BADGE_CONFIGURATION_TITLE",
-                    comment: "The title for the badge configuration page"
+                    comment: "The title for the badge configuration page",
                 ),
                 actionBlock: { [weak self] in
-                    guard let self = self else { return }
+                    guard let self else { return }
 
                     let avatarImage = SSKEnvironment.shared.databaseStorageRef.read { self.avatarImage(transaction: $0) }
 
@@ -233,9 +230,10 @@ class ProfileSettingsViewController: OWSTableViewController2 {
                         availableBadges: self.allBadges,
                         shouldDisplayOnProfile: self.displayBadgesOnProfile,
                         avatarImage: avatarImage,
-                        delegate: self)
+                        delegate: self,
+                    )
                     self.presentFormSheet(OWSNavigationController(rootViewController: vc), animated: true)
-                }
+                },
             ))
         }
         contents.add(mainSection)
@@ -247,12 +245,12 @@ class ProfileSettingsViewController: OWSTableViewController2 {
             case .unset:
                 usernameSection.footerTitle = OWSLocalizedString(
                     "PROFILE_VIEW_USERNAME_UNSET_DESCRIPTION",
-                    comment: "Footer below the usernames section of the profile settings when a username has not been set."
+                    comment: "Footer below the usernames section of the profile settings when a username has not been set.",
                 )
             case .available, .linkCorrupted, .usernameAndLinkCorrupted:
                 usernameSection.footerTitle = OWSLocalizedString(
                     "PROFILE_VIEW_USERNAME_DESCRIPTION",
-                    comment: "Footer below the usernames section of the profile settings explaining username visibility."
+                    comment: "Footer below the usernames section of the profile settings explaining username visibility.",
                 )
             }
 
@@ -263,7 +261,7 @@ class ProfileSettingsViewController: OWSTableViewController2 {
                 usernameSection.add(usernameAvailableTableItem(username: username))
                 usernameSection.add(usernameLinkAvailableTableItem(
                     username: username,
-                    usernameLink: usernameLink
+                    usernameLink: usernameLink,
                 ))
             case let .linkCorrupted(username):
                 usernameSection.add(usernameAvailableTableItem(username: username))
@@ -277,7 +275,6 @@ class ProfileSettingsViewController: OWSTableViewController2 {
         self.contents = contents
     }
 
-    @objc
     func presentAvatarSettingsView() {
         let currentAvatarImage: UIImage? = {
             guard let avatarData = profileValues.avatarData.currentValue else { return nil }
@@ -286,7 +283,7 @@ class ProfileSettingsViewController: OWSTableViewController2 {
 
         let vc = AvatarSettingsViewController(
             context: .profile,
-            currentAvatarImage: currentAvatarImage
+            currentAvatarImage: currentAvatarImage,
         ) { [weak self] newAvatarImage in
             self?.setAvatarImage(newAvatarImage)
         }
@@ -303,18 +300,18 @@ class ProfileSettingsViewController: OWSTableViewController2 {
                     icon: .profileUsername,
                     itemName: OWSLocalizedString(
                         "PROFILE_SETTINGS_USERNAME_PLACEHOLDER",
-                        comment: "A placeholder value shown in the profile settings screen on a tappable item leading to a username selection flow, for when the user doesn't have a username."
+                        comment: "A placeholder value shown in the profile settings screen on a tappable item leading to a username selection flow, for when the user doesn't have a username.",
                     ),
-                    accessoryType: .disclosureIndicator
+                    accessoryType: .disclosureIndicator,
                 )
             },
             actionBlock: { [weak self] in
                 guard let self else { return }
                 self.presentUsernameSelection(
                     currentUsername: nil,
-                    isAttemptingRecovery: false
+                    isAttemptingRecovery: false,
                 )
-            }
+            },
         )
     }
 
@@ -323,15 +320,15 @@ class ProfileSettingsViewController: OWSTableViewController2 {
         let editUsernameAction = UIAction(
             title: OWSLocalizedString(
                 "PROFILE_SETTINGS_USERNAME_EDIT_USERNAME_ACTION",
-                comment: "Title for a menu action allowing users to edit their existing username."
+                comment: "Title for a menu action allowing users to edit their existing username.",
             ),
             image: Theme.iconImage(.contextMenuEdit),
             handler: { [weak self] _ in
                 self?.presentUsernameSelection(
-                    currentUsername: username,
-                    isAttemptingRecovery: false
+                    currentUsername: try? LibSignalClient.Username(username),
+                    isAttemptingRecovery: false,
                 )
-            }
+            },
         )
 
         let deleteUsernameAction = UIAction(
@@ -340,7 +337,7 @@ class ProfileSettingsViewController: OWSTableViewController2 {
             attributes: .destructive,
             handler: { [weak self] _ in
                 self?.offerToDeleteUsername(currentUsername: username)
-            }
+            },
         )
 
         return OWSTableItem(
@@ -348,7 +345,7 @@ class ProfileSettingsViewController: OWSTableViewController2 {
                 let cell = OWSTableItem.buildCell(
                     icon: .profileUsername,
                     itemName: username,
-                    accessoryType: .disclosureIndicator
+                    accessoryType: .disclosureIndicator,
                 )
 
                 /// We want a context menu to present when the user taps this
@@ -356,8 +353,9 @@ class ProfileSettingsViewController: OWSTableViewController2 {
                 /// entire cell, which will intercept taps.
                 let contextMenuButton = ContextMenuButton(actions: [
                     editUsernameAction,
-                    deleteUsernameAction
+                    deleteUsernameAction,
                 ])
+                contextMenuButton.accessibilityLabel = username
 
                 /// We're intentionally not using `cell.contentView` here,
                 /// because we don't want the button inset.
@@ -365,14 +363,14 @@ class ProfileSettingsViewController: OWSTableViewController2 {
                 contextMenuButton.autoPinEdgesToSuperviewEdges()
 
                 return cell
-            }
+            },
         )
     }
 
     /// A table item for an available username and username link.
     private func usernameLinkAvailableTableItem(
         username: String,
-        usernameLink: Usernames.UsernameLink
+        usernameLink: Usernames.UsernameLink,
     ) -> OWSTableItem {
         return OWSTableItem(
             customCellBlock: {
@@ -380,9 +378,9 @@ class ProfileSettingsViewController: OWSTableViewController2 {
                     icon: .qrCodeLight,
                     itemName: OWSLocalizedString(
                         "PROFILE_SETTINGS_USERNAME_LINK_CELL_TITLE",
-                        comment: "Title for a table cell that lets the user manage their username link and QR code."
+                        comment: "Title for a table cell that lets the user manage their username link and QR code.",
                     ),
-                    accessoryType: .disclosureIndicator
+                    accessoryType: .disclosureIndicator,
                 )
             },
             willDisplayBlock: { [weak self] cell in
@@ -396,23 +394,23 @@ class ProfileSettingsViewController: OWSTableViewController2 {
                         onDismiss: { [weak self] in
                             self?.hideUsernameLinkTooltip(
                                 permanently: true,
-                                animated: true
+                                animated: true,
                             )
-                        }
+                        },
                     )
                 } else {
                     self.hideUsernameLinkTooltip(
                         permanently: false,
-                        animated: true
+                        animated: true,
                     )
                 }
             },
             actionBlock: { [weak self] in
                 self?.presentUsernameLink(
                     username: username,
-                    usernameLink: usernameLink
+                    usernameLink: usernameLink,
                 )
-            }
+            },
         )
     }
 
@@ -424,15 +422,15 @@ class ProfileSettingsViewController: OWSTableViewController2 {
                     icon: .profileUsername,
                     itemName: OWSLocalizedString(
                         "PROFILE_SETTINGS_USERNAME_PLACEHOLDER",
-                        comment: "A placeholder value shown in the profile settings screen on a tappable item leading to a username selection flow, for when the user doesn't have a username."
+                        comment: "A placeholder value shown in the profile settings screen on a tappable item leading to a username selection flow, for when the user doesn't have a username.",
                     ),
                     accessoryType: .disclosureIndicator,
-                    accessoryContentView: self?.buildUsernameErrorIconView()
+                    accessoryContentView: self?.buildUsernameErrorIconView(),
                 )
             },
             actionBlock: { [weak self] in
                 self?.presentUsernameCorruptedResolution()
-            }
+            },
         )
     }
 
@@ -443,22 +441,22 @@ class ProfileSettingsViewController: OWSTableViewController2 {
                     icon: .qrCodeLight,
                     itemName: OWSLocalizedString(
                         "PROFILE_SETTINGS_USERNAME_LINK_CELL_TITLE",
-                        comment: "Title for a table cell that lets the user manage their username link and QR code."
+                        comment: "Title for a table cell that lets the user manage their username link and QR code.",
                     ),
                     accessoryType: .disclosureIndicator,
-                    accessoryContentView: self?.buildUsernameErrorIconView()
+                    accessoryContentView: self?.buildUsernameErrorIconView(),
                 )
             },
             actionBlock: { [weak self] in
                 self?.presentUsernameLinkCorruptedResolution()
-            }
+            },
         )
     }
 
     private func buildUsernameErrorIconView() -> UIView {
         let imageView = UIImageView.withTemplateImageName(
             "error-circle",
-            tintColor: .ows_accentRed
+            tintColor: .Signal.red,
         )
 
         imageView.autoPinToSquareAspectRatio()
@@ -468,7 +466,7 @@ class ProfileSettingsViewController: OWSTableViewController2 {
 
     // MARK: Username actions
 
-    public func presentUsernameCorruptedResolution() {
+    func presentUsernameCorruptedResolution() {
         guard let localUsernameState else {
             return
         }
@@ -483,31 +481,31 @@ class ProfileSettingsViewController: OWSTableViewController2 {
 
         let actionSheet = ActionSheetController(message: OWSLocalizedString(
             "PROFILE_SETTINGS_USERNAME_CORRUPTED_RESOLUTION_CONFIRMATION_ALERT_MESSAGE",
-            comment: "A message explaining that something is wrong with the username, on a sheet allowing the user to resolve the issue."
+            comment: "A message explaining that something is wrong with the username, on a sheet allowing the user to resolve the issue.",
         ))
 
         actionSheet.addAction(ActionSheetAction(
             title: OWSLocalizedString(
                 "PROFILE_SETTINGS_USERNAME_CORRUPTED_RESOLUTION_FIX_ACTION_TITLE",
-                comment: "Title for an action sheet button allowing users to fix their username when their current one is corrupted."
+                comment: "Title for an action sheet button allowing users to fix their username when their current one is corrupted.",
             ),
             handler: { [weak self] _ in
                 self?.presentUsernameSelection(
                     currentUsername: nil,
-                    isAttemptingRecovery: true
+                    isAttemptingRecovery: true,
                 )
-            }
+            },
         ))
 
         actionSheet.addAction(ActionSheetAction(
             title: OWSLocalizedString(
                 "PROFILE_SETTINGS_USERNAME_CORRUPTED_RESOLUTION_DELETE_USERNAME_ACTION_TITLE",
-                comment: "Title for an action sheet button allowing users to delete their corrupted username."
+                comment: "Title for an action sheet button allowing users to delete their corrupted username.",
             ),
             style: .destructive,
             handler: { [weak self] _ in
                 self?.deleteUsernameBehindModalActivityIndicator()
-            }
+            },
         ))
 
         actionSheet.addAction(OWSActionSheets.cancelAction)
@@ -515,7 +513,7 @@ class ProfileSettingsViewController: OWSTableViewController2 {
         OWSActionSheets.showActionSheet(actionSheet, fromViewController: self)
     }
 
-    public func presentUsernameLinkCorruptedResolution() {
+    func presentUsernameLinkCorruptedResolution() {
         guard let localUsernameState else {
             return
         }
@@ -529,8 +527,8 @@ class ProfileSettingsViewController: OWSTableViewController2 {
     }
 
     private func presentUsernameSelection(
-        currentUsername: String?,
-        isAttemptingRecovery: Bool
+        currentUsername: LibSignalClient.Username?,
+        isAttemptingRecovery: Bool,
     ) {
         let usernameSelectionCoordinator = UsernameSelectionCoordinator(
             currentUsername: currentUsername,
@@ -541,8 +539,8 @@ class ProfileSettingsViewController: OWSTableViewController2 {
                 networkManager: SSKEnvironment.shared.networkManagerRef,
                 storageServiceManager: SSKEnvironment.shared.storageServiceManagerRef,
                 usernameEducationManager: context.usernameEducationManager,
-                localUsernameManager: context.localUsernameManager
-            )
+                localUsernameManager: context.localUsernameManager,
+            ),
         )
 
         usernameSelectionCoordinator.present(fromViewController: self)
@@ -550,18 +548,18 @@ class ProfileSettingsViewController: OWSTableViewController2 {
 
     private func offerToDeleteUsername(currentUsername: String) {
         OWSActionSheets.showConfirmationAlert(
-            message: String(
-                format: OWSLocalizedString(
+            message: String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
                     "PROFILE_SETTINGS_USERNAME_DELETION_CONFIRMATION_ALERT_MESSAGE_FORMAT",
-                    comment: "A message asking the user if they are sure they want to remove their username and explaining what will happen. Embeds {{ the user's current username }}."
+                    comment: "A message asking the user if they are sure they want to remove their username and explaining what will happen. Embeds {{ the user's current username }}.",
                 ),
-                currentUsername
+                currentUsername,
             ),
             proceedTitle: OWSLocalizedString(
                 "PROFILE_SETTINGS_USERNAME_DELETION_USERNAME_ACTION_TITLE",
-                comment: "The title of an action sheet button that will delete a user's username."
+                comment: "The title of an action sheet button that will delete a user's username.",
             ),
-            proceedStyle: .destructive
+            proceedStyle: .destructive,
         ) { [weak self] _ in
             guard let self else { return }
 
@@ -572,9 +570,12 @@ class ProfileSettingsViewController: OWSTableViewController2 {
     private func deleteUsernameBehindModalActivityIndicator() {
         ModalActivityIndicatorViewController.present(
             fromViewController: self,
+            title: CommonStrings.updatingModal,
             canCancel: false,
             asyncBlock: { modal in
-                let remoteMutationResult = await self.context.localUsernameManager.deleteUsername()
+                let result = await Result(catching: {
+                    try await self.context.localUsernameManager.deleteUsername()
+                })
 
                 let newState = self.context.db.read { tx in
                     return self.context.localUsernameManager.usernameState(tx: tx)
@@ -583,23 +584,23 @@ class ProfileSettingsViewController: OWSTableViewController2 {
                 // State may have changed with either success or failure.
                 self.usernameStateDidChange(newState: newState)
 
-                switch remoteMutationResult {
+                switch result {
                 case .success:
                     modal.dismiss()
-                case .failure(let remoteMutationError):
+                case .failure(let error):
                     modal.dismiss {
                         OWSActionSheets.showErrorAlert(
-                            message: remoteMutationError.localizedDescription
+                            message: Usernames.localizedDescription(forError: error),
                         )
                     }
                 }
-            }
+            },
         )
     }
 
     private func presentUsernameLink(
         username: String,
-        usernameLink: Usernames.UsernameLink?
+        usernameLink: Usernames.UsernameLink?,
     ) {
         presentFormSheet(
             OWSNavigationController(
@@ -609,10 +610,10 @@ class ProfileSettingsViewController: OWSTableViewController2 {
                     username: username,
                     usernameLink: usernameLink,
                     changeDelegate: self,
-                    scanDelegate: self
-                )
+                    scanDelegate: self,
+                ),
             ),
-            animated: true
+            animated: true,
         ) {
             self.hideUsernameLinkTooltip(permanently: true, animated: false)
         }
@@ -620,7 +621,7 @@ class ProfileSettingsViewController: OWSTableViewController2 {
 
     private func hideUsernameLinkTooltip(
         permanently: Bool,
-        animated: Bool
+        animated: Bool,
     ) {
         if let currentUsernameLinkTooltip {
             if animated {
@@ -686,52 +687,57 @@ class ProfileSettingsViewController: OWSTableViewController2 {
             OWSActionSheets.showErrorAlert(
                 message: OWSLocalizedString(
                     "PROFILE_VIEW_NO_CONNECTION",
-                    comment: "Error shown when the user tries to update their profile when the app is not connected to the internet."
-                )
+                    comment: "Error shown when the user tries to update their profile when the app is not connected to the internet.",
+                ),
             )
             return
         }
 
         // Show an activity indicator to block the UI during the profile upload.
-        ModalActivityIndicatorViewController.present(fromViewController: self, canCancel: false, asyncBlock: { [self] modalActivityIndicator in
-            let databaseStorage = SSKEnvironment.shared.databaseStorageRef
-            do {
-                let updatePromise = await databaseStorage.awaitableWrite { tx in
-                    SSKEnvironment.shared.profileManagerRef.updateLocalProfile(
-                        profileGivenName: profileValues.givenName.changedValue,
-                        profileFamilyName: profileValues.familyName.changedValue,
-                        profileBio: profileValues.bio.changedValue,
-                        profileBioEmoji: profileValues.bioEmoji.changedValue,
-                        profileAvatarData: { () -> OptionalAvatarChange<Data?> in
-                            switch profileValues.avatarData.changedValue {
-                            case .noChange:
-                                return .noChange
-                            case .setTo(let newValue):
-                                return .setTo(newValue)
-                            }
-                        }(),
-                        visibleBadgeIds: profileValues.visibleBadgeIds.changedValue,
-                        unsavedRotatedProfileKey: nil,
-                        userProfileWriter: .localUser,
-                        authedAccount: .implicit(),
-                        tx: tx
-                    )
+        ModalActivityIndicatorViewController.present(
+            fromViewController: self,
+            title: CommonStrings.updatingModal,
+            canCancel: false,
+            asyncBlock: { [self] modal in
+                let databaseStorage = SSKEnvironment.shared.databaseStorageRef
+                do {
+                    let updatePromise = await databaseStorage.awaitableWrite { tx in
+                        SSKEnvironment.shared.profileManagerRef.updateLocalProfile(
+                            profileGivenName: profileValues.givenName.changedValue,
+                            profileFamilyName: profileValues.familyName.changedValue,
+                            profileBio: profileValues.bio.changedValue,
+                            profileBioEmoji: profileValues.bioEmoji.changedValue,
+                            profileAvatarData: { () -> OptionalAvatarChange<Data?> in
+                                switch profileValues.avatarData.changedValue {
+                                case .noChange:
+                                    return .noChange
+                                case .setTo(let newValue):
+                                    return .setTo(newValue)
+                                }
+                            }(),
+                            visibleBadgeIds: profileValues.visibleBadgeIds.changedValue,
+                            unsavedRotatedProfileKey: nil,
+                            userProfileWriter: .localUser,
+                            authedAccount: .implicit,
+                            tx: tx,
+                        )
+                    }
+                    try await updatePromise.awaitable()
+                    await databaseStorage.awaitableWrite { transaction in
+                        DependenciesBridge.shared.donationSubscriptionManager.setDisplayBadgesOnProfile(
+                            displayBadgesOnProfile,
+                            updateStorageService: true,
+                            tx: transaction,
+                        )
+                    }
+                } catch {
+                    owsFailDebug("\(error)")
                 }
-                try await updatePromise.awaitable()
-                await databaseStorage.awaitableWrite { transaction in
-                    DonationSubscriptionManager.setDisplayBadgesOnProfile(
-                        displayBadgesOnProfile,
-                        updateStorageService: true,
-                        transaction: transaction
-                    )
+                modal.dismiss { [weak self] in
+                    self?.profileCompleted()
                 }
-            } catch {
-                owsFailDebug("\(error)")
-            }
-            modalActivityIndicator.dismiss { [weak self] in
-                self?.profileCompleted()
-            }
-        })
+            },
+        )
     }
 
     private func profileCompleted() {
@@ -767,7 +773,7 @@ class ProfileSettingsViewController: OWSTableViewController2 {
             badgedAvatarView.update(readTx) { config in
                 config.dataSource = .asset(
                     avatar: self.avatarImage(transaction: readTx),
-                    badge: self.displayBadgesOnProfile ? badgeImage : nil
+                    badge: self.displayBadgesOnProfile ? badgeImage : nil,
                 )
             }
         }
@@ -797,8 +803,10 @@ class ProfileSettingsViewController: OWSTableViewController2 {
         changeButton.autoPinWidthToSuperviewMargins(relation: .lessThanOrEqual)
         changeButton.autoCenterInSuperview()
         changeButton.setContentHuggingHigh()
-
-        changeButton.addTarget(self, action: #selector(presentAvatarSettingsView), for: .touchUpInside)
+        changeButton.addAction(
+            UIAction { [weak self] _ in self?.presentAvatarSettingsView() },
+            for: .primaryActionTriggered,
+        )
         return cell
     }
 
@@ -817,12 +825,12 @@ class ProfileSettingsViewController: OWSTableViewController2 {
 
 extension ProfileSettingsViewController {
 
-    override public var isModalInPresentation: Bool {
+    override var isModalInPresentation: Bool {
         get { hasUnsavedChanges }
         set { /* noop superclass requirement */ }
     }
 
-    public var shouldCancelNavigationBack: Bool {
+    var shouldCancelNavigationBack: Bool {
         let result = hasUnsavedChanges
         if result {
             leaveViewCheckingForUnsavedChanges()
@@ -832,7 +840,7 @@ extension ProfileSettingsViewController {
 }
 
 extension ProfileSettingsViewController: ProfileBioViewControllerDelegate {
-    public func profileBioViewDidComplete(bio: String?, bioEmoji: String?) {
+    func profileBioViewDidComplete(bio: String?, bioEmoji: String?) {
         profileValues.bio.changedValue = .setTo(bio)
         profileValues.bioEmoji.changedValue = .setTo(bioEmoji)
         updateTableContents()

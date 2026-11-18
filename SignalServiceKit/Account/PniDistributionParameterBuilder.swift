@@ -9,45 +9,45 @@ public enum PniDistribution {
     /// Parameters for distributing PNI information to linked devices.
     public struct Parameters {
         let pniIdentityKey: IdentityKey
-        private(set) var devicePniSignedPreKeys: [String: LibSignalClient.SignedPreKeyRecord] = [:]
-        private(set) var devicePniPqLastResortPreKeys: [String: LibSignalClient.KyberPreKeyRecord] = [:]
-        private(set) var pniRegistrationIds: [String: UInt32] = [:]
+        private(set) var devicePniSignedPreKeys: [DeviceId: LibSignalClient.SignedPreKeyRecord] = [:]
+        private(set) var devicePniPqLastResortPreKeys: [DeviceId: LibSignalClient.KyberPreKeyRecord] = [:]
+        private(set) var pniRegistrationIds: [DeviceId: UInt32] = [:]
         private(set) var deviceMessages: [DeviceMessage] = []
 
         fileprivate init(pniIdentityKey: IdentityKey) {
             self.pniIdentityKey = pniIdentityKey
         }
 
-        #if TESTABLE_BUILD
+#if TESTABLE_BUILD
 
         static func mock(
             pniIdentityKeyPair: ECKeyPair,
             localDeviceId: DeviceId,
             localDevicePniSignedPreKey: LibSignalClient.SignedPreKeyRecord,
             localDevicePniPqLastResortPreKey: LibSignalClient.KyberPreKeyRecord,
-            localDevicePniRegistrationId: UInt32
+            localDevicePniRegistrationId: UInt32,
         ) -> Parameters {
             var mock = Parameters(pniIdentityKey: pniIdentityKeyPair.keyPair.identityKey)
             mock.addLocalDevice(
                 localDeviceId: localDeviceId,
                 signedPreKey: localDevicePniSignedPreKey,
                 pqLastResortPreKey: localDevicePniPqLastResortPreKey,
-                registrationId: localDevicePniRegistrationId
+                registrationId: localDevicePniRegistrationId,
             )
             return mock
         }
 
-        #endif
+#endif
 
         fileprivate mutating func addLocalDevice(
             localDeviceId: DeviceId,
             signedPreKey: LibSignalClient.SignedPreKeyRecord,
             pqLastResortPreKey: LibSignalClient.KyberPreKeyRecord,
-            registrationId: UInt32
+            registrationId: UInt32,
         ) {
-            devicePniSignedPreKeys["\(localDeviceId)"] = signedPreKey
-            devicePniPqLastResortPreKeys["\(localDeviceId)"] = pqLastResortPreKey
-            pniRegistrationIds["\(localDeviceId)"] = registrationId
+            devicePniSignedPreKeys[localDeviceId] = signedPreKey
+            devicePniPqLastResortPreKeys[localDeviceId] = pqLastResortPreKey
+            pniRegistrationIds[localDeviceId] = registrationId
         }
 
         fileprivate mutating func addLinkedDevice(
@@ -55,24 +55,14 @@ public enum PniDistribution {
             signedPreKey: LibSignalClient.SignedPreKeyRecord,
             pqLastResortPreKey: LibSignalClient.KyberPreKeyRecord,
             registrationId: UInt32,
-            deviceMessage: DeviceMessage
+            deviceMessage: DeviceMessage,
         ) {
-            owsPrecondition(deviceId == deviceMessage.destinationDeviceId)
+            owsPrecondition(deviceId == deviceMessage.deviceId)
 
-            devicePniSignedPreKeys["\(deviceId)"] = signedPreKey
-            devicePniPqLastResortPreKeys["\(deviceId)"] = pqLastResortPreKey
-            pniRegistrationIds["\(deviceId)"] = registrationId
+            devicePniSignedPreKeys[deviceId] = signedPreKey
+            devicePniPqLastResortPreKeys[deviceId] = pqLastResortPreKey
+            pniRegistrationIds[deviceId] = registrationId
             deviceMessages.append(deviceMessage)
-        }
-
-        func requestParameters() -> [String: Any] {
-            [
-                "pniIdentityKey": pniIdentityKey.serialize().base64EncodedString(),
-                "devicePniSignedPrekeys": devicePniSignedPreKeys.mapValues { OWSRequestFactory.signedPreKeyRequestParameters($0) },
-                "devicePniPqLastResortPrekeys": devicePniPqLastResortPreKeys.mapValues { OWSRequestFactory.pqPreKeyRequestParameters($0) },
-                "deviceMessages": deviceMessages.map { $0.requestParameters() },
-                "pniRegistrationIds": pniRegistrationIds
-            ]
         }
     }
 }
@@ -89,12 +79,12 @@ protocol PniDistributionParamaterBuilder {
     ///   new identity. Note that this message contains private key data.
     func buildPniDistributionParameters(
         localAci: Aci,
-        localDeviceId: LocalDeviceId,
+        localDeviceId: DeviceId,
+        localNewPhoneNumber: E164,
         localPniIdentityKeyPair: ECKeyPair,
-        localE164: E164,
         localDevicePniSignedPreKey: LibSignalClient.SignedPreKeyRecord,
         localDevicePniPqLastResortPreKey: LibSignalClient.KyberPreKeyRecord,
-        localDevicePniRegistrationId: UInt32
+        localDevicePniRegistrationId: UInt32,
     ) async throws -> PniDistribution.Parameters
 }
 
@@ -102,52 +92,47 @@ final class PniDistributionParameterBuilderImpl: PniDistributionParamaterBuilder
     private let logger = PrefixedLogger(prefix: "PDPBI")
 
     private let db: any DB
-    private let messageSender: Shims.MessageSender
+    private let deviceMessageBuilder: any DeviceMessageBuilder
     private let pniKyberPreKeyStore: KyberPreKeyStoreImpl
     private let registrationIdGenerator: RegistrationIdGenerator
 
     init(
         db: any DB,
-        messageSender: Shims.MessageSender,
+        deviceMessageBuilder: any DeviceMessageBuilder,
         pniKyberPreKeyStore: KyberPreKeyStoreImpl,
-        registrationIdGenerator: RegistrationIdGenerator
+        registrationIdGenerator: RegistrationIdGenerator,
     ) {
         self.db = db
-        self.messageSender = messageSender
+        self.deviceMessageBuilder = deviceMessageBuilder
         self.pniKyberPreKeyStore = pniKyberPreKeyStore
         self.registrationIdGenerator = registrationIdGenerator
     }
 
     func buildPniDistributionParameters(
         localAci: Aci,
-        localDeviceId: LocalDeviceId,
+        localDeviceId: DeviceId,
+        localNewPhoneNumber: E164,
         localPniIdentityKeyPair: ECKeyPair,
-        localE164: E164,
         localDevicePniSignedPreKey: LibSignalClient.SignedPreKeyRecord,
         localDevicePniPqLastResortPreKey: LibSignalClient.KyberPreKeyRecord,
-        localDevicePniRegistrationId: UInt32
+        localDevicePniRegistrationId: UInt32,
     ) async throws -> PniDistribution.Parameters {
         var parameters = PniDistribution.Parameters(pniIdentityKey: localPniIdentityKeyPair.keyPair.identityKey)
-
-        guard let localDeviceId = localDeviceId.ifValid else {
-            let message = "Local device ID missing - can't build linked device params if the local device isn't registered."
-            logger.error(message)
-            throw OWSGenericError(message)
-        }
 
         // Include the signed pre key & registration ID for the current device.
         parameters.addLocalDevice(
             localDeviceId: localDeviceId,
             signedPreKey: localDevicePniSignedPreKey,
             pqLastResortPreKey: localDevicePniPqLastResortPreKey,
-            registrationId: localDevicePniRegistrationId
+            registrationId: localDevicePniRegistrationId,
         )
 
         // Create a signed pre key & registration ID for linked devices.
         let linkedDeviceParamResults = try await buildLinkedDevicePniGenerationParams(
             localAci: localAci,
+            localDeviceId: localDeviceId,
+            newPhoneNumber: localNewPhoneNumber,
             pniIdentityKeyPair: localPniIdentityKeyPair,
-            e164: localE164
         )
 
         for param in linkedDeviceParamResults {
@@ -156,7 +141,7 @@ final class PniDistributionParameterBuilderImpl: PniDistributionParamaterBuilder
                 signedPreKey: param.signedPreKey,
                 pqLastResortPreKey: param.pqLastResortPreKey,
                 registrationId: param.registrationId,
-                deviceMessage: param.deviceMessage
+                deviceMessage: param.deviceMessage,
             )
         }
 
@@ -176,13 +161,14 @@ final class PniDistributionParameterBuilderImpl: PniDistributionParamaterBuilder
     /// Build messages for our linked devices with new PNI key material.
     private func buildLinkedDevicePniGenerationParams(
         localAci: Aci,
+        localDeviceId: DeviceId,
+        newPhoneNumber: E164,
         pniIdentityKeyPair: ECKeyPair,
-        e164: E164
     ) async throws -> [LinkedDevicePniGenerationParams] {
         var syncMessages = [DeviceId: PniDistributionSyncMessage]()
 
         let identityKey = pniIdentityKeyPair.identityKeyPair.privateKey
-        let deviceMessages = try await self.messageSender.buildDeviceMessages(
+        let deviceMessages = try await self.deviceMessageBuilder.buildDeviceMessages(
             serviceId: localAci,
             isSelfSend: true,
             encryptionStyle: .whisper,
@@ -196,7 +182,7 @@ final class PniDistributionParameterBuilderImpl: PniDistributionParamaterBuilder
                     signedPreKey: signedPreKey,
                     pqLastResortPreKey: pqLastResortPreKey,
                     registrationId: registrationId,
-                    e164: e164
+                    e164: newPhoneNumber,
                 )
 
                 syncMessages[deviceId] = syncMessage
@@ -204,69 +190,20 @@ final class PniDistributionParameterBuilderImpl: PniDistributionParamaterBuilder
                 return try syncMessage.buildSerializedMessageProto()
             },
             isTransient: false,
-            sealedSenderParameters: nil // Sync messages do not use UD
+            sealedSenderParameters: nil, // Sync messages do not use UD
+            localAci: localAci,
+            localDeviceId: localDeviceId,
         )
 
         return deviceMessages.map {
-            let syncMessage = syncMessages[$0.destinationDeviceId]!
+            let syncMessage = syncMessages[$0.deviceId]!
             return LinkedDevicePniGenerationParams(
-                deviceId: $0.destinationDeviceId,
+                deviceId: $0.deviceId,
                 signedPreKey: syncMessage.signedPreKey,
                 pqLastResortPreKey: syncMessage.pqLastResortPreKey,
                 registrationId: syncMessage.registrationId,
-                deviceMessage: $0
+                deviceMessage: $0,
             )
         }
-    }
-}
-
-// MARK: - Shims
-
-extension PniDistributionParameterBuilderImpl {
-    enum Shims {
-        typealias MessageSender = _PniDistributionParameterBuilder_MessageSender_Shim
-    }
-
-    enum Wrappers {
-        typealias MessageSender = _PniDistributionParameterBuilder_MessageSender_Wrapper
-    }
-}
-
-// MARK: MessageSender
-
-protocol _PniDistributionParameterBuilder_MessageSender_Shim {
-    func buildDeviceMessages(
-        serviceId: ServiceId,
-        isSelfSend: Bool,
-        encryptionStyle: EncryptionStyle,
-        buildPlaintextContent: (DeviceId, DBWriteTransaction) throws -> Data,
-        isTransient: Bool,
-        sealedSenderParameters: SealedSenderParameters?
-    ) async throws -> [DeviceMessage]
-}
-
-class _PniDistributionParameterBuilder_MessageSender_Wrapper: _PniDistributionParameterBuilder_MessageSender_Shim {
-    private let messageSender: MessageSender
-
-    init(_ messageSender: MessageSender) {
-        self.messageSender = messageSender
-    }
-
-    func buildDeviceMessages(
-        serviceId: ServiceId,
-        isSelfSend: Bool,
-        encryptionStyle: EncryptionStyle,
-        buildPlaintextContent: (DeviceId, DBWriteTransaction) throws -> Data,
-        isTransient: Bool,
-        sealedSenderParameters: SealedSenderParameters?
-    ) async throws -> [DeviceMessage] {
-        try await messageSender.buildDeviceMessages(
-            serviceId: serviceId,
-            isSelfSend: isSelfSend,
-            encryptionStyle: encryptionStyle,
-            buildPlaintextContent: buildPlaintextContent,
-            isTransient: isTransient,
-            sealedSenderParameters: sealedSenderParameters
-        )
     }
 }

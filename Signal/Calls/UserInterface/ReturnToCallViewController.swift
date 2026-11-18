@@ -29,8 +29,11 @@ public class ReturnToCallViewController: UIViewController {
         let fourByThree = CGSize(width: 272, height: 204)
         let threeByFour = CGSize(width: 204, height: 272)
 
-        if UIDevice.current.isIPad && UIDevice.current.isFullScreen {
-            if CurrentAppContext().frame.size.width > CurrentAppContext().frame.size.height {
+        guard let window = CurrentAppContext().mainWindow else { return nineBySixteen }
+
+        let isFullScreen = window.bounds.size == window.screen.bounds.size
+        if UIDevice.current.isIPad, isFullScreen {
+            if window.bounds.size.width > window.bounds.size.height {
                 return fourByThree
             } else {
                 return threeByFour
@@ -105,20 +108,22 @@ public class ReturnToCallViewController: UIViewController {
         view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handlePan)))
 
         let notificationCenter = NotificationCenter.default
-        notificationCenter.addObserver(self,
-                                       selector: #selector(keyboardFrameWillChange),
-                                       name: UIWindow.keyboardWillChangeFrameNotification,
-                                       object: nil)
+        notificationCenter.addObserver(
+            self,
+            selector: #selector(keyboardFrameWillChange),
+            name: UIWindow.keyboardWillChangeFrameNotification,
+            object: nil,
+        )
     }
 
-    public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    override public func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         coordinator.animate(alongsideTransition: { [weak self] _ in
             self?.updatePipLayout()
         }, completion: nil)
     }
 
-    public override func viewWillLayoutSubviews() {
+    override public func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         updatePipLayout()
     }
@@ -133,9 +138,9 @@ public class ReturnToCallViewController: UIViewController {
                 view.frame = CGRect(
                     origin: CGPoint(
                         x: Self.inherentPipSize.width - 6 - localVideoSize.width,
-                        y: Self.inherentPipSize.height - 6 - localVideoSize.height
+                        y: Self.inherentPipSize.height - 6 - localVideoSize.height,
                     ),
-                    size: localVideoSize
+                    size: localVideoSize,
                 )
             }
         } else {
@@ -163,7 +168,7 @@ public class ReturnToCallViewController: UIViewController {
             snapshot.alpha = 0
             window.frame = CGRect(
                 origin: previousOrigin,
-                size: Self.inherentPipSize
+                size: Self.inherentPipSize,
             ).pinnedToVerticalEdge(of: self.pipBoundingRect)
             window.layoutIfNeeded()
         }) { _ in
@@ -190,7 +195,7 @@ public class ReturnToCallViewController: UIViewController {
         var rect = CurrentAppContext().frame
         rect = rect.inset(by: safeAreaInsets)
         rect.size.height -= bottomBarEstimatedHeight
-        if let dockedKeyboardFrame = dockedKeyboardFrame, rect.maxY > dockedKeyboardFrame.minY {
+        if let dockedKeyboardFrame, rect.maxY > dockedKeyboardFrame.minY {
             rect.size.height -= rect.maxY - dockedKeyboardFrame.minY
         }
         rect = rect.inset(by: UIEdgeInsets(margin: padding))
@@ -205,14 +210,16 @@ public class ReturnToCallViewController: UIViewController {
     /// adjusting it to the nearest vertical edge).
     ///
     /// If `animationDuration` and `animationCurve` are nil, a default animation is used.
-    private func updatePipLayout(animationDuration: CGFloat? = nil,
-                                 animationCurve: UIView.AnimationCurve? = nil) {
+    private func updatePipLayout(
+        animationDuration: CGFloat? = nil,
+        animationCurve: UIView.AnimationCurve? = nil,
+    ) {
         guard !isAnimating else { return }
         guard let window = view.window else { return owsFailDebug("missing window") }
         let origin = frameBeforeAdjustingForKeyboard?.origin ?? window.frame.origin
         let newFrame = CGRect(
             origin: origin,
-            size: Self.inherentPipSize
+            size: Self.inherentPipSize,
         ).pinnedToVerticalEdge(of: pipBoundingRect)
 
         UIView.animate(withDuration: animationDuration ?? 0.25, delay: 0, options: animationCurve.asAnimationOptions) {
@@ -239,7 +246,7 @@ public class ReturnToCallViewController: UIViewController {
             window.animateDecelerationToVerticalEdge(
                 withDuration: 0.35,
                 velocity: sender.velocity(in: window),
-                boundingRect: pipBoundingRect
+                boundingRect: pipBoundingRect,
             )
         default:
             break
@@ -328,7 +335,7 @@ public class ReturnToCallViewController: UIViewController {
 
     // MARK: Orientation
 
-    public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    override public var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return UIDevice.current.isIPad ? .all : .portrait
     }
 

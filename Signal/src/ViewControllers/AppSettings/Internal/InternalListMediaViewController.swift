@@ -33,7 +33,7 @@ class InternalListMediaViewController: OWSTableViewController2 {
                     self?.updateTableContents()
                 }
                 modal.dismiss(animated: true)
-            }
+            },
         )
     }
 
@@ -53,19 +53,19 @@ class InternalListMediaViewController: OWSTableViewController2 {
             lastListMediaFailure,
             lastListMediaResult,
         ) = DependenciesBridge.shared.db.read { tx in
-            return (
-                try! QueuedBackupAttachmentUpload
+            return failIfThrows { (
+                try QueuedBackupAttachmentUpload
                     .filter(Column(QueuedBackupAttachmentUpload.CodingKeys.state) == QueuedBackupAttachmentUpload.State.ready.rawValue)
                     .filter(Column(QueuedBackupAttachmentUpload.CodingKeys.isFullsize) == true)
                     .fetchCount(tx.database),
-                try! QueuedBackupAttachmentUpload
+                try QueuedBackupAttachmentUpload
                     .filter(Column(QueuedBackupAttachmentUpload.CodingKeys.state) == QueuedBackupAttachmentUpload.State.ready.rawValue)
                     .filter(Column(QueuedBackupAttachmentUpload.CodingKeys.isFullsize) == false)
                     .fetchCount(tx.database),
-                try! OrphanedBackupAttachment.fetchCount(tx.database),
-                try! DependenciesBridge.shared.backupListMediaStore.getLastFailingIntegrityCheckResult(tx: tx),
-                try! DependenciesBridge.shared.backupListMediaStore.getMostRecentIntegrityCheckResult(tx: tx)
-            )
+                try OrphanedBackupAttachment.fetchCount(tx.database),
+                DependenciesBridge.shared.backupListMediaStore.getLastFailingIntegrityCheckResult(tx: tx),
+                DependenciesBridge.shared.backupListMediaStore.getMostRecentIntegrityCheckResult(tx: tx),
+            ) }
         }
 
         let pendingUploadSection = OWSTableSection(title: "Pending upload")
@@ -97,8 +97,13 @@ class InternalListMediaViewController: OWSTableViewController2 {
                         self?.updateTableContents()
                         self?.dismiss(animated: false)
                     }
-                }
+                },
             )
+        }))
+        lastResultSection.add(.actionItem(withText: "Mark integrity check to run on next attepmt", actionBlock: {
+            DependenciesBridge.shared.db.write { tx in
+                DependenciesBridge.shared.backupListMediaStore.setManualNeedsListMedia(true, tx: tx)
+            }
         }))
         contents.add(lastResultSection)
 
@@ -111,12 +116,12 @@ class InternalListMediaViewController: OWSTableViewController2 {
         section.add(.copyableItem(
             label: "Ineligible count: Fullsize",
             subtitle: "e.g. DMs, view once, etc",
-            value: "\(listMediaResult.fullsize.ineligibleCount)"
+            value: "\(listMediaResult.fullsize.ineligibleCount)",
         ))
         section.add(.copyableItem(
             label: "Missing count: Fullsize",
             subtitle: "Bad if > 0",
-            value: "\(listMediaResult.fullsize.missingFromCdnCount)"
+            value: "\(listMediaResult.fullsize.missingFromCdnCount)",
         ))
         section.add(.copyableItem(label: "Unscheduled count: Fullsize", value: "\(listMediaResult.fullsize.notScheduledForUploadCount ?? 0)"))
         section.add(.copyableItem(label: "Discovered count: Fullsize", value: "\(listMediaResult.fullsize.discoveredOnCdnCount)"))
@@ -124,19 +129,19 @@ class InternalListMediaViewController: OWSTableViewController2 {
         section.add(.copyableItem(
             label: "Ineligible count: Thumbnail",
             subtitle: "e.g. DMs, view once, etc",
-            value: "\(listMediaResult.thumbnail.ineligibleCount)"
+            value: "\(listMediaResult.thumbnail.ineligibleCount)",
         ))
         section.add(.copyableItem(
             label: "Missing count: Thumbnail",
             subtitle: "Not good if > 0, but nbd",
-            value: "\(listMediaResult.thumbnail.missingFromCdnCount)"
+            value: "\(listMediaResult.thumbnail.missingFromCdnCount)",
         ))
         section.add(.copyableItem(label: "Unscheduled count: Thumbnail", value: "\(listMediaResult.thumbnail.notScheduledForUploadCount ?? 0)"))
         section.add(.copyableItem(label: "Discovered count: Thumbnail", value: "\(listMediaResult.thumbnail.discoveredOnCdnCount)"))
         section.add(.copyableItem(
             label: "Orphan count",
             subtitle: "Should roughy match pending deletion",
-            value: "\(listMediaResult.orphanedObjectCount)"
+            value: "\(listMediaResult.orphanedObjectCount)",
         ))
     }
 }

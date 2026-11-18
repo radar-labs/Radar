@@ -6,15 +6,13 @@
 import Foundation
 
 /// Thrown when a request isn't sent because the app is already expired.
-public struct AppExpiredError: Error, IsRetryableProvider {
-    public let isRetryableProvider: Bool = false
-}
+public struct AppExpiredError: Error {}
 
 public final class AppExpiry {
 
     public static let appExpiredStatusCode: UInt = 499
 
-    private let keyValueStore: KeyValueStore
+    private let keyValueStore: NewKeyValueStore
 
     private let appVersion: AppVersionNumber4
     private let buildDate: Date
@@ -27,6 +25,7 @@ public final class AppExpiry {
             case immediately
             case atDate
         }
+
         let mode: Mode
 
         let expirationDate: Date?
@@ -42,6 +41,7 @@ public final class AppExpiry {
             owsAssertDebug(mode != .atDate || expirationDate != nil)
         }
     }
+
     private let expirationState: AtomicValue<ExpirationState>
 
     static let keyValueCollection = "AppExpiry"
@@ -51,33 +51,33 @@ public final class AppExpiry {
         self.init(appVersion: appVersion.currentAppVersion4, buildDate: appVersion.buildDate)
     }
 
-    #if TESTABLE_BUILD
+#if TESTABLE_BUILD
 
     public static func forUnitTests(buildDate: Date = Date()) -> Self {
         return Self(appVersion: try! AppVersionNumber4(AppVersionNumber("1.2.3.4")), buildDate: buildDate)
     }
 
-    #endif
+#endif
 
     public init(
         appVersion: AppVersionNumber4,
         buildDate: Date,
     ) {
-        self.keyValueStore = KeyValueStore(collection: Self.keyValueCollection)
+        self.keyValueStore = NewKeyValueStore(collection: Self.keyValueCollection)
         self.appVersion = appVersion
         self.buildDate = buildDate
 
         self.expirationState = AtomicValue(
             .init(appVersion: appVersion.wrappedValue.rawValue, mode: .default),
-            lock: .sharedGlobal
+            lock: .sharedGlobal,
         )
     }
 
     public func warmCaches(with tx: DBReadTransaction) {
-        let persistedExpirationState: ExpirationState? = try? self.keyValueStore.getCodableValue(
+        let persistedExpirationState = try? self.keyValueStore.fetchJSONAsValue(
+            ExpirationState.self,
             forKey: Self.keyValueKey,
-            failDebugOnParseError: false,
-            transaction: tx
+            tx: tx,
         )
 
         // We only want to restore the persisted state if it's for our current version.
@@ -97,9 +97,10 @@ public final class AppExpiry {
         await db.awaitableWrite { transaction in
             do {
                 // Don't write or fire notification if the value hasn't changed.
-                let oldState: ExpirationState? = try self.keyValueStore.getCodableValue(
+                let oldState = try self.keyValueStore.fetchJSONAsValue(
+                    ExpirationState.self,
                     forKey: Self.keyValueKey,
-                    transaction: transaction
+                    tx: transaction,
                 )
                 if let oldState, oldState == state {
                     return
@@ -107,15 +108,11 @@ public final class AppExpiry {
             } catch {
                 owsFailDebug("Error reading expiration state \(error)")
             }
-            do {
-                try self.keyValueStore.setCodable(
-                    state,
-                    key: Self.keyValueKey,
-                    transaction: transaction
-                )
-            } catch {
-                owsFailDebug("Error persisting expiration state \(error)")
-            }
+            self.keyValueStore.writeValueAsJSON(
+                state,
+                forKey: Self.keyValueKey,
+                tx: transaction,
+            )
         }
 
         await didUpdateExpirationState()
@@ -148,7 +145,7 @@ public final class AppExpiry {
             newState = .init(
                 appVersion: appVersion.wrappedValue.rawValue,
                 mode: .atDate,
-                expirationDate: newExpirationDate
+                expirationDate: newExpirationDate,
             )
         } else {
             newState = .init(appVersion: appVersion.wrappedValue.rawValue, mode: .default)

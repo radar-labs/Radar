@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import SignalServiceKit
+import SignalServiceKit
 import SignalUI
 
-public enum ScrollAlignment: Int {
+enum ScrollAlignment: Int {
     case top
     case bottom
     case center
@@ -29,15 +29,13 @@ public enum ScrollAlignment: Int {
     }
 }
 
-// MARK: -
-
 // TODO: Do we need to specify the load alignment (top, bottom, center)
 // or that implicit in the value?
-public struct CVScrollAction: Equatable, CustomStringConvertible {
+struct CVScrollAction: Equatable, CustomStringConvertible {
 
     // TODO: Do we need to specify the load alignment (top, bottom, center)
     // or that implicit in the value?
-    public enum Action: Equatable, CustomStringConvertible {
+    enum Action: Equatable, CustomStringConvertible {
         case none
         case scrollTo(interactionId: String, onScreenPercentage: CGFloat, alignment: ScrollAlignment)
         case bottomOfLoadWindow
@@ -46,7 +44,7 @@ public struct CVScrollAction: Equatable, CustomStringConvertible {
 
         // MARK: - CustomStringConvertible
 
-        public var description: String {
+        var description: String {
             switch self {
             case .none:
                 return "none"
@@ -65,18 +63,16 @@ public struct CVScrollAction: Equatable, CustomStringConvertible {
     let action: Action
     let isAnimated: Bool
 
-    public static var none: CVScrollAction {
+    static var none: CVScrollAction {
         CVScrollAction(action: .none, isAnimated: false)
     }
 
     // MARK: - CustomStringConvertible
 
-    public var description: String {
+    var description: String {
         "[scrollAction: \(action), isAnimated: \(isAnimated)]"
     }
 }
-
-// MARK: -
 
 extension ConversationViewController {
 
@@ -93,9 +89,10 @@ extension ConversationViewController {
                 // TODO: Set position and animated.
                 scrollToInteraction(
                     indexPath: indexPath,
+                    interactionUniqueId: interactionId,
                     onScreenPercentage: onScreenPercentage,
                     alignment: alignment,
-                    animated: scrollAction.isAnimated
+                    animated: scrollAction.isAnimated,
                 )
             } else {
                 owsFailDebug("Could not locate interaction.")
@@ -126,7 +123,7 @@ extension ConversationViewController {
             return
         }
 
-        guard let initialScrollState = initialScrollState else {
+        guard let initialScrollState else {
             owsAssertDebug(hasViewDidAppearEverBegun)
             return
         }
@@ -139,8 +136,9 @@ extension ConversationViewController {
             } else if let indexPath = indexPath(forInteractionUniqueId: focusMessageId) {
                 scrollToInteraction(
                     indexPath: indexPath,
+                    interactionUniqueId: focusMessageId,
                     alignment: .top,
-                    animated: animated
+                    animated: animated,
                 )
                 return
             } else if hasRenderState {
@@ -151,8 +149,9 @@ extension ConversationViewController {
         if let indexPath = indexPathOfUnreadMessagesIndicator {
             scrollToInteraction(
                 indexPath: indexPath,
+                interactionUniqueId: nil,
                 alignment: .top,
-                animated: animated
+                animated: animated,
             )
         } else {
             scrollToLastVisibleInteraction(animated: animated)
@@ -176,12 +175,17 @@ extension ConversationViewController {
 
         // IFF the lastVisibleInteraction is the last non-dynamic interaction in the thread,
         // we want to scroll to the bottom to also show any active typing indicators.
-        if lastVisibleInteraction.sortId == lastSortIdInLoadedWindow,
-           SSKEnvironment.shared.typingIndicatorsRef.typingAddress(forThread: thread) != nil {
+        if
+            lastVisibleInteraction.sortId == lastSortIdInLoadedWindow,
+            SSKEnvironment.shared.typingIndicatorsRef.typingAddress(forThread: thread) != nil
+        {
             return scrollToBottomOfConversation(animated: animated)
         }
 
-        guard let indexPath = indexPath(forInteractionUniqueId: lastVisibleInteraction.uniqueId) else {
+        guard
+            let renderedId = safeUniqueIdForScrolling(interactionUniqueId: lastVisibleInteraction.uniqueId),
+            let indexPath = indexPath(forInteractionUniqueId: renderedId)
+        else {
             owsFailDebug("No index path for interaction, scrolling to bottom")
             scrollToBottomOfConversation(animated: animated)
             return
@@ -189,30 +193,39 @@ extension ConversationViewController {
 
         scrollToInteraction(
             indexPath: indexPath,
+            interactionUniqueId: renderedId,
             onScreenPercentage: CGFloat(lastVisibleInteraction.onScreenPercentage),
             alignment: .bottom,
-            animated: animated
+            animated: animated,
         )
     }
 
-    func scrollToInteraction(uniqueId: String,
-                             onScreenPercentage: CGFloat = 1,
-                             alignment: ScrollAlignment,
-                             animated: Bool) {
+    func scrollToInteraction(
+        uniqueId: String,
+        onScreenPercentage: CGFloat = 1,
+        alignment: ScrollAlignment,
+        animated: Bool,
+    ) {
         guard let indexPath = indexPath(forInteractionUniqueId: uniqueId) else {
             owsFailDebug("No index path for interaction, scrolling to bottom")
             return
         }
-        scrollToInteraction(indexPath: indexPath,
-                            onScreenPercentage: onScreenPercentage,
-                            alignment: alignment,
-                            animated: animated)
+        scrollToInteraction(
+            indexPath: indexPath,
+            interactionUniqueId: uniqueId,
+            onScreenPercentage: onScreenPercentage,
+            alignment: alignment,
+            animated: animated,
+        )
     }
 
-    func scrollToInteraction(indexPath: IndexPath,
-                             onScreenPercentage: CGFloat = 1,
-                             alignment: ScrollAlignment,
-                             animated: Bool = true) {
+    func scrollToInteraction(
+        indexPath: IndexPath,
+        interactionUniqueId: String?,
+        onScreenPercentage: CGFloat = 1,
+        alignment: ScrollAlignment,
+        animated: Bool = true,
+    ) {
         guard !isUserScrolling else { return }
 
         view.layoutIfNeeded()
@@ -220,6 +233,8 @@ extension ConversationViewController {
         guard let attributes = layout.layoutAttributesForItem(at: indexPath) else {
             return owsFailDebug("failed to get attributes for indexPath \(indexPath)")
         }
+
+        viewState.focusedMessageId = interactionUniqueId
 
         let topInset = collectionView.adjustedContentInset.top
         let bottomInset = collectionView.adjustedContentInset.bottom
@@ -237,6 +252,7 @@ extension ConversationViewController {
         // If the collection view contents aren't scrollable, do nothing.
         guard safeContentHeight > collectionViewHeightUnobscuredByBottomBar else {
             performMessageHighlightAnimationIfNeeded()
+            focusVoiceoverElementAfterScroll()
             return
         }
 
@@ -244,6 +260,7 @@ extension ConversationViewController {
         // is only valid for when the view is not on screen, do nothing.
         guard !alignment.scrollsOnlyIfNotEntirelyOnScreen || !rowIsEntirelyOnScreen else {
             performMessageHighlightAnimationIfNeeded()
+            focusVoiceoverElementAfterScroll()
             return
         }
 
@@ -253,6 +270,7 @@ extension ConversationViewController {
             let contentOffset = CGPoint(x: 0, y: bottomDestinationY)
             collectionView.setContentOffset(contentOffset, animated: animated)
             updateLastKnownDistanceFromBottom()
+            focusVoiceoverElementAfterScroll()
             return
         }
 
@@ -297,7 +315,7 @@ extension ConversationViewController {
                     withTimestamp: timestamp,
                     threadId: self.thread.uniqueId,
                     author: quotedReply.originalMessageAuthorAddress,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             }
         } else {
@@ -319,7 +337,7 @@ extension ConversationViewController {
                 let currentEdit = SSKEnvironment.shared.databaseStorageRef.read { transaction in
                     DependenciesBridge.shared.editMessageStore.findMessage(
                         fromEdit: quotedMessage,
-                        tx: transaction
+                        tx: transaction,
                     )
                 }
                 if let currentEdit {
@@ -333,27 +351,50 @@ extension ConversationViewController {
             ensureInteractionLoadedThenScrollToInteraction(
                 targetUniqueId,
                 alignment: .centerIfNotEntirelyOnScreen,
-                isAnimated: isAnimated
+                isAnimated: isAnimated,
             )
         }
     }
 
-    func ensureInteractionLoadedThenScrollToInteraction(_ interactionId: String,
-                                                        onScreenPercentage: CGFloat = 1,
-                                                        alignment: ScrollAlignment,
-                                                        isAnimated: Bool = true) {
+    func ensureInteractionLoadedThenScrollToInteraction(
+        _ interactionId: String,
+        onScreenPercentage: CGFloat = 1,
+        alignment: ScrollAlignment,
+        isAnimated: Bool = true,
+    ) {
         if let indexPath = self.indexPath(forInteractionUniqueId: interactionId) {
             viewState.highlightedMessageId = interactionId
-            scrollToInteraction(indexPath: indexPath,
-                                onScreenPercentage: onScreenPercentage,
-                                alignment: alignment,
-                                animated: isAnimated)
+            scrollToInteraction(
+                indexPath: indexPath,
+                interactionUniqueId: interactionId,
+                onScreenPercentage: onScreenPercentage,
+                alignment: alignment,
+                animated: isAnimated,
+            )
         } else {
-            loadCoordinator.enqueueLoadAndScrollToInteraction(interactionId: interactionId,
-                                                              onScreenPercentage: onScreenPercentage,
-                                                              alignment: alignment,
-                                                              isAnimated: isAnimated)
+            expandCollapseSetContaining(interactionId: interactionId)
+            loadCoordinator.enqueueLoadAndScrollToInteraction(
+                interactionId: interactionId,
+                onScreenPercentage: onScreenPercentage,
+                alignment: alignment,
+                isAnimated: isAnimated,
+            )
         }
+    }
+
+    /// Finds the uniqueId of the rendered item representing the given interaction.
+    /// If the interaction is inside a CollapseSetInteraction, returns the set's uniqueId.
+    private func safeUniqueIdForScrolling(interactionUniqueId: String) -> String? {
+        if indexPath(forInteractionUniqueId: interactionUniqueId) != nil {
+            return interactionUniqueId
+        }
+        return renderState.collapseSetUniqueId(forCollapsedInteractionId: interactionUniqueId)
+    }
+
+    private func expandCollapseSetContaining(interactionId: String) {
+        guard let parentUniqueId = renderState.collapseSetUniqueId(forCollapsedInteractionId: interactionId) else { return }
+        viewState.expandedCollapseSets.insert(parentUniqueId)
+        loadCoordinator.enqueueReload()
     }
 
     func setScrollActionForSizeTransition() {
@@ -370,19 +411,30 @@ extension ConversationViewController {
             }
             // IFF the lastVisibleInteraction is the last non-dynamic interaction in the thread,
             // we want to scroll to the bottom to also show any active typing indicators.
-            if lastVisibleInteraction.sortId == lastSortIdInLoadedWindow,
-               SSKEnvironment.shared.typingIndicatorsRef.typingAddress(forThread: thread) != nil {
+            if
+                lastVisibleInteraction.sortId == lastSortIdInLoadedWindow,
+                SSKEnvironment.shared.typingIndicatorsRef.typingAddress(forThread: thread) != nil
+            {
                 return CVScrollAction(action: .bottomOfLoadWindow, isAnimated: false)
             }
-            if let lastKnownDistanceFromBottom = self.lastKnownDistanceFromBottom,
-               lastKnownDistanceFromBottom < 50 {
+            if
+                let lastKnownDistanceFromBottom = self.lastKnownDistanceFromBottom,
+                lastKnownDistanceFromBottom < 50
+            {
                 return CVScrollAction(action: .bottomOfLoadWindow, isAnimated: false)
             }
 
-            return CVScrollAction(action: .scrollTo(interactionId: lastVisibleInteraction.uniqueId,
-                                                    onScreenPercentage: lastVisibleInteraction.onScreenPercentage,
-                                                    alignment: .bottom),
-                                  isAnimated: false)
+            let renderedId = safeUniqueIdForScrolling(
+                interactionUniqueId: lastVisibleInteraction.uniqueId,
+            ) ?? lastVisibleInteraction.uniqueId
+            return CVScrollAction(
+                action: .scrollTo(
+                    interactionId: renderedId,
+                    onScreenPercentage: lastVisibleInteraction.onScreenPercentage,
+                    alignment: .bottom,
+                ),
+                isAnimated: false,
+            )
         }()
     }
 
@@ -397,7 +449,6 @@ extension ConversationViewController {
         viewState.scrollActionForSizeTransition = nil
     }
 
-    @objc
     func scrollDownButtonTapped() {
         AssertIsOnMainThread()
 
@@ -418,10 +469,13 @@ extension ConversationViewController {
 
             if isScrolledAboveUnreadIndicator {
                 // Only scroll as far as the unread indicator if we're scrolled above the unread indicator.
-                scrollToInteraction(indexPath: indexPathOfUnreadMessagesIndicator,
-                                    onScreenPercentage: 1,
-                                    alignment: .top,
-                                    animated: true)
+                scrollToInteraction(
+                    indexPath: indexPathOfUnreadMessagesIndicator,
+                    interactionUniqueId: nil,
+                    onScreenPercentage: 1,
+                    alignment: .top,
+                    animated: true,
+                )
                 return
             }
         }
@@ -429,21 +483,20 @@ extension ConversationViewController {
         scrollToBottomOfConversation(animated: true)
     }
 
-    public func recordInitialScrollState(_ focusMessageId: String?) {
+    func recordInitialScrollState(_ focusMessageId: String?) {
         initialScrollState = CVInitialScrollState(focusMessageId: focusMessageId)
     }
 
-    public func clearInitialScrollState() {
+    func clearInitialScrollState() {
         initialScrollState = nil
     }
 
-    @objc
     func scrollToNextMentionButtonTapped() {
         if let nextMessageId = conversationViewModel.unreadMentionMessageIds.first {
             ensureInteractionLoadedThenScrollToInteraction(
                 nextMessageId,
                 alignment: .bottomIfNotEntirelyOnScreen,
-                isAnimated: true
+                isAnimated: true,
             )
         }
     }
@@ -483,11 +536,11 @@ extension ConversationViewController {
         safeDistanceFromTop <= tolerancePoints
     }
 
-    public var safeDistanceFromTop: CGFloat {
+    var safeDistanceFromTop: CGFloat {
         collectionView.contentOffset.y - minContentOffsetY
     }
 
-    public var safeDistanceFromBottom: CGFloat {
+    var safeDistanceFromBottom: CGFloat {
         // This is a bit subtle.
         //
         // The _wrong_ way to determine if we're scrolled to the bottom is to
@@ -511,7 +564,7 @@ extension ConversationViewController {
     }
 
     // The highest valid content offset when the view is at rest.
-    internal var maxContentOffsetY: CGFloat {
+    var maxContentOffsetY: CGFloat {
         let contentHeight = self.safeContentHeight
         let adjustedContentInset = collectionView.adjustedContentInset
         let rawValue = contentHeight + adjustedContentInset.bottom - collectionView.bounds.size.height
@@ -523,9 +576,9 @@ extension ConversationViewController {
 
     // We use this hook to ensure scroll state continuity.  As the collection
     // view's content size changes, we want to keep the same cells in view.
-    public func targetContentOffset(
+    func targetContentOffset(
         forProposedContentOffset proposedContentOffset: CGPoint,
-        lastKnownDistanceFromBottom: CGFloat?
+        lastKnownDistanceFromBottom: CGFloat?,
     ) -> CGPoint {
         // TODO: Consider handling these transitions using a scroll
         // continuity token.
@@ -548,8 +601,10 @@ extension ConversationViewController {
     }
 
     var shouldUseDelegateScrollContinuity: Bool {
-        if let scrollAction = viewState.scrollActionForSizeTransition,
-           scrollAction != .none {
+        if
+            let scrollAction = viewState.scrollActionForSizeTransition,
+            scrollAction != .none
+        {
             return true
         }
         if let scrollAction = viewState.scrollActionForUpdate {
@@ -621,13 +676,17 @@ extension ConversationViewController {
             let onScreenAlpha = (1 - onScreenPercentage).clamp01()
             contentOffset.y -= referenceLayoutAttributes.frame.height * onScreenAlpha
 
-            if let lastIndexPath = allIndexPaths.last,
-               let lastLayoutAttributes = layout.layoutAttributesForItem(at: lastIndexPath) {
+            if
+                let lastIndexPath = allIndexPaths.last,
+                let lastLayoutAttributes = layout.layoutAttributesForItem(at: lastIndexPath)
+            {
                 // Only offset if the reference interaction is not last.
                 if lastIndexPath != referenceIndexPath {
                     owsAssertDebug(lastLayoutAttributes.frame.maxY > referenceLayoutAttributes.frame.maxY)
-                    let distanceToLastInteraction = (lastLayoutAttributes.frame.maxY -
-                                                        referenceLayoutAttributes.frame.maxY)
+                    let distanceToLastInteraction = (
+                        lastLayoutAttributes.frame.maxY -
+                            referenceLayoutAttributes.frame.maxY,
+                    )
                     contentOffset.y -= distanceToLastInteraction
                 }
             } else {
@@ -647,19 +706,58 @@ extension ConversationViewController {
     // MARK: -
 
     private struct LastVisibleInteraction {
-        public let interaction: TSInteraction
-        public let onScreenPercentage: CGFloat
+        let interaction: TSInteraction
+        let onScreenPercentage: CGFloat
 
-        public var sortId: UInt64 { interaction.sortId }
-        public var uniqueId: String { interaction.uniqueId }
+        var sortId: UInt64 { interaction.sortId }
+        var uniqueId: String { interaction.uniqueId }
     }
 
-    public static func lastVisibleInteractionId(for thread: TSThread, tx: DBReadTransaction) -> String? {
+    static func lastVisibleInteractionId(for thread: TSThread, tx: DBReadTransaction) -> String? {
         return lastVisibleInteraction(for: thread, tx: tx)?.uniqueId
     }
 
     private func lastVisibleInteractionWithSneakyTransaction() -> LastVisibleInteraction? {
         return SSKEnvironment.shared.databaseStorageRef.read { tx in Self.lastVisibleInteraction(for: thread, tx: tx) }
+    }
+
+    func focusInitialVoiceoverElement() {
+        let focusIndexPath: IndexPath
+        if let _indexPath = indexPathOfUnreadMessagesIndicator {
+            focusIndexPath = _indexPath
+        } else if
+            let lastVisibleInteraction = lastVisibleInteractionWithSneakyTransaction(),
+            let _indexPath = indexPath(forInteractionUniqueId: lastVisibleInteraction.uniqueId)
+        {
+            focusIndexPath = _indexPath
+        } else {
+            return
+        }
+
+        if
+            let cell = self.collectionView.cellForItem(at: focusIndexPath) as? CVCell,
+            let componentView = cell.componentView
+        {
+            UIAccessibility.post(
+                notification: .screenChanged,
+                argument: componentView.rootView,
+            )
+        }
+    }
+
+    func focusVoiceoverElementAfterScroll() {
+        if
+            let scrolledMessageId = viewState.focusedMessageId,
+            let scrolledMessageIndexPath = indexPath(forInteractionUniqueId: scrolledMessageId),
+            let cell = self.collectionView.cellForItem(at: scrolledMessageIndexPath) as? CVCell,
+            let componentView = cell.componentView
+        {
+            UIAccessibility.post(
+                notification: .screenChanged,
+                argument: componentView.rootView,
+            )
+            viewState.focusedMessageId = nil
+        }
     }
 
     private static func lastVisibleInteraction(for thread: TSThread, tx: DBReadTransaction) -> LastVisibleInteraction? {

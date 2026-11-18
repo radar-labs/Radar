@@ -1,0 +1,2384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ACCESSIBILITY_LABEL_LONG_VOICE_MEMO_%d_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@minutes@ ir %2$#@seconds@</string>
+		<key>minutes</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d minutė</string>
+			<key>few</key>
+			<string>%1$d minutės</string>
+			<key>many</key>
+			<string>%1$d minučių</string>
+			<key>other</key>
+			<string>%1$d minučių</string>
+		</dict>
+		<key>seconds</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$d sekundė</string>
+			<key>few</key>
+			<string>%2$d sekundės</string>
+			<key>many</key>
+			<string>%2$d sekundžių</string>
+			<key>other</key>
+			<string>%2$d sekundžių</string>
+		</dict>
+	</dict>
+	<key>ACCESSIBILITY_LABEL_MULTIPLE_ATTACHMENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d medijos įrašas</string>
+			<key>few</key>
+			<string>%1$d medijos įrašai</string>
+			<key>many</key>
+			<string>%1$d medijos įrašo</string>
+			<key>other</key>
+			<string>%1$d medijos įrašų</string>
+		</dict>
+	</dict>
+	<key>ACCESSIBILITY_LABEL_SHORT_VOICE_MEMO_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Balso žinutė %1$d sekundė</string>
+			<key>few</key>
+			<string>Balso žinutė %1$d sekundės</string>
+			<key>many</key>
+			<string>Balso žinutė %1$d sekundės</string>
+			<key>other</key>
+			<string>Balso žinutė %1$d sekundžių</string>
+		</dict>
+	</dict>
+	<key>ADD_GROUP_MEMBERS_ACTION_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Pridėti narį</string>
+			<key>few</key>
+			<string>Pridėti narius</string>
+			<key>many</key>
+			<string>Pridėti narius</string>
+			<key>other</key>
+			<string>Pridėti narius</string>
+		</dict>
+	</dict>
+	<key>ADD_GROUP_MEMBERS_VIEW_CONFIRM_ALERT_MESSAGE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Pridėti narį į „%2$@“?</string>
+			<key>few</key>
+			<string>Pridėti %1$d narius į „%2$@“?</string>
+			<key>many</key>
+			<string>Pridėti %1$d nario į „%2$@“?</string>
+			<key>other</key>
+			<string>Pridėti %1$d narių į „%2$@“?</string>
+		</dict>
+	</dict>
+	<key>ADD_GROUP_MEMBERS_VIEW_CONFIRM_ALERT_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Pridėti naują narį</string>
+			<key>few</key>
+			<string>Pridėti naujus narius</string>
+			<key>many</key>
+			<string>Pridėti naujo nario</string>
+			<key>other</key>
+			<string>Pridėti naujų narių</string>
+		</dict>
+	</dict>
+	<key>BACKUP_SETTINGS_BACKUP_PLAN_FREE_HEADER_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Žinučių ir %1$d dienos įrašų atsarginė kopija</string>
+			<key>few</key>
+			<string>Žinučių ir %1$d dienų įrašų atsarginė kopija</string>
+			<key>many</key>
+			<string>Žinučių ir %1$d dienos įrašų atsarginė kopija</string>
+			<key>other</key>
+			<string>Žinučių ir %1$d dienų įrašų atsarginė kopija</string>
+		</dict>
+	</dict>
+	<key>CALLS_TAB_DELETE_MULTIPLE_TITLE</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Ištrinti %1$ld skambutį?</string>
+			<key>few</key>
+			<string>Ištrinti %1$ld skambučius?</string>
+			<key>many</key>
+			<string>Ištrinti %1$ld skambučio?</string>
+			<key>other</key>
+			<string>Ištrinti %1$ld skambučių?</string>
+		</dict>
+	</dict>
+	<key>CALL_LINK_APPROVE_ALL_REQUESTS_CONFIRMATION_BODY_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld asmuo bus pridėtas prie skambučio.</string>
+			<key>few</key>
+			<string>%1$ld asmenys bus pridėti prie skambučio.</string>
+			<key>many</key>
+			<string>%1$ld asmens bus pridėta prie skambučio.</string>
+			<key>other</key>
+			<string>%1$ld asmenų bus pridėta prie skambučio.</string>
+		</dict>
+	</dict>
+	<key>CALL_LINK_APPROVE_ALL_REQUESTS_CONFIRMATION_TITLE_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>Patvirtinti %1$ld prašymą?</string>
+			<key>few</key>
+			<string>Patvirtinti %1$ld prašymus?</string>
+			<key>many</key>
+			<string>Patvirtinti %1$ld prašymo?</string>
+			<key>other</key>
+			<string>Patvirtinti %1$ld prašymų?</string>
+		</dict>
+	</dict>
+	<key>CALL_LINK_DENY_ALL_REQUESTS_CONFIRMATION_BODY_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld asmuo nebus pridėtas prie skambučio.</string>
+			<key>few</key>
+			<string>%1$ld asmenys nebus pridėti prie skambučio.</string>
+			<key>many</key>
+			<string>%1$ld asmens nebus pridėta prie skambučio.</string>
+			<key>other</key>
+			<string>%1$ld asmenų nebus pridėta prie skambučio.</string>
+		</dict>
+	</dict>
+	<key>CALL_LINK_DENY_ALL_REQUESTS_CONFIRMATION_TITLE_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>Atmesti %1$ld prašymą?</string>
+			<key>few</key>
+			<string>Atmesti %1$ld prašymus?</string>
+			<key>many</key>
+			<string>Atmesti %1$ld prašymo?</string>
+			<key>other</key>
+			<string>Atmesti %1$ld prašymų?</string>
+		</dict>
+	</dict>
+	<key>CALL_LINK_JOIN_REQUEST_AMOUNT_MORE_BUTTON_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>+%1$ld prašymas</string>
+			<key>few</key>
+			<string>+%1$ld prašymai</string>
+			<key>many</key>
+			<string>+%1$ld prašymo</string>
+			<key>other</key>
+			<string>+%1$ld prašymų</string>
+		</dict>
+	</dict>
+	<key>CALL_LINK_MULTI_SUCCESS</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Ištrintas %1$ld skambučio žurnalas.</string>
+			<key>few</key>
+			<string>Ištrinti %1$ld skambučių žurnalai.</string>
+			<key>many</key>
+			<string>Ištrinta %1$ld skambučio žurnalo.</string>
+			<key>other</key>
+			<string>Ištrinta %1$ld skambučių žurnalų.</string>
+		</dict>
+	</dict>
+	<key>CALL_LINK_REQUEST_HEADER_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Laukia %1$ld asmuo</string>
+			<key>few</key>
+			<string>Laukia %1$ld asmenys</string>
+			<key>many</key>
+			<string>Laukia %1$ld asmens</string>
+			<key>other</key>
+			<string>Laukia %1$ld asmenų</string>
+		</dict>
+	</dict>
+	<key>CALL_PEOPLE_HERE</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld žmogus</string>
+			<key>few</key>
+			<string>%1$ld žmonės</string>
+			<key>many</key>
+			<string>%1$ld žmonių</string>
+			<key>other</key>
+			<string>%1$ld žmogus</string>
+		</dict>
+	</dict>
+	<key>CALL_PEOPLE_WAITING</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>Laukia %1$ld asmuo</string>
+			<key>few</key>
+			<string>Laukia %1$ld asmenys</string>
+			<key>many</key>
+			<string>Laukia %1$ld asmens</string>
+			<key>other</key>
+			<string>Laukia %1$ld asmenų</string>
+		</dict>
+	</dict>
+	<key>CAMERA_VO_N_ITEMS</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d elementas</string>
+			<key>few</key>
+			<string>%1$d elementai</string>
+			<key>many</key>
+			<string>%1$d elementų</string>
+			<key>other</key>
+			<string>%1$d elementas</string>
+		</dict>
+	</dict>
+	<key>CHAT_COLOR_SETTINGS_DELETE_ALERT_MESSAGE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Ši tinkinta spalva yra naudojama %1$d pokalbyje. Ar nori ją ištrinti visuose pokalbiuose?</string>
+			<key>few</key>
+			<string>Ši tinkinta spalva yra naudojama %1$d pokalbiuose. Ar nori ją ištrinti visuose pokalbiuose?</string>
+			<key>many</key>
+			<string>Ši tinkinta spalva yra naudojama %1$d pokalbio. Ar nori ją ištrinti visuose pokalbiuose?</string>
+			<key>other</key>
+			<string>Ši tinkinta spalva yra naudojama %1$d pokalbių. Ar nori ją ištrinti visuose pokalbiuose?</string>
+		</dict>
+	</dict>
+	<key>CHAT_COLOR_SETTINGS_UPDATE_ALERT_MESSAGE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Ši spalva yra naudojama %1$d pokalbyje. Ar norite įrašyti pakeitimus visuose pokalbiuose?</string>
+			<key>few</key>
+			<string>Ši spalva yra naudojama %1$d pokalbiuose. Ar norite įrašyti pakeitimus visuose pokalbiuose?</string>
+			<key>many</key>
+			<string>Ši spalva yra naudojama %1$d pokalbių. Ar norite įrašyti pakeitimus visuose pokalbiuose?</string>
+			<key>other</key>
+			<string>Ši spalva yra naudojama %1$d pokalbyje. Ar norite įrašyti pakeitimus visuose pokalbiuose?</string>
+		</dict>
+	</dict>
+	<key>CHOOSE_BACKUP_PLAN_BULLET_RECENT_MEDIA_BACKUP_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Paskutinė %1$d diena įrašų</string>
+			<key>few</key>
+			<string>Paskutinės %1$d dienos įrašų</string>
+			<key>many</key>
+			<string>Paskutinės %1$d dienos įrašų</string>
+			<key>other</key>
+			<string>Paskutinės %1$d dienų įrašų</string>
+		</dict>
+	</dict>
+	<key>CHOOSE_BACKUP_PLAN_DOWNGRADE_CONFIRMATION_ACTION_SHEET_MESSAGE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Jei pakeisite planą, į atsarginę kopiją bus įtrauktos visos jūsų tekstinės žinutės ir pastarosios %1$d dienos įrašai.</string>
+			<key>few</key>
+			<string>Jei pakeisite planą, į atsarginę kopiją bus įtrauktos visos jūsų tekstinės žinutės ir pastarųjų %1$d dienų įrašai.</string>
+			<key>many</key>
+			<string>Jei pakeisite planą, į atsarginę kopiją bus įtrauktos visos jūsų tekstinės žinutės ir pastarosios %1$d dienos įrašai.</string>
+			<key>other</key>
+			<string>Jei pakeisite planą, į atsarginę kopiją bus įtrauktos visos jūsų tekstinės žinutės ir pastarųjų %1$d dienų įrašai.</string>
+		</dict>
+	</dict>
+	<key>CHOOSE_BACKUP_PLAN_FREE_PLAN_SUBTITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Žinutės + %1$d diena įrašų</string>
+			<key>few</key>
+			<string>Žinutės + %1$d dienos įrašų</string>
+			<key>many</key>
+			<string>Žinutės + %1$d dienos įrašų</string>
+			<key>other</key>
+			<string>Žinutės + %1$d dienų įrašų</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_CALL_EVENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld skambutis</string>
+			<key>few</key>
+			<string>%1$ld skambučiai</string>
+			<key>many</key>
+			<string>%1$ld skambučio</string>
+			<key>other</key>
+			<string>%1$ld skambučių</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_CHAT_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld pokalbio atnaujinimas</string>
+			<key>few</key>
+			<string>%1$ld pokalbio atnaujinimai</string>
+			<key>many</key>
+			<string>%1$ld pokalbio atnaujinimo</string>
+			<key>other</key>
+			<string>%1$ld pokalbio atnaujinimų</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_GROUP_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld grupės atnaujinimas</string>
+			<key>few</key>
+			<string>%1$ld grupės atnaujinimai</string>
+			<key>many</key>
+			<string>%1$ld grupės atnaujinimo</string>
+			<key>other</key>
+			<string>%1$ld grupės atnaujinimų</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_TIMER_CHANGES_WITH_FINAL_TIMER_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld išnykstančių žinučių laikmačio pakeitimas · %2$@</string>
+			<key>few</key>
+			<string>%1$ld išnykstančių žinučių laikmačio pakeitimai · %2$@</string>
+			<key>many</key>
+			<string>%1$ld išnykstančių žinučių laikmačio pakeitimo · %2$@</string>
+			<key>other</key>
+			<string>%1$ld išnykstančių žinučių laikmačio pakeitimų · %2$@</string>
+		</dict>
+	</dict>
+	<key>CONVERSATION_DELETE_CONFIRMATIONS_ALERT_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Ištrinti pokalbį?</string>
+			<key>few</key>
+			<string>Ištrinti %1$d pokalbius?</string>
+			<key>many</key>
+			<string>Ištrinti %1$d pokalbio?</string>
+			<key>other</key>
+			<string>Ištrinti %1$d pokalbių?</string>
+		</dict>
+	</dict>
+	<key>CONVERSATION_DELETE_CONFIRMATION_ALERT_MESSAGES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Šis pokalbis bus ištrintas iš visų jūsų įrenginių.</string>
+			<key>few</key>
+			<string>Šie pokalbiai bus ištrinti iš visų jūsų įrenginių.</string>
+			<key>many</key>
+			<string>Šie pokalbiai bus ištrinti iš visų jūsų įrenginių.</string>
+			<key>other</key>
+			<string>Šie pokalbiai bus ištrinti iš visų jūsų įrenginių.</string>
+		</dict>
+	</dict>
+	<key>CONVERSATION_PICKER_CAN_SELECT_NO_MORE_CONVERSATIONS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Negalite pasirinkti daugiau kaip %1$d pokalbio.</string>
+			<key>few</key>
+			<string>Negalite pasirinkti daugiau kaip %1$d pokalbių.</string>
+			<key>many</key>
+			<string>Negalite pasirinkti daugiau kaip %1$d pokalbio.</string>
+			<key>other</key>
+			<string>Negalite pasirinkti daugiau kaip %1$d pokalbių.</string>
+		</dict>
+	</dict>
+	<key>CONVERSATION_SEARCH_RESULTS_%d_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@position@</string>
+		<key>position</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d %2$#@total@</string>
+			<key>few</key>
+			<string>%1$d %2$#@total@</string>
+			<key>many</key>
+			<string>%1$d %2$#@total@</string>
+			<key>other</key>
+			<string>%1$d %2$#@total@</string>
+		</dict>
+		<key>total</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>atitiktis</string>
+			<key>few</key>
+			<string>iš %2$d atitikčių</string>
+			<key>many</key>
+			<string>iš %2$d atitikties</string>
+			<key>other</key>
+			<string>iš %2$d atitikčių</string>
+		</dict>
+	</dict>
+	<key>CONVERSATION_SETTINGS_FORMER_MEMBERS_SECTION_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d ankstesnis narys</string>
+			<key>few</key>
+			<string>%1$d ankstesni nariai</string>
+			<key>many</key>
+			<string>%1$d ankstesnio nario</string>
+			<key>other</key>
+			<string>%1$d ankstesnių narių</string>
+		</dict>
+	</dict>
+	<key>CONVERSATION_SETTINGS_MEMBERS_SECTION_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d narys</string>
+			<key>few</key>
+			<string>%1$d nariai</string>
+			<key>many</key>
+			<string>%1$d nario</string>
+			<key>other</key>
+			<string>%1$d narių</string>
+		</dict>
+	</dict>
+	<key>CONVERSATION_SETTINGS_MUTUAL_GROUPS_SECTION_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d bendra grupė</string>
+			<key>few</key>
+			<string>%1$d bendros grupės</string>
+			<key>many</key>
+			<string>%1$d bendrų grupių</string>
+			<key>other</key>
+			<string>%1$d bendra grupė</string>
+		</dict>
+	</dict>
+	<key>DATE_MINUTES_AGO_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d min.</string>
+			<key>few</key>
+			<string>%1$d min.</string>
+			<key>many</key>
+			<string>%1$d min.</string>
+			<key>other</key>
+			<string>%1$d min.</string>
+		</dict>
+	</dict>
+	<key>DATE_MINUTES_AGO_LONG_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>prieš %1$d min.</string>
+			<key>few</key>
+			<string>prieš %1$d min.</string>
+			<key>many</key>
+			<string>prieš %1$d min.</string>
+			<key>other</key>
+			<string>prieš %1$d min.</string>
+		</dict>
+	</dict>
+	<key>DELETE_SELECTED_MESSAGES_IN_CONVERSATION_ALERT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Ištrinti %1$d žinutę?</string>
+			<key>few</key>
+			<string>Ištrinti %1$d žinutes?</string>
+			<key>many</key>
+			<string>Ištrinti %1$d žinutės?</string>
+			<key>other</key>
+			<string>Ištrinti %1$d žinučių?</string>
+		</dict>
+	</dict>
+	<key>EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER_GROUP_FULL_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Pasiektas didžiausias grupės dydis (%1$d narys).</string>
+			<key>few</key>
+			<string>Pasiektas didžiausias grupės dydis (%1$d nariai).</string>
+			<key>many</key>
+			<string>Pasiektas didžiausias grupės dydis (%1$d nario).</string>
+			<key>other</key>
+			<string>Pasiektas didžiausias grupės dydis (%1$d narių).</string>
+		</dict>
+	</dict>
+	<key>EDIT_MESSAGE_SEND_TOO_MANY_EDITS_ERROR</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Šiai žinutei galima atlikti tik %1$d pakeitimą.</string>
+			<key>few</key>
+			<string>Šiai žinutei galima atlikti tik %1$d pakeitimus.</string>
+			<key>many</key>
+			<string>Šiai žinutei galima atlikti tik %1$d pakeitimo.</string>
+			<key>other</key>
+			<string>Šiai žinutei galima atlikti tik %1$d pakeitimų.</string>
+		</dict>
+	</dict>
+	<key>GROUPS_TOO_MANY_MEMBERS_ALERT_MESSAGE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>„Radar“ grupės geriausiai veikia, kai jose yra %1$d ar mažiau narių. Pridėjus daugiau narių, žinučių išsiuntimas ir gavimas bus uždelsiamas.</string>
+			<key>few</key>
+			<string>„Radar“ grupės geriausiai veikia, kai jose yra %1$d ar mažiau narių. Pridėjus daugiau narių, žinučių išsiuntimas ir gavimas bus uždelsiamas.</string>
+			<key>many</key>
+			<string>„Radar“ grupės geriausiai veikia, kai jose yra %1$d ar mažiau narių. Pridėjus daugiau narių, žinučių išsiuntimas ir gavimas bus uždelsiamas.</string>
+			<key>other</key>
+			<string>„Radar“ grupės geriausiai veikia, kai jose yra %1$d ar mažiau narių. Pridėjus daugiau narių, žinučių išsiuntimas ir gavimas bus uždelsiamas.</string>
+		</dict>
+	</dict>
+	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Šiame skambutyje yra pasiektas didžiausias %1$d dalyvio skaičius. Vėliau bandykite dar kartą.</string>
+			<key>few</key>
+			<string>Šiame skambutyje yra pasiektas didžiausias %1$d dalyvių skaičius. Vėliau bandykite dar kartą.</string>
+			<key>many</key>
+			<string>Šiame skambutyje yra pasiektas didžiausias %1$d dalyvio skaičius. Vėliau bandykite dar kartą.</string>
+			<key>other</key>
+			<string>Šiame skambutyje yra pasiektas didžiausias %1$d dalyvių skaičius. Vėliau bandykite dar kartą.</string>
+		</dict>
+	</dict>
+	<key>GROUP_CALL_IS_RINGING_MANY_PEOPLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Skambinama naudotojams %2$@, %3$@ ir dar %1$d žmogui…</string>
+			<key>few</key>
+			<string>Skambinama naudotojams %2$@, %3$@ ir dar %1$d žmonėms…</string>
+			<key>many</key>
+			<string>Skambinama naudotojams %2$@, %3$@ ir dar %1$d žmonių…</string>
+			<key>other</key>
+			<string>Skambinama naudotojams %2$@, %3$@ ir dar %1$d žmonių…</string>
+		</dict>
+	</dict>
+	<key>GROUP_CALL_MANY_OTHERS_HERE</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld asmuo dalyvauja šiame skambutyje</string>
+			<key>few</key>
+			<string>%1$ld asmenys dalyvauja šiame skambutyje</string>
+			<key>many</key>
+			<string>%1$ld asmenų dalyvauja šiame skambutyje</string>
+			<key>other</key>
+			<string>%1$ld asmenų dalyvauja šiame skambutyje</string>
+		</dict>
+	</dict>
+	<key>GROUP_CALL_MANY_PEOPLE_HERE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Šiame skambutyje yra %2$@, %3$@ ir dar %1$d žmogus</string>
+			<key>few</key>
+			<string>Šiame skambutyje yra %2$@, %3$@ ir dar %1$d žmonės</string>
+			<key>many</key>
+			<string>Šiame skambutyje yra %2$@, %3$@ ir dar %1$d žmonių</string>
+			<key>other</key>
+			<string>Šiame skambutyje yra %2$@, %3$@ ir dar %1$d žmogus</string>
+		</dict>
+	</dict>
+	<key>GROUP_CALL_MEMBER_LIST_UNKNOWN_MEMBERS_ROW_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>Ir dar %1$ld</string>
+			<key>few</key>
+			<string>Ir dar %1$ld</string>
+			<key>many</key>
+			<string>Ir dar %1$ld</string>
+			<key>other</key>
+			<string>Ir dar %1$ld</string>
+		</dict>
+	</dict>
+	<key>GROUP_CALL_NOTIFICATION_MANY_JOINED_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Prie skambučio prisijungė %2$@, %3$@ ir dar %1$d žmogus</string>
+			<key>few</key>
+			<string>Prie skambučio prisijungė %2$@, %3$@ ir dar %1$d žmonės</string>
+			<key>many</key>
+			<string>Prie skambučio prisijungė %2$@, %3$@ ir dar %1$d žmonių</string>
+			<key>other</key>
+			<string>Prie skambučio prisijungė %2$@, %3$@ ir dar %1$d žmonių</string>
+		</dict>
+	</dict>
+	<key>GROUP_CALL_NOTIFICATION_MANY_LEFT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@, %3$@ ir dar %1$d žmogus išėjo iš skambučio</string>
+			<key>few</key>
+			<string>%2$@, %3$@ ir dar %1$d žmonės išėjo iš skambučio</string>
+			<key>many</key>
+			<string>%2$@, %3$@ ir dar %1$d žmonių išėjo iš skambučio</string>
+			<key>other</key>
+			<string>%2$@, %3$@ ir dar %1$d žmonių išėjo iš skambučio</string>
+		</dict>
+	</dict>
+	<key>GROUP_CALL_ONE_KNOWN_AND_MANY_OTHERS_HERE</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>Šiame skambutyje yra %2$@ ir dar %1$ld žmogus</string>
+			<key>few</key>
+			<string>Šiame skambutyje yra %2$@ ir dar %1$ld žmonės</string>
+			<key>many</key>
+			<string>Šiame skambutyje yra %2$@ ir dar %1$ld žmogaus</string>
+			<key>other</key>
+			<string>Šiame skambutyje yra %2$@ ir dar %1$ld žmonių</string>
+		</dict>
+	</dict>
+	<key>GROUP_CALL_WILL_NOTIFY_MANY_PEOPLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@, %3$@ ir dar %1$d žmogus gaus pranešimą</string>
+			<key>few</key>
+			<string>%2$@, %3$@ ir dar %1$d žmonės gaus pranešimą</string>
+			<key>many</key>
+			<string>%2$@, %3$@ ir dar %1$d žmonių gaus pranešimą</string>
+			<key>other</key>
+			<string>%2$@, %3$@ ir dar %1$d žmogus gaus pranešimą</string>
+		</dict>
+	</dict>
+	<key>GROUP_CALL_WILL_RING_MANY_PEOPLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Radar skambins naudotojams %2$@, %3$@ ir dar %1$d žmogui</string>
+			<key>few</key>
+			<string>Radar skambins naudotojams %2$@, %3$@ ir dar %1$d žmonėms</string>
+			<key>many</key>
+			<string>Radar skambins naudotojams %2$@, %3$@ ir dar %1$d žmonių</string>
+			<key>other</key>
+			<string>Radar skambins naudotojams %2$@, %3$@ ir dar %1$d žmogui</string>
+		</dict>
+	</dict>
+	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Pakvietimas išsiųstas</string>
+			<key>few</key>
+			<string>Išsiųsti %1$d pakvietimai</string>
+			<key>many</key>
+			<string>Išsiųsta %1$d pakvietimo</string>
+			<key>other</key>
+			<string>Išsiųsta %1$d pakvietimų</string>
+		</dict>
+	</dict>
+	<key>GROUP_MEMBERSHIP_COLLISIONS_BANNER_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d grupės narys turi tokį patį vardą.</string>
+			<key>few</key>
+			<string>%1$d grupės nariai turi tokį patį vardą.</string>
+			<key>many</key>
+			<string>%1$d grupės nario turi tokį patį vardą.</string>
+			<key>other</key>
+			<string>%1$d grupės narių turi tokį patį vardą.</string>
+		</dict>
+	</dict>
+	<key>GROUP_MEMBERSHIP_MULTIPLE_COLLISIONS_BANNER_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Šioje grupėje aptiktas %1$d vardų konfliktas.</string>
+			<key>few</key>
+			<string>Šioje grupėje aptikti %1$d vardų konfliktai.</string>
+			<key>many</key>
+			<string>Šioje grupėje aptikta %1$d vardo konflikto.</string>
+			<key>other</key>
+			<string>Šioje grupėje aptikta %1$d vardų konfliktų.</string>
+		</dict>
+	</dict>
+	<key>GROUP_MEMBERSHIP_NAME_COLLISION_MEMBER_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d narys</string>
+			<key>few</key>
+			<string>%1$d nariai</string>
+			<key>many</key>
+			<string>%1$d nario</string>
+			<key>other</key>
+			<string>%1$d narių</string>
+		</dict>
+	</dict>
+	<key>GROUP_MEMBERSHIP_NAME_MULTIPLE_COLLISION_HEADER_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Šioje grupėje aptiktas %1$d vardų konfliktas. Peržiūrėk toliau esančius narius arba imkis veiksmų.</string>
+			<key>few</key>
+			<string>Šioje grupėje aptikti %1$d vardų konfliktai. Peržiūrėk toliau esančius narius arba imkis veiksmų.</string>
+			<key>many</key>
+			<string>Šioje grupėje aptikta %1$d vardų konflikto. Peržiūrėk toliau esančius narius arba imkis veiksmų.</string>
+			<key>other</key>
+			<string>Šioje grupėje aptikta %1$d vardų konfliktų. Peržiūrėk toliau esančius narius arba imkis veiksmų.</string>
+		</dict>
+	</dict>
+	<key>GROUP_MEMBERSHIP_NAME_SINGLE_COLLISION_HEADER_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d grupės narys turi tokį patį vardą. Peržiūrėkite narį toliau arba imkitės veiksmų.</string>
+			<key>few</key>
+			<string>%1$d grupės nariai turi tokį patį vardą. Peržiūrėkite narius toliau arba imkitės veiksmų.</string>
+			<key>many</key>
+			<string>%1$d grupės nario turi tokį patį vardą. Peržiūrėkite narius toliau arba imkitės veiksmų.</string>
+			<key>other</key>
+			<string>%1$d grupės narių turi tokį patį vardą. Peržiūrėkite narius toliau arba imkitės veiksmų.</string>
+		</dict>
+	</dict>
+	<key>GROUP_MEMBER_COUNT_LABEL_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d narys</string>
+			<key>few</key>
+			<string>%1$d nariai</string>
+			<key>many</key>
+			<string>%1$d nario</string>
+			<key>other</key>
+			<string>%1$d narių</string>
+		</dict>
+	</dict>
+	<key>GROUP_MEMBER_COUNT_WITHOUT_LIMIT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d narys</string>
+			<key>few</key>
+			<string>%1$d nariai</string>
+			<key>many</key>
+			<string>%1$d nario</string>
+			<key>other</key>
+			<string>%1$d narių</string>
+		</dict>
+	</dict>
+	<key>GROUP_REMOTE_USER_INVITED_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Į grupę buvo pakviestas 1 žmogus.</string>
+			<key>few</key>
+			<string>Į grupę buvo pakviesti %1$d žmonės.</string>
+			<key>many</key>
+			<string>Į grupę buvo pakviesta %1$d žmog.</string>
+			<key>other</key>
+			<string>Į grupę buvo pakviesta %1$d žmonių.</string>
+		</dict>
+	</dict>
+	<key>GROUP_REMOTE_USER_INVITED_BY_REMOTE_USER_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ pakvietė 1 žmogų į grupę.</string>
+			<key>few</key>
+			<string>%2$@ pakvietė %1$d žmones į grupę.</string>
+			<key>many</key>
+			<string>%2$@ pakvietė %1$d žmog. į grupę.</string>
+			<key>other</key>
+			<string>%2$@ pakvietė %1$d žmonių į grupę.</string>
+		</dict>
+	</dict>
+	<key>GROUP_REMOTE_USER_INVITE_REVOKED_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Atšauktas %1$d pakvietimas į grupę.</string>
+			<key>few</key>
+			<string>Atšaukti %1$d pakvietimai į grupę.</string>
+			<key>many</key>
+			<string>Atšaukta %1$d pakvietimų į grupę.</string>
+			<key>other</key>
+			<string>Atšaukta %1$d pakvietimų į grupę.</string>
+		</dict>
+	</dict>
+	<key>GROUP_REMOTE_USER_INVITE_REVOKED_BY_REMOTE_USER_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ panaikino %1$d žmogui pakvietimą prisijungti prie grupės.</string>
+			<key>few</key>
+			<string>%2$@ panaikino %1$d žmonėms pakvietimus prisijungti prie grupės.</string>
+			<key>many</key>
+			<string>%2$@ panaikino %1$d žmonėms pakvietimus prisijungti prie grupės.</string>
+			<key>other</key>
+			<string>%2$@ panaikino %1$d žmonių pakvietimus prisijungti prie grupės.</string>
+		</dict>
+	</dict>
+	<key>GROUP_REMOTE_USER_REQUESTED_TO_JOIN_THE_GROUP_AND_CANCELED_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ paprašė ir atšaukė savo prašymą prisijungti per grupės nuorodą.</string>
+			<key>few</key>
+			<string>%2$@ paprašė ir atšaukė %1$d prašymus prisijungti per grupės nuorodą.</string>
+			<key>many</key>
+			<string>%2$@ paprašė ir atšaukė %1$d prašymo prisijungti per grupės nuorodą.</string>
+			<key>other</key>
+			<string>%2$@ paprašė ir atšaukė %1$d prašymų prisijungti per grupės nuorodą.</string>
+		</dict>
+	</dict>
+	<key>GROUP_STORY_VIEWERS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Grupės istorija · žiūrovų: %1$d</string>
+			<key>few</key>
+			<string>Grupės istorija · žiūrovų: %1$d</string>
+			<key>many</key>
+			<string>Grupės istorija · žiūrovų: %1$d</string>
+			<key>other</key>
+			<string>Grupės istorija · žiūrovų: %1$d</string>
+		</dict>
+	</dict>
+	<key>GROUP_WAS_MIGRATED_USERS_DROPPED_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Nario nepavyko pridėti į naująją grupę, jis pašalintas.</string>
+			<key>few</key>
+			<string>%1$d narių nepavyko pridėti į naująją grupę, jie pašalinti.</string>
+			<key>many</key>
+			<string>%1$d nario nepavyko pridėti į naująją grupę, jie pašalinti.</string>
+			<key>other</key>
+			<string>%1$d narių nepavyko pridėti į naująją grupę, jie pašalinti.</string>
+		</dict>
+	</dict>
+	<key>GROUP_WAS_MIGRATED_USERS_INVITED_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Nario nepavyko pridėti į naująją grupę, jis pakviestas prisijungti.</string>
+			<key>few</key>
+			<string>%1$d narių nepavyko pridėti į naująją grupę, jie pakviesti prisijungti.</string>
+			<key>many</key>
+			<string>%1$d nario nepavyko pridėti į naująją grupę, jie pakviesti prisijungti.</string>
+			<key>other</key>
+			<string>%1$d narių nepavyko pridėti į naująją grupę, jie pakviesti prisijungti.</string>
+		</dict>
+	</dict>
+	<key>IMAGE_PICKER_CAN_SELECT_NO_MORE_TOAST_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Jūs negalite bendrinti daugiau nei %1$d elementą.</string>
+			<key>few</key>
+			<string>Jūs negalite bendrinti daugiau nei %1$d elementus.</string>
+			<key>many</key>
+			<string>Jūs negalite bendrinti daugiau nei %1$d elemento.</string>
+			<key>other</key>
+			<string>Jūs negalite bendrinti daugiau nei %1$d elementų.</string>
+		</dict>
+	</dict>
+	<key>INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_BODY_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Kad „%2$@“ liktų susietas, atidarykite „Radar“ tame įrenginyje per %1$d d.</string>
+			<key>few</key>
+			<string>Kad „%2$@“ liktų susietas, atidarykite „Radar“ tame įrenginyje per %1$d d.</string>
+			<key>many</key>
+			<string>Kad „%2$@“ liktų susietas, atidarykite „Radar“ tame įrenginyje per %1$d d.</string>
+			<key>other</key>
+			<string>Kad „%2$@“ liktų susietas, atidarykite „Radar“ tame įrenginyje per %1$d d.</string>
+		</dict>
+	</dict>
+	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Perkelkite tekstines žinutes ir pastarosios %1$d dienos įrašus</string>
+			<key>few</key>
+			<string>Perkelkite tekstines žinutes ir pastarųjų %1$d dienų įrašus</string>
+			<key>many</key>
+			<string>Perkelkite tekstines žinutes ir pastarosios %1$d dienos įrašus</string>
+			<key>other</key>
+			<string>Perkelkite tekstines žinutes ir pastarųjų %1$d dienų įrašus</string>
+		</dict>
+	</dict>
+	<key>MANY_GROUPS_IN_COMMON_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d bendra grupė</string>
+			<key>few</key>
+			<string>%1$d bendros grupės</string>
+			<key>many</key>
+			<string>%1$d bendrų grupių</string>
+			<key>other</key>
+			<string>%1$d bendra grupė</string>
+		</dict>
+	</dict>
+	<key>MEDIA_GALLERY_DELETE_MEDIA_TITLE</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Ištrinti %1$d elementą?</string>
+			<key>few</key>
+			<string>Ištrinti %1$d elementus?</string>
+			<key>many</key>
+			<string>Ištrinti %1$d elemento?</string>
+			<key>other</key>
+			<string>Ištrinti %1$d elementų?</string>
+		</dict>
+	</dict>
+	<key>MEDIA_GALLERY_DELETE_MEDIA_TOAST</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Ištrintas vienas elementas</string>
+			<key>few</key>
+			<string>Ištrinti %1$d elementai</string>
+			<key>many</key>
+			<string>Ištrinta %1$d elemento</string>
+			<key>other</key>
+			<string>Ištrinta %1$d elementų</string>
+		</dict>
+	</dict>
+	<key>MEDIA_GALLERY_ITEM_IMAGE_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d nuotrauka</string>
+			<key>few</key>
+			<string>%1$d nuotraukos</string>
+			<key>many</key>
+			<string>%1$d nuotraukos</string>
+			<key>other</key>
+			<string>%1$d nuotraukų</string>
+		</dict>
+	</dict>
+	<key>MEDIA_GALLERY_ITEM_MIXED_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d elementas</string>
+			<key>few</key>
+			<string>%1$d elementai</string>
+			<key>many</key>
+			<string>%1$d elementų</string>
+			<key>other</key>
+			<string>%1$d elementas</string>
+		</dict>
+	</dict>
+	<key>MEDIA_PAGE_FORWARD_MEDIA_CONFIRM_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Persiųsti %1$d</string>
+			<key>few</key>
+			<string>Persiųsti %1$d</string>
+			<key>many</key>
+			<string>Persiųsti %1$d</string>
+			<key>other</key>
+			<string>Persiųsti %1$d</string>
+		</dict>
+	</dict>
+	<key>MESSAGE_ACTIONS_TOOLBAR_CAPTION_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@caption@</string>
+		<key>caption</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Pažymėta: %1$d</string>
+			<key>few</key>
+			<string>Pažymėta: %1$d</string>
+			<key>many</key>
+			<string>Pažymėta: %1$d</string>
+			<key>other</key>
+			<string>Pažymėta: %1$d</string>
+		</dict>
+	</dict>
+	<key>MESSAGE_REACTIONS_ACCESSIBILITY_LABEL_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d reakcija su %2$@.</string>
+			<key>few</key>
+			<string>%1$d reakcijos su %2$@.</string>
+			<key>many</key>
+			<string>%1$d reakcijos su %2$@.</string>
+			<key>other</key>
+			<string>%1$d reakcijų su %2$@.</string>
+		</dict>
+	</dict>
+	<key>MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_EXCEPT_SUBTITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>1 neitrauktas</string>
+			<key>few</key>
+			<string>%1$d neįtraukti</string>
+			<key>many</key>
+			<string>%1$d neitraukto</string>
+			<key>other</key>
+			<string>%1$d neįtrauktų</string>
+		</dict>
+	</dict>
+	<key>MY_STORIES_SETTINGS_VISIBILITY_ALL_SIGNAL_CONNECTIONS_SUBTITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d žiūrovas</string>
+			<key>few</key>
+			<string>%1$d žiūrovai</string>
+			<key>many</key>
+			<string>%1$d žiūrovų</string>
+			<key>other</key>
+			<string>%1$d žiūrovas</string>
+		</dict>
+	</dict>
+	<key>MY_STORIES_SETTINGS_VISIBILITY_ONLY_SHARE_WITH_SUBTITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d žiūrovas</string>
+			<key>few</key>
+			<string>%1$d žiūrovai</string>
+			<key>many</key>
+			<string>%1$d žiūrovų</string>
+			<key>other</key>
+			<string>%1$d žiūrovas</string>
+		</dict>
+	</dict>
+	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Visi „Radar“ kontaktai · 1 žiūrovas</string>
+			<key>few</key>
+			<string>Visi „Radar“ kontaktai · %1$d žiūrovai</string>
+			<key>many</key>
+			<string>Visi „Radar“ kontaktai · %1$d žiūrovo</string>
+			<key>other</key>
+			<string>Visi „Radar“ kontaktai · %1$d žiūrovų</string>
+		</dict>
+	</dict>
+	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Visi „Radar“ kontaktai · 1 neįtrauktas</string>
+			<key>few</key>
+			<string>Visi „Radar“ kontaktai · %1$d neįtraukti</string>
+			<key>many</key>
+			<string>Visi „Radar“ kontaktai · %1$d neįtraukto</string>
+			<key>other</key>
+			<string>Visi „Radar“ kontaktai · %1$d neįtrauktų</string>
+		</dict>
+	</dict>
+	<key>MY_STORY_VIEWERS_ONLY_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Dalintis tik su · %1$d žiūrovas</string>
+			<key>few</key>
+			<string>Dalintis tik su · %1$d žiūrovai</string>
+			<key>many</key>
+			<string>Dalintis tik su · %1$d žiūrovo</string>
+			<key>other</key>
+			<string>Dalintis tik su · %1$d žiūrovų</string>
+		</dict>
+	</dict>
+	<key>NEW_GROUP_MEMBERS_VIEW_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@caption@</string>
+		<key>caption</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d narys</string>
+			<key>few</key>
+			<string>%1$d nariai</string>
+			<key>many</key>
+			<string>%1$d nario</string>
+			<key>other</key>
+			<string>%1$d narių</string>
+		</dict>
+	</dict>
+	<key>NEW_PRIVATE_STORY_VIEW_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@caption@</string>
+		<key>caption</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d žiūrovas</string>
+			<key>few</key>
+			<string>%1$d žiūrovai</string>
+			<key>many</key>
+			<string>%1$d žiūrovų</string>
+			<key>other</key>
+			<string>%1$d žiūrovas</string>
+		</dict>
+	</dict>
+	<key>OVERFLOW_REACTIONS_ACCESSIBILITY_LABEL_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d papildoma reakcija.</string>
+			<key>few</key>
+			<string>%1$d papildomos reakcijos.</string>
+			<key>many</key>
+			<string>%1$d papildomos reakcijos.</string>
+			<key>other</key>
+			<string>%1$d papildomų reakcijų.</string>
+		</dict>
+	</dict>
+	<key>PENDING_GROUP_MEMBERS_MEMBER_INVITED_USERS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ pakvietė 1 žmogų</string>
+			<key>few</key>
+			<string>%2$@ pakvietė %1$d žmones</string>
+			<key>many</key>
+			<string>%2$@ pakvietė %1$d žmog.</string>
+			<key>other</key>
+			<string>%2$@ pakvietė %1$d žmonių</string>
+		</dict>
+	</dict>
+	<key>PENDING_GROUP_MEMBERS_REQUEST_BANNER_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@caption@</string>
+		<key>caption</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d laukiantis prašymas tapti nariu.</string>
+			<key>few</key>
+			<string>%1$d laukiantys prašymai tapti nariais.</string>
+			<key>many</key>
+			<string>%1$d laukiančių prašymų tapti nariais.</string>
+			<key>other</key>
+			<string>%1$d laukiantis prašymas tapti nariais.</string>
+		</dict>
+	</dict>
+	<key>PENDING_GROUP_MEMBERS_REVOKE_INVALID_INVITES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@caption@</string>
+		<key>caption</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Atšaukti negaliojantį pakvietimą</string>
+			<key>few</key>
+			<string>Atšaukti %1$d negaliojančius pakvietimus</string>
+			<key>many</key>
+			<string>Atšaukti %1$d negaliojančio pakvietimo</string>
+			<key>other</key>
+			<string>Atšaukti %1$d negaliojančių pakvietimų</string>
+		</dict>
+	</dict>
+	<key>PENDING_GROUP_MEMBERS_REVOKE_INVITE_BUTTON_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@caption@</string>
+		<key>caption</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Atšaukti pakvietimą</string>
+			<key>few</key>
+			<string>Atšaukti pakvietimus</string>
+			<key>many</key>
+			<string>Atšaukti pakvietimo</string>
+			<key>other</key>
+			<string>Atšaukti pakvietimų</string>
+		</dict>
+	</dict>
+	<key>PENDING_GROUP_MEMBERS_REVOKE_INVITE_CONFIRMATION_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Panaikinti pakvietimą prisijungti prie grupės, kurį atsiuntė %2$@?</string>
+			<key>few</key>
+			<string>Panaikinti %1$d pakvietimus prisijungti prie grupės, kuriuos atsiuntė %2$@?</string>
+			<key>many</key>
+			<string>Panaikinti %1$d pakvietimo prisijungti prie grupės, kuriuos atsiuntė %2$@?</string>
+			<key>other</key>
+			<string>Panaikinti %1$d pakvietimų prisijungti prie grupės, kuriuos atsiuntė %2$@?</string>
+		</dict>
+	</dict>
+	<key>PINNED_CONVERSATION_LIMIT</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Galite prisegti daugiausia %1$d pokalbį.</string>
+			<key>few</key>
+			<string>Galite prisegti daugiausia %1$d pokalbius.</string>
+			<key>many</key>
+			<string>Galite prisegti daugiausia %1$d pokalbio.</string>
+			<key>other</key>
+			<string>Galite prisegti daugiausia %1$d pokalbių.</string>
+		</dict>
+	</dict>
+	<key>POLL_VOTE_COUNT</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d balsas</string>
+			<key>few</key>
+			<string>%1$d balsai</string>
+			<key>many</key>
+			<string>%1$d balso</string>
+			<key>other</key>
+			<string>%1$d balsų</string>
+		</dict>
+	</dict>
+	<key>PRIVATE_STORY_VIEWERS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Tinkinta istorija · %1$d žiūrovas</string>
+			<key>few</key>
+			<string>Tinkinta istorija · %1$d žiūrovai</string>
+			<key>many</key>
+			<string>Tinkinta istorija · %1$d žiūrovo</string>
+			<key>other</key>
+			<string>Tinkinta istorija · %1$d žiūrovų</string>
+		</dict>
+	</dict>
+	<key>RAISED_HANDS_TOAST_MULTIPLE_HANDS_MESSAGE</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%2$@ +%1$ld pakėlė ranką</string>
+			<key>few</key>
+			<string>%2$@ +%1$ld pakėlė rankas</string>
+			<key>many</key>
+			<string>%2$@ +%1$ld pakėlė rankas</string>
+			<key>other</key>
+			<string>%2$@ + %1$ld pakėlė rankas</string>
+		</dict>
+	</dict>
+	<key>REREGISTER_INVALID_PIN_ATTEMPT_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d bandymas</string>
+			<key>few</key>
+			<string>%1$d bandymai</string>
+			<key>many</key>
+			<string>%1$d bandymo</string>
+			<key>other</key>
+			<string>%1$d bandymų</string>
+		</dict>
+	</dict>
+	<key>SETTINGS_CHANGE_PHONE_NUMBER_SPLASH_CANT_CHANGE_BODY</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Kadangi neseniai užregistravote šią paskyrą, šiuo metu telefono numerių pakeisti negalite. Trumpu laukimo laikotarpiu padedame apsaugoti jūsų paskyrą.
+
+Bandykite vėl po %1$d val.</string>
+			<key>few</key>
+			<string>Kadangi neseniai užregistravote šią paskyrą, šiuo metu telefono numerių pakeisti negalite. Trumpu laukimo laikotarpiu padedame apsaugoti jūsų paskyrą.
+
+Bandykite vėl po %1$d val.</string>
+			<key>many</key>
+			<string>Kadangi neseniai užregistravote šią paskyrą, šiuo metu telefono numerių pakeisti negalite. Trumpu laukimo laikotarpiu padedame apsaugoti jūsų paskyrą.
+
+Bandykite vėl po %1$d val.</string>
+			<key>other</key>
+			<string>Kadangi neseniai užregistravote šią paskyrą, šiuo metu telefono numerių pakeisti negalite. Trumpu laukimo laikotarpiu padedame apsaugoti jūsų paskyrą.
+
+Bandykite vėl po %1$d val.</string>
+		</dict>
+	</dict>
+	<key>STICKER_PACK_STICKER_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d lipdukas</string>
+			<key>few</key>
+			<string>%1$d lipdukai</string>
+			<key>many</key>
+			<string>%1$d lipduko</string>
+			<key>other</key>
+			<string>%1$d lipdukų</string>
+		</dict>
+	</dict>
+	<key>STORY_REPLIES_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@caption@</string>
+		<key>caption</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>&lt;bold&gt;1&lt;/bold&gt; atsakymas</string>
+			<key>few</key>
+			<string>&lt;bold&gt;%1$d&lt;/bold&gt; atsakymai</string>
+			<key>many</key>
+			<string>&lt;bold&gt;%1$d&lt;/bold&gt; atsakymo</string>
+			<key>other</key>
+			<string>&lt;bold&gt;%1$d&lt;/bold&gt; atsakymų</string>
+		</dict>
+	</dict>
+	<key>STORY_SELECT_ALLOWED_CONNECTIONS_VIEW_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@caption@</string>
+		<key>caption</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d žiūrovas</string>
+			<key>few</key>
+			<string>%1$d žiūrovai</string>
+			<key>many</key>
+			<string>%1$d žiūrovų</string>
+			<key>other</key>
+			<string>%1$d žiūrovas</string>
+		</dict>
+	</dict>
+	<key>STORY_SELECT_EXCLUDED_CONNECTIONS_VIEW_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@caption@</string>
+		<key>caption</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>1 neitrauktas</string>
+			<key>few</key>
+			<string>%1$d neįtraukti</string>
+			<key>many</key>
+			<string>%1$d neitraukto</string>
+			<key>other</key>
+			<string>%1$d neįtrauktų</string>
+		</dict>
+	</dict>
+	<key>STORY_SENDING_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@caption@</string>
+		<key>caption</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Siunčiama…</string>
+			<key>few</key>
+			<string>Siunčiama %1$d…</string>
+			<key>many</key>
+			<string>Siunčiama %1$d…</string>
+			<key>other</key>
+			<string>Siunčiama %1$d…</string>
+		</dict>
+	</dict>
+	<key>STORY_VIEWS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d peržiūra</string>
+			<key>few</key>
+			<string>%1$d peržiūros</string>
+			<key>many</key>
+			<string>%1$d peržiūrų</string>
+			<key>other</key>
+			<string>%1$d peržiūra</string>
+		</dict>
+	</dict>
+	<key>STORY_VIEWS_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@caption@</string>
+		<key>caption</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>&lt;bold&gt;%1$d&lt;/bold&gt; peržiūra</string>
+			<key>few</key>
+			<string>&lt;bold&gt;%1$d&lt;/bold&gt; peržiūros</string>
+			<key>many</key>
+			<string>&lt;bold&gt;%1$d&lt;/bold&gt; peržiūros</string>
+			<key>other</key>
+			<string>&lt;bold&gt;%1$d&lt;/bold&gt; peržiūrų</string>
+		</dict>
+	</dict>
+	<key>THREAD_DETAILS_MEMBERS_AND_INVITED_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%2$@ (+%1$ld pakviestas žmogus)</string>
+			<key>few</key>
+			<string>%2$@ (+%1$ld pakviesti žmonės)</string>
+			<key>many</key>
+			<string>%2$@ (+%1$ld pakviestų žmonių)</string>
+			<key>other</key>
+			<string>%2$@ (+%1$ld pakviestų žmonių)</string>
+		</dict>
+	</dict>
+	<key>THREAD_DETAILS_MORE_MUTUAL_GROUP_%3$ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$@, %2$@ ir dar %3$ld grupės narys</string>
+			<key>few</key>
+			<string>%1$@, %2$@ ir dar %3$ld grupių narys</string>
+			<key>many</key>
+			<string>%1$@, %2$@ ir dar %3$ld grupės narys</string>
+			<key>other</key>
+			<string>%1$@, %2$@ ir dar %3$ld grupių narys</string>
+		</dict>
+	</dict>
+	<key>THREAD_DETAILS_OTHER_MEMBERS_COUNT_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>dar %1$ld</string>
+			<key>few</key>
+			<string>dar %1$ld</string>
+			<key>many</key>
+			<string>dar %1$ld</string>
+			<key>other</key>
+			<string>dar %1$ld</string>
+		</dict>
+	</dict>
+	<key>UNAVAILABLE_ATTACHMENT_AUDIO_SHEET_MESSAGE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Ši balso žinutė nebuvo perkelta iš jūsų telefono susiejus šį įrenginį. Įrašų ir failų, kurie įrenginio susiejimo metu yra senesni nei %1$d diena, sinchronizuoti negalima.</string>
+			<key>few</key>
+			<string>Ši balso žinutė nebuvo perkelta iš jūsų telefono susiejus šį įrenginį. Įrašų ir failų, kurie įrenginio susiejimo metu yra senesni nei %1$d dienos, sinchronizuoti negalima.</string>
+			<key>many</key>
+			<string>Ši balso žinutė nebuvo perkelta iš jūsų telefono susiejus šį įrenginį. Įrašų ir failų, kurie įrenginio susiejimo metu yra senesni nei %1$d dienos, sinchronizuoti negalima.</string>
+			<key>other</key>
+			<string>Ši balso žinutė nebuvo perkelta iš jūsų telefono susiejus šį įrenginį. Įrašų ir failų, kurie įrenginio susiejimo metu yra senesni nei %1$d dienų, sinchronizuoti negalima.</string>
+		</dict>
+	</dict>
+	<key>UNAVAILABLE_ATTACHMENT_FILE_SHEET_MESSAGE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Šis failas nebuvo perkeltas iš jūsų telefono susiejus šį įrenginį. Įrašų ir failų, kurie įrenginio susiejimo metu yra senesni nei %1$d diena, sinchronizuoti negalima.</string>
+			<key>few</key>
+			<string>Šis failas nebuvo perkeltas iš jūsų telefono susiejus šį įrenginį. Įrašų ir failų, kurie įrenginio susiejimo metu yra senesni nei %1$d dienos, sinchronizuoti negalima.</string>
+			<key>many</key>
+			<string>Šis failas nebuvo perkeltas iš jūsų telefono susiejus šį įrenginį. Įrašų ir failų, kurie įrenginio susiejimo metu yra senesni nei %1$d dienos, sinchronizuoti negalima.</string>
+			<key>other</key>
+			<string>Šis failas nebuvo perkeltas iš jūsų telefono susiejus šį įrenginį. Įrašų ir failų, kurie įrenginio susiejimo metu yra senesni nei %1$d dienų, sinchronizuoti negalima.</string>
+		</dict>
+	</dict>
+	<key>UNAVAILABLE_ATTACHMENT_OVERSIZE_TEXT_SHEET_MESSAGE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Visas šios žinutės tekstas nebuvo perkeltas iš jūsų telefono susiejus šį įrenginį. Įrašų ir failų, kurie įrenginio susiejimo metu yra senesni nei %1$d diena, sinchronizuoti negalima.</string>
+			<key>few</key>
+			<string>Visas šios žinutės tekstas nebuvo perkeltas iš jūsų telefono susiejus šį įrenginį. Įrašų ir failų, kurie įrenginio susiejimo metu yra senesni nei %1$d dienos, sinchronizuoti negalima.</string>
+			<key>many</key>
+			<string>Visas šios žinutės tekstas nebuvo perkeltas iš jūsų telefono susiejus šį įrenginį. Įrašų ir failų, kurie įrenginio susiejimo metu yra senesni nei %1$d dienos, sinchronizuoti negalima.</string>
+			<key>other</key>
+			<string>Visas šios žinutės tekstas nebuvo perkeltas iš jūsų telefono susiejus šį įrenginį. Įrašų ir failų, kurie įrenginio susiejimo metu yra senesni nei %1$d dienų, sinchronizuoti negalima.</string>
+		</dict>
+	</dict>
+	<key>UNAVAILABLE_ATTACHMENT_STICKER_SHEET_MESSAGE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Šis lipdukas nebuvo perkeltas iš jūsų telefono susiejus šį įrenginį. Įrašų ir failų, kurie įrenginio susiejimo metu yra senesni nei %1$d diena, sinchronizuoti negalima.</string>
+			<key>few</key>
+			<string>Šis lipdukas nebuvo perkeltas iš jūsų telefono susiejus šį įrenginį. Įrašų ir failų, kurie įrenginio susiejimo metu yra senesni nei %1$d dienos, sinchronizuoti negalima.</string>
+			<key>many</key>
+			<string>Šis lipdukas nebuvo perkeltas iš jūsų telefono susiejus šį įrenginį. Įrašų ir failų, kurie įrenginio susiejimo metu yra senesni nei %1$d dienos, sinchronizuoti negalima.</string>
+			<key>other</key>
+			<string>Šis lipdukas nebuvo perkeltas iš jūsų telefono susiejus šį įrenginį. Įrašų ir failų, kurie įrenginio susiejimo metu yra senesni nei %1$d dienų, sinchronizuoti negalima.</string>
+		</dict>
+	</dict>
+	<key>USERNAME_SELECTION_TOO_SHORT_ERROR_MESSAGE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>Naudotojų vardai privalo prasidėti bent %1$d simboliu</string>
+			<key>few</key>
+			<string>Naudotojų vardai privalo prasidėti bent %1$d simboliais</string>
+			<key>many</key>
+			<string>Naudotojų vardai privalo prasidėti bent %1$d simbolio</string>
+			<key>other</key>
+			<string>Naudotojų vardai privalo prasidėti bent %1$d simbolių</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d paminėjimą iš %2$@ ir kitų</string>
+			<key>few</key>
+			<string>%1$d paminėjimus iš %2$@ ir kitų</string>
+			<key>many</key>
+			<string>%1$d paminėjimo iš %2$@ ir kitų</string>
+			<key>other</key>
+			<string>%1$d paminėjimų iš %2$@ ir kitų</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d paminėjimą iš %2$@ ir %3$@</string>
+			<key>few</key>
+			<string>%1$d paminėjimus iš %2$@ ir %3$@</string>
+			<key>many</key>
+			<string>%1$d paminėjimo iš %2$@ ir %3$@</string>
+			<key>other</key>
+			<string>%1$d paminėjimų iš %2$@ ir %3$@</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__messages</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d neskaitytą žinutę</string>
+			<key>few</key>
+			<string>%1$d neskaitytas žinutes</string>
+			<key>many</key>
+			<string>%1$d neskaitytos žinutės</string>
+			<key>other</key>
+			<string>%1$d neskaitytų žinučių</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d atsakymą iš %2$@ ir kitų</string>
+			<key>few</key>
+			<string>%1$d atsakymus iš %2$@ ir kitų</string>
+			<key>many</key>
+			<string>%1$d atsakymo iš %2$@ ir kitų</string>
+			<key>other</key>
+			<string>%1$d atsakymų iš %2$@ ir kitų</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d atsakymą iš %2$@ ir %3$@</string>
+			<key>few</key>
+			<string>%1$d atsakymus iš %2$@ ir %3$@</string>
+			<key>many</key>
+			<string>%1$d atsakymo iš %2$@ ir %3$@</string>
+			<key>other</key>
+			<string>%1$d atsakymų iš %2$@ ir %3$@</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

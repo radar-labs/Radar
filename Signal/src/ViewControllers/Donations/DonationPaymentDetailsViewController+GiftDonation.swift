@@ -13,7 +13,7 @@ extension DonationPaymentDetailsViewController {
     func giftDonation(
         with creditOrDebitCard: Stripe.PaymentMethod.CreditOrDebitCard,
         in thread: TSContactThread,
-        messageText: String
+        messageText: String,
     ) {
         Logger.info("[Gifting] Starting gift donation with credit/debit card")
 
@@ -25,7 +25,8 @@ extension DonationPaymentDetailsViewController {
                         try await throwIfAlreadySendingGift(threadUniqueId: thread.uniqueId)
 
                         let preparedPayment = try await DonationViewsUtil.Gifts.prepareToPay(
-                            amount: self.donationAmount, creditOrDebitCard: creditOrDebitCard
+                            amount: self.donationAmount,
+                            creditOrDebitCard: creditOrDebitCard,
                         )
 
                         guard await DonationViewsUtil.Gifts.showSafetyNumberConfirmationIfNecessary(for: thread) else {
@@ -38,9 +39,9 @@ extension DonationPaymentDetailsViewController {
                             thread: thread,
                             messageText: messageText,
                             databaseStorage: SSKEnvironment.shared.databaseStorageRef,
-                            blockingManager: SSKEnvironment.shared.blockingManagerRef
+                            blockingManager: SSKEnvironment.shared.blockingManagerRef,
                         )
-                    }
+                    },
                 )
                 Logger.info("[Gifting] Gifting card donation finished")
                 self.onFinished(nil)
@@ -52,11 +53,12 @@ extension DonationPaymentDetailsViewController {
         }
     }
 
-    private nonisolated func throwIfAlreadySendingGift(threadUniqueId: String) async throws {
+    @concurrent
+    private func throwIfAlreadySendingGift(threadUniqueId: String) async throws {
         try SSKEnvironment.shared.databaseStorageRef.read { transaction in
             try DonationViewsUtil.Gifts.throwIfAlreadySendingGift(
                 threadId: threadUniqueId,
-                transaction: transaction
+                transaction: transaction,
             )
         }
     }

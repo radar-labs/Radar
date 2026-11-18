@@ -1,0 +1,137 @@
+//
+// Copyright 2023 Signal Messenger, LLC
+// SPDX-License-Identifier: AGPL-3.0-only
+//
+
+import UIKit
+
+public class SettingsHeaderButton: UIView {
+
+    private static let buttonConfiguration: UIButton.Configuration = if #available(iOS 26, *) { .glass() } else { .gray() }
+    private let button = UIButton(configuration: SettingsHeaderButton.buttonConfiguration)
+    private let titleLabel = UILabel()
+    private let stackView = UIStackView()
+
+    public init(title: String, icon: ThemeIcon, actionHandler: (() -> Void)? = nil) {
+        super.init(frame: .zero)
+
+        // Stack View
+        stackView.axis = .vertical
+        stackView.spacing = 8
+        stackView.alignment = .center
+        addSubview(stackView)
+        stackView.addArrangedSubviews([button, titleLabel])
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            stackView.topAnchor.constraint(equalTo: topAnchor),
+            stackView.bottomAnchor.constraint(equalTo: bottomAnchor),
+        ])
+
+        // Button
+        button.configuration?.image = Theme.iconImage(icon)
+        button.configuration?.baseForegroundColor = .Signal.label
+        button.configuration?.contentInsets = .init(top: 13, leading: 26, bottom: 13, trailing: 26)
+        button.configuration?.cornerStyle = .capsule
+        updateButtonBackgroundColorTransformer()
+
+        if let buttonConfiguration = button.configuration, let imageSize = buttonConfiguration.image?.size {
+            let buttonWidth = imageSize.width + buttonConfiguration.contentInsets.leading + buttonConfiguration.contentInsets.trailing
+            let buttonHeight = imageSize.height + buttonConfiguration.contentInsets.top + buttonConfiguration.contentInsets.bottom
+            NSLayoutConstraint.activate([
+                button.widthAnchor.constraint(equalToConstant: buttonWidth),
+                button.heightAnchor.constraint(equalToConstant: buttonHeight),
+            ])
+        }
+
+        titleLabel.attributedText = title.styled(
+            with: .color(UIColor.Signal.label),
+            .alignment(.center),
+            .font(.dynamicTypeFootnoteClamped),
+            // Since this usually one word and is space-constrained,
+            // try to hyphenate when line wrapping.
+            .hyphenationFactor(1),
+        )
+        titleLabel.numberOfLines = 0
+
+        // Action
+        if let actionHandler {
+            addActionHandler(actionHandler)
+        }
+
+        // Accessibility
+        isAccessibilityElement = true
+        accessibilityTraits = .button
+        accessibilityLabel = title
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+
+    private static let actionIdentifier = UIAction.Identifier("SettingsHeaderButton.primary")
+
+    public func addActionHandler(_ handler: @escaping () -> Void) {
+        button.addAction(UIAction(identifier: Self.actionIdentifier) { _ in handler() }, for: .primaryActionTriggered)
+    }
+
+    public var minimumWidth: CGFloat {
+        return intrinsicContentSize.width
+    }
+
+    // MARK: - Properties
+
+    public var menu: UIMenu? {
+        get {
+            return button.menu
+        }
+        set {
+            button.menu = newValue
+            button.showsMenuAsPrimaryAction = (newValue != nil)
+        }
+    }
+
+    public var buttonBackgroundColor = OWSTableViewController2.defaultCellBackgroundColor {
+        didSet {
+            updateButtonBackgroundColorTransformer()
+        }
+    }
+
+    public var selectedButtonBackgroundColor = OWSTableViewController2.cellSelectedBackgroundColor {
+        didSet {
+            updateButtonBackgroundColorTransformer()
+        }
+    }
+
+    private func updateButtonBackgroundColorTransformer() {
+        button.configuration?.background.backgroundColorTransformer = UIConfigurationColorTransformer { [weak self] _ in
+            guard let self else { return .Signal.background }
+            if self.button.isHighlighted {
+                return self.selectedButtonBackgroundColor
+            }
+            return self.buttonBackgroundColor
+        }
+    }
+
+    public var isEnabled: Bool {
+        get {
+            button.isEnabled
+        }
+        set {
+            button.isEnabled = newValue
+        }
+    }
+
+    // MARK: Accessibility
+
+    override public func accessibilityActivate() -> Bool {
+        if #available(iOS 17.4, *) {
+            button.performPrimaryAction()
+        } else {
+            button.sendActions(for: .primaryActionTriggered)
+        }
+        return true
+    }
+
+}

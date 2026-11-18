@@ -28,11 +28,7 @@ public struct KeyValueStore {
     }
 
     public func setString(_ value: String?, key: String, transaction: DBWriteTransaction) {
-        guard let value = value else {
-            write(nil, forKey: key, transaction: transaction)
-            return
-        }
-        write(value as NSString, forKey: key, transaction: transaction)
+        write(value as NSString?, forKey: key, transaction: transaction)
     }
 
     // MARK: - Date
@@ -86,28 +82,11 @@ public struct KeyValueStore {
     // MARK: - Data
 
     public func getData(_ key: String, transaction: DBReadTransaction) -> Data? {
-        do {
-            return try NewKeyValueStore(collection: collection).fetchValueOrThrow(Data.self, forKey: key, tx: transaction)
-        } catch {
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(
-                userDefaults: CurrentAppContext().appUserDefaults(),
-                error: error
-            )
-            owsFailDebug("error: \(error)")
-            return nil
-        }
+        return NewKeyValueStore(collection: collection).fetchValue(Data.self, forKey: key, tx: transaction)
     }
 
-    public func setData(_ data: Data?, key: String, transaction: DBWriteTransaction) {
-        do {
-            try NewKeyValueStore(collection: collection).writeValueOrThrow(data, forKey: key, tx: transaction)
-        } catch {
-            DatabaseCorruptionState.flagDatabaseCorruptionIfNecessary(
-                userDefaults: CurrentAppContext().appUserDefaults(),
-                error: error
-            )
-            owsFailDebug("Error: \(error)")
-        }
+    public func setData(_ data: Data?, key: String, transaction tx: DBWriteTransaction) {
+        NewKeyValueStore(collection: collection).writeValue(data, forKey: key, tx: tx)
     }
 
     // MARK: - Int
@@ -196,41 +175,28 @@ public struct KeyValueStore {
 
     // MARK: - Object
 
-    public func setObject(_ anyValue: Any?, key: String, transaction: DBWriteTransaction) {
-        guard let anyValue = anyValue else {
-            write(nil, forKey: key, transaction: transaction)
-            return
-        }
-        guard let codingValue = anyValue as? NSCoding else {
-            owsFailDebug("Invalid value.")
-            write(nil, forKey: key, transaction: transaction)
-            return
-        }
-        write(codingValue, forKey: key, transaction: transaction)
+    public func setObject<T: NSObject & NSSecureCoding>(_ value: T?, key: String, transaction: DBWriteTransaction) {
+        write(value, forKey: key, transaction: transaction)
+    }
+
+    public func setStringArray(_ value: [String]?, key: String, transaction: DBWriteTransaction) {
+        setObject(value as [NSString]? as NSArray?, key: key, transaction: transaction)
     }
 
     // MARK: -
 
     public func removeValue(forKey key: String, transaction: DBWriteTransaction) {
-        write(nil, forKey: key, transaction: transaction)
+        setData(nil, key: key, transaction: transaction)
     }
 
     public func removeValues(forKeys keys: [String], transaction: DBWriteTransaction) {
         for key in keys {
-            write(nil, forKey: key, transaction: transaction)
+            setData(nil, key: key, transaction: transaction)
         }
     }
 
-    public func removeAll(transaction: DBWriteTransaction) {
-        do {
-            try NewKeyValueStore(collection: collection).removeAllOrThrow(tx: transaction)
-        } catch {
-            DatabaseCorruptionState.flagDatabaseCorruptionIfNecessary(
-                userDefaults: CurrentAppContext().appUserDefaults(),
-                error: error
-            )
-            owsFail("Error: \(error)")
-        }
+    public func removeAll(transaction tx: DBWriteTransaction) {
+        NewKeyValueStore(collection: collection).removeAll(tx: tx)
     }
 
     public func allDataValues(transaction: DBReadTransaction) -> [Data] {
@@ -253,16 +219,8 @@ public struct KeyValueStore {
         return dataValue
     }
 
-    public func allKeys(transaction: DBReadTransaction) -> [String] {
-        do {
-            return try NewKeyValueStore(collection: collection).fetchKeysOrThrow(tx: transaction)
-        } catch {
-            DatabaseCorruptionState.flagDatabaseCorruptionIfNecessary(
-                userDefaults: CurrentAppContext().appUserDefaults(),
-                error: error
-            )
-            owsFail("Error: \(error)")
-        }
+    public func allKeys(transaction tx: DBReadTransaction) -> [String] {
+        return NewKeyValueStore(collection: collection).fetchKeys(tx: tx)
     }
 
     // MARK: -
@@ -304,26 +262,13 @@ public struct KeyValueStore {
         }
     }
 
-    public func allCodableValues<T: Decodable>(transaction: DBReadTransaction) throws -> [T] {
-        var result = [T]()
-        for data in allDataValues(transaction: transaction) {
-            do {
-                result.append(try JSONDecoder().decode(T.self, from: data))
-            } catch {
-                owsFailDebug("Failed to decode: \(error).")
-                throw error
-            }
-        }
-        return result
-    }
-
     // MARK: - Archived Values
 
     public func getObject<ObjectType: NSObject & NSSecureCoding>(_ key: String, ofClass cls: ObjectType.Type, transaction: DBReadTransaction) -> ObjectType? {
         return self.getData(key, transaction: transaction).flatMap { self.parseArchivedValue($0, ofClass: cls) }
     }
 
-    public func getObject(_ key: String, ofClasses classes: [AnyClass], transaction: DBReadTransaction) -> Any? {
+    public func getObject(_ key: String, ofClasses classes: [NSSecureCoding.Type], transaction: DBReadTransaction) -> Any? {
         return self.getData(key, transaction: transaction).flatMap {
             do {
                 return try NSKeyedUnarchiver.unarchivedObject(ofClasses: classes, from: $0)
@@ -351,7 +296,7 @@ public struct KeyValueStore {
         _ key: String,
         keyClass: DecodedKey.Type,
         objectClass: DecodedObject.Type,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> [DecodedKey: DecodedObject]? {
         return self.getData(key, transaction: transaction).flatMap {
             do {
@@ -378,21 +323,21 @@ public struct KeyValueStore {
         return self.getArray(key, ofClass: NSString.self, transaction: transaction) as [String]?
     }
 
-    public func getSet<DecodedObject: NSObject & NSSecureCoding>(_ key: String, ofClass cls: DecodedObject.Type, transaction: DBReadTransaction) -> Set<DecodedObject>? {
+    public func getSet<DecodedObject: NSObject & NSCopying & NSSecureCoding>(_ key: String, ofClass cls: DecodedObject.Type, transaction: DBReadTransaction) -> Set<DecodedObject>? {
         return self.getObject(key, ofClasses: [NSSet.self, cls], transaction: transaction) as? Set<DecodedObject>
     }
 
     // MARK: - Internal Methods
 
-    private func write(
-        _ value: NSCoding?,
+    private func write<T: NSObject & NSSecureCoding>(
+        _ value: T?,
         forKey key: String,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) {
         let encoded: Data? = value.flatMap {
             try? NSKeyedArchiver.archivedData(
                 withRootObject: $0,
-                requiringSecureCoding: false
+                requiringSecureCoding: true,
             )
         }
 

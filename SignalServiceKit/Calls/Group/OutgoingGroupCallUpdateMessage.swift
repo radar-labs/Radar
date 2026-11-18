@@ -7,20 +7,43 @@
 /// some state has changed, such as we have joined or left the call.
 ///
 /// Not to be confused with an ``OWSGroupCallMessage``.
- @objc(OWSOutgoingGroupCallMessage)
-public final class OutgoingGroupCallUpdateMessage: TSOutgoingMessage {
+@objc(OWSOutgoingGroupCallMessage)
+public final class OutgoingGroupCallUpdateMessage: TransientOutgoingMessage {
+    override public class var supportsSecureCoding: Bool { true }
+
+    public required init?(coder: NSCoder) {
+        self.eraId = coder.decodeObject(of: NSString.self, forKey: "eraId") as String?
+        super.init(coder: coder)
+    }
+
+    override public func encode(with coder: NSCoder) {
+        super.encode(with: coder)
+        if let eraId {
+            coder.encode(eraId, forKey: "eraId")
+        }
+    }
+
+    override public var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(super.hash)
+        hasher.combine(eraId)
+        return hasher.finalize()
+    }
+
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard super.isEqual(object) else { return false }
+        guard self.eraId == object.eraId else { return false }
+        return true
+    }
+
     /// The era ID of the call with the update.
-    ///
-    /// - Note
-    /// Nullable and `var` to play nice with Mantle, which will set this during
-    /// its `init(coder:)`.
-    @objc
-    private(set) var eraId: String?
+    let eraId: String?
 
     public init(
         thread: TSGroupThread,
         eraId: String?,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) {
         self.eraId = eraId
 
@@ -29,30 +52,22 @@ public final class OutgoingGroupCallUpdateMessage: TSOutgoingMessage {
             additionalRecipients: [],
             explicitRecipients: [],
             skippedRecipients: [],
-            transaction: tx
+            transaction: tx,
         )
     }
-
-    required public init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
-
-    required public init(dictionary dictionaryValue: [String: Any]!) throws {
-        try super.init(dictionary: dictionaryValue)
-    }
-
-    override public var shouldBeSaved: Bool { false }
 
     override var contentHint: SealedSenderContentHint { .default }
 
     override public func dataMessageBuilder(
         with thread: TSThread,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> SSKProtoDataMessageBuilder? {
-        guard let dataMessageBuilder = super.dataMessageBuilder(
-            with: thread,
-            transaction: transaction
-        ) else {
+        guard
+            let dataMessageBuilder = super.dataMessageBuilder(
+                with: thread,
+                transaction: transaction,
+            )
+        else {
             return nil
         }
 
@@ -63,7 +78,7 @@ public final class OutgoingGroupCallUpdateMessage: TSOutgoingMessage {
         }
 
         dataMessageBuilder.setGroupCallUpdate(
-            groupCallUpdateBuilder.buildInfallibly()
+            groupCallUpdateBuilder.buildInfallibly(),
         )
 
         return dataMessageBuilder

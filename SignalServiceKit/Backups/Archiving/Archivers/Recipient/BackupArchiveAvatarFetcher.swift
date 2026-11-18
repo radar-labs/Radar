@@ -8,16 +8,15 @@ import LibSignalClient
 
 /// In charge of fetching avatars for groups as well as avatars and updated profiles
 /// for contacts we restore from a backup.
-public class BackupArchiveAvatarFetcher {
+class BackupArchiveAvatarFetcher {
 
-    private let appReadiness: AppReadiness
     private let db: any DB
     private let reachabilityManager: SSKReachabilityManager
     private let store: TaskStore
     private let taskQueue: TaskQueueLoader<TaskRunner>
     private let tsAccountManager: TSAccountManager
 
-    public init(
+    init(
         appReadiness: AppReadiness,
         dateProvider: @escaping DateProvider,
         db: any DB,
@@ -26,9 +25,8 @@ public class BackupArchiveAvatarFetcher {
         profileManager: ProfileManager,
         reachabilityManager: SSKReachabilityManager,
         threadStore: ThreadStore,
-        tsAccountManager: TSAccountManager
+        tsAccountManager: TSAccountManager,
     ) {
-        self.appReadiness = appReadiness
         self.db = db
         self.reachabilityManager = reachabilityManager
         self.tsAccountManager = tsAccountManager
@@ -47,27 +45,31 @@ public class BackupArchiveAvatarFetcher {
                 reachabilityManager: reachabilityManager,
                 store: store,
                 threadStore: threadStore,
-                tsAccountManager: tsAccountManager
-            )
+                tsAccountManager: tsAccountManager,
+            ),
         )
         appReadiness.runNowOrWhenMainAppDidBecomeReadyAsync { [weak self] in
-            Task { [weak self] in
-                do {
-                    try await self?.runIfNeeded()
-                } catch {
-                    Logger.debug("Failed to fetch avatars: \(error)")
-                }
-            }
+            self?.runAvatarFetch()
             self?.startObserving()
         }
     }
 
-    internal func enqueueFetchOfGroupAvatar(
+    private func runAvatarFetch() {
+        Task { [weak self] in
+            do {
+                try await self?.runIfNeeded()
+            } catch {
+                Logger.debug("Failed to fetch avatars: \(error)")
+            }
+        }
+    }
+
+    func enqueueFetchOfGroupAvatar(
         _ thread: TSGroupThread,
         currentTimestamp: UInt64,
         lastVisibleInteractionRowIdInGroupThread: Int64?,
         localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws {
         guard let avatarUrl = (thread.groupModel as? TSGroupModelV2)?.avatarUrlPath else {
             return
@@ -77,31 +79,28 @@ public class BackupArchiveAvatarFetcher {
             avatarUrl: avatarUrl,
             currentTimestamp: currentTimestamp,
             lastVisibleInteractionRowIdInGroupThread: lastVisibleInteractionRowIdInGroupThread,
-            localIdentifiers: localIdentifiers
+            localIdentifiers: localIdentifiers,
         )
         try record?.insert(tx.database)
     }
 
-    internal func enqueueFetchOfUserProfile(
+    func enqueueFetchOfUserProfile(
         serviceId: ServiceId,
         currentTimestamp: UInt64,
         lastVisibleInteractionRowIdInContactThread: Int64?,
         localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws {
         var record = Record.forUserProfile(
             serviceId: serviceId,
             currentTimestamp: currentTimestamp,
             lastVisibleInteractionRowIdInContactThread: lastVisibleInteractionRowIdInContactThread,
-            localIdentifiers: localIdentifiers
+            localIdentifiers: localIdentifiers,
         )
         try record.insert(tx.database)
     }
 
-    public func runIfNeeded() async throws {
-        guard appReadiness.isAppReady else {
-            return
-        }
+    func runIfNeeded() async throws {
         guard tsAccountManager.localIdentifiersWithMaybeSneakyTransaction != nil else {
             return
         }
@@ -114,36 +113,24 @@ public class BackupArchiveAvatarFetcher {
             self,
             selector: #selector(didUpdateRegistrationState),
             name: .registrationStateDidChange,
-            object: nil
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(reachabililityDidChange),
             name: SSKReachability.owsReachabilityDidChange,
-            object: nil
+            object: nil,
         )
     }
 
     @objc
     private func didUpdateRegistrationState() {
-        Task {
-            do {
-                try await runIfNeeded()
-            } catch {
-                Logger.debug("Failed to fetch avatars: \(error)")
-            }
-        }
+        runAvatarFetch()
     }
 
     @objc
     private func reachabililityDidChange() {
-        Task {
-            do {
-                try await runIfNeeded()
-            } catch {
-                Logger.debug("Failed to fetch avatars: \(error)")
-            }
-        }
+        runAvatarFetch()
     }
 
     // MARK: - TaskRunner
@@ -168,7 +155,7 @@ public class BackupArchiveAvatarFetcher {
             reachabilityManager: SSKReachabilityManager,
             store: TaskStore,
             threadStore: ThreadStore,
-            tsAccountManager: TSAccountManager
+            tsAccountManager: TSAccountManager,
         ) {
             self.dateProvider = dateProvider
             self.db = db
@@ -182,46 +169,47 @@ public class BackupArchiveAvatarFetcher {
         }
 
         func runTask(
-            record: Record,
-            loader: TaskQueueLoader<TaskRunner>
+            recordId: Record.IDType,
+            loader: TaskQueueLoader<TaskRunner>,
         ) async -> TaskRecordResult {
             guard
-                tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered,
-                let localIdentifiers = tsAccountManager.localIdentifiersWithMaybeSneakyTransaction
+                let record = db.read(block: { store.fetchRecord(recordId: recordId, tx: $0) })
             else {
-                try? await loader.stop()
-                return .cancelled
+                return .obsolete
+            }
+
+            guard let registeredState = try? tsAccountManager.registeredStateWithMaybeSneakyTransaction() else {
+                await loader.stop()
+                return .obsolete
             }
 
             if let serviceId = record.serviceId {
-                do {
-                    let profile = try db.read { tx in
+                let profile = db.read { tx in
+                    return failIfThrows {
                         return try OWSUserProfile
                             .filter(Column(OWSUserProfile.CodingKeys.serviceIdString) == serviceId.serviceIdUppercaseString)
                             .fetchOne(tx.database)
                     }
-                    if profile?.avatarFileName != nil {
-                        // We already have an avatar for this profile;
-                        // no need to fetch anything.
-                        return .cancelled
-                    }
-                } catch {
-                    return .unretryableError(error)
+                }
+                if profile?.avatarFileName != nil {
+                    // We already have an avatar for this profile;
+                    // no need to fetch anything.
+                    return .obsolete
                 }
 
                 do {
-                    if localIdentifiers.contains(serviceId: serviceId) {
+                    if registeredState.localIdentifiers.contains(serviceId: serviceId) {
                         _ = try await profileManager.fetchLocalUsersProfile(
-                            authedAccount: .implicit()
+                            authedAccount: .implicit,
                         )
                         try await profileManager.downloadAndDecryptLocalUserAvatarIfNeeded(
-                            authedAccount: .implicit()
+                            authedAccount: .implicit,
                         )
                     } else {
                         _ = try await profileFetcher.fetchProfileImpl(
                             for: serviceId,
-                            context: .init(isOpportunistic: true),
-                            authedAccount: .implicit()
+                            context: .init(isOpportunistic: true, userProfileWriter: .backupRestore),
+                            authedAccount: .implicit,
                         )
                     }
                     return .success
@@ -229,7 +217,7 @@ public class BackupArchiveAvatarFetcher {
                     // If we failed and think we aren't reachable,
                     // stop trying future tasks.
                     if !reachabilityManager.isReachable {
-                        try? await loader.stop()
+                        await loader.stop()
                     }
                     if record.retryDelay() != nil {
                         return .retryableError(error)
@@ -244,18 +232,18 @@ public class BackupArchiveAvatarFetcher {
                     let groupModel = groupThread.groupModel as? TSGroupModelV2,
                     let avatarUrlPath = groupModel.avatarUrlPath
                 else {
-                    return .cancelled
+                    return .obsolete
                 }
 
                 // Ensure we haven't since updated the group pointing to a new avatar.
                 guard avatarUrlPath == record.groupAvatarUrl else {
-                    return .cancelled
+                    return .obsolete
                 }
 
                 do {
                     let avatarDataState = try await groupsV2.fetchGroupAvatarRestoredFromBackup(
                         groupModel: groupModel,
-                        avatarUrlPath: avatarUrlPath
+                        avatarUrlPath: avatarUrlPath,
                     )
 
                     let avatarHash: String?
@@ -279,6 +267,10 @@ public class BackupArchiveAvatarFetcher {
                         avatarHash = nil
                         avatarDataFailedToFetchFromCDN = false
                         shouldNotDownloadAvatar = true
+                    case .skipped:
+                        avatarHash = nil
+                        avatarDataFailedToFetchFromCDN = false
+                        shouldNotDownloadAvatar = false
                     }
 
                     await db.awaitableWrite { tx in
@@ -297,7 +289,7 @@ public class BackupArchiveAvatarFetcher {
                         threadStore.update(
                             groupThread: refetchedGroupThread,
                             with: refetchedGroupModel,
-                            tx: tx
+                            tx: tx,
                         )
                     }
                     return .success
@@ -305,7 +297,7 @@ public class BackupArchiveAvatarFetcher {
                     // If we failed and think we aren't reachable,
                     // stop trying future tasks.
                     if !reachabilityManager.isReachable {
-                        try? await loader.stop()
+                        await loader.stop()
                     }
                     if record.retryDelay() != nil {
                         return .retryableError(error)
@@ -314,23 +306,33 @@ public class BackupArchiveAvatarFetcher {
                     }
                 }
             } else {
-                return .cancelled
+                return .obsolete
             }
         }
 
-        func didSucceed(record: Record, tx: DBWriteTransaction) throws {}
+        func didSucceed(recordId: Record.IDType, tx: DBWriteTransaction) {}
 
-        func didFail(record: Record, error: any Error, isRetryable: Bool, tx: DBWriteTransaction) throws {
-            guard isRetryable, let retryDelay = record.retryDelay() else {
+        func didFail(
+            recordId: Record.IDType,
+            error: any Error,
+            isRetryable: Bool,
+            tx: DBWriteTransaction,
+        ) {
+            guard
+                isRetryable,
+                var record = store.fetchRecord(recordId: recordId, tx: tx),
+                let retryDelay = record.retryDelay()
+            else {
                 return
             }
-            var record = record
             record.nextRetryTimestamp = dateProvider().addingTimeInterval(retryDelay).ows_millisecondsSince1970
             record.numRetries += 1
-            try record.update(tx.database)
+            failIfThrows {
+                try record.update(tx.database)
+            }
         }
 
-        func didCancel(record: Record, tx: DBWriteTransaction) throws {}
+        func didObsolete(recordId: Record.IDType, tx: DBWriteTransaction) {}
     }
 
     // MARK: - TaskStore
@@ -340,15 +342,25 @@ public class BackupArchiveAvatarFetcher {
 
         init() {}
 
-        func peek(count: UInt, tx: DBReadTransaction) throws -> [Record] {
-            return try Record
-                .order(Column(Record.CodingKeys.nextRetryTimestamp).asc)
-                .limit(Int(count))
-                .fetchAll(tx.database)
+        func peek(count: UInt, tx: DBReadTransaction) -> [Record] {
+            return failIfThrows {
+                try Record
+                    .order(Column(Record.CodingKeys.nextRetryTimestamp).asc)
+                    .limit(Int(count))
+                    .fetchAll(tx.database)
+            }
         }
 
-        func removeRecord(_ record: Record, tx: DBWriteTransaction) throws {
-            try record.delete(tx.database)
+        func fetchRecord(recordId: Record.IDType, tx: DBReadTransaction) -> Record? {
+            return failIfThrows {
+                try Record.fetchOne(tx.database, key: recordId)
+            }
+        }
+
+        func removeRecord(recordId: Record.IDType, tx: DBWriteTransaction) {
+            failIfThrows {
+                _ = try Record.deleteOne(tx.database, key: recordId)
+            }
         }
     }
 
@@ -377,7 +389,7 @@ public class BackupArchiveAvatarFetcher {
             serviceId: ServiceId?,
             currentTimestamp: UInt64,
             lastVisibleInteractionRowIdInThread: Int64?,
-            localIdentifiers: LocalIdentifiers
+            localIdentifiers: LocalIdentifiers,
         ) {
             self._id = nil
             self.groupThreadRowId = groupThreadRowId
@@ -395,7 +407,7 @@ public class BackupArchiveAvatarFetcher {
                 nextRetryTimestamp = 0
             } else if
                 let lastVisibleInteractionRowIdInThread = lastVisibleInteractionRowIdInThread
-                    .map({ UInt64(exactly: $0 ) }) ?? nil
+                    .map({ UInt64(exactly: $0) }) ?? nil
             {
                 if lastVisibleInteractionRowIdInThread < currentTimestamp {
                     nextRetryTimestamp = currentTimestamp - lastVisibleInteractionRowIdInThread
@@ -414,7 +426,7 @@ public class BackupArchiveAvatarFetcher {
             avatarUrl: String,
             currentTimestamp: UInt64,
             lastVisibleInteractionRowIdInGroupThread: Int64?,
-            localIdentifiers: LocalIdentifiers
+            localIdentifiers: LocalIdentifiers,
         ) -> Self? {
             guard let rowId = groupThread.sqliteRowId else { return nil }
             return .init(
@@ -423,7 +435,7 @@ public class BackupArchiveAvatarFetcher {
                 serviceId: nil,
                 currentTimestamp: currentTimestamp,
                 lastVisibleInteractionRowIdInThread: lastVisibleInteractionRowIdInGroupThread,
-                localIdentifiers: localIdentifiers
+                localIdentifiers: localIdentifiers,
             )
         }
 
@@ -431,7 +443,7 @@ public class BackupArchiveAvatarFetcher {
             serviceId: ServiceId,
             currentTimestamp: UInt64,
             lastVisibleInteractionRowIdInContactThread: Int64?,
-            localIdentifiers: LocalIdentifiers
+            localIdentifiers: LocalIdentifiers,
         ) -> Self {
             return .init(
                 groupThreadRowId: nil,
@@ -439,7 +451,7 @@ public class BackupArchiveAvatarFetcher {
                 serviceId: serviceId,
                 currentTimestamp: currentTimestamp,
                 lastVisibleInteractionRowIdInThread: lastVisibleInteractionRowIdInContactThread,
-                localIdentifiers: localIdentifiers
+                localIdentifiers: localIdentifiers,
             )
         }
 
@@ -449,11 +461,11 @@ public class BackupArchiveAvatarFetcher {
             case 0:
                 // We can afford to use a high delay;
                 // the job run itself has in-memory retries.
-                return 60 * 2
+                return 2 * .minute
             case 1:
-                return 60 * 60
+                return .hour
             case 2:
-                return 60 * 60 * 24
+                return .day
             default:
                 return nil
             }

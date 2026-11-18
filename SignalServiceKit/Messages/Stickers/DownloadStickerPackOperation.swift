@@ -6,17 +6,24 @@
 import Foundation
 
 enum DownloadStickerPackOperation {
-    static func run(stickerPackInfo: StickerPackInfo) async throws -> StickerPack {
+    static func run(stickerPackInfo: StickerPackInfo) async throws -> StickerPackRecord {
         return try await Retry.performWithBackoff(maxAttempts: 4) {
             return try await self._run(stickerPackInfo: stickerPackInfo)
         }
     }
 
-    private static func _run(stickerPackInfo: StickerPackInfo) async throws -> StickerPack {
+    private static func _run(stickerPackInfo: StickerPackInfo) async throws -> StickerPackRecord {
         owsAssertDebug(stickerPackInfo.packId.count > 0)
         owsAssertDebug(stickerPackInfo.packKey.count > 0)
 
-        if let stickerPack = StickerManager.fetchStickerPack(stickerPackInfo: stickerPackInfo) {
+        let stickerManager = DependenciesBridge.shared.stickerManager
+        let db = DependenciesBridge.shared.db
+
+        if
+            let stickerPack = db.read(block: { tx in
+                stickerManager.fetchStickerPack(stickerPackInfo: stickerPackInfo, transaction: tx)
+            })
+        {
             return stickerPack
         }
 
@@ -26,21 +33,19 @@ enum DownloadStickerPackOperation {
         do {
             let encryptedFileUrl: URL = try await CDNDownloadOperation.tryToDownload(
                 urlPath: urlPath,
-                maxDownloadSize: CDNDownloadOperation.kMaxStickerPackDownloadSize
+                maxDownloadSize: CDNDownloadOperation.kMaxStickerPackDownloadSize,
             )
             do {
-                let decryptedFileUrl = try StickerManager.decrypt(at: encryptedFileUrl, packKey: stickerPackInfo.packKey)
-                let manifestData = try Data(contentsOf: decryptedFileUrl)
+                let manifestData = try StickerManager.decrypt(at: encryptedFileUrl, packKey: stickerPackInfo.packKey)
 
                 return try self.parseStickerPackManifest(
                     stickerPackInfo: stickerPackInfo,
-                    manifestData: manifestData
+                    manifestData: manifestData,
                 )
             } catch {
-                owsFailDebug("Decryption failed: \(error)")
                 CDNDownloadOperation.markUrlPathAsCorrupt(urlPath)
                 // Fail immediately; do not retry.
-                throw SSKUnretryableError.stickerDecryptionFailure
+                throw OWSAssertionError("Decryption failed: \(error)")
             }
         } catch {
             if
@@ -48,14 +53,14 @@ enum DownloadStickerPackOperation {
                 (400..<500).contains(statusCode),
                 statusCode != 429
             {
-                StickerManager.markStickerPackAsMissing(stickerPackInfo: stickerPackInfo)
+                stickerManager.markStickerPackAsMissing(stickerPackInfo: stickerPackInfo)
             }
 
             throw error
         }
     }
 
-    private static func parseStickerPackManifest(stickerPackInfo: StickerPackInfo, manifestData: Data) throws -> StickerPack {
+    private static func parseStickerPackManifest(stickerPackInfo: StickerPackInfo, manifestData: Data) throws -> StickerPackRecord {
         owsAssertDebug(manifestData.count > 0)
 
         let manifestProto: SSKProtoPack
@@ -80,8 +85,7 @@ enum DownloadStickerPackOperation {
         }
         let cover = manifestCover ?? firstItem
 
-        let stickerPack = StickerPack(info: stickerPackInfo, title: title, author: author, cover: cover, stickers: items)
-        return stickerPack
+        return StickerPackRecord(info: stickerPackInfo, title: title, author: author, cover: cover, items: items)
     }
 
     private static func parseOptionalString(_ value: String?) -> String? {

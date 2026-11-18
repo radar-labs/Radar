@@ -17,6 +17,7 @@ class MockAuthCrededentialManager: AuthCredentialManager {
     func fetchGroupAuthCredential(localIdentifiers: LocalIdentifiers) async throws -> AuthCredentialWithPni {
         throw OWSGenericError("Not implemented.")
     }
+
     func fetchCallLinkAuthCredential(localIdentifiers: LocalIdentifiers) async throws -> CallLinkAuthCredential {
         throw OWSGenericError("Not implemented.")
     }
@@ -34,7 +35,7 @@ class AuthCredentialManagerImpl: AuthCredentialManager {
         authCredentialStore: AuthCredentialStore,
         callLinkPublicParams: GenericServerPublicParams,
         dateProvider: @escaping DateProvider,
-        db: any DB
+        db: any DB,
     ) {
         self.authCredentialStore = authCredentialStore
         self.callLinkPublicParams = callLinkPublicParams
@@ -54,7 +55,7 @@ class AuthCredentialManagerImpl: AuthCredentialManager {
             for: redemptionTime,
             localIdentifiers: localIdentifiers,
             fetchCachedAuthCredential: self.authCredentialStore.groupAuthCredential(for:tx:),
-            authCredentialsKeyPath: \.groupAuthCredentials
+            authCredentialsKeyPath: \.groupAuthCredentials,
         )
     }
 
@@ -64,13 +65,13 @@ class AuthCredentialManagerImpl: AuthCredentialManager {
             for: redemptionTime,
             localIdentifiers: localIdentifiers,
             fetchCachedAuthCredential: self.authCredentialStore.callLinkAuthCredential(for:tx:),
-            authCredentialsKeyPath: \.callLinkAuthCredentials
+            authCredentialsKeyPath: \.callLinkAuthCredentials,
         )
         return CallLinkAuthCredential(
             localAci: localIdentifiers.aci,
             redemptionTime: redemptionTime,
             serverParams: self.callLinkPublicParams,
-            authCredential: authCredential
+            authCredential: authCredential,
         )
     }
 
@@ -78,10 +79,10 @@ class AuthCredentialManagerImpl: AuthCredentialManager {
         for redemptionTime: UInt64,
         localIdentifiers: LocalIdentifiers,
         fetchCachedAuthCredential: (UInt64, DBReadTransaction) throws -> T?,
-        authCredentialsKeyPath: KeyPath<ReceivedAuthCredentials, [(redemptionTime: UInt64, authCredential: T)]>
+        authCredentialsKeyPath: KeyPath<ReceivedAuthCredentials, [(redemptionTime: UInt64, authCredential: T)]>,
     ) async throws -> T {
         do {
-            let authCredential = try self.db.read { (tx) throws -> T? in
+            let authCredential = try self.db.read { tx throws -> T? in
                 return try fetchCachedAuthCredential(redemptionTime, tx)
             }
             if let authCredential {
@@ -94,7 +95,7 @@ class AuthCredentialManagerImpl: AuthCredentialManager {
 
         let authCredentials = try await fetchNewAuthCredentials(
             startTimestamp: redemptionTime,
-            localIdentifiers: localIdentifiers
+            localIdentifiers: localIdentifiers,
         )
 
         await db.awaitableWrite { tx in
@@ -103,7 +104,7 @@ class AuthCredentialManagerImpl: AuthCredentialManager {
                 self.authCredentialStore.setGroupAuthCredential(
                     authCredential,
                     for: redemptionTime,
-                    tx: tx
+                    tx: tx,
                 )
             }
 
@@ -112,13 +113,13 @@ class AuthCredentialManagerImpl: AuthCredentialManager {
                 self.authCredentialStore.setCallLinkAuthCredential(
                     authCredential,
                     for: redemptionTime,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
 
         let authCredential = authCredentials[keyPath: authCredentialsKeyPath].first(
-            where: { $0.redemptionTime == redemptionTime }
+            where: { $0.redemptionTime == redemptionTime },
         )?.authCredential
         guard let authCredential else {
             throw OWSAssertionError("The server didn't give us the credential we requested")
@@ -134,7 +135,7 @@ class AuthCredentialManagerImpl: AuthCredentialManager {
 
     private func fetchNewAuthCredentials(
         startTimestamp: UInt64,
-        localIdentifiers: LocalIdentifiers
+        localIdentifiers: LocalIdentifiers,
     ) async throws -> ReceivedAuthCredentials {
         let endTimestamp = startTimestamp + Constants.numberOfDaysToFetch * UInt64(TimeInterval.day)
         let timestampRange = startTimestamp...endTimestamp
@@ -149,11 +150,16 @@ class AuthCredentialManagerImpl: AuthCredentialManager {
 
         let authCredentialResponse = try JSONDecoder().decode(AuthCredentialResponse.self, from: bodyData)
 
-        if let localPni = localIdentifiers.pni, authCredentialResponse.pni != localPni {
-            Logger.warn("Auth credential \(authCredentialResponse.pni) didn't match local \(localPni)")
+        switch localIdentifiers.accountType {
+        case .phoneNumberfull(_, let localPni):
+            if let localPni, authCredentialResponse.pni?.wrappedValue != localPni {
+                Logger.warn("auth credential \(authCredentialResponse.pni?.wrappedValue as Optional) didn't match local \(localPni)")
+            }
+        case .phoneNumberless:
+            break
         }
 
-        let serverPublicParams = GroupsV2Protos.serverPublicParams()
+        let serverPublicParams = TSConstants.serverPublicParams()
         let clientZkAuthOperations = ClientZkAuthOperations(serverPublicParams: serverPublicParams)
         var result = ReceivedAuthCredentials()
         for fetchedValue in authCredentialResponse.groupAuthCredentials {
@@ -161,12 +167,26 @@ class AuthCredentialManagerImpl: AuthCredentialManager {
                 owsFailDebug("Dropping auth credential we didn't ask for")
                 continue
             }
-            let receivedValue = try clientZkAuthOperations.receiveAuthCredentialWithPniAsServiceId(
-                aci: localIdentifiers.aci,
-                pni: authCredentialResponse.pni,
-                redemptionTime: fetchedValue.redemptionTime,
-                authCredentialResponse: AuthCredentialWithPniResponse(contents: fetchedValue.credential)
-            )
+            let receivedValue: AuthCredentialWithPni
+            switch localIdentifiers.accountType {
+            case .phoneNumberfull:
+                guard let pni = authCredentialResponse.pni else {
+                    throw OWSGenericError("auth credential response missing required pni")
+                }
+                receivedValue = try clientZkAuthOperations.receiveAuthCredentialWithPniAsServiceId(
+                    aci: localIdentifiers.aci,
+                    pni: pni.wrappedValue,
+                    redemptionTime: fetchedValue.redemptionTime,
+                    authCredentialResponse: AuthCredentialWithPniResponse(contents: fetchedValue.credential),
+                )
+            case .phoneNumberless(let authCredentialSalt):
+                receivedValue = try clientZkAuthOperations.receiveAuthCredentialWithoutPni(
+                    aci: localIdentifiers.aci,
+                    salt: authCredentialSalt.rawValue,
+                    redemptionTime: fetchedValue.redemptionTime,
+                    authCredentialResponse: AuthCredentialWithPniResponse(contents: fetchedValue.credential),
+                )
+            }
             result.groupAuthCredentials.append((fetchedValue.redemptionTime, receivedValue))
         }
         for fetchedValue in authCredentialResponse.callLinkAuthCredentials {
@@ -174,18 +194,19 @@ class AuthCredentialManagerImpl: AuthCredentialManager {
                 owsFailDebug("Dropping call link credential we didn't ask for")
                 continue
             }
-            // A call link credential we can't parse must not block the group
-            // credentials fetched alongside it. Signal is moving call link
-            // credentials to new zkgroup params (Signal-Server 355d95c6,
-            // libsignal v0.101.0) whose format this libsignal can't read; if the
-            // server starts sending those to us, skip them and keep groups working.
+            // Radar: a call link credential we can't parse must not block the
+            // group credentials fetched alongside it in this loop. 7.96 needed
+            // this because its libsignal couldn't read the new call link zkgroup
+            // params (Signal-Server 355d95c6, libsignal v0.101.0); this libsignal
+            // can, so it's kept only as defense in depth: skip the credential
+            // and keep groups working.
             do {
                 let receivedValue = try CallLinkAuthCredentialResponse(
-                    contents: fetchedValue.credential
+                    contents: fetchedValue.credential,
                 ).receive(
                     userId: localIdentifiers.aci,
                     redemptionTime: Date(timeIntervalSince1970: TimeInterval(fetchedValue.redemptionTime)),
-                    params: callLinkPublicParams
+                    params: callLinkPublicParams,
                 )
                 result.callLinkAuthCredentials.append((fetchedValue.redemptionTime, receivedValue))
             } catch {
@@ -208,7 +229,7 @@ class AuthCredentialManagerImpl: AuthCredentialManager {
             case callLinkAuthCredentials
         }
 
-        @PniUuid var pni: Pni
+        var pni: PniUuid?
         var groupAuthCredentials: [AuthCredential]
         var callLinkAuthCredentials: [AuthCredential]
 

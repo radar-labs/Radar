@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import LibSignalClient
 import SignalServiceKit
 
 extension ProvisioningCoordinatorImpl {
@@ -19,28 +20,29 @@ extension ProvisioningCoordinatorImpl {
 
         static func makeVerifySecondaryDeviceRequest(
             verificationCode: String,
-            phoneNumber: String,
+            aci: Aci,
+            aciPreKeyBundle: RegistrationPreKeyUploadBundle,
+            pniPreKeyBundle: RegistrationPreKeyUploadBundle?,
             authPassword: String,
-            accountAttributes: AccountAttributes,
+            deviceAttributes: DeviceAttributes,
             apnRegistrationId: RegistrationRequestFactory.ApnRegistrationId?,
-            prekeyBundles: RegistrationPreKeyUploadBundles,
-            signalService: OWSSignalServiceProtocol
+            networkManager: any NetworkManagerProtocol,
         ) async -> VerifySecondaryDeviceResponse {
             let request = ProvisioningRequestFactory.verifySecondaryDeviceRequest(
                 verificationCode: verificationCode,
-                phoneNumber: phoneNumber,
+                aci: aci,
+                aciPreKeyBundle: aciPreKeyBundle,
+                pniPreKeyBundle: pniPreKeyBundle,
                 authPassword: authPassword,
-                attributes: accountAttributes,
+                attributes: deviceAttributes,
                 apnRegistrationId: apnRegistrationId,
-                prekeyBundles: prekeyBundles
             )
 
             do {
-                let response = try await signalService.urlSessionForMainSignalService().performRequest(request)
+                let response = try await networkManager.asyncRequest(request)
                 return handleVerifySecondaryDeviceResponse(
                     statusCode: response.responseStatusCode,
-                    retryAfterHeader: response.headers[Constants.retryAfterHeader],
-                    bodyData: response.responseBodyData
+                    bodyData: response.responseBodyData,
                 )
             } catch {
                 if error.isNetworkFailureOrTimeout {
@@ -51,16 +53,14 @@ extension ProvisioningCoordinatorImpl {
                 }
                 return handleVerifySecondaryDeviceResponse(
                     statusCode: error.responseStatusCode,
-                    retryAfterHeader: error.responseHeaders?[Constants.retryAfterHeader],
-                    bodyData: error.httpResponseData
+                    bodyData: error.httpResponseData,
                 )
             }
         }
 
         private static func handleVerifySecondaryDeviceResponse(
             statusCode: Int,
-            retryAfterHeader: String?,
-            bodyData: Data?
+            bodyData: Data?,
         ) -> VerifySecondaryDeviceResponse {
             let statusCode = ProvisioningServiceResponses.VerifySecondaryDeviceResponseCodes(rawValue: statusCode)
             switch statusCode {
@@ -68,10 +68,12 @@ extension ProvisioningCoordinatorImpl {
                 guard let bodyData else {
                     return .genericError(OWSAssertionError("Got empty verify secondary device response"))
                 }
-                guard let response = try? JSONDecoder().decode(
-                    ProvisioningServiceResponses.VerifySecondaryDeviceResponse.self,
-                    from: bodyData
-                ) else {
+                guard
+                    let response = try? JSONDecoder().decode(
+                        ProvisioningServiceResponses.VerifySecondaryDeviceResponse.self,
+                        from: bodyData,
+                    )
+                else {
                     return .genericError(OWSAssertionError("Unable to parse verify secondary device response from response"))
                 }
 
@@ -85,29 +87,6 @@ extension ProvisioningCoordinatorImpl {
             case .none, .unexpectedError:
                 return .genericError(OWSAssertionError("Unknown status code"))
             }
-        }
-
-        static func makeUpdateSecondaryDeviceCapabilitiesRequest(
-            capabilities: AccountAttributes.Capabilities,
-            auth: ChatServiceAuth,
-            networkManager: any NetworkManagerProtocol,
-            tsAccountManager: TSAccountManager
-        ) async throws {
-            let request = AccountAttributesRequestFactory(
-                tsAccountManager: tsAccountManager
-            ).updateLinkedDeviceCapabilitiesRequest(
-                capabilities,
-                auth: auth
-            )
-
-            // Don't care what the response is.
-            _ = try await networkManager.asyncRequest(request)
-        }
-
-        enum Constants {
-            static let defaultRetryTime: TimeInterval = 3
-
-            static let retryAfterHeader = "retry-after"
         }
     }
 }

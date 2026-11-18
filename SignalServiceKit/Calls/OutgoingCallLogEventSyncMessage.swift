@@ -8,39 +8,51 @@
 ///
 /// - SeeAlso ``IncomingCallLogEventSyncMessageManager``
 @objc(OutgoingCallLogEventSyncMessage)
-public class OutgoingCallLogEventSyncMessage: OWSOutgoingSyncMessage {
+public class OutgoingCallLogEventSyncMessage: OutgoingSyncMessage {
+    override public class var supportsSecureCoding: Bool { true }
+
+    public required init?(coder: NSCoder) {
+        guard let callLogEvent = coder.decodeObject(of: CallLogEvent.self, forKey: "callLogEvent") else {
+            return nil
+        }
+        self.callLogEvent = callLogEvent
+        super.init(coder: coder)
+    }
+
+    override public func encode(with coder: NSCoder) {
+        super.encode(with: coder)
+        coder.encode(callLogEvent, forKey: "callLogEvent")
+    }
+
+    override public var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(super.hash)
+        hasher.combine(callLogEvent)
+        return hasher.finalize()
+    }
+
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard super.isEqual(object) else { return false }
+        guard self.callLogEvent == object.callLogEvent else { return false }
+        return true
+    }
 
     /// The call log event.
-    ///
-    /// - Important
-    /// The ObjC name must remain as-is for compatibility with Mantle.
-    ///
-    /// - Note
-    /// Nullability here is intentional, since Mantle will set this property via
-    /// its reflection-based `init(coder:)` when we call `super.init(coder:)`.
-    @objc(callLogEvent)
-    private(set) var callLogEvent: CallLogEvent!
+    private let callLogEvent: CallLogEvent
 
     init(
         callLogEvent: CallLogEvent,
         localThread: TSContactThread,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) {
         self.callLogEvent = callLogEvent
-        super.init(localThread: localThread, transaction: tx)
-    }
-
-    required public init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
-
-    required public init(dictionary dictionaryValue: [String: Any]!) throws {
-        try super.init(dictionary: dictionaryValue)
+        super.init(localThread: localThread, tx: tx)
     }
 
     override public var isUrgent: Bool { false }
 
-    override public func syncMessageBuilder(transaction: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override public func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
         let callLogEventBuilder = SSKProtoSyncMessageCallLogEvent.builder()
 
         callLogEventBuilder.setTimestamp(callLogEvent.timestamp)
@@ -64,7 +76,7 @@ public class OutgoingCallLogEventSyncMessage: OWSOutgoingSyncMessage {
 
 public extension OutgoingCallLogEventSyncMessage {
     @objc(OutgoingCallLogEvent)
-    class CallLogEvent: NSObject, NSCoding {
+    class CallLogEvent: NSObject, NSSecureCoding {
         public enum EventType: UInt, CaseIterable {
             /// Indicates we cleared our call log in its entirety.
             ///
@@ -93,7 +105,7 @@ public extension OutgoingCallLogEventSyncMessage {
             eventType: EventType,
             callId: UInt64?,
             conversationId: Data?,
-            timestamp: UInt64
+            timestamp: UInt64,
         ) {
             self.eventType = eventType
             self.callId = callId
@@ -101,7 +113,7 @@ public extension OutgoingCallLogEventSyncMessage {
             self.timestamp = timestamp
         }
 
-        // MARK: NSCoding
+        // MARK: NSSecureCoding
 
         private enum Keys {
             static let eventType = "eventType"
@@ -110,11 +122,13 @@ public extension OutgoingCallLogEventSyncMessage {
             static let conversationId = "conversationId"
         }
 
-        required public init?(coder: NSCoder) {
+        public static var supportsSecureCoding: Bool { true }
+
+        public required init?(coder: NSCoder) {
             guard
-                let eventTypeRaw = coder.decodeObject(of: NSNumber.self, forKey: Keys.eventType) as? UInt,
+                let eventTypeRaw = coder.decodeObject(of: NSNumber.self, forKey: Keys.eventType)?.uintValue,
                 let eventType = EventType(rawValue: eventTypeRaw),
-                let timestamp = coder.decodeObject(of: NSNumber.self, forKey: Keys.timestamp) as? UInt64
+                let timestamp = coder.decodeObject(of: NSNumber.self, forKey: Keys.timestamp)?.uint64Value
             else {
                 owsFailDebug("Missing or unrecognized fields!")
                 return nil
@@ -124,7 +138,7 @@ public extension OutgoingCallLogEventSyncMessage {
             self.timestamp = timestamp
 
             if
-                let callId = coder.decodeObject(of: NSNumber.self, forKey: Keys.callId) as? UInt64,
+                let callId = coder.decodeObject(of: NSNumber.self, forKey: Keys.callId)?.uint64Value,
                 let conversationId = coder.decodeObject(of: NSData.self, forKey: Keys.conversationId) as Data?
             {
                 self.callId = callId

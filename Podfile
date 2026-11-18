@@ -8,66 +8,36 @@ use_frameworks!
 
 source 'https://cdn.cocoapods.org/'
 
-pod 'blurhash', podspec: './ThirdParty/blurhash.podspec'
-pod 'SwiftProtobuf', "1.31.1"
-
-ENV['LIBSIGNAL_FFI_PREBUILD_CHECKSUM'] = '6694474cea1b47cb4ee6cdb93cd0b405a2800745f0d0917683958e7563ef6900'
-pod 'LibSignalClient', git: 'https://github.com/signalapp/libsignal.git', tag: 'v0.99.4', testspecs: ["Tests"]
-# pod 'LibSignalClient', path: '../libsignal', testspecs: ["Tests"]
-
-ENV['RINGRTC_PREBUILD_CHECKSUM'] = 'b4a56a4d548cf2ea0215664f5a64c127c725ccf2ec360cbebe790da689286837'
-pod 'SignalRingRTC', git: 'https://github.com/signalapp/ringrtc', tag: 'v2.59.3', inhibit_warnings: true
+ENV['RINGRTC_PREBUILD_CHECKSUM'] = 'eb2579b7507ad206bec3b582e6d289793c77cdf2393722c96e1f61123040f88a'
+# ENV['RINGRTC_USE_FILE_BASED_CAMERA'] = '1'
+pod 'SignalRingRTC', git: 'https://github.com/signalapp/ringrtc', tag: 'v2.73.0', inhibit_warnings: true
 # pod 'SignalRingRTC', path: '../ringrtc', testspecs: ["Tests"]
 
-pod 'GRDB.swift/SQLCipher'
-# pod 'GRDB.swift/SQLCipher', path: '../GRDB.swift'
-
-pod 'SQLCipher', git: 'https://github.com/signalapp/sqlcipher.git', tag: 'v4.6.1-f_barrierfsync'
-# pod 'SQLCipher', path: '../sqlcipher'
-
 ###
-# forked third party pods
+# Radar pods (Lightning wallet). Kept in CocoaPods; everything else upstream moved
+# to Swift Package Manager.
 ###
 
-# Forked for performance optimizations that are not likely to be upstreamed as they are specific
-# to our limited use of Mantle
-pod 'Mantle', git: 'https://github.com/signalapp/Mantle', branch: 'signal-master'
-# pod 'Mantle', path: '../Mantle'
+def radar_breez_pods
+  pod 'PasskeyPRFHelperObjC', :podspec => './ThirdParty/PasskeyPRFHelperObjC.podspec.json'
+  pod 'breez_sdk_sparkFFI', :podspec => './ThirdParty/breez_sdk_sparkFFI.podspec.json'
+  pod 'BreezSdkSpark', :podspec => './ThirdParty/BreezSdkSpark.podspec.json'
+end
 
-pod 'libPhoneNumber-iOS', git: 'https://github.com/signalapp/libPhoneNumber-iOS', branch: 'signal-master'
-# pod 'libPhoneNumber-iOS', path: '../libPhoneNumber-iOS'
-
-pod 'SDWebImage'
-pod 'SDWebImageWebPCoder'
-pod 'libwebp'
+def radar_ui_pods
+  radar_breez_pods
+  pod 'Swift-BigInt', '2.4.0'
+  pod "MnemonicSwift", git: 'https://github.com/zcash/swift-bip39', tag: '2.2.5'
+end
 
 ###
 # third party pods
 ####
 
-pod 'Reachability', '~> 3.7.7', :inhibit_warnings => true
-
-def ui_pods
-  pod 'BonMot', inhibit_warnings: true
-  pod 'PureLayout', :inhibit_warnings => true
-  pod 'lottie-ios', :inhibit_warnings => true
-
-  pod 'LibMobileCoin/CoreHTTP', git: 'https://github.com/signalapp/libmobilecoin-ios-artifacts', tag: 'signal/6.0.2', submodules: true
-  pod 'MobileCoin/CoreHTTP', git: 'https://github.com/mobilecoinofficial/MobileCoin-Swift', tag: 'v6.0.3'
-
-  pod 'Swift-BigInt', '2.4.0'
-  pod 'PasskeyPRFHelperObjC', :podspec => './ThirdParty/PasskeyPRFHelperObjC.podspec.json'
-  pod 'breez_sdk_sparkFFI', :podspec => './ThirdParty/breez_sdk_sparkFFI.podspec.json'
-  pod 'BreezSdkSpark', :podspec => './ThirdParty/BreezSdkSpark.podspec.json'
-
-  pod "MnemonicSwift", git: 'https://github.com/zcash/swift-bip39', tag: '2.2.5'
-end
-
 target 'Signal' do
   project 'Signal.xcodeproj', 'Debug' => :debug, 'Release' => :release
 
-  # Pods only available inside the main Signal app
-  ui_pods
+  radar_ui_pods
 
   target 'SignalTests' do
     inherit! :search_paths
@@ -77,11 +47,11 @@ end
 # These extensions inherit all of the common pods
 
 target 'SignalShareExtension' do
-  ui_pods
+  radar_ui_pods
 end
 
 target 'SignalUI' do
-  ui_pods
+  radar_ui_pods
 
   target 'SignalUITests' do
     inherit! :search_paths
@@ -89,12 +59,8 @@ target 'SignalUI' do
 end
 
 target 'SignalServiceKit' do
-  pod 'CocoaLumberjack'
-
   pod 'Swift-BigInt', '2.4.0'
-  pod 'PasskeyPRFHelperObjC', :podspec => './ThirdParty/PasskeyPRFHelperObjC.podspec.json'
-  pod 'breez_sdk_sparkFFI', :podspec => './ThirdParty/breez_sdk_sparkFFI.podspec.json'
-  pod 'BreezSdkSpark', :podspec => './ThirdParty/BreezSdkSpark.podspec.json'
+  radar_breez_pods
 
   target 'SignalServiceKitTests' do
     inherit! :search_paths
@@ -116,7 +82,6 @@ post_install do |installer|
   update_frameworks_script(installer)
   disable_non_development_pod_warnings(installer)
   fix_ringrtc_project_symlink(installer)
-  patch_reachability_private_header(installer)
   disable_extension_api_only_for_breez(installer)
   fetch_ringrtc
   copy_acknowledgements
@@ -142,6 +107,8 @@ def enable_extension_support_for_purelayout(installer)
   end
 end
 
+# BreezSdkSpark uses APIs that are unavailable to app extensions; it is only
+# linked into extension targets transitively, so allow it to build.
 def disable_extension_api_only_for_breez(installer)
   installer.pods_project.targets.each do |target|
     if target.name == "BreezSdkSpark"
@@ -199,26 +166,6 @@ def promote_minimum_supported_version(installer)
   end
 end
 
-
-# The Reachability 3.7.x pod imports <netinet6/in6.h>, which newer Apple SDKs
-# treat as a private system header. The file uses only IPv4 types, so the
-# import is dead code — stripping it after each `pod install` eliminates the
-# resulting "Use of private header from outside its module" error. Pod source
-# files install read-only, so we temporarily make the file writable.
-def patch_reachability_private_header(installer)
-  reachability_m = 'Pods/Reachability/Reachability.m'
-  return unless File.exist?(reachability_m)
-  contents = File.read(reachability_m)
-  fixed = contents.gsub(/^#import <netinet6\/in6\.h>\s*\n/, '')
-  return if fixed == contents
-  original_mode = File.stat(reachability_m).mode
-  File.chmod(0644, reachability_m)
-  begin
-    File.write(reachability_m, fixed)
-  ensure
-    File.chmod(original_mode, reachability_m)
-  end
-end
 
 def disable_bitcode(installer)
   installer.pods_project.targets.each do |target|
@@ -298,128 +245,5 @@ def fetch_ringrtc
 end
 
 def copy_acknowledgements
-  targets = [
-    'Signal',
-    'SignalNSE',
-    'SignalServiceKit',
-    'SignalServiceKitTests',
-    'SignalShareExtension',
-    'SignalTests',
-    'SignalUI',
-    'SignalUITests'
-  ]
-  acknowledgements_files = targets.map do |target|
-    "Pods/Target Support Files/Pods-#{target}/Pods-#{target}-acknowledgements.plist"
-  end
-  acknowledgements_files << "Pods/LibSignalClient/acknowledgments/acknowledgments-ios.plist"
-  acknowledgements_files << "Pods/SignalRingRTC/acknowledgments/acknowledgments.plist"
-  acknowledgements_files << "Pods/SignalRingRTC/out/release/acknowledgments-webrtc-ios.plist"
-
-  def get_specifier_groups(acknowledgements_files)
-    acknowledgements_files.map do |file|
-      extract_cmd = ['plutil', '-extract', 'PreferenceSpecifiers', 'json', '-o', '-', file]
-
-      io = IO.popen(extract_cmd, unsetenv_others: true, exception: true)
-      result = JSON.parse(io.read)
-      io.close
-      status = $?
-      raise status unless status.exitstatus == 0
-
-      result
-    end
-  end
-
-  def get_acknowledgements_specifiers(group)
-    group[1...-1]
-  end
-
-  def write_output_file(specifiers)
-    output_file = 'Signal/Settings.bundle/Acknowledgements.plist'
-    output_json = JSON.dump(specifiers)
-    system('plutil', '-create', 'xml1', output_file, exception: true)
-    system('plutil', '-insert', 'PreferenceSpecifiers', '-json', output_json, '-append', output_file, exception: true)
-  end
-
-  def add_in_repo_third_party_code_licenses(specifiers)
-#    specifiers << {
-#      "Type" => "PSGroupSpecifier",
-#      "Title" => "",
-#      "FooterText" => "",
-#      "License" => "",
-#    }
-     specifiers << {
-       "Type" => "PSGroupSpecifier",
-       "Title" => "UIImage-Resize",
-       "FooterText" => <<~'LICENSE',
-         Without any further information, all the sources provided here are under the MIT License
-         quoted below.
-
-         Anyway, please contact me by email (olivier.halligon+ae@gmail.com) if you plan to use my work and the provided classes
-         in your own software. Thanks.
-
-
-         /***********************************************************************************
-          *
-          * Copyright (c) 2010 Olivier Halligon
-          *
-          * Permission is hereby granted, free of charge, to any person obtaining a copy
-          * of this software and associated documentation files (the "Software"), to deal
-          * in the Software without restriction, including without limitation the rights
-          * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-          * copies of the Software, and to permit persons to whom the Software is
-          * furnished to do so, subject to the following conditions:
-          *
-          * The above copyright notice and this permission notice shall be included in
-          * all copies or substantial portions of the Software.
-          *
-          * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-          * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-          * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-          * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-          * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-          * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-          * THE SOFTWARE.
-          *
-          ***********************************************************************************
-          *
-          * Any comment or suggestion welcome. Referencing this project in your AboutBox is appreciated.
-          * Please tell me if you use this class so we can cross-reference our projects.
-          *
-          ***********************************************************************************/
-       LICENSE
-       "License" => "MIT",
-     }
-  end
-
-  specifier_groups = get_specifier_groups(acknowledgements_files)
-
-  header_specifier = specifier_groups.first.first
-  footer_specifier = specifier_groups.first.last
-  all_acknowledgements_specifiers = specifier_groups.flat_map {|g| get_acknowledgements_specifiers(g)}
-
-  add_in_repo_third_party_code_licenses(all_acknowledgements_specifiers)
-
-  libraries_by_license = Hash.new { |h, k| h[k] = [] }
-  all_acknowledgements_specifiers.each do |v|
-    v["Title"].split(", ").each do |title|
-      libraries_by_license[[v["FooterText"], v["License"]]] << title
-    end
-  end
-
-  grouped_acknowledgements_specifiers = []
-  libraries_by_license.each do |key, value|
-    titles = value.uniq.sort_by { |s| s.downcase }.join(", ")
-    acknowledgement = {
-      "Type" => "PSGroupSpecifier",
-      "Title" => titles,
-      "FooterText" => key[0],
-    }
-    acknowledgement["License"] = key[1] if key[1]
-    grouped_acknowledgements_specifiers << acknowledgement
-  end
-
-  cleaned_acknowledgements_specifiers = grouped_acknowledgements_specifiers.sort_by {|s| s["Title"].downcase}
-  final_specifiers = [header_specifier] + cleaned_acknowledgements_specifiers + [footer_specifier]
-
-  write_output_file(final_specifiers)
+  system('Scripts/generate_acknowledgements.py', exception: true)
 end

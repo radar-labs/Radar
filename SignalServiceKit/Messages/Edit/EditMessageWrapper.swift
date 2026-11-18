@@ -27,17 +27,17 @@ public protocol EditMessageWrapper {
         applying: MessageEdits,
         isLatestRevision: Bool,
         attachmentContentValidator: AttachmentContentValidator,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> MessageBuilderType
 
     static func build(
         _ builder: MessageBuilderType,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> MessageType
 
     func updateMessageCopy(
         newMessageCopy: MessageType,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 }
 
@@ -91,7 +91,7 @@ public struct IncomingEditMessageWrapper: EditMessageWrapper {
         applying edits: MessageEdits,
         isLatestRevision: Bool,
         attachmentContentValidator: AttachmentContentValidator,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> TSIncomingMessageBuilder {
         let editState: TSEditState = {
             if isLatestRevision {
@@ -115,7 +115,7 @@ public struct IncomingEditMessageWrapper: EditMessageWrapper {
             messageBody = message.body.map {
                 attachmentContentValidator.truncatedMessageBodyForInlining(
                     MessageBody(text: $0, ranges: message.bodyRanges ?? .empty),
-                    tx: tx
+                    tx: tx,
                 )
             }
         case .change(let body):
@@ -144,6 +144,9 @@ public struct IncomingEditMessageWrapper: EditMessageWrapper {
             editState: editState,
             // Prior revisions don't expire (timer=0); instead they
             // are cascade-deleted when the latest revision expires.
+            //
+            // Note that this has implications for Backups; if you're changing
+            // this, please refer to ChatItemExpirationDetails.
             expiresInSeconds: isLatestRevision ? message.expiresInSeconds : 0,
             expireTimerVersion: isLatestRevision ? message.expireTimerVersion?.uint32Value : nil,
             expireStartedAt: message.expireStartedAt,
@@ -166,20 +169,19 @@ public struct IncomingEditMessageWrapper: EditMessageWrapper {
             giftBadge: message.giftBadge,
             paymentNotification: nil,
             isPoll: false,
-            isStarred: false,
         )
     }
 
     public static func build(
         _ builder: TSIncomingMessageBuilder,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> TSIncomingMessage {
         return builder.build()
     }
 
     public func updateMessageCopy(
         newMessageCopy: TSIncomingMessage,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {}
 }
 
@@ -192,7 +194,7 @@ public struct OutgoingEditMessageWrapper: EditMessageWrapper {
 
     public init(
         message: TSOutgoingMessage,
-        thread: TSThread
+        thread: TSThread,
     ) {
         self.message = message
         self.thread = thread
@@ -205,7 +207,7 @@ public struct OutgoingEditMessageWrapper: EditMessageWrapper {
         applying edits: MessageEdits,
         isLatestRevision: Bool,
         attachmentContentValidator: AttachmentContentValidator,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> TSOutgoingMessageBuilder {
         let messageBody: ValidatedInlineMessageBody?
         switch edits.body {
@@ -213,7 +215,7 @@ public struct OutgoingEditMessageWrapper: EditMessageWrapper {
             messageBody = message.body.map {
                 attachmentContentValidator.truncatedMessageBodyForInlining(
                     MessageBody(text: $0, ranges: message.bodyRanges ?? .empty),
-                    tx: tx
+                    tx: tx,
                 )
             }
         case .change(let body):
@@ -242,7 +244,6 @@ public struct OutgoingEditMessageWrapper: EditMessageWrapper {
             expireTimerVersion: isLatestRevision ? message.expireTimerVersion?.uint32Value : 0,
             expireStartedAt: message.expireStartedAt,
             isVoiceMessage: message.isVoiceMessage,
-            groupMetaMessage: message.groupMetaMessage,
             isSmsMessageRestoredFromBackup: message.isSmsMessageRestoredFromBackup,
             isViewOnceMessage: message.isViewOnceMessage,
             isViewOnceComplete: message.isViewOnceComplete,
@@ -258,26 +259,25 @@ public struct OutgoingEditMessageWrapper: EditMessageWrapper {
             messageSticker: nil,
             giftBadge: message.giftBadge,
             isPoll: false,
-            isStarred: false,
         )
     }
 
     public static func build(
         _ builder: TSOutgoingMessageBuilder,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> TSOutgoingMessage {
         return builder.build(transaction: tx)
     }
 
     public func updateMessageCopy(
         newMessageCopy: TSOutgoingMessage,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         // Need to copy over the recipient address from the old message
         // This is needed when procesing sync messages.
         newMessageCopy.updateWithRecipientAddressStates(
             message.recipientAddressStates,
-            tx: tx
+            tx: tx,
         )
     }
 }

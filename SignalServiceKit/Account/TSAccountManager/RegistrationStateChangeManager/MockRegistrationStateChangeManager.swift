@@ -13,80 +13,48 @@ open class MockRegistrationStateChangeManager: RegistrationStateChangeManager {
     public init() {}
 
     public var registrationStateMock: (() -> TSRegistrationState) = {
-        return .registered
+        owsFail("not implemented")
     }
 
     open func registrationState(tx: DBReadTransaction) -> TSRegistrationState {
         return registrationStateMock()
     }
 
-    public lazy var didRegisterPrimaryMock: (
-        _ e164: E164,
-        _ aci: Aci,
-        _ pni: Pni,
-        _ authToken: String
-    ) -> Void = { [weak self] _, _, _, _ in
-        self?.registrationStateMock = { .registered }
+    public lazy var didRegisterOrProvisionMock: (
+        _ account: AuthedAccount.Explicit,
+    ) -> Void = { [weak self] account in
+        self?.registrationStateMock = { .registered(account.localIdentifiers) }
     }
 
-    open func didRegisterPrimary(
-        e164: E164,
-        aci: Aci,
-        pni: Pni,
-        authToken: String,
-        tx: DBWriteTransaction
+    open func didRegisterOrProvision(
+        account: AuthedAccount.Explicit,
+        tx: DBWriteTransaction,
     ) {
-        didRegisterPrimaryMock(e164, aci, pni, authToken)
-    }
-
-    public lazy var didProvisionSecondaryMock: (
-        _ e164: E164,
-        _ aci: Aci,
-        _ pni: Pni,
-        _ authToken: String,
-        _ deviceId: DeviceId
-    ) -> Void = { [weak self] _, _, _, _, _ in
-        self?.registrationStateMock = { .provisioned }
-    }
-
-    open func didProvisionSecondary(e164: E164, aci: Aci, pni: Pni, authToken: String, deviceId: DeviceId, tx: DBWriteTransaction) {
-        didProvisionSecondaryMock(e164, aci, pni, authToken, deviceId)
-    }
-
-    public lazy var didFinishProvisioningSecondayMock: () -> Void = { [weak self] in
-        self?.registrationStateMock = { .provisioned }
-    }
-
-    open func didFinishProvisioningSecondary(tx: DBWriteTransaction) {
-        didFinishProvisioningSecondayMock()
+        didRegisterOrProvisionMock(account)
     }
 
     public var didUpdateLocalPhoneNumberMock: (
-        _ e164: E164,
         _ aci: Aci,
-        _ pni: Pni
-    ) -> Void = { _, _, _ in }
+        _ phoneNumber: LocalIdentifiers.PhoneNumber,
+    ) -> Void = { _, _ in }
 
-    open func didUpdateLocalPhoneNumber(_ e164: E164, aci: Aci, pni: Pni, tx: DBWriteTransaction) {
-        didUpdateLocalPhoneNumberMock(e164, aci, pni)
+    public func didUpdateLocalPhoneNumber(aci: Aci, phoneNumber: LocalIdentifiers.PhoneNumber, tx: DBWriteTransaction) {
+        didUpdateLocalPhoneNumberMock(aci, phoneNumber)
     }
 
     public lazy var resetForReregistrationMock: (
-        _ localPhoneNumber: E164,
-        _ localAci: Aci,
-        _ wasPrimaryDevice: Bool
-    ) -> Void = { [weak self] phoneNumber, aci, _ in
-        self?.registrationStateMock = { .reregistering(phoneNumber: phoneNumber.stringValue, aci: aci) }
+        _ localIdentifiers: ReregisteringLocalIdentifiers,
+        _ isPrimaryDevice: Bool,
+    ) -> Void = { [weak self] localIdentifiers, _ in
+        self?.registrationStateMock = { .reregistering(localIdentifiers) }
     }
 
     open func resetForReregistration(
-        localPhoneNumber: E164,
-        localAci: Aci,
-        discoverability: PhoneNumberDiscoverability?,
-        wasPrimaryDevice: Bool,
-        tx: DBWriteTransaction
+        localIdentifiers: ReregisteringLocalIdentifiers,
+        isPrimaryDevice: Bool,
+        tx: DBWriteTransaction,
     ) {
-        return resetForReregistrationMock(localPhoneNumber, localAci, wasPrimaryDevice)
+        return resetForReregistrationMock(localIdentifiers, isPrimaryDevice)
     }
 
     public lazy var setIsTransferInProgressMock: () -> Void = { [weak self] in
@@ -98,7 +66,7 @@ open class MockRegistrationStateChangeManager: RegistrationStateChangeManager {
     }
 
     public lazy var setIsTransferCompleteMock: () -> Void = { [weak self] in
-        self?.registrationStateMock = { .registered }
+        owsFail("not implemented")
     }
 
     open func setIsTransferComplete(sendStateUpdateNotification: Bool, tx: DBWriteTransaction) {
@@ -120,17 +88,16 @@ open class MockRegistrationStateChangeManager: RegistrationStateChangeManager {
     }
 
     public lazy var setIsDeregisteredOrDelinkedMock: (
-        _ isDeregisteredOrDelinked: Bool
-    ) -> Void = { [weak self] isDeregisteredOrDelinked in
-        let wasPrimary = self?.registrationStateMock().isPrimaryDevice ?? true
-        if isDeregisteredOrDelinked {
-            self?.registrationStateMock = wasPrimary ? { .deregistered } : { .delinked }
-        } else {
-            self?.registrationStateMock = wasPrimary ? { .registered } : { .provisioned }
-        }
+        _ isDeregisteredOrDelinked: Bool,
+    ) -> Void = { _ in
+        owsFail("not implemented")
     }
 
-    open func setIsDeregisteredOrDelinked(_ isDeregisteredOrDelinked: Bool, tx: DBWriteTransaction) {
+    open func setIsDeregisteredOrDelinked(
+        _ isDeregisteredOrDelinked: Bool,
+        notify: Bool,
+        tx: DBWriteTransaction,
+    ) {
         setIsDeregisteredOrDelinkedMock(isDeregisteredOrDelinked)
     }
 

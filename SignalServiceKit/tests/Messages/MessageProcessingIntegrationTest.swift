@@ -3,15 +3,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import XCTest
-@testable import SignalServiceKit
 import GRDB
 import LibSignalClient
+import XCTest
+@testable import SignalServiceKit
 
 class MessageProcessingIntegrationTest: SSKBaseTest {
-
-    let localE164Identifier = "+13235551234"
-    let localAci = Aci.randomForTesting()
+    let localIdentifiers = LocalIdentifiers.forUnitTests
 
     let aliceE164Identifier = "+14715355555"
     var aliceClient: TestSignalClient!
@@ -35,12 +33,8 @@ class MessageProcessingIntegrationTest: SSKBaseTest {
         identityManager.generateAndPersistNewIdentityKey(for: .pni)
         SSKEnvironment.shared.databaseStorageRef.write { tx in
             (DependenciesBridge.shared.registrationStateChangeManager as! RegistrationStateChangeManagerImpl).registerForTests(
-                localIdentifiers: .init(
-                    aci: localAci,
-                    pni: Pni.randomForTesting(),
-                    e164: .init(localE164Identifier)!
-                ),
-                tx: tx
+                localIdentifiers: localIdentifiers,
+                tx: tx,
             )
 
             DependenciesBridge.shared.tsAccountManager.setRegistrationId(RegistrationIdGenerator.generate(), for: .aci, tx: tx)
@@ -62,9 +56,11 @@ class MessageProcessingIntegrationTest: SSKBaseTest {
 
     func test_contactMessage_UuidOnlyEnvelope() {
         write { transaction in
-            try! self.runner.initialize(senderClient: self.bobClient,
-                                        recipientClient: self.localClient,
-                                        transaction: transaction)
+            try! self.runner.initialize(
+                senderClient: self.bobClient,
+                recipientClient: self.localClient,
+                transaction: transaction,
+            )
         }
 
         // Wait until message processing has completed, otherwise future
@@ -118,7 +114,7 @@ class MessageProcessingIntegrationTest: SSKBaseTest {
         SSKEnvironment.shared.messageProcessorRef.enqueueReceivedEnvelopeData(
             envelopeData,
             serverDeliveryTimestamp: NSDate.ows_millisecondTimeStamp(),
-            envelopeSource: .tests
+            envelopeSource: .tests,
         ) {}
         waitForExpectations(timeout: 1.0)
     }
@@ -128,9 +124,11 @@ class MessageProcessingIntegrationTest: SSKBaseTest {
 
         let localPniClient = LocalSignalClient(identity: .pni)
         write { transaction in
-            try! self.runner.initializePreKeys(senderClient: self.bobClient,
-                                               recipientClient: localPniClient,
-                                               transaction: transaction)
+            try! self.runner.initializePreKeys(
+                senderClient: self.bobClient,
+                recipientClient: localPniClient,
+                transaction: transaction,
+            )
         }
 
         // Wait until message processing has completed, otherwise future
@@ -146,10 +144,12 @@ class MessageProcessingIntegrationTest: SSKBaseTest {
         let timestamp = MessageTimestampGenerator.sharedInstance.generateTimestamp()
         let content = try! fakeService.buildContentData(timestamp: timestamp, bodyText: "Those who stands for nothing will fall for anything")
         let ciphertext = SSKEnvironment.shared.databaseStorageRef.write { transaction in
-            try! runner.encrypt(content,
-                                senderClient: bobClient,
-                                recipient: localPniClient.protocolAddress,
-                                context: transaction)
+            try! runner.encrypt(
+                content,
+                senderClient: bobClient,
+                recipient: localPniClient.protocolAddress,
+                context: transaction,
+            )
         }
 
         let envelopeBuilder = SSKProtoEnvelope.builder(timestamp: 100)
@@ -160,12 +160,12 @@ class MessageProcessingIntegrationTest: SSKBaseTest {
         envelopeBuilder.setSourceDevice(1)
         envelopeBuilder.setServerTimestamp(NSDate.ows_millisecondTimeStamp())
         envelopeBuilder.setServerGuidBinary(UUID().data)
-        envelopeBuilder.setDestinationServiceIDBinary(DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction!.pni!.serviceIdBinary)
+        envelopeBuilder.setDestinationServiceIDBinary(try! DependenciesBridge.shared.tsAccountManager.registeredStateWithMaybeSneakyTransaction().localIdentifiers.pni!.serviceIdBinary)
         let envelopeData = try! envelopeBuilder.buildSerializedData()
         SSKEnvironment.shared.messageProcessorRef.enqueueReceivedEnvelopeData(
             envelopeData,
             serverDeliveryTimestamp: NSDate.ows_millisecondTimeStamp(),
-            envelopeSource: .tests
+            envelopeSource: .tests,
         ) {}
         waitForExpectations(timeout: 1.0)
         self.read { transaction in
@@ -192,7 +192,7 @@ class MessageProcessingIntegrationTest: SSKBaseTest {
                 SSKEnvironment.shared.messageProcessorRef.enqueueReceivedEnvelopeData(
                     envelopeData,
                     serverDeliveryTimestamp: 102,
-                    envelopeSource: .websocketUnidentified
+                    envelopeSource: .websocketUnidentified,
                 ) { continuation.resume() }
             }
         }
@@ -204,7 +204,7 @@ class MessageProcessingIntegrationTest: SSKBaseTest {
         let content = try self.fakeService.buildSyncSentMessage(
             bodyText: "Hello world",
             recipient: self.bobClient.address,
-            timestamp: timestamp
+            timestamp: timestamp,
         )
 
         // Encrypt message content
@@ -229,7 +229,7 @@ class MessageProcessingIntegrationTest: SSKBaseTest {
                 SSKEnvironment.shared.messageProcessorRef.enqueueReceivedEnvelopeData(
                     envelopeData,
                     serverDeliveryTimestamp: NSDate.ows_millisecondTimeStamp(),
-                    envelopeSource: .tests
+                    envelopeSource: .tests,
                 ) { continuation.resume() }
             }
         }
@@ -237,7 +237,7 @@ class MessageProcessingIntegrationTest: SSKBaseTest {
             // Now make sure the status is delivered.
             let fetched = try InteractionFinder.fetchInteractions(
                 timestamp: timestamp,
-                transaction: transaction
+                transaction: transaction,
             ).compactMap { $0 as? TSOutgoingMessage }
             XCTAssertNotNil(fetched.first)
             let message = fetched.first!
@@ -253,12 +253,16 @@ class MessageProcessingIntegrationTest: SSKBaseTest {
     @MainActor
     func testEarlyUDDeliveryReceipt() async throws {
         write { transaction in
-            try! self.runner.initialize(senderClient: self.linkedClient,
-                                        recipientClient: localClient,
-                                        transaction: transaction)
-            try! self.runner.initialize(senderClient: self.bobClient,
-                                        recipientClient: self.localClient,
-                                        transaction: transaction)
+            try! self.runner.initialize(
+                senderClient: self.linkedClient,
+                recipientClient: localClient,
+                transaction: transaction,
+            )
+            try! self.runner.initialize(
+                senderClient: self.bobClient,
+                recipientClient: self.localClient,
+                transaction: transaction,
+            )
         }
 
         // Handle a UD receipt from Bob.
@@ -270,7 +274,7 @@ class MessageProcessingIntegrationTest: SSKBaseTest {
         do {
             let ciphertextData = try fakeService.buildEncryptedContentData(
                 fromSenderClient: self.bobClient,
-                deliveryReceiptForMessage: timestamp
+                deliveryReceiptForMessage: timestamp,
             )
             let envelopeBuilder = SSKProtoEnvelope.builder(timestamp: deliveryTimestamp)
             envelopeBuilder.setContent(ciphertextData)
@@ -286,7 +290,7 @@ class MessageProcessingIntegrationTest: SSKBaseTest {
                 SSKEnvironment.shared.messageProcessorRef.enqueueReceivedEnvelopeData(
                     envelopeData,
                     serverDeliveryTimestamp: 102,
-                    envelopeSource: .websocketUnidentified
+                    envelopeSource: .websocketUnidentified,
                 ) { continuation.resume() }
             }
         }
@@ -294,16 +298,20 @@ class MessageProcessingIntegrationTest: SSKBaseTest {
         do {
             // Handle a sync message
             // Build message content
-            let content = try! self.fakeService.buildSyncSentMessage(bodyText: "Hello world",
-                                                                     recipient: self.bobClient.address,
-                                                                     timestamp: timestamp)
+            let content = try! self.fakeService.buildSyncSentMessage(
+                bodyText: "Hello world",
+                recipient: self.bobClient.address,
+                timestamp: timestamp,
+            )
 
             // Encrypt message content
             let ciphertext = SSKEnvironment.shared.databaseStorageRef.write { transaction in
-                try! self.runner.encrypt(content,
-                                         senderClient: self.linkedClient,
-                                         recipient: self.localClient.protocolAddress,
-                                         context: transaction)
+                try! self.runner.encrypt(
+                    content,
+                    senderClient: self.linkedClient,
+                    recipient: self.localClient.protocolAddress,
+                    context: transaction,
+                )
             }
 
             // Build the message
@@ -322,14 +330,14 @@ class MessageProcessingIntegrationTest: SSKBaseTest {
                 SSKEnvironment.shared.messageProcessorRef.enqueueReceivedEnvelopeData(
                     envelopeData,
                     serverDeliveryTimestamp: NSDate.ows_millisecondTimeStamp(),
-                    envelopeSource: .tests
+                    envelopeSource: .tests,
                 ) { continuation.resume() }
             }
             self.read { transaction in
                 // Now make sure the status is delivered.
                 let fetched = try! InteractionFinder.fetchInteractions(
                     timestamp: timestamp,
-                    transaction: transaction
+                    transaction: transaction,
                 ).compactMap { $0 as? TSOutgoingMessage }
                 XCTAssertNotNil(fetched.first)
                 let message = fetched.first!
@@ -359,5 +367,6 @@ extension DatabaseWriteBlockDelegate: DatabaseWriteDelegate {
     func databaseDidCommit(db: Database) {
         block(db)
     }
+
     func databaseDidRollback(db: Database) { /* no-op */ }
 }

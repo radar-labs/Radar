@@ -26,8 +26,11 @@ final class VoiceMessageInProgressDraft: VoiceMessageSendableDraft {
 
     init(thread: TSThread, audioSession: AudioSession, sleepManager: any DeviceSleepManager) {
         self.threadUniqueId = thread.uniqueId
-        self.audioFileUrl = OWSFileSystem.temporaryFileUrl(fileExtension: "m4a")
-        self.audioActivity = AudioActivity(audioDescription: "Voice Message Recording", behavior: .playAndRecord)
+        self.audioFileUrl = OWSFileSystem.temporaryFileUrl(
+            fileExtension: "m4a",
+            isAvailableWhileDeviceLocked: false,
+        )
+        self.audioActivity = AudioActivity(audioDescription: "Voice Message Recording", behavior: .recordAudio)
         self.audioSession = audioSession
         self.sleepManager = sleepManager
     }
@@ -55,16 +58,21 @@ final class VoiceMessageInProgressDraft: VoiceMessageSendableDraft {
             throw OWSAssertionError("Couldn't configure audio session")
         }
 
+        var recorderSettings: [String: Any] = [
+            AVFormatIDKey: kAudioFormatMPEG4AAC,
+            AVSampleRateKey: DebugFlags.voiceMessageSampleRate.get(),
+            AVNumberOfChannelsKey: 1,
+            AVEncoderBitRateKey: DebugFlags.voiceMessageBitRate.get(),
+        ]
+        if let audioQuality = DebugFlags.voiceMessageAudioQuality.get()?.avAudioQuality {
+            recorderSettings[AVEncoderAudioQualityKey] = audioQuality.rawValue
+        }
+
         let audioRecorder: AVAudioRecorder
         do {
             audioRecorder = try AVAudioRecorder(
                 url: audioFileUrl,
-                settings: [
-                    AVFormatIDKey: kAudioFormatMPEG4AAC,
-                    AVSampleRateKey: 44100,
-                    AVNumberOfChannelsKey: 1,
-                    AVEncoderBitRateKey: 32000
-                ]
+                settings: recorderSettings,
             )
             self.audioRecorder = audioRecorder
         } catch {
@@ -93,7 +101,7 @@ final class VoiceMessageInProgressDraft: VoiceMessageSendableDraft {
             sleepManager.removeBlock(blockObject: sleepBlockObject)
         }
 
-        guard let audioRecorder = audioRecorder else { return }
+        guard let audioRecorder else { return }
         self.audioRecorder = nil
 
         self.duration = audioRecorder.currentTime
@@ -113,7 +121,7 @@ final class VoiceMessageInProgressDraft: VoiceMessageSendableDraft {
             sleepManager.removeBlock(blockObject: sleepBlockObject)
         }
 
-        guard let audioRecorder = audioRecorder else { return }
+        guard let audioRecorder else { return }
         self.audioRecorder = nil
 
         self.duration = audioRecorder.currentTime
@@ -132,7 +140,7 @@ final class VoiceMessageInProgressDraft: VoiceMessageSendableDraft {
         let directoryUrl = VoiceMessageInterruptedDraftStore.saveDraft(
             audioFileUrl: audioFileUrl,
             threadUniqueId: threadUniqueId,
-            transaction: transaction
+            transaction: transaction,
         )
         return VoiceMessageInterruptedDraft(threadUniqueId: threadUniqueId, directoryUrl: directoryUrl)
     }

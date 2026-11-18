@@ -65,7 +65,7 @@ public struct CallLink: Equatable {
         components.host = Constants.host
         components.path = Constants.path
         components.queryItems = [
-            URLQueryItem(name: Constants.key, value: rootKey.description),
+            URLQueryItem(name: Constants.key, value: rootKey.unredactedString),
         ]
         components.percentEncodedFragment = components.percentEncodedQuery
         components.query = nil
@@ -74,7 +74,7 @@ public struct CallLink: Equatable {
 
     // MARK: - Equatable
 
-    public static func == (lhs: CallLink, rhs: CallLink) -> Bool {
+    public static func ==(lhs: CallLink, rhs: CallLink) -> Bool {
         lhs.url() == rhs.url()
     }
 }

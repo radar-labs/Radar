@@ -12,6 +12,8 @@ public protocol NotificationPresenter {
 
     func notifyUser(forIncomingMessage: TSIncomingMessage, editTarget: TSIncomingMessage, thread: TSThread, transaction: DBWriteTransaction)
 
+    func notifyUser(forReleaseNotesMessage: TSReleaseNotesMessage, thread: TSThread, transaction: DBWriteTransaction)
+
     func notifyUser(forReaction: OWSReaction, onOutgoingMessage: TSOutgoingMessage, thread: TSThread, transaction: DBWriteTransaction)
 
     func notifyUser(forErrorMessage: TSErrorMessage, thread: TSThread, transaction: DBWriteTransaction)
@@ -34,33 +36,56 @@ public protocol NotificationPresenter {
         notificationInfo: CallNotificationInfo,
         offerMediaType: TSRecentCallOfferType,
         sentAt timestamp: Date,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     )
 
     func notifyUserOfMissedCallBecauseOfNewIdentity(
         notificationInfo: CallNotificationInfo,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 
     func notifyUserOfMissedCallBecauseOfNoLongerVerifiedIdentity(
         notificationInfo: CallNotificationInfo,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 
     func notifyForGroupCallSafetyNumberChange(
         callTitle: String,
         threadUniqueId: String?,
         roomId: Data?,
-        presentAtJoin: Bool
+        presentAtJoin: Bool,
     )
+
+    /// Schedule or update an existing unread reminder
+    /// - Parameter initialDelay: The notification delay from the first message.
+    /// Ignored if not the first message.
+    /// - Parameter latestFireDate: The date after which an unread reminder
+    /// shouldn't fire
+    func scheduleUnreadReminder(
+        threadUniqueId: String,
+        threadIdentifier: String?,
+        title: String?,
+        body: String,
+        initialDelay: TimeInterval,
+        latestFireDate: Date,
+        tx: DBWriteTransaction,
+    )
+
+    func cancelUnreadReminder(threadUniqueId: String, tx: DBReadTransaction)
 
     func scheduleNotifyForNewLinkedDevice(deviceLinkTimestamp: Date)
 
     func scheduleNotifyForBackupsEnabled(backupsTimestamp: Date)
 
+    func notifyUserOfAttachmentBackfill(
+        threadUniqueId: String,
+        messageUniqueId: String,
+        body: String,
+    )
+
     func notifyUserOfMediaTierQuotaConsumed()
 
-    func notifyUserOfListMediaIntegrityCheckFailure()
+    func notifyUserOfBackupsMediaError()
 
     /// Notify user to relaunch the app after we deliberately terminate when an incoming device transfer completes.
     func notifyUserToRelaunchAfterTransfer(completion: @escaping () -> Void)

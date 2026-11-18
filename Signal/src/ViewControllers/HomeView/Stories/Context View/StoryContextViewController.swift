@@ -3,21 +3,19 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
-import SignalServiceKit
-import UIKit
-import SignalUI
 import BonMot
 import Lottie
+import SignalServiceKit
+import SignalUI
 
 protocol StoryContextViewControllerDelegate: AnyObject {
     func storyContextViewControllerWantsTransitionToNextContext(
         _ storyContextViewController: StoryContextViewController,
-        loadPositionIfRead: StoryContextViewController.LoadPosition
+        loadPositionIfRead: StoryContextViewController.LoadPosition,
     )
     func storyContextViewControllerWantsTransitionToPreviousContext(
         _ storyContextViewController: StoryContextViewController,
-        loadPositionIfRead: StoryContextViewController.LoadPosition
+        loadPositionIfRead: StoryContextViewController.LoadPosition,
     )
     func storyContextViewController(_ storyContextViewController: StoryContextViewController, contextAfter context: StoryContext) -> StoryContext?
     func storyContextViewControllerDidPause(_ storyContextViewController: StoryContextViewController)
@@ -27,7 +25,10 @@ protocol StoryContextViewControllerDelegate: AnyObject {
     func storyContextViewControllerShouldBeMuted(_ storyContextViewController: StoryContextViewController) -> Bool
 }
 
-class StoryContextViewController: OWSViewController {
+class StoryContextViewController: OWSViewController, DatabaseChangeDelegate,
+    StoryContextMenuDelegate, StoryItemMediaViewDelegate,
+    StoryContextOnboardingOverlayViewDelegate, UIGestureRecognizerDelegate
+{
     let context: StoryContext
 
     weak var delegate: StoryContextViewControllerDelegate?
@@ -42,11 +43,12 @@ class StoryContextViewController: OWSViewController {
             currentItemWasUpdated(messageDidChange: oldValue?.message.uniqueId != currentItem?.message.uniqueId)
         }
     }
+
     var currentItemMediaView: StoryItemMediaView? {
         didSet {
             if
                 oldValue == nil,
-                let pauseAndHideChromeWhenMediaViewIsCreated = pauseAndHideChromeWhenMediaViewIsCreated
+                let pauseAndHideChromeWhenMediaViewIsCreated
             {
                 pauseCurrentMediaItem(hideChrome: pauseAndHideChromeWhenMediaViewIsCreated)
             }
@@ -57,7 +59,7 @@ class StoryContextViewController: OWSViewController {
     }
 
     var allowsReplies: Bool {
-        guard let currentItem = currentItem else {
+        guard let currentItem else {
             return false
         }
         return currentItem.message.localUserAllowedToReply
@@ -70,6 +72,7 @@ class StoryContextViewController: OWSViewController {
         case presentReplies
         case presentInfo
     }
+
     var action: Action = .none
 
     enum LoadPosition {
@@ -77,6 +80,7 @@ class StoryContextViewController: OWSViewController {
         case newest
         case oldest
     }
+
     private(set) var loadPositionIfRead: LoadPosition
 
     private(set) lazy var contextMenuGenerator = StoryContextMenuGenerator(presentingController: self, delegate: self)
@@ -85,13 +89,14 @@ class StoryContextViewController: OWSViewController {
         context: StoryContext,
         loadPositionIfRead: LoadPosition = .default,
         spoilerState: SpoilerRenderState,
-        delegate: StoryContextViewControllerDelegate
+        delegate: StoryContextViewControllerDelegate,
     ) {
         self.context = context
         self.spoilerState = spoilerState
         self.loadPositionIfRead = loadPositionIfRead
         super.init()
         self.delegate = delegate
+        overrideUserInterfaceStyle = .dark
         DependenciesBridge.shared.databaseChangeObserver.appendDatabaseChangeDelegate(self)
     }
 
@@ -102,22 +107,26 @@ class StoryContextViewController: OWSViewController {
     func resetForPresentation() {
         pauseTime = nil
         lastTransitionTime = nil
-        if let currentItemMediaView = currentItemMediaView {
+        if let currentItemMediaView {
             pauseAndHideChromeWhenMediaViewIsCreated = nil
             // Restart playback for the current item
             currentItemMediaView.resetPlayback()
             updateProgressState()
         } else {
             // If a specific message was specified to load to, present that first.
-            if let loadMessage = loadMessage, let item = items.first(where: {
-                $0.message.uniqueId == loadMessage.uniqueId
-            }) {
+            if
+                let loadMessage, let item = items.first(where: {
+                    $0.message.uniqueId == loadMessage.uniqueId
+                })
+            {
                 currentItem = item
 
-            // Otherwise, if there's an unviewed story, we always want to present that first.
-            } else if let firstUnviewedStory = items.first(where: {
-                $0.message.localUserViewedTimestamp == nil
-            }) {
+                // Otherwise, if there's an unviewed story, we always want to present that first.
+            } else if
+                let firstUnviewedStory = items.first(where: {
+                    $0.message.localUserViewedTimestamp == nil
+                })
+            {
                 currentItem = firstUnviewedStory
             } else {
                 switch loadPositionIfRead {
@@ -158,23 +167,27 @@ class StoryContextViewController: OWSViewController {
     }
 
     func transitionToNextItem(nextContextLoadPositionIfRead: LoadPosition = .default) {
-        guard let currentItem = currentItem,
-              let currentItemIndex = items.firstIndex(of: currentItem),
-              let itemAfter = items[safe: currentItemIndex.advanced(by: 1)] else {
-                  delegate?.storyContextViewControllerWantsTransitionToNextContext(self, loadPositionIfRead: nextContextLoadPositionIfRead)
-                  return
-              }
+        guard
+            let currentItem,
+            let currentItemIndex = items.firstIndex(of: currentItem),
+            let itemAfter = items[safe: currentItemIndex.advanced(by: 1)]
+        else {
+            delegate?.storyContextViewControllerWantsTransitionToNextContext(self, loadPositionIfRead: nextContextLoadPositionIfRead)
+            return
+        }
 
         self.currentItem = itemAfter
     }
 
     func transitionToPreviousItem(previousContextLoadPositionIfRead: LoadPosition = .default) {
-        guard let currentItem = currentItem,
-              let currentItemIndex = items.firstIndex(of: currentItem),
-              let itemBefore = items[safe: currentItemIndex.advanced(by: -1)] else {
-                  delegate?.storyContextViewControllerWantsTransitionToPreviousContext(self, loadPositionIfRead: previousContextLoadPositionIfRead)
-                  return
-              }
+        guard
+            let currentItem,
+            let currentItemIndex = items.firstIndex(of: currentItem),
+            let itemBefore = items[safe: currentItemIndex.advanced(by: -1)]
+        else {
+            delegate?.storyContextViewControllerWantsTransitionToPreviousContext(self, loadPositionIfRead: previousContextLoadPositionIfRead)
+            return
+        }
 
         self.currentItem = itemBefore
     }
@@ -185,7 +198,12 @@ class StoryContextViewController: OWSViewController {
     private lazy var zoomPinchGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(handlePinchZoom))
     private lazy var zoomPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePinchZoom))
 
-    private lazy var closeButton = OWSButton(imageName: Theme.iconName(.buttonX), tintColor: .ows_white)
+    private lazy var closeButton = UIButton(
+        configuration: .round(themeIcon: .buttonX),
+        primaryAction: UIAction { [weak self] _ in
+            self?.dismiss(animated: true)
+        },
+    )
 
     private lazy var mediaViewContainer = UIView()
 
@@ -193,7 +211,20 @@ class StoryContextViewController: OWSViewController {
 
     private lazy var sendingIndicatorStackView = UIStackView()
 
-    private lazy var repliesAndViewsButton = OWSButton()
+    private lazy var repliesAndViewsButton: UIButton = {
+        var buttonConfiguration = UIButton.Configuration.plain()
+        buttonConfiguration.contentInsets = .init(hMargin: 8, vMargin: 20) // button is generously tall and full-screen wide.
+        buttonConfiguration.imagePadding = 8
+        let button = UIButton(
+            configuration: buttonConfiguration,
+            primaryAction: UIAction { [weak self] _ in
+                self?.presentRepliesAndViewsSheet()
+            },
+        )
+        button.tintColor = .Signal.label
+        return button
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -220,10 +251,6 @@ class StoryContextViewController: OWSViewController {
 
         onboardingOverlay.autoPinEdges(toEdgesOf: mediaViewContainer)
 
-        repliesAndViewsButton.block = { [weak self] in self?.presentRepliesAndViewsSheet() }
-        repliesAndViewsButton.autoSetDimension(.height, toSize: 64)
-        repliesAndViewsButton.setTitleColor(Theme.darkThemePrimaryColor, for: .normal)
-        repliesAndViewsButton.setTitleColor(Theme.darkThemePrimaryColor.withAlphaComponent(0.4), for: .highlighted)
         view.addSubview(repliesAndViewsButton)
         repliesAndViewsButton.autoPinEdge(.leading, to: .leading, of: mediaViewContainer)
         repliesAndViewsButton.autoPinEdge(.trailing, to: .trailing, of: mediaViewContainer)
@@ -234,26 +261,34 @@ class StoryContextViewController: OWSViewController {
         view.addSubview(sendingIndicatorStackView)
         sendingIndicatorStackView.autoPinEdges(toEdgesOf: repliesAndViewsButton)
 
-        view.addSubview(playbackProgressView)
-        playbackProgressView.autoPinEdge(.leading, to: .leading, of: mediaViewContainer, withOffset: OWSTableViewController2.defaultHOuterMargin)
-        playbackProgressView.autoPinEdge(.trailing, to: .trailing, of: mediaViewContainer, withOffset: -OWSTableViewController2.defaultHOuterMargin)
-        playbackProgressView.autoSetDimension(.height, toSize: 2)
         playbackProgressView.isUserInteractionEnabled = false
+        view.addSubview(playbackProgressView)
 
+        let progressViewSideMargin: CGFloat
         if UIDevice.current.hasIPhoneXNotch || UIDevice.current.isIPad {
+            let cornerRadius: CGFloat = if #available(iOS 26, *) { 40 } else { 18 }
             // iPhone with notch or iPad (views/replies rendered below media, media is in a card)
-            mediaViewContainer.layer.cornerRadius = 18
+            mediaViewContainer.layer.cornerRadius = cornerRadius
             mediaViewContainer.clipsToBounds = true
-            onboardingOverlay.layer.cornerRadius = 18
+
+            onboardingOverlay.layer.cornerRadius = cornerRadius
             onboardingOverlay.clipsToBounds = true
+
+            progressViewSideMargin = OWSTableViewController2.defaultHOuterMargin + 4
+            // Equal margins on the sides and the bottom.
+            playbackProgressView.autoPinEdge(.bottom, to: .bottom, of: mediaViewContainer, withOffset: -progressViewSideMargin)
             repliesAndViewsButton.autoPinEdge(.top, to: .bottom, of: mediaViewContainer)
-            playbackProgressView.autoPinEdge(.bottom, to: .top, of: repliesAndViewsButton, withOffset: -OWSTableViewController2.defaultHOuterMargin)
         } else {
+            progressViewSideMargin = OWSTableViewController2.defaultHOuterMargin
+
             // iPhone with home button (views/replies rendered on top of media, media is fullscreen)
             repliesAndViewsButton.autoPinEdge(.bottom, to: .bottom, of: mediaViewContainer)
             playbackProgressView.autoPinEdge(.bottom, to: .top, of: repliesAndViewsButton)
             mediaViewContainer.autoPinEdge(toSuperviewSafeArea: .bottom)
         }
+        playbackProgressView.autoSetDimension(.height, toSize: 2)
+        playbackProgressView.autoPinEdge(.leading, to: .leading, of: mediaViewContainer, withOffset: progressViewSideMargin)
+        playbackProgressView.autoPinEdge(.trailing, to: .trailing, of: mediaViewContainer, withOffset: -progressViewSideMargin)
 
         applyConstraints()
 
@@ -262,15 +297,26 @@ class StoryContextViewController: OWSViewController {
         spinner.autoCenterInSuperview()
         spinner.startAnimating()
 
-        closeButton.block = { [weak self] in
-            self?.dismiss(animated: true)
-        }
-        closeButton.setShadow()
-        closeButton.ows_imageEdgeInsets = UIEdgeInsets(hMargin: 16, vMargin: 16)
+        closeButton.isPointerInteractionEnabled = true
         view.addSubview(closeButton)
-        closeButton.autoSetDimensions(to: CGSize(square: 56))
-        closeButton.autoPinEdge(toSuperviewSafeArea: .top)
-        closeButton.autoPinEdge(toSuperviewSafeArea: .trailing)
+        closeButton.translatesAutoresizingMaskIntoConstraints = false
+        if #available(iOS 26, *) {
+            // Button has a round glass background and needs padding around it.
+            let margin = OWSTableViewController2.defaultHOuterMargin
+            NSLayoutConstraint.activate([
+                closeButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: margin),
+                closeButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -margin),
+            ])
+        } else {
+            // Margins are baked into the button itself. The button has no background and can be placed flush along the edges.
+            closeButton.configuration?.contentInsets = .init(margin: 16)
+            closeButton.setShadow()
+
+            NSLayoutConstraint.activate([
+                closeButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                closeButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            ])
+        }
 
         loadStoryItems { [weak self] storyItems in
             // If there are no stories for this context, dismiss.
@@ -313,12 +359,12 @@ class StoryContextViewController: OWSViewController {
     private func loadStoryItems(completion: @escaping ([StoryItem]) -> Void) {
         var storyItems = [StoryItem]()
         SSKEnvironment.shared.databaseStorageRef.asyncRead { [weak self] transaction in
-            guard let self = self else { return }
+            guard let self else { return }
             StoryFinder.enumerateStoriesForContext(self.context, transaction: transaction) { message, stop in
-                if self.delegate?.storyContextViewControllerShouldOnlyRenderMyStories(self) == true && !message.authorAddress.isLocalAddress { return }
+                if self.delegate?.storyContextViewControllerShouldOnlyRenderMyStories(self) == true, !message.authorAddress.isLocalAddress { return }
                 guard let storyItem = self.buildStoryItem(for: message, transaction: transaction) else { return }
                 storyItems.append(storyItem)
-                if storyItems.count >= Self.maxItemsToRender { stop.pointee = true }
+                if storyItems.count >= Self.maxItemsToRender { stop = true }
             }
 
             DispatchQueue.main.async {
@@ -334,9 +380,9 @@ class StoryContextViewController: OWSViewController {
         switch message.attachment {
         case .media:
             attachment = message.id.map {
-                return DependenciesBridge.shared.attachmentStore.fetchFirstReferencedAttachment(
+                return DependenciesBridge.shared.attachmentStore.fetchAnyReferencedAttachment(
                     for: .storyMessageMedia(storyMessageRowId: $0),
-                    tx: transaction
+                    tx: transaction,
                 )
             } ?? nil
 
@@ -344,7 +390,7 @@ class StoryContextViewController: OWSViewController {
             let preloadedAttachment = PreloadedTextAttachment.from(
                 attachment,
                 storyMessage: message,
-                tx: transaction
+                tx: transaction,
             )
             return .init(message: message, numberOfReplies: replyCount, attachment: .text(preloadedAttachment))
         }
@@ -358,21 +404,21 @@ class StoryContextViewController: OWSViewController {
             let pointer = StoryItem.Attachment.Pointer(
                 reference: attachment.reference,
                 attachment: attachmentPointer,
-                downloadState: downloadState
+                downloadState: downloadState,
             )
             return StoryItem(
                 message: message,
                 numberOfReplies: replyCount,
-                attachment: .pointer(pointer)
+                attachment: .pointer(pointer),
             )
         } else if let attachmentStream = attachment.attachment.asStream() {
             let stream = StoryItem.Attachment.Stream(
-                attachment: .init(reference: attachment.reference, attachmentStream: attachmentStream)
+                attachment: .init(reference: attachment.reference, attachmentStream: attachmentStream),
             )
             return StoryItem(
                 message: message,
                 numberOfReplies: replyCount,
-                attachment: .stream(stream)
+                attachment: .stream(stream),
             )
         } else {
             owsFailDebug("Unexpected attachment type \(type(of: attachment))")
@@ -381,7 +427,7 @@ class StoryContextViewController: OWSViewController {
     }
 
     private func currentItemWasUpdated(messageDidChange: Bool) {
-        if let currentItem = currentItem {
+        if let currentItem {
             let newContextButton: ContextMenuButton = {
                 let attachment: StoryThumbnailView.Attachment
                 switch currentItem.attachment {
@@ -394,7 +440,7 @@ class StoryContextViewController: OWSViewController {
                 }
 
                 let contextButton = ContextMenuButton(
-                    empty: (),
+                    configuration: .round(themeIcon: .buttonMore),
                     onWillDisplayContextMenu: { [weak self] in
                         guard let self else { return }
                         pause()
@@ -413,10 +459,11 @@ class StoryContextViewController: OWSViewController {
                         attachment: attachment,
                         spoilerState: self.spoilerState,
                         sourceView: { [weak contextButton] in return contextButton },
-                        transaction: tx
+                        transaction: tx,
                     )
                 }
                 contextButton.setActions(actions: actions)
+                contextButton.isPointerInteractionEnabled = true
                 return contextButton
             }()
 
@@ -425,7 +472,7 @@ class StoryContextViewController: OWSViewController {
                     item: currentItem,
                     contextButton: newContextButton,
                     spoilerState: spoilerState,
-                    delegate: self
+                    delegate: self,
                 )
                 self.currentItemMediaView = itemView
                 mediaViewContainer.addSubview(itemView)
@@ -434,7 +481,7 @@ class StoryContextViewController: OWSViewController {
 
             currentItemMediaView!.updateItem(
                 currentItem,
-                newContextButton: newContextButton
+                newContextButton: newContextButton,
             )
 
             if currentItem.message.sendingState != .sent {
@@ -471,7 +518,7 @@ class StoryContextViewController: OWSViewController {
 
             let sendingLabel = UILabel()
             sendingLabel.font = .dynamicTypeBody
-            sendingLabel.textColor = Theme.darkThemePrimaryColor
+            sendingLabel.textColor = .Signal.label
             sendingLabel.textAlignment = .center
             sendingLabel.text = OWSLocalizedString("STORY_SENDING", comment: "Text indicating that the story is currently sending")
             sendingLabel.setContentHuggingHigh()
@@ -483,7 +530,7 @@ class StoryContextViewController: OWSViewController {
                 leadingSpacer,
                 sendingSpinner,
                 sendingLabel,
-                trailingSpacer
+                trailingSpacer,
             ])
 
             leadingSpacer.autoMatch(.width, to: .width, of: trailingSpacer)
@@ -494,13 +541,13 @@ class StoryContextViewController: OWSViewController {
 
             let failedIcon = UIImageView()
             failedIcon.contentMode = .scaleAspectFit
-            failedIcon.setTemplateImageName("error-circle-20", tintColor: .ows_accentRed)
+            failedIcon.setTemplateImageName("error-circle-20", tintColor: .Signal.red)
             failedIcon.autoSetDimension(.width, toSize: 20)
             sendingIndicatorStackView.addArrangedSubview(failedIcon)
 
             let failedLabel = UILabel()
             failedLabel.font = .dynamicTypeBody
-            failedLabel.textColor = Theme.darkThemePrimaryColor
+            failedLabel.textColor = .Signal.label
             failedLabel.textAlignment = .center
             failedLabel.text = currentItem.message.hasSentToAnyRecipients
                 ? OWSLocalizedString("STORY_SEND_PARTIALLY_FAILED_TAP_FOR_DETAILS", comment: "Text indicating that the story send has partially failed")
@@ -515,7 +562,7 @@ class StoryContextViewController: OWSViewController {
                 leadingSpacer,
                 failedIcon,
                 failedLabel,
-                trailingSpacer
+                trailingSpacer,
             ])
 
             leadingSpacer.autoMatch(.width, to: .width, of: trailingSpacer)
@@ -556,20 +603,23 @@ class StoryContextViewController: OWSViewController {
                         leadingIcon = UIImage(imageLiteralResourceName: "reply-20")
                         repliesAndViewsButtonText = OWSLocalizedString(
                             "STORY_REPLY_TO_GROUP_BUTTON",
-                            comment: "Button for replying to a group story with no existing replies.")
+                            comment: "Button for replying to a group story with no existing replies.",
+                        )
                     } else {
                         trailingIcon = UIImage(imageLiteralResourceName: "chevron-right-20")
                         let format = OWSLocalizedString(
                             "STORY_REPLIES_COUNT_%d",
                             tableName: "PluralAware",
-                            comment: "Button for replying to a story with N existing replies.")
+                            comment: "Button for replying to a story with N existing replies.",
+                        )
                         repliesAndViewsButtonText = String.localizedStringWithFormat(format, currentItem.numberOfReplies)
                     }
                 } else {
                     leadingIcon = UIImage(imageLiteralResourceName: "reply-20")
                     repliesAndViewsButtonText = OWSLocalizedString(
                         "STORY_REPLY_BUTTON",
-                        comment: "Button for replying to a story with no existing replies.")
+                        comment: "Button for replying to a story with no existing replies.",
+                    )
                 }
             case .outgoing:
                 var textSegments = [String]()
@@ -577,26 +627,26 @@ class StoryContextViewController: OWSViewController {
                     let format = OWSLocalizedString(
                         "STORY_VIEWS_COUNT_%d",
                         tableName: "PluralAware",
-                        comment: "Button for viewing the views for a story sent to a private list"
+                        comment: "Button for viewing the views for a story sent to a private list",
                     )
                     textSegments.append(
-                        String.localizedStringWithFormat(format, currentItem.message.remoteViewCount(in: context))
+                        String.localizedStringWithFormat(format, currentItem.message.remoteViewCount(in: context)),
                     )
                 }
                 if case .groupId = context, StoryManager.areViewReceiptsEnabled || currentItem.numberOfReplies > 0 {
                     let format = OWSLocalizedString(
                         "STORY_REPLIES_COUNT_%d",
                         tableName: "PluralAware",
-                        comment: "Button for replying to a story with N existing replies."
+                        comment: "Button for replying to a story with N existing replies.",
                     )
                     textSegments.append(
-                        String.localizedStringWithFormat(format, currentItem.numberOfReplies)
+                        String.localizedStringWithFormat(format, currentItem.numberOfReplies),
                     )
                 }
                 if textSegments.isEmpty {
                     repliesAndViewsButtonText = OWSLocalizedString(
                         "STORY_VIEWS_OFF",
-                        comment: "Text indicating that the user has views turned off"
+                        comment: "Text indicating that the user has views turned off",
                     )
                 } else {
                     trailingIcon = UIImage(imageLiteralResourceName: "chevron-right-20")
@@ -604,33 +654,23 @@ class StoryContextViewController: OWSViewController {
                 }
             }
 
-            repliesAndViewsButton.semanticContentAttribute = .unspecified
+            let baseFont = UIFont.dynamicTypeBodyClamped.medium()
+            let semiboldStyle = StringStyle(.font(baseFont.semibold()))
+            let attrButtonTitle = repliesAndViewsButtonText.styled(
+                with: .font(baseFont),
+                .xmlRules([.style("bold", semiboldStyle)]),
+            )
+            repliesAndViewsButton.configuration?.attributedTitle = AttributedString(attrButtonTitle)
 
-            if let leadingIcon = leadingIcon {
-                repliesAndViewsButton.setImage(leadingIcon.withTintColor(Theme.darkThemePrimaryColor, renderingMode: .alwaysOriginal), for: .normal)
-                repliesAndViewsButton.ows_imageEdgeInsets = UIEdgeInsets(top: 2, leading: 0, bottom: 0, trailing: 16)
-            } else if let trailingIcon = trailingIcon {
-                repliesAndViewsButton.setImage(trailingIcon.withTintColor(Theme.darkThemePrimaryColor, renderingMode: .alwaysOriginal), for: .normal)
-                repliesAndViewsButton.semanticContentAttribute = CurrentAppContext().isRTL ? .forceLeftToRight : .forceRightToLeft
-                repliesAndViewsButton.ows_imageEdgeInsets = UIEdgeInsets(top: 3, leading: 0, bottom: 0, trailing: 0)
+            if let leadingIcon {
+                repliesAndViewsButton.configuration?.image = leadingIcon
+                repliesAndViewsButton.configuration?.imagePlacement = .leading
+            } else if let trailingIcon {
+                repliesAndViewsButton.configuration?.image = trailingIcon
+                repliesAndViewsButton.configuration?.imagePlacement = .trailing
             } else {
-                repliesAndViewsButton.setImage(nil, for: .normal)
-                repliesAndViewsButton.contentHorizontalAlignment = .center
+                repliesAndViewsButton.configuration?.image = nil
             }
-
-            let semiboldStyle = StringStyle(.font(.systemFont(ofSize: 17, weight: .semibold)))
-            repliesAndViewsButton.setAttributedTitle(
-                repliesAndViewsButtonText.styled(
-                    with: .font(.systemFont(ofSize: 17)),
-                    .color(Theme.darkThemePrimaryColor),
-                    .xmlRules([.style("bold", semiboldStyle)])),
-                for: .normal)
-            repliesAndViewsButton.setAttributedTitle(
-                repliesAndViewsButtonText.styled(
-                    with: .font(.systemFont(ofSize: 17)),
-                    .color(Theme.darkThemePrimaryColor.withAlphaComponent(0.4)),
-                    .xmlRules([.style("bold", semiboldStyle)])),
-                for: .highlighted)
         } else {
             repliesAndViewsButton.isHidden = true
         }
@@ -668,7 +708,7 @@ class StoryContextViewController: OWSViewController {
                 // Don't progress stories that are pending download.
                 lastTransitionTime = CACurrentMediaTime()
                 playbackProgressView.itemState = .init(index: idx, value: 0)
-            } else if let lastTransitionTime = lastTransitionTime {
+            } else if let lastTransitionTime {
                 let currentTime: CFTimeInterval
                 if let elapsedTime = currentItemView.elapsedTime {
                     currentTime = lastTransitionTime + elapsedTime
@@ -678,8 +718,8 @@ class StoryContextViewController: OWSViewController {
 
                 let value = currentTime.inverseLerp(
                     lastTransitionTime,
-                    (lastTransitionTime + currentItemView.duration),
-                    shouldClamp: true
+                    lastTransitionTime + currentItemView.duration,
+                    shouldClamp: true,
                 )
                 playbackProgressView.itemState = .init(index: idx, value: value)
 
@@ -696,9 +736,9 @@ class StoryContextViewController: OWSViewController {
 
     private static let subsequentItemsToLoad = 3
     private func ensureSubsequentItemsDownloaded() {
-        guard let currentItem = currentItem, let currentItemIdx = items.firstIndex(of: currentItem) else { return }
+        guard let currentItem, let currentItemIdx = items.firstIndex(of: currentItem) else { return }
 
-        let endingIdx = min((items.count - 1), currentItemIdx + Self.subsequentItemsToLoad)
+        let endingIdx = min(items.count - 1, currentItemIdx + Self.subsequentItemsToLoad)
         var subsequentItems = items[currentItemIdx...endingIdx]
         var context = context
 
@@ -709,10 +749,10 @@ class StoryContextViewController: OWSViewController {
 
                 SSKEnvironment.shared.databaseStorageRef.read { transaction in
                     StoryFinder.enumerateUnviewedIncomingStoriesForContext(self.context, transaction: transaction) { message, stop in
-                        if self.delegate?.storyContextViewControllerShouldOnlyRenderMyStories(self) == true && !message.authorAddress.isLocalAddress { return }
+                        if self.delegate?.storyContextViewControllerShouldOnlyRenderMyStories(self) == true, !message.authorAddress.isLocalAddress { return }
                         guard let storyItem = self.buildStoryItem(for: message, transaction: transaction) else { return }
                         subsequentItems.append(storyItem)
-                        if subsequentItems.count >= Self.subsequentItemsToLoad { stop.pointee = true }
+                        if subsequentItems.count >= Self.subsequentItemsToLoad { stop = true }
                     }
                 }
 
@@ -726,7 +766,7 @@ class StoryContextViewController: OWSViewController {
     private lazy var iPhoneConstraints = [
         mediaViewContainer.autoPinEdge(toSuperviewSafeArea: .top),
         mediaViewContainer.autoPinEdge(toSuperviewSafeArea: .leading),
-        mediaViewContainer.autoPinEdge(toSuperviewSafeArea: .trailing)
+        mediaViewContainer.autoPinEdge(toSuperviewSafeArea: .trailing),
     ]
 
     private lazy var iPadConstraints: [NSLayoutConstraint] = {
@@ -736,7 +776,7 @@ class StoryContextViewController: OWSViewController {
         NSLayoutConstraint.autoSetPriority(.defaultHigh) {
             constraints.append(contentsOf: [
                 mediaViewContainer.autoMatch(.height, to: .height, of: view),
-                mediaViewContainer.autoMatch(.width, to: .width, of: view)
+                mediaViewContainer.autoMatch(.width, to: .width, of: view),
             ])
         }
 
@@ -745,7 +785,7 @@ class StoryContextViewController: OWSViewController {
             to: .width,
             of: view,
             withOffset: 0,
-            relation: .lessThanOrEqual
+            relation: .lessThanOrEqual,
         )
         constraints.append(maxWidthConstraint)
 
@@ -758,8 +798,8 @@ class StoryContextViewController: OWSViewController {
             to: .height,
             of: view,
             withMultiplier: 0.75,
-            relation: .lessThanOrEqual
-        )
+            relation: .lessThanOrEqual,
+        ),
     ]
     private lazy var iPadPortraitConstraints = [
         mediaViewContainer.autoMatch(
@@ -767,8 +807,8 @@ class StoryContextViewController: OWSViewController {
             to: .height,
             of: view,
             withMultiplier: 0.65,
-            relation: .lessThanOrEqual
-        )
+            relation: .lessThanOrEqual,
+        ),
     ]
 
     private func applyConstraints() {
@@ -810,7 +850,7 @@ class StoryContextViewController: OWSViewController {
             let touchPoint = sender.location(in: mediaViewContainer)
             mediaViewContainer.setAnchorPointAndMaintainPosition(CGPoint(
                 x: touchPoint.x / mediaViewContainer.width,
-                y: touchPoint.y / mediaViewContainer.height
+                y: touchPoint.y / mediaViewContainer.height,
             ))
         }
 
@@ -821,11 +861,12 @@ class StoryContextViewController: OWSViewController {
                 .possible,
                 .ended,
                 .cancelled,
-                .failed
+                .failed,
             ]
 
-            guard endableStates.contains(zoomPanGestureRecognizer.state)
-                    && endableStates.contains(zoomPinchGestureRecognizer.state) else { return }
+            guard
+                endableStates.contains(zoomPanGestureRecognizer.state),
+                endableStates.contains(zoomPinchGestureRecognizer.state) else { return }
 
             isPinchZooming = false
 
@@ -870,7 +911,7 @@ class StoryContextViewController: OWSViewController {
     private var pauseAndHideChromeWhenMediaViewIsCreated: Bool?
 
     private func pauseCurrentMediaItem(hideChrome: Bool) {
-        guard let currentItemMediaView = currentItemMediaView else {
+        guard let currentItemMediaView else {
             pauseAndHideChromeWhenMediaViewIsCreated = hideChrome
             return
         }
@@ -885,7 +926,7 @@ class StoryContextViewController: OWSViewController {
     }
 
     func play() {
-        if let lastTransitionTime = lastTransitionTime, let pauseTime = pauseTime {
+        if let lastTransitionTime, let pauseTime {
             let pauseDuration = CACurrentMediaTime() - pauseTime
             self.lastTransitionTime = lastTransitionTime + pauseDuration
             self.pauseTime = nil
@@ -897,9 +938,9 @@ class StoryContextViewController: OWSViewController {
         }
         delegate?.storyContextViewControllerDidResume(self)
     }
-}
 
-extension StoryContextViewController: UIGestureRecognizerDelegate {
+    // MARK: - UIGestureRecognizerDelegate
+
     @objc
     func didTapLeft() {
         guard currentItemMediaView?.willHandleTapGesture(leftTapGestureRecognizer) != true else {
@@ -941,7 +982,7 @@ extension StoryContextViewController: UIGestureRecognizerDelegate {
     }
 
     func presentRepliesAndViewsSheet() {
-        guard let currentItem = currentItem, currentItem.message.localUserAllowedToReply else {
+        guard let currentItem, currentItem.message.localUserAllowedToReply else {
             owsFailDebug("Unexpectedly attempting to present reply sheet")
             return
         }
@@ -950,45 +991,59 @@ extension StoryContextViewController: UIGestureRecognizerDelegate {
         case .groupId:
             switch currentItem.message.direction {
             case .outgoing:
+                pause()
+
                 let groupRepliesAndViewsVC = StoryGroupRepliesAndViewsSheet(
                     storyMessage: currentItem.message,
                     context: context,
-                    spoilerState: spoilerState
+                    spoilerState: spoilerState,
                 )
                 groupRepliesAndViewsVC.dismissHandler = { [weak self] in self?.play() }
                 groupRepliesAndViewsVC.focusedTab = currentItem.numberOfReplies > 0 ? .replies : .views
-                self.pause()
-                self.present(groupRepliesAndViewsVC, animated: true)
+                present(groupRepliesAndViewsVC, animated: true)
+
             case .incoming:
-                let groupReplyVC = StoryGroupReplySheet(
+                pause()
+
+                let groupReplyVC = StoryGroupReplyViewController(
                     storyMessage: currentItem.message,
-                    spoilerState: spoilerState
+                    spoilerState: spoilerState,
+                    isStandaloneVC: true,
                 )
                 groupReplyVC.dismissHandler = { [weak self] in self?.play() }
-                self.pause()
-                self.present(groupReplyVC, animated: true)
+                present(groupReplyVC, animated: true)
             }
+
         case .authorAci:
+            pause()
+
             owsAssertDebug(
                 !currentItem.message.authorAddress.isSystemStoryAddress,
-                "Should be impossible to reply to system stories"
+                "Should be impossible to reply to system stories",
             )
+
             let directReplyVC = StoryDirectReplySheet(storyMessage: currentItem.message, spoilerState: spoilerState)
             directReplyVC.dismissHandler = { [weak self] in self?.play() }
-            self.pause()
-            self.present(directReplyVC, animated: true)
+            present(directReplyVC, animated: true)
+
         case .privateStory:
-            let privateViewsVC = StoryPrivateViewsSheet(storyMessage: currentItem.message, context: context)
-            privateViewsVC.dismissHandler = { [weak self] in self?.play() }
-            self.pause()
-            self.present(privateViewsVC, animated: true)
+            pause()
+
+            let viewController = StoryViewsViewController(
+                storyMessage: currentItem.message,
+                context: context,
+                isStandaloneVC: true,
+            )
+            viewController.dismissHandler = { [weak self] in self?.play() }
+            present(viewController, animated: true)
+
         case .none:
             owsFailDebug("Unexpected context")
         }
     }
 
     func presentInfoSheet() {
-        guard let currentItem = currentItem else { return }
+        guard let currentItem else { return }
 
         let vc = StoryInfoSheet(storyMessage: currentItem.message, context: context, spoilerState: spoilerState)
         vc.dismissHandler = { [weak self] in self?.play() }
@@ -1047,11 +1102,11 @@ extension StoryContextViewController: UIGestureRecognizerDelegate {
         [zoomPanGestureRecognizer, zoomPinchGestureRecognizer].contains(gestureRecognizer)
             && [zoomPanGestureRecognizer, zoomPinchGestureRecognizer].contains(otherGestureRecognizer)
     }
-}
 
-extension StoryContextViewController: DatabaseChangeDelegate {
+    // MARK: - DatabaseChangeDelegate
+
     func databaseChangesDidUpdate(databaseChanges: DatabaseChanges) {
-        guard var currentItem = currentItem else { return }
+        guard var currentItem else { return }
         guard !databaseChanges.storyMessageRowIds.isEmpty else { return }
 
         SSKEnvironment.shared.databaseStorageRef.asyncRead { transaction in
@@ -1093,9 +1148,9 @@ extension StoryContextViewController: DatabaseChangeDelegate {
     func databaseChangesDidUpdateExternally() {}
 
     func databaseChangesDidReset() {}
-}
 
-extension StoryContextViewController: StoryItemMediaViewDelegate {
+    // MARK: - StoryItemMediaViewDelegate
+
     func storyItemMediaViewWantsToPlay(_ storyItemMediaView: StoryItemMediaView) {
         play()
     }
@@ -1107,9 +1162,8 @@ extension StoryContextViewController: StoryItemMediaViewDelegate {
     func storyItemMediaViewShouldBeMuted(_ storyItemMediaView: StoryItemMediaView) -> Bool {
         return delegate?.storyContextViewControllerShouldBeMuted(self) ?? false
     }
-}
 
-extension StoryContextViewController: StoryContextMenuDelegate {
+    // MARK: - StoryContextMenuDelegate
 
     func storyContextMenuWillDelete(_ completion: @escaping () -> Void) {
         // Go to the next item after deleting.
@@ -1128,9 +1182,8 @@ extension StoryContextViewController: StoryContextMenuDelegate {
     func storyContextMenuDidFinishDisplayingFollowups() {
         play()
     }
-}
 
-extension StoryContextViewController: StoryContextOnboardingOverlayViewDelegate {
+    // MARK: - StoryContextOnboardingOverlayViewDelegate
 
     func storyContextOnboardingOverlayWillDisplay(_: StoryContextOnboardingOverlayView) {
         pause(hideChrome: true)
@@ -1149,7 +1202,7 @@ private extension UIView {
     func setAnchorPointAndMaintainPosition(_ newAnchorPoint: CGPoint) {
         layer.position = CGPoint(
             x: layer.position.x + (newAnchorPoint.x * width) - (layer.anchorPoint.x * width),
-            y: layer.position.y + (newAnchorPoint.y * height) - (layer.anchorPoint.y * height)
+            y: layer.position.y + (newAnchorPoint.y * height) - (layer.anchorPoint.y * height),
         )
         layer.anchorPoint = newAnchorPoint
     }

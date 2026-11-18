@@ -58,7 +58,7 @@ public enum ImageFormat: CustomStringConvertible {
         return MimeTypeUtil.fileExtensionForMimeType(mimeType.rawValue)!
     }
 
-    internal func isValid(mimeType: String) -> Bool {
+    func isValid(mimeType: String) -> Bool {
         owsAssertDebug(!mimeType.isEmpty)
         let mimeTypes = self.mimeTypes
         return ([mimeTypes.preferredMimeType] + mimeTypes.alternativeMimeTypes).contains(where: {
@@ -71,43 +71,15 @@ public struct ImageMetadata {
     public let imageFormat: ImageFormat
     public let pixelSize: CGSize
     public let hasAlpha: Bool
-    let isAnimated: Bool
+    public let isAnimated: Bool
 
-    internal init(imageFormat: ImageFormat, pixelSize: CGSize, hasAlpha: Bool, isAnimated: Bool) {
-        self.imageFormat = imageFormat
-        self.pixelSize = pixelSize
-        self.hasAlpha = hasAlpha
-        self.isAnimated = isAnimated
-    }
-
-    var hasStickerLikeProperties: Bool {
+    public var hasStickerLikeProperties: Bool {
         let maxStickerHeight = CGFloat(512)
-        return (
+        return
             pixelSize.width <= maxStickerHeight
-            && pixelSize.height <= maxStickerHeight
-            && pixelSize != CGSize(width: 1, height: 1)
-            && hasAlpha
-        )
+                && pixelSize.height <= maxStickerHeight
+                && pixelSize != CGSize(width: 1, height: 1)
+                && hasAlpha
+
     }
-}
-
-internal struct WebpMetadata {
-    let isValid: Bool
-    let canvasWidth: UInt32
-    let canvasHeight: UInt32
-    let frameCount: UInt32
-}
-
-public enum ImageMetadataResult {
-    /// Source data exceeded size limit for all attachments;
-    /// as a precaution no validation was performed.
-    case genericSizeLimitExceeded
-
-    /// Exceeded the file size limit for the inferred type of image.
-    /// Smaller than the generic size limit.
-    case imageTypeSizeLimitExceeded
-
-    case invalid
-
-    case valid(ImageMetadata)
 }

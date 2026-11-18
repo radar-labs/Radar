@@ -6,10 +6,8 @@
 import CryptoKit
 public import LibSignalClient
 
-public enum IdentityManagerError: Error, IsRetryableProvider {
+public enum IdentityManagerError: Error {
     case identityKeyMismatchForOutgoingMessage
-
-    public var isRetryableProvider: Bool { false }
 }
 
 public protocol OWSIdentityManager {
@@ -22,15 +20,25 @@ public protocol OWSIdentityManager {
     func removeRecipientIdentity(for recipientUniqueId: RecipientUniqueId, tx: DBWriteTransaction)
 
     func generateNewIdentityKeyPair() -> ECKeyPair
+
+    /// The local identity key for the given identity type, if present.
     func identityKeyPair(for identity: OWSIdentity, tx: DBReadTransaction) -> ECKeyPair?
+    /// Set the local identity key for the given identity type.
     func setIdentityKeyPair(_ keyPair: ECKeyPair?, for identity: OWSIdentity, tx: DBWriteTransaction)
     func wipeIdentityKeysFromFailedProvisioning(tx: DBWriteTransaction)
 
+    /// The raw data of the `IdentityKey` for the given address, if known.
     func identityKey(for address: SignalServiceAddress, tx: DBReadTransaction) -> Data?
+    /// The `IdentityKey` for the given service ID, if known.
     func identityKey(for serviceId: ServiceId, tx: DBReadTransaction) throws -> IdentityKey?
 
     @discardableResult
-    func saveIdentityKey(_ identityKey: Data, for serviceId: ServiceId, tx: DBWriteTransaction) -> Result<IdentityChange, RecipientIdError>
+    func saveIdentityKey(
+        _ identityKey: Data,
+        for serviceId: ServiceId,
+        shouldUpdateStorageService: Bool,
+        tx: DBWriteTransaction,
+    ) -> Result<IdentityChange, RecipientIdError>
 
     func insertIdentityChangeInfoMessage(for serviceId: ServiceId, wasIdentityVerified: Bool, tx: DBWriteTransaction)
     func insertSessionSwitchoverEvent(for recipient: SignalRecipient, phoneNumber: String?, tx: DBWriteTransaction)
@@ -39,7 +47,7 @@ public protocol OWSIdentityManager {
     func untrustedIdentityForSending(
         to address: SignalServiceAddress,
         untrustedThreshold: Date?,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> OWSRecipientIdentity?
 
     func tryToSyncQueuedVerificationStates()
@@ -50,7 +58,7 @@ public protocol OWSIdentityManager {
         of identityKey: Data,
         for address: SignalServiceAddress,
         isUserInitiatedChange: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> ChangeVerificationStateResult
 
     func processIncomingVerifiedProto(_ verified: SSKProtoVerified, tx: DBWriteTransaction) throws
@@ -65,8 +73,18 @@ public protocol OWSIdentityManager {
 
 extension OWSIdentityManager {
     @discardableResult
-    public func saveIdentityKey(_ identityKey: IdentityKey, for serviceId: ServiceId, tx: DBWriteTransaction) -> Result<IdentityChange, RecipientIdError> {
-        return saveIdentityKey(identityKey.publicKey.keyBytes, for: serviceId, tx: tx)
+    public func saveIdentityKey(
+        _ identityKey: IdentityKey,
+        for serviceId: ServiceId,
+        shouldUpdateStorageService: Bool,
+        tx: DBWriteTransaction,
+    ) -> Result<IdentityChange, RecipientIdError> {
+        return saveIdentityKey(
+            identityKey.publicKey.keyBytes,
+            for: serviceId,
+            shouldUpdateStorageService: shouldUpdateStorageService,
+            tx: tx,
+        )
     }
 }
 
@@ -111,7 +129,7 @@ public class IdentityStore: IdentityKeyStore {
     fileprivate init(
         identityManager: OWSIdentityManagerImpl,
         identityKeyPair: IdentityKeyPair,
-        fetchLocalRegistrationId: @escaping (DBWriteTransaction) -> UInt32
+        fetchLocalRegistrationId: @escaping (DBWriteTransaction) -> UInt32,
     ) {
         self.identityManager = identityManager
         self.identityKeyPair = identityKeyPair
@@ -129,12 +147,13 @@ public class IdentityStore: IdentityKeyStore {
     public func saveIdentity(
         _ identityKey: IdentityKey,
         for address: ProtocolAddress,
-        context: StoreContext
+        context: StoreContext,
     ) throws -> IdentityChange {
         try identityManager.saveIdentityKey(
             identityKey,
             for: address.serviceId,
-            tx: context.asTransaction
+            shouldUpdateStorageService: true,
+            tx: context.asTransaction,
         ).get()
     }
 
@@ -142,13 +161,13 @@ public class IdentityStore: IdentityKeyStore {
         _ identityKey: IdentityKey,
         for address: ProtocolAddress,
         direction: Direction,
-        context: StoreContext
+        context: StoreContext,
     ) throws -> Bool {
         return try identityManager.isTrustedIdentityKey(
             identityKey,
             serviceId: address.serviceId,
             direction: TSMessageDirection(direction),
-            tx: context.asTransaction
+            tx: context.asTransaction,
         )
     }
 
@@ -189,7 +208,6 @@ private extension OWSIdentity {
 }
 
 public class OWSIdentityManagerImpl: OWSIdentityManager {
-    private let aciProtocolStore: SignalProtocolStore
     private let appReadiness: AppReadiness
     private let db: any DB
     private let messageSenderJobQueue: MessageSenderJobQueue
@@ -202,12 +220,12 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
     private let recipientDatabaseTable: RecipientDatabaseTable
     private let recipientFetcher: RecipientFetcher
     private let recipientIdFinder: RecipientIdFinder
+    private let sessionStore: SessionStore
     private let shareMyPhoneNumberStore: KeyValueStore
     private let storageServiceManager: StorageServiceManager
     private let tsAccountManager: TSAccountManager
 
-    public init(
-        aciProtocolStore: SignalProtocolStore,
+    init(
         appReadiness: AppReadiness,
         db: any DB,
         messageSenderJobQueue: MessageSenderJobQueue,
@@ -218,33 +236,33 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
         recipientDatabaseTable: RecipientDatabaseTable,
         recipientFetcher: RecipientFetcher,
         recipientIdFinder: RecipientIdFinder,
+        sessionStore: SessionStore,
         storageServiceManager: StorageServiceManager,
-        tsAccountManager: TSAccountManager
+        tsAccountManager: TSAccountManager,
     ) {
-        self.aciProtocolStore = aciProtocolStore
         self.appReadiness = appReadiness
         self.db = db
         self.messageSenderJobQueue = messageSenderJobQueue
         self.networkManager = networkManager
         self.notificationPresenter = notificationPresenter
         self.ownIdentityKeyValueStore = KeyValueStore(
-            collection: "TSStorageManagerIdentityKeyStoreCollection"
+            collection: "TSStorageManagerIdentityKeyStoreCollection",
         )
         self.pniProtocolStore = pniProtocolStore
         self.profileManager = profileManager
         self.queuedVerificationStateSyncMessagesKeyValueStore = KeyValueStore(
-            collection: "OWSIdentityManager_QueuedVerificationStateSyncMessages"
+            collection: "OWSIdentityManager_QueuedVerificationStateSyncMessages",
         )
         self.recipientDatabaseTable = recipientDatabaseTable
         self.recipientFetcher = recipientFetcher
         self.recipientIdFinder = recipientIdFinder
+        self.sessionStore = sessionStore
         self.shareMyPhoneNumberStore = KeyValueStore(
-            collection: "OWSIdentityManager.shareMyPhoneNumberStore"
+            collection: "OWSIdentityManager.shareMyPhoneNumberStore",
         )
         self.storageServiceManager = storageServiceManager
         self.tsAccountManager = tsAccountManager
 
-        SwiftSingletons.register(self)
     }
 
     public func libSignalStore(for identity: OWSIdentity, tx: DBReadTransaction) throws -> IdentityStore {
@@ -262,7 +280,7 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
                     owsFail("Missing registrationId for \(identity)")
                 }
                 return registrationId
-            }
+            },
         )
     }
 
@@ -347,28 +365,49 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
     }
 
     @discardableResult
-    public func saveIdentityKey(_ identityKey: Data, for serviceId: ServiceId, tx: DBWriteTransaction) -> Result<IdentityChange, RecipientIdError> {
-        let recipientIdResult = recipientIdFinder.ensureRecipientUniqueId(for: serviceId, tx: tx)
-        return recipientIdResult.map({ _saveIdentityKey(identityKey, for: serviceId, recipientUniqueId: $0, tx: tx) })
+    public func saveIdentityKey(
+        _ identityKey: Data,
+        for serviceId: ServiceId,
+        shouldUpdateStorageService: Bool,
+        tx: DBWriteTransaction,
+    ) -> Result<IdentityChange, RecipientIdError> {
+        let recipientResult = recipientIdFinder.ensureRecipient(for: serviceId, tx: tx)
+        return recipientResult.map({
+            return _saveIdentityKey(
+                identityKey,
+                for: serviceId,
+                recipient: $0,
+                shouldUpdateStorageService: shouldUpdateStorageService,
+                tx: tx,
+            )
+        })
     }
 
-    private func _saveIdentityKey(_ identityKey: Data, for serviceId: ServiceId, recipientUniqueId: RecipientUniqueId, tx: DBWriteTransaction) -> IdentityChange {
+    private func _saveIdentityKey(
+        _ identityKey: Data,
+        for serviceId: ServiceId,
+        recipient: SignalRecipient,
+        shouldUpdateStorageService: Bool,
+        tx: DBWriteTransaction,
+    ) -> IdentityChange {
         owsAssertDebug(identityKey.count == Constants.storedIdentityKeyLength)
 
-        let existingIdentity = OWSRecipientIdentity.anyFetch(uniqueId: recipientUniqueId, transaction: tx)
+        let existingIdentity = OWSRecipientIdentity.anyFetch(uniqueId: recipient.uniqueId, transaction: tx)
         guard let existingIdentity else {
             Logger.info("Saving first-use identity for \(serviceId)")
             OWSRecipientIdentity(
-                uniqueId: recipientUniqueId,
+                uniqueId: recipient.uniqueId,
                 identityKey: identityKey,
                 isFirstKnownKey: true,
                 createdAt: Date(),
-                verificationState: .default
+                verificationState: .default,
             ).anyInsert(transaction: tx)
             // Cancel any pending verification state sync messages for this recipient.
-            clearSyncMessage(for: recipientUniqueId, tx: tx)
+            clearSyncMessage(for: recipient.uniqueId, tx: tx)
             fireIdentityStateChangeNotification(after: tx)
-            storageServiceManager.recordPendingUpdates(updatedRecipientUniqueIds: [recipientUniqueId])
+            if shouldUpdateStorageService {
+                storageServiceManager.recordPendingUpdates(updatedRecipientUniqueIds: [recipient.uniqueId])
+            }
             return .newOrUnchanged
         }
 
@@ -386,40 +425,42 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
         Logger.info("Saving new identity for \(serviceId): \(existingIdentity.verificationState) -> \(verificationState)")
         insertIdentityChangeInfoMessage(for: serviceId, wasIdentityVerified: existingIdentity.wasIdentityVerified, tx: tx)
         OWSRecipientIdentity(
-            uniqueId: recipientUniqueId,
+            uniqueId: recipient.uniqueId,
             identityKey: identityKey,
             isFirstKnownKey: false,
             createdAt: Date(),
-            verificationState: verificationState.rawValue
+            verificationState: verificationState.rawValue,
         ).anyUpsert(transaction: tx)
-        aciProtocolStore.sessionStore.archiveAllSessions(for: serviceId, tx: tx)
+        sessionStore.archiveSessions(forRecipientId: recipient.id, localIdentity: .aci, tx: tx)
         // Cancel any pending verification state sync messages for this recipient.
-        clearSyncMessage(for: recipientUniqueId, tx: tx)
-        storageServiceManager.recordPendingUpdates(updatedRecipientUniqueIds: [recipientUniqueId])
+        clearSyncMessage(for: recipient.uniqueId, tx: tx)
+        if shouldUpdateStorageService {
+            storageServiceManager.recordPendingUpdates(updatedRecipientUniqueIds: [recipient.uniqueId])
+        }
         return .replacedExisting
     }
 
     public func insertIdentityChangeInfoMessage(
         for serviceId: ServiceId,
         wasIdentityVerified: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         let contactThread = TSContactThread.getOrCreateThread(
             withContactAddress: SignalServiceAddress(serviceId),
-            transaction: tx
+            transaction: tx,
         )
         let contactThreadMessage: TSErrorMessage = .nonblockingIdentityChange(
             thread: contactThread,
             address: SignalServiceAddress(serviceId),
-            wasIdentityVerified: wasIdentityVerified
+            wasIdentityVerified: wasIdentityVerified,
         )
         contactThreadMessage.anyInsert(transaction: tx)
 
-        for groupThread in TSGroupThread.groupThreads(with: SignalServiceAddress(serviceId), transaction: tx) {
+        for groupThread in TSGroupThread.activeGroupThreads(withFullMember: SignalServiceAddress(serviceId), tx: tx) {
             TSErrorMessage.nonblockingIdentityChange(
                 thread: groupThread,
                 address: SignalServiceAddress(serviceId),
-                wasIdentityVerified: wasIdentityVerified
+                wasIdentityVerified: wasIdentityVerified,
             ).anyInsert(transaction: tx)
         }
 
@@ -430,14 +471,14 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
     public func insertSessionSwitchoverEvent(
         for recipient: SignalRecipient,
         phoneNumber: String?,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         guard let contactThread = TSContactThread.getWithContactAddress(recipient.address, transaction: tx) else {
             return
         }
         let sessionSwitchoverEvent: TSInfoMessage = .makeForSessionSwitchover(
             contactThread: contactThread,
-            phoneNumber: phoneNumber
+            phoneNumber: phoneNumber,
         )
         sessionSwitchoverEvent.anyInsert(transaction: tx)
     }
@@ -456,7 +497,7 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
                 identityKey: fromValue.identityKey,
                 isFirstKnownKey: fromValue.isFirstKnownKey,
                 createdAt: fromValue.createdAt,
-                verificationState: fromValue.verificationState
+                verificationState: fromValue.verificationState,
             ).anyInsert(transaction: tx)
         }
         fromValue.anyRemove(transaction: tx)
@@ -467,14 +508,14 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
     public func untrustedIdentityForSending(
         to address: SignalServiceAddress,
         untrustedThreshold: Date?,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> OWSRecipientIdentity? {
         let recipientIdentity = recipientIdentity(for: address, tx: tx)
         let isTrusted = isIdentityKeyTrustedForSending(
             address: address,
             recipientIdentity: recipientIdentity,
             untrustedThreshold: untrustedThreshold,
-            tx: tx
+            tx: tx,
         )
         return isTrusted ? nil : recipientIdentity
     }
@@ -483,7 +524,7 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
         address: SignalServiceAddress,
         recipientIdentity: OWSRecipientIdentity?,
         untrustedThreshold: Date?,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> Bool {
         owsAssertDebug(address.isValid)
 
@@ -502,7 +543,7 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
         _ identityKey: IdentityKey,
         serviceId: ServiceId,
         direction: TSMessageDirection,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> Bool {
         let localIdentifiers = tsAccountManager.localIdentifiers(tx: tx)
         if localIdentifiers?.aci == serviceId {
@@ -519,7 +560,7 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
             }
             let recipientIdentity = OWSRecipientIdentity.anyFetch(
                 uniqueId: recipientUniqueId,
-                transaction: tx
+                transaction: tx,
             )
             if let recipientIdentity, recipientIdentity.identityKey != identityKey.publicKey.keyBytes {
                 Logger.warn("Key mismatch for \(serviceId)")
@@ -577,12 +618,12 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
     // MARK: - Sync Messages
 
     private func enqueueSyncMessage(for recipientUniqueId: RecipientUniqueId, tx: DBWriteTransaction) {
-        queuedVerificationStateSyncMessagesKeyValueStore.setObject(true, key: recipientUniqueId, transaction: tx)
+        queuedVerificationStateSyncMessagesKeyValueStore.setBool(true, key: recipientUniqueId, transaction: tx)
         DispatchQueue.main.async { self.tryToSyncQueuedVerificationStates() }
     }
 
     private func clearSyncMessage(for key: String, tx: DBWriteTransaction) {
-        queuedVerificationStateSyncMessagesKeyValueStore.setObject(nil, key: key, transaction: tx)
+        queuedVerificationStateSyncMessagesKeyValueStore.removeValue(forKey: key, transaction: tx)
     }
 
     public func tryToSyncQueuedVerificationStates() {
@@ -593,19 +634,16 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
     }
 
     private func syncQueuedVerificationStates() {
-        guard tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered else {
+        guard let registeredState = try? tsAccountManager.registeredStateWithMaybeSneakyTransaction() else {
             return
         }
-        guard let thread = TSContactThread.getOrCreateLocalThreadWithSneakyTransaction() else {
-            owsFailDebug("Missing thread.")
-            return
-        }
+        let thread = TSContactThread.getOrCreateThread(contactAddress: registeredState.localIdentifiers.aciAddress)
         let allKeys = db.read { tx in queuedVerificationStateSyncMessagesKeyValueStore.allKeys(transaction: tx) }
         // We expect very few keys in practice, and each key triggers multiple
         // database write transactions. If we do end up with thousands of keys,
         // using a separate transaction avoids long blocks.
         for key in allKeys {
-            let syncMessage = db.write { (tx) -> OWSVerificationStateSyncMessage? in
+            let syncMessage = db.write { tx -> OutgoingVerificationStateSyncMessage? in
                 guard let syncMessage = buildVerificationStateSyncMessage(for: key, localThread: thread, tx: tx) else {
                     queuedVerificationStateSyncMessagesKeyValueStore.removeValue(forKey: key, transaction: tx)
                     return nil
@@ -622,12 +660,12 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
     private func buildVerificationStateSyncMessage(
         for key: String,
         localThread: TSContactThread,
-        tx: DBReadTransaction
-    ) -> OWSVerificationStateSyncMessage? {
+        tx: DBReadTransaction,
+    ) -> OutgoingVerificationStateSyncMessage? {
         let value: Any? = queuedVerificationStateSyncMessagesKeyValueStore.getObject(
             key,
             ofClasses: [NSNumber.self, NSString.self, SignalServiceAddress.self],
-            transaction: tx
+            transaction: tx,
         )
         guard let value else {
             return nil
@@ -681,65 +719,32 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
             return nil
         }
 
-        return OWSVerificationStateSyncMessage(
+        return OutgoingVerificationStateSyncMessage(
             localThread: localThread,
             verificationState: recipientIdentity.verificationState,
             identityKey: identityKey.serialize(),
             verificationForRecipientAddress: recipient.address,
-            transaction: tx
+            tx: tx,
         )
     }
 
-    private func sendVerificationStateSyncMessage(for recipientUniqueId: RecipientUniqueId, message: OWSVerificationStateSyncMessage) {
-        let address = message.verificationForRecipientAddress
-        let contactThread = TSContactThread.getOrCreateThread(contactAddress: address)
-
-        // DURABLE CLEANUP - we could replace the custom durability logic in this class
-        // with a durable JobQueue.
-        let nullMessagePromise = db.write { tx in
-            // Send null message to appear as though we're sending a normal message to cover the sync message sent
-            // subsequently
-            let nullMessage = OWSOutgoingNullMessage(
-                contactThread: contactThread,
-                verificationStateSyncMessage: message,
-                transaction: tx
-            )
+    private func sendVerificationStateSyncMessage(for recipientUniqueId: RecipientUniqueId, message: OutgoingVerificationStateSyncMessage) {
+        let syncMessagePromise = self.db.write { tx in
             let preparedMessage = PreparedOutgoingMessage.preprepared(
-                transientMessageWithoutAttachments: nullMessage
+                transientMessageWithoutAttachments: message,
             )
-            return messageSenderJobQueue.add(
+            return self.messageSenderJobQueue.add(
                 .promise,
                 message: preparedMessage,
                 limitToCurrentProcessLifetime: true,
-                transaction: tx
+                transaction: tx,
             )
         }
-
-        nullMessagePromise.done(on: DispatchQueue.global()) {
-            Logger.info("Successfully sent verification state NullMessage")
-            let syncMessagePromise = self.db.write { tx in
-                let preparedMessage = PreparedOutgoingMessage.preprepared(
-                    transientMessageWithoutAttachments: message
-                )
-                return self.messageSenderJobQueue.add(
-                    .promise,
-                    message: preparedMessage,
-                    limitToCurrentProcessLifetime: true,
-                    transaction: tx
-                )
-            }
-            syncMessagePromise.done(on: DispatchQueue.global()) {
-                Logger.info("Successfully sent verification state sync message")
-                self.db.write { tx in self.clearSyncMessage(for: recipientUniqueId, tx: tx) }
-            }.catch(on: DispatchQueue.global()) { error in
-                Logger.error("Failed to send verification state sync message: \(error)")
-            }
+        syncMessagePromise.done(on: DispatchQueue.global()) {
+            Logger.info("Successfully sent verification state sync message")
+            self.db.write { tx in self.clearSyncMessage(for: recipientUniqueId, tx: tx) }
         }.catch(on: DispatchQueue.global()) { error in
-            Logger.error("Failed to send verification state NullMessage: \(error)")
-            if error is MessageSenderNoSuchSignalRecipientError {
-                Logger.info("Removing retries for syncing verification for unregistered user: \(address)")
-                self.db.write { tx in self.clearSyncMessage(for: recipientUniqueId, tx: tx) }
-            }
+            Logger.error("Failed to send verification state sync message: \(error)")
         }
     }
 
@@ -754,11 +759,11 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
         of identityKey: Data,
         for address: SignalServiceAddress,
         isUserInitiatedChange: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> ChangeVerificationStateResult {
         owsAssertDebug(identityKey.count == Constants.storedIdentityKeyLength)
 
-        guard let recipient = recipientDatabaseTable.fetchRecipient(address: address, tx: tx) else {
+        guard var recipient = recipientDatabaseTable.fetchRecipient(address: address, tx: tx) else {
             owsFailDebug("Missing SignalRecipient")
             return .error
         }
@@ -808,23 +813,20 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
                     // to the profile whitelist so they become a "Signal
                     // Connection". (Other devices will learn about this via
                     // Storage Service like normal.)
-                    profileManager.addUser(
-                        toProfileWhitelist: recipient.address,
-                        userProfileWriter: .localUser,
-                        transaction: tx
-                    )
+                    profileManager.addRecipientToProfileWhitelist(&recipient, userProfileWriter: .localUser, tx: tx)
                 case .noLongerVerified, .implicit:
                     break
                 }
 
                 saveChangeMessages(for: recipient, verificationState: verificationState, isLocalChange: true, tx: tx)
                 enqueueSyncMessage(for: recipientUniqueId, tx: tx)
+
+                // Verification state has changed, so notify storage service.
+                storageServiceManager.recordPendingUpdates(updatedRecipientUniqueIds: [recipientUniqueId])
             } else {
                 // Cancel any pending verification state sync messages for this recipient.
                 clearSyncMessage(for: recipientUniqueId, tx: tx)
             }
-            // Verification state has changed, so notify storage service.
-            storageServiceManager.recordPendingUpdates(updatedRecipientUniqueIds: [recipientUniqueId])
         }
         fireIdentityStateChangeNotification(after: tx)
         return .success
@@ -849,7 +851,7 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
                 aci: aci,
                 identityKey: identityKey,
                 overwriteOnConflict: false,
-                tx: tx
+                tx: tx,
             )
         case .verified:
             applyVerificationStateAction(
@@ -857,7 +859,7 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
                 aci: aci,
                 identityKey: identityKey,
                 overwriteOnConflict: true,
-                tx: tx
+                tx: tx,
             )
         case .unverified:
             return owsFailDebug("Verification state sync message for \(aci) has unverified state")
@@ -876,7 +878,7 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
         aci: Aci,
         identityKey: IdentityKey,
         overwriteOnConflict: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         let recipient = recipientFetcher.fetchOrCreate(serviceId: aci, tx: tx)
         let recipientUniqueId = recipient.uniqueId
@@ -907,7 +909,7 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
         if shouldSaveIdentityKey {
             // Ensure a remote identity exists for this key. We may be learning about
             // it for the first time.
-            saveIdentityKey(identityKey, for: aci, tx: tx)
+            saveIdentityKey(identityKey, for: aci, shouldUpdateStorageService: false, tx: tx)
             recipientIdentity = OWSRecipientIdentity.anyFetch(uniqueId: recipientUniqueId, transaction: tx)
         }
 
@@ -932,7 +934,7 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
         case .clearVerification:
             switch oldVerificationState {
             case .implicit:
-                return  // We can keep any implicit state.
+                return // We can keep any implicit state.
             case .verified, .noLongerVerified:
                 newVerificationState = .implicit(isAcknowledged: false)
             }
@@ -951,13 +953,13 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
         for signalRecipient: SignalRecipient,
         verificationState: VerificationState,
         isLocalChange: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         let address = signalRecipient.address
 
         var relevantThreads = [TSThread]()
         relevantThreads.append(TSContactThread.getOrCreateThread(withContactAddress: address, transaction: tx))
-        relevantThreads.append(contentsOf: TSGroupThread.groupThreads(with: address, transaction: tx))
+        relevantThreads.append(contentsOf: TSGroupThread.groupThreads(withFullMember: address, tx: tx))
 
         for thread in relevantThreads {
             OWSVerificationStateChangeMessage(
@@ -965,7 +967,7 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
                 timestamp: MessageTimestampGenerator.sharedInstance.generateTimestamp(),
                 recipientAddress: address,
                 verificationState: verificationState.rawValue,
-                isLocalChange: isLocalChange
+                isLocalChange: isLocalChange,
             ).anyInsert(transaction: tx)
         }
     }
@@ -1022,7 +1024,7 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
             let response = try await self.networkManager.asyncRequest(request)
 
             guard response.responseStatusCode == 200 else {
-                throw OWSAssertionError("Unexpected response from batch identity request \(response.responseStatusCode)")
+                throw response.asError()
             }
 
             guard let responseDictionary = response.responseBodyDict else {
@@ -1054,7 +1056,7 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
                         continue
                     }
 
-                    self.saveIdentityKey(identityKey, for: serviceId, tx: tx)
+                    self.saveIdentityKey(identityKey, for: serviceId, shouldUpdateStorageService: true, tx: tx)
                 }
             }
         }
@@ -1065,19 +1067,11 @@ public class OWSIdentityManagerImpl: OWSIdentityManager {
 
 class OWSIdentityManagerObjCBridge: NSObject {
     @objc
-    static let identityKeyLength = UInt(OWSIdentityManagerImpl.Constants.identityKeyLength)
-
-    @objc
     static func identityKey(forAddress address: SignalServiceAddress) -> Data? {
         return SSKEnvironment.shared.databaseStorageRef.read { tx in
             let identityManager = DependenciesBridge.shared.identityManager
             return identityManager.identityKey(for: address, tx: tx)
         }
-    }
-
-    @objc
-    static func saveIdentityKey(_ identityKey: Data, forServiceId serviceId: ServiceIdObjC, transaction tx: DBWriteTransaction) {
-        DependenciesBridge.shared.identityManager.saveIdentityKey(identityKey, for: serviceId.wrappedValue, tx: tx)
     }
 }
 

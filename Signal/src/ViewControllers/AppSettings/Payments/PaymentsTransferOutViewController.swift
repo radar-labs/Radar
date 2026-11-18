@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import BreezSdkSpark
 import Lottie
 import MobileCoin
-import BreezSdkSpark
 public import SignalServiceKit
 public import SignalUI
 
@@ -23,7 +23,7 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
     }
 
     private var hasValidAddress: Bool {
-        guard let addressValue = addressValue else {
+        guard let addressValue else {
             return false
         }
         return !addressValue.isEmpty
@@ -33,16 +33,17 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
         self.transferAmount = transferAmount
     }
 
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
 
-        title = OWSLocalizedString("SETTINGS_PAYMENTS_SEND_TO_TITLE",
-                                  comment: "Title for the unified 'send to' payment view.")
+        title = OWSLocalizedString(
+            "SETTINGS_PAYMENTS_SEND_TO_TITLE",
+            comment: "Title for the unified 'send to' payment view.",
+        )
 
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel,
-                                                           target: self,
-                                                           action: #selector(didTapDismiss),
-                                                           accessibilityIdentifier: "dismiss")
+        navigationItem.leftBarButtonItem = .cancelButton { [weak self] in
+            self?.didTapDismiss()
+        }
 
         createViews()
 
@@ -54,16 +55,17 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
     }
 
     private func updateNavbar() {
-        let rightBarButtonItem = UIBarButtonItem(title: CommonStrings.nextButton,
+        let rightBarButtonItem = UIBarButtonItem(
+            title: CommonStrings.nextButton,
             style: .plain,
             target: self,
-            action: #selector(didTapNext)
+            action: #selector(didTapNext),
         )
         rightBarButtonItem.isEnabled = hasValidAddress
         navigationItem.rightBarButtonItem = rightBarButtonItem
     }
 
-    public override func viewWillAppear(_ animated: Bool) {
+    override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         updateTableContents()
@@ -72,7 +74,7 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
         addressTextfield.becomeFirstResponder()
     }
 
-    public override func viewDidAppear(_ animated: Bool) {
+    override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         SUIEnvironment.shared.paymentsSwiftRef.updateCurrentPaymentBalance()
@@ -89,7 +91,7 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
         addressTextfield.addTarget(self, action: #selector(addressDidChange), for: .editingChanged)
     }
 
-    public override func themeDidChange() {
+    override public func themeDidChange() {
         super.themeDidChange()
 
         updateTableContents()
@@ -102,9 +104,9 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
         let placeholder = NSAttributedString(
             string: OWSLocalizedString(
                 "SETTINGS_PAYMENTS_SEND_TO_PLACEHOLDER",
-                comment: "Placeholder text for the address/search field in the 'send to' payment view."
+                comment: "Placeholder text for the address/search field in the 'send to' payment view.",
             ),
-            attributes: [.foregroundColor: Theme.secondaryTextAndIconColor]
+            attributes: [.foregroundColor: Theme.secondaryTextAndIconColor],
         )
         addressTextfield.attributedPlaceholder = placeholder
 
@@ -165,7 +167,7 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
             let recentSection = OWSTableSection()
             recentSection.headerTitle = OWSLocalizedString(
                 "SETTINGS_PAYMENTS_RECENT_RECIPIENTS",
-                comment: "Header for the 'recent' section in the payment send-to view."
+                comment: "Header for the 'recent' section in the payment send-to view.",
             )
             recentSection.separatorInsetLeading = OWSTableViewController2.cellHInnerMargin + 36 + 12
 
@@ -179,7 +181,7 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
 
                     let avatarView = ConversationAvatarView(
                         sizeClass: .thirtySix,
-                        localUserDisplayMode: .asUser
+                        localUserDisplayMode: .asUser,
                     )
                     avatarView.updateWithSneakyTransactionIfNecessary { config in
                         config.dataSource = .address(recipientAddress)
@@ -225,7 +227,7 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
             delegate: self,
             recipientAddress: address,
             isOutgoingTransfer: false,
-            mode: .fromPaymentSettings
+            mode: .fromPaymentSettings,
         )
     }
 
@@ -243,7 +245,8 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
         guard !SUIEnvironment.shared.paymentsRef.isKillSwitchActive else {
             OWSActionSheets.showErrorAlert(message: OWSLocalizedString(
                 "SETTINGS_PAYMENTS_CANNOT_SEND_PAYMENTS_KILL_SWITCH",
-                comment: "Error message indicating that payments cannot be sent because the feature is not currently available."))
+                comment: "Error message indicating that payments cannot be sent because the feature is not currently available.",
+            ))
             return
         }
         PaymentsSendRecipientViewController.presentAsFormSheet(fromViewController: self, isOutgoingTransfer: false)
@@ -257,27 +260,43 @@ public class PaymentsTransferOutViewController: OWSTableViewController2 {
     @objc
     private func didTapNext() {
         guard let inputType = tryToParseAddress() else {
-            OWSActionSheets.showActionSheet(title: OWSLocalizedString("SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS_TITLE",
-                                                                     comment: "Title for error alert indicating that Bitcoin over Lightning public address is not valid."),
-                                            message: OWSLocalizedString("SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS",
-                                                                       comment: "Error indicating that MobileCoin public address is not valid."))
+            OWSActionSheets.showActionSheet(
+                title: OWSLocalizedString(
+                    "SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS_TITLE",
+                    comment: "Title for error alert indicating that Bitcoin over Lightning public address is not valid.",
+                ),
+                message: OWSLocalizedString(
+                    "SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS",
+                    comment: "Error indicating that MobileCoin public address is not valid.",
+                ),
+            )
             return
         }
         let recipientAddress = PaymentsImpl.format(inputType: inputType)
-        guard let localWalletLightningAddress = SUIEnvironment.shared.paymentsRef.walletLightningAddress,
-              localWalletLightningAddress != recipientAddress else {
-            OWSActionSheets.showActionSheet(title: OWSLocalizedString("SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS_TITLE",
-                                                                     comment: "Title for error alert indicating that Bitcoin over Lightning public address is not valid."),
-                                            message: OWSLocalizedString("SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF",
-                                                                       comment: "Error indicating that it is not valid to send yourself a payment."))
+        guard
+            let localWalletLightningAddress = SUIEnvironment.shared.paymentsRef.walletLightningAddress,
+            localWalletLightningAddress != recipientAddress
+        else {
+            OWSActionSheets.showActionSheet(
+                title: OWSLocalizedString(
+                    "SETTINGS_PAYMENTS_TRANSFER_OUT_INVALID_PUBLIC_ADDRESS_TITLE",
+                    comment: "Title for error alert indicating that Bitcoin over Lightning public address is not valid.",
+                ),
+                message: OWSLocalizedString(
+                    "SETTINGS_PAYMENTS_TRANSFER_OUT_CANNOT_SEND_TO_SELF",
+                    comment: "Error indicating that it is not valid to send yourself a payment.",
+                ),
+            )
             return
         }
 
         let recipient: SendPaymentRecipientImpl = .publicAddress(inputType: inputType)
-        let view = SendPaymentViewController(recipient: recipient,
-                                             initialPaymentAmount: transferAmount,
-                                             isOutgoingTransfer: true,
-                                             mode: .fromTransferOutFlow)
+        let view = SendPaymentViewController(
+            recipient: recipient,
+            initialPaymentAmount: transferAmount,
+            isOutgoingTransfer: true,
+            mode: .fromTransferOutFlow,
+        )
         view.delegate = self
         navigationController?.pushViewController(view, animated: true)
     }

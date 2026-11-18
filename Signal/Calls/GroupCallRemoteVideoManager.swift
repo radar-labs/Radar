@@ -27,6 +27,7 @@ class GroupCallRemoteVideoManager {
     }
 
     // MARK: - Remote Video Views
+
     private var videoViews = [UInt32: [CallMemberVisualContext: GroupCallRemoteVideoView]]()
 
     func remoteVideoView(for device: RemoteDeviceState, context: CallMemberVisualContext) -> GroupCallRemoteVideoView {
@@ -55,13 +56,14 @@ class GroupCallRemoteVideoManager {
     private func updateVideoRequests() {
         updateVideoRequestsDebounceTimer?.invalidate()
         updateVideoRequestsDebounceTimer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false, block: { [weak self] _ in
-            guard let self = self else { return }
+            guard let self else { return }
 
             // scheduledTimer promises to schedule this block on the same run loop that called scheduled timer so we should be main actor here
             MainActor.assumeIsolated {
                 guard let groupCall = self.currentRingRtcCall else { return }
 
                 var activeSpeakerHeight: UInt16 = 0
+                var isSomeonePresenting = false
 
                 let videoRequests: [VideoRequest] = groupCall.remoteDeviceStates.map { demuxId, _ in
                     guard
@@ -70,6 +72,8 @@ class GroupCallRemoteVideoManager {
                     else {
                         return VideoRequest(demuxId: demuxId, width: 0, height: 0, framerate: nil)
                     }
+
+                    isSomeonePresenting = isSomeonePresenting || renderingVideoViews.contains(where: \.value.isScreenShare)
 
                     if let activeSpeakerVideoView = renderingVideoViews[.speaker] {
                         activeSpeakerHeight = max(activeSpeakerHeight, UInt16(activeSpeakerVideoView.currentSize.height))
@@ -83,10 +87,13 @@ class GroupCallRemoteVideoManager {
                         demuxId: demuxId,
                         width: UInt16(size.width),
                         height: UInt16(size.height),
-                        framerate: size.height <= GroupCallVideoOverflow.itemHeight ? 15 : 30
+                        framerate: size.height <= GroupCallVideoOverflow.itemHeight ? 15 : 30,
                     )
                 }
 
+                // currently we do not support presenting + speaker videos
+                // so when someone is presenting, do not prioritize active speaker video over presenter video
+                activeSpeakerHeight = isSomeonePresenting ? 0 : activeSpeakerHeight
                 groupCall.updateVideoRequests(resolutions: videoRequests, activeSpeakerHeight: activeSpeakerHeight)
             }
         })
@@ -136,7 +143,7 @@ extension GroupCallRemoteVideoManager: GroupCallObserver {
         }
     }
 
-    func groupCallEnded(_ call: GroupCall, reason: GroupCallEndReason) {
+    func groupCallEnded(_ call: GroupCall, reason: CallEndReason) {
         videoViews.keys.forEach { destroyRemoteVideoView(for: $0) }
     }
 }

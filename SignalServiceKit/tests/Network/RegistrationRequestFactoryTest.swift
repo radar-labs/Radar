@@ -4,8 +4,8 @@
 //
 
 import Foundation
-@testable import SignalServiceKit
 public import XCTest
+@testable import SignalServiceKit
 
 public class RegistrationRequestFactoryTest: XCTestCase {
 
@@ -16,7 +16,7 @@ public class RegistrationRequestFactoryTest: XCTestCase {
             ("en", nil, "en"),
             ("es", "US", "es-US, es;q=0.9, en;q=0.8"),
             ("es", nil, "es, en;q=0.9"),
-            (nil, nil, "en")
+            (nil, nil, "en"),
         ]
 
         for (languageCode, countryCode, expectedHeader) in expectedValues {
@@ -24,7 +24,8 @@ public class RegistrationRequestFactoryTest: XCTestCase {
                 sessionId: "123",
                 languageCode: languageCode,
                 countryCode: countryCode,
-                transport: .sms
+                transport: .sms,
+                logger: .empty(),
             )
             XCTAssertEqual(request.url.relativeString, "v1/verification/session/123/code")
             XCTAssertEqual(request.parameters["transport"] as? String, "sms")

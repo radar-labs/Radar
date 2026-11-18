@@ -29,34 +29,21 @@ public enum SentMessageTranscriptType {
 
         public let attachmentPointerProtos: [SSKProtoAttachmentPointer]
 
-        /// Construction of the builder itself deferred since the builder's constructor does database inserts.
-        /// Edit messages construct a transcript but don't use the attachment builders and instead make their own.
-        public let makeQuotedMessageBuilder: (DBWriteTransaction) throws -> OwnedAttachmentBuilder<TSQuotedMessage>?
-
-        /// Construction of the builder itself deferred since the builder's constructor does database inserts.
-        /// Edit messages construct a transcript but don't use the attachment builders and instead make their own.
-        public let makeContactBuilder: (DBWriteTransaction) throws -> OwnedAttachmentBuilder<OWSContact>?
-
-        /// Construction of the builder itself deferred since the builder's constructor does database inserts.
-        /// Edit messages construct a transcript but don't use the attachment builders and instead make their own.
-        public let makeLinkPreviewBuilder: (DBWriteTransaction) throws -> OwnedAttachmentBuilder<OWSLinkPreview>?
-
+        public let validatedContactShare: ValidatedContactShareProto?
+        public let validatedQuotedReply: ValidatedQuotedReply?
+        public let validatedLinkPreview: ValidatedLinkPreviewProto?
+        public let validatedMessageSticker: ValidatedMessageStickerProto?
+        public let validatedPollCreate: ValidatedIncomingPollCreate?
         public let giftBadge: OWSGiftBadge?
-
-        /// Construction of the builder itself deferred since the builder's constructor does database inserts.
-        /// Edit messages construct a transcript but don't use the attachment builders and instead make their own.
-        public let makeMessageStickerBuilder: (DBWriteTransaction) throws -> OwnedAttachmentBuilder<MessageSticker>?
 
         public let isViewOnceMessage: Bool
 
-        public let expirationStartedAt: UInt64?
-        public let expirationDurationSeconds: UInt32?
-        public let expireTimerVersion: UInt32?
+        public let expirationStartedAt: UInt64
+        public let expirationDurationSeconds: UInt32
+        public let expireTimerVersion: UInt32
 
         public let storyTimestamp: UInt64?
         public let storyAuthorAci: Aci?
-
-        public let makePollCreateBuilder: ((Int64, DBWriteTransaction) throws -> Void)?
     }
 
     public struct PaymentNotification {
@@ -65,21 +52,10 @@ public enum SentMessageTranscriptType {
         public let notification: TSPaymentNotification
     }
 
-    public struct ArchivedPayment {
-        public let target: SentMessageTranscriptTarget
-        public let amount: String?
-        public let fee: String?
-        public let note: String?
-        public let expirationStartedAt: UInt64?
-        public let expirationDurationSeconds: UInt32?
-    }
-
     case message(Message)
     case recipientUpdate(TSGroupThread)
     case expirationTimerUpdate(SentMessageTranscriptTarget)
-    case endSessionUpdate(TSContactThread)
     case paymentNotification(PaymentNotification)
-    case archivedPayment(ArchivedPayment)
 }
 
 /// A transcript for a message that has already been sent, and which came in
@@ -99,14 +75,12 @@ extension SentMessageTranscript {
 
     public var threadForDataMessage: TSThread? {
         switch type {
-        case .endSessionUpdate, .expirationTimerUpdate:
+        case .expirationTimerUpdate:
             return nil
         case .message(let messageParams):
             return messageParams.target.thread
         case .paymentNotification(let notification):
             return notification.target.thread
-        case .archivedPayment(let payment):
-            return payment.target.thread
         case .recipientUpdate(let thread):
             return thread
         }

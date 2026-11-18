@@ -7,62 +7,78 @@ import Foundation
 public import GRDB
 
 extension Attachment {
-    public struct Record: Codable, MutablePersistableRecord, FetchableRecord, Equatable, UInt64SafeRecord {
+    public struct Record: Codable, MutablePersistableRecord, FetchableRecord, Equatable {
 
         public typealias IDType = Int64
 
         var sqliteId: IDType?
         let blurHash: String?
-        var sha256ContentHash: Data?
+        let plaintextHash: Data?
         let encryptedByteCount: UInt32?
         let unencryptedByteCount: UInt32?
         let mimeType: String
+        /// - Important
+        /// The underlying database column for this is nullable, but in practice
+        /// must always contain a valid non-NULL value.
+        let contentType: Attachment.ContentType
         let encryptionKey: Data
-        let digestSHA256Ciphertext: Data?
-        let contentType: UInt32?
+        let ciphertextDigest: Data?
         let latestTransitCdnNumber: UInt32?
         let latestTransitCdnKey: String?
-        let latestTransitUploadTimestamp: UInt64?
+        @DBUInt64Optional
+        var latestTransitUploadTimestamp: UInt64?
         let latestTransitEncryptionKey: Data?
         let latestTransitUnencryptedByteCount: UInt32?
-        let latestTransitDigestSHA256Ciphertext: Data?
-        let latestTransitLastDownloadAttemptTimestamp: UInt64?
-        let mediaName: String?
+        let latestTransitCiphertextDigest: Data?
+        @DBUInt64Optional
+        var latestTransitLastDownloadAttemptTimestamp: UInt64?
+        private let _mediaName: String? // deprecated, always NULL
         let mediaTierCdnNumber: UInt32?
         let mediaTierUnencryptedByteCount: UInt32?
         let mediaTierUploadEra: String?
-        let lastMediaTierDownloadAttemptTimestamp: UInt64?
+        @DBUInt64Optional
+        var lastMediaTierDownloadAttemptTimestamp: UInt64?
         let thumbnailCdnNumber: UInt32?
         let thumbnailUploadEra: String?
-        let lastThumbnailDownloadAttemptTimestamp: UInt64?
+        @DBUInt64Optional
+        var lastThumbnailDownloadAttemptTimestamp: UInt64?
         let localRelativeFilePath: String?
         let localRelativeFilePathThumbnail: String?
-        let cachedAudioDurationSeconds: Double?
         let cachedMediaHeightPixels: UInt32?
         let cachedMediaWidthPixels: UInt32?
         let cachedVideoDurationSeconds: Double?
+        let audioDurationSeconds: Double?
         let audioWaveformRelativeFilePath: String?
+        let audioWaveformSamples: Data?
         let videoStillFrameRelativeFilePath: String?
         let originalAttachmentIdForQuotedReply: Int64?
         let mediaTierIncrementalMac: Data?
         let mediaTierIncrementalMacChunkSize: UInt32?
         let latestTransitTierIncrementalMac: Data?
         let latestTransitTierIncrementalMacChunkSize: UInt32?
-        let lastFullscreenViewTimestamp: UInt64?
+        @DBUInt64Optional
+        var lastFullscreenViewTimestamp: UInt64?
         let originalTransitCdnNumber: UInt32?
         let originalTransitCdnKey: String?
-        let originalTransitUploadTimestamp: UInt64?
+        @DBUInt64Optional
+        var originalTransitUploadTimestamp: UInt64?
         let originalTransitUnencryptedByteCount: UInt32?
-        let originalTransitDigestSHA256Ciphertext: Data?
+        let originalTransitCiphertextDigest: Data?
         let originalTransitTierIncrementalMac: Data?
         let originalTransitTierIncrementalMacChunkSize: UInt32?
+
+        var mediaName: String? {
+            return self.plaintextHash.map {
+                return Attachment.mediaName(plaintextHash: $0, encryptionKey: self.encryptionKey)
+            }
+        }
 
         public var allFilesRelativePaths: [String] {
             return [
                 localRelativeFilePath,
                 localRelativeFilePathThumbnail,
                 videoStillFrameRelativeFilePath,
-                audioWaveformRelativeFilePath
+                audioWaveformRelativeFilePath,
             ].compacted()
         }
 
@@ -72,20 +88,20 @@ extension Attachment {
             case sqliteId = "id"
             case blurHash
             case mimeType
-            case sha256ContentHash
+            case plaintextHash = "sha256ContentHash"
             case encryptedByteCount
             case unencryptedByteCount
             case contentType
             case encryptionKey
-            case digestSHA256Ciphertext
+            case ciphertextDigest = "digestSHA256Ciphertext"
             case latestTransitCdnNumber = "transitCdnNumber"
             case latestTransitCdnKey = "transitCdnKey"
             case latestTransitUploadTimestamp = "transitUploadTimestamp"
             case latestTransitEncryptionKey = "transitEncryptionKey"
             case latestTransitUnencryptedByteCount = "transitUnencryptedByteCount"
-            case latestTransitDigestSHA256Ciphertext = "transitDigestSHA256Ciphertext"
+            case latestTransitCiphertextDigest = "transitDigestSHA256Ciphertext"
             case latestTransitLastDownloadAttemptTimestamp = "lastTransitDownloadAttemptTimestamp"
-            case mediaName
+            case _mediaName = "mediaName"
             case mediaTierCdnNumber
             case mediaTierUnencryptedByteCount
             case mediaTierUploadEra
@@ -95,11 +111,12 @@ extension Attachment {
             case lastThumbnailDownloadAttemptTimestamp
             case localRelativeFilePath
             case localRelativeFilePathThumbnail
-            case cachedAudioDurationSeconds
             case cachedMediaHeightPixels
             case cachedMediaWidthPixels
             case cachedVideoDurationSeconds
+            case audioDurationSeconds = "cachedAudioDurationSeconds"
             case audioWaveformRelativeFilePath
+            case audioWaveformSamples
             case videoStillFrameRelativeFilePath
             case originalAttachmentIdForQuotedReply
             case mediaTierIncrementalMac
@@ -111,24 +128,9 @@ extension Attachment {
             case originalTransitCdnKey
             case originalTransitUploadTimestamp
             case originalTransitUnencryptedByteCount
-            case originalTransitDigestSHA256Ciphertext
+            case originalTransitCiphertextDigest = "originalTransitDigestSHA256Ciphertext"
             case originalTransitTierIncrementalMac
             case originalTransitTierIncrementalMacChunkSize
-        }
-
-        // MARK: - UInt64SafeRecord
-
-        public static var uint64Fields: [KeyPath<Attachment.Record, UInt64>] { [] }
-
-        public static var uint64OptionalFields: [KeyPath<Self, UInt64?>] {
-            return [
-                \.latestTransitUploadTimestamp,
-                \.latestTransitLastDownloadAttemptTimestamp,
-                \.lastMediaTierDownloadAttemptTimestamp,
-                \.lastThumbnailDownloadAttemptTimestamp,
-                \.lastFullscreenViewTimestamp,
-                \.originalTransitUploadTimestamp,
-            ]
         }
 
         // MARK: - MutablePersistableRecord
@@ -141,110 +143,17 @@ extension Attachment {
 
         // MARK: - Initializers
 
-        internal init(
-            sqliteId: IDType? = nil,
-            blurHash: String?,
-            sha256ContentHash: Data?,
-            encryptedByteCount: UInt32?,
-            unencryptedByteCount: UInt32?,
-            mimeType: String,
-            encryptionKey: Data,
-            digestSHA256Ciphertext: Data?,
-            contentType: UInt32?,
-            latestTransitCdnNumber: UInt32?,
-            latestTransitCdnKey: String?,
-            latestTransitUploadTimestamp: UInt64?,
-            latestTransitEncryptionKey: Data?,
-            latestTransitUnencryptedByteCount: UInt32?,
-            latestTransitDigestSHA256Ciphertext: Data?,
-            latestTransitLastDownloadAttemptTimestamp: UInt64?,
-            mediaName: String?,
-            mediaTierCdnNumber: UInt32?,
-            mediaTierUnencryptedByteCount: UInt32?,
-            mediaTierUploadEra: String?,
-            lastMediaTierDownloadAttemptTimestamp: UInt64?,
-            thumbnailCdnNumber: UInt32?,
-            thumbnailUploadEra: String?,
-            lastThumbnailDownloadAttemptTimestamp: UInt64?,
-            localRelativeFilePath: String?,
-            localRelativeFilePathThumbnail: String?,
-            cachedAudioDurationSeconds: Double?,
-            cachedMediaHeightPixels: UInt32?,
-            cachedMediaWidthPixels: UInt32?,
-            cachedVideoDurationSeconds: Double?,
-            audioWaveformRelativeFilePath: String?,
-            videoStillFrameRelativeFilePath: String?,
-            originalAttachmentIdForQuotedReply: Int64?,
-            mediaTierIncrementalMac: Data?,
-            mediaTierIncrementalMacChunkSize: UInt32?,
-            latestTransitTierIncrementalMac: Data?,
-            latestTransitTierIncrementalMacChunkSize: UInt32?,
-            lastFullscreenViewTimestamp: UInt64?,
-            originalTransitCdnNumber: UInt32?,
-            originalTransitCdnKey: String?,
-            originalTransitUploadTimestamp: UInt64?,
-            originalTransitUnencryptedByteCount: UInt32?,
-            originalTransitDigestSHA256Ciphertext: Data?,
-            originalTransitTierIncrementalMac: Data?,
-            originalTransitTierIncrementalMacChunkSize: UInt32?,
-        ) {
-            self.sqliteId = sqliteId
-            self.blurHash = blurHash
-            self.sha256ContentHash = sha256ContentHash
-            self.encryptedByteCount = encryptedByteCount
-            self.unencryptedByteCount = unencryptedByteCount
-            self.mimeType = mimeType
-            self.encryptionKey = encryptionKey
-            self.digestSHA256Ciphertext = digestSHA256Ciphertext
-            self.contentType = contentType
-            self.latestTransitCdnNumber = latestTransitCdnNumber
-            self.latestTransitCdnKey = latestTransitCdnKey
-            self.latestTransitUploadTimestamp = latestTransitUploadTimestamp
-            self.latestTransitEncryptionKey = latestTransitEncryptionKey
-            self.latestTransitUnencryptedByteCount = latestTransitUnencryptedByteCount
-            self.latestTransitDigestSHA256Ciphertext = latestTransitDigestSHA256Ciphertext
-            self.latestTransitLastDownloadAttemptTimestamp = latestTransitLastDownloadAttemptTimestamp
-            self.mediaName = mediaName
-            self.mediaTierCdnNumber = mediaTierCdnNumber
-            self.mediaTierUnencryptedByteCount = mediaTierUnencryptedByteCount
-            self.mediaTierUploadEra = mediaTierUploadEra
-            self.lastMediaTierDownloadAttemptTimestamp = lastMediaTierDownloadAttemptTimestamp
-            self.thumbnailCdnNumber = thumbnailCdnNumber
-            self.thumbnailUploadEra = thumbnailUploadEra
-            self.lastThumbnailDownloadAttemptTimestamp = lastThumbnailDownloadAttemptTimestamp
-            self.localRelativeFilePath = localRelativeFilePath
-            self.localRelativeFilePathThumbnail = localRelativeFilePathThumbnail
-            self.cachedAudioDurationSeconds = cachedAudioDurationSeconds
-            self.cachedMediaHeightPixels = cachedMediaHeightPixels
-            self.cachedMediaWidthPixels = cachedMediaWidthPixels
-            self.cachedVideoDurationSeconds = cachedVideoDurationSeconds
-            self.audioWaveformRelativeFilePath = audioWaveformRelativeFilePath
-            self.videoStillFrameRelativeFilePath = videoStillFrameRelativeFilePath
-            self.originalAttachmentIdForQuotedReply = originalAttachmentIdForQuotedReply
-            self.mediaTierIncrementalMac = mediaTierIncrementalMac
-            self.mediaTierIncrementalMacChunkSize = mediaTierIncrementalMacChunkSize
-            self.latestTransitTierIncrementalMac = latestTransitTierIncrementalMac
-            self.latestTransitTierIncrementalMacChunkSize = latestTransitTierIncrementalMacChunkSize
-            self.lastFullscreenViewTimestamp = lastFullscreenViewTimestamp
-            self.originalTransitCdnNumber = originalTransitCdnNumber
-            self.originalTransitCdnKey = originalTransitCdnKey
-            self.originalTransitUploadTimestamp = originalTransitUploadTimestamp
-            self.originalTransitUnencryptedByteCount = originalTransitUnencryptedByteCount
-            self.originalTransitDigestSHA256Ciphertext = originalTransitDigestSHA256Ciphertext
-            self.originalTransitTierIncrementalMac = originalTransitTierIncrementalMac
-            self.originalTransitTierIncrementalMacChunkSize = originalTransitTierIncrementalMacChunkSize
-        }
-
-        internal init(attachment: Attachment) {
+        init(attachment: Attachment) {
             self.init(
                 sqliteId: attachment.id,
                 blurHash: attachment.blurHash,
                 mimeType: attachment.mimeType,
+                contentType: attachment.contentType,
                 encryptionKey: attachment.encryptionKey,
-                sha256ContentHash: attachment.sha256ContentHash,
-                mediaName: attachment.mediaName,
+                plaintextHash: attachment.plaintextHash,
                 localRelativeFilePathThumbnail: attachment.localRelativeFilePathThumbnail,
                 streamInfo: attachment.streamInfo,
+                audioDetails: attachment.audioDetails,
                 latestTransitTierInfo: attachment.latestTransitTierInfo,
                 originalTransitTierInfo: attachment.originalTransitTierInfo,
                 mediaTierInfo: attachment.mediaTierInfo,
@@ -254,34 +163,16 @@ extension Attachment {
             )
         }
 
-        internal init(params: Attachment.ConstructionParams) {
-            self.init(
-                optionalSqliteId: nil,
-                blurHash: params.blurHash,
-                mimeType: params.mimeType,
-                encryptionKey: params.encryptionKey,
-                sha256ContentHash: params.sha256ContentHash,
-                mediaName: params.mediaName,
-                localRelativeFilePathThumbnail: params.localRelativeFilePathThumbnail,
-                streamInfo: params.streamInfo,
-                latestTransitTierInfo: params.latestTransitTierInfo,
-                originalTransitTierInfo: params.originalTransitTierInfo,
-                mediaTierInfo: params.mediaTierInfo,
-                thumbnailMediaTierInfo: params.thumbnailMediaTierInfo,
-                originalAttachmentIdForQuotedReply: params.originalAttachmentIdForQuotedReply,
-                lastFullscreenViewTimestamp: params.lastFullscreenViewTimestamp,
-            )
-        }
-
-        internal init(
-            sqliteId: IDType,
+        init(
+            sqliteId: IDType?,
             blurHash: String?,
             mimeType: String,
+            contentType: Attachment.ContentType,
             encryptionKey: Data,
-            sha256ContentHash: Data?,
-            mediaName: String?,
+            plaintextHash: Data?,
             localRelativeFilePathThumbnail: String?,
             streamInfo: Attachment.StreamInfo?,
+            audioDetails: Attachment.AudioDetails?,
             latestTransitTierInfo: Attachment.TransitTierInfo?,
             originalTransitTierInfo: Attachment.TransitTierInfo?,
             mediaTierInfo: Attachment.MediaTierInfo?,
@@ -289,138 +180,209 @@ extension Attachment {
             originalAttachmentIdForQuotedReply: Int64?,
             lastFullscreenViewTimestamp: UInt64?,
         ) {
-            self.init(
-                optionalSqliteId: sqliteId,
-                blurHash: blurHash,
-                mimeType: mimeType,
-                encryptionKey: encryptionKey,
-                sha256ContentHash: sha256ContentHash,
-                mediaName: mediaName,
-                localRelativeFilePathThumbnail: localRelativeFilePathThumbnail,
-                streamInfo: streamInfo,
-                latestTransitTierInfo: latestTransitTierInfo,
-                originalTransitTierInfo: originalTransitTierInfo,
-                mediaTierInfo: mediaTierInfo,
-                thumbnailMediaTierInfo: thumbnailMediaTierInfo,
-                originalAttachmentIdForQuotedReply: originalAttachmentIdForQuotedReply,
-                lastFullscreenViewTimestamp: lastFullscreenViewTimestamp,
-            )
-        }
-
-        // Private as we want to be deliberate around when sqlite id is not provided.
-        private init(
-            optionalSqliteId: IDType?,
-            blurHash: String?,
-            mimeType: String,
-            encryptionKey: Data,
-            sha256ContentHash: Data?,
-            mediaName: String?,
-            localRelativeFilePathThumbnail: String?,
-            streamInfo: Attachment.StreamInfo?,
-            latestTransitTierInfo: Attachment.TransitTierInfo?,
-            originalTransitTierInfo: Attachment.TransitTierInfo?,
-            mediaTierInfo: Attachment.MediaTierInfo?,
-            thumbnailMediaTierInfo: Attachment.ThumbnailMediaTierInfo?,
-            originalAttachmentIdForQuotedReply: Int64?,
-            lastFullscreenViewTimestamp: UInt64?,
-        ) {
-            self.sqliteId = optionalSqliteId
+            self.sqliteId = sqliteId
             self.blurHash = blurHash
-            self.sha256ContentHash = sha256ContentHash
+            self.plaintextHash = plaintextHash
             self.encryptedByteCount = streamInfo?.encryptedByteCount
             self.unencryptedByteCount = streamInfo?.unencryptedByteCount
             self.mimeType = mimeType
+            self.contentType = contentType
             self.encryptionKey = encryptionKey
-            self.digestSHA256Ciphertext = streamInfo?.digestSHA256Ciphertext
-            self.contentType = (streamInfo?.contentType.raw.rawValue).map { UInt32($0) }
+            self.ciphertextDigest = streamInfo?.ciphertextDigest
             self.latestTransitCdnNumber = latestTransitTierInfo?.cdnNumber
             self.latestTransitCdnKey = latestTransitTierInfo?.cdnKey
-            self.latestTransitUploadTimestamp = latestTransitTierInfo?.uploadTimestamp
+            self._latestTransitUploadTimestamp = DBUInt64Optional(wrappedValue: latestTransitTierInfo?.uploadTimestamp)
             self.latestTransitEncryptionKey = latestTransitTierInfo?.encryptionKey
             self.latestTransitUnencryptedByteCount = latestTransitTierInfo?.unencryptedByteCount
             switch latestTransitTierInfo?.integrityCheck {
-            case .digestSHA256Ciphertext(let data):
-                self.latestTransitDigestSHA256Ciphertext = data
-            case nil, .sha256ContentHash:
-                self.latestTransitDigestSHA256Ciphertext = nil
+            case .ciphertextDigest(let data):
+                self.latestTransitCiphertextDigest = data
+            case nil, .plaintextHash:
+                self.latestTransitCiphertextDigest = nil
             }
             self.latestTransitTierIncrementalMac = latestTransitTierInfo?.incrementalMacInfo?.mac
             self.latestTransitTierIncrementalMacChunkSize = latestTransitTierInfo?.incrementalMacInfo?.chunkSize
-            self.latestTransitLastDownloadAttemptTimestamp = latestTransitTierInfo?.lastDownloadAttemptTimestamp
+            self._latestTransitLastDownloadAttemptTimestamp = DBUInt64Optional(wrappedValue: latestTransitTierInfo?.lastDownloadAttemptTimestamp)
 
             self.originalTransitCdnNumber = originalTransitTierInfo?.cdnNumber
             self.originalTransitCdnKey = originalTransitTierInfo?.cdnKey
-            self.originalTransitUploadTimestamp = originalTransitTierInfo?.uploadTimestamp
+            self._originalTransitUploadTimestamp = DBUInt64Optional(wrappedValue: originalTransitTierInfo?.uploadTimestamp)
             self.originalTransitUnencryptedByteCount = originalTransitTierInfo?.unencryptedByteCount
             switch originalTransitTierInfo?.integrityCheck {
-            case .digestSHA256Ciphertext(let data):
-                self.originalTransitDigestSHA256Ciphertext = data
-            case nil, .sha256ContentHash:
-                self.originalTransitDigestSHA256Ciphertext = nil
+            case .ciphertextDigest(let data):
+                self.originalTransitCiphertextDigest = data
+            case nil, .plaintextHash:
+                self.originalTransitCiphertextDigest = nil
             }
             self.originalTransitTierIncrementalMac = originalTransitTierInfo?.incrementalMacInfo?.mac
             self.originalTransitTierIncrementalMacChunkSize = originalTransitTierInfo?.incrementalMacInfo?.chunkSize
 
-            self.mediaName = mediaName
+            self._mediaName = nil
             self.mediaTierCdnNumber = mediaTierInfo?.cdnNumber
             self.mediaTierUnencryptedByteCount = mediaTierInfo?.unencryptedByteCount
             self.mediaTierIncrementalMac = mediaTierInfo?.incrementalMacInfo?.mac
             self.mediaTierIncrementalMacChunkSize = mediaTierInfo?.incrementalMacInfo?.chunkSize
             self.mediaTierUploadEra = mediaTierInfo?.uploadEra
-            self.lastMediaTierDownloadAttemptTimestamp = mediaTierInfo?.lastDownloadAttemptTimestamp
+            self._lastMediaTierDownloadAttemptTimestamp = DBUInt64Optional(wrappedValue: mediaTierInfo?.lastDownloadAttemptTimestamp)
             self.thumbnailCdnNumber = thumbnailMediaTierInfo?.cdnNumber
             self.thumbnailUploadEra = thumbnailMediaTierInfo?.uploadEra
-            self.lastThumbnailDownloadAttemptTimestamp = thumbnailMediaTierInfo?.lastDownloadAttemptTimestamp
+            self._lastThumbnailDownloadAttemptTimestamp = DBUInt64Optional(wrappedValue: thumbnailMediaTierInfo?.lastDownloadAttemptTimestamp)
             self.localRelativeFilePath = streamInfo?.localRelativeFilePath
             self.localRelativeFilePathThumbnail = localRelativeFilePathThumbnail
             self.originalAttachmentIdForQuotedReply = originalAttachmentIdForQuotedReply
-            self.lastFullscreenViewTimestamp = lastFullscreenViewTimestamp
+            self._lastFullscreenViewTimestamp = DBUInt64Optional(wrappedValue: lastFullscreenViewTimestamp)
 
-            let cachedAudioDurationSeconds: TimeInterval?
-            let cachedMediaSizePixels: CGSize?
-            let cachedVideoDurationSeconds: TimeInterval?
-            let audioWaveformRelativeFilePath: String?
-            let videoStillFrameRelativeFilePath: String?
+            self.cachedMediaHeightPixels = streamInfo?.cachedMediaSizePixels.flatMap { UInt32(exactly: $0.height.rounded()) }
+            self.cachedMediaWidthPixels = streamInfo?.cachedMediaSizePixels.flatMap { UInt32(exactly: $0.width.rounded()) }
+            self.cachedVideoDurationSeconds = streamInfo?.cachedVideoDuration
+            self.audioDurationSeconds = audioDetails?.duration
+            self.audioWaveformRelativeFilePath = audioDetails?.waveformRelativeFilePath
+            self.audioWaveformSamples = audioDetails?.waveform?.waveformData
+            self.videoStillFrameRelativeFilePath = streamInfo?.cachedVideoStillFrameRelativeFilePath
+        }
 
-            switch streamInfo?.contentType {
-            case .invalid, .file, nil:
-                cachedAudioDurationSeconds = nil
-                cachedMediaSizePixels = nil
-                cachedVideoDurationSeconds = nil
-                audioWaveformRelativeFilePath = nil
-                videoStillFrameRelativeFilePath = nil
-            case .image(let pixelSize):
-                cachedAudioDurationSeconds = nil
-                cachedMediaSizePixels = pixelSize
-                cachedVideoDurationSeconds = nil
-                audioWaveformRelativeFilePath = nil
-                videoStillFrameRelativeFilePath = nil
-            case .video(let duration, let pixelSize, let stillFrameRelativeFilePath):
-                cachedAudioDurationSeconds = nil
-                cachedMediaSizePixels = pixelSize
-                cachedVideoDurationSeconds = duration
-                audioWaveformRelativeFilePath = nil
-                videoStillFrameRelativeFilePath = stillFrameRelativeFilePath
-            case .animatedImage(let pixelSize):
-                cachedAudioDurationSeconds = nil
-                cachedMediaSizePixels = pixelSize
-                cachedVideoDurationSeconds = nil
-                audioWaveformRelativeFilePath = nil
-                videoStillFrameRelativeFilePath = nil
-            case .audio(let duration, let waveformRelativeFilePath):
-                cachedAudioDurationSeconds = duration
-                cachedMediaSizePixels = nil
-                cachedVideoDurationSeconds = nil
-                audioWaveformRelativeFilePath = waveformRelativeFilePath
-                videoStillFrameRelativeFilePath = nil
-            }
+        // MARK: -
 
-            self.cachedAudioDurationSeconds = cachedAudioDurationSeconds
-            self.cachedMediaHeightPixels = cachedMediaSizePixels.map { UInt32(exactly: $0.height.rounded()) } ?? nil
-            self.cachedMediaWidthPixels = cachedMediaSizePixels.map { UInt32(exactly: $0.width.rounded()) } ?? nil
-            self.cachedVideoDurationSeconds = cachedVideoDurationSeconds
-            self.audioWaveformRelativeFilePath = audioWaveformRelativeFilePath
-            self.videoStillFrameRelativeFilePath = videoStillFrameRelativeFilePath
+        static func forInsertingPointer(
+            blurHash: String?,
+            mimeType: String,
+            contentType: ContentType,
+            encryptionKey: Data,
+            audioDetails: Attachment.AudioDetails?,
+            latestTransitTierInfo: Attachment.TransitTierInfo,
+        ) -> Record {
+            return Record(
+                sqliteId: nil,
+                blurHash: blurHash,
+                mimeType: mimeType,
+                contentType: contentType,
+                encryptionKey: encryptionKey,
+                plaintextHash: nil,
+                localRelativeFilePathThumbnail: nil,
+                streamInfo: nil,
+                audioDetails: audioDetails,
+                latestTransitTierInfo: latestTransitTierInfo,
+                originalTransitTierInfo: latestTransitTierInfo.encryptionKey == encryptionKey
+                    ? latestTransitTierInfo : nil,
+                mediaTierInfo: nil,
+                thumbnailMediaTierInfo: nil,
+                originalAttachmentIdForQuotedReply: nil,
+                lastFullscreenViewTimestamp: nil,
+            )
+        }
+
+        static func forInsertingStream(
+            blurHash: String?,
+            mimeType: String,
+            contentType: ContentType,
+            encryptionKey: Data,
+            streamInfo: Attachment.StreamInfo,
+            audioDetails: Attachment.AudioDetails?,
+            plaintextHash: Data,
+        ) -> Record {
+            return Record(
+                sqliteId: nil,
+                blurHash: blurHash,
+                mimeType: mimeType,
+                contentType: contentType,
+                encryptionKey: encryptionKey,
+                plaintextHash: plaintextHash,
+                localRelativeFilePathThumbnail: nil,
+                streamInfo: streamInfo,
+                audioDetails: audioDetails,
+                latestTransitTierInfo: nil,
+                originalTransitTierInfo: nil,
+                mediaTierInfo: nil,
+                thumbnailMediaTierInfo: nil,
+                originalAttachmentIdForQuotedReply: nil,
+                lastFullscreenViewTimestamp: nil,
+            )
+        }
+
+        static func forInsertingFromBackup(
+            blurHash: String?,
+            mimeType: String,
+            contentType: ContentType,
+            encryptionKey: Data,
+            audioDetails: Attachment.AudioDetails?,
+            latestTransitTierInfo: Attachment.TransitTierInfo?,
+            plaintextHash: Data?,
+            mediaTierInfo: Attachment.MediaTierInfo?,
+            thumbnailMediaTierInfo: Attachment.ThumbnailMediaTierInfo?,
+        ) -> Record {
+            return Record(
+                sqliteId: nil,
+                blurHash: blurHash,
+                mimeType: mimeType,
+                contentType: contentType,
+                encryptionKey: encryptionKey,
+                plaintextHash: plaintextHash,
+                localRelativeFilePathThumbnail: nil,
+                streamInfo: nil,
+                audioDetails: audioDetails,
+                latestTransitTierInfo: latestTransitTierInfo,
+                originalTransitTierInfo: latestTransitTierInfo?.encryptionKey == encryptionKey
+                    ? latestTransitTierInfo : nil,
+                mediaTierInfo: mediaTierInfo,
+                thumbnailMediaTierInfo: thumbnailMediaTierInfo,
+                originalAttachmentIdForQuotedReply: nil,
+                lastFullscreenViewTimestamp: nil,
+            )
+        }
+
+        static func forInsertingInvalidBackupAttachment(
+            blurHash: String?,
+            mimeType: String,
+            contentType: ContentType,
+            audioDetails: Attachment.AudioDetails?,
+        ) -> Record {
+            return Record(
+                sqliteId: nil,
+                blurHash: blurHash,
+                mimeType: mimeType,
+                contentType: contentType,
+                // We don't have any cdn info from which to download, so what
+                // encryption key we use is irrelevant. Just generate a new one.
+                encryptionKey: AttachmentKey.generate().combinedKey,
+                plaintextHash: nil,
+                localRelativeFilePathThumbnail: nil,
+                streamInfo: nil,
+                audioDetails: audioDetails,
+                latestTransitTierInfo: nil,
+                originalTransitTierInfo: nil,
+                mediaTierInfo: nil,
+                thumbnailMediaTierInfo: nil,
+                originalAttachmentIdForQuotedReply: nil,
+                lastFullscreenViewTimestamp: nil,
+            )
+        }
+
+        static func forQuotedReplyThumbnailPointer(
+            originalAttachment: Attachment,
+            thumbnailBlurHash: String?,
+            thumbnailMimeType: String,
+            thumbnailContentType: ContentType,
+            thumbnailEncryptionKey: Data,
+            thumbnailTransitTierInfo: Attachment.TransitTierInfo?,
+        ) -> Record {
+            return .init(
+                sqliteId: nil,
+                blurHash: thumbnailBlurHash,
+                mimeType: thumbnailMimeType,
+                contentType: thumbnailContentType,
+                encryptionKey: thumbnailEncryptionKey,
+                plaintextHash: nil,
+                localRelativeFilePathThumbnail: nil,
+                streamInfo: nil,
+                audioDetails: nil,
+                latestTransitTierInfo: thumbnailTransitTierInfo,
+                originalTransitTierInfo: thumbnailTransitTierInfo?.encryptionKey == thumbnailEncryptionKey
+                    ? thumbnailTransitTierInfo : nil,
+                mediaTierInfo: nil,
+                thumbnailMediaTierInfo: nil,
+                originalAttachmentIdForQuotedReply: originalAttachment.id,
+                lastFullscreenViewTimestamp: nil,
+            )
         }
     }
 }

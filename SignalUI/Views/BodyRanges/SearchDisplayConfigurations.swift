@@ -10,8 +10,8 @@ extension HydratedMessageBody.DisplayConfiguration.SearchRanges {
     public static func matchedRanges(_ ranges: [NSRange]) -> Self {
         return HydratedMessageBody.DisplayConfiguration.SearchRanges(
             matchingBackgroundColor: .fixed(ConversationStyle.searchMatchHighlightColor),
-            matchingForegroundColor: .fixed(.ows_black),
-            matchedRanges: ranges
+            matchingForegroundColor: .fixed(.black),
+            matchedRanges: ranges,
         )
     }
 }

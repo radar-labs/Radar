@@ -26,7 +26,7 @@ public struct AccountAttributes: Codable {
     /// A randomly generated ID that is associated with the user's PNI that identifies
     /// a single registration and is sent to e.g. message recipients. If this changes, it tells
     /// you the sender has re-registered, and is cheaper to compare than doing full key comparison.
-    public let pniRegistrationId: UInt32
+    public let pniRegistrationId: UInt32?
 
     /// Base64-encoded SMKUDAccessKey generated from the user's profile key.
     public let unidentifiedAccessKey: String?
@@ -78,14 +78,14 @@ public struct AccountAttributes: Codable {
     public init(
         isManualMessageFetchEnabled: Bool,
         registrationId: UInt32,
-        pniRegistrationId: UInt32,
+        pniRegistrationId: UInt32?,
         unidentifiedAccessKey: String?,
         unrestrictedUnidentifiedAccess: Bool,
         reglockToken: String?,
         registrationRecoveryPassword: String?,
         encryptedDeviceName: String?,
         discoverableByPhoneNumber: PhoneNumberDiscoverability?,
-        hasSVRBackups: Bool
+        capabilities: Capabilities,
     ) {
         self.isManualMessageFetchEnabled = isManualMessageFetchEnabled
         self.registrationId = registrationId
@@ -96,15 +96,16 @@ public struct AccountAttributes: Codable {
         self.registrationRecoveryPassword = registrationRecoveryPassword
         self.encryptedDeviceName = encryptedDeviceName
         self.discoverableByPhoneNumber = discoverableByPhoneNumber.orAccountAttributeDefault.isDiscoverable
-        self.capabilities = Capabilities(hasSVRBackups: hasSVRBackups)
+        self.capabilities = capabilities
     }
 
-    public struct Capabilities: Codable {
+    public struct Capabilities: Codable, Equatable {
         public let transfer = true
         public let hasSVRBackups: Bool
         public let spqr = true
         public let attachmentBackfill = true
         public let usernameChangeSyncMessage = true
+        public let optionalPhoneNumber = BuildFlags.phoneNumberlessCanBeLinkedDevice
 
         public enum CodingKeys: String, CodingKey {
             case transfer
@@ -112,15 +113,11 @@ public struct AccountAttributes: Codable {
             case spqr
             case attachmentBackfill
             case usernameChangeSyncMessage
+            case optionalPhoneNumber
         }
 
         public init(hasSVRBackups: Bool) {
             self.hasSVRBackups = hasSVRBackups
-        }
-
-        var requestParameters: [String: NSNumber] {
-            let jsonData = try! JSONEncoder().encode(self)
-            return try! JSONSerialization.jsonObject(with: jsonData) as! [String: NSNumber]
         }
     }
 }

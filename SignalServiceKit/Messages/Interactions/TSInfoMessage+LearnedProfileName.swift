@@ -10,24 +10,26 @@ extension TSInfoMessage {
     public enum DisplayNameBeforeLearningProfileName: Equatable {
         case phoneNumber(String)
         case username(String)
+        case sharedName(String)
     }
 
     static func insertLearnedProfileNameMessage(
         serviceId: ServiceId,
         displayNameBefore: DisplayNameBeforeLearningProfileName,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         let threadStore = DependenciesBridge.shared.threadStore
         let interactionStore = DependenciesBridge.shared.interactionStore
 
-        guard let contactThread = threadStore.fetchContactThreads(
-            serviceId: serviceId,
-            tx: tx
-        ).first else { return }
+        guard
+            let contactThread = threadStore.fetchContactThreads(
+                serviceId: serviceId,
+                tx: tx,
+            ).first else { return }
 
         let infoMessage: TSInfoMessage = .makeForLearnedProfileName(
             contactThread: contactThread,
-            displayNameBefore: displayNameBefore
+            displayNameBefore: displayNameBefore,
         )
         interactionStore.insertInteraction(infoMessage, tx: tx)
     }
@@ -35,20 +37,22 @@ extension TSInfoMessage {
     static func makeForLearnedProfileName(
         contactThread: TSContactThread,
         timestamp: UInt64 = MessageTimestampGenerator.sharedInstance.generateTimestamp(),
-        displayNameBefore: DisplayNameBeforeLearningProfileName
+        displayNameBefore: DisplayNameBeforeLearningProfileName,
     ) -> TSInfoMessage {
         let infoMessageUserInfo: [InfoMessageUserInfoKey: Any] = switch displayNameBefore {
         case .phoneNumber(let phoneNumber):
             [.phoneNumberDisplayNameBeforeLearningProfileName: phoneNumber]
         case .username(let username):
             [.usernameDisplayNameBeforeLearningProfileName: username]
+        case .sharedName(let sharedName):
+            [.sharedNameDisplayNameBeforeLearningProfileName: sharedName]
         }
 
         return TSInfoMessage(
             thread: contactThread,
             messageType: .learnedProfileName,
             timestamp: timestamp,
-            infoMessageUserInfo: infoMessageUserInfo
+            infoMessageUserInfo: infoMessageUserInfo,
         )
     }
 }
@@ -59,12 +63,13 @@ public extension TSInfoMessage {
             return .phoneNumber(phoneNumber)
         } else if let username: String = infoMessageValue(forKey: .usernameDisplayNameBeforeLearningProfileName) {
             return .username(username)
+        } else if let sharedName: String = infoMessageValue(forKey: .sharedNameDisplayNameBeforeLearningProfileName) {
+            return .sharedName(sharedName)
         }
 
         return nil
     }
 
-    @objc
     func learnedProfileNameDescription(tx: DBReadTransaction) -> String {
         guard let displayNameBeforeLearningProfileName else {
             return ""
@@ -72,14 +77,16 @@ public extension TSInfoMessage {
 
         let format = OWSLocalizedString(
             "INFO_MESSAGE_LEARNED_PROFILE_KEY",
-            comment: "When you start a chat with someone and then later learn their profile name, we insert an in-chat message with this string to record the identifier you originally used to contact them. Embeds {{ the identifier, either a phone number or a username }}."
+            comment: "When you start a chat with someone and then later learn their profile name, we insert an in-chat message with this string to record the identifier you originally used to contact them. Embeds {{ the identifier, either a phone number, a username, or a name someone else shared }}.",
         )
 
         switch displayNameBeforeLearningProfileName {
         case .phoneNumber(let phoneNumber):
-            return String(format: format, phoneNumber)
+            return String.nonPluralLocalizedStringWithFormat(format, phoneNumber)
         case .username(let username):
-            return String(format: format, username)
+            return String.nonPluralLocalizedStringWithFormat(format, username)
+        case .sharedName(let sharedName):
+            return String.nonPluralLocalizedStringWithFormat(format, sharedName.filterForDisplay)
         }
     }
 }

@@ -4,187 +4,121 @@
 //
 
 import Foundation
-public import SignalServiceKit
 import LibSignalClient
+public import SignalServiceKit
 
 public class AttachmentMultisend {
 
-    public struct Result {
-        /// Resolved when the messages are prepared but before uploading/sending.
-        public let preparedPromise: Promise<[PreparedOutgoingMessage]>
-        /// Resolved when sending is durably enqueued but before uploading/sending.
-        public let enqueuedPromise: Promise<[TSThread]>
-        /// Resolved when the message is sent.
-        public let sentPromise: Promise<[TSThread]>
+    public struct EnqueueResult {
+        public let preparedMessage: PreparedOutgoingMessage
+        public let sendPromise: Promise<Void>
     }
 
     private init() {}
 
     // MARK: - API
 
-    public class func sendApprovedMedia(
+    public class func enqueueApprovedMedia(
         conversations: [ConversationItem],
         approvedMessageBody: MessageBody?,
-        approvedAttachments: [SignalAttachment]
-    ) -> AttachmentMultisend.Result {
-        let (preparedPromise, preparedFuture) = Promise<[PreparedOutgoingMessage]>.pending()
-        let (enqueuedPromise, enqueuedFuture) = Promise<[TSThread]>.pending()
+        approvedAttachments: ApprovedAttachments,
+        attachmentLimits: OutgoingAttachmentLimits,
+    ) async throws -> [EnqueueResult] {
+        let destinations = try await prepareDestinations(
+            forSendingMessageBody: approvedMessageBody,
+            toConversations: conversations,
+        )
 
-        let sentPromise = Promise<[TSThread]>.wrapAsync {
-            let threads: [TSThread]
-            let preparedMessages: [PreparedOutgoingMessage]
-            let sendPromises: [Promise<Void>]
-            do {
-                let destinations = try await Self.prepareForSending(
-                    approvedMessageBody,
-                    to: conversations,
-                    db: deps.databaseStorage,
-                    attachmentValidator: deps.attachmentValidator
-                )
-
-                var hasNonStoryDestination = false
-                var hasStoryDestination = false
-                destinations.forEach { destination in
-                    switch destination.conversationItem.outgoingMessageType {
-                    case .message:
-                        hasNonStoryDestination = true
-                    case .storyMessage:
-                        hasStoryDestination = true
-                    }
-                }
-
-                let segmentedAttachments = try await segmentAttachmentsIfNecessary(
-                    for: conversations,
-                    approvedAttachments: approvedAttachments,
-                    hasNonStoryDestination: hasNonStoryDestination,
-                    hasStoryDestination: hasStoryDestination
-                )
-
-                (threads, preparedMessages, sendPromises) = try await deps.databaseStorage.awaitableWrite { tx in
-                    let threads: [TSThread]
-                    let preparedMessages: [PreparedOutgoingMessage]
-                    (threads, preparedMessages) = try prepareForSending(
-                        destinations: destinations,
-                        // Stories get an untruncated message body
-                        messageBodyForStories: approvedMessageBody,
-                        approvedAttachments: segmentedAttachments,
-                        tx: tx
-                    )
-
-                    let sendPromises: [Promise<Void>] = preparedMessages.map {
-                        deps.messageSenderJobQueue.add(
-                            .promise,
-                            message: $0,
-                            transaction: tx
-                        )
-                    }
-                    return (threads, preparedMessages, sendPromises)
-                }
-            } catch let error {
-                preparedFuture.reject(error)
-                enqueuedFuture.reject(error)
-                throw error
+        var hasNonStoryDestination = false
+        var hasStoryDestination = false
+        destinations.forEach { destination in
+            switch destination.conversationItem.outgoingMessageType {
+            case .message:
+                hasNonStoryDestination = true
+            case .storyMessage:
+                hasStoryDestination = true
             }
-            preparedFuture.resolve(preparedMessages)
-            enqueuedFuture.resolve(threads)
-
-            try await withThrowingTaskGroup(of: Void.self) { taskGroup in
-                sendPromises.forEach { promise in
-                    taskGroup.addTask {
-                        try await promise.awaitable()
-                    }
-                }
-                try await taskGroup.waitForAll()
-            }
-            return threads
         }
 
-        return .init(
-            preparedPromise: preparedPromise,
-            enqueuedPromise: enqueuedPromise,
-            sentPromise: sentPromise
+        let imageQuality = approvedAttachments.imageQuality
+        let imageQualityLevel = ImageQualityLevel.resolvedValue(
+            imageQuality: imageQuality,
+            standardQualityLevel: attachmentLimits.standardQualityLevel,
         )
+        let sendableAttachments = try await approvedAttachments.attachments.mapAsync {
+            return try await SendableAttachment.forPreviewableAttachment($0, imageQualityLevel: imageQualityLevel)
+        }
+
+        let segmentedAttachments = try await segmentAttachmentsIfNecessary(
+            for: conversations,
+            sendableAttachments: sendableAttachments,
+            hasNonStoryDestination: hasNonStoryDestination,
+            hasStoryDestination: hasStoryDestination,
+            attachmentLimits: attachmentLimits,
+        )
+
+        return try await deps.databaseStorage.awaitableWrite { tx in
+            let preparedMessages = try prepareMessages(
+                // Stories get an untruncated message body
+                forSendingMessageBodyForStories: approvedMessageBody,
+                approvedAttachments: segmentedAttachments,
+                isViewOnce: approvedAttachments.isViewOnce,
+                toDestinations: destinations,
+                tx: tx,
+            )
+
+            return preparedMessages.map {
+                let sendPromise = deps.messageSenderJobQueue.add(.promise, message: $0, transaction: tx)
+                return EnqueueResult(preparedMessage: $0, sendPromise: sendPromise)
+            }
+        }
     }
 
-    public class func sendTextAttachment(
+    public class func enqueueTextAttachment(
         _ textAttachment: UnsentTextAttachment,
-        to conversations: [ConversationItem]
-    ) -> AttachmentMultisend.Result {
-        let (preparedPromise, preparedFuture) = Promise<[PreparedOutgoingMessage]>.pending()
-        let (enqueuedPromise, enqueuedFuture) = Promise<[TSThread]>.pending()
-
-        let sentPromise = Promise<[TSThread]>.wrapAsync {
-            // Prepare the text attachment
-            let textAttachment = try await textAttachment.validateAndPrepareForSending()
-
-            let threads: [TSThread]
-            let preparedMessages: [PreparedOutgoingMessage]
-            let sendPromises: [Promise<Void>]
-            do {
-                (threads, preparedMessages, sendPromises) = try await deps.databaseStorage.awaitableWrite { tx in
-                    let threads: [TSThread]
-                    let preparedMessages: [PreparedOutgoingMessage]
-                    (threads, preparedMessages) = try prepareForSending(
-                        conversations: conversations,
-                        textAttachment,
-                        tx: tx
-                    )
-
-                    let sendPromises: [Promise<Void>] = preparedMessages.map {
-                        deps.messageSenderJobQueue.add(
-                            .promise,
-                            message: $0,
-                            transaction: tx
-                        )
-                    }
-                    return (threads, preparedMessages, sendPromises)
-                }
-            } catch let error {
-                preparedFuture.reject(error)
-                enqueuedFuture.reject(error)
-                throw error
-            }
-            preparedFuture.resolve(preparedMessages)
-            enqueuedFuture.resolve(threads)
-
-            try await withThrowingTaskGroup(of: Void.self) { taskGroup in
-                sendPromises.forEach { promise in
-                    taskGroup.addTask {
-                        try await promise.awaitable()
-                    }
-                }
-                try await taskGroup.waitForAll()
-            }
-            return threads
+        to conversations: [ConversationItem],
+    ) async throws -> [EnqueueResult] {
+        if conversations.isEmpty {
+            return []
         }
 
-        return .init(
-            preparedPromise: preparedPromise,
-            enqueuedPromise: enqueuedPromise,
-            sentPromise: sentPromise
-        )
+        // Prepare the text attachment
+        let textAttachment = try await textAttachment.validateAndPrepareForSending()
+
+        return try await deps.databaseStorage.awaitableWrite { tx in
+            let preparedMessages = try prepareMessages(
+                forSendingTextAttachment: textAttachment,
+                toConversations: conversations,
+                tx: tx,
+            )
+
+            return preparedMessages.map {
+                let sendPromise = deps.messageSenderJobQueue.add(.promise, message: $0, transaction: tx)
+                return EnqueueResult(preparedMessage: $0, sendPromise: sendPromise)
+            }
+        }
     }
 
     // MARK: - Dependencies
 
-    private struct Dependencies {
+    struct Dependencies {
         let attachmentManager: AttachmentManager
         let attachmentValidator: AttachmentContentValidator
         let contactsMentionHydrator: ContactsMentionHydrator.Type
         let databaseStorage: SDSDatabaseStorage
-        let imageQualityLevel: ImageQualityLevel.Type
+        let linkPreviewManager: LinkPreviewManager
         let messageSenderJobQueue: MessageSenderJobQueue
         let tsAccountManager: TSAccountManager
     }
 
-    private static var deps = Dependencies(
+    static let deps = Dependencies(
         attachmentManager: DependenciesBridge.shared.attachmentManager,
         attachmentValidator: DependenciesBridge.shared.attachmentContentValidator,
         contactsMentionHydrator: ContactsMentionHydrator.self,
         databaseStorage: SSKEnvironment.shared.databaseStorageRef,
-        imageQualityLevel: ImageQualityLevel.self,
+        linkPreviewManager: DependenciesBridge.shared.linkPreviewManager,
         messageSenderJobQueue: SSKEnvironment.shared.messageSenderJobQueueRef,
-        tsAccountManager: DependenciesBridge.shared.tsAccountManager
+        tsAccountManager: DependenciesBridge.shared.tsAccountManager,
     )
 
     // MARK: - Segmenting Attachments
@@ -192,14 +126,12 @@ public class AttachmentMultisend {
     private struct SegmentAttachmentResult {
         let original: AttachmentDataSource?
         let segmented: [AttachmentDataSource]?
-        let isViewOnce: Bool
         let renderingFlag: AttachmentReference.RenderingFlag
 
         init(
             original: AttachmentDataSource?,
             segmented: [AttachmentDataSource]?,
-            isViewOnce: Bool,
-            renderingFlag: AttachmentReference.RenderingFlag
+            renderingFlag: AttachmentReference.RenderingFlag,
         ) throws {
             // We only create data sources for the original or segments if we need to.
             // Stories use segments if available; non stories always need the original.
@@ -210,7 +142,6 @@ public class AttachmentMultisend {
             }
             self.original = original
             self.segmented = segmented
-            self.isViewOnce = isViewOnce
             self.renderingFlag = renderingFlag
         }
 
@@ -224,112 +155,92 @@ public class AttachmentMultisend {
 
     private class func segmentAttachmentsIfNecessary(
         for conversations: [ConversationItem],
-        approvedAttachments: [SignalAttachment],
+        sendableAttachments: [SendableAttachment],
         hasNonStoryDestination: Bool,
-        hasStoryDestination: Bool
+        hasStoryDestination: Bool,
+        attachmentLimits: OutgoingAttachmentLimits,
     ) async throws -> [SegmentAttachmentResult] {
         let maxSegmentDurations = conversations.compactMap(\.videoAttachmentDurationLimit)
         guard hasStoryDestination, !maxSegmentDurations.isEmpty, let requiredSegmentDuration = maxSegmentDurations.min() else {
             // No need to segment!
             var results = [SegmentAttachmentResult]()
-            for attachment in approvedAttachments {
-                let dataSource: AttachmentDataSource = try await deps.attachmentValidator.validateContents(
-                    dataSource: attachment.dataSource,
-                    shouldConsume: true,
-                    mimeType: attachment.mimeType,
-                    renderingFlag: attachment.renderingFlag,
-                    sourceFilename: attachment.dataSource.sourceFilename?.filterFilename(),
+            for attachment in sendableAttachments {
+                let dataSource: AttachmentDataSource = try await deps.attachmentValidator.validateSendableAttachmentContents(
+                    attachment,
+                    shouldUseDefaultFilename: false,
                 )
                 try results.append(.init(
                     original: dataSource,
                     segmented: nil,
-                    isViewOnce: attachment.isViewOnceAttachment,
-                    renderingFlag: attachment.renderingFlag
+                    renderingFlag: attachment.renderingFlag,
                 ))
             }
             return results
         }
 
-        let qualityLevel = deps.databaseStorage.read(block: deps.imageQualityLevel.resolvedQuality(tx:))
+        var segmentedResults = [SegmentAttachmentResult]()
+        for attachment in sendableAttachments {
+            let segmentingResult = try await attachment.segmentedIfNecessary(
+                segmentDuration: requiredSegmentDuration,
+                attachmentLimits: attachmentLimits,
+            )
 
-        let segmentedResults = try await withThrowingTaskGroup(
-            of: (Int, SegmentAttachmentResult).self
-        ) { taskGroup in
-            for (index, attachment) in approvedAttachments.enumerated() {
-                taskGroup.addTask(operation: {
-                    let segmentingResult = try await attachment.preparedForOutput(qualityLevel: qualityLevel)
-                        .segmentedIfNecessary(segmentDuration: requiredSegmentDuration)
-
-                    let originalDataSource: AttachmentDataSource?
-                    if hasNonStoryDestination || segmentingResult.segmented == nil {
-                        // We need to prepare the original, either because there are no segments
-                        // or because we are sending to a non-story which doesn't segment.
-                        originalDataSource = try await deps.attachmentValidator.validateContents(
-                            dataSource: segmentingResult.original.dataSource,
-                            shouldConsume: true,
-                            mimeType: segmentingResult.original.mimeType,
-                            renderingFlag: segmentingResult.original.renderingFlag,
-                            sourceFilename: segmentingResult.original.dataSource.sourceFilename?.filterFilename(),
-                        )
-                    } else {
-                        originalDataSource = nil
-                    }
-
-                    let segmentedDataSources: [AttachmentDataSource]? = try await { () -> [AttachmentDataSource]? in
-                        guard let segments = segmentingResult.segmented, hasStoryDestination else {
-                            return nil
-                        }
-                        var segmentedDataSources = [AttachmentDataSource]()
-                        for segment in segments {
-                            let dataSource: AttachmentDataSource = try await deps.attachmentValidator.validateContents(
-                                dataSource: segment.dataSource,
-                                shouldConsume: true,
-                                mimeType: segment.mimeType,
-                                renderingFlag: segment.renderingFlag,
-                                sourceFilename: segment.dataSource.sourceFilename?.filterFilename(),
-                            )
-                            segmentedDataSources.append(dataSource)
-                        }
-                        return segmentedDataSources
-                    }()
-
-                    return try (index, .init(
-                        original: originalDataSource,
-                        segmented: segmentedDataSources,
-                        isViewOnce: attachment.isViewOnceAttachment,
-                        renderingFlag: attachment.renderingFlag
-                    ))
-                })
+            let originalDataSource: AttachmentDataSource?
+            if hasNonStoryDestination || segmentingResult.segmented == nil {
+                // We need to prepare the original, either because there are no segments
+                // (e.g., it's an image) or because we are sending to a non-story which
+                // doesn't segment.
+                originalDataSource = try await deps.attachmentValidator.validateSendableAttachmentContents(
+                    segmentingResult.original,
+                    shouldUseDefaultFilename: false,
+                )
+            } else {
+                originalDataSource = nil
             }
-            var segmentedResults = [SegmentAttachmentResult?].init(repeating: nil, count: approvedAttachments.count)
-            for try await result in taskGroup {
-                segmentedResults[result.0] = result.1
-            }
-            return segmentedResults.compacted()
+
+            let segmentedDataSources: [AttachmentDataSource]? = try await { () -> [AttachmentDataSource]? in
+                guard let segments = segmentingResult.segmented, hasStoryDestination else {
+                    return nil
+                }
+                var segmentedDataSources = [AttachmentDataSource]()
+                for segment in segments {
+                    let dataSource: AttachmentDataSource = try await deps.attachmentValidator.validateSendableAttachmentContents(
+                        segment,
+                        shouldUseDefaultFilename: false,
+                    )
+                    segmentedDataSources.append(dataSource)
+                }
+                return segmentedDataSources
+            }()
+
+            segmentedResults.append(try SegmentAttachmentResult(
+                original: originalDataSource,
+                segmented: segmentedDataSources,
+                renderingFlag: attachment.renderingFlag,
+            ))
         }
-
         return segmentedResults
     }
 
     // MARK: - Preparing messages
 
-    private class func prepareForSending(
-        destinations: [Destination],
-        messageBodyForStories: MessageBody?,
+    private class func prepareMessages(
+        forSendingMessageBodyForStories messageBodyForStories: MessageBody?,
         approvedAttachments: [SegmentAttachmentResult],
-        tx: DBWriteTransaction
-    ) throws -> ([TSThread], [PreparedOutgoingMessage]) {
+        isViewOnce: Bool,
+        toDestinations destinations: [Destination],
+        tx: DBWriteTransaction,
+    ) throws -> [PreparedOutgoingMessage] {
         let segmentedAttachments = approvedAttachments.reduce([], { arr, segmented in
-            return arr + segmented.segmentedOrOriginal.map { ($0, segmented.renderingFlag == .shouldLoop) }
+            return arr + segmented.segmentedOrOriginal
         })
-        let unsegmentedAttachments = approvedAttachments.compactMap { (attachment) -> SignalAttachment.ForSending? in
+        let unsegmentedAttachments = approvedAttachments.compactMap { attachment -> SendableAttachment.ForSending? in
             guard let original = attachment.original else {
                 return nil
             }
-            return SignalAttachment.ForSending(
+            return SendableAttachment.ForSending(
                 dataSource: original,
-                isViewOnce: attachment.isViewOnce,
-                renderingFlag: attachment.renderingFlag
+                renderingFlag: attachment.renderingFlag,
             )
         }
 
@@ -357,8 +268,8 @@ public class AttachmentMultisend {
         let nonStoryMessages = try prepareNonStoryMessages(
             threadDestinations: nonStoryThreads,
             unsegmentedAttachments: unsegmentedAttachments,
-            isViewOnceMessage: approvedAttachments.contains(where: \.isViewOnce),
-            tx: tx
+            isViewOnceMessage: isViewOnce,
+            tx: tx,
         )
 
         let storyMessageBuilders = try storyMessageBuilders(
@@ -366,30 +277,27 @@ public class AttachmentMultisend {
             approvedMessageBody: messageBodyForStories,
             groupStoryThreads: groupStoryThreads,
             privateStoryThreads: privateStoryThreads,
-            tx: tx
+            tx: tx,
         )
 
         let groupStoryMessages = try prepareGroupStoryMessages(
             groupStoryThreads: groupStoryThreads,
             builders: storyMessageBuilders,
-            tx: tx
+            tx: tx,
         )
         let privateStoryMessages = try preparePrivateStoryMessages(
             privateStoryThreads: privateStoryThreads,
             builders: storyMessageBuilders,
-            tx: tx
+            tx: tx,
         )
-        let preparedMessages = nonStoryMessages + groupStoryMessages + privateStoryMessages
-        let allThreads = nonStoryThreads.map(\.thread) + groupStoryThreads + privateStoryThreads
-        return (allThreads, preparedMessages)
+        return nonStoryMessages + groupStoryMessages + privateStoryMessages
     }
 
-    private class func prepareForSending(
-        conversations: [ConversationItem],
-        _ textAttachment: UnsentTextAttachment.ForSending,
-        tx: DBWriteTransaction
-    ) throws -> ([TSThread], [PreparedOutgoingMessage]) {
-        var allStoryThreads = [TSThread]()
+    private class func prepareMessages(
+        forSendingTextAttachment textAttachment: UnsentTextAttachment.ForSending,
+        toConversations conversations: [ConversationItem],
+        tx: DBWriteTransaction,
+    ) throws -> [PreparedOutgoingMessage] {
         var privateStoryThreads = [TSPrivateStoryThread]()
         var groupStoryThreads = [TSGroupThread]()
         for conversation in conversations {
@@ -406,37 +314,35 @@ public class AttachmentMultisend {
             case .storyMessage:
                 throw OWSAssertionError("Invalid story message target!")
             }
-            allStoryThreads.append(thread)
         }
 
         let storyMessageBuilder = try storyMessageBuilder(
             textAttachment: textAttachment,
             groupStoryThreads: groupStoryThreads,
             privateStoryThreads: privateStoryThreads,
-            tx: tx
+            tx: tx,
         )
 
         let groupStoryMessages = try prepareGroupStoryMessages(
             groupStoryThreads: groupStoryThreads,
             builders: [storyMessageBuilder],
-            tx: tx
+            tx: tx,
         )
         let privateStoryMessages = try preparePrivateStoryMessages(
             privateStoryThreads: privateStoryThreads,
             builders: [storyMessageBuilder],
-            tx: tx
+            tx: tx,
         )
-        let preparedMessages = groupStoryMessages + privateStoryMessages
-        return (allStoryThreads, preparedMessages)
+        return groupStoryMessages + privateStoryMessages
     }
 
     // MARK: Preparing Non-Story Messages
 
     private class func prepareNonStoryMessages(
         threadDestinations: [Destination],
-        unsegmentedAttachments: [SignalAttachment.ForSending],
+        unsegmentedAttachments: [SendableAttachment.ForSending],
         isViewOnceMessage: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws -> [PreparedOutgoingMessage] {
         return try threadDestinations.map { destination in
             let thread = destination.thread
@@ -444,14 +350,15 @@ public class AttachmentMultisend {
             ThreadUtil.addThreadToProfileWhitelistIfEmptyOrPendingRequest(
                 thread,
                 setDefaultTimerIfNecessary: true,
-                tx: tx
+                tx: tx,
             )
 
             let preparedMessage = try prepareNonStoryMessage(
                 messageBody: destination.messageBody,
                 attachments: unsegmentedAttachments,
+                isViewOnce: isViewOnceMessage,
                 thread: thread,
-                tx: tx
+                tx: tx,
             )
             if let message = preparedMessage.messageForIntentDonation(tx: tx) {
                 thread.donateSendMessageIntent(for: message, transaction: tx)
@@ -462,17 +369,19 @@ public class AttachmentMultisend {
 
     private class func prepareNonStoryMessage(
         messageBody: ValidatedMessageBody?,
-        attachments: [SignalAttachment.ForSending],
+        attachments: [SendableAttachment.ForSending],
+        isViewOnce: Bool,
         thread: TSThread,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws -> PreparedOutgoingMessage {
         let unpreparedMessage = UnpreparedOutgoingMessage.build(
             thread: thread,
             messageBody: messageBody,
             mediaAttachments: attachments,
+            isViewOnce: isViewOnce,
             quotedReplyDraft: nil,
             linkPreviewDataSource: nil,
-            transaction: tx
+            transaction: tx,
         )
         return try unpreparedMessage.prepare(tx: tx)
     }
@@ -488,7 +397,7 @@ public class AttachmentMultisend {
     private class func prepareGroupStoryMessages(
         groupStoryThreads: [TSGroupThread],
         builders: [StoryMessageBuilder],
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws -> [PreparedOutgoingMessage] {
         return try groupStoryThreads
             .flatMap { groupThread in
@@ -496,14 +405,14 @@ public class AttachmentMultisend {
                     let storyMessage = try createAndInsertStoryMessage(
                         builder: builder,
                         groupThread: groupThread,
-                        tx: tx
+                        tx: tx,
                     )
                     let outgoingMessage = OutgoingStoryMessage(
                         thread: groupThread,
                         storyMessage: storyMessage,
                         storyMessageRowId: storyMessage.id!,
                         skipSyncTranscript: false,
-                        transaction: tx
+                        transaction: tx,
                     )
                     return outgoingMessage
                 }
@@ -511,7 +420,7 @@ public class AttachmentMultisend {
             .map { outgoingStoryMessage in
                 return try UnpreparedOutgoingMessage.forOutgoingStoryMessage(
                     outgoingStoryMessage,
-                    storyMessageRowId: outgoingStoryMessage.storyMessageRowId
+                    storyMessageRowId: outgoingStoryMessage.storyMessageRowId,
                 ).prepare(tx: tx)
             }
     }
@@ -519,20 +428,20 @@ public class AttachmentMultisend {
     private class func createAndInsertStoryMessage(
         builder: StoryMessageBuilder,
         groupThread: TSGroupThread,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws -> StoryMessage {
         let storyManifest: StoryManifest = .outgoing(
             recipientStates: groupThread.recipientAddresses(with: tx)
                 .lazy
                 .compactMap { $0.serviceId }
                 .dictionaryMappingToValues { _ in
-                    return .init(allowsReplies: true, contexts: [])
-                }
+                    return StoryRecipientState(allowsReplies: true, contexts: [])
+                },
         )
         return try builder.build(
             groupId: groupThread.groupId,
             manifest: storyManifest,
-            tx: tx
+            tx: tx,
         )
     }
 
@@ -547,7 +456,7 @@ public class AttachmentMultisend {
     private class func preparePrivateStoryMessages(
         privateStoryThreads: [TSPrivateStoryThread],
         builders: [StoryMessageBuilder],
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws -> [PreparedOutgoingMessage] {
         if privateStoryThreads.isEmpty {
             return []
@@ -557,18 +466,18 @@ public class AttachmentMultisend {
                 let storyMessage = try createAndInsertStoryMessage(
                     builder: builder,
                     privateStoryThreads: privateStoryThreads,
-                    tx: tx
+                    tx: tx,
                 )
                 return OutgoingStoryMessage.createDedupedOutgoingMessages(
                     for: storyMessage,
                     sendingTo: privateStoryThreads,
-                    tx: tx
+                    tx: tx,
                 )
             }
             .map { outgoingStoryMessage in
                 return try UnpreparedOutgoingMessage.forOutgoingStoryMessage(
                     outgoingStoryMessage,
-                    storyMessageRowId: outgoingStoryMessage.storyMessageRowId
+                    storyMessageRowId: outgoingStoryMessage.storyMessageRowId,
                 ).prepare(tx: tx)
             }
     }
@@ -576,7 +485,7 @@ public class AttachmentMultisend {
     private class func createAndInsertStoryMessage(
         builder: StoryMessageBuilder,
         privateStoryThreads: [TSPrivateStoryThread],
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws -> StoryMessage {
         var recipientStates = [ServiceId: StoryRecipientState]()
         for thread in privateStoryThreads {
@@ -590,7 +499,7 @@ public class AttachmentMultisend {
                 let existingState = recipientStates[recipient] ?? .init(allowsReplies: false, contexts: [])
                 let newState = StoryRecipientState(
                     allowsReplies: existingState.allowsReplies || thread.allowsReplies,
-                    contexts: existingState.contexts + [threadUuid]
+                    contexts: existingState.contexts + [threadUuid],
                 )
                 recipientStates[recipient] = newState
             }
@@ -601,59 +510,111 @@ public class AttachmentMultisend {
         return try builder.build(
             groupId: nil,
             manifest: storyManifest,
-            tx: tx
+            tx: tx,
         )
     }
 
     // MARK: Generic story construction
 
     private struct StoryMessageBuilder {
-        /// Group id to builder; each group thread gets its own builder.
-        let groupThreadAttachmentBuilders: [Data: OwnedAttachmentBuilder<StoryMessageAttachment>]
-        /// All private story threads share a single builder (because they share a single StoryMessage).
-        let privateStoryThreadAttachmentBuilder: OwnedAttachmentBuilder<StoryMessageAttachment>?
+        enum AttachmentType {
+            case media(AttachmentDataSource, caption: StyleOnlyMessageBody?)
+            case text(TextAttachment, linkPreviewImage: AttachmentDataSource?)
+        }
+
         let localAci: Aci
-        let mediaCaption: StyleOnlyMessageBody?
-        let shouldLoop: Bool
+        let attachmentType: AttachmentType
+
+        /// Each group thread gets a `StoryMessage`.
+        let groupIds: [Data]
+        /// All private story threads share a single `StoryMessage`.
+        let includePrivateStoryThread: Bool
 
         func build(
             groupId: Data?,
             manifest: StoryManifest,
-            tx: DBWriteTransaction
+            tx: DBWriteTransaction,
         ) throws -> StoryMessage {
-            let attachmentBuilder: OwnedAttachmentBuilder<StoryMessageAttachment>?
-            if let groupId {
-                attachmentBuilder = groupThreadAttachmentBuilders[groupId]
-            } else {
-                attachmentBuilder = privateStoryThreadAttachmentBuilder
-            }
-            guard let attachmentBuilder else {
-                throw OWSAssertionError("Building for an unprepared thread")
-            }
-
-            let storyMessage = try StoryMessage.createAndInsert(
+            let storyMessage = StoryMessage(
                 timestamp: MessageTimestampGenerator.sharedInstance.generateTimestamp(),
-                authorAci: self.localAci,
+                authorAci: localAci,
                 groupId: groupId,
                 manifest: manifest,
+                attachment: { () -> StoryMessageAttachment in
+                    switch attachmentType {
+                    case .media:
+                        return .media
+                    case .text(let textAttachment, _):
+                        return .text(textAttachment)
+                    }
+                }(),
                 replyCount: 0,
-                attachmentBuilder: attachmentBuilder,
-                mediaCaption: self.mediaCaption,
-                shouldLoop: self.shouldLoop,
-                transaction: tx
             )
+            storyMessage.anyInsert(transaction: tx)
+
+            try insertAttachmentIfNecessary(
+                storyMessage: storyMessage,
+                tx: tx,
+            )
+
             return storyMessage
+        }
+
+        private func insertAttachmentIfNecessary(
+            storyMessage: StoryMessage,
+            tx: DBWriteTransaction,
+        ) throws {
+            let attachmentManager = DependenciesBridge.shared.attachmentManager
+
+            guard let storyMessageID = storyMessage.id else {
+                throw OWSAssertionError("Missing ID for StoryMessage!")
+            }
+
+            let attachmentLabel: String?
+            let ownedAttachmentDataSource: OwnedAttachmentDataSource?
+            switch attachmentType {
+            case .media(let attachmentDataSource, let caption):
+                attachmentLabel = "media"
+                ownedAttachmentDataSource = OwnedAttachmentDataSource(
+                    dataSource: attachmentDataSource,
+                    owner: .storyMessageMedia(.init(
+                        storyMessageRowId: storyMessageID,
+                        caption: caption,
+                    )),
+                )
+            case .text(_, let linkPreviewImage):
+                if let linkPreviewImage {
+                    attachmentLabel = "link preview"
+                    ownedAttachmentDataSource = OwnedAttachmentDataSource(
+                        dataSource: linkPreviewImage,
+                        owner: .storyMessageLinkPreview(
+                            storyMessageRowId: storyMessageID,
+                        ),
+                    )
+                } else {
+                    attachmentLabel = nil
+                    ownedAttachmentDataSource = nil
+                }
+            }
+
+            if let attachmentLabel, let ownedAttachmentDataSource {
+                let attachmentID = try attachmentManager.createAttachmentStream(
+                    from: ownedAttachmentDataSource,
+                    tx: tx,
+                )
+                Logger.info("Created \(attachmentLabel) attachment \(attachmentID) for outgoing story \(storyMessage.timestamp)")
+            }
         }
     }
 
     private class func storyMessageBuilders(
-        segmentedAttachments: [(AttachmentDataSource, isLoopingVideo: Bool)],
+        segmentedAttachments: [AttachmentDataSource],
         approvedMessageBody: MessageBody?,
         groupStoryThreads: [TSGroupThread],
         privateStoryThreads: [TSPrivateStoryThread],
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> [StoryMessageBuilder] {
-        if groupStoryThreads.isEmpty && privateStoryThreads.isEmpty {
+        if groupStoryThreads.isEmpty, privateStoryThreads.isEmpty {
             // No story destinations, no need to build story messages.
             return []
         }
@@ -666,24 +627,15 @@ public class AttachmentMultisend {
             .hydrating(mentionHydrator: ContactsMentionHydrator.mentionHydrator(transaction: tx))
             .asStyleOnlyBody()
 
-        return segmentedAttachments.map { attachmentDataSource, isLoopingVideo in
-            let attachmentManager = deps.attachmentManager
-            let attachmentBuilder = OwnedAttachmentBuilder<StoryMessageAttachment>(
-                info: .media,
-                finalize: { owner, tx in
-                    try attachmentManager.createAttachmentStream(
-                        consuming: .init(dataSource: attachmentDataSource, owner: owner),
-                        tx: tx
-                    )
-                }
-            )
+        return segmentedAttachments.map { attachmentDataSource in
             return storyMessageBuilder(
-                attachmentBuilder: attachmentBuilder,
+                localAci: localAci,
+                attachmentType: .media(
+                    attachmentDataSource,
+                    caption: storyCaption,
+                ),
                 groupStoryThreads: groupStoryThreads,
                 privateStoryThreads: privateStoryThreads,
-                localAci: localAci,
-                mediaCaption: storyCaption,
-                shouldLoop: isLoopingVideo
             )
         }
     }
@@ -692,55 +644,65 @@ public class AttachmentMultisend {
         textAttachment: UnsentTextAttachment.ForSending,
         groupStoryThreads: [TSGroupThread],
         privateStoryThreads: [TSPrivateStoryThread],
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws -> StoryMessageBuilder {
         guard let localAci = deps.tsAccountManager.localIdentifiers(tx: tx)?.aci else {
             throw OWSAssertionError("Sending without a local aci!")
         }
-        guard
-            let textAttachmentBuilder = textAttachment
-                .buildTextAttachment(transaction: tx)?
-                .wrap({ StoryMessageAttachment.text($0) })
-        else {
-            throw OWSAssertionError("Invalid text attachment")
+
+        let validatedLinkPreviewDataSource: ValidatedLinkPreviewDataSource?
+        if let linkPreviewDraft = textAttachment.linkPreviewDraft {
+            do {
+                validatedLinkPreviewDataSource = try deps.linkPreviewManager.validateDataSource(
+                    dataSource: linkPreviewDraft,
+                    tx: tx,
+                )
+            } catch LinkPreviewError.featureDisabled {
+                validatedLinkPreviewDataSource = nil
+            } catch {
+                Logger.warn("Failed to build link preview! \(error)")
+                validatedLinkPreviewDataSource = nil
+            }
+        } else {
+            validatedLinkPreviewDataSource = nil
         }
+
+        if
+            validatedLinkPreviewDataSource == nil,
+            textAttachment.body == nil || textAttachment.body!.isEmpty
+        {
+            throw OWSAssertionError("Not sending text story with empty content!")
+        }
+
         return storyMessageBuilder(
-            attachmentBuilder: textAttachmentBuilder,
+            localAci: localAci,
+            attachmentType: .text(
+                TextAttachment(
+                    body: textAttachment.body,
+                    textStyle: textAttachment.textStyle,
+                    textForegroundColor: textAttachment.textForegroundColor,
+                    textBackgroundColor: textAttachment.textBackgroundColor,
+                    background: textAttachment.background,
+                    linkPreview: validatedLinkPreviewDataSource?.preview,
+                ),
+                linkPreviewImage: validatedLinkPreviewDataSource?.imageDataSource,
+            ),
             groupStoryThreads: groupStoryThreads,
             privateStoryThreads: privateStoryThreads,
-            localAci: localAci,
-            mediaCaption: nil,
-            shouldLoop: false
         )
     }
 
     private class func storyMessageBuilder(
-        attachmentBuilder: OwnedAttachmentBuilder<StoryMessageAttachment>,
+        localAci: Aci,
+        attachmentType: StoryMessageBuilder.AttachmentType,
         groupStoryThreads: [TSGroupThread],
         privateStoryThreads: [TSPrivateStoryThread],
-        localAci: Aci,
-        mediaCaption: StyleOnlyMessageBody?,
-        shouldLoop: Bool
     ) -> StoryMessageBuilder {
-        var numDestinations = groupStoryThreads.count
-        if !privateStoryThreads.isEmpty {
-            numDestinations += 1
-        }
-        let duplicatedAttachmentBuilders = attachmentBuilder.forMultisendReuse(
-            numDestinations: numDestinations
-        )
-        var groupThreadAttachmentBuilders = [Data: OwnedAttachmentBuilder<StoryMessageAttachment>]()
-        for (index, groupStoryThread) in groupStoryThreads.enumerated() {
-            groupThreadAttachmentBuilders[groupStoryThread.groupId] = duplicatedAttachmentBuilders[index]
-        }
-        return .init(
-            groupThreadAttachmentBuilders: groupThreadAttachmentBuilders,
-            privateStoryThreadAttachmentBuilder: privateStoryThreads.isEmpty
-                ? nil
-                : duplicatedAttachmentBuilders.last,
+        return StoryMessageBuilder(
             localAci: localAci,
-            mediaCaption: mediaCaption,
-            shouldLoop: shouldLoop
+            attachmentType: attachmentType,
+            groupIds: groupStoryThreads.map(\.groupId),
+            includePrivateStoryThread: !privateStoryThreads.isEmpty,
         )
     }
 }

@@ -19,12 +19,13 @@ extension GroupViewHelper {
     private func showMemberActionConfirmationActionSheet<T: ServiceId>(
         address: SignalServiceAddress,
         titleFormat: String,
+        message: String?,
         actionTitle: String,
         updateDescription: String,
-        updateBlock: @escaping (TSGroupModelV2, T) async throws -> Void
+        updateBlock: @escaping (GroupSecretParams, T) async throws -> Void,
     ) {
         guard
-            let fromViewController = fromViewController,
+            let fromViewController,
             let oldGroupModel = delegate?.currentGroupModel as? TSGroupModelV2,
             oldGroupModel.groupMembership.isMemberOfAnyKind(address),
             let serviceId = address.serviceId as? T
@@ -32,20 +33,21 @@ extension GroupViewHelper {
             GroupViewUtils.showUpdateErrorUI(error: OWSAssertionError("Invalid parameters for update: \(updateDescription)"))
             return
         }
+        let secretParams = Result(catching: { try oldGroupModel.secretParams() })
 
         let actionBlock = { @MainActor [self] in
             GroupViewUtils.updateGroupWithActivityIndicator(
                 fromViewController: fromViewController,
-                updateBlock: { try await updateBlock(oldGroupModel, serviceId) },
+                updateBlock: { try await updateBlock(secretParams.get(), serviceId) },
                 completion: { [weak self] in
                     self?.delegate?.groupViewHelperDidUpdateGroup()
-                }
+                },
             )
         }
-        let title = String(format: titleFormat, SSKEnvironment.shared.databaseStorageRef.read { tx in
+        let title = String.nonPluralLocalizedStringWithFormat(titleFormat, SSKEnvironment.shared.databaseStorageRef.read { tx in
             return SSKEnvironment.shared.contactManagerRef.displayName(for: address, tx: tx).resolvedValue()
         })
-        let actionSheet = ActionSheetController(title: title)
+        let actionSheet = ActionSheetController(title: title, message: message)
         actionSheet.addAction(ActionSheetAction(title: actionTitle, style: .default, handler: { _ in actionBlock() }))
         actionSheet.addAction(OWSActionSheets.cancelAction)
         fromViewController.presentActionSheet(actionSheet)
@@ -54,9 +56,11 @@ extension GroupViewHelper {
     // MARK: - Make Group Admin
 
     func memberActionSheetCanMakeGroupAdmin(address: SignalServiceAddress) -> Bool {
-        guard let groupThread = thread as? TSGroupThread,
-            groupThread.isGroupV2Thread else {
-                return false
+        guard
+            let groupThread = thread as? TSGroupThread,
+            groupThread.isGroupV2Thread
+        else {
+            return false
         }
         guard let localAddress = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.aciAddress else {
             owsFailDebug("Missing localAddress.")
@@ -64,34 +68,45 @@ extension GroupViewHelper {
         }
         let isLocalUserAdmin = groupThread.groupModel.groupMembership.isFullMemberAndAdministrator(localAddress)
         let groupMembership = groupThread.groupModel.groupMembership
-        let canBecomeAdmin = (groupMembership.isFullMember(address) &&
-            !groupMembership.isFullMemberAndAdministrator(address))
-        return (canEditConversationMembership && isLocalUserAdmin && canBecomeAdmin)
+        let canBecomeAdmin = (
+            groupMembership.isFullMember(address) &&
+                !groupMembership.isFullMemberAndAdministrator(address),
+        )
+        let isGroupEnded = (groupThread.groupModel as? TSGroupModelV2)?.isTerminated ?? false
+
+        return canEditConversationMembership && isLocalUserAdmin && canBecomeAdmin && !isGroupEnded
     }
 
     @MainActor
     func memberActionSheetMakeGroupAdminWasSelected(address: SignalServiceAddress) {
-        let titleFormat = OWSLocalizedString("CONVERSATION_SETTINGS_MAKE_GROUP_ADMIN_TITLE_FORMAT",
-                                            comment: "Format for title for 'make group admin' confirmation alert. Embeds {user to make an admin}.")
-        let actionTitle =  OWSLocalizedString("CONVERSATION_SETTINGS_MAKE_GROUP_ADMIN_BUTTON",
-                                             comment: "Label for 'make group admin' button in conversation settings view.")
+        let titleFormat = OWSLocalizedString(
+            "CONVERSATION_SETTINGS_MAKE_GROUP_ADMIN_TITLE_FORMAT",
+            comment: "Format for title for 'make group admin' confirmation alert. Embeds {user to make an admin}.",
+        )
+        let actionTitle = OWSLocalizedString(
+            "CONVERSATION_SETTINGS_MAKE_GROUP_ADMIN_BUTTON",
+            comment: "Label for 'make group admin' button in conversation settings view.",
+        )
         showMemberActionConfirmationActionSheet(
             address: address,
             titleFormat: titleFormat,
+            message: nil,
             actionTitle: actionTitle,
             updateDescription: "Make group admin",
-            updateBlock: { (oldGroupModel, aci: Aci) in
-                try await GroupManager.changeMemberRoleV2(groupModel: oldGroupModel, aci: aci, role: .administrator)
-            }
+            updateBlock: { (secretParams, aci: Aci) in
+                try await GroupManager.changeMemberRoleV2(secretParams: secretParams, aci: aci, role: .administrator)
+            },
         )
     }
 
     // MARK: - Revoke Group Admin
 
     func memberActionSheetCanRevokeGroupAdmin(address: SignalServiceAddress) -> Bool {
-        guard let groupThread = thread as? TSGroupThread,
-            groupThread.isGroupV2Thread else {
-                return false
+        guard
+            let groupThread = thread as? TSGroupThread,
+            groupThread.isGroupV2Thread
+        else {
+            return false
         }
         guard let localAddress = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.aciAddress else {
             owsFailDebug("Missing localAddress.")
@@ -100,23 +115,41 @@ extension GroupViewHelper {
         let groupMembership = groupThread.groupModel.groupMembership
         let isLocalUserAdmin = groupMembership.isFullMemberAndAdministrator(localAddress)
         let canRevokeAdmin = groupMembership.isFullMemberAndAdministrator(address)
-        return (canEditConversationMembership && isLocalUserAdmin && canRevokeAdmin)
+        return canEditConversationMembership && isLocalUserAdmin && canRevokeAdmin && !groupThread.isTerminatedGroup
     }
 
     @MainActor
-    func memberActionSheetRevokeGroupAdminWasSelected(address: SignalServiceAddress) {
-        let titleFormat = OWSLocalizedString("CONVERSATION_SETTINGS_REVOKE_GROUP_ADMIN_TITLE_FORMAT",
-                                            comment: "Format for title for 'revoke group admin' confirmation alert. Embeds {user to revoke admin status from}.")
-        let actionTitle =  OWSLocalizedString("CONVERSATION_SETTINGS_REVOKE_GROUP_ADMIN_BUTTON",
-                                             comment: "Label for 'revoke group admin' button in conversation settings view.")
+    func memberActionSheetRevokeGroupAdminWasSelected(address: SignalServiceAddress, hasMemberLabel: Bool) {
+        let titleFormat = OWSLocalizedString(
+            "CONVERSATION_SETTINGS_REVOKE_GROUP_ADMIN_TITLE_FORMAT",
+            comment: "Format for title for 'revoke group admin' confirmation alert. Embeds {user to revoke admin status from}.",
+        )
+        let actionTitle = OWSLocalizedString(
+            "CONVERSATION_SETTINGS_REVOKE_GROUP_ADMIN_BUTTON",
+            comment: "Label for 'revoke group admin' button in conversation settings view.",
+        )
+
+        var message: String?
+        if
+            hasMemberLabel,
+            let groupModel = (thread as? TSGroupThread)?.groupModel as? TSGroupModelV2,
+            groupModel.access.memberLabels == .administrator
+        {
+            message = OWSLocalizedString(
+                "CONVERSATION_SETTINGS_REVOKE_GROUP_ADMIN_MESSAGE",
+                comment: "Message for 'revoke group admin' confirmation alert.",
+            )
+        }
+
         showMemberActionConfirmationActionSheet(
             address: address,
             titleFormat: titleFormat,
+            message: message,
             actionTitle: actionTitle,
             updateDescription: "Revoke group admin",
-            updateBlock: { (oldGroupModel, aci: Aci) in
-                try await GroupManager.changeMemberRoleV2(groupModel: oldGroupModel, aci: aci, role: .normal)
-            }
+            updateBlock: { (secretParams, aci: Aci) in
+                try await GroupManager.changeMemberRoleV2(secretParams: secretParams, aci: aci, role: .normal)
+            },
         )
     }
 
@@ -124,9 +157,11 @@ extension GroupViewHelper {
 
     // This action can be used to remove members _or_ revoke invites.
     func canRemoveFromGroup(address: SignalServiceAddress) -> Bool {
-        guard let groupThread = thread as? TSGroupThread,
-            groupThread.isGroupV2Thread else {
-                return false
+        guard
+            let groupThread = thread as? TSGroupThread,
+            groupThread.isGroupV2Thread
+        else {
+            return false
         }
         guard let localAddress = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.aciAddress else {
             owsFailDebug("Missing localAddress.")
@@ -137,27 +172,30 @@ extension GroupViewHelper {
         let isLocalUserAdmin = groupMembership.isFullMemberAndAdministrator(localAddress)
         let isAddressInGroup = groupMembership.isMemberOfAnyKind(address)
         let isRemovalTargetLocalAdress = address.isLocalAddress
-        return canEditConversationMembership && isLocalUserAdmin && isAddressInGroup && !isRemovalTargetLocalAdress
+        let isGroupEnded = (groupThread.groupModel as? TSGroupModelV2)?.isTerminated ?? false
+
+        return canEditConversationMembership && isLocalUserAdmin && isAddressInGroup && !isRemovalTargetLocalAdress && !isGroupEnded
     }
 
     @MainActor
     func presentRemoveFromGroupActionSheet(address: SignalServiceAddress) {
         let titleFormat = OWSLocalizedString(
             "CONVERSATION_SETTINGS_REMOVE_FROM_GROUP_TITLE_FORMAT",
-            comment: "Format for title for 'remove from group' confirmation alert. Embeds {user to remove from the group}."
+            comment: "Format for title for 'remove from group' confirmation alert. Embeds {user to remove from the group}.",
         )
-        let actionTitle =  OWSLocalizedString(
+        let actionTitle = OWSLocalizedString(
             "CONVERSATION_SETTINGS_REMOVE_FROM_GROUP_BUTTON",
-            comment: "Label for 'remove from group' button in conversation settings view."
+            comment: "Label for 'remove from group' button in conversation settings view.",
         )
         showMemberActionConfirmationActionSheet(
             address: address,
             titleFormat: titleFormat,
+            message: nil,
             actionTitle: actionTitle,
             updateDescription: "Remove user from group",
-            updateBlock: { (oldGroupModel, serviceId: ServiceId) in
-                try await GroupManager.removeFromGroupOrRevokeInviteV2(groupModel: oldGroupModel, serviceIds: [serviceId])
-            }
+            updateBlock: { (secretParams, serviceId: ServiceId) in
+                try await GroupManager.removeFromGroupOrRevokeInviteV2(secretParams: secretParams, serviceIds: [serviceId])
+            },
         )
     }
 }

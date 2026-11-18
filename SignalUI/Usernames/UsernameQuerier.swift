@@ -8,204 +8,218 @@ public import SignalServiceKit
 
 public struct UsernameQuerier {
     private let contactsManager: any ContactManager
-    private let databaseStorage: SDSDatabaseStorage
+    private let db: DB
     private let localUsernameManager: LocalUsernameManager
-    private let networkManager: NetworkManager
     private let profileManager: ProfileManager
     private let recipientManager: any SignalRecipientManager
     private let recipientFetcher: RecipientFetcher
+    private let serviceProvider: any ServiceProvider
     private let storageServiceManager: StorageServiceManager
     private let tsAccountManager: TSAccountManager
-    private let usernameApiClient: UsernameApiClient
-    private let usernameLinkManager: UsernameLinkManager
     private let usernameLookupManager: UsernameLookupManager
 
     public init() {
         self.init(
             contactsManager: SSKEnvironment.shared.contactManagerRef,
-            databaseStorage: SSKEnvironment.shared.databaseStorageRef,
+            db: DependenciesBridge.shared.db,
             localUsernameManager: DependenciesBridge.shared.localUsernameManager,
-            networkManager: SSKEnvironment.shared.networkManagerRef,
             profileManager: SSKEnvironment.shared.profileManagerRef,
             recipientManager: DependenciesBridge.shared.recipientManager,
             recipientFetcher: DependenciesBridge.shared.recipientFetcher,
+            serviceProvider: DependenciesBridge.shared.chatConnectionManager,
             storageServiceManager: SSKEnvironment.shared.storageServiceManagerRef,
             tsAccountManager: DependenciesBridge.shared.tsAccountManager,
-            usernameApiClient: DependenciesBridge.shared.usernameApiClient,
-            usernameLinkManager: DependenciesBridge.shared.usernameLinkManager,
-            usernameLookupManager: DependenciesBridge.shared.usernameLookupManager
+            usernameLookupManager: DependenciesBridge.shared.usernameLookupManager,
         )
     }
 
     public init(
         contactsManager: any ContactManager,
-        databaseStorage: SDSDatabaseStorage,
+        db: DB,
         localUsernameManager: LocalUsernameManager,
-        networkManager: NetworkManager,
         profileManager: ProfileManager,
         recipientManager: any SignalRecipientManager,
         recipientFetcher: RecipientFetcher,
+        serviceProvider: any ServiceProvider,
         storageServiceManager: StorageServiceManager,
         tsAccountManager: TSAccountManager,
-        usernameApiClient: UsernameApiClient,
-        usernameLinkManager: UsernameLinkManager,
-        usernameLookupManager: UsernameLookupManager
+        usernameLookupManager: UsernameLookupManager,
     ) {
         self.contactsManager = contactsManager
-        self.databaseStorage = databaseStorage
+        self.db = db
         self.localUsernameManager = localUsernameManager
-        self.networkManager = networkManager
         self.profileManager = profileManager
         self.recipientManager = recipientManager
         self.recipientFetcher = recipientFetcher
+        self.serviceProvider = serviceProvider
         self.storageServiceManager = storageServiceManager
         self.tsAccountManager = tsAccountManager
-        self.usernameApiClient = usernameApiClient
-        self.usernameLinkManager = usernameLinkManager
         self.usernameLookupManager = usernameLookupManager
     }
 
+    // MARK: -
+
+    /// Query for the username via the given link, internally handling
+    /// displaying errors as appropriate. Callers should do nothing if this
+    /// method returns `nil`.
     @MainActor
     public func queryForUsernameLink(
         link: Usernames.UsernameLink,
         fromViewController: UIViewController,
-        tx: DBReadTransaction,
-        failureSheetDismissalDelegate: (any SheetDismissalDelegate)? = nil,
-        onSuccess: @escaping (_ username: String, _ aci: Aci) -> Void
-    ) {
-        let usernameState = localUsernameManager.usernameState(tx: tx)
-        if
-            let localAci = tsAccountManager.localIdentifiers(tx: tx)?.aci,
-            let localLink = usernameState.usernameLink,
-            let localUsername = usernameState.username,
-            localLink == link
-        {
-            queryMatchedLocalUser(
-                onSuccess: { onSuccess(localUsername, $0) },
-                localAci: localAci,
-                tx: tx
-            )
-            return
+        failureSheetDismissalDelegate: SheetDismissalDelegate? = nil,
+    ) async -> (username: String, Aci)? {
+        do throws(SheetDisplayableError) {
+            return try await _queryForUsernameLink(link: link, fromViewController: fromViewController)
+        } catch {
+            error.showSheet(from: fromViewController, dismissalDelegate: failureSheetDismissalDelegate)
+            return nil
         }
-
-        ModalActivityIndicatorViewController.present(
-            fromViewController: fromViewController,
-            canCancel: true,
-            asyncBlock: { modal in
-                do {
-                    let username = try await usernameLinkManager.decryptEncryptedLink(link: link)
-                    guard let username else {
-                        modal.dismissIfNotCanceled {
-                            showUsernameLinkOutdatedError(dismissalDelegate: failureSheetDismissalDelegate)
-                        }
-                        return
-                    }
-
-                    guard let hashedUsername = try? Usernames.HashedUsername(
-                        forUsername: username
-                    ) else {
-                        modal.dismissIfNotCanceled {
-                            showInvalidUsernameError(username: username, dismissalDelegate: failureSheetDismissalDelegate)
-                        }
-                        return
-                    }
-
-                    let usernameAci = try await queryServiceForUsername(hashedUsername: hashedUsername)
-                    modal.dismissIfNotCanceled {
-                        onSuccess(hashedUsername.usernameString, usernameAci)
-                    }
-                } catch {
-                    modal.dismissIfNotCanceled {
-                        handleError(error, dismissalDelegate: failureSheetDismissalDelegate)
-                    }
-                }
-            }
-        )
     }
 
-    /// Query the service for the given username, invoking a callback if the
-    /// username is successfully resolved to an ACI.
-    ///
-    /// - Parameter onSuccess
-    /// A callback invoked if the queried username resolves to an ACI.
-    /// Guaranteed to be called on the main thread.
+    private func _queryForUsernameLink(
+        link: Usernames.UsernameLink,
+        fromViewController: UIViewController,
+    ) async throws(SheetDisplayableError) -> (username: String, Aci) {
+        let (localAci, localLink, localUsername): (
+            Aci?,
+            Usernames.UsernameLink?,
+            String?,
+        ) = db.read { tx in
+            let usernameState = localUsernameManager.usernameState(tx: tx)
+            return (
+                tsAccountManager.localIdentifiers(tx: tx)?.aci,
+                usernameState.usernameLink,
+                usernameState.username,
+            )
+        }
+
+        if
+            let localAci,
+            let localLink,
+            let localUsername,
+            localLink == link
+        {
+            return (localUsername, localAci)
+        }
+
+        return try await ModalActivityIndicatorViewController.presentAndPropagateResult(
+            from: fromViewController,
+            title: CommonStrings.searchingModal,
+            canCancel: true,
+        ) { () throws(SheetDisplayableError) -> (username: String, Aci) in
+            let username: LibSignalClient.Username?
+            do {
+                username = try await serviceProvider.withUnauthService(.usernames) {
+                    return try await $0.lookUpUsernameLink(link.handle, entropy: link.entropy.rawValue)
+                }
+            } catch is CancellationError {
+                throw .userCancelled
+            } catch where error.isNetworkFailureOrTimeout {
+                throw .networkError
+            } catch {
+                Logger.warn("Failed to decrypt username link with generic error! \(error)")
+                throw .usernameLookupGenericError()
+            }
+
+            guard let username else {
+                throw .usernameLinkNoLongerValidError()
+            }
+
+            do {
+                let usernameAci = try await queryServiceForUsername(username)
+                return (username.value, usernameAci)
+            } catch is CancellationError {
+                throw .userCancelled
+            } catch is UsernameNotFoundError {
+                throw .usernameNotFoundError(username.value)
+            } catch where error.isNetworkFailureOrTimeout {
+                throw .networkError
+            } catch {
+                Logger.warn("Failed to look up username for link with generic error! \(error)")
+                throw .usernameLookupGenericError()
+            }
+        }
+    }
+
+    // MARK: -
+
+    /// Query for the given username, internally handling displaying errors as
+    /// appropriate. Callers should do nothing if this method returns `nil`.
     @MainActor
     public func queryForUsername(
         username: String,
         fromViewController: UIViewController,
-        tx: DBReadTransaction,
-        failureSheetDismissalDelegate: (any SheetDismissalDelegate)? = nil,
-        onSuccess: @escaping (Aci) -> Void
-    ) {
+        failureSheetDismissalDelegate: SheetDismissalDelegate? = nil,
+    ) async -> Aci? {
+        do throws(SheetDisplayableError) {
+            return try await _queryForUsername(username: username, fromViewController: fromViewController)
+        } catch {
+            error.showSheet(from: fromViewController, dismissalDelegate: failureSheetDismissalDelegate)
+            return nil
+        }
+    }
+
+    private func _queryForUsername(
+        username: String,
+        fromViewController: UIViewController,
+    ) async throws(SheetDisplayableError) -> Aci {
+        let (localAci, localUsername): (Aci?, String?) = db.read { tx in
+            return (
+                tsAccountManager.localIdentifiers(tx: tx)?.aci,
+                localUsernameManager.usernameState(tx: tx).username,
+            )
+        }
+
         if
-            let localAci = tsAccountManager.localIdentifiers(tx: tx)?.aci,
-            let localUsername = localUsernameManager.usernameState(tx: tx).username,
+            let localAci,
+            let localUsername,
             localUsername.caseInsensitiveCompare(username) == .orderedSame
         {
-            queryMatchedLocalUser(onSuccess: onSuccess, localAci: localAci, tx: tx)
-            return
+            return localAci
         }
 
-        guard let hashedUsername = try? Usernames.HashedUsername(
-            forUsername: username
-        ) else {
-            showInvalidUsernameError(
-                username: username,
-                dismissalDelegate: failureSheetDismissalDelegate
-            )
-            return
-        }
-
-        ModalActivityIndicatorViewController.present(
-            fromViewController: fromViewController,
+        return try await ModalActivityIndicatorViewController.presentAndPropagateResult(
+            from: fromViewController,
+            title: CommonStrings.searchingModal,
             canCancel: true,
-            asyncBlock: { modal in
-                do {
-                    let aci = try await queryServiceForUsername(hashedUsername: hashedUsername)
-                    modal.dismissIfNotCanceled {
-                        onSuccess(aci)
-                    }
-                } catch {
-                    modal.dismissIfNotCanceled {
-                        handleError(error, dismissalDelegate: failureSheetDismissalDelegate)
-                    }
-                }
+        ) { () throws(SheetDisplayableError) -> Aci in
+            guard let username = try? LibSignalClient.Username(username) else {
+                throw .usernameInvalidError(username)
             }
-        )
-    }
 
-    /// Handle a query that we know will match the local user.
-    ///
-    /// - Parameter tx
-    /// An unused database transaction. Forced as a parameter here to draw
-    /// attention to the fact that this workaround is required because the query
-    /// methods are within the context of a transaction.
-    private func queryMatchedLocalUser(
-        onSuccess: @escaping (Aci) -> Void,
-        localAci: Aci,
-        tx _: DBReadTransaction
-    ) {
-        // Dispatch asynchronously, since we are inside a transaction.
-        DispatchQueue.main.async {
-            onSuccess(localAci)
+            do {
+                return try await queryServiceForUsername(username)
+            } catch is CancellationError {
+                throw .userCancelled
+            } catch is UsernameNotFoundError {
+                throw .usernameNotFoundError(username.value)
+            } catch where error.isNetworkFailureOrTimeout {
+                throw .networkError
+            } catch {
+                Logger.warn("Failed to query username with generic error! \(error)")
+                throw .usernameLookupGenericError()
+            }
         }
     }
 
-    private struct UsernameNotFoundError: Error {
-        var usernameString: String
-    }
+    // MARK: -
+
+    private struct UsernameNotFoundError: Error {}
 
     /// Query the service for the ACI of the given username.
-    private func queryServiceForUsername(hashedUsername: Usernames.HashedUsername) async throws -> Aci {
-        let aci = try await self.usernameApiClient.lookupAci(forHashedUsername: hashedUsername)
-        guard let aci else {
-            throw UsernameNotFoundError(usernameString: hashedUsername.usernameString)
+    private func queryServiceForUsername(_ username: LibSignalClient.Username) async throws -> Aci {
+        let aci = try await serviceProvider.withUnauthService(.usernames) {
+            return try await $0.lookUpUsernameHash(username.hash)
         }
-        await self.databaseStorage.awaitableWrite { tx in
-            self.handleUsernameLookupCompleted(
+        guard let aci else {
+            throw UsernameNotFoundError()
+        }
+
+        await db.awaitableWrite { tx in
+            handleUsernameLookupCompleted(
                 aci: aci,
-                username: hashedUsername.usernameString,
-                tx: tx
+                username: username.value,
+                tx: tx,
             )
         }
         return aci
@@ -214,7 +228,7 @@ public struct UsernameQuerier {
     private func handleUsernameLookupCompleted(
         aci: Aci,
         username: String,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         var recipient = recipientFetcher.fetchOrCreate(serviceId: aci, tx: tx)
         recipientManager.markAsRegisteredAndSave(&recipient, shouldUpdateStorageService: true, tx: tx)
@@ -223,7 +237,7 @@ public struct UsernameQuerier {
             forRecipient: recipient,
             profileManager: profileManager,
             contactManager: contactsManager,
-            transaction: tx
+            transaction: tx,
         ).usernameIsBestIdentifier()
 
         if isUsernameBestIdentifier {
@@ -233,7 +247,7 @@ public struct UsernameQuerier {
             usernameLookupManager.saveUsername(
                 username,
                 forAci: aci,
-                transaction: tx
+                transaction: tx,
             )
 
             storageServiceManager.recordPendingUpdates(updatedRecipientUniqueIds: [recipient.uniqueId])
@@ -244,88 +258,61 @@ public struct UsernameQuerier {
             usernameLookupManager.saveUsername(
                 nil,
                 forAci: aci,
-                transaction: tx
+                transaction: tx,
             )
         }
     }
+}
 
-    // MARK: - Errors
+// MARK: -
 
-    private func showInvalidUsernameError(
-        username: String,
-        dismissalDelegate: (any SheetDismissalDelegate)?
-    ) {
-        OWSActionSheets.showActionSheet(
-            title: OWSLocalizedString(
+private extension SheetDisplayableError {
+    static func usernameInvalidError(_ username: String) -> SheetDisplayableError {
+        return ActionSheetDisplayableError(
+            localizedTitle: OWSLocalizedString(
                 "USERNAME_LOOKUP_INVALID_USERNAME_TITLE",
-                comment: "Title for an action sheet indicating that a user-entered username value is not a valid username."
+                comment: "Title for an action sheet indicating that a user-entered username value is not a valid username.",
             ),
-            message: String(
-                format: OWSLocalizedString(
+            localizedMessage: String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
                     "USERNAME_LOOKUP_INVALID_USERNAME_MESSAGE_FORMAT",
-                    comment: "A message indicating that a user-entered username value is not a valid username. Embeds {{ a username }}."
+                    comment: "A message indicating that a user-entered username value is not a valid username. Embeds {{ a username }}.",
                 ),
-                username
+                username,
             ),
-            dismissalDelegate: dismissalDelegate
         )
     }
 
-    private func showUsernameNotFoundError(
-        username: String,
-        dismissalDelegate: (any SheetDismissalDelegate)?
-    ) {
-        OWSActionSheets.showActionSheet(
-            title: OWSLocalizedString(
+    static func usernameNotFoundError(_ username: String) -> SheetDisplayableError {
+        return ActionSheetDisplayableError(
+            localizedTitle: OWSLocalizedString(
                 "USERNAME_LOOKUP_NOT_FOUND_TITLE",
-                comment: "Title for an action sheet indicating that the given username is not associated with a registered Signal account."
+                comment: "Title for an action sheet indicating that the given username is not associated with a registered Signal account.",
             ),
-            message: String(
-                format: OWSLocalizedString(
+            localizedMessage: String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
                     "USERNAME_LOOKUP_NOT_FOUND_MESSAGE_FORMAT",
-                    comment: "A message indicating that the given username is not associated with a registered Signal account. Embeds {{ a username }}."
+                    comment: "A message indicating that the given username is not associated with a registered Signal account. Embeds {{ a username }}.",
                 ),
-                username
+                username,
             ),
-            dismissalDelegate: dismissalDelegate
         )
     }
 
-    private func showUsernameLinkOutdatedError(
-        dismissalDelegate: (any SheetDismissalDelegate)?
-    ) {
-        OWSActionSheets.showActionSheet(
-            title: CommonStrings.errorAlertTitle,
-            message: OWSLocalizedString(
+    static func usernameLinkNoLongerValidError() -> SheetDisplayableError {
+        return ActionSheetDisplayableError(
+            localizedTitle: CommonStrings.errorAlertTitle,
+            localizedMessage: OWSLocalizedString(
                 "USERNAME_LOOKUP_LINK_NO_LONGER_VALID_MESSAGE",
-                comment: "A message indicating that a username link the user attempted to query is no longer valid."
+                comment: "A message indicating that a username link the user attempted to query is no longer valid.",
             ),
-            dismissalDelegate: dismissalDelegate
         )
     }
 
-    private func handleError(
-        _ error: any Error,
-        dismissalDelegate: (any SheetDismissalDelegate)?,
-    ) {
-        if let notFoundError = error as? UsernameNotFoundError {
-            showUsernameNotFoundError(username: notFoundError.usernameString, dismissalDelegate: dismissalDelegate)
-        } else {
-            showGenericError(dismissalDelegate: dismissalDelegate)
-        }
-    }
-
-    private func showGenericError(
-        dismissalDelegate: (any SheetDismissalDelegate)?
-    ) {
-        Logger.error("Error while querying for username!")
-
-        OWSActionSheets.showErrorAlert(
-            message: OWSLocalizedString(
-                "USERNAME_LOOKUP_ERROR_MESSAGE",
-                comment: "A message indicating that username lookup failed."
-            ),
-            dismissalDelegate: dismissalDelegate
-        )
+    static func usernameLookupGenericError() -> SheetDisplayableError {
+        return ActionSheetDisplayableError(localizedMessage: OWSLocalizedString(
+            "USERNAME_LOOKUP_ERROR_MESSAGE",
+            comment: "A message indicating that username lookup failed.",
+        ))
     }
 }

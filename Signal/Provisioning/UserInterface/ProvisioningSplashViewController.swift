@@ -24,11 +24,10 @@ class ProvisioningSplashViewController: ProvisioningBaseViewController {
             primaryAction: UIAction { [weak self] _ in
                 guard let self else { return }
                 self.provisioningController.provisioningSplashRequestedModeSwitch(viewController: self)
-            }
+            },
         )
-        modeSwitchButton.configuration?.image = .init(named: "link-slash")
+        modeSwitchButton.configuration?.image = .linkSlash
         modeSwitchButton.tintColor = .ows_gray25
-        modeSwitchButton.accessibilityIdentifier = "onboarding.splash.modeSwitch"
         view.addSubview(modeSwitchButton)
         modeSwitchButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -39,13 +38,12 @@ class ProvisioningSplashViewController: ProvisioningBaseViewController {
         ])
 
         // Image at the top.
-        let imageView = UIImageView(image: UIImage(named: "onboarding_splash_hero"))
+        let imageView = UIImageView(image: .onboardingSplashHero)
         imageView.contentMode = .scaleAspectFit
         imageView.layer.minificationFilter = .trilinear
         imageView.layer.magnificationFilter = .trilinear
         imageView.setCompressionResistanceLow()
         imageView.setContentHuggingVerticalLow()
-        imageView.accessibilityIdentifier = "onboarding.splash.heroImageView"
         let heroImageContainer = UIView.container()
         heroImageContainer.addSubview(imageView)
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -61,7 +59,7 @@ class ProvisioningSplashViewController: ProvisioningBaseViewController {
             if TSConstants.isUsingProductionService {
                 return OWSLocalizedString(
                     "ONBOARDING_SPLASH_TITLE",
-                    comment: "Title of the 'onboarding splash' view."
+                    comment: "Title of the 'onboarding splash' view.",
                 )
             } else {
                 return "Internal Staging Build\n\(AppVersionImpl.shared.currentAppVersion)"
@@ -74,14 +72,15 @@ class ProvisioningSplashViewController: ProvisioningBaseViewController {
         let tosPPButton = UIButton(
             configuration: .smallBorderless(title: OWSLocalizedString(
                 "ONBOARDING_SPLASH_TERM_AND_PRIVACY_POLICY",
-                comment: "Link to the 'terms and privacy policy' in the 'onboarding splash' view."
+                comment: "Link to the 'terms and privacy policy' in the 'onboarding splash' view.",
             )),
             primaryAction: UIAction { [weak self] _ in
                 self?.present(SFSafariViewController(url: TSConstants.legalTermsUrl), animated: true)
 
-            }
+            },
         )
         tosPPButton.configuration?.baseForegroundColor = .Signal.secondaryLabel
+        tosPPButton.accessibilityTraits.insert(.link)
         tosPPButton.enableMultilineLabel()
         tosPPButton.accessibilityIdentifier = "onboarding.splash.explanationLabel"
 
@@ -92,7 +91,7 @@ class ProvisioningSplashViewController: ProvisioningBaseViewController {
                 Task { @MainActor in
                     await self.provisioningController.provisioningSplashDidComplete(viewController: self)
                 }
-            }
+            },
         )
         continueButton.accessibilityIdentifier = "onboarding.splash.continueButton"
 

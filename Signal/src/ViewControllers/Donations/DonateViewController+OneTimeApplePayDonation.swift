@@ -15,8 +15,14 @@ extension DonateViewController {
     func paymentAuthorizationControllerForOneTime(
         _ controller: PKPaymentAuthorizationController,
         didAuthorizePayment payment: PKPayment,
-        handler completion: @escaping (PKPaymentAuthorizationResult) -> Void
+        handler completion: @escaping (PKPaymentAuthorizationResult) -> Void,
     ) {
+        let db = DependenciesBridge.shared.db
+        let donationPermitFetcher = DependenciesBridge.shared.donationPermitFetcher
+        let donationSubscriptionManager = DependenciesBridge.shared.donationSubscriptionManager
+        let idealStore = DependenciesBridge.shared.pendingIDEALDonationStore
+        let networkManager = SSKEnvironment.shared.networkManagerRef
+
         guard let oneTime = state.oneTime, let amount = oneTime.amount else {
             owsFail("Amount or currency code are missing")
         }
@@ -24,21 +30,34 @@ extension DonateViewController {
         let boostBadge = oneTime.profileBadge
 
         Task {
-            let confirmedIntent: Stripe.ConfirmedPaymentIntent
+            let confirmedPaymentIntent: Stripe.ConfirmedPaymentIntent
             do {
-                confirmedIntent = try await Stripe.boost(
-                    amount: amount,
-                    level: .boostBadge,
-                    for: .applePay(payment: payment)
+                confirmedPaymentIntent = try await Retry.performWithBackoff(maxAttempts: 3) {
+                    let donationPermit = try await donationPermitFetcher.fetchDonationPermit()
+
+                    Logger.info("[Donations] Starting one-time Apple Pay donation")
+                    return try await Stripe.boost(
+                        amount: amount,
+                        level: .boostBadge,
+                        for: .applePay(payment: payment),
+                        donationPermit: donationPermit,
+                        networkManager: networkManager,
+                    )
+                }
+                owsAssertBeta(
+                    confirmedPaymentIntent.redirectToUrl == nil,
+                    "[Donations] There shouldn't be a 3DS redirect for Apple Pay",
                 )
-                owsPrecondition(
-                    confirmedIntent.redirectToUrl == nil,
-                    "[Donations] There shouldn't be a 3DS redirect for Apple Pay"
-                )
-                completion(.init(status: .success, errors: nil))
+                completion(PKPaymentAuthorizationResult(status: .success, errors: nil))
             } catch {
-                completion(.init(status: .failure, errors: [error]))
-                owsFailDebugUnlessNetworkFailure(error)
+                Logger.warn("[Donations] One-time Apple Pay donation failed")
+                completion(PKPaymentAuthorizationResult(status: .failure, errors: [error]))
+                self.didFailDonation(
+                    error: error,
+                    mode: .oneTime,
+                    badge: boostBadge,
+                    paymentMethod: .applePay,
+                )
                 return
             }
 
@@ -46,24 +65,27 @@ extension DonateViewController {
                 try await DonationViewsUtil.wrapInProgressView(
                     from: self,
                     operation: {
-                        try await DonationViewsUtil.waitForRedemption(paymentMethod: .applePay) {
-                            try await DonationSubscriptionManager.requestAndRedeemReceipt(
-                                boostPaymentIntentId: confirmedIntent.paymentIntentId,
-                                amount: amount,
-                                paymentProcessor: .stripe,
-                                paymentMethod: .applePay
-                            )
-                        }
-                    }
+                        try await DonationViewsUtil.redeemOneTimeDonation(
+                            paymentIntentId: confirmedPaymentIntent.paymentIntentId,
+                            amount: amount,
+                            paymentProcessor: .stripe,
+                            paymentMethod: .applePay,
+                            db: db,
+                            donationSubscriptionManager: donationSubscriptionManager,
+                            idealStore: idealStore,
+                        )
+                    },
                 )
+
+                Logger.info("[Donations] One-time Apple Pay donation finished")
                 self.didCompleteDonation(receiptCredentialSuccessMode: .oneTimeBoost)
             } catch {
-                owsFailDebugUnlessNetworkFailure(error)
+                Logger.warn("[Donations] One-time Apple Pay donation failed")
                 self.didFailDonation(
                     error: error,
                     mode: .oneTime,
                     badge: boostBadge,
-                    paymentMethod: .applePay
+                    paymentMethod: .applePay,
                 )
             }
         }

@@ -13,7 +13,7 @@ protocol RegistrationConfimModeSwitchPresenter: AnyObject {
 class RegistrationConfirmModeSwitchViewController: OWSViewController {
     weak var presenter: RegistrationConfimModeSwitchPresenter?
 
-    public init(presenter: RegistrationConfimModeSwitchPresenter) {
+    init(presenter: RegistrationConfimModeSwitchPresenter) {
         self.presenter = presenter
         super.init()
     }
@@ -21,21 +21,14 @@ class RegistrationConfirmModeSwitchViewController: OWSViewController {
     private var titleText: String {
         OWSLocalizedString(
             "ONBOARDING_MODE_SWITCH_TITLE_REGISTERING",
-            comment: "header text indicating to the user they're switching from registering to linking flow"
+            comment: "header text indicating to the user they're switching from registering to linking flow",
         )
     }
 
     private var subtitleText: String {
         OWSLocalizedString(
             "ONBOARDING_MODE_SWITCH_EXPLANATION_REGISTERING",
-            comment: "explanation to the user they're switching from registering to linking flow"
-        )
-    }
-
-    private var warningText: String {
-        OWSLocalizedString(
-            "ONBOARDING_MODE_SWITCH_WARNING_REGISTERING",
-            comment: "warning to the user that linking a phone is not recommended"
+            comment: "explanation to the user they're switching from registering to linking flow",
         )
     }
 
@@ -50,11 +43,11 @@ class RegistrationConfirmModeSwitchViewController: OWSViewController {
         let nextButton = UIButton(
             configuration: .largePrimary(title: OWSLocalizedString(
                 "ONBOARDING_MODE_SWITCH_BUTTON_REGISTERING",
-                comment: "button indicating that the user will link their phone"
+                comment: "button indicating that the user will link this device",
             )),
-            primaryAction: UIAction { [weak self] _ in
-                self?.didPressNext()
-            }
+            primaryAction: UIAction { [weak presenter] _ in
+                presenter?.confirmSwitchToDeviceLinkingMode()
+            },
         )
         nextButton.accessibilityIdentifier = "onboarding.modeSwitch.nextButton"
 
@@ -62,23 +55,8 @@ class RegistrationConfirmModeSwitchViewController: OWSViewController {
             titleLabel,
             explanationLabel,
             .vStretchingSpacer(),
-            nextButton.enclosedInVerticalStackView(isFullWidthButton: true)
+            nextButton.enclosedInVerticalStackView(isFullWidthButton: true),
         ])
-    }
-
-    func didPressNext() {
-        let actionSheet = ActionSheetController(message: warningText)
-
-        let continueAction = ActionSheetAction(
-            title: CommonStrings.continueButton,
-            handler: { [weak self] _ in
-                self?.presenter?.confirmSwitchToDeviceLinkingMode()
-            }
-        )
-        actionSheet.addAction(continueAction)
-        actionSheet.addAction(OWSActionSheets.cancelAction)
-
-        presentActionSheet(actionSheet)
     }
 }
 
@@ -97,8 +75,8 @@ private class PreviewRegistrationConfimModeSwitchPresenter: RegistrationConfimMo
     let presenter = PreviewRegistrationConfimModeSwitchPresenter()
     return UINavigationController(
         rootViewController: RegistrationConfirmModeSwitchViewController(
-            presenter: presenter
-        )
+            presenter: presenter,
+        ),
     )
 }
 

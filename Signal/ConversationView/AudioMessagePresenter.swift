@@ -3,14 +3,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Lottie
 import SignalServiceKit
 import SignalUI
 
 // Defines the look of audio messages in the conversation view.
 class AudioMessagePresenter: AudioPresenter {
     let name = "AudioMessageView"
-    let isIncoming: Bool
     let playbackTimeLabel = CVLabel()
     let playedDotContainer = ManualLayoutView(name: "playedDotContainer")
     let playbackRateView: AudioMessagePlaybackRateView
@@ -18,10 +16,14 @@ class AudioMessagePresenter: AudioPresenter {
     let threadUniqueId: String
     let audioPlaybackRate: AudioPlaybackRate
 
-    init(isIncoming: Bool,
-         audioAttachment: AudioAttachment,
-         threadUniqueId: String,
-         playbackRate: AudioPlaybackRate) {
+    private let isIncoming: Bool
+
+    init(
+        isIncoming: Bool,
+        audioAttachment: AudioAttachment,
+        threadUniqueId: String,
+        playbackRate: AudioPlaybackRate,
+    ) {
         self.threadUniqueId = threadUniqueId
         self.audioPlaybackRate = playbackRate
         self.isIncoming = isIncoming
@@ -30,7 +32,8 @@ class AudioMessagePresenter: AudioPresenter {
             threadUniqueId: threadUniqueId,
             audioAttachment: audioAttachment,
             playbackRate: playbackRate,
-            isIncoming: isIncoming)
+            isIncoming: isIncoming,
+        )
     }
 
     var bottomInnerStackSpacing: CGFloat {
@@ -42,34 +45,51 @@ class AudioMessagePresenter: AudioPresenter {
         }
     }
 
-    func playedColor(isIncoming: Bool) -> UIColor {
-        return isIncoming ? (Theme.isDarkThemeEnabled ? .ows_gray15 : .ows_gray60)
-        : .ows_white
+    func playedColor() -> UIColor {
+        isIncoming ? .Signal.secondaryLabel : .Signal.ColorBase.labelPrimary
     }
 
-    func unplayedColor(isIncoming: Bool) -> UIColor {
-        return isIncoming ? (Theme.isDarkThemeEnabled ? .ows_gray60 : .ows_gray25) : .ows_whiteAlpha40
+    func unplayedColor() -> UIColor {
+        isIncoming ? .Signal.quaternaryLabel : .Signal.ColorBase.labelTertiary
     }
 
-    func thumbColor(isIncoming: Bool) -> UIColor {
-        return playedColor(isIncoming: isIncoming)
+    // Over the waveform the thumb sits among the bars, so it takes the label
+    // color to stand apart from them.
+    func waveformThumbColor() -> UIColor {
+        isIncoming ? .Signal.label : .Signal.ColorBase.labelPrimary
     }
 
-    func playPauseContainerBackgroundColor(isIncoming: Bool) -> UIColor {
-        return isIncoming ? (Theme.isDarkThemeEnabled ? .ows_gray60 : .ows_whiteAlpha80) : .ows_whiteAlpha20
+    // On the bare progress bar it's a capsule handle, white in both incoming
+    // and outgoing bubbles.
+    func progressBarThumbColor() -> UIColor {
+        .Signal.ColorBase.labelPrimary
     }
 
-    func playPauseAnimationColor(isIncoming: Bool) -> ColorValueProvider {
-        ColorValueProvider(thumbColor(isIncoming: isIncoming).lottieColorValue)
+    func playPauseContainerBackgroundColor(conversationStyle: ConversationStyle) -> UIColor {
+        switch (isIncoming, conversationStyle.hasWallpaper) {
+        case (true, true): .Signal.MaterialBase.button
+        case (true, _): .Signal.LightBase.button
+        case (false, _): .Signal.ColorBase.button
+        }
     }
 
-    func playedDotAnimationColor(conversationStyle: ConversationStyle,
-                                 isIncoming: Bool) -> ColorValueProvider {
-        return ColorValueProvider(conversationStyle.bubbleSecondaryTextColor(isIncoming: isIncoming).lottieColorValue)
+    func playPauseAnimationColor() -> UIColor {
+        isIncoming ? .Signal.label : .Signal.ColorBase.labelPrimary
+    }
+
+    func playedDotAnimationColor(conversationStyle: ConversationStyle) -> UIColor {
+        conversationStyle.bubbleSecondaryTextColor(isIncoming: isIncoming)
+    }
+
+    func progressViewConfiguration(conversationStyle: ConversationStyle) -> CVAttachmentProgressView.Configuration {
+        CVAttachmentProgressView.Configuration(
+            conversationStyle: conversationStyle,
+            isIncoming: isIncoming,
+        )
     }
 
     func configureForRendering(conversationStyle: ConversationStyle) {
-        let playbackTimeLabelConfig = Self.playbackTimeLabelConfig(isIncoming: isIncoming, conversationStyle: conversationStyle)
+        let playbackTimeLabelConfig = Self.playbackTimeLabelConfig(isIncoming: isIncoming)
         playbackTimeLabelConfig.applyForRendering(label: playbackTimeLabel)
         playbackTimeLabel.setContentHuggingHigh()
     }
@@ -85,7 +105,7 @@ class AudioMessagePresenter: AudioPresenter {
 
             let playbackTimeLabelConfig = Self.playbackTimeLabelConfig_forMeasurement(
                 audioAttachment: audioAttachment,
-                maxWidth: maxWidth
+                maxWidth: maxWidth,
             )
             let playbackTimeLabelSize = CVText.measureLabel(config: playbackTimeLabelConfig, maxWidth: maxWidth)
 
@@ -94,7 +114,8 @@ class AudioMessagePresenter: AudioPresenter {
             return SubviewConfig(
                 playbackTimeLabelMeasurementInfo: playbackTimeLabelSize.asManualSubviewInfo(hasFixedSize: true),
                 playedDotContainerMeasurementInfo: dotSize.asManualSubviewInfo(hasFixedSize: true),
-                playbackRateViewMeasurementInfo: playbackRateSize.asManualSubviewInfo(hasFixedSize: true))
+                playbackRateViewMeasurementInfo: playbackRateSize.asManualSubviewInfo(hasFixedSize: true),
+            )
         }
         var subviewConfig: SubviewConfig?
         let lazySubviewConfig = { maxWidth in
@@ -110,28 +131,32 @@ class AudioMessagePresenter: AudioPresenter {
             SubviewGenerator(
                 id: "transparentSpacer1",
                 measurementInfo: { _ in CGSize.zero.asManualSubviewInfo(hasFixedWidth: true) },
-                viewGenerator: { UIView.transparentSpacer() }),
+                viewGenerator: { UIView.transparentSpacer() },
+            ),
             SubviewGenerator(
                 id: "playbackTimeLabel",
                 measurementInfo: { lazySubviewConfig($0).playbackTimeLabelMeasurementInfo },
-                viewGenerator: { [unowned self] in self.playbackTimeLabel }),
+                viewGenerator: { [unowned self] in self.playbackTimeLabel },
+            ),
             SubviewGenerator(
                 id: "playedDotContainer",
                 measurementInfo: { lazySubviewConfig($0).playedDotContainerMeasurementInfo },
-                viewGenerator: { [unowned self] in self.playedDotContainer }),
+                viewGenerator: { [unowned self] in self.playedDotContainer },
+            ),
             SubviewGenerator(
                 id: "playbackRateView",
                 measurementInfo: { lazySubviewConfig($0).playbackRateViewMeasurementInfo },
-                viewGenerator: { [unowned self] in self.playbackRateView}),
+                viewGenerator: { [unowned self] in self.playbackRateView },
+            ),
             SubviewGenerator(
                 id: "transparentSpacer2",
                 measurementInfo: { _ in .empty },
-                viewGenerator: { UIView.transparentSpacer() })
+                viewGenerator: { UIView.transparentSpacer() },
+            ),
         ]
     }
 
-    func topLabelConfig(audioAttachment: AudioAttachment, isIncoming: Bool, conversationStyle: ConversationStyle?) -> CVLabelConfig? {
-
+    var topLabelConfig: CVLabelConfig? {
         guard !audioAttachment.isVoiceMessage else {
             return nil
         }
@@ -146,12 +171,14 @@ class AudioMessagePresenter: AudioPresenter {
         return CVLabelConfig.unstyledText(
             text,
             font: Constants.labelFont,
-            textColor: conversationStyle?.bubbleTextColor(isIncoming: isIncoming) ?? .label
+            textColor: ConversationStyle.bubbleTextColor(isIncoming: isIncoming),
         )
     }
 
-    func audioWaveform(attachmentStream: SignalServiceKit.AttachmentStream?) -> Task<AudioWaveform, Error>? {
-        return attachmentStream?.audioWaveform()
+    func audioWaveform(attachment: Attachment) -> Task<AudioWaveform, Error> {
+        DependenciesBridge.shared.audioWaveformManager.cachedAudioWaveform(
+            attachment: attachment,
+        )
     }
 }
 

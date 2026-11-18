@@ -11,26 +11,24 @@ public protocol AttachmentUploadManager {
     func uploadBackup(
         localUploadMetadata: Upload.EncryptedBackupUploadMetadata,
         form: Upload.Form,
-        progress: OWSProgressSink?
+        progressBlock: OWSURLSession.ProgressBlock,
     ) async throws -> Upload.Result<Upload.EncryptedBackupUploadMetadata>
 
     /// Upload a transient attachment that isn't saved to the database for sending.
     func uploadTransientAttachment(
         dataSource: DataSourcePath,
-        progress: OWSProgressSink?
     ) async throws -> Upload.Result<Upload.LocalUploadMetadata>
 
     /// Upload a transient link'n'sync attachment that isn't saved to the database for sending.
     func uploadLinkNSyncAttachment(
         dataSource: DataSourcePath,
-        progress: OWSProgressSink?
+        progressBlock: OWSURLSession.ProgressBlock,
     ) async throws -> Upload.Result<Upload.LinkNSyncUploadMetadata>
 
     /// Upload an Attachment to the given endpoint.
     /// Will fail if the attachment doesn't exist or isn't available locally.
     func uploadTransitTierAttachment(
         attachmentId: Attachment.IDType,
-        progress: OWSProgressSink?
     ) async throws
 
     /// Upload an attachment to the media tier (uploading to the transit tier if needed and copying to the media tier).
@@ -41,7 +39,7 @@ public protocol AttachmentUploadManager {
         localAci: Aci,
         backupKey: MediaRootBackupKey,
         auth: BackupServiceAuth,
-        progress: OWSProgressSink?
+        progressBlock: OWSURLSession.ProgressBlock,
     ) async throws
 
     /// Upload an attachment's thumbnail to the media tier (uploading to the transit tier and copying to the media tier).
@@ -52,86 +50,14 @@ public protocol AttachmentUploadManager {
         localAci: Aci,
         backupKey: MediaRootBackupKey,
         auth: BackupServiceAuth,
-        progress: OWSProgressSink?
+        progressBlock: OWSURLSession.ProgressBlock,
     ) async throws
+
+    @MainActor
+    func currentProgress(forAttachmentId attachmentId: Attachment.IDType) -> Float?
 }
 
-extension AttachmentUploadManager {
-
-    public func uploadBackup(
-        localUploadMetadata: Upload.EncryptedBackupUploadMetadata,
-        form: Upload.Form
-    ) async throws -> Upload.Result<Upload.EncryptedBackupUploadMetadata> {
-        try await uploadBackup(
-            localUploadMetadata: localUploadMetadata,
-            form: form,
-            progress: nil
-        )
-    }
-
-    public func uploadTransientAttachment(
-        dataSource: DataSourcePath,
-    ) async throws -> Upload.Result<Upload.LocalUploadMetadata> {
-        try await uploadTransientAttachment(
-            dataSource: dataSource,
-            progress: nil
-        )
-    }
-
-    public func uploadLinkNSyncAttachment(
-        dataSource: DataSourcePath,
-    ) async throws -> Upload.Result<Upload.LinkNSyncUploadMetadata> {
-        try await uploadLinkNSyncAttachment(
-            dataSource: dataSource,
-            progress: nil
-        )
-    }
-
-    public func uploadTransitTierAttachment(
-        attachmentId: Attachment.IDType
-    ) async throws {
-        try await uploadTransitTierAttachment(
-            attachmentId: attachmentId,
-            progress: nil
-        )
-    }
-
-    public func uploadMediaTierAttachment(
-        attachmentId: Attachment.IDType,
-        uploadEra: String,
-        localAci: Aci,
-        backupKey: MediaRootBackupKey,
-        auth: BackupServiceAuth
-    ) async throws {
-        try await  uploadMediaTierAttachment(
-            attachmentId: attachmentId,
-            uploadEra: uploadEra,
-            localAci: localAci,
-            backupKey: backupKey,
-            auth: auth,
-            progress: nil
-        )
-    }
-
-    public func uploadMediaTierThumbnailAttachment(
-        attachmentId: Attachment.IDType,
-        uploadEra: String,
-        localAci: Aci,
-        backupKey: MediaRootBackupKey,
-        auth: BackupServiceAuth
-    ) async throws {
-        try await uploadMediaTierThumbnailAttachment(
-            attachmentId: attachmentId,
-            uploadEra: uploadEra,
-            localAci: localAci,
-            backupKey: backupKey,
-            auth: auth,
-            progress: nil
-        )
-    }
-}
-
-public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
+public class AttachmentUploadManagerImpl: AttachmentUploadManager {
 
     private let accountKeyStore: AccountKeyStore
     private let attachmentEncrypter: Upload.Shims.AttachmentEncrypter
@@ -143,13 +69,13 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
     private let db: any DB
     private let fileSystem: Upload.Shims.FileSystem
     private let interactionStore: InteractionStore
-    private let networkManager: NetworkManager
     private let remoteConfigProvider: any RemoteConfigProvider
+    private let serviceProvider: any ServiceProvider
     private let signalService: OWSSignalServiceProtocol
     private let sleepTimer: Upload.Shims.SleepTimer
     private let storyStore: StoryStore
 
-    private struct ActiveUploadKey: Hashable {
+    private struct UploadId: Hashable {
         let attachmentId: Attachment.IDType
         let isThumbnailUpload: Bool
 
@@ -164,8 +90,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         }
     }
 
-    // Map of active upload tasks.
-    private var activeUploads = [ActiveUploadKey: Task<(AttachmentUploadRecord, Upload.AttachmentResult), Error>]()
+    private let uploadQueue = KeyedConcurrentTaskQueue<UploadId>(concurrentLimitPerKey: 1)
 
     private enum UploadType {
         case transitTier
@@ -193,11 +118,11 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         db: any DB,
         fileSystem: Upload.Shims.FileSystem,
         interactionStore: InteractionStore,
-        networkManager: NetworkManager,
         remoteConfigProvider: any RemoteConfigProvider,
+        serviceProvider: any ServiceProvider,
         signalService: OWSSignalServiceProtocol,
         sleepTimer: Upload.Shims.SleepTimer,
-        storyStore: StoryStore
+        storyStore: StoryStore,
     ) {
         self.accountKeyStore = accountKeyStore
         self.attachmentEncrypter = attachmentEncrypter
@@ -209,8 +134,8 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         self.db = db
         self.fileSystem = fileSystem
         self.interactionStore = interactionStore
-        self.networkManager = networkManager
         self.remoteConfigProvider = remoteConfigProvider
+        self.serviceProvider = serviceProvider
         self.signalService = signalService
         self.sleepTimer = sleepTimer
         self.storyStore = storyStore
@@ -219,7 +144,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
     public func uploadBackup(
         localUploadMetadata: Upload.EncryptedBackupUploadMetadata,
         form: Upload.Form,
-        progress: OWSProgressSink?
+        progressBlock: OWSURLSession.ProgressBlock,
     ) async throws -> Upload.Result<Upload.EncryptedBackupUploadMetadata> {
         let logger = PrefixedLogger(prefix: "[Upload]", suffix: "[backup]")
         do {
@@ -229,13 +154,13 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                 signalService: signalService,
                 fileSystem: fileSystem,
                 dateProvider: dateProvider,
-                logger: logger
+                logger: logger,
             )
             return try await AttachmentUpload.start(
                 attempt: attempt,
                 dateProvider: dateProvider,
                 sleepTimer: sleepTimer,
-                progress: progress,
+                progressBlock: progressBlock,
             )
         } catch {
             if error.isNetworkFailureOrTimeout {
@@ -253,35 +178,32 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         }
     }
 
-    public func uploadTransientAttachment(
-        dataSource: DataSourcePath,
-        progress: OWSProgressSink?
-    ) async throws -> Upload.Result<Upload.LocalUploadMetadata> {
+    public func uploadTransientAttachment(dataSource: DataSourcePath) async throws -> Upload.Result<Upload.LocalUploadMetadata> {
         let logger = PrefixedLogger(prefix: "[Upload]", suffix: "[transient]")
 
         let temporaryFile = fileSystem.temporaryFileUrl()
         let sourceURL = dataSource.fileUrl
         let metadata = try attachmentEncrypter.encryptAttachment(at: sourceURL, output: temporaryFile)
         let localMetadata = try Upload.LocalUploadMetadata.validateAndBuild(fileUrl: temporaryFile, metadata: metadata)
-        let form = try await Upload.FormRequest(
-            networkManager: networkManager
-        ).fetchForm(encryptedByteLength: localMetadata.encryptedDataLength)
+        let form = try await serviceProvider.withAuthService(.attachments) {
+            try await $0.getUploadForm(uploadSize: UInt64(localMetadata.encryptedDataLength)).asUploadForm()
+        }
 
         do {
-            // We don't show progress for transient uploads
             let attempt = try await AttachmentUpload.buildAttempt(
                 for: localMetadata,
                 form: form,
                 signalService: signalService,
                 fileSystem: fileSystem,
                 dateProvider: dateProvider,
-                logger: logger
+                logger: logger,
             )
             return try await AttachmentUpload.start(
                 attempt: attempt,
                 dateProvider: dateProvider,
                 sleepTimer: sleepTimer,
-                progress: nil
+                // We don't show progress for transient uploads
+                progressBlock: { _ in },
             )
         } catch {
             if error.isNetworkFailureOrTimeout {
@@ -301,19 +223,18 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
 
     public func uploadLinkNSyncAttachment(
         dataSource: DataSourcePath,
-        progress: OWSProgressSink?
+        progressBlock: OWSURLSession.ProgressBlock,
     ) async throws -> Upload.Result<Upload.LinkNSyncUploadMetadata> {
         let logger = PrefixedLogger(prefix: "[Upload]", suffix: "[link'n'sync]")
 
-        let dataLength = dataSource.dataLength
         let sourceURL = dataSource.fileUrl
-        guard dataLength > 0, let dataLength = UInt32(exactly: dataLength) else {
+        guard let fileSize = try? dataSource.readLength(), fileSize > 0, let fileSize = UInt32(exactly: fileSize) else {
             throw OWSAssertionError("invalid link n sync attachment size")
         }
-        let metadata = Upload.LinkNSyncUploadMetadata(fileUrl: sourceURL, encryptedDataLength: dataLength)
-        let form = try await Upload.FormRequest(
-            networkManager: networkManager
-        ).fetchForm(encryptedByteLength: metadata.encryptedDataLength)
+        let metadata = Upload.LinkNSyncUploadMetadata(fileUrl: sourceURL, encryptedDataLength: fileSize)
+        let form = try await serviceProvider.withAuthService(.attachments) {
+            try await $0.getUploadForm(uploadSize: UInt64(metadata.encryptedDataLength)).asUploadForm()
+        }
 
         do {
             // We don't show progress for transient uploads
@@ -323,13 +244,13 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                 signalService: signalService,
                 fileSystem: fileSystem,
                 dateProvider: dateProvider,
-                logger: logger
+                logger: logger,
             )
             return try await AttachmentUpload.start(
                 attempt: attempt,
                 dateProvider: dateProvider,
                 sleepTimer: sleepTimer,
-                progress: progress
+                progressBlock: progressBlock,
             )
         } catch {
             if error.isNetworkFailureOrTimeout {
@@ -347,56 +268,52 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         }
     }
 
-    public func uploadTransitTierAttachment(
-        attachmentId: Attachment.IDType,
-        progress: OWSProgressSink?
-    ) async throws {
+    public func uploadTransitTierAttachment(attachmentId: Attachment.IDType) async throws {
+        let type = UploadType.transitTier
+        let uploadId = UploadId(attachmentId: attachmentId, uploadType: type)
+        return try await uploadQueue.runWithThrowingTask(forKey: uploadId) {
+            let result = await Result(catching: {
+                return try await _uploadTransitTierAttachment(attachmentId: attachmentId, type: type)
+            })
+            await clearProgress(attachmentId: attachmentId)
+            return try result.get()
+        }
+    }
+
+    private func _uploadTransitTierAttachment(attachmentId: Attachment.IDType, type: UploadType) async throws {
         let logger = PrefixedLogger(prefix: "[Upload]", suffix: "[\(attachmentId)]")
 
-        let encryptedByteCount = db.read { tx in
-            return attachmentStore.fetch(id: attachmentId, tx: tx)?.streamInfo?.encryptedByteCount
-        } ?? 0
-
-        let progressSource = await progress?.addSource(
-            withLabel: "upload",
-            unitCount: UInt64(encryptedByteCount)
-        )
-
-        let wrappedProgress: OWSProgressSink = OWSProgress.createSink { [weak self] progressValue in
-            self?.updateProgress(id: attachmentId, progress: Double(progressValue.percentComplete))
-            if let progressSource, progressSource.completedUnitCount < progressValue.completedUnitCount {
-                progressSource.incrementCompletedUnitCount(
-                    by: progressValue.completedUnitCount - progressSource.completedUnitCount
-                )
-            }
-        }
-
-        let (record, result) = try await uploadAttachment(
-            attachmentId: attachmentId,
-            type: .transitTier,
+        let (record, result) = try await _uploadAttachmentId(
+            attachmentId,
+            type: type,
             logger: logger,
-            progress: wrappedProgress
+            progressBlock: { progressUpdate in
+                guard let totalByteCount = progressUpdate.totalByteCount else {
+                    return
+                }
+                await postProgress(attachmentId: attachmentId, progress: Float(progressUpdate.completedByteCount) / Float(totalByteCount))
+            },
         )
+        await postProgress(attachmentId: attachmentId, progress: 1)
 
         // Update the attachment and associated messages with the success
         // and clean up and left over upload state
-        try await db.awaitableWrite { tx in
+        await db.awaitableWrite { tx in
             // Read the attachment fresh from the DB
-            guard let attachmentStream = try? self.fetchAttachment(
-                attachmentId: attachmentId,
-                logger: logger,
-                tx: tx
-            ).asStream() else {
+            guard
+                let attachmentStream = try? self.fetchAttachment(
+                    attachmentId: attachmentId,
+                    logger: logger,
+                    tx: tx,
+                ).asStream()
+            else {
                 logger.warn("Attachment deleted while uploading")
                 return
             }
 
-            try self.updateTransitTier(
-                attachmentStream: attachmentStream,
-                with: result,
-                logger: logger,
-                tx: tx
-            )
+            self.updateTransitTier(forAttachmentStream: attachmentStream, uploadResult: result, tx: tx)
+
+            self.touchAllMessageReferences(attachmentId: attachmentStream.attachment.id, logger: logger, tx: tx)
 
             self.cleanup(record: record, logger: logger, tx: tx)
         }
@@ -408,23 +325,42 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         localAci: Aci,
         backupKey: MediaRootBackupKey,
         auth: BackupServiceAuth,
-        progress: OWSProgressSink?
+        progressBlock: OWSURLSession.ProgressBlock,
+    ) async throws {
+        let type = UploadType.mediaTier(auth: auth, isThumbnail: false)
+        let uploadId = UploadId(attachmentId: attachmentId, uploadType: type)
+        return try await uploadQueue.runWithThrowingTask(forKey: uploadId) {
+            return try await _uploadMediaTierAttachment(
+                attachmentId: attachmentId,
+                type: type,
+                uploadEra: uploadEra,
+                localAci: localAci,
+                backupKey: backupKey,
+                auth: auth,
+                progressBlock: progressBlock,
+            )
+        }
+    }
+
+    private func _uploadMediaTierAttachment(
+        attachmentId: Attachment.IDType,
+        type: UploadType,
+        uploadEra: String,
+        localAci: Aci,
+        backupKey: MediaRootBackupKey,
+        auth: BackupServiceAuth,
+        progressBlock: OWSURLSession.ProgressBlock,
     ) async throws {
         let logger = PrefixedLogger(prefix: "[MediaTierUpload]", suffix: "[\(attachmentId)]")
-        let (record, uploadResult) = try await uploadAttachment(
-            attachmentId: attachmentId,
-            type: .mediaTier(auth: auth, isThumbnail: false),
-            logger: logger,
-            progress: progress
-        )
+        let (record, uploadResult) = try await _uploadAttachmentId(attachmentId, type: type, logger: logger, progressBlock: progressBlock)
 
         // Read the attachment fresh from the DB
         guard
             let attachmentStream = try? db.read(block: { try self.fetchAttachment(
                 attachmentId: attachmentId,
                 logger: logger,
-                tx: $0
-            )}).asStream(),
+                tx: $0,
+            ) }).asStream(),
             let mediaName = attachmentStream.attachment.mediaName
         else {
             logger.warn("Attachment deleted while uploading")
@@ -439,13 +375,20 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                 mediaName: mediaName,
                 uploadEra: uploadEra,
                 result: uploadResult,
-                logger: logger
+                logger: logger,
             )
         } catch let error as BackupArchive.Response.CopyToMediaTierError {
+
+            await db.awaitableWrite { tx in
+                // Clean up the upload record; if we failed to copy
+                // we want to start an upload fresh next time.
+                self.cleanup(record: record, logger: logger, tx: tx)
+            }
+
             switch error {
-            case .sourceObjectNotFound:
+            case .sourceObjectNotFound, .badArgument:
                 let attachmentFileUrl = AttachmentStream.absoluteAttachmentFileURL(
-                    relativeFilePath: attachmentStream.localRelativeFilePath
+                    relativeFilePath: attachmentStream.localRelativeFilePath,
                 )
                 let fileMissingOrEmpty: Bool
                 do {
@@ -454,42 +397,31 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                     fileMissingOrEmpty = true
                 }
 
-                try await db.awaitableWrite { tx in
-                    // Clean up the upload record; if we failed to copy
-                    // we want to start an upload fresh next time.
-                    self.cleanup(record: record, logger: logger, tx: tx)
+                await db.awaitableWrite { tx in
+                    guard let attachment = attachmentStore.fetch(id: attachmentStream.id, tx: tx) else {
+                        return
+                    }
 
                     if fileMissingOrEmpty {
                         logger.error("Missing attachment file!")
 
-                        guard let attachment = attachmentStore.fetch(id: attachmentStream.id, tx: tx) else {
-                            return
-                        }
-
-                        let params = Attachment.ConstructionParams.forOffloadingFiles(
+                        attachmentStore.markOffloaded(
                             attachment: attachment,
-                            localRelativeFilePathThumbnail: nil
+                            localRelativeFilePathThumbnail: nil,
+                            tx: tx,
                         )
-                        var newRecord = Attachment.Record(params: params)
-                        newRecord.sqliteId = attachment.id
-                        try newRecord.update(tx.database)
                     }
 
                     if
                         uploadResult.localUploadMetadata.isReusedTransitTierUpload,
-                        let transitTierInfo = attachmentStream.attachment.latestTransitTierInfo
+                        let transitTierInfo = attachment.latestTransitTierInfo
                     {
                         // We reused a transit tier upload but the source couldn't be found.
                         // That transit tier upload is now invalid.
-                        // Refetch the attachment
-                        guard let attachment = attachmentStore.fetch(id: attachmentStream.id, tx: tx) else {
-                            return
-                        }
-
-                        try self.attachmentUploadStore.markTransitTierUploadExpired(
+                        attachmentStore.removeTransitTierInfo(
+                            transitTierInfo,
                             attachment: attachment,
-                            info: transitTierInfo,
-                            tx: tx
+                            tx: tx,
                         )
                     }
                 }
@@ -501,7 +433,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
             throw error
         }
 
-        try await db.awaitableWrite { tx in
+        await db.awaitableWrite { tx in
             // Refetch the attachment to ensure other fields are up-to-date.
             guard let attachmentStream = attachmentStore.fetch(id: attachmentStream.id, tx: tx)?.asStream() else {
                 return
@@ -510,18 +442,17 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
             let mediaTierInfo = Attachment.MediaTierInfo(
                 cdnNumber: cdnNumber,
                 unencryptedByteCount: uploadResult.localUploadMetadata.plaintextDataLength,
-                sha256ContentHash: attachmentStream.sha256ContentHash,
+                plaintextHash: attachmentStream.plaintextHash,
                 // TODO: [Attachment Streaming] support incremental mac
                 incrementalMacInfo: nil,
                 uploadEra: uploadEra,
-                lastDownloadAttemptTimestamp: nil
+                lastDownloadAttemptTimestamp: nil,
             )
 
-            try self.attachmentUploadStore.markUploadedToMediaTier(
+            attachmentStore.saveMediaTierInfo(
                 attachment: attachmentStream.attachment,
                 mediaTierInfo: mediaTierInfo,
-                mediaName: attachmentStream.info.mediaName,
-                tx: tx
+                tx: tx,
             )
 
             // To upload to media tier, we also upload to transit tier and then perform a copy.
@@ -557,29 +488,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
             }()
 
             if shouldUpdateTransitTierInfo {
-                let transitTierInfo = Attachment.TransitTierInfo(
-                    cdnNumber: uploadResult.cdnNumber,
-                    cdnKey: uploadResult.cdnKey,
-                    uploadTimestamp: uploadResult.beginTimestamp,
-                    encryptionKey: uploadResult.localUploadMetadata.key,
-                    unencryptedByteCount: uploadResult.localUploadMetadata.plaintextDataLength,
-                    // ALWAYS use digest for integrity check for uploaded attachments;
-                    // we only allow sending using a digest integrity check not a plaintext hash
-                    // so prefer digest if we have both. If we don't, this attachment we just
-                    // uploaded will fail to send.
-                    integrityCheck: .digestSHA256Ciphertext(uploadResult.localUploadMetadata.digest),
-                    // TODO: [Attachment Streaming] support incremental mac
-                    incrementalMacInfo: nil,
-                    lastDownloadAttemptTimestamp: nil
-                )
-                // Refetch so we get the updated media tier info from above.
-                if let attachmentStream = attachmentStore.fetch(id: attachmentStream.id, tx: tx)?.asStream() {
-                    try self.attachmentUploadStore.markUploadedToTransitTier(
-                        attachmentStream: attachmentStream,
-                        info: transitTierInfo,
-                        tx: tx
-                    )
-                }
+                self.updateTransitTier(forAttachmentStream: attachmentStream, uploadResult: uploadResult, tx: tx)
             }
 
             self.cleanup(record: record, logger: logger, tx: tx)
@@ -592,23 +501,42 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         localAci: Aci,
         backupKey: MediaRootBackupKey,
         auth: BackupServiceAuth,
-        progress: OWSProgressSink?
+        progressBlock: OWSURLSession.ProgressBlock,
+    ) async throws {
+        let type = UploadType.mediaTier(auth: auth, isThumbnail: true)
+        let uploadId = UploadId(attachmentId: attachmentId, uploadType: type)
+        return try await uploadQueue.runWithThrowingTask(forKey: uploadId) {
+            return try await _uploadMediaTierThumbnailAttachment(
+                attachmentId: attachmentId,
+                type: type,
+                uploadEra: uploadEra,
+                localAci: localAci,
+                backupKey: backupKey,
+                auth: auth,
+                progressBlock: progressBlock,
+            )
+        }
+    }
+
+    private func _uploadMediaTierThumbnailAttachment(
+        attachmentId: Attachment.IDType,
+        type: UploadType,
+        uploadEra: String,
+        localAci: Aci,
+        backupKey: MediaRootBackupKey,
+        auth: BackupServiceAuth,
+        progressBlock: OWSURLSession.ProgressBlock,
     ) async throws {
         let logger = PrefixedLogger(prefix: "[MediaTierThumbnailUpload]", suffix: "[\(attachmentId)]")
-        let (record, result) = try await uploadAttachment(
-            attachmentId: attachmentId,
-            type: .mediaTier(auth: auth, isThumbnail: true),
-            logger: logger,
-            progress: progress
-        )
+        let (record, result) = try await _uploadAttachmentId(attachmentId, type: type, logger: logger, progressBlock: progressBlock)
 
         // Read the attachment fresh from the DB
         guard
             let attachmentStream = try? db.read(block: { try self.fetchAttachment(
                 attachmentId: attachmentId,
                 logger: logger,
-                tx: $0
-            )}).asStream(),
+                tx: $0,
+            ) }).asStream(),
             let mediaName = attachmentStream.attachment.mediaName
         else {
             logger.warn("Attachment deleted while uploading")
@@ -623,7 +551,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                 mediaName: AttachmentBackupThumbnail.thumbnailMediaName(fullsizeMediaName: mediaName),
                 uploadEra: uploadEra,
                 result: result,
-                logger: logger
+                logger: logger,
             )
         } catch let error as BackupArchive.Response.CopyToMediaTierError {
             switch error {
@@ -641,7 +569,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
             throw error
         }
 
-        try await db.awaitableWrite { tx in
+        await db.awaitableWrite { tx in
             // Refetch the attachment to ensure other fields are up-to-date.
             guard let attachmentStream = attachmentStore.fetch(id: attachmentStream.id, tx: tx)?.asStream() else {
                 return
@@ -650,83 +578,52 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
             let thumbnailInfo = Attachment.ThumbnailMediaTierInfo(
                 cdnNumber: cdnNumber,
                 uploadEra: uploadEra,
-                lastDownloadAttemptTimestamp: nil
+                lastDownloadAttemptTimestamp: nil,
             )
 
-            try self.attachmentUploadStore.markThumbnailUploadedToMediaTier(
+            attachmentStore.saveMediaTierThumbnailInfo(
                 attachment: attachmentStream.attachment,
                 thumbnailMediaTierInfo: thumbnailInfo,
-                mediaName: attachmentStream.info.mediaName,
-                tx: tx
+                tx: tx,
             )
 
             self.cleanup(record: record, logger: logger, tx: tx)
         }
     }
 
-    /// Entry point for uploading an `AttachmentStream`
-    /// Fetches the `AttachmentStream`, fetches an upload form, builds the AttachmentUpload, begins the
-    /// upload, and updates the `AttachmentStream` upon success.
+    /// Uploads an `AttachmentStream`.
     ///
-    /// It is assumed any errors that could be retried or otherwise handled will have happend at a lower level,
-    /// so any error encountered here is considered unrecoverable and thrown to the caller.
+    /// Fetches the `AttachmentStream`, fetches an upload form, builds the
+    /// AttachmentUpload, begins the upload, and updates the `AttachmentStream`
+    /// upon success.
     ///
-    /// Resumption of an active upload can be handled at a lower level, but if the endpoint returns an
-    /// error that requires a full restart, this is the method that will be called to fetch a new upload form and
-    /// rebuild the endpoint and upload state before trying again.
-    private func uploadAttachment(
-        attachmentId: Attachment.IDType,
+    /// It is assumed any errors that could be retried or otherwise handled will
+    /// have happend at a lower level, so any error encountered here is
+    /// considered unrecoverable and thrown to the caller.
+    ///
+    /// Resumption of an active upload can be handled at a lower level, but if
+    /// the endpoint returns an error that requires a full restart, this is the
+    /// method that will be called to fetch a new upload form and rebuild the
+    /// endpoint and upload state before trying again.
+    private func _uploadAttachmentId(
+        _ attachmentId: Attachment.IDType,
         type: UploadType,
         logger: PrefixedLogger,
-        progress: OWSProgressSink?
+        progressBlock: OWSURLSession.ProgressBlock,
     ) async throws -> (record: AttachmentUploadRecord, result: Upload.AttachmentResult) {
-
-        let activeUploadKey = ActiveUploadKey(attachmentId: attachmentId, uploadType: type)
-        if let activeUpload = activeUploads[activeUploadKey] {
-            // If this fails, it means the internal retry logic has given up, so don't
-            // attempt any retries here
-            do {
-                return try await activeUpload.value
-            } catch {
-                return try await uploadAttachment(
-                    attachmentId: attachmentId,
-                    type: type,
-                    logger: logger,
-                    progress: progress
-                )
-            }
-        }
-
         let attachment = try db.read(block: { tx in
             try fetchAttachment(attachmentId: attachmentId, logger: logger, tx: tx)
         })
-
-        let uploadTask = Task {
-            defer {
-                // Clear out the active upload task once it finishes running.
-                activeUploads[activeUploadKey] = nil
-            }
-
-            // This task will only fail if a non-recoverable error is encountered, or the
-            // max number of retries is exhausted.
-            return try await self.upload(
-                attachment: attachment,
-                type: type,
-                logger: logger,
-                progress: progress
-            )
-        }
-
-        // Add the active task to allow any additional scheduled uploads to reuse the same upload
-        activeUploads[activeUploadKey] = uploadTask
-        return try await uploadTask.value
+        // This task will only fail if a non-recoverable error is encountered, or the
+        // max number of retries is exhausted.
+        return try await self._uploadAttachment(attachment, type: type, logger: logger, progressBlock: progressBlock)
     }
 
-    private func upload(
-        attachment: Attachment,
+    private func _uploadAttachment(
+        _ attachment: Attachment,
         type: UploadType,
         logger: PrefixedLogger,
-        progress: OWSProgressSink?
+        progressBlock: OWSURLSession.ProgressBlock,
     ) async throws -> (AttachmentUploadRecord, Upload.AttachmentResult) {
         let attachmentId = attachment.id
         var updateRecord = false
@@ -734,10 +631,10 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
 
         // Fetch the record if it exists, or create a new one.
         // Note this record isn't persisted in this method, so it will need to be saved later.
-        var attachmentUploadRecord = try self.fetchOrCreateAttachmentRecord(
+        var attachmentUploadRecord = fetchOrCreateAttachmentRecord(
             for: attachmentId,
             sourceType: type.sourceType,
-            db: db
+            db: db,
         )
 
         // Fetch or build the LocalUploadMetadata.
@@ -748,7 +645,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
             attachment: attachment,
             type: type,
             record: attachmentUploadRecord,
-            logger: logger
+            logger: logger,
         ) {
         case .existing(let metadata), .reuse(let metadata):
             // Cached metadata is still good to use
@@ -774,6 +671,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
             attachmentUploadRecord.uploadForm = nil
             attachmentUploadRecord.uploadFormTimestamp = nil
             attachmentUploadRecord.uploadSessionUrl = nil
+
         case .alreadyUploaded(let metadata):
             // No need to upload - Cleanup the upload record and return
             return (
@@ -783,21 +681,21 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                     cdnNumber: metadata.cdnNumber,
                     localUploadMetadata: metadata,
                     beginTimestamp: dateProvider().ows_millisecondsSince1970,
-                    finishTimestamp: dateProvider().ows_millisecondsSince1970
-                )
+                    finishTimestamp: dateProvider().ows_millisecondsSince1970,
+                ),
             )
         }
 
         /// Check for a cached upload form
         /// This can be up to ~7 days old from the point of upload starting. Just to avoid running into any fuzzieness around the 7 day expiration, expire the form after 6 days
-        /// If the upload hasn't started, the form shouldnt' be cached
+        /// If the upload hasn't started, the form shouldn't be cached
         let uploadForm: Upload.Form
         if
             let form = attachmentUploadRecord.uploadForm,
             let formTimestamp = attachmentUploadRecord.uploadFormTimestamp,
             // And we are still in the window to reuse it
             dateProvider().timeIntervalSince(
-                Date(millisecondsSince1970: formTimestamp)
+                Date(millisecondsSince1970: formTimestamp),
             ) <= Upload.Constants.uploadFormReuseWindow
         {
             uploadForm = form
@@ -805,14 +703,15 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
             updateRecord = true
             switch type {
             case .transitTier:
-                uploadForm = try await Upload.FormRequest(
-                    networkManager: self.networkManager
-                ).fetchForm(encryptedByteLength: localMetadata.encryptedDataLength)
+                uploadForm = try await serviceProvider.withAuthService(.attachments) {
+                    try await $0.getUploadForm(uploadSize: UInt64(safeCast: localMetadata.encryptedDataLength)).asUploadForm()
+                }
             case .mediaTier(let auth, _):
                 uploadForm = try await self.backupRequestManager
                     .fetchBackupMediaAttachmentUploadForm(
+                        encryptedByteLength: localMetadata.encryptedDataLength,
                         auth: auth,
-                        logger: logger
+                        logger: logger,
                     )
             }
 
@@ -829,15 +728,15 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                 signalService: self.signalService,
                 fileSystem: self.fileSystem,
                 dateProvider: self.dateProvider,
-                logger: logger
+                logger: logger,
             )
 
             // The upload record has modified the metadata, upload form,
             // or upload session URL, so persist it before beginning the upload.
             if updateRecord || attachmentUploadRecord.uploadSessionUrl == nil {
-                try await db.awaitableWrite { tx in
+                await db.awaitableWrite { tx in
                     attachmentUploadRecord.uploadSessionUrl = attempt.uploadLocation
-                    try self.attachmentUploadStore.upsert(record: attachmentUploadRecord, tx: tx)
+                    attachmentUploadStore.upsert(record: attachmentUploadRecord, tx: tx)
                 }
             }
 
@@ -845,7 +744,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                 attempt: attempt,
                 dateProvider: self.dateProvider,
                 sleepTimer: sleepTimer,
-                progress: progress
+                progressBlock: progressBlock,
             )
 
             // On success, cleanup the temp file.  Temp files are only created for
@@ -877,55 +776,49 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                 throw error
             }
 
-            // If an uploadFailure has percolated up to this layer, it means AttachmentUpload
-            // has failed in it's retries. Usually this means something with the form or
-            // metadata is in error or expired, so clear everything out and try again.
+            // If an uploadFailure has percolated up to this layer, it means
+            // AttachmentUpload has failed in its retries. Usually this means something
+            // with the form or metadata is in error or expired, so clear everything
+            // out and try again.
             if case Upload.Error.uploadFailure = error {
 
-                // Only bump the attempt count if the upload failed.  Don't bump for things
+                // Only bump the attempt count if the upload failed. Don't bump for things
                 // like network issues
                 attachmentUploadRecord.attempt += 1
 
-                // If the error has made it here, something was encountered during upload that requires
-                // a full restart of the upload.
-                // This means at least throwing away the upload form, and just to be sure,
-                // throw away the local metadata as well.
+                // If the error has made it here, something was encountered during upload
+                // that requires a full restart of the upload. This means at least throwing
+                // away the upload form, and just to be sure, throw away the local metadata
+                // as well.
                 attachmentUploadRecord.localMetadata = nil
                 attachmentUploadRecord.uploadForm = nil
                 attachmentUploadRecord.uploadSessionUrl = nil
 
-                try await db.awaitableWrite { tx in
-                    try self.attachmentUploadStore.upsert(record: attachmentUploadRecord, tx: tx)
+                await db.awaitableWrite { tx in
+                    attachmentUploadStore.upsert(record: attachmentUploadRecord, tx: tx)
                 }
-                return try await upload(
-                    attachment: attachment,
-                    type: type,
-                    logger: logger,
-                    progress: progress
-                )
+                return try await _uploadAttachment(attachment, type: type, logger: logger, progressBlock: progressBlock)
             } else if case Upload.Error.missingFile = error {
-                try await db.awaitableWrite { tx in
+                await db.awaitableWrite { tx in
                     if
                         let attachmentRelFilePath = attachment.streamInfo?.localRelativeFilePath,
-                        // If the missing file matches the url of the primary attachment file,
-                        // mark the whole attachment as not having a file anymore.
+                        // If the missing file matches the url of the primary attachment file, mark
+                        // the whole attachment as not having a file anymore.
                         localMetadata.fileUrl == AttachmentStream.absoluteAttachmentFileURL(relativeFilePath: attachmentRelFilePath),
                         let attachment = attachmentStore.fetch(id: attachmentId, tx: tx)
                     {
                         logger.error("Primary attachment file missing!")
-                        let params = Attachment.ConstructionParams.forOffloadingFiles(
+                        attachmentStore.markOffloaded(
                             attachment: attachment,
-                            localRelativeFilePathThumbnail: nil
+                            localRelativeFilePathThumbnail: nil,
+                            tx: tx,
                         )
-                        var newRecord = Attachment.Record(params: params)
-                        newRecord.sqliteId = attachment.id
-                        try newRecord.update(tx.database)
                     }
                     // Delete the upload record; whatever the state was we need to start over next time.
-                    try self.attachmentUploadStore.removeRecord(
+                    attachmentUploadStore.removeRecord(
                         for: attachmentUploadRecord.attachmentId,
                         sourceType: attachmentUploadRecord.sourceType,
-                        tx: tx
+                        tx: tx,
                     )
                 }
                 throw error
@@ -939,8 +832,8 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                     logger.warn("Upload cancelled")
                 } else {
                     attachmentUploadRecord.attempt += 1
-                    try await db.awaitableWrite { tx in
-                        try self.attachmentUploadStore.upsert(record: attachmentUploadRecord, tx: tx)
+                    await db.awaitableWrite { tx in
+                        attachmentUploadStore.upsert(record: attachmentUploadRecord, tx: tx)
                     }
                     if let statusCode = error.httpStatusCode {
                         logger.warn("Unexpected upload error [status: \(statusCode)]")
@@ -958,12 +851,14 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
     private func fetchOrCreateAttachmentRecord(
         for attachmentId: Attachment.IDType,
         sourceType: AttachmentUploadRecord.SourceType,
-        db: any DB
-    ) throws -> AttachmentUploadRecord {
+        db: any DB,
+    ) -> AttachmentUploadRecord {
         var attachmentUploadRecord: AttachmentUploadRecord
-        if let record = try db.read(block: { tx in
-            try self.attachmentUploadStore.fetchAttachmentUploadRecord(for: attachmentId, sourceType: sourceType, tx: tx)
-        }) {
+        if
+            let record = db.read(block: { tx in
+                attachmentUploadStore.fetchAttachmentUploadRecord(for: attachmentId, sourceType: sourceType, tx: tx)
+            })
+        {
             attachmentUploadRecord = record
         } else {
             attachmentUploadRecord = AttachmentUploadRecord(sourceType: sourceType, attachmentId: attachmentId)
@@ -982,22 +877,20 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         attachment: Attachment,
         type: UploadType,
         record: AttachmentUploadRecord,
-        logger: PrefixedLogger
+        logger: PrefixedLogger,
     ) async throws -> MetadataResult {
 
         switch type {
         case .mediaTier(_, isThumbnail: false):
             // We never allow uploads of data we don't have locally.
             guard let stream = attachment.asStream() else {
-                logger.warn("Attachment is not uploadable.")
-                throw OWSUnretryableError()
+                throw OWSGenericError("Attachment is not uploadable.")
             }
 
             let now: Date = dateProvider()
             let messageQueueTime: TimeInterval = remoteConfigProvider.currentConfig().messageQueueTime
 
             if
-                !Upload.disableTransitTierUploadReuse,
                 // We have an existing upload
                 let transitTierInfo = attachment.latestTransitTierInfo,
                 // It uses the same primary key (it isn't a reupload with a rotated key)
@@ -1010,7 +903,7 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                     cdnKey: transitTierInfo.cdnKey,
                     cdnNumber: transitTierInfo.cdnNumber,
                     key: attachment.encryptionKey,
-                    digest: stream.encryptedFileSha256Digest,
+                    digest: stream.ciphertextDigest,
                     plaintextDataLength: stream.unencryptedByteCount,
                     // This is the length from the stream, not the transit tier,
                     // but the length is the same regardless of the key used.
@@ -1019,15 +912,15 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                     // padding length doesn't match the padding length from the sender
                     // on CDN. This only becomes a problem if we ever change padding
                     // values or they drift between clients.
-                    encryptedDataLength: stream.encryptedByteCount
+                    encryptedDataLength: stream.encryptedByteCount,
                 ))
             } else {
                 let metadata = Upload.LocalUploadMetadata(
                     fileUrl: stream.fileURL,
                     key: attachment.encryptionKey,
-                    digest: stream.info.digestSHA256Ciphertext,
-                    encryptedDataLength: stream.info.encryptedByteCount,
-                    plaintextDataLength: stream.info.unencryptedByteCount
+                    digest: stream.ciphertextDigest,
+                    encryptedDataLength: stream.encryptedByteCount,
+                    plaintextDataLength: stream.unencryptedByteCount,
                 )
                 return .reuse(metadata)
             }
@@ -1038,37 +931,39 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                 let stream = attachment.asStream(),
                 let mediaName = attachment.mediaName
             else {
-                logger.warn("Attachment is not uploadable.")
-                throw OWSUnretryableError()
+                throw OWSGenericError("Attachment is not uploadable.")
             }
             let fileUrl = fileSystem.temporaryFileUrl()
 
             guard let mrbk = db.read(block: { accountKeyStore.getMediaRootBackupKey(tx: $0) }) else {
-                logger.warn("Media tier upload missing root key.")
-                throw OWSUnretryableError()
+                throw OWSGenericError("Media tier upload missing root key.")
             }
 
-            let encryptionKey = try mrbk.mediaEncryptionMetadata(
+            let encryptionKey = mrbk.mediaEncryptionMetadata(
                 mediaName: AttachmentBackupThumbnail.thumbnailMediaName(fullsizeMediaName: mediaName),
-                type: .transitTierThumbnail
+                type: .transitTierThumbnail,
             )
-            guard
+
+            let thumbnailData: Data
+            if let data = try AttachmentBackupThumbnail(attachment: attachment)?.decryptedRawData() {
+                thumbnailData = data
+            } else if
                 let thumbnailImage = await attachmentThumbnailService.thumbnailImage(
                     for: stream,
-                    quality: .backupThumbnail
+                    quality: .backupThumbnail,
                 )
-            else {
-                logger.warn("Unable to generate thumbnail; may not be visual media?")
-                throw OWSUnretryableError()
+            {
+                thumbnailData = try attachmentThumbnailService.backupThumbnailData(image: thumbnailImage)
+            } else {
+                throw OWSGenericError("Unable to generate thumbnail; may not be visual media?")
             }
 
-            let thumbnailData = try attachmentThumbnailService.backupThumbnailData(image: thumbnailImage)
             let attachmentKey = try encryptionKey.attachmentKey()
 
             let (encryptedThumbnailData, encryptedThumbnailMetadata) = try Cryptography.encrypt(
                 thumbnailData,
                 attachmentKey: attachmentKey,
-                applyExtraPadding: true
+                applyExtraPadding: true,
             )
 
             // Write the thumbnail to the file.
@@ -1079,15 +974,13 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
                 key: attachmentKey.combinedKey,
                 digest: encryptedThumbnailMetadata.digest,
                 encryptedDataLength: UInt32(encryptedThumbnailData.count),
-                plaintextDataLength: UInt32(thumbnailData.count)
+                plaintextDataLength: UInt32(thumbnailData.count),
             ))
 
         case .transitTier:
             switch attachment.transitUploadStrategy(dateProvider: dateProvider) {
-            case .cannotUpload:
-                logger.warn("Attachment is not uploadable.")
-                // Can't upload non-stream attachments; terminal failure.
-                throw OWSUnretryableError()
+            case .missingLocalFile:
+                throw OWSGenericError("Cannot upload attachment \(attachment.id): missing local file.")
             case .reuseExistingUpload(let metadata):
                 logger.debug("Attachment previously uploaded.")
                 return .alreadyUploaded(metadata)
@@ -1119,32 +1012,24 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
     private func fetchAttachment(
         attachmentId: Attachment.IDType,
         logger: PrefixedLogger,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> Attachment {
         guard let attachment = attachmentStore.fetch(id: attachmentId, tx: tx) else {
-            logger.warn("Missing attachment.")
             // Not finding a local attachment is a terminal failure.
-            throw OWSUnretryableError()
+            throw OWSGenericError("Missing attachment.")
         }
         return attachment
     }
 
     private func cleanup(record: AttachmentUploadRecord, logger: PrefixedLogger, tx: DBWriteTransaction) {
-        do {
-            try self.attachmentUploadStore.removeRecord(for: record.attachmentId, sourceType: record.sourceType, tx: tx)
-        } catch {
-            logger.warn("Failed to clean existing upload record for (\(record.attachmentId))")
-        }
+        attachmentUploadStore.removeRecord(for: record.attachmentId, sourceType: record.sourceType, tx: tx)
     }
 
-    // Update all the necessary places once the upload succeeds
     private func updateTransitTier(
-        attachmentStream: AttachmentStream,
-        with result: Upload.AttachmentResult,
-        logger: PrefixedLogger,
-        tx: DBWriteTransaction
-    ) throws {
-
+        forAttachmentStream attachmentStream: AttachmentStream,
+        uploadResult result: Upload.AttachmentResult,
+        tx: DBWriteTransaction,
+    ) {
         let transitTierInfo = Attachment.TransitTierInfo(
             cdnNumber: result.cdnNumber,
             cdnKey: result.cdnKey,
@@ -1155,52 +1040,50 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
             // we only allow sending using a digest integrity check not a plaintext hash
             // so prefer digest if we have both. If we don't, this attachment we just
             // uploaded to be able to send will fail to send.
-            integrityCheck: .digestSHA256Ciphertext(result.localUploadMetadata.digest),
+            integrityCheck: .ciphertextDigest(result.localUploadMetadata.digest),
             // TODO: [Attachment Streaming] support incremental mac
             incrementalMacInfo: nil,
-            lastDownloadAttemptTimestamp: nil
+            lastDownloadAttemptTimestamp: nil,
         )
 
-        try self.attachmentUploadStore.markUploadedToTransitTier(
+        attachmentStore.saveLatestTransitTierInfo(
             attachmentStream: attachmentStream,
-            info: transitTierInfo,
-            tx: tx
+            transitTierInfo: transitTierInfo,
+            tx: tx,
         )
+    }
 
-        do {
-            try self.attachmentStore.enumerateAllReferences(
-                toAttachmentId: attachmentStream.attachment.id,
-                tx: tx
-            ) { attachmentReference, _ in
-                switch attachmentReference.owner {
-                case .message(let messageSource):
-                    guard
-                        let interaction = self.interactionStore.fetchInteraction(
-                            rowId: messageSource.messageRowId,
-                            tx: tx
-                        )
-                    else {
-                        logger.warn("Missing interaction.")
-                        return
-                    }
-                    self.db.touch(interaction: interaction, shouldReindex: false, tx: tx)
-                case .storyMessage(let storyMessageSource):
-                    guard
-                        let storyMessage = self.storyStore.fetchStoryMessage(
-                            rowId: storyMessageSource.storyMsessageRowId,
-                            tx: tx
-                        )
-                    else {
-                        logger.warn("Missing story message.")
-                        return
-                    }
-                    self.db.touch(storyMessage: storyMessage, tx: tx)
-                case .thread:
-                    break
+    private func touchAllMessageReferences(attachmentId: Attachment.IDType, logger: PrefixedLogger, tx: DBWriteTransaction) {
+        attachmentStore.enumerateAllReferences(
+            toAttachmentId: attachmentId,
+            tx: tx,
+        ) { attachmentReference, _ in
+            switch attachmentReference.owner {
+            case .message(let messageSource):
+                guard
+                    let interaction = self.interactionStore.fetchInteraction(
+                        rowId: messageSource.messageRowId,
+                        tx: tx,
+                    )
+                else {
+                    logger.warn("Missing interaction.")
+                    return
                 }
+                self.db.touch(interaction: interaction, shouldReindex: false, tx: tx)
+            case .storyMessage(let storyMessageSource):
+                guard
+                    let storyMessage = self.storyStore.fetchStoryMessage(
+                        rowId: storyMessageSource.storyMessageRowId,
+                        tx: tx,
+                    )
+                else {
+                    logger.warn("Missing story message.")
+                    return
+                }
+                self.db.touch(storyMessage: storyMessage, tx: tx)
+            case .thread:
+                break
             }
-        } catch {
-            Logger.error("Failed to enumerate references: \(error)")
         }
     }
 
@@ -1210,26 +1093,26 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         mediaName: String,
         uploadEra: String,
         result: Upload.AttachmentResult,
-        logger: PrefixedLogger
+        logger: PrefixedLogger,
     ) async throws -> UInt32 {
-        let mediaEncryptionMetadata = try backupKey.mediaEncryptionMetadata(
+        let mediaEncryptionMetadata = backupKey.mediaEncryptionMetadata(
             mediaName: mediaName,
-            type: .outerLayerFullsizeOrThumbnail
+            type: .outerLayerFullsizeOrThumbnail,
         )
 
         return try await backupRequestManager.copyToMediaTier(
             item: .init(
                 sourceAttachment: .init(
                     cdn: result.cdnNumber,
-                    key: result.cdnKey
+                    key: result.cdnKey,
                 ),
                 objectLength: result.localUploadMetadata.encryptedDataLength,
                 mediaId: mediaEncryptionMetadata.mediaId,
                 hmacKey: mediaEncryptionMetadata.hmacKey,
-                aesKey: mediaEncryptionMetadata.aesKey
+                aesKey: mediaEncryptionMetadata.aesKey,
             ),
             auth: auth,
-            logger: logger
+            logger: logger,
         )
     }
 
@@ -1238,9 +1121,8 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         let tmpDecryptedFile = fileSystem.temporaryFileUrl()
         let decryptionMedatata = DecryptionMetadata(
             key: try AttachmentKey(combinedKey: attachmentStream.attachment.encryptionKey),
-            // No need to validate for an already-validated stream
-            integrityCheck: .sha256ContentHash(attachmentStream.sha256ContentHash),
-            plaintextLength: UInt64(safeCast: attachmentStream.info.unencryptedByteCount),
+            integrityCheck: .plaintextHash(attachmentStream.plaintextHash),
+            plaintextLength: UInt64(safeCast: attachmentStream.unencryptedByteCount),
         )
         try attachmentEncrypter.decryptAttachment(at: attachmentStream.fileURL, metadata: decryptionMedatata, output: tmpDecryptedFile)
 
@@ -1255,14 +1137,29 @@ public actor AttachmentUploadManagerImpl: AttachmentUploadManager {
         return try .validateAndBuild(fileUrl: tmpReencryptedFile, metadata: reencryptedMetadata)
     }
 
-    private nonisolated func updateProgress(id: Attachment.IDType, progress: Double) {
-        NotificationCenter.default.postOnMainThread(
+    // MARK: Progress
+
+    private var _currentProgress = [Attachment.IDType: Float]()
+
+    public func currentProgress(forAttachmentId attachmentId: Attachment.IDType) -> Float? {
+        return self._currentProgress[attachmentId]
+    }
+
+    @MainActor
+    private func clearProgress(attachmentId: Attachment.IDType) {
+        _ = self._currentProgress.removeValue(forKey: attachmentId)
+    }
+
+    @MainActor
+    private func postProgress(attachmentId: Attachment.IDType, progress: Float) {
+        self._currentProgress[attachmentId] = progress
+        NotificationCenter.default.post(
             name: Upload.Constants.attachmentUploadProgressNotification,
             object: nil,
             userInfo: [
                 Upload.Constants.uploadProgressKey: progress,
-                Upload.Constants.uploadAttachmentIDKey: id
-            ]
+                Upload.Constants.uploadAttachmentIDKey: attachmentId,
+            ],
         )
     }
 }
@@ -1275,17 +1172,22 @@ extension Upload.Result where Metadata: AttachmentUploadMetadata {
             cdnNumber: cdnNumber,
             localUploadMetadata: localUploadMetadata,
             beginTimestamp: beginTimestamp,
-            finishTimestamp: finishTimestamp
+            finishTimestamp: finishTimestamp,
         )
     }
 }
 
-extension Upload {
-    public static var disableTransitTierUploadReuse: Bool {
-        get { DebugFlags.internalSettings && UserDefaults.standard.bool(forKey: "disableTransitTierUploadReuse") }
-        set {
-            guard DebugFlags.internalSettings else { return }
-            UserDefaults.standard.set(newValue, forKey: "disableTransitTierUploadReuse")
-        }
+extension Upload.Form {
+    public init(uploadForm: UploadForm) {
+        self.headers = HttpHeaders(httpHeaders: uploadForm.headers, overwriteOnConflict: true)
+        self.signedUploadLocation = uploadForm.signedUploadUrl.absoluteString
+        self.cdnKey = uploadForm.key
+        self.cdnNumber = uploadForm.cdn
+    }
+}
+
+extension UploadForm {
+    func asUploadForm() -> Upload.Form {
+        Upload.Form(uploadForm: self)
     }
 }

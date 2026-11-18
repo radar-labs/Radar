@@ -17,13 +17,13 @@ class CallButton: UIButton {
         return iconName
     }
 
-    var iconColor: UIColor = .ows_white { didSet { updateAppearance() } }
-    var selectedIconColor: UIColor = .ows_black { didSet { updateAppearance() } }
+    var iconColor: UIColor = .white { didSet { updateAppearance() } }
+    var selectedIconColor: UIColor = .black { didSet { updateAppearance() } }
     var currentIconColor: UIColor { isSelected ? selectedIconColor : iconColor }
 
     static let unselectedBackgroundColor = UIColor(rgbHex: 0x4A4A4A).withAlphaComponent(0.63)
     var unselectedBackgroundColor: UIColor = CallButton.unselectedBackgroundColor { didSet { updateAppearance() } }
-    var selectedBackgroundColor: UIColor = .ows_white { didSet { updateAppearance() } }
+    var selectedBackgroundColor: UIColor = .white { didSet { updateAppearance() } }
 
     var currentBackgroundColor: UIColor {
         return isSelected ? selectedBackgroundColor : unselectedBackgroundColor
@@ -106,10 +106,12 @@ class CallButton: UIButton {
         updateAppearance()
         updateSizing()
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(updateOrientationForPhone),
-                                               name: CallService.phoneOrientationDidChange,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(updateOrientationForPhone),
+            name: CallService.phoneOrientationDidChange,
+            object: nil,
+        )
     }
 
     private func updateAppearance() {
@@ -117,7 +119,7 @@ class CallButton: UIButton {
         iconView.setTemplateImageName(currentIconName, tintColor: currentIconColor)
         dropdownIconView?.setTemplateImageName("dropdown-triangle-12", tintColor: currentIconColor)
 
-        if let text = text {
+        if let text {
             label.isHidden = false
             label.text = text
         } else {
@@ -133,10 +135,10 @@ class CallButton: UIButton {
 
         currentConstraints += circleView.autoSetDimensions(to: CGSize(square: currentIconSize))
         circleView.layer.shadowPath = UIBezierPath(
-            ovalIn: CGRect(origin: .zero, size: .square(currentIconSize))
+            ovalIn: CGRect(origin: .zero, size: .square(currentIconSize)),
         ).cgPath
         currentConstraints += iconView.autoPinEdgesToSuperviewEdges(with: currentIconInsets)
-        if let dropdownIconView = dropdownIconView {
+        if let dropdownIconView {
             currentConstraints.append(dropdownIconView.autoPinEdge(.leading, to: .trailing, of: iconView, withOffset: isSmall ? 0 : 2))
         }
     }

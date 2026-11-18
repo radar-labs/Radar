@@ -5,12 +5,11 @@
 
 import SignalServiceKit
 import SignalUI
-import UIKit
 
 enum PhotoGridItemType {
     case photo
     case animated
-    case video(Promise<TimeInterval>)
+    case video(duration: TimeInterval?)
 
     var localizedString: String {
         switch self {
@@ -18,12 +17,11 @@ enum PhotoGridItemType {
             return CommonStrings.attachmentTypePhoto
         case .animated:
             return CommonStrings.attachmentTypeAnimated
-        case .video(let promise):
-            switch promise.result {
-            case .failure, .none:
+        case .video(let duration):
+            if let duration {
+                return "\(CommonStrings.attachmentTypeVideo) \(OWSFormat.localizedDurationString(from: duration))"
+            } else {
                 return "\(CommonStrings.attachmentTypeVideo)"
-            case .success(let value):
-                return "\(CommonStrings.attachmentTypeVideo) \(OWSFormat.localizedDurationString(from: value))"
             }
         }
     }
@@ -33,15 +31,18 @@ enum PhotoGridItemType {
         case .animated:
             return OWSLocalizedString(
                 "ALL_MEDIA_THUMBNAIL_LABEL_GIF",
-                comment: "Label shown over thumbnails of GIFs in the All Media view")
+                comment: "Label shown over thumbnails of GIFs in the All Media view",
+            )
         case .photo:
             return OWSLocalizedString(
                 "ALL_MEDIA_THUMBNAIL_LABEL_IMAGE",
-                comment: "Label shown by thumbnails of images in the All Media view")
+                comment: "Label shown by thumbnails of images in the All Media view",
+            )
         case .video:
             return OWSLocalizedString(
                 "ALL_MEDIA_THUMBNAIL_LABEL_VIDEO",
-                comment: "Label shown by thumbnails of videos in the All Media view")
+                comment: "Label shown by thumbnails of videos in the All Media view",
+            )
         }
     }
 }
@@ -63,18 +64,16 @@ class PhotoGridViewCell: UICollectionViewCell {
 
     static let reuseIdentifier = "PhotoGridViewCell"
 
-    public let imageView: UIImageView
+    let imageView: UIImageView
 
     private var durationLabel: UILabel?
     private var durationLabelBackground: UIView?
-    private let selectionButton = SelectionButton()
+    private let selectionIndicator = SelectionIndicatorView(style: .media)
 
     private let highlightedMaskView: UIView
     private let selectedMaskView: UIView
 
     private(set) var photoGridItem: PhotoGridItem?
-
-    public var loadingColor = Theme.washColor
 
     var allowsMultipleSelection = false {
         didSet {
@@ -82,13 +81,13 @@ class PhotoGridViewCell: UICollectionViewCell {
         }
     }
 
-    public override var isHighlighted: Bool {
+    override var isHighlighted: Bool {
         didSet {
             highlightedMaskView.isHidden = !isHighlighted
         }
     }
 
-    override public var isSelected: Bool {
+    override var isSelected: Bool {
         didSet {
             updateSelectionState()
         }
@@ -100,12 +99,12 @@ class PhotoGridViewCell: UICollectionViewCell {
 
         highlightedMaskView = UIView()
         highlightedMaskView.alpha = 0.2
-        highlightedMaskView.backgroundColor = Theme.darkThemePrimaryColor
+        highlightedMaskView.backgroundColor = .white
         highlightedMaskView.isHidden = true
 
         selectedMaskView = UIView()
         selectedMaskView.alpha = 0.3
-        selectedMaskView.backgroundColor = Theme.darkThemeBackgroundColor
+        selectedMaskView.backgroundColor = .black
         selectedMaskView.isHidden = true
 
         super.init(frame: frame)
@@ -115,32 +114,34 @@ class PhotoGridViewCell: UICollectionViewCell {
         contentView.addSubview(imageView)
         contentView.addSubview(highlightedMaskView)
         contentView.addSubview(selectedMaskView)
-        contentView.addSubview(selectionButton)
+        contentView.addSubview(selectionIndicator)
 
         imageView.autoPinEdgesToSuperviewEdges()
         highlightedMaskView.autoPinEdgesToSuperviewEdges()
         selectedMaskView.autoPinEdgesToSuperviewEdges()
 
-        selectionButton.autoPinEdge(toSuperviewEdge: .trailing, withInset: 5)
-        selectionButton.autoPinEdge(toSuperviewEdge: .top, withInset: 5)
+        selectionIndicator.autoPinEdge(toSuperviewEdge: .trailing, withInset: 5)
+        selectionIndicator.autoPinEdge(toSuperviewEdge: .top, withInset: 5)
     }
 
     @available(*, unavailable, message: "Unimplemented")
-    required public init?(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     private func updateSelectionState() {
         selectedMaskView.isHidden = !isSelected
-        selectionButton.isSelected = isSelected
-        selectionButton.allowsMultipleSelection = allowsMultipleSelection
+        selectionIndicator.isSelected = isSelected
+        selectionIndicator.isHidden = allowsMultipleSelection == false
     }
 
-    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
 
-        if let durationLabel = durationLabel,
-           previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory {
+        if
+            let durationLabel,
+            previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory
+        {
             durationLabel.font = Self.durationLabelFont()
         }
     }
@@ -149,7 +150,7 @@ class PhotoGridViewCell: UICollectionViewCell {
         get { return imageView.image }
         set {
             imageView.image = newValue
-            imageView.backgroundColor = newValue == nil ? loadingColor : .clear
+            imageView.backgroundColor = newValue == nil ? Theme.washColor : .clear
         }
     }
 
@@ -159,33 +160,18 @@ class PhotoGridViewCell: UICollectionViewCell {
     }
 
     private func setMedia(itemType: PhotoGridItemType) {
-        hideVideoDuration()
+        let caption: String
         switch itemType {
-        case .video(let promisedDuration):
-            updateVideoDurationWhenPromiseFulfilled(promisedDuration)
+        case .video(.some(let duration)):
+            caption = OWSFormat.localizedDurationString(from: duration)
         case .animated:
-            setCaption(itemType.formattedType)
-        case .photo:
-            break
+            caption = itemType.formattedType
+        case .video(duration: nil), .photo:
+            durationLabel?.isHidden = true
+            durationLabelBackground?.isHidden = true
+            return
         }
-    }
 
-    private func updateVideoDurationWhenPromiseFulfilled(_ promisedDuration: Promise<TimeInterval>) {
-        let originalItem = photoGridItem
-        promisedDuration.observe { [weak self] result in
-            guard let self, self.photoGridItem === originalItem, case .success(let duration) = result else {
-                return
-            }
-            self.setCaption(OWSFormat.localizedDurationString(from: duration))
-        }
-    }
-
-    private func hideVideoDuration() {
-        durationLabel?.isHidden = true
-        durationLabelBackground?.isHidden = true
-    }
-
-    private func setCaption(_ caption: String) {
         if durationLabel == nil {
             let durationLabel = UILabel()
             durationLabel.textColor = .white
@@ -206,7 +192,7 @@ class PhotoGridViewCell: UICollectionViewCell {
             self.durationLabelBackground = gradientView
         }
 
-        guard let durationLabel = durationLabel, let durationLabelBackground = durationLabelBackground else {
+        guard let durationLabel, let durationLabelBackground else {
             return
         }
 
@@ -235,16 +221,16 @@ class PhotoGridViewCell: UICollectionViewCell {
         if let item {
             self.accessibilityLabel = [
                 item.type.localizedString,
-                MediaTileDateFormatter.formattedDateString(for: item.mediaMetadata?.creationDate)
+                MediaTileDateFormatter.formattedDateString(for: item.mediaMetadata?.creationDate),
             ]
-                .compactMap { $0 }
-                .joined(separator: ", ")
+            .compactMap { $0 }
+            .joined(separator: ", ")
         } else {
             self.accessibilityLabel = ""
         }
     }
 
-    public func makePlaceholder() {
+    func makePlaceholder() {
         photoGridItem = nil
         image = nil
         setMedia(itemType: .photo)
@@ -281,7 +267,7 @@ class PhotoGridViewCell: UICollectionViewCell {
         setUpAccessibility(item: item)
     }
 
-    override public func prepareForReuse() {
+    override func prepareForReuse() {
         super.prepareForReuse()
 
         photoGridItem = nil
@@ -290,7 +276,6 @@ class PhotoGridViewCell: UICollectionViewCell {
         durationLabelBackground?.isHidden = true
         highlightedMaskView.isHidden = true
         selectedMaskView.isHidden = true
-        selectionButton.reset()
     }
 
     func mediaPresentationContext(collectionView: UICollectionView, in coordinateSpace: UICoordinateSpace) -> MediaPresentationContext? {
@@ -299,11 +284,16 @@ class PhotoGridViewCell: UICollectionViewCell {
             return nil
         }
         let presentationFrame = coordinateSpace.convert(imageView.frame, from: mediaSuperview)
-        let clippingAreaInsets = UIEdgeInsets(top: collectionView.adjustedContentInset.top, leading: 0, bottom: 0, trailing: 0)
+        let clippingAreaInsets = UIEdgeInsets(
+            top: collectionView.adjustedContentInset.top,
+            leading: 0,
+            bottom: collectionView.adjustedContentInset.bottom,
+            trailing: 0,
+        )
         return MediaPresentationContext(
             mediaView: imageView,
             presentationFrame: presentationFrame,
-            clippingAreaInsets: clippingAreaInsets
+            clippingAreaInsets: clippingAreaInsets,
         )
     }
 }

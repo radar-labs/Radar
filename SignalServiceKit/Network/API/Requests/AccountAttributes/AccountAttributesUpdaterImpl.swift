@@ -8,271 +8,213 @@ import Foundation
 public class AccountAttributesUpdaterImpl: AccountAttributesUpdater {
     private let accountAttributesGenerator: AccountAttributesGenerator
     private let appReadiness: AppReadiness
-    private let appVersion: AppVersion
+    private let cronStore: CronStore
     private let dateProvider: DateProvider
     private let db: any DB
-    private let kvStore: KeyValueStore
+    private let kvStore: NewKeyValueStore
     private let networkManager: NetworkManager
     private let profileManager: ProfileManager
-    private let svrLocalStorage: SVRLocalStorage
-    private let syncManager: SyncManagerProtocol
+    private let syncManager: SyncManager
     private let tsAccountManager: TSAccountManager
+    private let twoFactorManager: OWS2FAManager
 
-    public init(
+    private enum Constants {
+        // We must refresh our registration recovery password periodically. We
+        // typically do this when updating to a new version, but we want to refresh
+        // it after 14 days if we haven't upgraded.
+        static let periodicRefreshInterval: TimeInterval = 14 * .day
+    }
+
+    init(
         accountAttributesGenerator: AccountAttributesGenerator,
         appReadiness: AppReadiness,
-        appVersion: AppVersion,
+        cron: Cron,
         dateProvider: @escaping DateProvider,
         db: any DB,
         networkManager: NetworkManager,
         profileManager: ProfileManager,
-        svrLocalStorage: SVRLocalStorage,
-        syncManager: SyncManagerProtocol,
-        tsAccountManager: TSAccountManager
+        syncManager: SyncManager,
+        tsAccountManager: TSAccountManager,
+        twoFactorManager: OWS2FAManager,
     ) {
         self.accountAttributesGenerator = accountAttributesGenerator
         self.appReadiness = appReadiness
-        self.appVersion = appVersion
+        self.cronStore = CronStore(uniqueKey: .updateAttributes)
         self.dateProvider = dateProvider
         self.db = db
-        self.kvStore = KeyValueStore(collection: "AccountAttributesUpdater")
+        self.kvStore = NewKeyValueStore(collection: "AccountAttributesUpdater")
         self.networkManager = networkManager
         self.profileManager = profileManager
-        self.svrLocalStorage = svrLocalStorage
         self.syncManager = syncManager
         self.tsAccountManager = tsAccountManager
+        self.twoFactorManager = twoFactorManager
+        self.registerForCron(cron)
+    }
 
-        appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
-            Task {
-                do {
-                    try await self.updateAccountAttributesIfNecessaryAttempt(authedAccount: .implicit())
-                } catch {
-                    Logger.warn("Failed to update account attributes: \(error)")
+    private func registerForCron(_ cron: Cron) {
+        cron.scheduleFrequently(
+            mustBeRegistered: true,
+            mustBeConnected: true,
+            operation: { () throws -> Bool in
+                return try await self.updateAccountAttributesIfNeeded(authedAccount: .implicit)
+            },
+            handleResult: { result in
+                switch result {
+                case .success(false), .failure(is CancellationError):
+                    break
+                case .success(true):
+                    // Handled by updateAccountAttributes.
+                    break
+                case .failure(let error):
+                    Logger.warn("account attributes hit terminal error; stopping for now: \(error)")
+                    await self.db.awaitableWrite(block: self.updateMostRecentDate(tx:))
                 }
-            }
-        }
-
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(reachabilityDidChange),
-            name: .reachabilityChanged,
-            object: nil
+            },
         )
     }
 
-    deinit {
-        NotificationCenter.default.removeObserver(self)
+    private let updateQueue = ConcurrentTaskQueue(concurrentLimit: 1)
+
+    private func updateAccountAttributesIfNeeded(authedAccount: AuthedAccount) async throws -> Bool {
+        return try await updateQueue.runWithThrowingTask {
+            return try await _updateAccountAttributesIfNeeded(authedAccount: authedAccount)
+        }
     }
 
-    @objc
-    private func reachabilityDidChange() {
-        appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
-            Task {
-                do {
-                    try await self.updateAccountAttributesIfNecessaryAttempt(authedAccount: .implicit())
-                } catch {
-                    Logger.warn("Failed to update account attributes: \(error)")
-                }
+    private func _updateAccountAttributesIfNeeded(authedAccount: AuthedAccount) async throws -> Bool {
+        let updateConfig = self.db.read { tx -> UpdateConfig? in
+            guard let updateConfig = self.updateConfig(tx: tx) else {
+                return nil
             }
-        }
-    }
-
-    public func updateAccountAttributes(authedAccount: AuthedAccount) async throws {
-        await db.awaitableWrite { tx in
-            self.kvStore.setData(
-                Randomness.generateRandomBytes(16),
-                key: Keys.latestUpdateRequestToken,
-                transaction: tx,
+            // We update periodically (according to Cron), whenever the capabilities
+            // change (useful during testing or if capabilities are influenced by
+            // RemoteConfig, DB migrations, etc.), and whenever requested explicitly.
+            let shouldUpdate: Bool = (
+                updateConfig.updateRequestToken != nil
+                    || Date() >= self.cronStore.mostRecentDate(tx: tx).addingTimeInterval(Constants.periodicRefreshInterval)
+                    || updateConfig.capabilities != self.oldCapabilities(tx: tx),
             )
+            return shouldUpdate ? updateConfig : nil
         }
-        try await self.updateAccountAttributesIfNecessaryAttempt(authedAccount: authedAccount)
+        guard let updateConfig else {
+            return false
+        }
+        try await self.updateAccountAttributes(updateConfig: updateConfig, authedAccount: authedAccount)
+        return true
     }
 
-    public func scheduleAccountAttributesUpdate(authedAccount: AuthedAccount, tx: DBWriteTransaction) {
-        self.kvStore.setData(
+    private func updateMostRecentDate(tx: DBWriteTransaction) {
+        self.cronStore.setMostRecentDate(Date(), jitter: Constants.periodicRefreshInterval / 20, tx: tx)
+    }
+
+    @discardableResult
+    public func scheduleAccountAttributesUpdate(authedAccount: AuthedAccount, tx: DBWriteTransaction) -> Task<Void, any Error> {
+        self.kvStore.writeValue(
             Randomness.generateRandomBytes(16),
-            key: Keys.latestUpdateRequestToken,
-            transaction: tx,
+            forKey: Keys.latestUpdateRequestToken,
+            tx: tx,
         )
-        tx.addSyncCompletion {
-            Task {
-                do {
-                    try await self.updateAccountAttributesIfNecessaryAttempt(authedAccount: authedAccount)
-                } catch {
-                    Logger.warn("Failed to update account attributes: \(error)")
-                }
-            }
+        let txCompletion = CancellableContinuation<Void>()
+        tx.addSyncCompletion { txCompletion.resume(with: .success(())) }
+        return Task {
+            try await txCompletion.wait()
+            _ = try await self.updateAccountAttributesIfNeeded(authedAccount: authedAccount)
         }
     }
 
-    // Performs a single attempt to update the account attributes.
-    //
-    // We need to update our account attributes in a variety of scenarios:
-    //
-    // * Every time the user upgrades to a new version.
-    // * Whenever the device capabilities change.
-    //   This is useful during development and internal testing when
-    //   moving between builds with different device capabilities.
-    // * Whenever another component of the system requests an attribute,
-    //   update e.g. during registration, after rotating the profile key, etc.
-    //
-    // The client will retry failed attempts:
-    //
-    // * On launch.
-    // * When reachability changes.
-    private func updateAccountAttributesIfNecessaryAttempt(authedAccount: AuthedAccount) async throws {
-        guard appReadiness.isAppReady else {
-            Logger.info("Aborting; app is not ready.")
-            return
+    private struct UpdateConfig {
+        var registrationState: TSRegistrationState
+        var updateRequestToken: Data?
+        var capabilities: AccountAttributes.Capabilities
+    }
+
+    private func updateConfig(tx: DBReadTransaction) -> UpdateConfig? {
+        let registrationState = self.tsAccountManager.registrationState(tx: tx)
+        guard registrationState.isRegistered else {
+            return nil
         }
 
-        let currentAppVersion = appVersion.currentAppVersion
+        // has non-nil value if isRegistered is true.
+        let hasBackedUpMasterKey = self.twoFactorManager.shouldMasterKeyBeBackedUp(tx: tx)
+        let capabilities = AccountAttributes.Capabilities(hasSVRBackups: hasBackedUpMasterKey)
+        let lastAttributeRequestToken = self.kvStore.fetchValue(Data.self, forKey: Keys.latestUpdateRequestToken, tx: tx)
 
-        enum ShouldUpdate {
-            case no
-            case yes(
-                currentDeviceCapabilities: AccountAttributes.Capabilities,
-                lastAttributeRequestToken: Data?,
-                registrationState: TSRegistrationState,
-                aciRegistrationId: UInt32,
-                pniRegistrationId: UInt32
+        return UpdateConfig(
+            registrationState: registrationState,
+            updateRequestToken: lastAttributeRequestToken,
+            capabilities: capabilities,
+        )
+    }
+
+    private func oldCapabilities(tx: DBReadTransaction) -> AccountAttributes.Capabilities? {
+        let encodedCapabilities = self.kvStore.fetchValue(
+            Data.self,
+            forKey: Keys.lastUpdateDeviceCapabilities,
+            tx: tx,
+        )
+        guard let encodedCapabilities else {
+            return nil
+        }
+        do {
+            return try JSONDecoder().decode(AccountAttributes.Capabilities.self, from: encodedCapabilities)
+        } catch {
+            // Expected when upgrading or downgrading... (we want to refresh because
+            // they're definitely different if we can't decode them)
+            return nil
+        }
+    }
+
+    /// Performs a single attempt to update the account attributes.
+    ///
+    /// This method assumes we have a priori knowledge that an update is
+    /// required; callers must check whether or not an update is required.
+    private func updateAccountAttributes(updateConfig: UpdateConfig, authedAccount: AuthedAccount) async throws {
+        let request: TSRequest
+        if updateConfig.registrationState.isPrimaryDevice == true {
+            let attributes = try db.read { tx in
+                return try accountAttributesGenerator
+                    .generateForPrimary(capabilities: updateConfig.capabilities, tx: tx)
+            }
+            request = AccountAttributesRequestFactory(tsAccountManager: tsAccountManager)
+                .updatePrimaryDeviceAttributesRequest(attributes, auth: authedAccount.chatServiceAuth)
+        } else {
+            request = AccountAttributesRequestFactory(tsAccountManager: tsAccountManager)
+                .updateLinkedDeviceCapabilitiesRequest(updateConfig.capabilities, auth: authedAccount.chatServiceAuth)
+        }
+        _ = try await networkManager.asyncRequest(request)
+
+        await db.awaitableWrite { tx in
+            self.updateMostRecentDate(tx: tx)
+            self.kvStore.writeValue(
+                failIfThrows { try JSONEncoder().encode(updateConfig.capabilities) },
+                forKey: Keys.lastUpdateDeviceCapabilities,
+                tx: tx,
             )
-        }
-
-        let shouldUpdate = db.read { tx -> ShouldUpdate in
-            let registrationState = self.tsAccountManager.registrationState(tx: tx)
-            let isRegistered = registrationState.isRegistered
-            let aciRegistrationId = self.tsAccountManager.getRegistrationId(for: .aci, tx: tx)
-            let pniRegistrationId = self.tsAccountManager.getRegistrationId(for: .pni, tx: tx)
-
-            guard
-                isRegistered,
-                let aciRegistrationId,
-                let pniRegistrationId
-            else {
-                return .no
-            }
-
-            // has non-nil value if isRegistered is true.
-            let hasBackedUpMasterKey = self.svrLocalStorage.getIsMasterKeyBackedUp(tx)
-            let currentDeviceCapabilities = AccountAttributes.Capabilities(hasSVRBackups: hasBackedUpMasterKey)
-
-            // Check if there's been a request for an attributes update.
-            let lastAttributeRequestToken = self.kvStore.getData(Keys.latestUpdateRequestToken, transaction: tx)
-            if lastAttributeRequestToken != nil {
-                return .yes(
-                    currentDeviceCapabilities: currentDeviceCapabilities,
-                    lastAttributeRequestToken: lastAttributeRequestToken,
-                    registrationState: registrationState,
-                    aciRegistrationId: aciRegistrationId,
-                    pniRegistrationId: pniRegistrationId
-                )
-            }
-
-            // Check if device capabilities have changed.
-            let lastUpdateDeviceCapabilities = self.kvStore.getDictionary(
-                Keys.lastUpdateDeviceCapabilities,
-                keyClass: NSString.self,
-                objectClass: NSNumber.self,
-                transaction: tx
-            ) as [String: NSNumber]?
-            if lastUpdateDeviceCapabilities != currentDeviceCapabilities.requestParameters {
-                return .yes(
-                    currentDeviceCapabilities: currentDeviceCapabilities,
-                    lastAttributeRequestToken: lastAttributeRequestToken,
-                    registrationState: registrationState,
-                    aciRegistrationId: aciRegistrationId,
-                    pniRegistrationId: pniRegistrationId
-                )
-            }
-            // Check if the app version has changed.
-            let lastUpdateAppVersion = self.kvStore.getString(Keys.lastUpdateAppVersion, transaction: tx)
-            if lastUpdateAppVersion != currentAppVersion {
-                return .yes(
-                    currentDeviceCapabilities: currentDeviceCapabilities,
-                    lastAttributeRequestToken: lastAttributeRequestToken,
-                    registrationState: registrationState,
-                    aciRegistrationId: aciRegistrationId,
-                    pniRegistrationId: pniRegistrationId
-                )
-            }
-            return .no
-        }
-        switch shouldUpdate {
-        case .no:
-            return
-        case let .yes(
-            currentDeviceCapabilities,
-            lastAttributeRequestToken,
-            registrationState,
-            aciRegistrationId,
-            pniRegistrationId
-        ):
-            Logger.info("Updating account attributes.")
-            let reportedDeviceCapabilities: AccountAttributes.Capabilities
-            if registrationState.isPrimaryDevice == true {
-                let attributes = db.read { tx in
-                    accountAttributesGenerator.generateForPrimary(
-                        aciRegistrationId: aciRegistrationId,
-                        pniRegistrationId: pniRegistrationId,
-                        tx: tx
-                    )
-                }
-
-                let request = AccountAttributesRequestFactory(
-                    tsAccountManager: tsAccountManager
-                ).updatePrimaryDeviceAttributesRequest(
-                    attributes,
-                    auth: authedAccount.chatServiceAuth
-                )
-                _ = try await networkManager.asyncRequest(request)
-
-                reportedDeviceCapabilities = attributes.capabilities
-            } else {
-                let request = AccountAttributesRequestFactory(
-                    tsAccountManager: tsAccountManager
-                ).updateLinkedDeviceCapabilitiesRequest(
-                    currentDeviceCapabilities,
-                    auth: authedAccount.chatServiceAuth
-                )
-                _ = try await networkManager.asyncRequest(request)
-
-                reportedDeviceCapabilities = currentDeviceCapabilities
-            }
-
-            // Kick off an async profile fetch (not awaited)
-            Task {
-                do {
-                    _ = try await profileManager.fetchLocalUsersProfile(authedAccount: authedAccount)
-                } catch {
-                    Logger.warn("Failed to fetch local user profile: \(error)")
-                }
-            }
-
-            await db.awaitableWrite { tx in
-                self.kvStore.setString(currentAppVersion, key: Keys.lastUpdateAppVersion, transaction: tx)
-                self.kvStore.setObject(reportedDeviceCapabilities.requestParameters, key: Keys.lastUpdateDeviceCapabilities, transaction: tx)
-                // Clear the update request unless a new update has been requested
-                // while this update was in flight.
-                if
-                    let lastAttributeRequestToken,
-                    lastAttributeRequestToken == self.kvStore.getData(Keys.latestUpdateRequestToken, transaction: tx)
-                {
-                    self.kvStore.removeValue(forKey: Keys.latestUpdateRequestToken, transaction: tx)
-                }
+            // Clear the update request unless a new update has been requested
+            // while this update was in flight.
+            if
+                let updateRequestToken = updateConfig.updateRequestToken,
+                updateRequestToken == self.kvStore.fetchValue(Data.self, forKey: Keys.latestUpdateRequestToken, tx: tx)
+            {
+                self.kvStore.removeValue(forKey: Keys.latestUpdateRequestToken, tx: tx)
             }
 
             // Primary devices should sync their configuration whenever they
             // update their account attributes.
-            if registrationState.isRegisteredPrimaryDevice {
-                self.syncManager.sendConfigurationSyncMessage()
+            if updateConfig.registrationState.isRegisteredPrimaryDevice {
+                self.syncManager.sendConfigurationSyncMessage(tx: tx)
             }
         }
+
+        // Best-effort fetch our own profile, in case we now have new
+        // account-level capabilities (which we discover from our profile) as a
+        // result of our account attributes update (which includes device-level
+        // capabilities).
+        _ = try? await profileManager.fetchLocalUsersProfile(authedAccount: authedAccount)
     }
 
     private enum Keys {
         static let latestUpdateRequestToken = "latestUpdateRequestDate"
         static let lastUpdateDeviceCapabilities = "lastUpdateDeviceCapabilities"
-        static let lastUpdateAppVersion = "lastUpdateAppVersion"
     }
 }

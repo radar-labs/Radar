@@ -3,9 +3,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
-
 #if TESTABLE_BUILD
+
+public import CoreGraphics
+import Foundation
 
 extension AttachmentReference.ConstructionParams {
 
@@ -13,47 +14,77 @@ extension AttachmentReference.ConstructionParams {
         owner: AttachmentReference.Owner,
         sourceFilename: String? = UUID().uuidString,
         sourceUnencryptedByteCount: UInt32? = .random(in: 0...100),
-        sourceMediaSizePixels: CGSize? = CGSize(width: .random(in: 0...100), height: .random(in: 0...100))
+        sourceMediaSizePixels: CGSize? = CGSize(width: .random(in: 0...100), height: .random(in: 0...100)),
     ) -> AttachmentReference.ConstructionParams {
         return AttachmentReference.ConstructionParams(
             owner: owner,
             sourceFilename: sourceFilename,
             sourceUnencryptedByteCount: sourceUnencryptedByteCount,
-            sourceMediaSizePixels: sourceMediaSizePixels
+            sourceMediaSizePixels: sourceMediaSizePixels,
         )
     }
 
     public static func mockMessageBodyAttachmentReference(
+        attachmentRecord: Attachment.Record,
         messageRowId: Int64,
         threadRowId: Int64,
         receivedAtTimestamp: UInt64 = Date().ows_millisecondsSince1970,
-        contentType: Attachment.ContentTypeRaw? = .image,
         caption: String? = nil,
         renderingFlag: AttachmentReference.RenderingFlag = .default,
         isViewOnce: Bool = false,
         isPastEditRevision: Bool = false,
-        orderInOwner: UInt32 = 0,
+        orderInMessage: UInt32 = 0,
         idInOwner: UUID? = nil,
         sourceFilename: String? = UUID().uuidString,
         sourceUnencryptedByteCount: UInt32? = .random(in: 0...100),
-        sourceMediaSizePixels: CGSize? = CGSize(width: .random(in: 0...100), height: .random(in: 0...100))
+        sourceMediaSizePixels: CGSize? = CGSize(width: .random(in: 0...100), height: .random(in: 0...100)),
     ) -> AttachmentReference.ConstructionParams {
         return .mock(
             owner: .message(.bodyAttachment(.init(
                 messageRowId: messageRowId,
                 receivedAtTimestamp: receivedAtTimestamp,
                 threadRowId: threadRowId,
-                contentType: contentType,
+                contentType: attachmentRecord.contentType,
+                mimeType: attachmentRecord.mimeType,
                 isPastEditRevision: isPastEditRevision,
                 caption: caption,
                 renderingFlag: renderingFlag,
-                orderInOwner: orderInOwner,
+                orderInMessage: orderInMessage,
                 idInOwner: idInOwner,
-                isViewOnce: isViewOnce
+                isViewOnce: isViewOnce,
             ))),
             sourceFilename: sourceFilename,
             sourceUnencryptedByteCount: sourceUnencryptedByteCount,
-            sourceMediaSizePixels: sourceMediaSizePixels
+            sourceMediaSizePixels: sourceMediaSizePixels,
+        )
+    }
+
+    public static func mockMessageStickerReference(
+        messageRowId: Int64,
+        threadRowId: Int64,
+        receivedAtTimestamp: UInt64 = Date().ows_millisecondsSince1970,
+        contentType: Attachment.ContentType = .image,
+        isPastEditRevision: Bool = false,
+        stickerPackId: Data = Data(repeating: 0, count: 16),
+        stickerId: UInt32 = 0,
+        sourceFilename: String? = UUID().uuidString,
+        sourceUnencryptedByteCount: UInt32? = .random(in: 0...100),
+        sourceMediaSizePixels: CGSize? = CGSize(width: .random(in: 0...100), height: .random(in: 0...100)),
+    ) -> AttachmentReference.ConstructionParams {
+        return .mock(
+            owner: .message(.sticker(.init(
+                messageRowId: messageRowId,
+                receivedAtTimestamp: receivedAtTimestamp,
+                threadRowId: threadRowId,
+                contentType: contentType,
+                mimeType: MimeType.applicationOctetStream.rawValue,
+                isPastEditRevision: isPastEditRevision,
+                stickerPackId: stickerPackId,
+                stickerId: stickerId,
+            ))),
+            sourceFilename: sourceFilename,
+            sourceUnencryptedByteCount: sourceUnencryptedByteCount,
+            sourceMediaSizePixels: sourceMediaSizePixels,
         )
     }
 }

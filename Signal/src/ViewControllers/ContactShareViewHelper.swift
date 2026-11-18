@@ -4,6 +4,7 @@
 //
 
 import ContactsUI
+import LibSignalClient
 import MessageUI
 import SignalServiceKit
 import SignalUI
@@ -32,6 +33,118 @@ class ContactShareViewHelper: NSObject, CNContactViewControllerDelegate {
         presentThread(performAction: .compose, to: phoneNumbers, from: viewController)
     }
 
+    func sendMessage(toAci aci: Aci, sharedName: OWSContactName) {
+        presentThread(performAction: .compose, toAci: aci, sharedName: sharedName)
+    }
+
+    func addToGroup(
+        aci: Aci,
+        sharedName: OWSContactName,
+        groupThread: TSGroupThread,
+        fromViewController: UIViewController,
+        completion: (() -> Void)? = nil,
+    ) {
+        guard let groupModel = groupThread.groupModel as? TSGroupModelV2 else {
+            owsFailDebug("Can't add members to a non-v2 group.")
+            return
+        }
+
+        let messageFormat = OWSLocalizedString(
+            "CONTACT_SHARE_ADD_TO_GROUP_CONFIRMATION_FORMAT",
+            comment: "Confirmation shown before adding a shared contact to the current group. Embeds {{ %1$@ contact name, %2$@ group name }}.",
+        )
+        OWSActionSheets.showConfirmationAlert(
+            message: String.nonPluralLocalizedStringWithFormat(messageFormat, sharedName.displayName, groupThread.groupNameOrDefault),
+            proceedTitle: OWSLocalizedString(
+                "CONTACT_SHARE_ADD_TO_GROUP_CONFIRMATION_BUTTON",
+                comment: "Button in the confirmation shown before adding a shared contact to the current group that adds the contact.",
+            ),
+            proceedAction: { _ in
+                GroupViewUtils.updateGroupWithActivityIndicator(
+                    fromViewController: fromViewController,
+                    updateBlock: {
+                        await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
+                            self.recordContactShareNameIfNecessary(sharedName, forAci: aci, tx: tx)
+                        }
+                        try await GroupManager.addOrInvite(
+                            secretParams: groupModel.secretParams(),
+                            serviceIds: [aci],
+                        )
+                    },
+                    completion: completion,
+                )
+            },
+            fromViewController: fromViewController,
+        )
+    }
+
+    /// Stores the shared name so the new conversation has something to show
+    /// for an account we may know nothing else about.
+    func recordContactShareNameIfNecessary(_ name: OWSContactName, forAci aci: Aci, tx: DBWriteTransaction) {
+        guard let sharedName = sharedNameToRecord(name, forAci: aci, tx: tx) else {
+            return
+        }
+
+        let recipient = DependenciesBridge.shared.recipientFetcher.fetchOrCreate(serviceId: aci, tx: tx)
+        DependenciesBridge.shared.aciContactShareNameManager.saveName(
+            givenName: sharedName.givenName,
+            familyName: sharedName.familyName,
+            recipient: recipient,
+            allowOverwrite: false,
+            updateStorageService: true,
+            tx: tx,
+        )
+    }
+
+    /// Like ``recordContactShareNameIfNecessary(_:forAci:tx:)``, but only
+    /// opens a write transaction when there's a name to record.
+    func recordContactShareNameIfNecessary(_ name: OWSContactName, forAci aci: Aci) {
+        let databaseStorage = SSKEnvironment.shared.databaseStorageRef
+        let needsName = databaseStorage.read { tx in
+            return sharedNameToRecord(name, forAci: aci, tx: tx) != nil
+        }
+        guard needsName else {
+            return
+        }
+        databaseStorage.write { tx in
+            recordContactShareNameIfNecessary(name, forAci: aci, tx: tx)
+        }
+    }
+
+    /// The name to store for `aci`, or nil if nothing should be stored. Falls
+    /// back to the nickname, then the organization name, when the shared name
+    /// has no given or family name, as ``OWSContactName/displayName`` does.
+    private func sharedNameToRecord(
+        _ name: OWSContactName,
+        forAci aci: Aci,
+        tx: DBReadTransaction,
+    ) -> (givenName: String?, familyName: String?)? {
+        let sharedName: (givenName: String?, familyName: String?)
+        let givenName = name.givenName?.strippedOrNil
+        let familyName = name.familyName?.strippedOrNil
+        if givenName != nil || familyName != nil {
+            sharedName = (givenName, familyName)
+        } else if let fallbackName = name.nickname?.strippedOrNil ?? name.organizationName?.strippedOrNil {
+            sharedName = (fallbackName, nil)
+        } else {
+            return nil
+        }
+
+        let displayName = SSKEnvironment.shared.contactManagerRef.displayName(for: SignalServiceAddress(aci), tx: tx)
+        guard !displayName.hasProfileNameOrBetter else {
+            return nil
+        }
+
+        if
+            let recipient = DependenciesBridge.shared.recipientDatabaseTable.fetchRecipient(serviceId: aci, transaction: tx),
+            DependenciesBridge.shared.aciContactShareNameManager.fetchName(recipient: recipient, tx: tx) != nil
+        {
+            return nil
+        }
+
+        return sharedName
+    }
+
     func audioCall(to phoneNumbers: [String], from viewController: UIViewController) {
         Logger.info("")
 
@@ -44,10 +157,40 @@ class ContactShareViewHelper: NSObject, CNContactViewControllerDelegate {
         presentThread(performAction: .videoCall, to: phoneNumbers, from: viewController)
     }
 
+    func audioCall(toAci aci: Aci, sharedName: OWSContactName) {
+        presentThread(performAction: .voiceCall, toAci: aci, sharedName: sharedName)
+    }
+
+    func videoCall(toAci aci: Aci, sharedName: OWSContactName) {
+        presentThread(performAction: .videoCall, toAci: aci, sharedName: sharedName)
+    }
+
+    func showAddToGroup(aci: Aci, sharedName: OWSContactName, fromViewController: UIViewController) {
+        recordContactShareNameIfNecessary(sharedName, forAci: aci)
+        AddToGroupViewController.presentForUser(SignalServiceAddress(aci), from: fromViewController)
+    }
+
+    private func presentThread(
+        performAction action: ConversationViewAction,
+        toAci aci: Aci,
+        sharedName: OWSContactName,
+    ) {
+        let thread = SSKEnvironment.shared.databaseStorageRef.write { tx in
+            recordContactShareNameIfNecessary(sharedName, forAci: aci, tx: tx)
+            return TSContactThread.getOrCreateThread(withContactAddress: SignalServiceAddress(aci), transaction: tx)
+        }
+
+        SignalApp.shared.presentConversationForThread(
+            threadUniqueId: thread.uniqueId,
+            action: action,
+            animated: true,
+        )
+    }
+
     private func presentThread(
         performAction action: ConversationViewAction,
         to phoneNumbers: [String],
-        from viewController: UIViewController
+        from viewController: UIViewController,
     ) {
         guard phoneNumbers.count > 0 else {
             owsFailDebug("No registered phone numbers.")
@@ -63,7 +206,7 @@ class ContactShareViewHelper: NSObject, CNContactViewControllerDelegate {
             SignalApp.shared.presentConversationForAddress(
                 SignalServiceAddress(phoneNumber: phoneNumber),
                 action: action,
-                animated: true
+                animated: true,
             )
         }
         let actionSheet = ActionSheetController(title: nil, message: nil)
@@ -71,7 +214,7 @@ class ContactShareViewHelper: NSObject, CNContactViewControllerDelegate {
         for phoneNumber in phoneNumbers {
             actionSheet.addAction(ActionSheetAction(
                 title: PhoneNumber.bestEffortLocalizedPhoneNumber(e164: phoneNumber),
-                style: .default
+                style: .default,
             ) { _ in
                 completion(phoneNumber)
             })
@@ -111,17 +254,18 @@ class ContactShareViewHelper: NSObject, CNContactViewControllerDelegate {
         actionSheet.addAction(ActionSheetAction(
             title: OWSLocalizedString(
                 "CONVERSATION_SETTINGS_NEW_CONTACT",
-                comment: "Label for 'new contact' button in conversation settings view."
+                comment: "Label for 'new contact' button in conversation settings view.",
             ),
-            style: .default
+            style: .default,
         ) { _ in
             self.presentCreateNewContactFlow(contactShare: contactShare, from: viewController)
         })
         actionSheet.addAction(ActionSheetAction(
-            title: OWSLocalizedString("CONVERSATION_SETTINGS_ADD_TO_EXISTING_CONTACT",
-                                      comment: "Label for 'new contact' button in conversation settings view."
-                                     ),
-            style: .default
+            title: OWSLocalizedString(
+                "CONVERSATION_SETTINGS_ADD_TO_EXISTING_CONTACT",
+                comment: "Label for 'new contact' button in conversation settings view.",
+            ),
+            style: .default,
         ) { _ in
             self.presentAddToExistingContactFlow(contactShare: contactShare, from: viewController)
         })
@@ -139,11 +283,11 @@ class ContactShareViewHelper: NSObject, CNContactViewControllerDelegate {
                     flow: .init(contactShare: contactShare, operation: .createNew),
                     completion: {
                         self.delegate?.didCreateOrEditContact()
-                    }
+                    },
                 )
                 viewController.present(modalViewController, animated: true)
             },
-            presentErrorFrom: viewController
+            presentErrorFrom: viewController,
         )
     }
 
@@ -156,11 +300,11 @@ class ContactShareViewHelper: NSObject, CNContactViewControllerDelegate {
                     flow: .init(contactShare: contactShare, operation: .addToExisting),
                     completion: {
                         self.delegate?.didCreateOrEditContact()
-                    }
+                    },
                 )
                 viewController.present(modalViewController, animated: true)
             },
-            presentErrorFrom: viewController
+            presentErrorFrom: viewController,
         )
     }
 }
@@ -187,8 +331,9 @@ private class AddContactShareToContactsFlow {
         }
         if let oldContact = existingContact {
             let tsAccountManager = DependenciesBridge.shared.tsAccountManager
-            let phoneNumber = tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.phoneNumber
-            let canonicalPhoneNumber = E164(phoneNumber).map(CanonicalPhoneNumber.init(nonCanonicalPhoneNumber:))
+            let localIdentifiers = tsAccountManager.localIdentifiersWithMaybeSneakyTransaction
+                .owsFailUnwrap("must have been registered to save a contact")
+            let canonicalPhoneNumber = E164(localIdentifiers.phoneNumber).map(CanonicalPhoneNumber.init(nonCanonicalPhoneNumber:))
             return mergeContact(newContact, into: oldContact, localPhoneNumber: canonicalPhoneNumber)
         }
         return newContact
@@ -197,7 +342,7 @@ private class AddContactShareToContactsFlow {
     private func mergeContact(
         _ newCNContact: CNContact,
         into oldCNContact: CNContact,
-        localPhoneNumber: CanonicalPhoneNumber?
+        localPhoneNumber: CanonicalPhoneNumber?,
     ) -> CNContact {
         let oldContact = SystemContact(cnContact: oldCNContact)
         let mergedCNContact = oldCNContact.mutableCopy() as! CNMutableContact
@@ -223,7 +368,7 @@ private class AddContactShareToContactsFlow {
         var existingCanonicalPhoneNumbers = Set(FetchedSystemContacts.parsePhoneNumbers(
             for: oldContact,
             phoneNumberUtil: SSKEnvironment.shared.phoneNumberUtilRef,
-            localPhoneNumber: localPhoneNumber
+            localPhoneNumber: localPhoneNumber,
         ))
         var mergedPhoneNumbers = mergedCNContact.phoneNumbers
         for labeledPhoneNumber in newCNContact.phoneNumbers {
@@ -234,7 +379,7 @@ private class AddContactShareToContactsFlow {
             let canonicalPhoneNumbers = FetchedSystemContacts.parsePhoneNumber(
                 phoneNumber,
                 phoneNumberUtil: SSKEnvironment.shared.phoneNumberUtilRef,
-                localPhoneNumber: localPhoneNumber
+                localPhoneNumber: localPhoneNumber,
             )
             guard existingCanonicalPhoneNumbers.isDisjoint(with: canonicalPhoneNumbers) else {
                 continue

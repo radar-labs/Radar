@@ -14,21 +14,16 @@ public protocol BackupPlanManager {
     ///
     /// - Important
     /// Must only be called on linked devices!
-    ///
-    /// - Important
-    /// Callers should use a `DB` method that rolls-back-if-throws to get the
-    /// `tx` for calling this API, to avoid state being partially set.
     func setBackupPlan(
         fromStorageService backupLevel: LibSignalClient.BackupLevel?,
-        tx: DBWriteTransaction
-    ) throws
+        tx: DBWriteTransaction,
+    )
 
     /// Set the current `BackupPlan`.
     ///
     /// - Important
-    /// Callers should use a `DB` method that rolls-back-if-throws to get the
-    /// `tx` for calling this API, to avoid state being partially set.
-    func setBackupPlan(_ plan: BackupPlan, tx: DBWriteTransaction) throws
+    /// Must only be called on primary devices!
+    func setBackupPlan(_ plan: BackupPlan, tx: DBWriteTransaction)
 }
 
 extension Notification.Name {
@@ -40,6 +35,7 @@ extension Notification.Name {
 class BackupPlanManagerImpl: BackupPlanManager {
 
     private let backupAttachmentDownloadStore: BackupAttachmentDownloadStore
+    private let backupAttachmentDownloadProgress: BackupAttachmentDownloadProgress
     private let backupAttachmentUploadEraStore: BackupAttachmentUploadEraStore
     private let backupAttachmentUploadProgress: BackupAttachmentUploadProgress
     private let backupSettingsStore: BackupSettingsStore
@@ -49,6 +45,7 @@ class BackupPlanManagerImpl: BackupPlanManager {
 
     init(
         backupAttachmentDownloadStore: BackupAttachmentDownloadStore,
+        backupAttachmentDownloadProgress: BackupAttachmentDownloadProgress,
         backupAttachmentUploadEraStore: BackupAttachmentUploadEraStore,
         backupAttachmentUploadProgress: BackupAttachmentUploadProgress,
         backupSettingsStore: BackupSettingsStore,
@@ -56,6 +53,7 @@ class BackupPlanManagerImpl: BackupPlanManager {
         tsAccountManager: TSAccountManager,
     ) {
         self.backupAttachmentDownloadStore = backupAttachmentDownloadStore
+        self.backupAttachmentDownloadProgress = backupAttachmentDownloadProgress
         self.backupAttachmentUploadEraStore = backupAttachmentUploadEraStore
         self.backupAttachmentUploadProgress = backupAttachmentUploadProgress
         self.backupSettingsStore = backupSettingsStore
@@ -72,37 +70,54 @@ class BackupPlanManagerImpl: BackupPlanManager {
 
     // MARK: -
 
-    func setBackupPlan(fromStorageService backupLevel: BackupLevel?, tx: DBWriteTransaction) throws {
-        guard tsAccountManager.registrationState(tx: tx).isPrimaryDevice == false else {
+    func setBackupPlan(fromStorageService backupLevel: BackupLevel?, tx: DBWriteTransaction) {
+        guard
+            let registeredState = try? tsAccountManager.registeredState(tx: tx),
+            !registeredState.isPrimary
+        else {
             owsFailDebug("Attempting to set backupPlan from Storage Service, but not a linked device!")
             return
         }
 
+        let oldBackupPlan = backupPlan(tx: tx)
+
+        let newBackupPlan: BackupPlan
         switch backupLevel {
         case nil:
-            backupSettingsStore.setBackupPlan(.disabled, tx: tx)
-            try configureDownloadsForDisablingBackups(tx: tx)
+            newBackupPlan = .disabled
         case .free:
-            backupSettingsStore.setBackupPlan(.free, tx: tx)
+            newBackupPlan = .free
         case .paid:
             // Linked devices don't support optimizeLocalStorage; default off.
-            backupSettingsStore.setBackupPlan(.paid(optimizeLocalStorage: false), tx: tx)
+            newBackupPlan = .paid(optimizeLocalStorage: false)
+        }
+
+        guard oldBackupPlan != newBackupPlan else {
+            return
+        }
+
+        logger.info("Setting BackupPlan via Storage Service! \(oldBackupPlan) -> \(newBackupPlan)")
+
+        backupSettingsStore.setBackupPlan(newBackupPlan, tx: tx)
+
+        switch backupLevel {
+        case nil:
+            configureDownloadsForDisablingBackups(tx: tx)
+        case .free, .paid:
+            break
         }
     }
 
     // MARK: -
 
-    func setBackupPlan(_ newBackupPlan: BackupPlan, tx: DBWriteTransaction) throws {
+    func setBackupPlan(_ newBackupPlan: BackupPlan, tx: DBWriteTransaction) {
         let oldBackupPlan = backupPlan(tx: tx)
 
-        logger.info("Setting BackupPlan! \(oldBackupPlan) -> \(newBackupPlan)")
+        guard oldBackupPlan != newBackupPlan else {
+            return
+        }
 
-        // Bail early on unexpected state transitions, before we persist state
-        // we later regret.
-        try validateBackupPlanStateTransition(
-            oldBackupPlan: oldBackupPlan,
-            newBackupPlan: newBackupPlan
-        )
+        logger.info("Setting BackupPlan! \(oldBackupPlan) -> \(newBackupPlan)")
 
         backupSettingsStore.setBackupPlan(newBackupPlan, tx: tx)
 
@@ -118,10 +133,10 @@ class BackupPlanManagerImpl: BackupPlanManager {
             tx: tx,
         )
 
-        try configureDownloadsForBackupPlanChange(
+        configureDownloadsForBackupPlanChange(
             oldPlan: oldBackupPlan,
             newPlan: newBackupPlan,
-            tx: tx
+            tx: tx,
         )
 
         switch newBackupPlan {
@@ -138,6 +153,15 @@ class BackupPlanManagerImpl: BackupPlanManager {
         if oldBackupPlan != newBackupPlan {
             tx.addSyncCompletion {
                 NotificationCenter.default.post(name: .backupPlanChanged, object: nil)
+                NotificationCenter.default.postOnMainThread(name: .megaphoneStateDidChange, object: nil)
+
+                Task { @concurrent in
+                    // This is run after the write transaction that updates the backup plan
+                    // completes.  This allows the download progress observer to recalculate
+                    // the new state of pending downloads and allow progress to be displayed,
+                    // even if the queue may not be started yet.
+                    self.backupAttachmentDownloadProgress.beginObserving()
+                }
             }
         }
     }
@@ -170,14 +194,7 @@ class BackupPlanManagerImpl: BackupPlanManager {
         oldPlan: BackupPlan,
         newPlan: BackupPlan,
         tx: DBWriteTransaction,
-    ) throws {
-        // Linked devices don't care about state changes; they keep downloading
-        // whatever got enqueued at link'n'sync time.
-        // (They also don't support storage optimization so that's moot.)
-        guard tsAccountManager.registrationState(tx: tx).isRegisteredPrimaryDevice else {
-            return
-        }
-
+    ) {
         switch (oldPlan, newPlan) {
         case
             (.disabling, .disabling),
@@ -185,38 +202,41 @@ class BackupPlanManagerImpl: BackupPlanManager {
             (.free, .free):
             // No change.
             return
+
         case
             (.disabling, .free),
             (.disabling, .paid),
             (.disabling, .paidExpiringSoon),
             (.disabling, .paidAsTester),
             (.disabled, .disabling):
-            throw OWSAssertionError("Unexpected BackupPlan transition: \(oldPlan) -> \(newPlan)")
+            owsFailDebug("Unexpected BackupPlan transition: \(oldPlan) -> \(newPlan)")
+            return
+
         case (.free, .disabling):
             // While in free tier, we may have been continuing downloads
             // from when you were previously paid tier. But that was nice
             // to have; now that we're disabling backups cancel them all.
-            Logger.info("Configuring downloads for disabling free backups")
-            try backupAttachmentDownloadStore.markAllReadyIneligible(tx: tx)
-            try backupAttachmentDownloadStore.deleteAllDone(tx: tx)
+            backupAttachmentDownloadStore.markAllReadyIneligible(tx: tx)
+            backupAttachmentDownloadStore.deleteAllDone(tx: tx)
+
         case
             let (.paid(optimizeLocalStorage), .disabling),
             let (.paidExpiringSoon(optimizeLocalStorage), .disabling),
             let (.paidAsTester(optimizeLocalStorage), .disabling):
-            Logger.info("Configuring downloads for disabling paid backups")
-            try backupAttachmentDownloadStore.deleteAllDone(tx: tx)
+            backupAttachmentDownloadStore.deleteAllDone(tx: tx)
             // Unsuspend; this is the user opt-in to trigger downloads.
             backupSettingsStore.setIsBackupDownloadQueueSuspended(false, tx: tx)
             if optimizeLocalStorage {
                 // If we had optimize enabled, make anything ineligible (offloaded
                 // attachments) now eligible.
-                try backupAttachmentDownloadStore.markAllIneligibleReady(tx: tx)
+                backupAttachmentDownloadStore.markAllIneligibleReady(tx: tx)
             }
+
         case (_, .disabled):
-            try configureDownloadsForDisablingBackups(tx: tx)
+            configureDownloadsForDisablingBackups(tx: tx)
 
         case (.disabled, .free):
-            try backupAttachmentDownloadStore.markAllIneligibleReady(tx: tx)
+            backupAttachmentDownloadStore.markAllIneligibleReady(tx: tx)
             // Suspend the queue so the user has to explicitly opt-in to download.
             backupSettingsStore.setIsBackupDownloadQueueSuspended(true, tx: tx)
 
@@ -224,14 +244,14 @@ class BackupPlanManagerImpl: BackupPlanManager {
             let (.disabled, .paid(optimizeStorage)),
             let (.disabled, .paidExpiringSoon(optimizeStorage)),
             let (.disabled, .paidAsTester(optimizeStorage)):
-            try backupAttachmentDownloadStore.markAllIneligibleReady(tx: tx)
+            backupAttachmentDownloadStore.markAllIneligibleReady(tx: tx)
             // Suspend the queue so the user has to explicitly opt-in to download.
             backupSettingsStore.setIsBackupDownloadQueueSuspended(true, tx: tx)
             if optimizeStorage {
                 // Unclear how you would go straight from disabled to optimize
                 // enabled, but just go through the motions of both state changes
                 // as if they'd happened independently.
-                try configureDownloadsForDidEnableOptimizeStorage(tx: tx)
+                configureDownloadsForDidEnableOptimizeStorage(tx: tx)
             }
 
         case
@@ -244,7 +264,7 @@ class BackupPlanManagerImpl: BackupPlanManager {
             // also not schedule (or un-suspend) if we weren't already downloading.
             // But if optimization was on, its now implicitly off, so handle that.
             if wasOptimizeLocalStorageEnabled {
-                try configureDownloadsForDidDisableOptimizeStorage(tx: tx)
+                configureDownloadsForDidDisableOptimizeStorage(tx: tx)
             }
 
         case
@@ -258,7 +278,7 @@ class BackupPlanManagerImpl: BackupPlanManager {
             // handle that state transition.
             if optimizeStorage {
                 owsFailDebug("Going from free or disabled directly to optimize enabled shouldn't be allowed?")
-                try configureDownloadsForDidEnableOptimizeStorage(tx: tx)
+                configureDownloadsForDidEnableOptimizeStorage(tx: tx)
             }
 
         case
@@ -276,96 +296,55 @@ class BackupPlanManagerImpl: BackupPlanManager {
                 // Nothing changed.
                 break
             } else if newOptimize {
-                try configureDownloadsForDidEnableOptimizeStorage(tx: tx)
+                configureDownloadsForDidEnableOptimizeStorage(tx: tx)
             } else {
-                try configureDownloadsForDidDisableOptimizeStorage(tx: tx)
+                configureDownloadsForDidDisableOptimizeStorage(tx: tx)
             }
         }
     }
 
-    private func configureDownloadsForDisablingBackups(tx: DBWriteTransaction) throws {
-        Logger.info("Configuring downloads for disabled backups")
+    private func configureDownloadsForDisablingBackups(tx: DBWriteTransaction) {
         // When we disable, we mark everything ineligible and delete all
         // done rows. If we ever re-enable, we will mark those rows
         // ready again.
-        try backupAttachmentDownloadStore.deleteAllDone(tx: tx)
-        try backupAttachmentDownloadStore.markAllReadyIneligible(tx: tx)
+        backupAttachmentDownloadStore.deleteAllDone(tx: tx)
+        backupAttachmentDownloadStore.markAllReadyIneligible(tx: tx)
         // This doesn't _really_ do anything, since we don't run the queue
         // when disabled anyway, but may as well suspend.
         backupSettingsStore.setIsBackupDownloadQueueSuspended(true, tx: tx)
     }
 
-    private func configureDownloadsForDidEnableOptimizeStorage(tx: DBWriteTransaction) throws {
-        Logger.info("Configuring downloads for optimize enabled")
+    private func configureDownloadsForDidEnableOptimizeStorage(tx: DBWriteTransaction) {
         // When we turn on optimization, make all media tier fullsize downloads
         // from the queue that are past the optimization threshold ineligible.
         // If we downloaded them we'd offload them immediately anyway.
         // This isn't 100% necessary; after all something 29 days old today will be
         // 30 days old tomorrow, so the queue runner will gracefully handle old
         // downloads at run-time anyway. But its more efficient to do in bulk.
-        let threshold = dateProvider().ows_millisecondsSince1970 - Attachment.offloadingThresholdMs
-        try backupAttachmentDownloadStore.markAllMediaTierFullsizeDownloadsIneligible(
+        let threshold = dateProvider()
+            .addingTimeInterval(-Attachment.offloadingThreshold)
+            .ows_millisecondsSince1970
+        backupAttachmentDownloadStore.markAllMediaTierFullsizeDownloadsIneligible(
             olderThan: threshold,
-            tx: tx
+            tx: tx,
         )
         // Un-suspend; when optimization is enabled we always auto-download
         // the stuff that is eligible (newer attachments).
         backupSettingsStore.setIsBackupDownloadQueueSuspended(false, tx: tx)
         // Reset the progress counter.
-        try backupAttachmentDownloadStore.deleteAllDone(tx: tx)
+        backupAttachmentDownloadStore.deleteAllDone(tx: tx)
     }
 
-    private func configureDownloadsForDidDisableOptimizeStorage(tx: DBWriteTransaction) throws {
-        Logger.info("Configuring downloads for optimize disabled")
+    private func configureDownloadsForDidDisableOptimizeStorage(tx: DBWriteTransaction) {
         // When we turn _off_ optimization, we want to make ready all the media tier downloads,
         // but suspend the queue so we don't immediately start downloading.
-        try backupAttachmentDownloadStore.markAllIneligibleReady(tx: tx)
+        backupAttachmentDownloadStore.markAllIneligibleReady(tx: tx)
         // Suspend the queue; the user has to explicitly opt in to downloads
         // after optimization is disabled.
         backupSettingsStore.setIsBackupDownloadQueueSuspended(true, tx: tx)
 
         // Reset the download banner so we show it again if the user dismissed.
         backupAttachmentDownloadStore.resetDidDismissDownloadCompleteBanner(tx: tx)
-    }
-
-    // MARK: -
-
-    private func validateBackupPlanStateTransition(
-        oldBackupPlan: BackupPlan,
-        newBackupPlan: BackupPlan,
-    ) throws {
-        var illegalStateTransition: Bool = false
-
-        switch oldBackupPlan {
-        case .disabled:
-            switch newBackupPlan {
-            case .disabled, .free, .paid, .paidExpiringSoon, .paidAsTester:
-                break
-            case .disabling:
-                // We're already disabled; how are we starting disabling again?
-                illegalStateTransition = true
-            }
-        case .disabling:
-            switch newBackupPlan {
-            case .disabled, .disabling:
-                break
-            case .free, .paid, .paidExpiringSoon, .paidAsTester:
-                // Shouldn't be able to "enable" while we're disabling!
-                illegalStateTransition = true
-            }
-        case .free, .paid, .paidExpiringSoon, .paidAsTester:
-            switch newBackupPlan {
-            case .disabling, .free, .paid, .paidExpiringSoon, .paidAsTester:
-                break
-            case .disabled:
-                // Should've moved through .disabling first!
-                illegalStateTransition = true
-            }
-        }
-
-        if illegalStateTransition {
-            throw OWSAssertionError("Unexpected illegal BackupPlan state transition: \(oldBackupPlan) -> \(newBackupPlan).")
-        }
     }
 }
 
@@ -383,7 +362,7 @@ class MockBackupPlanManager: BackupPlanManager {
         owsFail("Not implemented!")
     }
 
-    func setBackupPlan(_ plan: BackupPlan, tx: DBWriteTransaction) throws {
+    func setBackupPlan(_ plan: BackupPlan, tx: DBWriteTransaction) {
         backupPlanMock = plan
     }
 }

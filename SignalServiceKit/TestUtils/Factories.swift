@@ -34,12 +34,13 @@ public import LibSignalClient
 ///     messageFactory.create(count: 100)
 ///
 public protocol Factory {
-    associatedtype ObjectType: TSYapDatabaseObject
+    associatedtype ObjectType
 
     static func write(block: @escaping (DBWriteTransaction) -> Void)
     func write(block: @escaping (DBWriteTransaction) -> Void)
 
     // MARK: Factory Methods
+
     func create() -> ObjectType
     func create(transaction: DBWriteTransaction) -> ObjectType
 
@@ -87,8 +88,10 @@ public class ContactThreadFactory: Factory {
     // MARK: Factory
 
     public func create(transaction: DBWriteTransaction) -> TSContactThread {
-        let thread = TSContactThread.getOrCreateThread(withContactAddress: contactAddressBuilder(),
-                                                       transaction: transaction)
+        let thread = TSContactThread.getOrCreateThread(
+            withContactAddress: contactAddressBuilder(),
+            transaction: transaction,
+        )
 
         let incomingMessageFactory = IncomingMessageFactory()
         incomingMessageFactory.threadCreator = { _ in return thread }
@@ -129,7 +132,6 @@ public class OutgoingMessageFactory: Factory {
             expireTimerVersion: expireTimerVersionBuilder(),
             expireStartedAt: expireStartedAtBuilder(),
             isVoiceMessage: isVoiceMessageBuilder(),
-            groupMetaMessage: groupMetaMessageBuilder(),
             isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackupBuilder(),
             isViewOnceMessage: isViewOnceMessageBuilder(),
             isViewOnceComplete: false,
@@ -145,7 +147,6 @@ public class OutgoingMessageFactory: Factory {
             messageSticker: messageStickerBuilder(),
             giftBadge: giftBadgeBuilder(),
             isPoll: isPollBuilder(),
-            isStarred: false
         ).build(transaction: transaction)
         return message
     }
@@ -159,7 +160,7 @@ public class OutgoingMessageFactory: Factory {
 
     // MARK: Dependent Factories
 
-    public var threadCreator: (DBWriteTransaction) -> TSThread = { transaction in
+    public var threadCreator: (DBWriteTransaction) -> TSContactThread = { transaction in
         ContactThreadFactory().create(transaction: transaction)
     }
 
@@ -176,7 +177,7 @@ public class OutgoingMessageFactory: Factory {
     public lazy var validatedMessageBodyBuilder: (_ tx: DBWriteTransaction) -> ValidatedInlineMessageBody = { tx in
         DependenciesBridge.shared.attachmentContentValidator.truncatedMessageBodyForInlining(
             MessageBody(text: self.messageBodyBuilder(), ranges: self.bodyRangesBuilder()),
-            tx: tx
+            tx: tx,
         )
     }
 
@@ -206,10 +207,6 @@ public class OutgoingMessageFactory: Factory {
 
     public var isVoiceMessageBuilder: () -> Bool = {
         return false
-    }
-
-    public var groupMetaMessageBuilder: () -> TSGroupMetaMessage = {
-        return .unspecified
     }
 
     public var isSmsMessageRestoredFromBackupBuilder: () -> Bool = {
@@ -262,18 +259,21 @@ public class OutgoingMessageFactory: Factory {
 
     // MARK: Delivery Receipts
 
-    public func buildDeliveryReceipt() -> OWSReceiptsForSenderMessage {
-        var item: OWSReceiptsForSenderMessage!
+    func buildDeliveryReceipt() -> ReceiptMessage {
+        var item: ReceiptMessage!
         write { transaction in
             item = self.buildDeliveryReceipt(transaction: transaction)
         }
         return item
     }
 
-    public func buildDeliveryReceipt(transaction: DBWriteTransaction) -> OWSReceiptsForSenderMessage {
-        let item = OWSReceiptsForSenderMessage.deliveryReceiptsForSenderMessage(with: threadCreator(transaction),
-                                                                                receiptSet: receiptSetBuilder(), transaction: transaction)
-        return item
+    func buildDeliveryReceipt(transaction: DBWriteTransaction) -> ReceiptMessage {
+        return ReceiptMessage(
+            thread: threadCreator(transaction),
+            receiptSet: receiptSetBuilder(),
+            receiptType: .delivery,
+            tx: transaction,
+        )
     }
 
     var receiptSetBuilder: () -> MessageReceiptSet = {
@@ -321,7 +321,6 @@ public class IncomingMessageFactory: Factory {
             giftBadge: giftBadgeBuilder(),
             paymentNotification: paymentNotificationBuilder(),
             isPoll: isPollBuilder(),
-            isStarred: false
         )
         let item = builder.build()
         item.anyInsert(transaction: transaction)
@@ -347,7 +346,7 @@ public class IncomingMessageFactory: Factory {
     public lazy var validatedMessageBodyBuilder: (_ tx: DBWriteTransaction) -> ValidatedInlineMessageBody = { tx in
         DependenciesBridge.shared.attachmentContentValidator.truncatedMessageBodyForInlining(
             MessageBody(text: self.messageBodyBuilder(), ranges: self.bodyRangesBuilder()),
-            tx: tx
+            tx: tx,
         )
     }
 
@@ -451,89 +450,29 @@ public class IncomingMessageFactory: Factory {
     }
 }
 
-public class ConversationFactory {
-
-    public init() {}
-
-    @discardableResult
-    public func createSentMessage(
-        bodyAttachmentDataSources: [AttachmentDataSource],
-        transaction: DBWriteTransaction
-    ) -> TSOutgoingMessage {
-        let outgoingFactory = OutgoingMessageFactory()
-        outgoingFactory.threadCreator = threadCreator
-        let message = outgoingFactory.create(transaction: transaction)
-
-        Task {
-            let messageBody = try! await DependenciesBridge.shared.attachmentContentValidator.prepareOversizeTextIfNeeded(
-                MessageBody(text: outgoingFactory.messageBodyBuilder(), ranges: outgoingFactory.bodyRangesBuilder())
-            )
-
-            await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { asyncTransaction in
-                let unpreparedMessage = UnpreparedOutgoingMessage.forMessage(
-                    message,
-                    body: messageBody,
-                    unsavedBodyMediaAttachments: bodyAttachmentDataSources
-                )
-                _ = try! unpreparedMessage.prepare(tx: asyncTransaction)
-
-                for attachment in message.allAttachments(transaction: asyncTransaction) {
-                    guard let stream = attachment.asStream() else {
-                        continue
-                    }
-                    let transitTierInfo = Attachment.TransitTierInfo(
-                        cdnNumber: 3,
-                        cdnKey: "1234",
-                        uploadTimestamp: 1,
-                        encryptionKey: Randomness.generateRandomBytes(16),
-                        unencryptedByteCount: 16,
-                        integrityCheck: .digestSHA256Ciphertext(Randomness.generateRandomBytes(16)),
-                        // TODO: [Attachment Streaming] support incremental mac
-                        incrementalMacInfo: nil,
-                        lastDownloadAttemptTimestamp: nil
-                    )
-                    try! (DependenciesBridge.shared.attachmentStore as? AttachmentUploadStore)?.markUploadedToTransitTier(
-                        attachmentStream: stream,
-                        info: transitTierInfo,
-                        tx: asyncTransaction
-                    )
-                }
-
-                message.updateWithFakeMessageState(.sent, tx: asyncTransaction)
-            }
-        }
-
-        return message
-    }
-
-    public var threadCreator: (DBWriteTransaction) -> TSThread = { transaction in
-        ContactThreadFactory().create(transaction: transaction)
-    }
-}
-
 public class CommonGenerator {
 
-    static public func e164() -> String {
+    public static func e164() -> String {
         // note 4 zeros in the last group to mimic the spacing of a phone number
         return String(format: "+1%010ld", Int.random(in: 0..<1_000_000_0000))
     }
 
-    static public func address() -> SignalServiceAddress {
+    public static func address() -> SignalServiceAddress {
         return address(hasPhoneNumber: true)
     }
 
-    static public func email() -> String {
+    public static func email() -> String {
         return "\(word)@\(word).\(word)"
     }
 
-    static public func address(hasAci: Bool = true, hasPhoneNumber: Bool = true) -> SignalServiceAddress {
+    public static func address(hasAci: Bool = true, hasPhoneNumber: Bool = true) -> SignalServiceAddress {
         return SignalServiceAddress(
             serviceId: hasAci ? Aci.randomForTesting() : nil,
-            phoneNumber: hasPhoneNumber ? e164() : nil
+            phoneNumber: hasPhoneNumber ? e164() : nil,
         )
     }
 
-    static public let firstNames = [
+    public static let firstNames = [
         "Alan",
         "Alex",
         "Alice",
@@ -599,10 +538,10 @@ public class CommonGenerator {
         "Vanna",
         "Victor",
         "Walter",
-        "Wendy"
+        "Wendy",
     ]
 
-    static public var lastNames = [
+    public static var lastNames = [
         "Abbott",
         "Acevedo",
         "Acosta",
@@ -1602,27 +1541,27 @@ public class CommonGenerator {
         "York",
         "Young",
         "Zamora",
-        "Zimmerman"
+        "Zimmerman",
     ]
 
-    static public let nicknames = [
+    public static let nicknames = [
         "AAAA",
-        "BBBB"
+        "BBBB",
     ]
 
-    static public func nickname() -> String {
+    public static func nickname() -> String {
         return nicknames.randomElement()!
     }
 
-    static public func firstName() -> String {
+    public static func firstName() -> String {
         return firstNames.randomElement()!
     }
 
-    static public func lastName() -> String {
+    public static func lastName() -> String {
         return lastNames.randomElement()!
     }
 
-    static public func fullName() -> String {
+    public static func fullName() -> String {
         if Bool.random() {
             // sometimes only a first name is stored as the full name
             return firstName()
@@ -1653,14 +1592,14 @@ public class CommonGenerator {
         "Every society has the criminals it deserves.",
         "Anarchism is founded on the observation that since few men are wise enough to rule themselves, even fewer are wise enough to rule others.",
         "If you would know who controls you see who you may not criticise.",
-        "At one time in the world there were woods that no one owned."
+        "At one time in the world there were woods that no one owned.",
     ]
 
-    static public var word: String {
+    public static var word: String {
         return String(sentence.split(separator: " ").first!)
     }
 
-    static public func words(count: Int) -> String {
+    public static func words(count: Int) -> String {
         var result: [String] = []
 
         while result.count < count {
@@ -1671,19 +1610,19 @@ public class CommonGenerator {
         return result.joined(separator: " ")
     }
 
-    static public var sentence: String {
+    public static var sentence: String {
         return sentences.randomElement()!
     }
 
-    static public func sentences(count: UInt) -> [String] {
+    public static func sentences(count: UInt) -> [String] {
         return (0..<count).map { _ in sentence }
     }
 
-    static public var paragraph: String {
+    public static var paragraph: String {
         paragraph(sentenceCount: UInt.random(in: 2...8))
     }
 
-    static public func paragraph(sentenceCount: UInt) -> String {
+    public static func paragraph(sentenceCount: UInt) -> String {
         return sentences(count: sentenceCount).joined(separator: " ")
     }
 }
@@ -1693,10 +1632,12 @@ public class ImageFactory {
     public init() {}
 
     public func build() -> UIImage {
-        return type(of: self).buildImage(size: sizeBuilder(),
-                                         backgroundColor: backgroundColorBuilder(),
-                                         textColor: textColorBuilder(),
-                                         text: textBuilder())
+        return type(of: self).buildImage(
+            size: sizeBuilder(),
+            backgroundColor: backgroundColorBuilder(),
+            textColor: textColorBuilder(),
+            text: textBuilder(),
+        )
     }
 
     public func buildPNGData() -> Data {
@@ -1708,7 +1649,7 @@ public class ImageFactory {
     }
 
     public func buildJPGData() -> Data {
-        guard let data = build().jpegData(compressionQuality: 0.9) else {
+        guard let data = build().jpegDataSafe(compressionQuality: 0.9) else {
             owsFailDebug("data was unexpectedly nil")
             return Data()
         }
@@ -1722,21 +1663,28 @@ public class ImageFactory {
 
     public class func buildImage(size: CGSize, backgroundColor: UIColor, textColor: UIColor, text: String) -> UIImage {
         return autoreleasepool {
-            let imageSize = CGSize(width: size.width / UIScreen.main.scale,
-                                   height: size.height / UIScreen.main.scale)
+            let displayScale = UITraitCollection.current.displayScale
+            let imageSize = CGSize(
+                width: size.width / displayScale,
+                height: size.height / displayScale,
+            )
 
             let imageFrame = CGRect(origin: .zero, size: imageSize)
             let font = UIFont.boldSystemFont(ofSize: imageSize.width * 0.1)
 
-            let textAttributes: [NSAttributedString.Key: Any] = [.font: font,
-                                                                 .foregroundColor: textColor]
+            let textAttributes: [NSAttributedString.Key: Any] = [
+                .font: font,
+                .foregroundColor: textColor,
+            ]
 
-            let textFrame = text.boundingRect(with: imageFrame.size,
-                                              options: [.usesLineFragmentOrigin, .usesFontLeading],
-                                              attributes: textAttributes,
-                                              context: nil)
+            let textFrame = text.boundingRect(
+                with: imageFrame.size,
+                options: [.usesLineFragmentOrigin, .usesFontLeading],
+                attributes: textAttributes,
+                context: nil,
+            )
 
-            UIGraphicsBeginImageContextWithOptions(imageFrame.size, false, UIScreen.main.scale)
+            UIGraphicsBeginImageContextWithOptions(imageFrame.size, false, displayScale)
             guard let context = UIGraphicsGetCurrentContext() else {
                 owsFailDebug("context was unexpectedly nil")
                 return UIImage()
@@ -1745,9 +1693,13 @@ public class ImageFactory {
             context.setFillColor(backgroundColor.cgColor)
             context.fill(imageFrame)
 
-            text.draw(at: CGPoint(x: imageFrame.midX - textFrame.midX,
-                                  y: imageFrame.midY - textFrame.midY),
-                      withAttributes: textAttributes)
+            text.draw(
+                at: CGPoint(
+                    x: imageFrame.midX - textFrame.midX,
+                    y: imageFrame.midY - textFrame.midY,
+                ),
+                withAttributes: textAttributes,
+            )
 
             guard let image = UIGraphicsGetImageFromCurrentImageContext() else {
                 owsFailDebug("image was unexpectedly nil")

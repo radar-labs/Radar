@@ -82,7 +82,7 @@ public enum ContactDiscoveryMode {
     static let allCasesOrderedByRateLimitPriority: [ContactDiscoveryMode] = [
         .oneOffUserRequest,
         .outgoingMessage,
-        .contactIntersection
+        .contactIntersection,
     ]
 }
 
@@ -95,7 +95,6 @@ public final class ContactDiscoveryManagerImpl: ContactDiscoveryManager {
 
     init(contactDiscoveryTaskQueue: ContactDiscoveryTaskQueue) {
         self.contactDiscoveryTaskQueue = contactDiscoveryTaskQueue
-        SwiftSingletons.register(self)
     }
 
     public convenience init(
@@ -104,9 +103,10 @@ public final class ContactDiscoveryManagerImpl: ContactDiscoveryManager {
         recipientFetcher: RecipientFetcher,
         recipientManager: any SignalRecipientManager,
         recipientMerger: RecipientMerger,
+        remoteAttestationAuthFetcher: RemoteAttestationAuthFetcher,
         tsAccountManager: TSAccountManager,
         udManager: OWSUDManager,
-        libsignalNet: Net
+        libsignalNet: Net,
     ) {
         self.init(
             contactDiscoveryTaskQueue: ContactDiscoveryTaskQueueImpl(
@@ -115,10 +115,11 @@ public final class ContactDiscoveryManagerImpl: ContactDiscoveryManager {
                 recipientFetcher: recipientFetcher,
                 recipientManager: recipientManager,
                 recipientMerger: recipientMerger,
+                remoteAttestationAuthFetcher: remoteAttestationAuthFetcher,
                 tsAccountManager: tsAccountManager,
                 udManager: udManager,
-                libsignalNet: libsignalNet
-            )
+                libsignalNet: libsignalNet,
+            ),
         )
     }
 
@@ -325,7 +326,7 @@ public final class ContactDiscoveryManagerImpl: ContactDiscoveryManager {
 
         func processResults(
             _ signalRecipients: [SignalRecipient],
-            requestedPhoneNumbers: Set<String>
+            requestedPhoneNumbers: Set<String>,
         ) {
             let now = Date()
             let missingPhoneNumbers = requestedPhoneNumbers

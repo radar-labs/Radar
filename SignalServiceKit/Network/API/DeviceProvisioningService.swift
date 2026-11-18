@@ -30,9 +30,9 @@ public protocol DeviceProvisioningService {
 }
 
 public class DeviceProvisioningServiceImpl: DeviceProvisioningService {
-    private let networkManager: NetworkManager
+    private let networkManager: any NetworkManagerProtocol
 
-    public init(networkManager: NetworkManager) {
+    public init(networkManager: any NetworkManagerProtocol) {
         self.networkManager = networkManager
     }
 
@@ -56,7 +56,7 @@ public class DeviceProvisioningServiceImpl: DeviceProvisioningService {
     public func provisionDevice(messageBody: Data, ephemeralDeviceId: String) async throws {
         let request = OWSRequestFactory.provisionDevice(
             withMessageBody: messageBody,
-            ephemeralDeviceId: ephemeralDeviceId
+            ephemeralDeviceId: ephemeralDeviceId,
         )
         do {
             _ = try await networkManager.asyncRequest(request)

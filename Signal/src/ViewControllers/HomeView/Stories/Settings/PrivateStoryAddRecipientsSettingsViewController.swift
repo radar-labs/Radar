@@ -11,7 +11,7 @@ public class PrivateStoryAddRecipientsSettingsViewController: BaseMemberViewCont
     let thread: TSPrivateStoryThread
     var recipientSet: OrderedSet<PickedRecipient> = []
 
-    public override var hasUnsavedChanges: Bool { !recipientSet.orderedMembers.isEmpty }
+    override public var hasUnsavedChanges: Bool { !recipientSet.orderedMembers.isEmpty }
 
     public init(thread: TSPrivateStoryThread) {
         self.thread = thread
@@ -22,7 +22,7 @@ public class PrivateStoryAddRecipientsSettingsViewController: BaseMemberViewCont
 
     // MARK: - View Lifecycle
 
-    public override func viewWillAppear(_ animated: Bool) {
+    override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         updateBarButtons()
     }
@@ -35,7 +35,7 @@ public class PrivateStoryAddRecipientsSettingsViewController: BaseMemberViewCont
 
         title = OWSLocalizedString(
             "PRIVATE_STORY_SETTINGS_ADD_VIEWER_BUTTON",
-            comment: "Button to add a new viewer on the 'private story settings' view"
+            comment: "Button to add a new viewer on the 'private story settings' view",
         )
     }
 
@@ -49,7 +49,7 @@ public class PrivateStoryAddRecipientsSettingsViewController: BaseMemberViewCont
         ModalActivityIndicatorViewController.presentAsInvisible(fromViewController: self) { modal in
             SSKEnvironment.shared.databaseStorageRef.asyncWrite { tx in
                 guard
-                    let storyThread = TSPrivateStoryThread.anyFetchPrivateStoryThread(uniqueId: uniqueId, transaction: tx),
+                    let storyThread = TSPrivateStoryThread.fetchPrivateStoryThreadViaCache(uniqueId: uniqueId, transaction: tx),
                     storyThread.storyViewMode == .explicit
                 else {
                     // Conflict during the update; stop.
@@ -58,9 +58,7 @@ public class PrivateStoryAddRecipientsSettingsViewController: BaseMemberViewCont
                 let recipientFetcher = DependenciesBridge.shared.recipientFetcher
                 let recipientIds = newValues.map { recipientFetcher.fetchOrCreate(serviceId: $0, tx: tx).id }
                 let storyRecipientManager = DependenciesBridge.shared.storyRecipientManager
-                failIfThrows {
-                    try storyRecipientManager.insertRecipientIds(recipientIds, for: storyThread, shouldUpdateStorageService: true, tx: tx)
-                }
+                storyRecipientManager.insertRecipientIds(recipientIds, for: storyThread, shouldUpdateStorageService: true, tx: tx)
             } completion: {
                 self.navigationController?.popViewController(animated: true) { modal.dismiss(animated: false) }
             }
@@ -101,17 +99,10 @@ extension PrivateStoryAddRecipientsSettingsViewController: MemberViewDelegate {
             return false
         }
         let storyRecipientStore = DependenciesBridge.shared.storyRecipientStore
-        do {
-            return try storyRecipientStore.doesStoryThreadId(thread.sqliteRowId!, containRecipientId: recipient.id, tx: transaction)
-        } catch {
-            Logger.warn("Couldn't check if member is already in story thread: \(error)")
-            return false
-        }
+        return storyRecipientStore.doesStoryThreadId(thread.sqliteRowId!, containRecipientId: recipient.id, tx: transaction)
     }
 
-    public func memberViewCustomIconNameForPickedMember(_ recipient: PickedRecipient) -> String? { nil }
-
-    public func memberViewCustomIconColorForPickedMember(_ recipient: PickedRecipient) -> UIColor? { nil }
+    public func memberViewCustomIndicatorForPickedMember(_ recipient: PickedRecipient) -> UIView? { nil }
 
     public func memberViewDismiss() {
         navigationController?.popViewController(animated: true)

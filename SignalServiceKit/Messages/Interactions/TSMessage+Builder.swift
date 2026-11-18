@@ -35,7 +35,6 @@ public class TSMessageBuilder: NSObject {
     public var giftBadge: OWSGiftBadge?
 
     public var isPoll: Bool
-    public var isStarred: Bool
 
     @nonobjc
     init(
@@ -60,7 +59,6 @@ public class TSMessageBuilder: NSObject {
         messageSticker: MessageSticker?,
         giftBadge: OWSGiftBadge?,
         isPoll: Bool,
-        isStarred: Bool
     ) {
         let nowMs = NSDate.ows_millisecondTimeStamp()
 
@@ -87,7 +85,6 @@ public class TSMessageBuilder: NSObject {
         self.messageSticker = messageSticker
         self.giftBadge = giftBadge
         self.isPoll = isPoll
-        self.isStarred = isStarred
     }
 
     /// NOTE: if expiresInSeconds is set, expireTimerVersion should also be set (even if its nil, which is a valid input)
@@ -115,7 +112,6 @@ public class TSMessageBuilder: NSObject {
         messageSticker: MessageSticker? = nil,
         giftBadge: OWSGiftBadge? = nil,
         isPoll: Bool = false,
-        isStarred: Bool = false,
     ) -> TSMessageBuilder {
         return TSMessageBuilder(
             thread: thread,
@@ -139,7 +135,6 @@ public class TSMessageBuilder: NSObject {
             messageSticker: messageSticker,
             giftBadge: giftBadge,
             isPoll: isPoll,
-            isStarred: isStarred
         )
     }
 

@@ -35,7 +35,7 @@ public class ProvisioningManagerTests {
         self.mockReceiptManager = ProvisioningManager.Mocks.ReceiptManager()
         self.mockTsAccountManager = MockTSAccountManager()
 
-        recipientFetcher = RecipientFetcherImpl(
+        recipientFetcher = RecipientFetcher(
             recipientDatabaseTable: recipientDatabaseTable,
             searchableNameIndexer: MockSearchableNameIndexer(),
         )
@@ -44,12 +44,13 @@ public class ProvisioningManagerTests {
     }
 
     @Test
-    func testProvisioningWithMasterKey() async throws {
+    func testProvisioning() async throws {
         let myAciIdentityKeyPair = IdentityKeyPair.generate()
         let myPniIdentityKeyPair = IdentityKeyPair.generate()
-        let myAci = Aci.randomForTesting()
-        let myPhoneNumber = E164("+16505550100")!
-        let myPni = Pni.randomForTesting()
+        let localIdentifiers = LocalIdentifiers.forUnitTests
+        let myAci = localIdentifiers.aci
+        let myPhoneNumber = E164(localIdentifiers.phoneNumber!)!
+        let myPni = localIdentifiers.pni!
         let profileKey = Aes256Key.generateRandom()
         let accountEntropyPool = AccountEntropyPool()
         let mrbk = MediaRootBackupKey(backupKey: .generateRandom())
@@ -70,12 +71,11 @@ public class ProvisioningManagerTests {
             _ = try! SignalRecipient.insertRecord(aci: myAci, phoneNumber: myPhoneNumber, pni: myPni, tx: tx)
         }
 
+        mockTsAccountManager.registrationStateMock = {
+            return .registered(localIdentifiers)
+        }
         mockTsAccountManager.localIdentifiersMock = {
-            return LocalIdentifiers(
-                aci: myAci,
-                pni: myPni,
-                e164: myPhoneNumber
-            )
+            return localIdentifiers
         }
         mockProfileManager.localProfile = OWSUserProfile(address: .localUser, profileKey: profileKey)
         mockReceiptManager.areReadReceiptsEnabledValue = readReceiptsEnabled
@@ -90,45 +90,44 @@ public class ProvisioningManagerTests {
             linkAndSyncManager: mockLinkAndSyncManager,
             profileManager: mockProfileManager,
             receiptManager: mockReceiptManager,
-            tsAccountManager: mockTsAccountManager
+            tsAccountManager: mockTsAccountManager,
         )
 
         // New device: Build the linking URL that is shown in the QR code
         let provisioningUrl = DeviceProvisioningURL(
             type: .linkDevice,
             ephemeralDeviceId: ephemeralDeviceId,
-            publicKey: newDeviceIdentityKeyPair.publicKey
+            publicKey: newDeviceIdentityKeyPair.publicKey,
         )
 
         // Old device: Using the provisioning URL read from the new device, build a provisioning
         // message, encrypt id, and send the envelope back to the new device
         _ = try await provisioningManager.provision(with: provisioningUrl, shouldLinkNSync: false)
         let (messageBody, _) = self.mockDeviceProvisioningService.provisionedDevices.removeFirst()
-        let provisionEnvelope = try ProvisioningProtoProvisionEnvelope(serializedData: messageBody)
+        let provisionEnvelope = try ProvisioningProtos_ProvisionEnvelope(serializedBytes: messageBody)
 
         // New device: take the received provisioning envelope and decrypts the
         // envelope.body using the envelope.publicKey and the new device keypair
         let provisioningCipher = ProvisioningCipher(ourKeyPair: newDeviceIdentityKeyPair)
         let provisionMessageData = try provisioningCipher.decrypt(
             data: provisionEnvelope.body,
-            theirPublicKey: PublicKey(provisionEnvelope.publicKey)
+            theirPublicKey: PublicKey(provisionEnvelope.publicKey),
         )
-        let provisionMessage = try LinkingProvisioningMessage(plaintext: provisionMessageData)
+        let provisionMessage = try LinkingProvisioningMessage(ProvisioningProtos_ProvisionMessage(serializedBytes: provisionMessageData))
 
         // Validate that all the data in the decrypted envelope on the new device side matches the
         // values populated by the old device
-        switch provisionMessage.rootKey {
-        case .accountEntropyPool(let aep):
-            #expect(aep == accountEntropyPool)
-        case .masterKey:
-            Issue.record("Expected AEP, but found MasterKey")
-        }
-
+        #expect(provisionMessage.aep == accountEntropyPool)
         #expect(provisionMessage.aci == myAci)
-        #expect(provisionMessage.phoneNumber == myPhoneNumber.stringValue)
-        #expect(provisionMessage.pni == myPni)
         #expect(provisionMessage.aciIdentityKeyPair.publicKey == myAciIdentityKeyPair.publicKey)
-        #expect(provisionMessage.pniIdentityKeyPair.publicKey == myPniIdentityKeyPair.publicKey)
+        switch provisionMessage.accountType {
+        case .phoneNumberfull(let phoneNumberState):
+            #expect(phoneNumberState.phoneNumber.e164 == myPhoneNumber)
+            #expect(phoneNumberState.phoneNumber.pni == myPni)
+            #expect(phoneNumberState.pniIdentityKeyPair.publicKey == myPniIdentityKeyPair.publicKey)
+        case .phoneNumberless:
+            Issue.record("wrong type of account")
+        }
         #expect(provisionMessage.profileKey == profileKey)
         #expect(provisionMessage.areReadReceiptsEnabled == readReceiptsEnabled)
         #expect(provisionMessage.provisioningCode == provisioningCode)
@@ -164,7 +163,7 @@ private class MockLinkAndSyncManager: LinkAndSyncManager {
     func waitForLinkingAndUploadBackup(
         ephemeralBackupKey: MessageRootBackupKey,
         tokenId: DeviceProvisioningTokenId,
-        progress: OWSSequentialProgressRootSink<PrimaryLinkNSyncProgressPhase>
+        progress: OWSSequentialProgressRootSink<PrimaryLinkNSyncProgressPhase>,
     ) async throws(PrimaryLinkNSyncError) {
         return
     }
@@ -173,8 +172,8 @@ private class MockLinkAndSyncManager: LinkAndSyncManager {
         localIdentifiers: LocalIdentifiers,
         auth: ChatServiceAuth,
         ephemeralBackupKey: MessageRootBackupKey,
-        progress: OWSSequentialProgressRootSink<SecondaryLinkNSyncProgressPhase>
-    ) async throws(SecondaryLinkNSyncError) {
+        progress: OWSSequentialProgressRootSink<SecondaryLinkNSyncProgressPhase>,
+    ) async throws {
         return
     }
 }

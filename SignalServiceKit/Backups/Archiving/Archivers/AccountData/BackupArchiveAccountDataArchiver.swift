@@ -6,60 +6,28 @@
 import LibSignalClient
 
 extension BackupArchive {
-    /// An identifier for the ``BackupProto_AccountData`` backup frame.
-    ///
-    /// Uses a singleton pattern, as there is only ever one account data frame
-    /// in a backup.
-    public struct AccountDataId: BackupArchive.LoggableId {
-        static let localUser = AccountDataId()
-
-        static func forCustomChatColorError(chatColorId: CustomChatColorId) -> Self {
-            return .init(chatColorId)
-        }
-
-        /// Since custom chat colors are included in account data, errors can be nested
-        /// with an account data -> chat color id
-        private let chatColorId: CustomChatColorId?
-
-        private init(_ chatColorId: CustomChatColorId? = nil) {
-            self.chatColorId = chatColorId
-        }
-
-        // MARK: BackupArchive.LoggableId
-
-        public var typeLogString: String {
-            if chatColorId != nil {
-                return "BackupProto_AccountData_CustomChatColor"
-            } else {
-                return "BackupProto_AccountData"
-            }
-        }
-
-        public var idLogString: String {
-            if let chatColorId {
-                return "localUser_\(chatColorId.value)"
-            } else {
-                return "localUser"
-            }
-        }
-    }
-
-    public typealias ArchiveAccountDataResult = ArchiveSingleFrameResult<Void, AccountDataId>
-    public typealias RestoreAccountDataResult = RestoreFrameResult<BackupArchive.AccountDataId>
+    typealias ArchiveAccountDataResult = ArchiveSingleFrameResult<Void>
+    typealias RestoreAccountDataResult = RestoreFrameResult
 }
 
 /// Archives the ``BackupProto_AccountData`` frame.
-public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
+class BackupArchiveAccountDataArchiver {
+    private let adminDeleteManager: AdminDeleteManager
     private let backupAttachmentUploadEraStore: BackupAttachmentUploadEraStore
-    private let backupPlanManager: BackupPlanManager
+    private let backupSettingsStore: BackupSettingsStore
     private let backupSubscriptionManager: BackupSubscriptionManager
+    private let callServiceSettingsStore: CallServiceSettingsStore
     private let chatStyleArchiver: BackupArchiveChatStyleArchiver
     private let disappearingMessageConfigurationStore: DisappearingMessagesConfigurationStore
     private let donationSubscriptionManager: BackupArchive.Shims.DonationSubscriptionManager
     private let imageQuality: BackupArchive.Shims.ImageQuality
+    private let keyTransparencyManager: KeyTransparencyManager
+    private let keyTransparencyStore: KeyTransparencyStore
     private let linkPreviewSettingStore: LinkPreviewSettingStore
     private let localUsernameManager: LocalUsernameManager
+    private let logger: PrefixedLogger
     private let mediaBandwidthPreferenceStore: MediaBandwidthPreferenceStore
+    private let notificationPreferencesManager: NotificationPreferencesManager
     private let ows2FAManager: BackupArchive.Shims.OWS2FAManager
     private let phoneNumberDiscoverabilityManager: PhoneNumberDiscoverabilityManager
     private let preferences: BackupArchive.Shims.Preferences
@@ -70,21 +38,27 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
     private let sskPreferences: BackupArchive.Shims.SSKPreferences
     private let storyManager: BackupArchive.Shims.StoryManager
     private let systemStoryManager: BackupArchive.Shims.SystemStoryManager
+    private let theme: ThemeDataStore
     private let typingIndicators: BackupArchive.Shims.TypingIndicators
     private let udManager: BackupArchive.Shims.UDManager
     private let usernameEducationManager: UsernameEducationManager
 
-    public init(
+    init(
+        adminDeleteManager: AdminDeleteManager,
         backupAttachmentUploadEraStore: BackupAttachmentUploadEraStore,
-        backupPlanManager: BackupPlanManager,
+        backupSettingsStore: BackupSettingsStore,
         backupSubscriptionManager: BackupSubscriptionManager,
+        callServiceSettingsStore: CallServiceSettingsStore,
         chatStyleArchiver: BackupArchiveChatStyleArchiver,
         disappearingMessageConfigurationStore: DisappearingMessagesConfigurationStore,
         donationSubscriptionManager: BackupArchive.Shims.DonationSubscriptionManager,
         imageQuality: BackupArchive.Shims.ImageQuality,
+        keyTransparencyManager: KeyTransparencyManager,
+        keyTransparencyStore: KeyTransparencyStore,
         linkPreviewSettingStore: LinkPreviewSettingStore,
         localUsernameManager: LocalUsernameManager,
         mediaBandwidthPreferenceStore: MediaBandwidthPreferenceStore,
+        notificationPreferencesManager: NotificationPreferencesManager,
         ows2FAManager: BackupArchive.Shims.OWS2FAManager,
         phoneNumberDiscoverabilityManager: PhoneNumberDiscoverabilityManager,
         preferences: BackupArchive.Shims.Preferences,
@@ -95,20 +69,27 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
         sskPreferences: BackupArchive.Shims.SSKPreferences,
         storyManager: BackupArchive.Shims.StoryManager,
         systemStoryManager: BackupArchive.Shims.SystemStoryManager,
+        theme: ThemeDataStore,
         typingIndicators: BackupArchive.Shims.TypingIndicators,
         udManager: BackupArchive.Shims.UDManager,
-        usernameEducationManager: UsernameEducationManager
+        usernameEducationManager: UsernameEducationManager,
     ) {
+        self.adminDeleteManager = adminDeleteManager
         self.backupAttachmentUploadEraStore = backupAttachmentUploadEraStore
-        self.backupPlanManager = backupPlanManager
+        self.backupSettingsStore = backupSettingsStore
         self.backupSubscriptionManager = backupSubscriptionManager
+        self.callServiceSettingsStore = callServiceSettingsStore
         self.chatStyleArchiver = chatStyleArchiver
         self.disappearingMessageConfigurationStore = disappearingMessageConfigurationStore
         self.donationSubscriptionManager = donationSubscriptionManager
         self.imageQuality = imageQuality
+        self.keyTransparencyManager = keyTransparencyManager
+        self.keyTransparencyStore = keyTransparencyStore
         self.linkPreviewSettingStore = linkPreviewSettingStore
         self.localUsernameManager = localUsernameManager
+        self.logger = PrefixedLogger(prefix: "[Backups]")
         self.mediaBandwidthPreferenceStore = mediaBandwidthPreferenceStore
+        self.notificationPreferencesManager = notificationPreferencesManager
         self.ows2FAManager = ows2FAManager
         self.phoneNumberDiscoverabilityManager = phoneNumberDiscoverabilityManager
         self.preferences = preferences
@@ -119,6 +100,7 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
         self.sskPreferences = sskPreferences
         self.storyManager = storyManager
         self.systemStoryManager = systemStoryManager
+        self.theme = theme
         self.typingIndicators = typingIndicators
         self.udManager = udManager
         self.usernameEducationManager = usernameEducationManager
@@ -127,15 +109,15 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
     // MARK: -
 
     func archiveAccountData(
-        stream: BackupArchiveProtoOutputStream,
-        context: BackupArchive.CustomChatColorArchivingContext
+        stream: BackupArchiveOutputStream,
+        context: BackupArchive.CustomChatColorArchivingContext,
     ) -> BackupArchive.ArchiveAccountDataResult {
-        return context.bencher.processFrame { frameBencher in
+        return context.processFrame { frameBencher in
             guard let localProfile = profileManager.getUserProfileForLocalUser(tx: context.tx) else {
-                return .failure(.archiveFrameError(.missingLocalProfile, .localUser))
+                return .failure(.archiveFrameError(.missingLocalProfile))
             }
             guard let profileKeyData = localProfile.profileKey?.keyData else {
-                return .failure(.archiveFrameError(.missingLocalProfileKey, .localUser))
+                return .failure(.archiveFrameError(.missingLocalProfileKey))
             }
 
             var accountData = BackupProto_AccountData()
@@ -186,10 +168,16 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
                 accountData.svrPin = pin
             }
 
-            let error = Self.writeFrameToStream(
-                stream,
-                objectId: BackupArchive.AccountDataId.localUser,
-                frameBencher: frameBencher
+            if let isSystemCallLogEnabled = preferences.isSystemCallLogEnabled(tx: context.tx) {
+                var iosSpecificSettings = BackupProto_AccountData.IOSSpecificSettings()
+                iosSpecificSettings.isSystemCallLogEnabled = isSystemCallLogEnabled
+                accountData.iosSpecificSettings = iosSpecificSettings
+            }
+
+            let error: BackupArchive.ArchiveFrameError? = context.writeFrame(
+                toStream: stream,
+                flush: .afterWrite,
+                frameBencher: frameBencher,
             ) {
                 var frame = BackupProto_Frame()
                 frame.item = .account(accountData)
@@ -205,14 +193,14 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
     }
 
     private func buildUsernameLinkProto(
-        context: BackupArchive.ArchivingContext
+        context: BackupArchive.ArchivingContext,
     ) -> (username: String, usernameLink: BackupProto_AccountData.UsernameLink)? {
         switch self.localUsernameManager.usernameState(tx: context.tx) {
         case .unset, .linkCorrupted, .usernameAndLinkCorrupted:
             return nil
         case .available(let username, let usernameLink):
             var usernameLinkProto = BackupProto_AccountData.UsernameLink()
-            usernameLinkProto.entropy = usernameLink.entropy
+            usernameLinkProto.entropy = usernameLink.entropy.rawValue
             usernameLinkProto.serverID = usernameLink.handle.data
             usernameLinkProto.color = localUsernameManager.usernameLinkQRCodeColor(tx: context.tx).backupProtoColor
 
@@ -221,8 +209,8 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
     }
 
     private func buildAccountSettingsProto(
-        context: BackupArchive.CustomChatColorArchivingContext
-    ) -> BackupArchive.ArchiveSingleFrameResult<BackupProto_AccountData.AccountSettings, BackupArchive.AccountDataId> {
+        context: BackupArchive.CustomChatColorArchivingContext,
+    ) -> BackupArchive.ArchiveSingleFrameResult<BackupProto_AccountData.AccountSettings> {
 
         // Fetch all the account settings
         let readReceipts = receiptManager.areReadReceiptsEnabled(tx: context.tx)
@@ -236,15 +224,15 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
         let preferContactAvatars = sskPreferences.preferContactAvatars(tx: context.tx)
         let universalExpireTimerSeconds = disappearingMessageConfigurationStore.fetchOrBuildDefault(
             for: .universal,
-            tx: context.tx
+            tx: context.tx,
         ).durationSeconds
         let displayBadgesOnProfile = donationSubscriptionManager.displayBadgesOnProfile(tx: context.tx)
         let keepMutedChatsArchived = sskPreferences.shouldKeepMutedChatsArchived(tx: context.tx)
         let hasSetMyStoriesPrivacy = storyManager.hasSetMyStoriesPrivacy(tx: context.tx)
         let hasViewedOnboardingStory = systemStoryManager.isOnboardingStoryViewed(tx: context.tx)
-        let storiesDisabled = storyManager.areStoriesEnabled(tx: context.tx).negated
+        let storiesDisabled = !storyManager.areStoriesEnabled(tx: context.tx)
         let hasSeenGroupStoryEducationSheet = systemStoryManager.hasSeenGroupStoryEducationSheet(tx: context.tx)
-        let hasCompletedUsernameOnboarding = usernameEducationManager.shouldShowUsernameEducation(tx: context.tx).negated
+        let hasCompletedUsernameOnboarding = !usernameEducationManager.shouldShowUsernameEducation(tx: context.tx)
         let phoneNumberSharingMode: BackupProto_AccountData.PhoneNumberSharingMode = switch udManager.phoneNumberSharingMode(tx: context.tx).orDefault {
         case .everybody: .everybody
         case .nobody: .nobody
@@ -271,7 +259,7 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
         accountSettings.preferredReactionEmoji = reactionManager.customEmojiSet(tx: context.tx) ?? []
         accountSettings.storyViewReceiptsEnabled = storyManager.areViewReceiptsEnabled(tx: context.tx)
         accountSettings.pinReminders = hasPinReminders
-        switch backupPlanManager.backupPlan(tx: context.tx) {
+        switch backupSettingsStore.backupPlan(tx: context.tx) {
         case .disabling, .disabled:
             accountSettings.clearBackupTier()
             accountSettings.optimizeOnDeviceStorage = false
@@ -284,7 +272,7 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
         }
 
         let customChatColorsResult = chatStyleArchiver.archiveCustomChatColors(
-            context: context
+            context: context,
         )
         switch customChatColorsResult {
         case .success(let customChatColors):
@@ -296,7 +284,7 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
         // This has to happen _after_ we archive custom chat colors, because
         // the default chat style might use a custom chat color.
         let defaultChatStyleResult = chatStyleArchiver.archiveDefaultChatStyle(
-            context: context
+            context: context,
         )
         switch defaultChatStyleResult {
         case .success(let chatStyleProto):
@@ -308,40 +296,11 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
         }
 
         accountSettings.allowSealedSenderFromAnyone = udManager.shouldAllowUnrestrictedAccessLocal(tx: context.tx)
-        accountSettings.defaultSentMediaQuality = (imageQuality.resolvedQuality(tx: context.tx) == .high ? .high : .standard)
-
-        // App theme. `Theme` lives in SignalUI, which SignalServiceKit can't
-        // depend on, so read the persisted value directly from its store.
-        // Theme.Mode is { system = 0, light = 1, dark = 2 }; unset means system.
-        let themeStore = KeyValueStore(collection: "ThemeCollection")
-        accountSettings.appTheme = switch themeStore.getUInt("ThemeKeyCurrentMode", transaction: context.tx) {
-        case 1: .light
-        case 2: .dark
-        default: .system
-        }
-
-        // Calls-use-less-data. `CallService` lives in the Signal target, so read
-        // its persisted high-data interface set directly. Unset means
-        // wifiAndCellular (i.e. never use less data).
-        let callServiceStore = KeyValueStore(collection: "CallService")
-        let highDataInterfaces = callServiceStore.getUInt("HighBandwidthPreferenceKey", transaction: context.tx)
-            .map(NetworkInterfaceSet.init(rawValue:)) ?? .wifiAndCellular
-        accountSettings.callsUseLessDataSetting = if highDataInterfaces == .wifiAndCellular {
-            .wifiAndMobileData
-        } else if highDataInterfaces == .cellular {
-            .mobileDataOnly
-        } else {
-            .never
-        }
-
-        // Key transparency isn't supported in this fork. Blind-preserve whatever
-        // value a previous backup carried so that re-exporting stays lossless.
-        let preservedSettingsStore = KeyValueStore(collection: "BackupPreservedAccountSettings")
-        accountSettings.allowAutomaticKeyVerification = preservedSettingsStore.getBool(
-            "allowAutomaticKeyVerification",
-            defaultValue: false,
-            transaction: context.tx
+        accountSettings.allowAutomaticKeyVerification = keyTransparencyManager.isEnabled(tx: context.tx)
+        accountSettings.hasSeenAdminDeleteEducationDialog_p = adminDeleteManager.adminDeleteEducationReadStatus(
+            tx: context.tx,
         )
+        accountSettings.defaultSentMediaQuality = imageQuality.fetchValue(tx: context.tx) == .high ? .high : .standard
 
         var downloadSettings = BackupProto_AccountData.AutoDownloadSettings()
         for type in MediaBandwidthPreferences.MediaType.allCases {
@@ -364,6 +323,48 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
             accountSettings.screenLockTimeoutMinutes = UInt32(screenLockSeconds / Double(60))
         }
 
+        accountSettings.appTheme = switch theme.getCurrentMode(tx: context.tx) {
+        case .dark: .dark
+        case .light: .light
+        case .system: .system
+        }
+
+        let callServiceDataSetting = callServiceSettingsStore.highDataNetworkInterfaces(tx: context.tx)
+        accountSettings.callsUseLessDataSetting = if callServiceDataSetting == .wifiAndCellular {
+            .wifiAndMobileData
+        } else if callServiceDataSetting == .cellular {
+            .mobileDataOnly
+        } else {
+            .never
+        }
+
+        // Notifications
+        accountSettings.unreadBadgeType = switch notificationPreferencesManager.badgeCountType(tx: context.tx) {
+        case .unreadMessages: .unreadMessages
+        case .unreadChats: .unreadChats
+        }
+        if let includeMutedChatsInBadge = notificationPreferencesManager.storedIncludeMutedThreadsInBadgeCount(tx: context.tx) {
+            accountSettings.includeMutedChatsInBadge = includeMutedChatsInBadge
+        }
+        if let reactionNotifications = notificationPreferencesManager.storedAreReactionNotificationsEnabled(tx: context.tx) {
+            accountSettings.reactionNotifications = reactionNotifications
+        }
+        if let notifyForCallsIfMuted = notificationPreferencesManager.storedGlobalNotifyForCallsWhenMuted(tx: context.tx) {
+            accountSettings.notifyForCallsIfMuted = notifyForCallsIfMuted
+        }
+        if let notifyForMentionsIfMuted = notificationPreferencesManager.storedGlobalNotifyForMentionsWhenMuted(tx: context.tx) {
+            accountSettings.notifyForMentionsIfMuted = notifyForMentionsIfMuted
+        }
+        if let notifyForRepliesIfMuted = notificationPreferencesManager.storedGlobalNotifyForRepliesWhenMuted(tx: context.tx) {
+            accountSettings.notifyForRepliesIfMuted = notifyForRepliesIfMuted
+        }
+        if let showUnreadReminders = notificationPreferencesManager.storedGlobalShowUnreadReminders(tx: context.tx) {
+            accountSettings.showUnreadReminders = showUnreadReminders
+        }
+        if let notifyWhenContactJoins = notificationPreferencesManager.storedShouldNotifyOfNewAccounts(tx: context.tx) {
+            accountSettings.notifyWhenContactJoins = notifyWhenContactJoins
+        }
+
         return .success(accountSettings)
     }
 
@@ -373,16 +374,13 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
         _ accountData: BackupProto_AccountData,
         context: BackupArchive.AccountDataRestoringContext,
         chatColorsContext: BackupArchive.CustomChatColorRestoringContext,
-        chatItemContext: BackupArchive.ChatItemRestoringContext
+        chatItemContext: BackupArchive.ChatItemRestoringContext,
     ) -> BackupArchive.RestoreAccountDataResult {
         guard let profileKey = Aes256Key(data: accountData.profileKey) else {
-            return .failure([.restoreFrameError(
-                .invalidProtoData(.invalidLocalProfileKey),
-                .localUser
-            )])
+            return .failure([.restoreFrameError(.invalidProtoData(.invalidLocalProfileKey))])
         }
 
-        var partialErrors = [BackupArchive.RestoreFrameError<BackupArchive.AccountDataId>]()
+        var partialErrors = [BackupArchive.RestoreFrameError]()
 
         // Given name and profile key are required for the local profile. The
         // rest are optional.
@@ -393,7 +391,7 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
             bio: accountData.bioText.nilIfEmpty,
             bioEmoji: accountData.bioEmoji.nilIfEmpty,
             profileKey: profileKey,
-            tx: context.tx
+            tx: context.tx,
         )
 
         // Restore donation subscription data, if present.
@@ -412,17 +410,17 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
             typealias IAPSubscriptionID = BackupSubscriptionManager.IAPSubscriberData.IAPSubscriptionId
             let iapSubscriptionID: IAPSubscriptionID = switch protoIapSubscriberID {
             case .purchaseToken(let value):
-                    .purchaseToken(value)
+                .purchaseToken(value)
             case .originalTransactionID(let value):
-                    .originalTransactionId(value)
+                .originalTransactionId(value)
             }
 
             backupSubscriptionManager.restoreIAPSubscriberData(
                 BackupSubscriptionManager.IAPSubscriberData(
                     subscriberId: subscriberID,
-                    iapSubscriptionId: iapSubscriptionID
+                    iapSubscriptionId: iapSubscriptionID,
                 ),
-                tx: context.tx
+                tx: context.tx,
             )
         }
 
@@ -430,13 +428,10 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
         if accountData.accountSettings.hasBackupTier {
             guard
                 let parsedLevel =
-                    UInt8(exactly: accountData.accountSettings.backupTier)
+                UInt8(exactly: accountData.accountSettings.backupTier)
                     .map(BackupLevel.init(rawValue:))
             else {
-                return .failure([.restoreFrameError(
-                    .invalidProtoData(.invalidBackupTier),
-                    .localUser
-                )])
+                return .failure([.restoreFrameError(.invalidProtoData(.invalidBackupTier))])
             }
             backupLevel = parsedLevel
         } else {
@@ -450,7 +445,8 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
         case .paid:
             uploadEra = backupAttachmentUploadEraStore.currentUploadEra(tx: context.tx)
 
-            let optimizeLocalStorage = accountData.accountSettings.optimizeOnDeviceStorage
+            // Only enable optimizeLocalStorage for restores to a primary.
+            let optimizeLocalStorage = context.isPrimaryDevice && accountData.accountSettings.optimizeOnDeviceStorage
             if BuildFlags.Backups.avoidStoreKitForTesters {
                 // If we're importing into a build that can't make purchases,
                 // opt ourselves into "paid as tester" mode. We'll manage IAP
@@ -476,14 +472,8 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
             uploadEra = backupAttachmentUploadEraStore.currentUploadEra(tx: context.tx)
             backupPlan = .disabled
         }
-        do {
-            try backupPlanManager.setBackupPlan(backupPlan, tx: context.tx)
-        } catch {
-            return .failure([.restoreFrameError(
-                .failedToSetBackupPlan(error),
-                .localUser,
-            )])
-        }
+        logger.info("Setting BackupPlan during restore: \(backupPlan)")
+        backupSettingsStore.setBackupPlan(backupPlan, tx: context.tx)
 
         // These MUST get set before we restore custom chat colors/wallpapers.
         context.uploadEra = uploadEra
@@ -497,19 +487,19 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
             typingIndicators.setTypingIndicatorsEnabled(value: settings.typingIndicators, tx: context.tx)
             linkPreviewSettingStore.setAreLinkPreviewsEnabled(settings.linkPreviews, tx: context.tx)
             phoneNumberDiscoverabilityManager.setPhoneNumberDiscoverability(
-                settings.notDiscoverableByPhoneNumber ? .nobody : .everybody,
+                (!settings.notDiscoverableByPhoneNumber && context.localIdentifiers.hasPhoneNumber) ? .everybody : .nobody,
                 updateAccountAttributes: false, // This should be updated later, similar to storage service
                 updateStorageService: false,
-                authedAccount: .implicit(),
-                tx: context.tx
+                authedAccount: .implicit,
+                tx: context.tx,
             )
             sskPreferences.setPreferContactAvatars(value: settings.preferContactAvatars, tx: context.tx)
             disappearingMessageConfigurationStore.setUniversalTimer(
                 token: DisappearingMessageToken(
                     isEnabled: settings.universalExpireTimerSeconds > 0,
-                    durationSeconds: settings.universalExpireTimerSeconds
+                    durationSeconds: settings.universalExpireTimerSeconds,
                 ),
-                tx: context.tx
+                tx: context.tx,
             )
             if settings.preferredReactionEmoji.count > 0 {
                 reactionManager.setCustomEmojiSet(emojis: settings.preferredReactionEmoji, tx: context.tx)
@@ -518,12 +508,12 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
             sskPreferences.setShouldKeepMutedChatsArchived(value: settings.keepMutedChatsArchived, tx: context.tx)
             storyManager.setHasSetMyStoriesPrivacy(value: settings.hasSetMyStoriesPrivacy_p, tx: context.tx)
             systemStoryManager.setHasViewedOnboardingStory(value: settings.hasViewedOnboardingStory_p, tx: context.tx)
-            storyManager.setAreStoriesEnabled(value: settings.storiesDisabled.negated, tx: context.tx)
+            storyManager.setAreStoriesEnabled(value: !settings.storiesDisabled, tx: context.tx)
             if settings.hasStoryViewReceiptsEnabled {
                 storyManager.setAreViewReceiptsEnabled(value: settings.storyViewReceiptsEnabled, tx: context.tx)
             }
             systemStoryManager.setHasSeenGroupStoryEducationSheet(value: settings.hasSeenGroupStoryEducationSheet_p, tx: context.tx)
-            usernameEducationManager.setShouldShowUsernameEducation(settings.hasCompletedUsernameOnboarding_p.negated, tx: context.tx)
+            usernameEducationManager.setShouldShowUsernameEducation(!settings.hasCompletedUsernameOnboarding_p, tx: context.tx)
             udManager.setPhoneNumberSharingMode(
                 mode: { () -> PhoneNumberSharingMode in
                     switch settings.phoneNumberSharingMode {
@@ -535,12 +525,12 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
                         return .nobody
                     }
                 }(),
-                tx: context.tx
+                tx: context.tx,
             )
 
             let customChatColorsResult = chatStyleArchiver.restoreCustomChatColors(
                 settings.customChatColors,
-                context: chatColorsContext
+                context: chatColorsContext,
             )
             switch customChatColorsResult {
             case .success:
@@ -564,7 +554,7 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
             }
             let defaultChatStyleResult = chatStyleArchiver.restoreDefaultChatStyle(
                 defaultChatStyleToRestore,
-                context: chatColorsContext
+                context: chatColorsContext,
             )
             switch defaultChatStyleResult {
             case .success:
@@ -579,40 +569,24 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
 
             udManager.setShouldAllowUnrestrictedAccessLocal(settings.allowSealedSenderFromAnyone, tx: context.tx)
 
-            // App theme: write to the same store SignalUI's `Theme` reads from.
-            // Theme.Mode is { system = 0, light = 1, dark = 2 }.
-            let themeStore = KeyValueStore(collection: "ThemeCollection")
-            let themeRawMode: UInt = switch settings.appTheme {
-            case .light: 1
-            case .dark: 2
-            case .system, .unknownAppTheme, .UNRECOGNIZED: 0
-            }
-            themeStore.setUInt(themeRawMode, key: "ThemeKeyCurrentMode", transaction: context.tx)
-
-            // Calls-use-less-data: write to `CallService`'s store as the
-            // high-data interface set (the inverse framing of the proto field).
-            let callServiceStore = KeyValueStore(collection: "CallService")
-            let highDataInterfaces: NetworkInterfaceSet = switch settings.callsUseLessDataSetting {
-            case .mobileDataOnly: .cellular
-            case .wifiAndMobileData: .wifiAndCellular
-            case .never, .unknownCallDataSetting, .UNRECOGNIZED: .none
-            }
-            callServiceStore.setUInt(highDataInterfaces.rawValue, key: "HighBandwidthPreferenceKey", transaction: context.tx)
-
-            // Key transparency isn't supported in this fork; blind-preserve the
-            // value so a subsequent export round-trips it unchanged.
-            let preservedSettingsStore = KeyValueStore(collection: "BackupPreservedAccountSettings")
-            preservedSettingsStore.setBool(
+            keyTransparencyManager.setIsEnabled(
                 settings.allowAutomaticKeyVerification,
-                key: "allowAutomaticKeyVerification",
-                transaction: context.tx
+                updateStorageService: false,
+                tx: context.tx,
             )
 
+            if settings.hasSeenAdminDeleteEducationDialog_p {
+                adminDeleteManager.setAdminDeleteEducationRead(
+                    tx: context.tx,
+                    updateStorageService: false,
+                )
+            }
+
             switch settings.defaultSentMediaQuality {
-            case .unknownQuality, .UNRECOGNIZED, .standard:
-                imageQuality.setUserSelectedHighQuality(false, tx: context.tx)
             case .high:
-                imageQuality.setUserSelectedHighQuality(true, tx: context.tx)
+                imageQuality.setValue(.high, tx: context.tx)
+            case .unknownQuality, .UNRECOGNIZED, .standard:
+                imageQuality.setValue(.standard, tx: context.tx)
             }
 
             if settings.hasAutoDownloadSettings {
@@ -623,25 +597,25 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
                         mediaBandwidthPreferenceStore.set(
                             mediaSettings.audio.mediaBandwidthPreference,
                             for: .audio,
-                            tx: context.tx
+                            tx: context.tx,
                         )
                     case .video:
                         mediaBandwidthPreferenceStore.set(
                             mediaSettings.video.mediaBandwidthPreference,
                             for: .video,
-                            tx: context.tx
+                            tx: context.tx,
                         )
                     case .document:
                         mediaBandwidthPreferenceStore.set(
                             mediaSettings.documents.mediaBandwidthPreference,
                             for: .document,
-                            tx: context.tx
+                            tx: context.tx,
                         )
                     case .photo:
                         mediaBandwidthPreferenceStore.set(
                             mediaSettings.images.mediaBandwidthPreference,
                             for: .photo,
-                            tx: context.tx
+                            tx: context.tx,
                         )
                     }
                 }
@@ -656,8 +630,89 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
             if settings.hasPinReminders {
                 ows2FAManager.setAreRemindersEnabled(settings.pinReminders, tx: context.tx)
                 if settings.pinReminders {
-                    ows2FAManager.resetDefaultRepetitionIntervalForBackupRestore(tx: context.tx)
+                    // When restoring, don't prompt a PIN reminder for 1wk.
+                    ows2FAManager.recordReminderCompleted(
+                        repetitionIntervalAdjustment: .setTo(.oneWeek),
+                        tx: context.tx,
+                    )
                 }
+            }
+
+            let appAppearanceMode: ThemeDataStore.Appearance = switch settings.appTheme {
+            case .UNRECOGNIZED, .unknownAppTheme, .system: .system
+            case .dark: .dark
+            case .light: .light
+            }
+            theme.setCurrentMode(appAppearanceMode, tx: context.tx)
+
+            let callServiceDataMode: NetworkInterfaceSet = switch settings.callsUseLessDataSetting {
+            case .mobileDataOnly: .cellular
+            case .wifiAndMobileData: .wifiAndCellular
+            case .never, .UNRECOGNIZED, .unknownCallDataSetting: .none
+            }
+            callServiceSettingsStore.setHighDataInterfaces(
+                callServiceDataMode,
+                tx: context.tx,
+            )
+
+            // Notifications
+            let badgeCountType: BadgeCountType = switch settings.unreadBadgeType {
+            case .UNRECOGNIZED, .unknownBadgeType, .unreadMessages: .unreadMessages
+            case .unreadChats: .unreadChats
+            }
+            notificationPreferencesManager.setBadgeCountType(
+                badgeCountType,
+                updateStorageService: false,
+                tx: context.tx,
+            )
+            if settings.hasIncludeMutedChatsInBadge {
+                notificationPreferencesManager.setIncludeMutedThreadsInBadgeCount(
+                    settings.includeMutedChatsInBadge,
+                    updateStorageService: false,
+                    tx: context.tx,
+                )
+            }
+            if settings.hasReactionNotifications {
+                notificationPreferencesManager.setAreReactionNotificationsEnabled(
+                    settings.reactionNotifications,
+                    updateStorageService: false,
+                    tx: context.tx,
+                )
+            }
+            if settings.hasNotifyForCallsIfMuted {
+                notificationPreferencesManager.setGlobalNotifyForCallsWhenMuted(
+                    settings.notifyForCallsIfMuted,
+                    updateStorageService: false,
+                    tx: context.tx,
+                )
+            }
+            if settings.hasNotifyForMentionsIfMuted {
+                notificationPreferencesManager.setGlobalNotifyForMentionsWhenMuted(
+                    settings.notifyForMentionsIfMuted,
+                    updateStorageService: false,
+                    tx: context.tx,
+                )
+            }
+            if settings.hasNotifyForRepliesIfMuted {
+                notificationPreferencesManager.setGlobalNotifyForRepliesWhenMuted(
+                    settings.notifyForRepliesIfMuted,
+                    updateStorageService: false,
+                    tx: context.tx,
+                )
+            }
+            if settings.hasShowUnreadReminders {
+                notificationPreferencesManager.setGlobalShowUnreadReminders(
+                    settings.showUnreadReminders,
+                    updateStorageService: false,
+                    tx: context.tx,
+                )
+            }
+            if settings.hasNotifyWhenContactJoins {
+                notificationPreferencesManager.setShouldNotifyOfNewAccounts(
+                    settings.notifyWhenContactJoins,
+                    updateStorageService: false,
+                    tx: context.tx,
+                )
             }
         }
 
@@ -668,11 +723,12 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
 
             if
                 let handle = UUID(data: usernameLink.serverID),
-                let linkData = Usernames.UsernameLink(handle: handle, entropy: usernameLink.entropy)
+                let entropy = try? UsernameLink.Entropy(rawValue: usernameLink.entropy)
             {
+                let linkData = UsernameLink(handle: handle, entropy: entropy)
                 localUsernameManager.setLocalUsername(username: username, usernameLink: linkData, tx: context.tx)
             } else {
-                return .failure([.restoreFrameError(.invalidProtoData(.invalidLocalUsernameLink), .localUser)])
+                return .failure([.restoreFrameError(.invalidProtoData(.invalidLocalUsernameLink))])
             }
 
             localUsernameManager.setUsernameLinkQRCodeColor(color: usernameLink.color.qrCodeColor, tx: context.tx)
@@ -680,6 +736,13 @@ public class BackupArchiveAccountDataArchiver: BackupArchiveProtoStreamWriter {
 
         if !accountData.svrPin.isEmpty {
             ows2FAManager.restorePinFromBackup(accountData.svrPin, tx: context.tx)
+        }
+
+        if accountData.hasIosSpecificSettings {
+            preferences.setIsSystemCallLogEnabled(
+                accountData.iosSpecificSettings.isSystemCallLogEnabled,
+                tx: context.tx,
+            )
         }
 
         if partialErrors.isEmpty {

@@ -15,9 +15,155 @@ class UserProfileTest: SignalBaseTest {
         SSKEnvironment.shared.databaseStorageRef.write { tx in
             (DependenciesBridge.shared.registrationStateChangeManager as! RegistrationStateChangeManagerImpl).registerForTests(
                 localIdentifiers: .forUnitTests,
-                tx: tx
+                tx: tx,
             )
         }
+    }
+
+    func testLearningProfileNameDeletesAciContactShareName() {
+        let aci = Aci.randomForTesting()
+        let address = SignalServiceAddress(aci)
+        let aciContactShareNameManager = DependenciesBridge.shared.aciContactShareNameManager
+
+        let recipient = write { tx in
+            DependenciesBridge.shared.recipientFetcher.fetchOrCreate(serviceId: aci, tx: tx)
+        }
+
+        write { tx in
+            aciContactShareNameManager.saveName(givenName: "Shared", familyName: "Name", recipient: recipient, allowOverwrite: true, updateStorageService: false, tx: tx)
+            OWSUserProfile(address: .otherUser(address)).anyInsert(transaction: tx)
+        }
+
+        XCTAssertNotNil(read { tx in aciContactShareNameManager.fetchName(recipient: recipient, tx: tx) })
+
+        write { tx in
+            OWSUserProfile.getUserProfile(for: .otherUser(address), tx: tx)?.update(
+                givenName: .setTo("Alice"),
+                userProfileWriter: .profileFetch,
+                transaction: tx,
+            )
+        }
+
+        XCTAssertNil(read { tx in aciContactShareNameManager.fetchName(recipient: recipient, tx: tx) })
+    }
+
+    func testAciContactShareNameSurvivesNonNameProfileUpdate() {
+        let aci = Aci.randomForTesting()
+        let address = SignalServiceAddress(aci)
+        let aciContactShareNameManager = DependenciesBridge.shared.aciContactShareNameManager
+
+        let recipient = write { tx in
+            DependenciesBridge.shared.recipientFetcher.fetchOrCreate(serviceId: aci, tx: tx)
+        }
+
+        write { tx in
+            aciContactShareNameManager.saveName(givenName: "Shared", familyName: "Name", recipient: recipient, allowOverwrite: true, updateStorageService: false, tx: tx)
+            OWSUserProfile(address: .otherUser(address)).anyInsert(transaction: tx)
+        }
+
+        write { tx in
+            OWSUserProfile.getUserProfile(for: .otherUser(address), tx: tx)?.update(
+                bio: .setTo("A bio"),
+                userProfileWriter: .profileFetch,
+                transaction: tx,
+            )
+        }
+
+        XCTAssertEqual(
+            read { tx in aciContactShareNameManager.fetchName(recipient: recipient, tx: tx) }?.givenName,
+            "Shared",
+        )
+    }
+
+    func testProfileUpdateDeletesAciContactShareNameOutrankedByNickname() {
+        let aci = Aci.randomForTesting()
+        let address = SignalServiceAddress(aci)
+        let aciContactShareNameManager = DependenciesBridge.shared.aciContactShareNameManager
+
+        let recipient = write { tx in
+            DependenciesBridge.shared.recipientFetcher.fetchOrCreate(serviceId: aci, tx: tx)
+        }
+
+        write { tx in
+            aciContactShareNameManager.saveName(givenName: "Shared", familyName: "Name", recipient: recipient, allowOverwrite: true, updateStorageService: false, tx: tx)
+            DependenciesBridge.shared.nicknameManager.createOrUpdate(
+                nicknameRecord: NicknameRecord(recipient: recipient, givenName: "Nick", familyName: nil, note: nil),
+                updateStorageServiceFor: nil,
+                tx: tx,
+            )
+            OWSUserProfile(address: .otherUser(address)).anyInsert(transaction: tx)
+        }
+
+        write { tx in
+            OWSUserProfile.getUserProfile(for: .otherUser(address), tx: tx)?.update(
+                bio: .setTo("A bio"),
+                userProfileWriter: .profileFetch,
+                transaction: tx,
+            )
+        }
+
+        XCTAssertNil(read { tx in aciContactShareNameManager.fetchName(recipient: recipient, tx: tx) })
+    }
+
+    func testStorageServiceProfileUpdateKeepsAciContactShareName() {
+        let aci = Aci.randomForTesting()
+        let address = SignalServiceAddress(aci)
+        let aciContactShareNameManager = DependenciesBridge.shared.aciContactShareNameManager
+
+        let recipient = write { tx in
+            DependenciesBridge.shared.recipientFetcher.fetchOrCreate(serviceId: aci, tx: tx)
+        }
+
+        write { tx in
+            aciContactShareNameManager.saveName(givenName: "Shared", familyName: "Name", recipient: recipient, allowOverwrite: true, updateStorageService: false, tx: tx)
+            OWSUserProfile(address: .otherUser(address)).anyInsert(transaction: tx)
+        }
+
+        write { tx in
+            OWSUserProfile.getUserProfile(for: .otherUser(address), tx: tx)?.update(
+                givenName: .setTo("Alice"),
+                userProfileWriter: .storageService,
+                transaction: tx,
+            )
+        }
+
+        XCTAssertEqual(
+            read { tx in aciContactShareNameManager.fetchName(recipient: recipient, tx: tx) }?.givenName,
+            "Shared",
+        )
+    }
+
+    func testLearningProfileNameRecordsAciContactShareNameBeforeLearning() {
+        let aci = Aci.randomForTesting()
+        let address = SignalServiceAddress(aci)
+        let aciContactShareNameManager = DependenciesBridge.shared.aciContactShareNameManager
+
+        let recipient = write { tx in
+            DependenciesBridge.shared.recipientFetcher.fetchOrCreate(serviceId: aci, tx: tx)
+        }
+
+        let thread = write { tx in
+            DependenciesBridge.shared.usernameLookupManager.saveUsername("shared.01", forAci: aci, transaction: tx)
+            aciContactShareNameManager.saveName(givenName: "Shared", familyName: "Name", recipient: recipient, allowOverwrite: true, updateStorageService: false, tx: tx)
+            OWSUserProfile(address: .otherUser(address)).anyInsert(transaction: tx)
+            return TSContactThread.getOrCreateThread(withContactAddress: address, transaction: tx)
+        }
+
+        write { tx in
+            OWSUserProfile.getUserProfile(for: .otherUser(address), tx: tx)?.update(
+                givenName: .setTo("Alice"),
+                userProfileWriter: .profileFetch,
+                transaction: tx,
+            )
+        }
+
+        let learnedProfileNameMessages = read { tx in
+            try! InteractionFinder(threadUniqueId: thread.uniqueId)
+                .fetchAllInteractions(rowIdFilter: .newest, limit: Int.max, tx: tx)
+                .compactMap { $0 as? TSInfoMessage }
+                .filter { $0.messageType == .learnedProfileName }
+        }
+        XCTAssertEqual(learnedProfileNameMessages.map(\.displayNameBeforeLearningProfileName), [.sharedName("Shared Name")])
     }
 
     func testGetUserProfile() {
@@ -155,11 +301,11 @@ final class UserProfile2Test: XCTestCase {
     func testNameComponent() {
         XCTAssertEqual(
             OWSUserProfile.NameComponent(truncating: String(repeating: "A", count: 27))?.stringValue.rawValue,
-            String(repeating: "A", count: 26)
+            String(repeating: "A", count: 26),
         )
         XCTAssertEqual(
             OWSUserProfile.NameComponent(truncating: String(repeating: "👨‍👩‍👧‍👦", count: 6))?.stringValue.rawValue,
-            String(repeating: "👨‍👩‍👧‍👦", count: 5)
+            String(repeating: "👨‍👩‍👧‍👦", count: 5),
         )
         // If you strip and then truncate this string, the resulting string would
         // become empty if you strip it again. While you'd normally expect a

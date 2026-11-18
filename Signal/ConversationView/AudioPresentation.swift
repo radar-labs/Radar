@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Lottie
 import SignalServiceKit
 import SignalUI
 
@@ -19,9 +18,6 @@ protocol AudioPresenter {
     // This is used for debugging. The name is given to the root ManualStackView.
     var name: String { get }
 
-    // Is the current message incoming?
-    var isIncoming: Bool { get }
-
     // Thread for the message.
     var threadUniqueId: String { get }
 
@@ -32,24 +28,30 @@ protocol AudioPresenter {
     var audioPlaybackRate: AudioPlaybackRate { get }
 
     // Color for play/pause button.
-    func playPauseAnimationColor(isIncoming: Bool) -> ColorValueProvider
+    func playPauseAnimationColor() -> UIColor
 
     // Color for dot indicating listened/unlistened status.
-    func playedDotAnimationColor(
-        conversationStyle: ConversationStyle,
-        isIncoming: Bool) -> ColorValueProvider
+    func playedDotAnimationColor(conversationStyle: ConversationStyle) -> UIColor
 
-    // Color for scrubbing thumb.
-    func thumbColor(isIncoming: Bool) -> UIColor
+    // Color for the scrubbing thumb drawn over the waveform.
+    func waveformThumbColor() -> UIColor
 
-    // Color for waveform left of thumb.
-    func playedColor(isIncoming: Bool) -> UIColor
+    // Color for the scrubbing thumb on the progress bar shown when there's no
+    // waveform to draw.
+    func progressBarThumbColor() -> UIColor
 
-    // Color for waveform right of thumb.
-    func unplayedColor(isIncoming: Bool) -> UIColor
+    // Color for the progress bar left of the thumb.
+    func playedColor() -> UIColor
+
+    // Color for the progress bar right of the thumb.
+    func unplayedColor() -> UIColor
 
     // Color of circle enclosing the play/pause icon.
-    func playPauseContainerBackgroundColor(isIncoming: Bool) -> UIColor
+    func playPauseContainerBackgroundColor(conversationStyle: ConversationStyle) -> UIColor
+
+    // Configuration for the progress view shown in place of the play/pause
+    // button while the attachment is undownloaded.
+    func progressViewConfiguration(conversationStyle: ConversationStyle) -> CVAttachmentProgressView.Configuration
 
     // Last chance to adjust constraints before the view appears.
     func configureForRendering(conversationStyle: ConversationStyle)
@@ -71,10 +73,11 @@ protocol AudioPresenter {
 
     // If you want to show a label at the top of the view, return its configuration here.
     // For example, you could choose to show a filename when one exists.
-    func topLabelConfig(audioAttachment: AudioAttachment, isIncoming: Bool, conversationStyle: ConversationStyle?) -> CVLabelConfig?
+    var topLabelConfig: CVLabelConfig? { get }
 
-    // The sampled waveform used to display the visual preview of the audio message.
-    func audioWaveform(attachmentStream: AttachmentStream?) -> Task<AudioWaveform, Error>?
+    // The sampled waveform used to display the visual preview of the audio
+    // message. Fails if it doesn't have one.
+    func audioWaveform(attachment: Attachment) -> Task<AudioWaveform, Error>
 }
 
 extension AudioPresenter {
@@ -82,7 +85,7 @@ extension AudioPresenter {
     static func playbackTimeLabelConfig_forMeasurement(audioAttachment: AudioAttachment, maxWidth: CGFloat) -> CVLabelConfig {
         // playbackTimeLabel uses a monospace font, so we measure the
         // worst-case width using the full duration of the audio.
-        let text = OWSFormat.localizedDurationString(from: audioAttachment.durationSeconds)
+        let text = OWSFormat.localizedDurationString(from: audioAttachment.durationSeconds ?? 0)
         let fullDurationConfig = playbackTimeLabelConfig(text: text)
         // Never let it get shorter than "0:00" duration.
         let minimumWidthText = OWSFormat.localizedDurationString(from: 0)
@@ -94,15 +97,11 @@ extension AudioPresenter {
         }
     }
 
-    static func playbackTimeLabelConfig(
-        text: String = " ",
-        isIncoming: Bool = true,
-        conversationStyle: ConversationStyle? = nil
-    ) -> CVLabelConfig {
+    static func playbackTimeLabelConfig(text: String = " ", isIncoming: Bool = true) -> CVLabelConfig {
         return CVLabelConfig.unstyledText(
             text,
             font: UIFont.dynamicTypeCaption1Clamped,
-            textColor: conversationStyle?.bubbleSecondaryTextColor(isIncoming: isIncoming) ?? .label
+            textColor: isIncoming ? .Signal.secondaryLabel : .Signal.ColorBase.labelSecondary,
         )
     }
 }

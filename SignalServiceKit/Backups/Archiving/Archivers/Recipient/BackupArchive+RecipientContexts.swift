@@ -8,10 +8,10 @@ import LibSignalClient
 
 extension BackupArchive {
 
-    public struct RecipientId: Hashable {
+    struct RecipientId: Hashable {
         let value: UInt64
 
-        public init(value: UInt64) {
+        init(value: UInt64) {
             self.value = value
         }
 
@@ -44,18 +44,15 @@ extension BackupArchive {
         }
     }
 
-    public struct GroupId: Hashable, BackupArchive.LoggableId {
+    struct GroupId: Hashable {
         let value: Data
 
-        init(groupModel: TSGroupModel) {
-            self.value = groupModel.groupId
+        init(groupId: Data) {
+            self.value = groupId
         }
-
-        public var typeLogString: String { "Group" }
-        public var idLogString: String { value.base64EncodedString() }
     }
 
-    public struct DistributionId: Hashable {
+    struct DistributionId: Hashable {
 
         let value: UUID
         let isMyStoryId: Bool
@@ -69,7 +66,7 @@ extension BackupArchive {
             /// Check, though, that the value didn't drift just in case.
             owsAssertBeta(
                 TSPrivateStoryThread.myStoryUniqueId == "00000000-0000-0000-0000-000000000000",
-                "My Story hardcoded id drifted; legacy backups may now be invalid"
+                "My Story hardcoded id drifted; legacy backups may now be invalid",
             )
             self.isMyStoryId = value.uuidString == TSPrivateStoryThread.myStoryUniqueId
         }
@@ -101,8 +98,8 @@ extension BackupArchive {
      * for that recipient, we will need to add the corresponding ``BackupRecipientId``, which we look up
      * using the contact's Aci/Pni/e164, from the map this context keeps.
      */
-    public class RecipientArchivingContext: ArchivingContext {
-        public enum Address {
+    class RecipientArchivingContext: ArchivingContext {
+        enum Address {
             case releaseNotesChannel
             case contact(ContactAddress)
             case group(GroupId)
@@ -112,38 +109,37 @@ extension BackupArchive {
 
         let localRecipientId: RecipientId
         let localSignalRecipientRowId: SignalRecipient.RowId
-        let localIdentifiers: LocalIdentifiers
 
         var localRecipientAddress: ContactAddress {
-            return .init(
+            return ContactAddress(
                 aci: localIdentifiers.aci,
                 pni: localIdentifiers.pni,
-                e164: E164(localIdentifiers.phoneNumber)
+                e164: E164(localIdentifiers.phoneNumber),
             )
         }
 
         private var currentRecipientId: RecipientId
         private var releaseNotesChannelRecipientId: RecipientId?
-        private let groupIdMap = SharedMap<GroupId, RecipientId>()
-        private let distributionIdMap = SharedMap<DistributionId, RecipientId>()
-        private let contactAciMap = SharedMap<Aci, RecipientId>()
-        private let contactPniMap = SharedMap<Pni, RecipientId>()
-        private let contactE164Map = SharedMap<E164, RecipientId>()
-        private let recipientDbRowIdMap = SharedMap<SignalRecipient.RowId, RecipientId>()
-        private let callLinkIdMap = SharedMap<CallLinkRecordId, RecipientId>()
+        private var groupIdMap = [GroupId: RecipientId]()
+        private var distributionIdMap = [DistributionId: RecipientId]()
+        private var contactAciMap = [Aci: RecipientId]()
+        private var contactPniMap = [Pni: RecipientId]()
+        private var contactE164Map = [E164: RecipientId]()
+        private var recipientDbRowIdMap = [SignalRecipient.RowId: RecipientId]()
+        private var callLinkIdMap = [CallLinkRecordId: RecipientId]()
 
         init(
-            bencher: BackupArchive.ArchiveBencher,
-            attachmentByteCounter: BackupArchiveAttachmentByteCounter,
-            currentBackupAttachmentUploadEra: String,
-            includedContentFilter: IncludedContentFilter,
-            localIdentifiers: LocalIdentifiers,
             localRecipientId: RecipientId,
             localSignalRecipientRowId: SignalRecipient.RowId,
-            startTimestampMs: UInt64,
-            tx: DBReadTransaction
+            localIdentifiers: LocalIdentifiers,
+            startDate: Date,
+            remoteConfig: RemoteConfig,
+            currentUploadEra: String,
+            bencher: BackupArchive.ArchiveBencher,
+            includedContentFilter: IncludedContentFilter,
+            perFrameAccumulator: PerFrameAccumulator,
+            tx: DBReadTransaction,
         ) {
-            self.localIdentifiers = localIdentifiers
             self.localRecipientId = localRecipientId
             self.localSignalRecipientRowId = localSignalRecipientRowId
 
@@ -161,12 +157,14 @@ extension BackupArchive {
             }
 
             super.init(
+                localIdentifiers: localIdentifiers,
+                startDate: startDate,
+                remoteConfig: remoteConfig,
+                currentUploadEra: currentUploadEra,
                 bencher: bencher,
-                attachmentByteCounter: attachmentByteCounter,
-                currentBackupAttachmentUploadEra: currentBackupAttachmentUploadEra,
                 includedContentFilter: includedContentFilter,
-                startTimestampMs: startTimestampMs,
-                tx: tx
+                perFrameAccumulator: perFrameAccumulator,
+                tx: tx,
             )
         }
 
@@ -203,29 +201,26 @@ extension BackupArchive {
         }
 
         subscript(_ address: Address) -> RecipientId? {
-            // swiftlint:disable:next implicit_getter
-            get {
-                switch address {
-                case .releaseNotesChannel:
-                    return releaseNotesChannelRecipientId
-                case .group(let groupId):
-                    return groupIdMap[groupId]
-                case .distributionList(let distributionId):
-                    return distributionIdMap[distributionId]
-                case .contact(let contactAddress):
-                    // Go down identifiers in priority order, return the first we have.
-                    if let aci = contactAddress.aci {
-                        return contactAciMap[aci]
-                    } else if let e164 = contactAddress.e164 {
-                        return contactE164Map[e164]
-                    } else if let pni = contactAddress.pni {
-                        return contactPniMap[pni]
-                    } else {
-                        return nil
-                    }
-                case .callLink(let callLinkId):
-                    return callLinkIdMap[callLinkId]
+            switch address {
+            case .releaseNotesChannel:
+                return releaseNotesChannelRecipientId
+            case .group(let groupId):
+                return groupIdMap[groupId]
+            case .distributionList(let distributionId):
+                return distributionIdMap[distributionId]
+            case .contact(let contactAddress):
+                // Go down identifiers in priority order, return the first we have.
+                if let aci = contactAddress.aci {
+                    return contactAciMap[aci]
+                } else if let e164 = contactAddress.e164 {
+                    return contactE164Map[e164]
+                } else if let pni = contactAddress.pni {
+                    return contactPniMap[pni]
+                } else {
+                    return nil
                 }
+            case .callLink(let callLinkId):
+                return callLinkIdMap[callLinkId]
             }
         }
 
@@ -235,10 +230,36 @@ extension BackupArchive {
             }
             return recipientDbRowIdMap[recipientDbRowId]
         }
+
+        enum RecipientIdResult {
+            case found(BackupArchive.RecipientId)
+            case missing(BackupArchive.ArchiveFrameError)
+        }
+
+        func getRecipientId(
+            aci: Aci,
+            forInteraction interaction: TSInteraction,
+            file: StaticString = #file,
+            function: StaticString = #function,
+            line: UInt = #line,
+        ) -> RecipientIdResult {
+            let contactAddress = BackupArchive.ContactAddress(aci: aci)
+
+            if let recipientId = self[.contact(contactAddress)] {
+                return .found(recipientId)
+            }
+
+            return .missing(.archiveFrameError(
+                .referencedRecipientIdMissing(.contact(contactAddress)),
+                file: file,
+                function: function,
+                line: line,
+            ))
+        }
     }
 
-    public class RecipientRestoringContext: RestoringContext {
-        public enum Address {
+    class RecipientRestoringContext: RestoringContext {
+        enum Address {
             case localAddress
             case releaseNotesChannel
             case contact(ContactAddress)
@@ -247,32 +268,20 @@ extension BackupArchive {
             case callLink(CallLinkRecordId)
         }
 
-        let localIdentifiers: LocalIdentifiers
         var localSignalRecipientRowId: SignalRecipient.RowId?
 
-        private let map = SharedMap<RecipientId, Address>()
-        private let recipientDbRowIdCache = SharedMap<RecipientId, SignalRecipient.RowId>()
+        private var map = [RecipientId: Address]()
+        private var recipientDbRowIdCache = [RecipientId: SignalRecipient.RowId]()
         /// We create TSGroupThread (and GroupModel) when we restore the Recipient, NOT the Chat.
         /// By comparison, TSContactThread is created when we restore the Chat frame.
         /// We cache the TSGroupThread here to avoid fetching later when we do restore the Chat.
-        private let groupThreadCache = SharedMap<GroupId, TSGroupThread>()
-        private let callLinkRecordCache = SharedMap<CallLinkRecordId, CallLinkRecord>()
-
-        init(
-            localIdentifiers: LocalIdentifiers,
-            startTimestampMs: UInt64,
-            attachmentByteCounter: BackupArchiveAttachmentByteCounter,
-            isPrimaryDevice: Bool,
-            tx: DBWriteTransaction
-        ) {
-            self.localIdentifiers = localIdentifiers
-            super.init(
-                startTimestampMs: startTimestampMs,
-                attachmentByteCounter: attachmentByteCounter,
-                isPrimaryDevice: isPrimaryDevice,
-                tx: tx
-            )
-        }
+        private var groupThreadCache = [GroupId: TSGroupThread]()
+        private var callLinkRecordCache = [CallLinkRecordId: CallLinkRecord]()
+        /// GroupIds whose group Recipient was discarded because its snapshot was
+        /// invalid (version 0 with no members).
+        /// Chat frames referencing these groups are skipped rather than causing
+        /// a restore failure.
+        private var discardedGroupIdsWithInvalidSnapshot = Set<GroupId>()
 
         subscript(_ id: RecipientId) -> Address? {
             get { map[id] }
@@ -289,6 +298,14 @@ extension BackupArchive {
             set(newValue) { callLinkRecordCache[id] = newValue }
         }
 
+        func markGroupDiscardedDueToInvalidSnapshot(_ id: GroupId) {
+            discardedGroupIdsWithInvalidSnapshot.insert(id)
+        }
+
+        func isGroupDiscardedDueToInvalidSnapshot(_ id: GroupId) -> Bool {
+            discardedGroupIdsWithInvalidSnapshot.contains(id)
+        }
+
         func allRecipientIds() -> Dictionary<RecipientId, Address>.Keys {
             return map.keys
         }
@@ -303,7 +320,7 @@ extension BackupArchive {
 
         // MARK: Post-Frame Restore
 
-        public struct PostFrameRestoreActions {
+        struct PostFrameRestoreActions {
             /// A `TSInfoMessage` indicating a contact is hidden should be
             /// inserted for the `SignalRecipient` with the given proto ID.
             ///
@@ -322,7 +339,7 @@ extension BackupArchive {
         }
 
         /// Represents actions that should be taken after all `Frame`s have been restored.
-        private(set) var postFrameRestoreActions = SharedMap<RecipientId, PostFrameRestoreActions>()
+        private(set) var postFrameRestoreActions = [RecipientId: PostFrameRestoreActions]()
 
         func setNeedsPostRestoreContactHiddenInfoMessage(recipientId: RecipientId) {
             var actions = postFrameRestoreActions[recipientId] ?? PostFrameRestoreActions()
@@ -338,90 +355,51 @@ extension BackupArchive {
     }
 }
 
-extension BackupArchive.RecipientId: BackupArchive.LoggableId {
-    public var typeLogString: String { "BackupProto_Recipient" }
-
-    public var idLogString: String { "\(self.value)" }
-}
-
-extension BackupArchive.RecipientArchivingContext.Address: BackupArchive.LoggableId {
-    public var typeLogString: String {
-        switch self {
-        case .releaseNotesChannel:
-            return "ReleaseNotesChannel_Type"
-        case .contact(let address):
-            return address.typeLogString
-        case .group:
-            return "TSGroupThread"
-        case .distributionList:
-            return "TSPrivateStoryThread"
-        case .callLink:
-            return "CallLinkRecord"
-        }
-    }
-
-    public var idLogString: String {
-        switch self {
-        case .releaseNotesChannel:
-            return "ReleaseNotesChannel_ID"
-        case .contact(let contactAddress):
-            return contactAddress.idLogString
-        case .group(let groupId):
-            // Rely on the scrubber to scrub the id.
-            return groupId.idLogString
-        case .distributionList(let distributionId):
-            return distributionId.value.uuidString
-        case .callLink(let callLinkRecordId):
-            return callLinkRecordId.idLogString
-        }
-    }
-}
-
 extension BackupProto_Recipient {
 
-    public var recipientId: BackupArchive.RecipientId {
+    var recipientId: BackupArchive.RecipientId {
         return BackupArchive.RecipientId(recipient: self)
     }
 }
 
 extension BackupProto_Chat {
 
-    public var typedRecipientId: BackupArchive.RecipientId {
+    var typedRecipientId: BackupArchive.RecipientId {
         return BackupArchive.RecipientId(chat: self)
     }
 }
 
 extension BackupProto_ChatItem {
 
-    public var authorRecipientId: BackupArchive.RecipientId {
+    var authorRecipientId: BackupArchive.RecipientId {
         return BackupArchive.RecipientId(chatItem: self)
     }
 }
 
 extension BackupProto_Reaction {
 
-    public var authorRecipientId: BackupArchive.RecipientId {
+    var authorRecipientId: BackupArchive.RecipientId {
         return BackupArchive.RecipientId(reaction: self)
     }
 }
 
 extension BackupProto_Quote {
 
-    public var authorRecipientId: BackupArchive.RecipientId {
+    var authorRecipientId: BackupArchive.RecipientId {
         return BackupArchive.RecipientId(quote: self)
     }
 }
 
 extension BackupProto_SendStatus {
 
-    public var destinationRecipientId: BackupArchive.RecipientId {
+    var destinationRecipientId: BackupArchive.RecipientId {
         return BackupArchive.RecipientId(sendStatus: self)
     }
 }
 
 extension BackupProto_AdHocCall {
 
-    public var callLinkRecipientId: BackupArchive.RecipientId {
+    var callLinkRecipientId: BackupArchive.RecipientId {
         return BackupArchive.RecipientId(adHocCall: self)
     }
 }

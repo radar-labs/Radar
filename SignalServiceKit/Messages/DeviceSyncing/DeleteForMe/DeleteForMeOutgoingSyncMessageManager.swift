@@ -39,7 +39,7 @@ extension DeleteForMeSyncMessage {
                 conversationIdentifier: ConversationIdentifier,
                 isFullDelete: Bool,
                 threadUniqueId: String,
-                localIdentifiers: LocalIdentifiers
+                localIdentifiers: LocalIdentifiers,
             ) {
                 self.conversationIdentifier = conversationIdentifier
                 self.isFullDelete = isFullDelete
@@ -67,10 +67,11 @@ extension DeleteForMeSyncMessage {
                     owsPrecondition(message.uniqueThreadId == threadUniqueId)
                 }
 
-                guard let addressableMessage: AddressableMessage = .addressing(
-                    message: message,
-                    localIdentifiers: localIdentifiers
-                ) else { return }
+                guard
+                    let addressableMessage = AddressableMessage(
+                        message: message,
+                        localIdentifiers: localIdentifiers,
+                    ) else { return }
 
                 let isMessageExpiring = message.expiresAt > 0
 
@@ -102,7 +103,7 @@ public protocol DeleteForMeOutgoingSyncMessageManager {
         deletedMessages: [TSMessage],
         thread: TSThread,
         localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 
     /// Send a sync message that the attachments with the given identifiers were
@@ -113,13 +114,13 @@ public protocol DeleteForMeOutgoingSyncMessageManager {
         deletedAttachmentIdentifiers: [TSMessage: [Outgoing.AttachmentIdentifier]],
         thread: TSThread,
         localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 
     /// Send a sync message for the given thread deletion contexts.
     func send(
         threadDeletionContexts: [Outgoing.ThreadDeletionContext],
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 
     /// Get a deletion context for the given thread. This context should be
@@ -135,7 +136,7 @@ public protocol DeleteForMeOutgoingSyncMessageManager {
         thread: TSThread,
         isFullDelete: Bool,
         localIdentifiers: LocalIdentifiers,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> Outgoing.ThreadDeletionContext?
 }
 
@@ -148,7 +149,7 @@ public extension DeleteForMeOutgoingSyncMessageManager {
         deletedAttachments: [TSMessage: [ReferencedAttachment]],
         thread: TSThread,
         localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         var deletedAttachmentIdentifiers = [TSMessage: [Outgoing.AttachmentIdentifier]]()
 
@@ -156,8 +157,8 @@ public extension DeleteForMeOutgoingSyncMessageManager {
             let attachmentIdentifiers: [Outgoing.AttachmentIdentifier] = attachments.map { attachment in
                 return Outgoing.AttachmentIdentifier(
                     clientUuid: attachment.reference.knownIdInOwningMessage,
-                    encryptedDigest: attachment.attachment.asStream()?.encryptedFileSha256Digest,
-                    plaintextHash: attachment.attachment.asStream()?.sha256ContentHash
+                    ciphertextDigest: attachment.attachment.asStream()?.ciphertextDigest,
+                    plaintextHash: attachment.attachment.asStream()?.plaintextHash,
                 )
             }
 
@@ -168,7 +169,7 @@ public extension DeleteForMeOutgoingSyncMessageManager {
             deletedAttachmentIdentifiers: deletedAttachmentIdentifiers,
             thread: thread,
             localIdentifiers: localIdentifiers,
-            tx: tx
+            tx: tx,
         )
     }
 }
@@ -185,7 +186,7 @@ final class DeleteForMeOutgoingSyncMessageManagerImpl: DeleteForMeOutgoingSyncMe
     init(
         recipientDatabaseTable: RecipientDatabaseTable,
         syncMessageSender: any Shims.SyncMessageSender,
-        threadStore: any ThreadStore
+        threadStore: any ThreadStore,
     ) {
         self.recipientDatabaseTable = recipientDatabaseTable
         self.syncMessageSender = syncMessageSender
@@ -196,14 +197,14 @@ final class DeleteForMeOutgoingSyncMessageManagerImpl: DeleteForMeOutgoingSyncMe
         deletedMessages: [TSMessage],
         thread: TSThread,
         localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         guard let conversationIdentifier = conversationIdentifier(thread: thread, tx: tx) else {
             return
         }
 
-        let addressableMessages = deletedMessages.compactMap { message -> Outgoing.AddressableMessage? in
-            return .addressing(message: message, localIdentifiers: localIdentifiers)
+        let addressableMessages = deletedMessages.compactMap { message -> AddressableMessage? in
+            return AddressableMessage(message: message, localIdentifiers: localIdentifiers)
         }
 
         if addressableMessages.isEmpty { return }
@@ -214,7 +215,7 @@ final class DeleteForMeOutgoingSyncMessageManagerImpl: DeleteForMeOutgoingSyncMe
             /// any UX affordances that'd let you do so in practice.
             let messageDeletes = Outgoing.MessageDeletes(
                 conversationIdentifier: conversationIdentifier,
-                addressableMessages: addressableMessageBatch
+                addressableMessages: addressableMessageBatch,
             )
 
             sendSyncMessage(
@@ -222,9 +223,9 @@ final class DeleteForMeOutgoingSyncMessageManagerImpl: DeleteForMeOutgoingSyncMe
                     messageDeletes: [messageDeletes],
                     attachmentDeletes: [],
                     conversationDeletes: [],
-                    localOnlyConversationDelete: []
+                    localOnlyConversationDelete: [],
                 ),
-                tx: tx
+                tx: tx,
             )
         }
     }
@@ -233,18 +234,20 @@ final class DeleteForMeOutgoingSyncMessageManagerImpl: DeleteForMeOutgoingSyncMe
         deletedAttachmentIdentifiers: [TSMessage: [Outgoing.AttachmentIdentifier]],
         thread: TSThread,
         localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         guard let conversationIdentifier = conversationIdentifier(thread: thread, tx: tx) else {
             return
         }
 
         let attachmentDeletes: [Outgoing.AttachmentDelete] = deletedAttachmentIdentifiers
-            .compactMap { (message, attachmentIdentifiers) -> [Outgoing.AttachmentDelete]? in
-                guard let targetMessage: Outgoing.AddressableMessage = .addressing(
-                    message: message,
-                    localIdentifiers: localIdentifiers
-                ) else {
+            .compactMap { message, attachmentIdentifiers -> [Outgoing.AttachmentDelete]? in
+                guard
+                    let targetMessage = AddressableMessage(
+                        message: message,
+                        localIdentifiers: localIdentifiers,
+                    )
+                else {
                     // We failed to convert the deleted-from message into an
                     // addressable message. This should never happen!
                     return nil
@@ -255,8 +258,8 @@ final class DeleteForMeOutgoingSyncMessageManagerImpl: DeleteForMeOutgoingSyncMe
                         conversationIdentifier: conversationIdentifier,
                         targetMessage: targetMessage,
                         clientUuid: attachmentIdentifier.clientUuid,
-                        encryptedDigest: attachmentIdentifier.encryptedDigest,
-                        plaintextHash: attachmentIdentifier.plaintextHash
+                        ciphertextDigest: attachmentIdentifier.ciphertextDigest,
+                        plaintextHash: attachmentIdentifier.plaintextHash,
                     )
                 }
             }
@@ -268,16 +271,16 @@ final class DeleteForMeOutgoingSyncMessageManagerImpl: DeleteForMeOutgoingSyncMe
                     messageDeletes: [],
                     attachmentDeletes: attachmentBatch,
                     conversationDeletes: [],
-                    localOnlyConversationDelete: []
+                    localOnlyConversationDelete: [],
                 ),
-                tx: tx
+                tx: tx,
             )
         }
     }
 
     func send(
         threadDeletionContexts: [Outgoing.ThreadDeletionContext],
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         for deletionContextBatch in Batcher().batch(threadDeletionContexts: threadDeletionContexts) {
             var conversationDeletes = [Outgoing.ConversationDelete]()
@@ -286,20 +289,20 @@ final class DeleteForMeOutgoingSyncMessageManagerImpl: DeleteForMeOutgoingSyncMe
             for context in deletionContextBatch {
                 if context.mostRecentAddressableMessages.isEmpty {
                     localOnlyConversationDeletes.append(Outgoing.LocalOnlyConversationDelete(
-                        conversationIdentifier: context.conversationIdentifier
+                        conversationIdentifier: context.conversationIdentifier,
                     ))
                 } else {
                     conversationDeletes.append(Outgoing.ConversationDelete(
                         conversationIdentifier: context.conversationIdentifier,
                         mostRecentAddressableMessages: context.mostRecentAddressableMessages,
-                        mostRecentNonExpiringAddressableMessages: { () -> [Outgoing.AddressableMessage] in
+                        mostRecentNonExpiringAddressableMessages: { () -> [AddressableMessage] in
                             if context.areAnyMostRecentMessagesExpiring {
                                 return context.mostRecentNonExpiringAddressableMessages
                             }
 
                             return []
                         }(),
-                        isFullDelete: context.isFullDelete
+                        isFullDelete: context.isFullDelete,
                     ))
                 }
             }
@@ -309,9 +312,9 @@ final class DeleteForMeOutgoingSyncMessageManagerImpl: DeleteForMeOutgoingSyncMe
                     messageDeletes: [],
                     attachmentDeletes: [],
                     conversationDeletes: conversationDeletes,
-                    localOnlyConversationDelete: localOnlyConversationDeletes
+                    localOnlyConversationDelete: localOnlyConversationDeletes,
                 ),
-                tx: tx
+                tx: tx,
             )
         }
     }
@@ -320,7 +323,7 @@ final class DeleteForMeOutgoingSyncMessageManagerImpl: DeleteForMeOutgoingSyncMe
         thread: TSThread,
         isFullDelete: Bool,
         localIdentifiers: LocalIdentifiers,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> Outgoing.ThreadDeletionContext? {
         guard let conversationIdentifier = conversationIdentifier(thread: thread, tx: tx) else {
             return nil
@@ -330,7 +333,7 @@ final class DeleteForMeOutgoingSyncMessageManagerImpl: DeleteForMeOutgoingSyncMe
             conversationIdentifier: conversationIdentifier,
             isFullDelete: isFullDelete,
             threadUniqueId: thread.uniqueId,
-            localIdentifiers: localIdentifiers
+            localIdentifiers: localIdentifiers,
         )
     }
 
@@ -338,20 +341,23 @@ final class DeleteForMeOutgoingSyncMessageManagerImpl: DeleteForMeOutgoingSyncMe
 
     private func conversationIdentifier(
         thread: TSThread,
-        tx: DBReadTransaction
-    ) -> Outgoing.ConversationIdentifier? {
+        tx: DBReadTransaction,
+    ) -> ConversationIdentifier? {
         if
             let contactThread = thread as? TSContactThread,
             let contactServiceId = recipientDatabaseTable.fetchServiceId(contactThread: contactThread, tx: tx)
         {
-            return .threadServiceId(serviceId: ServiceIdUppercaseString(wrappedValue: contactServiceId))
+            return .serviceId(contactServiceId)
         } else if
             let contactThread = thread as? TSContactThread,
-            let contactE164 = contactThread.contactPhoneNumber
+            let contactE164 = E164(contactThread.contactPhoneNumber)
         {
-            return .threadE164(e164: contactE164)
-        } else if let groupThread = thread as? TSGroupThread {
-            return .threadGroupId(groupId: groupThread.groupId)
+            return .e164(contactE164)
+        } else if
+            let groupThread = thread as? TSGroupThread,
+            let groupIdentifier = try? groupThread.groupIdentifier
+        {
+            return .groupIdentifier(groupIdentifier)
         }
 
         logger.warn("No conversation identifier for thread of type: \(type(of: thread)).")
@@ -360,7 +366,7 @@ final class DeleteForMeOutgoingSyncMessageManagerImpl: DeleteForMeOutgoingSyncMe
 
     private func sendSyncMessage(
         contents: DeleteForMeOutgoingSyncMessage.Contents,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         guard let localThread = threadStore.getOrCreateLocalThread(tx: tx) else {
             logger.error("Missing local thread!")
@@ -372,7 +378,7 @@ final class DeleteForMeOutgoingSyncMessageManagerImpl: DeleteForMeOutgoingSyncMe
         syncMessageSender.sendSyncMessage(
             contents: contents,
             localThread: localThread,
-            tx: tx
+            tx: tx,
         )
     }
 }
@@ -391,30 +397,30 @@ private extension DeleteForMeOutgoingSyncMessageManagerImpl {
             static let maxThreadContextsPerSyncMessage: Int = 100
         }
 
-        func batch(addressableMessages: [Outgoing.AddressableMessage]) -> [[Outgoing.AddressableMessage]] {
+        func batch(addressableMessages: [AddressableMessage]) -> [[AddressableMessage]] {
             return batch(
                 addressableMessages,
-                maxBatchSize: MaxSyncMessageSizeConstants.maxInteractionsPerSyncMessage
+                maxBatchSize: MaxSyncMessageSizeConstants.maxInteractionsPerSyncMessage,
             )
         }
 
         func batch(attachmentDeletes: [Outgoing.AttachmentDelete]) -> [[Outgoing.AttachmentDelete]] {
             return batch(
                 attachmentDeletes,
-                maxBatchSize: MaxSyncMessageSizeConstants.maxAttachmentsPerSyncMessage
+                maxBatchSize: MaxSyncMessageSizeConstants.maxAttachmentsPerSyncMessage,
             )
         }
 
         func batch(threadDeletionContexts: [Outgoing.ThreadDeletionContext]) -> [[Outgoing.ThreadDeletionContext]] {
             return batch(
                 threadDeletionContexts,
-                maxBatchSize: MaxSyncMessageSizeConstants.maxThreadContextsPerSyncMessage
+                maxBatchSize: MaxSyncMessageSizeConstants.maxThreadContextsPerSyncMessage,
             )
         }
 
         private func batch<T>(
             _ items: any Sequence<T>,
-            maxBatchSize: Int
+            maxBatchSize: Int,
         ) -> [[T]] {
             var batches = [[T]]()
 
@@ -450,7 +456,7 @@ protocol _DeleteForMeOutgoingSyncMessageManagerImpl_SyncMessageSender_Shim {
     func sendSyncMessage(
         contents: DeleteForMeOutgoingSyncMessage.Contents,
         localThread: TSContactThread,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 }
 
@@ -464,63 +470,18 @@ final class _DeleteForMeOutgoingSyncMessageManagerImpl_SyncMessageSender_Wrapper
     func sendSyncMessage(
         contents: DeleteForMeOutgoingSyncMessage.Contents,
         localThread: TSContactThread,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
-        guard let syncMessage = DeleteForMeOutgoingSyncMessage(
-            contents: contents,
-            localThread: localThread,
-            tx: tx
-        ) else { return }
+        guard
+            let syncMessage = DeleteForMeOutgoingSyncMessage(
+                contents: contents,
+                localThread: localThread,
+                tx: tx,
+            ) else { return }
 
         messageSenderJobQueue.add(
             message: .preprepared(transientMessageWithoutAttachments: syncMessage),
-            transaction: tx
+            transaction: tx,
         )
     }
 }
-
-// MARK: - Mock
-
-#if TESTABLE_BUILD
-
-open class MockDeleteForMeOutgoingSyncMessageManager: DeleteForMeOutgoingSyncMessageManager {
-    var sendMessagesMock: ((
-        _ messages: [TSMessage]
-    ) -> Void)!
-    public func send(deletedMessages: [TSMessage], thread: TSThread, localIdentifiers: LocalIdentifiers, tx: DBWriteTransaction) {
-        sendMessagesMock(deletedMessages)
-    }
-
-    var sendAttachmentsMock: ((
-        _ attachmentIdentifiers: [TSMessage: [Outgoing.AttachmentIdentifier]]
-    ) -> Void)!
-    public func send(deletedAttachmentIdentifiers: [TSMessage: [Outgoing.AttachmentIdentifier]], thread: TSThread, localIdentifiers: LocalIdentifiers, tx: DBWriteTransaction) {
-        sendAttachmentsMock(deletedAttachmentIdentifiers)
-    }
-
-    var sendDeletionContextMock: ((
-        _ threadContexts: [Outgoing.ThreadDeletionContext]
-    ) -> Void)!
-    public func send(threadDeletionContexts: [Outgoing.ThreadDeletionContext], tx: DBWriteTransaction) {
-        sendDeletionContextMock(threadDeletionContexts)
-    }
-
-    public func makeThreadDeletionContext(thread: TSThread, isFullDelete: Bool, localIdentifiers: LocalIdentifiers, tx: DBReadTransaction) -> Outgoing.ThreadDeletionContext? {
-        let conversationIdentifier: Outgoing.ConversationIdentifier = if let contactThread = thread as? TSContactThread {
-            .threadServiceId(serviceId: ServiceIdUppercaseString(wrappedValue: try! ServiceId.parseFrom(serviceIdString: contactThread.contactUUID!)))
-        } else if let groupThread = thread as? TSGroupThread {
-            .threadGroupId(groupId: groupThread.groupId)
-        } else {
-            owsFail("Invalid thread!")
-        }
-
-        return Outgoing.ThreadDeletionContext(
-            conversationIdentifier: conversationIdentifier,
-            isFullDelete: isFullDelete,
-            threadUniqueId: thread.uniqueId,
-            localIdentifiers: localIdentifiers
-        )
-    }
-}
-
-#endif

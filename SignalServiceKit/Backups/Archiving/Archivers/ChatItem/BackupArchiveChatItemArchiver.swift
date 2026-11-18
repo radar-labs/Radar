@@ -6,38 +6,34 @@
 import Foundation
 import LibSignalClient
 
-public extension BackupArchive {
+extension BackupArchive {
 
     /// An identifier for a ``BackupProto_ChatItem`` backup frame.
-    struct ChatItemId: BackupArchive.LoggableId, Hashable {
+    struct ChatItemId: Hashable {
         let value: UInt64
 
-        public init(backupProtoChatItem: BackupProto_ChatItem) {
+        init(backupProtoChatItem: BackupProto_ChatItem) {
             self.value = backupProtoChatItem.dateSent
         }
 
-        public init(interaction: TSInteraction) {
+        init(interaction: TSInteraction) {
             self.value = interaction.timestamp
         }
-
-        // MARK: BackupArchive.LoggableId
-
-        public var typeLogString: String { "BackupProto_ChatItem" }
-        public var idLogString: String { "timestamp: \(value)" }
     }
 }
 
 // MARK: -
 
-public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
+class BackupArchiveChatItemArchiver {
     typealias ChatItemId = BackupArchive.ChatItemId
-    typealias ArchiveMultiFrameResult = BackupArchive.ArchiveMultiFrameResult<BackupArchive.InteractionUniqueId>
-    typealias RestoreFrameResult = BackupArchive.RestoreFrameResult<ChatItemId>
+    typealias ArchiveMultiFrameResult = BackupArchive.ArchiveMultiFrameResult
+    typealias RestoreFrameResult = BackupArchive.RestoreFrameResult
 
-    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError<BackupArchive.InteractionUniqueId>
+    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError
 
     private let archivedPaymentStore: ArchivedPaymentStore
     private let attachmentsArchiver: BackupArchiveMessageAttachmentArchiver
+    private let attachmentStore: AttachmentStore
     private let callRecordStore: CallRecordStore
     private let contactManager: BackupArchive.Shims.ContactManager
     private let editMessageStore: EditMessageStore
@@ -50,24 +46,31 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
     private let reactionStore: ReactionStore
     private let threadStore: BackupArchiveThreadStore
     private let reactionArchiver: BackupArchiveReactionArchiver
+    private let pinnedMessageManager: PinnedMessageManager
+    private let adminDeleteManager: AdminDeleteManager
 
     private lazy var contentsArchiver = BackupArchiveTSMessageContentsArchiver(
         interactionStore: interactionStore,
         archivedPaymentStore: archivedPaymentStore,
         attachmentsArchiver: attachmentsArchiver,
+        attachmentStore: attachmentStore,
         oversizeTextArchiver: oversizeTextArchiver,
         reactionArchiver: reactionArchiver,
-        pollArchiver: pollArchiver
+        pollArchiver: pollArchiver,
+        pinnedMessageManager: pinnedMessageManager,
+        adminDeleteManager: adminDeleteManager,
     )
     private lazy var incomingMessageArchiver = BackupArchiveTSIncomingMessageArchiver(
         contentsArchiver: contentsArchiver,
         editMessageStore: editMessageStore,
-        interactionStore: interactionStore
+        interactionStore: interactionStore,
+        pinnedMessageManager: pinnedMessageManager,
     )
     private lazy var outgoingMessageArchiver = BackupArchiveTSOutgoingMessageArchiver(
         contentsArchiver: contentsArchiver,
         editMessageStore: editMessageStore,
-        interactionStore: interactionStore
+        interactionStore: interactionStore,
+        pinnedMessageManager: pinnedMessageManager,
     )
     private lazy var chatUpdateMessageArchiver = BackupArchiveChatUpdateMessageArchiver(
         callRecordStore: callRecordStore,
@@ -75,12 +78,13 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
         groupCallRecordManager: groupCallRecordManager,
         groupUpdateItemBuilder: groupUpdateItemBuilder,
         individualCallRecordManager: individualCallRecordManager,
-        interactionStore: interactionStore
+        interactionStore: interactionStore,
     )
 
     init(
         archivedPaymentStore: ArchivedPaymentStore,
         attachmentsArchiver: BackupArchiveMessageAttachmentArchiver,
+        attachmentStore: AttachmentStore,
         callRecordStore: CallRecordStore,
         contactManager: BackupArchive.Shims.ContactManager,
         editMessageStore: EditMessageStore,
@@ -92,10 +96,13 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
         pollArchiver: BackupArchivePollArchiver,
         reactionStore: ReactionStore,
         threadStore: BackupArchiveThreadStore,
-        reactionArchiver: BackupArchiveReactionArchiver
+        reactionArchiver: BackupArchiveReactionArchiver,
+        pinnedMessageManager: PinnedMessageManager,
+        adminDeleteManager: AdminDeleteManager,
     ) {
         self.archivedPaymentStore = archivedPaymentStore
         self.attachmentsArchiver = attachmentsArchiver
+        self.attachmentStore = attachmentStore
         self.callRecordStore = callRecordStore
         self.contactManager = contactManager
         self.editMessageStore = editMessageStore
@@ -108,6 +115,8 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
         self.reactionStore = reactionStore
         self.threadStore = threadStore
         self.reactionArchiver = reactionArchiver
+        self.pinnedMessageManager = pinnedMessageManager
+        self.adminDeleteManager = adminDeleteManager
     }
 
     // MARK: -
@@ -121,35 +130,35 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
     /// ``ArchiveMultiFrameResult.completeFailure``, on the other hand, will stop the entire backup,
     /// and should be used if some critical or category-wide failure occurs.
     func archiveInteractions(
-        stream: BackupArchiveProtoOutputStream,
-        context: BackupArchive.ChatArchivingContext
+        stream: BackupArchiveOutputStream,
+        context: BackupArchive.ChatArchivingContext,
     ) throws(CancellationError) -> ArchiveMultiFrameResult {
         var completeFailureError: BackupArchive.FatalArchivingError?
         var partialFailures = [ArchiveFrameError]()
 
-        func archiveInteraction(
-            _ interactionRecord: InteractionRecord,
-            _ frameBencher: BackupArchive.Bencher.FrameBencher
-        ) -> Bool {
-            return autoreleasepool { () -> Bool in
+        try context.wrapEnumeration(
+            enumerationBlock: { tx, block throws(CancellationError) in
+                var cursor = FailIfThrowsRecordCursor {
+                    try InteractionRecord.fetchCursor(tx.database)
+                }
+
+                while let interactionRecord = cursor.next(), try block(interactionRecord) {}
+            },
+            perEnumerantBlock: { [self] interactionRecord, frameBencher -> Bool in
                 let interaction: TSInteraction
                 do {
                     interaction = try TSInteraction.fromRecord(interactionRecord)
                 } catch let error {
-                    partialFailures.append(.archiveFrameError(
-                        .invalidInteractionDatabaseRow(error),
-                        BackupArchive.InteractionUniqueId(invalidInteractionRecord: interactionRecord),
-                    ))
+                    partialFailures.append(.archiveFrameError(.invalidInteractionDatabaseRow(error)))
                     return true
                 }
 
-                let result = self.archiveInteraction(
+                switch archiveInteraction(
                     interaction,
                     stream: stream,
                     frameBencher: frameBencher,
-                    context: context
-                )
-                switch result {
+                    context: context,
+                ) {
                 case .success:
                     return true
                 case .partialSuccess(let errors):
@@ -159,32 +168,8 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
                     completeFailureError = error
                     return false
                 }
-            }
-        }
-
-        do {
-            try context.bencher.wrapEnumeration(
-                { tx, block in
-                    let cursor = try InteractionRecord
-                        .fetchCursor(tx.database)
-
-                    while
-                        let interactionRecord = try cursor.next(),
-                        try block(interactionRecord)
-                    {}
-                },
-                tx: context.tx
-            ) { interactionRecord, frameBencher in
-                try Task.checkCancellation()
-                return archiveInteraction(interactionRecord, frameBencher)
-            }
-        } catch let error as CancellationError {
-            throw error
-        } catch let error {
-            // Errors thrown here are from the iterator's SQL query,
-            // not the individual interaction handler.
-            return .completeFailure(.fatalArchiveError(.interactionIteratorError(error)))
-        }
+            },
+        )
 
         if let completeFailureError {
             return .completeFailure(completeFailureError)
@@ -197,14 +182,11 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
 
     private func archiveInteraction(
         _ interaction: TSInteraction,
-        stream: BackupArchiveProtoOutputStream,
+        stream: BackupArchiveOutputStream,
         frameBencher: BackupArchive.Bencher.FrameBencher,
-        context: BackupArchive.ChatArchivingContext
+        context: BackupArchive.ChatArchivingContext,
     ) -> ArchiveMultiFrameResult {
         var partialErrors = [ArchiveFrameError]()
-
-        let chatId = context[interaction.uniqueThreadIdentifier]
-        let threadInfo = chatId.map { context[$0] } ?? nil
 
         if context.gv1ThreadIds.contains(interaction.uniqueThreadIdentifier) {
             /// We are knowingly dropping GV1 data from backups, so we'll skip
@@ -212,57 +194,94 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
             return .success
         }
 
-        guard let chatId, let threadInfo else {
-            partialErrors.append(.archiveFrameError(
-                .referencedThreadIdMissing(interaction.uniqueThreadIdentifier),
-                interaction.uniqueInteractionId
-            ))
-            return .partialSuccess(partialErrors)
+        if interaction.uniqueThreadId == TSReleaseNotesThread.releaseNotesUniqueId {
+            // We skip archiving release notes messages.
+            return .success
         }
 
-        let archiveInteractionResult: BackupArchive.ArchiveInteractionResult<BackupArchive.InteractionArchiveDetails>
         if
             let message = interaction as? TSMessage,
             message.isGroupStoryReply
         {
-            // We skip group story reply messages, as stories
-            // aren't backed up so neither should their replies.
+            // Stories aren't backed up, and group story replies are only shown
+            // in the context of the stories UX, so we don't back them up either.
             return .success
-        } else if let incomingMessage = interaction as? TSIncomingMessage {
+        }
+
+        let expirationDetails: BackupArchive.ChatItemExpirationDetails?
+        if let expiringInteraction = interaction as? ExpiringInteraction {
+            expirationDetails = BackupArchive.ChatItemExpirationDetails(
+                expiringInteraction: expiringInteraction,
+            )
+        } else {
+            expirationDetails = nil
+        }
+
+        if let expirationDetails {
+            guard
+                BackupArchive.Timestamps.isValid(expirationDetails.expireStartedAt),
+                BackupArchive.Timestamps.isValid(expirationDetails.expiresInMs)
+            else {
+                // Skip messages with invalid timestamps, lest they be rejected
+                // by the validator.
+                return .success
+            }
+
+            if
+                context.includedContentFilter.shouldSkipMessage(
+                    expirationDetails: expirationDetails,
+                    currentTimestamp: context.startDate.ows_millisecondsSince1970,
+                )
+            {
+                // This message is excluded based on our content filter: don't archive!
+                return .success
+            }
+        }
+
+        guard
+            let chatId = context[interaction.uniqueThreadIdentifier],
+            let threadInfo = context[chatId]
+        else {
+            partialErrors.append(.archiveFrameError(.referencedThreadIdMissing(interaction.uniqueThreadIdentifier)))
+            return .partialSuccess(partialErrors)
+        }
+
+        let archiveInteractionResult: BackupArchive.ArchiveInteractionResult<BackupArchive.InteractionArchiveDetails>
+        if let incomingMessage = interaction as? TSIncomingMessage {
             archiveInteractionResult = incomingMessageArchiver.archiveIncomingMessage(
                 incomingMessage,
                 threadInfo: threadInfo,
-                context: context
+                context: context,
             )
         } else if let outgoingMessage = interaction as? TSOutgoingMessage {
             archiveInteractionResult = outgoingMessageArchiver.archiveOutgoingMessage(
                 outgoingMessage,
                 threadInfo: threadInfo,
-                context: context
+                context: context,
             )
         } else if let individualCallInteraction = interaction as? TSCall {
             archiveInteractionResult = chatUpdateMessageArchiver.archiveIndividualCall(
                 individualCallInteraction,
                 threadInfo: threadInfo,
-                context: context
+                context: context,
             )
         } else if let groupCallInteraction = interaction as? OWSGroupCallMessage {
             archiveInteractionResult = chatUpdateMessageArchiver.archiveGroupCall(
                 groupCallInteraction,
                 threadInfo: threadInfo,
-                context: context
+                context: context,
             )
         } else if let errorMessage = interaction as? TSErrorMessage {
             archiveInteractionResult = chatUpdateMessageArchiver.archiveErrorMessage(
                 errorMessage,
                 threadInfo: threadInfo,
-                context: context
+                context: context,
             )
         } else if let infoMessage = interaction as? TSInfoMessage {
             archiveInteractionResult = chatUpdateMessageArchiver.archiveInfoMessage(
                 infoMessage,
                 threadInfo: threadInfo,
-                context: context
+                context: context,
             )
         } else {
             /// Any interactions that landed us here will be legacy messages we
@@ -288,32 +307,20 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
             return .completeFailure(error)
         }
 
-        // We may skip archiving messages based on their expiration
-        // (disappearing message) details.
-        if
-            context.includedContentFilter.shouldSkipMessageBasedOnExpiration(
-                expireStartDate: details.expireStartDate,
-                expiresInMs: details.expiresInMs,
-                currentTimestamp: context.startTimestampMs
-            )
-        {
-            // Skip, but treat as a success.
-            return .success
-        }
-
         // A bug on iOS allowed us to create edits of voice notes that contained
         // text as well, which are not allowed in a Backup. Sanitize before
         // writing that disallowed content to the stream.
         sanitizeVoiceNotesWithText(details: &details)
 
-        let error = Self.writeFrameToStream(
-            stream,
-            objectId: interaction.uniqueInteractionId,
-            frameBencher: frameBencher
+        let error: ArchiveFrameError? = context.writeFrame(
+            toStream: stream,
+            flush: .afterInterval,
+            frameBencher: frameBencher,
         ) {
             let chatItem = buildChatItem(
                 fromDetails: details,
-                chatId: chatId
+                expirationDetails: expirationDetails,
+                chatId: chatId,
             )
 
             var frame = BackupProto_Frame()
@@ -339,7 +346,7 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
     /// messages such that they could get body text added, by converting those
     /// messages to "text messages with a non-voice-message audio attachment".
     private func sanitizeVoiceNotesWithText(
-        details: inout BackupArchive.InteractionArchiveDetails
+        details: inout BackupArchive.InteractionArchiveDetails,
     ) {
         let anyRevisionContainsVoiceNoteAndText = details.anyRevisionContainsChatItemType { chatItemType -> Bool in
             switch chatItemType {
@@ -377,20 +384,30 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
         }
     }
 
+    /// - Parameter expirationDetails
+    /// Expiration details for the latest revision, which are applied to all
+    /// revisions. (Past revisions don't have their own expire timer locally.)
     private func buildChatItem(
         fromDetails details: BackupArchive.InteractionArchiveDetails,
-        chatId: BackupArchive.ChatId
+        expirationDetails: BackupArchive.ChatItemExpirationDetails?,
+        chatId: BackupArchive.ChatId,
     ) -> BackupProto_ChatItem {
         var chatItem = BackupProto_ChatItem()
         chatItem.chatID = chatId.value
         chatItem.authorID = details.author.value
         chatItem.dateSent = details.dateCreated
-        if let expiresInMs = details.expiresInMs, expiresInMs > 0 {
-            if let expireStartDate = details.expireStartDate {
+
+        if
+            let expirationDetails,
+            expirationDetails.expiresInMs > 0
+        {
+            chatItem.expiresInMs = expirationDetails.expiresInMs
+
+            if let expireStartDate = expirationDetails.expireStartDate {
                 chatItem.expireStartDate = expireStartDate
             }
-            chatItem.expiresInMs = expiresInMs
         }
+
         chatItem.sms = details.isSmsPreviouslyRestoredFromBackup
         chatItem.item = details.chatItemType
         chatItem.directionalDetails = details.directionalDetails
@@ -399,8 +416,22 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
             /// their own. (Their `pastRevisions` will all be empty.)
             return buildChatItem(
                 fromDetails: pastRevisionDetails,
-                chatId: chatId
+                expirationDetails: expirationDetails,
+                chatId: chatId,
             )
+        }
+
+        if let pinMessageDetails = details.pinMessageDetails {
+            var pinDetails = BackupProto_ChatItem.PinDetails()
+            pinDetails.pinnedAtTimestamp = pinMessageDetails.pinnedAtTimestamp
+            let expiryDetails: BackupProto_ChatItem.PinDetails.OneOf_PinExpiry
+            if let expiry = pinMessageDetails.expiresAtTimestamp {
+                expiryDetails = .pinExpiresAtTimestamp(expiry)
+            } else {
+                expiryDetails = .pinNeverExpires(true)
+            }
+            pinDetails.pinExpiry = expiryDetails
+            chatItem.pinDetails = pinDetails
         }
 
         return chatItem
@@ -415,13 +446,13 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
     /// but typically an error will be shown to the user, but the restore will be allowed to proceed.
     func restore(
         _ chatItem: BackupProto_ChatItem,
-        context: BackupArchive.ChatItemRestoringContext
+        context: BackupArchive.ChatItemRestoringContext,
     ) -> RestoreFrameResult {
         func restoreFrameError(
-            _ error: BackupArchive.RestoreFrameError<BackupArchive.ChatItemId>.ErrorType,
-            line: UInt = #line
+            _ error: BackupArchive.RestoreFrameError.ErrorType,
+            line: UInt = #line,
         ) -> RestoreFrameResult {
-            return .failure([.restoreFrameError(error, chatItem.id, line: line)])
+            return .failure([.restoreFrameError(error, line: line)])
         }
 
         switch context.recipientContext[chatItem.authorRecipientId] {
@@ -443,43 +474,43 @@ public class BackupArchiveChatItemArchiver: BackupArchiveProtoStreamWriter {
         switch chatItem.directionalDetails {
         case nil:
             return .unrecognizedEnum(BackupArchive.UnrecognizedEnumError(
-                enumType: BackupProto_ChatItem.OneOf_DirectionalDetails.self
+                enumType: BackupProto_ChatItem.OneOf_DirectionalDetails.self,
             ))
         case .incoming:
             restoreInteractionResult = incomingMessageArchiver.restoreIncomingChatItem(
                 chatItem,
                 chatThread: thread,
-                context: context
+                context: context,
             )
         case .outgoing:
             restoreInteractionResult = outgoingMessageArchiver.restoreChatItem(
                 chatItem,
                 chatThread: thread,
-                context: context
+                context: context,
             )
         case .directionless:
             switch chatItem.item {
             case nil:
                 return .unrecognizedEnum(BackupArchive.UnrecognizedEnumError(
-                    enumType: BackupProto_ChatItem.OneOf_Item.self
+                    enumType: BackupProto_ChatItem.OneOf_Item.self,
                 ))
             case
-                    .standardMessage,
-                    .contactMessage,
-                    .giftBadge,
-                    .viewOnceMessage,
-                    .paymentNotification,
-                    .remoteDeletedMessage,
-                    .stickerMessage,
-                    .directStoryReplyMessage,
-                    .adminDeletedMessage,
-                    .poll:
+                .standardMessage,
+                .contactMessage,
+                .giftBadge,
+                .viewOnceMessage,
+                .paymentNotification,
+                .remoteDeletedMessage,
+                .stickerMessage,
+                .directStoryReplyMessage,
+                .poll,
+                .adminDeletedMessage:
                 return restoreFrameError(.invalidProtoData(.directionlessChatItemNotUpdateMessage))
             case .updateMessage:
                 restoreInteractionResult = chatUpdateMessageArchiver.restoreChatItem(
                     chatItem,
                     chatThread: thread,
-                    context: context
+                    context: context,
                 )
             }
         }

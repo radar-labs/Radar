@@ -14,7 +14,7 @@ class DebugUITableViewController: OWSTableViewController2 {
 
     static func presentDebugUI(
         fromViewController: UIViewController,
-        thread: TSThread?
+        thread: TSThread?,
     ) {
         let viewController = DebugUITableViewController()
 
@@ -24,10 +24,11 @@ class DebugUITableViewController: OWSTableViewController2 {
             itemForSubsection(DebugUIPrompts(), viewController: viewController, thread: thread),
             itemForSubsection(DebugUISessionState(), viewController: viewController, thread: thread),
             itemForSubsection(DebugUIDiskUsage(), viewController: viewController, thread: thread),
+            itemForSubsection(DebugUIReachability(), viewController: viewController, thread: thread),
         ]
         viewController.setContents(OWSTableContents(
             title: "Debug UI",
-            sections: [ OWSTableSection(items: subsectionItems) ]
+            sections: [OWSTableSection(items: subsectionItems)],
         ))
         viewController.present(fromViewController: fromViewController)
     }
@@ -37,15 +38,15 @@ class DebugUITableViewController: OWSTableViewController2 {
     private func pushPageWithSection(_ section: OWSTableSection, title: String) {
         let viewController = DebugUITableViewController()
         viewController.setContents(
-            OWSTableContents(title: title, sections: [section])
+            OWSTableContents(title: title, sections: [section]),
         )
-        navigationController?.pushViewController(viewController, animated: true )
+        navigationController?.pushViewController(viewController, animated: true)
     }
 
     private static func itemForSubsection(
         _ page: DebugUIPage,
         viewController: DebugUITableViewController,
-        thread: TSThread? = nil
+        thread: TSThread? = nil,
     ) -> OWSTableItem {
         return OWSTableItem.disclosureItem(
             withText: page.name,
@@ -53,7 +54,7 @@ class DebugUITableViewController: OWSTableViewController2 {
                 guard let viewController, let section = page.section(thread: thread) else { return }
                 section.headerTitle = nil // Updated the style. Too lazy to go through and change all of these to not set their own titles
                 viewController.pushPageWithSection(section, title: page.name)
-            }
+            },
         )
     }
 }

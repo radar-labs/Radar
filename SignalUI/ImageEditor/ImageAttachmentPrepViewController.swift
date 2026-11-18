@@ -5,7 +5,7 @@
 
 import SignalServiceKit
 
-class ImageAttachmentPrepViewController: AttachmentPrepViewController {
+class ImageAttachmentPrepViewController: AttachmentPrepViewController, ImageEditorViewDelegate {
 
     private let model: ImageEditorModel
     weak var stickerSheetDelegate: StickerPickerSheetDelegate?
@@ -28,8 +28,9 @@ class ImageAttachmentPrepViewController: AttachmentPrepViewController {
     }
 
     override func prepareContentView() {
-        editorView.setHasRoundCorners(true)
-        editorView.textInteractionModes = [ .tap, .move ]
+        editorView.hasRoundedCorners = true
+        editorView.contentMode = .scaleToFill
+        editorView.textInteractionModes = [.tap, .move]
         editorView.configureSubviews()
     }
 
@@ -38,31 +39,28 @@ class ImageAttachmentPrepViewController: AttachmentPrepViewController {
     }
 
     override var canSaveMedia: Bool {
-        if model.isDirty() {
+        if model.isDirty {
             return true
         }
         return super.canSaveMedia
     }
 
-    /**
-     * Bottom toolbar in edit mode is always the same height and can be cached.
-     */
-    private static let editModeToolbarHeight: CGFloat = {
-        let toolbar = ImageEditorBottomBar(buttonProvider: nil)
-        let size = toolbar.systemLayoutSizeFitting(CGSize(width: UIView.noIntrinsicMetric, height: .greatestFiniteMagnitude),
-                                                   withHorizontalFittingPriority: .fittingSizeLevel,
-                                                   verticalFittingPriority: .fittingSizeLevel)
-        return size.height
-    }()
-
-    override var mediaEditingToolbarHeight: CGFloat? {
-        ImageAttachmentPrepViewController.editModeToolbarHeight
-    }
-
     // MARK: - Tools
+
+    // Same insets that we use to determine max content size for the scroll view
+    // in `AttachmentPrepViewController.configureScrollViewContentSizeAndZoom`.
+    private func initialContentInsetsForToolViewController() -> UIEdgeInsets {
+        UIEdgeInsets(
+            top: view.safeAreaInsets.top + Self.contentInsets.top,
+            leading: view.safeAreaInsets.leading + Self.contentInsets.leading,
+            bottom: view.safeAreaInsets.bottom + Self.contentInsets.bottom,
+            trailing: view.safeAreaInsets.trailing + Self.contentInsets.trailing,
+        )
+    }
 
     override func activatePenTool() {
         let viewController = ImageEditorViewController(model: model, stickerSheetDelegate: stickerSheetDelegate)
+        viewController.initialContentInsets = initialContentInsetsForToolViewController()
         presentMediaTool(viewController: viewController)
     }
 
@@ -82,18 +80,23 @@ class ImageAttachmentPrepViewController: AttachmentPrepViewController {
         }
 
         let cropTool = ImageEditorCropViewController(model: model, srcImage: srcImage, previewImage: previewImage)
+        cropTool.initialContentInsets = initialContentInsetsForToolViewController()
         presentMediaTool(viewController: cropTool)
     }
-}
 
-// MARK: -
-
-extension ImageAttachmentPrepViewController: ImageEditorViewDelegate {
+    // MARK: - ImageEditorViewDelegate
 
     private func openTextTool(with textItem: ImageEditorTextItem, isNewItem: Bool, editText: Bool) {
         let textEditor = ImageEditorViewController(model: model, stickerSheetDelegate: stickerSheetDelegate)
         textEditor.selectTextItem(textItem, isNewItem: isNewItem, startEditing: editText)
+        textEditor.initialContentInsets = initialContentInsetsForToolViewController()
         presentMediaTool(viewController: textEditor)
+    }
+
+    func imageEditorViewModelDidChange(_ imageEditorView: ImageEditorView) {
+        // Updated model might have different image size / aspect ratio
+        // and we need to re-configure scrolling.
+        view.setNeedsLayout()
     }
 
     func imageEditorView(_: ImageEditorView, didRequestAddTextItem textItem: ImageEditorTextItem) {

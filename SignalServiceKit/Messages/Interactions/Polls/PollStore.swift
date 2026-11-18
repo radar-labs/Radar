@@ -12,11 +12,11 @@ public class PollStore {
         interactionId: Int64,
         allowsMultiSelect: Bool,
         options: [String],
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) throws {
         var pollRecord = PollRecord(
             interactionId: interactionId,
-            allowsMultiSelect: allowsMultiSelect
+            allowsMultiSelect: allowsMultiSelect,
         )
         try pollRecord.insert(transaction.database)
 
@@ -29,7 +29,7 @@ public class PollStore {
             var pollOptionRecord = PollOptionRecord(
                 pollId: pollID,
                 option: option,
-                optionIndex: Int32(index)
+                optionIndex: Int32(index),
             )
             try pollOptionRecord.insert(transaction.database)
         }
@@ -37,7 +37,7 @@ public class PollStore {
 
     public func terminatePoll(
         interactionId: Int64,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) throws {
         try PollRecord
             .filter(Column(PollRecord.CodingKeys.interactionId.rawValue) == interactionId)
@@ -46,7 +46,7 @@ public class PollStore {
 
     public func revertPollTerminate(
         interactionId: Int64,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) throws {
         try PollRecord
             .filter(Column(PollRecord.CodingKeys.interactionId.rawValue) == interactionId)
@@ -58,17 +58,18 @@ public class PollStore {
         message: TSMessage,
         localUser: Aci,
         transaction: DBReadTransaction,
-        ownerIsLocalUser: Bool
+        ownerIsLocalUser: Bool,
     ) throws -> OWSPoll? {
         guard let interactionId = message.grdbId?.int64Value else {
             owsFailDebug("No interactionId found")
             return nil
         }
 
-        guard let poll = try PollRecord
-            .filter(PollRecord.Columns.interactionId == interactionId)
-            .fetchOne(transaction.database),
-              let pollId = poll.id
+        guard
+            let poll = try PollRecord
+                .filter(PollRecord.Columns.interactionId == interactionId)
+                .fetchOne(transaction.database),
+            let pollId = poll.id
         else {
             owsFailDebug("No poll found")
             return nil
@@ -92,10 +93,11 @@ public class PollStore {
                 .fetchAll(transaction.database)
 
             for voteRow in voteRows {
-                guard let recipient = try SignalRecipient
-                    .filter(voteRow.voteAuthorId == Column(SignalRecipient.CodingKeys.id.rawValue))
-                    .fetchOne(transaction.database),
-                      let aci = recipient.aci
+                guard
+                    let recipient = try SignalRecipient
+                        .filter(voteRow.voteAuthorId == Column(SignalRecipient.CodingKeys.id.rawValue))
+                        .fetchOne(transaction.database),
+                    let aci = recipient.aci
                 else {
                     owsFailDebug("Vote author not found in recipients table")
                     return nil
@@ -110,7 +112,7 @@ public class PollStore {
                 }
 
                 if voteRow.voteState.isPending() {
-                    if !poll.allowsMultiSelect && voteRow.voteState == .pendingVote {
+                    if !poll.allowsMultiSelect, voteRow.voteState == .pendingVote {
                         // If most recent single select vote, visually "un-vote" everything else to avoid UX
                         // confusion, since only the latest vote will apply when pending vote messages send.
                         if voteRow.voteCount > maxPendingVoteCount {
@@ -140,13 +142,13 @@ public class PollStore {
             allowsMultiSelect: poll.allowsMultiSelect,
             votes: votes,
             isEnded: poll.isEnded,
-            ownerIsLocalUser: ownerIsLocalUser
+            ownerIsLocalUser: ownerIsLocalUser,
         )
     }
 
     public func pollForInteractionId(
         interactionId: Int64,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) throws -> PollRecord? {
         return try PollRecord
             .filter(Column(PollRecord.CodingKeys.interactionId.rawValue) == interactionId)
@@ -165,21 +167,26 @@ public class PollStore {
         optionsVoted: [OWSPoll.OptionIndex],
         voteAuthorId: Int64,
         voteCount: UInt32,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) throws -> Bool {
-        guard let poll = try pollForInteractionId(
-            interactionId: interactionId,
-            transaction: transaction
-        ), let pollId = poll.id else {
+        guard
+            let poll = try pollForInteractionId(
+                interactionId: interactionId,
+                transaction: transaction,
+            ), let pollId = poll.id
+        else {
             Logger.error("Can't find target poll")
             return false
         }
 
-        guard try checkValidVote(
-            poll: poll,
-            optionsVoted: optionsVoted,
-            transaction: transaction
-        ) else {
+        guard
+            try checkValidVote(
+                poll: poll,
+                optionsVoted: optionsVoted,
+                voteCount: voteCount,
+                transaction: transaction,
+            )
+        else {
             return false
         }
 
@@ -187,7 +194,7 @@ public class PollStore {
             pollId: pollId,
             voteAuthorId: voteAuthorId,
             includePending: false,
-            transaction: transaction
+            transaction: transaction,
         )
 
         guard highestVoteCount < voteCount else {
@@ -209,13 +216,13 @@ public class PollStore {
             pollId: pollId,
             voteAuthorId: voteAuthorId,
             voteCount: highestVoteCount,
-            transaction: transaction
+            transaction: transaction,
         )
 
         let newVoteOptionIds = try voteOptionIds(
             from: optionsVoted,
             pollId: pollId,
-            transaction: transaction
+            transaction: transaction,
         )
 
         // Delete vote counts up to and including the new one to clean up,
@@ -226,7 +233,7 @@ public class PollStore {
             for: voteAuthorId,
             pollId: pollId,
             minRequiredVoteCount: Int32(voteCount) + 1,
-            transaction: transaction
+            transaction: transaction,
         )
 
         let unvotes = currentVoteOptionIds.subtracting(newVoteOptionIds)
@@ -237,7 +244,7 @@ public class PollStore {
                 optionId: optionId,
                 voteAuthorId: voteAuthorId,
                 voteCount: Int32(voteCount),
-                voteState: unvotes.contains(optionId) ? .unvote : .vote
+                voteState: unvotes.contains(optionId) ? .unvote : .vote,
             )
             try pollVoteRecord.insert(transaction.database)
         }
@@ -248,16 +255,20 @@ public class PollStore {
     private func checkValidVote(
         poll: PollRecord,
         optionsVoted: [OWSPoll.OptionIndex],
-        transaction: DBReadTransaction
+        voteCount: UInt32,
+        transaction: DBReadTransaction,
     ) throws -> Bool {
         guard !poll.isEnded else {
             Logger.error("Poll has ended, dropping vote")
-            return false
+            throw OWSGenericError("Poll has ended, dropping vote")
         }
 
         guard optionsVoted.count <= 1 || poll.allowsMultiSelect else {
-            Logger.error("Poll doesn't support multi-select but multiple options were voted for")
-            return false
+            throw OWSAssertionError("Poll doesn't support multi-select but multiple options were voted for")
+        }
+
+        if voteCount >= Int32.max {
+            throw OWSAssertionError("Vote count does not fit in Int32!")
         }
 
         return true
@@ -267,7 +278,7 @@ public class PollStore {
         pollId: Int64,
         voteAuthorId: Int64,
         includePending: Bool,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) throws -> Int32 {
         let optionIds = try PollOptionRecord
             .filter(PollOptionRecord.Columns.pollId == pollId)
@@ -299,7 +310,7 @@ public class PollStore {
         pollId: Int64,
         voteAuthorId: Int64,
         voteCount: Int32,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) throws -> Set<OptionId> {
         let optionIds = try PollOptionRecord
             .filter(PollOptionRecord.Columns.pollId == pollId)
@@ -324,7 +335,7 @@ public class PollStore {
     private func voteOptionIds(
         from optionIndexes: [OWSPoll.OptionIndex],
         pollId: Int64,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) throws -> [OptionId] {
         return try PollOptionRecord
             .filter(PollOptionRecord.Columns.pollId == pollId)
@@ -339,7 +350,7 @@ public class PollStore {
         for voteAuthorId: Int64,
         pollId: Int64,
         minRequiredVoteCount: Int32,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) throws {
         let optionIds = try PollOptionRecord
             .filter(PollOptionRecord.Columns.pollId == pollId)
@@ -360,29 +371,40 @@ public class PollStore {
         localRecipientId: Int64,
         optionIndex: OWSPoll.OptionIndex,
         isUnvote: Bool,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) throws -> Int32? {
-        guard let poll = try pollForInteractionId(
-            interactionId: interactionId,
-            transaction: transaction
-        ), let pollId = poll.id else {
+        guard
+            let poll = try pollForInteractionId(
+                interactionId: interactionId,
+                transaction: transaction,
+            ), let pollId = poll.id
+        else {
             Logger.error("Can't find target poll")
             return nil
         }
 
         // Include pending here so we don't reuse an already-sent but not-yet-delivered vote count.
-        let newHighestVoteCount = try highestVoteCount(
+
+        let highestVoteCount = try highestVoteCount(
             pollId: pollId,
             voteAuthorId: localRecipientId,
             includePending: true,
-            transaction: transaction
-        ) + 1
+            transaction: transaction,
+        )
 
-        guard let optionId = try voteOptionIds(
-            from: [optionIndex],
-            pollId: pollId,
-            transaction: transaction
-        ).first else {
+        guard highestVoteCount < Int32.max else {
+            Logger.error("Failed to apply pending vote, highestVoteCount is too large")
+            return nil
+        }
+
+        let newHighestVoteCount = highestVoteCount + 1
+        guard
+            let optionId = try voteOptionIds(
+                from: [optionIndex],
+                pollId: pollId,
+                transaction: transaction,
+            ).first
+        else {
             Logger.error("Invalid option index")
             return nil
         }
@@ -394,7 +416,7 @@ public class PollStore {
             optionId: optionId,
             voteAuthorId: localRecipientId,
             voteCount: newHighestVoteCount,
-            voteState: isUnvote ? .pendingUnvote : .pendingVote
+            voteState: isUnvote ? .pendingUnvote : .pendingVote,
         )
 
         try voteRecord.insert(transaction.database)
@@ -406,12 +428,14 @@ public class PollStore {
         interactionId: Int64,
         voteAuthorId: Int64,
         voteCount: Int32?,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) throws -> [Int32] {
-        guard let poll = try pollForInteractionId(
-            interactionId: interactionId,
-            transaction: transaction
-        ), let pollId = poll.id else {
+        guard
+            let poll = try pollForInteractionId(
+                interactionId: interactionId,
+                transaction: transaction,
+            ), let pollId = poll.id
+        else {
             Logger.error("Can't find target poll")
             return []
         }
@@ -454,22 +478,26 @@ public class PollStore {
         voteCount: Int32,
         interactionId: Int64,
         voteAuthorId: Int64,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) throws {
-        guard let poll = try pollForInteractionId(
-            interactionId: interactionId,
-            transaction: transaction
-        ), let pollId = poll.id else {
+        guard
+            let poll = try pollForInteractionId(
+                interactionId: interactionId,
+                transaction: transaction,
+            ), let pollId = poll.id
+        else {
             Logger.error("Can't find target poll")
             return
         }
 
-        guard let highestNonPendingVoteCount = try? highestVoteCount(
-            pollId: pollId,
-            voteAuthorId: voteAuthorId,
-            includePending: false,
-            transaction: transaction
-        ) else {
+        guard
+            let highestNonPendingVoteCount = try? highestVoteCount(
+                pollId: pollId,
+                voteAuthorId: voteAuthorId,
+                includePending: false,
+                transaction: transaction,
+            )
+        else {
             Logger.error("Couldn't get highest non-pending vote count")
             return
         }
@@ -495,27 +523,27 @@ public class PollStore {
 // MARK: - Backups
 
 extension PollStore {
-    public func backupPollData(
+    func backupPollData(
         question: String,
         message: TSMessage,
         interactionId: Int64,
-        transaction: DBReadTransaction
-    ) -> BackupArchive.ArchiveSingleFrameResult<BackupsPollData, BackupArchive.InteractionUniqueId> {
-        let interactionUniqueId = BackupArchive.InteractionUniqueId(interaction: message)
+        transaction: DBReadTransaction,
+    ) -> BackupArchive.ArchiveSingleFrameResult<BackupsPollData> {
         var poll: PollRecord
         var pollId: Int64
         do {
-            guard let wrappedPoll = try PollRecord
-                .filter(PollRecord.Columns.interactionId == interactionId)
-                .fetchOne(transaction.database),
-                  let wrappedPollId = wrappedPoll.id
+            guard
+                let wrappedPoll = try PollRecord
+                    .filter(PollRecord.Columns.interactionId == interactionId)
+                    .fetchOne(transaction.database),
+                let wrappedPollId = wrappedPoll.id
             else {
-                return .failure(.archiveFrameError(.pollMissing, interactionUniqueId))
+                return .failure(.archiveFrameError(.pollMissing))
             }
             poll = wrappedPoll
             pollId = wrappedPollId
         } catch {
-            return .failure(.archiveFrameError(.invalidPollRecordDatabaseRow, interactionUniqueId))
+            return .failure(.archiveFrameError(.invalidPollRecordDatabaseRow))
         }
 
         var optionRows: [PollOptionRecord]
@@ -524,17 +552,17 @@ extension PollStore {
                 .filter(PollOptionRecord.Columns.pollId == pollId)
                 .fetchAll(transaction.database)
         } catch {
-            return .failure(.archiveFrameError(.invalidPollOptionRecordDatabaseRow, interactionUniqueId))
+            return .failure(.archiveFrameError(.invalidPollOptionRecordDatabaseRow))
         }
 
         var voteRows: [PollVoteRecord]
         do {
-            let optionRowIds = optionRows.compactMap{ $0.id }
+            let optionRowIds = optionRows.compactMap { $0.id }
             voteRows = try PollVoteRecord
                 .filter(optionRowIds.contains(PollVoteRecord.Columns.optionId))
                 .fetchAll(transaction.database)
         } catch {
-            return .failure(.archiveFrameError(.invalidPollVoteRecordDatabaseRow, interactionUniqueId))
+            return .failure(.archiveFrameError(.invalidPollVoteRecordDatabaseRow))
         }
 
         let optionIdToVotes = Dictionary(grouping: voteRows, by: { $0.optionId })
@@ -542,12 +570,12 @@ extension PollStore {
         var optionData: [BackupsPollData.BackupsPollOption] = []
         for optionRow in optionRows {
             guard let optionId = optionRow.id else {
-                return .failure(.archiveFrameError(.pollOptionIdMissing, interactionUniqueId))
+                return .failure(.archiveFrameError(.pollOptionIdMissing))
             }
             var votes: [BackupsPollData.BackupsPollOption.BackupsPollVote] = []
             for voteRow in optionIdToVotes[optionId] ?? [] {
                 if voteRow.voteState == .vote {
-                    votes.append(BackupsPollData.BackupsPollOption.BackupsPollVote(voteAuthorId: voteRow.voteAuthorId, voteCount: UInt32(voteRow.voteCount)))
+                    votes.append(BackupsPollData.BackupsPollOption.BackupsPollVote(voteAuthorId: voteRow.voteAuthorId, voteCount: voteRow.voteCount))
                 }
             }
             optionData.append(BackupsPollData.BackupsPollOption(text: optionRow.option, votes: votes))
@@ -557,6 +585,7 @@ extension PollStore {
             question: question,
             allowMultiple: poll.allowsMultiSelect,
             isEnded: poll.isEnded,
-            options: optionData))
+            options: optionData,
+        ))
     }
 }

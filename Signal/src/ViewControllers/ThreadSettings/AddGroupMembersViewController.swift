@@ -18,15 +18,13 @@ public class AddGroupMembersViewController: BaseGroupMemberViewController {
     weak var addGroupMembersViewControllerDelegate: AddGroupMembersViewControllerDelegate?
 
     private let groupThread: TSGroupThread
-    private let oldGroupModel: TSGroupModel
+    private let oldGroupModel: TSGroupModelV2
 
     private var newRecipientSet = OrderedSet<PickedRecipient>()
 
-    public init(groupThread: TSGroupThread) {
-        owsAssertDebug(groupThread.isGroupV2Thread, "Can't add members to v1 threads.")
-
+    public init(groupThread: TSGroupThread, groupModel: TSGroupModelV2) {
         self.groupThread = groupThread
-        self.oldGroupModel = groupThread.groupModel
+        self.oldGroupModel = groupModel
 
         super.init()
 
@@ -35,29 +33,30 @@ public class AddGroupMembersViewController: BaseGroupMemberViewController {
 
     // MARK: - View Lifecycle
 
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
 
-        title = OWSLocalizedString("ADD_GROUP_MEMBERS_VIEW_TITLE",
-                                  comment: "The title for the 'add group members' view.")
+        title = OWSLocalizedString(
+            "ADD_GROUP_MEMBERS_VIEW_TITLE",
+            comment: "The title for the 'add group members' view.",
+        )
     }
 
     // MARK: -
 
     fileprivate func updateNavbar() {
         if hasUnsavedChanges {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: OWSLocalizedString("EDIT_GROUP_UPDATE_BUTTON",
-                                                                                         comment: "The title for the 'update group' button."),
-                                                                style: .plain,
-                                                                target: self,
-                                                                action: #selector(updateGroupPressed),
-                                                                accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "update"))
+            navigationItem.rightBarButtonItem = .button(title: OWSLocalizedString(
+                "EDIT_GROUP_UPDATE_BUTTON",
+                comment: "The title for the 'update group' button.",
+            )) { [weak self] in
+                self?.updateGroupPressed()
+            }
         } else {
             navigationItem.rightBarButtonItem = nil
         }
     }
 
-    @objc
     private func updateGroupPressed() {
         showConfirmationAlert()
     }
@@ -73,20 +72,31 @@ public class AddGroupMembersViewController: BaseGroupMemberViewController {
         let alertTitle: String
         let alertMessage: String
         let actionTitle: String
-        let messageFormat = OWSLocalizedString("ADD_GROUP_MEMBERS_VIEW_CONFIRM_ALERT_MESSAGE_%d", tableName: "PluralAware",
-                                              comment: "Format for the message for the 'add group members' confirmation alert.  Embeds {{ %1$@ number of new members, %2$@ name of the group. }}.")
+        let messageFormat = OWSLocalizedString(
+            "ADD_GROUP_MEMBERS_VIEW_CONFIRM_ALERT_MESSAGE_%d",
+            tableName: "PluralAware",
+            comment: "Format for the message for the 'add group members' confirmation alert.  Embeds {{ %1$@ number of new members, %2$@ name of the group. }}.",
+        )
         alertMessage = String.localizedStringWithFormat(messageFormat, newRecipientSet.count, groupName)
-        alertTitle = String.localizedStringWithFormat(OWSLocalizedString("ADD_GROUP_MEMBERS_VIEW_CONFIRM_ALERT_TITLE_%d", tableName: "PluralAware",
-                                                      comment: "Title for the 'add group members' confirmation alert."), newRecipientSet.count)
-        actionTitle = String.localizedStringWithFormat(OWSLocalizedString("ADD_GROUP_MEMBERS_ACTION_TITLE_%d", tableName: "PluralAware",
-                                        comment: "Label for the 'add group members' button."), newRecipientSet.count)
+        alertTitle = String.localizedStringWithFormat(OWSLocalizedString(
+            "ADD_GROUP_MEMBERS_VIEW_CONFIRM_ALERT_TITLE_%d",
+            tableName: "PluralAware",
+            comment: "Title for the 'add group members' confirmation alert.",
+        ), newRecipientSet.count)
+        actionTitle = String.localizedStringWithFormat(OWSLocalizedString(
+            "ADD_GROUP_MEMBERS_ACTION_TITLE_%d",
+            tableName: "PluralAware",
+            comment: "Label for the 'add group members' button.",
+        ), newRecipientSet.count)
 
         let actionSheet = ActionSheetController(title: alertTitle, message: alertMessage)
-        actionSheet.addAction(ActionSheetAction(title: actionTitle,
-                                                style: .default,
-                                                handler: { [weak self] _ in
-                                                    self?.updateGroupThreadAndDismiss()
-        }))
+        actionSheet.addAction(ActionSheetAction(
+            title: actionTitle,
+            style: .default,
+            handler: { [weak self] _ in
+                self?.updateGroupThreadAndDismiss()
+            },
+        ))
         actionSheet.addAction(OWSActionSheets.cancelAction)
         self.presentActionSheet(actionSheet)
     }
@@ -99,7 +109,7 @@ private extension AddGroupMembersViewController {
     func updateGroupThreadAndDismiss() {
 
         let dismissAndUpdateDelegate = { [weak self] in
-            guard let self = self else {
+            guard let self else {
                 return
             }
             self.addGroupMembersViewControllerDelegate?.addGroupMembersViewDidUpdate()
@@ -113,8 +123,10 @@ private extension AddGroupMembersViewController {
 
         let newServiceIds = newRecipientSet.orderedMembers
             .compactMap { recipient -> ServiceId? in
-                if let serviceId = recipient.address?.serviceId,
-                   !oldGroupModel.groupMembership.isFullMember(serviceId) {
+                if
+                    let serviceId = recipient.address?.serviceId,
+                    !oldGroupModel.groupMembership.isFullMember(serviceId)
+                {
                     return serviceId
                 }
 
@@ -132,11 +144,11 @@ private extension AddGroupMembersViewController {
             fromViewController: self,
             updateBlock: {
                 try await GroupManager.addOrInvite(
+                    secretParams: self.oldGroupModel.secretParams(),
                     serviceIds: newServiceIds,
-                    toExistingGroup: self.oldGroupModel
                 )
             },
-            completion: dismissAndUpdateDelegate
+            completion: dismissAndUpdateDelegate,
         )
     }
 }
@@ -181,22 +193,15 @@ extension AddGroupMembersViewController: GroupMemberViewDelegate {
         groupMemberViewGroupMemberCountForDisplay() >= RemoteConfig.current.maxGroupSizeRecommended
     }
 
-    func groupMemberViewIsPreExistingMember(_ recipient: PickedRecipient,
-                                            transaction: DBReadTransaction) -> Bool {
+    func groupMemberViewIsPreExistingMember(
+        _ recipient: PickedRecipient,
+        transaction: DBReadTransaction,
+    ) -> Bool {
         guard let serviceId = recipient.address?.serviceId else {
             owsFailDebug("Invalid recipient.")
             return false
         }
-        let groupMembership = oldGroupModel.groupMembership
-        switch groupMembership.canTryToAddToGroup(serviceId: serviceId) {
-        case .alreadyInGroup:
-            return true
-        case .addableWithProfileKeyCredential:
-            let canAddMember = GroupMembership.canTryToAddWithProfileKeyCredential(serviceId: serviceId, tx: transaction)
-            return !canAddMember
-        case .addableOrInvitable:
-            return false
-        }
+        return !oldGroupModel.groupMembership.canTryToAddToGroup(serviceId: serviceId, tx: transaction)
     }
 
     func groupMemberViewDismiss() {

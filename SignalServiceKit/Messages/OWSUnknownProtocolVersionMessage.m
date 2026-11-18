@@ -8,14 +8,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-NSUInteger const OWSUnknownProtocolVersionMessageSchemaVersion = 1;
-
 @interface OWSUnknownProtocolVersionMessage ()
 
 @property (nonatomic) NSUInteger protocolVersion;
 // If nil, the invalid message was sent by a linked device.
 @property (nonatomic, nullable) SignalServiceAddress *sender;
-@property (nonatomic, readonly) NSUInteger unknownProtocolVersionMessageSchemaVersion;
 
 @end
 
@@ -34,6 +31,7 @@ NSUInteger const OWSUnknownProtocolVersionMessageSchemaVersion = 1;
                      messageType:TSInfoMessageUnknownProtocolVersion
               expireTimerVersion:nil
                 expiresInSeconds:0
+                 expireStartedAt:0
              infoMessageUserInfo:nil];
 
     if (self) {
@@ -43,29 +41,32 @@ NSUInteger const OWSUnknownProtocolVersionMessageSchemaVersion = 1;
 
         _protocolVersion = protocolVersion;
         _sender = sender;
-        _unknownProtocolVersionMessageSchemaVersion = OWSUnknownProtocolVersionMessageSchemaVersion;
     }
 
     return self;
 }
 
-- (nullable instancetype)initWithCoder:(NSCoder *)coder
+- (NSUInteger)hash
 {
-    self = [super initWithCoder:coder];
-    if (!self) {
-        return self;
+    NSUInteger result = [super hash];
+    result ^= self.protocolVersion;
+    result ^= self.sender.hash;
+    return result;
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (![super isEqual:other]) {
+        return NO;
     }
-
-    if (_unknownProtocolVersionMessageSchemaVersion < 1) {
-        NSString *_Nullable phoneNumber = [coder decodeObjectForKey:@"senderId"];
-        if (phoneNumber) {
-            _sender = [SignalServiceAddress legacyAddressWithServiceIdString:nil phoneNumber:phoneNumber];
-        }
+    OWSUnknownProtocolVersionMessage *typedOther = (OWSUnknownProtocolVersionMessage *)other;
+    if (self.protocolVersion != typedOther.protocolVersion) {
+        return NO;
     }
-
-    _unknownProtocolVersionMessageSchemaVersion = OWSUnknownProtocolVersionMessageSchemaVersion;
-
-    return self;
+    if (![NSObject isObject:self.sender equalToObject:typedOther.sender]) {
+        return NO;
+    }
+    return YES;
 }
 
 // --- CODE GENERATION MARKER
@@ -94,7 +95,6 @@ NSUInteger const OWSUnknownProtocolVersionMessageSchemaVersion = 1;
                isGroupStoryReply:(BOOL)isGroupStoryReply
                           isPoll:(BOOL)isPoll
   isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
-                       isStarred:(BOOL)isStarred
               isViewOnceComplete:(BOOL)isViewOnceComplete
                isViewOnceMessage:(BOOL)isViewOnceMessage
                      linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -133,7 +133,6 @@ NSUInteger const OWSUnknownProtocolVersionMessageSchemaVersion = 1;
                  isGroupStoryReply:isGroupStoryReply
                             isPoll:isPoll
     isSmsMessageRestoredFromBackup:isSmsMessageRestoredFromBackup
-                         isStarred:isStarred
                 isViewOnceComplete:isViewOnceComplete
                  isViewOnceMessage:isViewOnceMessage
                        linkPreview:linkPreview

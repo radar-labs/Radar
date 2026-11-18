@@ -25,6 +25,7 @@ public class OWSLinkPreviewDraft: Equatable {
     public var urlString: String {
         return url.absoluteString
     }
+
     public let title: String?
     public let imageData: Data?
     public let imageMimeType: String?
@@ -58,7 +59,7 @@ public class OWSLinkPreviewDraft: Equatable {
     /// Uses identity equatability even though comparing fields seems like it would make more sense because this
     /// object used to inherit from `NSObject` without overridding `isEqual(_)` so it would have inherited
     /// identity equatability.
-    public static func == (lhs: OWSLinkPreviewDraft, rhs: OWSLinkPreviewDraft) -> Bool {
+    public static func ==(lhs: OWSLinkPreviewDraft, rhs: OWSLinkPreviewDraft) -> Bool {
         return lhs === rhs
     }
 }
@@ -66,7 +67,53 @@ public class OWSLinkPreviewDraft: Equatable {
 // MARK: - OWSLinkPreview
 
 @objc
-public class OWSLinkPreview: MTLModel, Codable {
+public final class OWSLinkPreview: NSObject, NSSecureCoding, NSCopying, Codable {
+    public static var supportsSecureCoding: Bool { true }
+
+    public init?(coder: NSCoder) {
+        self.date = coder.decodeObject(of: NSDate.self, forKey: "date") as Date?
+        self.previewDescription = coder.decodeObject(of: NSString.self, forKey: "previewDescription") as String?
+        self.title = coder.decodeObject(of: NSString.self, forKey: "title") as String?
+        self.urlString = coder.decodeObject(of: NSString.self, forKey: "urlString") as String?
+    }
+
+    public func encode(with coder: NSCoder) {
+        if let date {
+            coder.encode(date, forKey: "date")
+        }
+        if let previewDescription {
+            coder.encode(previewDescription, forKey: "previewDescription")
+        }
+        if let title {
+            coder.encode(title, forKey: "title")
+        }
+        if let urlString {
+            coder.encode(urlString, forKey: "urlString")
+        }
+    }
+
+    override public var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(date)
+        hasher.combine(previewDescription)
+        hasher.combine(title)
+        hasher.combine(urlString)
+        return hasher.finalize()
+    }
+
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard type(of: self) == type(of: object) else { return false }
+        guard self.date == object.date else { return false }
+        guard self.previewDescription == object.previewDescription else { return false }
+        guard self.title == object.title else { return false }
+        guard self.urlString == object.urlString else { return false }
+        return true
+    }
+
+    public func copy(with zone: NSZone? = nil) -> Any {
+        return self
+    }
 
     public struct Metadata {
         public let urlString: String
@@ -75,49 +122,32 @@ public class OWSLinkPreview: MTLModel, Codable {
         public let date: Date?
     }
 
-    @objc
-    public var urlString: String?
-
-    @objc
-    public var title: String?
-
-    @objc
-    public var previewDescription: String?
-
-    @objc
-    public var date: Date?
+    public let urlString: String?
+    public let title: String?
+    public let previewDescription: String?
+    public let date: Date?
 
     public init(
         urlString: String,
-        title: String? = nil
+        title: String? = nil,
+        previewDescription: String? = nil,
+        date: Date? = nil,
     ) {
         self.urlString = urlString
         self.title = title
+        self.previewDescription = previewDescription
+        self.date = date
 
         super.init()
     }
 
-    public convenience init(
-        metadata: Metadata
-    ) {
+    public convenience init(metadata: Metadata) {
         self.init(
             urlString: metadata.urlString,
-            title: metadata.title
+            title: metadata.title,
+            previewDescription: metadata.previewDescription,
+            date: metadata.date,
         )
-        self.previewDescription = metadata.previewDescription
-        self.date = metadata.date
-    }
-
-    public override init() {
-        super.init()
-    }
-
-    public required init!(coder: NSCoder) {
-        super.init(coder: coder)
-    }
-
-    public required init(dictionary dictionaryValue: [String: Any]!) throws {
-        try super.init(dictionary: dictionaryValue)
     }
 
     @objc
@@ -129,7 +159,7 @@ public class OWSLinkPreview: MTLModel, Codable {
     }
 
     public var displayDomain: String? {
-        urlString.flatMap(URL.init(string: )).flatMap(LinkPreviewHelper.displayDomain(forUrl:))
+        urlString.flatMap(URL.init(string:)).flatMap(LinkPreviewHelper.displayDomain(forUrl:))
     }
 
     // MARK: - Codable
@@ -154,16 +184,16 @@ public class OWSLinkPreview: MTLModel, Codable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        if let urlString = urlString {
+        if let urlString {
             try container.encode(urlString, forKey: .urlString)
         }
-        if let title = title {
+        if let title {
             try container.encode(title, forKey: .title)
         }
-        if let previewDescription = previewDescription {
+        if let previewDescription {
             try container.encode(previewDescription, forKey: .previewDescription)
         }
-        if let date = date {
+        if let date {
             try container.encode(date, forKey: .date)
         }
     }

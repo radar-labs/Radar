@@ -8,47 +8,38 @@
 /// - Note
 /// Number of exported database rows is not a perfect metric for time spent, as
 /// some rows require more time and work than others.
-public struct BackupArchiveExportProgress {
+struct BackupArchiveExportProgress {
     private let progressSource: OWSProgressSource
 
-    private init(progressSource: OWSProgressSource) {
-        self.progressSource = progressSource
-    }
-
-    public static func prepare(
+    static func prepare(
         sink: OWSProgressSink,
-        db: any DB
-    ) async throws -> Self {
-        var estimatedFrameCount = try db.read { tx in
-            // Get all the major things we iterate over. It doesn't have
-            // to be perfect; we'll skip some of these and besides they're
-            // all weighted evenly. Its just an estimate.
-            return try
-                SignalRecipient.fetchCount(tx.database)
-                + ThreadRecord.fetchCount(tx.database)
-                + InteractionRecord.fetchCount(tx.database)
-                + CallLinkRecord.fetchCount(tx.database)
-                + StickerPackRecord.fetchCount(tx.database)
+        db: any DB,
+    ) -> Self {
+        let estimatedFrameCount = failIfThrows {
+            try db.read { tx in
+                // Get all the major things we iterate over. It doesn't have
+                // to be perfect; we'll skip some of these and besides they're
+                // all weighted evenly. Its just an estimate.
+                return try SignalRecipient.fetchCount(tx.database)
+                    + TSThread.fetchCount(tx.database)
+                    + InteractionRecord.fetchCount(tx.database)
+                    + CallLinkRecord.fetchCount(tx.database)
+                    + StickerPackRecord.fetchCount(tx.database)
+            }
         }
-        // Add a fixed extra amount for:
-        // * header frame
-        // * self recipient
-        // * account data frame
-        // * release notes channel
-        estimatedFrameCount += 4
 
-        let progressSource = await sink.addSource(
+        let progressSource = sink.addSource(
             withLabel: "Backup Export",
-            unitCount: UInt64(estimatedFrameCount)
+            unitCount: UInt64(estimatedFrameCount),
         )
         return BackupArchiveExportProgress(progressSource: progressSource)
     }
 
-    public func didExportFrame() {
+    func didExportFrame() {
         progressSource.incrementCompletedUnitCount(by: 1)
     }
 
-    public func didCloseStream() {
+    func didCloseStream() {
         // We used an estimate to populate the unit count originally, so make
         // sure we complete the progress when we're done.
         progressSource.complete()
@@ -62,29 +53,25 @@ public struct BackupArchiveExportProgress {
 /// - Note
 /// Number of bytes read is not a perfect metric for time spent, as some frames
 /// require more time and work than others.
-public struct BackupArchiveImportFramesProgress {
+struct BackupArchiveImportFramesProgress {
     private let progressSource: OWSProgressSource
 
-    private init(progressSource: OWSProgressSource) {
-        self.progressSource = progressSource
-    }
-
-    public static func prepare(
+    static func prepare(
         sink: OWSProgressSink,
-        fileUrl: URL
-    ) async throws -> Self {
+        fileUrl: URL,
+    ) throws -> Self {
         let totalByteCount = try OWSFileSystem.fileSize(of: fileUrl)
 
-        let progressSource = await sink.addSource(
+        let progressSource = sink.addSource(
             withLabel: "Backup Import: Frame Restore",
-            unitCount: totalByteCount
+            unitCount: totalByteCount,
         )
         return BackupArchiveImportFramesProgress(
-            progressSource: progressSource
+            progressSource: progressSource,
         )
     }
 
-    public func didReadBytes(count byteLength: Int) {
+    func didReadBytes(count byteLength: Int) {
         guard let byteLength = UInt64(exactly: byteLength) else {
             owsFailDebug("How did we get such a huge byte length?")
             return
@@ -97,7 +84,7 @@ public struct BackupArchiveImportFramesProgress {
 
 // MARK: -
 
-public class BackupArchiveImportRecreateIndexesProgress {
+class BackupArchiveImportRecreateIndexesProgress {
     private enum Constants {
         static let progressSourceUnitCount: UInt64 = .max
     }
@@ -110,15 +97,15 @@ public class BackupArchiveImportRecreateIndexesProgress {
         self.progressSource = progressSource
     }
 
-    public static func prepare(
-        sink: OWSProgressSink
-    ) async -> BackupArchiveImportRecreateIndexesProgress {
-        let progressSource = await sink.addSource(
+    static func prepare(
+        sink: OWSProgressSink,
+    ) -> BackupArchiveImportRecreateIndexesProgress {
+        let progressSource = sink.addSource(
             withLabel: "Backup Import: Recreate Indexes",
-            unitCount: Constants.progressSourceUnitCount
+            unitCount: Constants.progressSourceUnitCount,
         )
         return BackupArchiveImportRecreateIndexesProgress(
-            progressSource: progressSource
+            progressSource: progressSource,
         )
     }
 
@@ -133,7 +120,7 @@ public class BackupArchiveImportRecreateIndexesProgress {
     /// - Important
     /// Callers must pair a call to this method with a call to
     /// ``didFinishIndexRecreation()``.
-    public func willStartIndexRecreation(totalFramesRestored: UInt64) {
+    func willStartIndexRecreation(totalFramesRestored: UInt64) {
         owsPrecondition(updateProcessPeriodicallyTask == nil)
 
         // Ballpark that we can recreate indexes for 5k frames-worth of database
@@ -156,7 +143,7 @@ public class BackupArchiveImportRecreateIndexesProgress {
 
     /// Finish approximating progress towards recreating indexes during a Backup
     /// import.
-    public func didFinishIndexRecreation() {
+    func didFinishIndexRecreation() {
         updateProcessPeriodicallyTask?.cancel()
         updateProcessPeriodicallyTask = nil
 

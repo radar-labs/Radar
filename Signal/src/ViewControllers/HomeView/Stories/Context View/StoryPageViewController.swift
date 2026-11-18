@@ -10,7 +10,7 @@ import SignalUI
 protocol StoryPageViewControllerDataSource: AnyObject {
     func storyPageViewControllerAvailableContexts(
         _ storyPageViewController: StoryPageViewController,
-        hiddenStoryFilter: Bool?
+        hiddenStoryFilter: Bool?,
     ) -> [StoryContext]
 }
 
@@ -26,10 +26,11 @@ class StoryPageViewController: UIPageViewController {
             setViewControllers(
                 [StoryContextViewController(context: newValue, spoilerState: spoilerState, delegate: self)],
                 direction: .forward,
-                animated: false
+                animated: false,
             )
         }
     }
+
     let onlyRenderMyStories: Bool
 
     var currentMessage: StoryMessage? {
@@ -69,7 +70,7 @@ class StoryPageViewController: UIPageViewController {
         hiddenStoryFilter: Bool? = nil, /* If true only hidden stories, if false only unhidden. */
         loadMessage: StoryMessage? = nil,
         action: StoryContextViewController.Action = .none,
-        onlyRenderMyStories: Bool = false
+        onlyRenderMyStories: Bool = false,
     ) {
         self.spoilerState = spoilerState
         self.onlyRenderMyStories = onlyRenderMyStories
@@ -79,6 +80,7 @@ class StoryPageViewController: UIPageViewController {
         self.currentContext = context
         currentContextViewController.loadMessage = loadMessage
         currentContextViewController.action = action
+        overrideUserInterfaceStyle = .dark
         modalPresentationStyle = .fullScreen
         transitioningDelegate = self
     }
@@ -87,8 +89,18 @@ class StoryPageViewController: UIPageViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override var prefersStatusBarHidden: Bool { !UIDevice.current.hasIPhoneXNotch && !UIDevice.current.isIPad }
+    override var prefersStatusBarHidden: Bool {
+        guard
+            let appWindow = CurrentAppContext().mainWindow,
+            appWindow.shouldHideStatusBarForFullScreenPresentation
+        else {
+            return super.prefersStatusBarHidden
+        }
+        return true
+    }
+
     override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
+
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         UIDevice.current.isIPad ? .all : .portrait
     }
@@ -119,7 +131,7 @@ class StoryPageViewController: UIPageViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        if let displayLink = displayLink {
+        if let displayLink {
             displayLink.isPaused = false
         } else {
             let displayLink = CADisplayLink(target: self, selector: #selector(displayLinkStep))
@@ -129,11 +141,11 @@ class StoryPageViewController: UIPageViewController {
         viewIsAppeared = true
     }
 
-    public override func viewDidAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         // For now, the design only allows for portrait layout on non-iPads
-        if !UIDevice.current.isIPad && view.window?.windowScene?.interfaceOrientation != .portrait {
+        if !UIDevice.current.isIPad, view.window?.windowScene?.interfaceOrientation != .portrait {
             UIDevice.current.ows_setOrientation(.portrait)
         }
 
@@ -165,7 +177,7 @@ class StoryPageViewController: UIPageViewController {
         // and an ongoing paging drag transition but the scrollview isn't dragging) and resolve it
         // by closing the transition out ourselves.
         if
-            pendingTransitionViewControllers.isEmpty.negated,
+            !pendingTransitionViewControllers.isEmpty,
             isTransitioningByScroll,
             !isUserDraggingScrollView
         {
@@ -190,7 +202,7 @@ class StoryPageViewController: UIPageViewController {
         didSet {
             if muteStatus != nil, muteStatusObserver == nil {
                 muteStatusObserver = NotificationCenter.default.addObserver(
-                    forName: UIApplication.willEnterForegroundNotification,
+                    forName: .OWSApplicationWillEnterForeground,
                     object: nil,
                     queue: nil,
                     using: { _ in muteStatus = nil },
@@ -245,7 +257,7 @@ class StoryPageViewController: UIPageViewController {
         }
 
         // Observe volume buttons only if on screen and muted.
-        if viewIsAppeared && isMuted {
+        if viewIsAppeared, isMuted {
             if isObservingVolumeButtons {
                 // Nothing to do, we are already listening.
             } else {
@@ -324,7 +336,7 @@ extension StoryPageViewController: UIPageViewControllerDelegate {
         _ pageViewController: UIPageViewController,
         didFinishAnimating finished: Bool,
         previousViewControllers: [UIViewController],
-        transitionCompleted completed: Bool
+        transitionCompleted completed: Bool,
     ) {
         guard finished else {
             return
@@ -366,22 +378,26 @@ extension StoryPageViewController: UIPageViewControllerDataSource {
 
 extension StoryPageViewController: StoryContextViewControllerDelegate {
     var availableContexts: [StoryContext] {
-        guard let contextDataSource = contextDataSource else { return viewableContexts }
+        guard let contextDataSource else { return viewableContexts }
         let availableContexts = contextDataSource.storyPageViewControllerAvailableContexts(self, hiddenStoryFilter: hiddenStoryFilter)
         return viewableContexts.filter { availableContexts.contains($0) }
     }
 
     var previousStoryContext: StoryContext? {
-        guard let contextIndex = availableContexts.firstIndex(of: currentContext),
-              let contextBefore = availableContexts[safe: contextIndex.advanced(by: -1)] else {
+        guard
+            let contextIndex = availableContexts.firstIndex(of: currentContext),
+            let contextBefore = availableContexts[safe: contextIndex.advanced(by: -1)]
+        else {
             return nil
         }
         return contextBefore
     }
 
     var nextStoryContext: StoryContext? {
-        guard let contextIndex = availableContexts.firstIndex(of: currentContext),
-              let contextAfter = availableContexts[safe: contextIndex.advanced(by: 1)] else {
+        guard
+            let contextIndex = availableContexts.firstIndex(of: currentContext),
+            let contextAfter = availableContexts[safe: contextIndex.advanced(by: 1)]
+        else {
             return nil
         }
         return contextAfter
@@ -389,7 +405,7 @@ extension StoryPageViewController: StoryContextViewControllerDelegate {
 
     func storyContextViewControllerWantsTransitionToNextContext(
         _ storyContextViewController: StoryContextViewController,
-        loadPositionIfRead: StoryContextViewController.LoadPosition
+        loadPositionIfRead: StoryContextViewController.LoadPosition,
     ) {
         guard
             pendingTransitionViewControllers.isEmpty,
@@ -406,13 +422,13 @@ extension StoryPageViewController: StoryContextViewControllerDelegate {
             context: nextContext,
             loadPositionIfRead: loadPositionIfRead,
             spoilerState: spoilerState,
-            delegate: self
+            delegate: self,
         )]
         self.willTransition(to: newControllers, fromDrag: false)
         setViewControllers(
             newControllers,
             direction: .forward,
-            animated: true
+            animated: true,
         ) { completed in
             self.didFinishTransitioning(completed: completed)
         }
@@ -420,7 +436,7 @@ extension StoryPageViewController: StoryContextViewControllerDelegate {
 
     func storyContextViewControllerWantsTransitionToPreviousContext(
         _ storyContextViewController: StoryContextViewController,
-        loadPositionIfRead: StoryContextViewController.LoadPosition
+        loadPositionIfRead: StoryContextViewController.LoadPosition,
     ) {
         guard let previousContext = previousStoryContext else {
             storyContextViewController.resetForPresentation()
@@ -430,21 +446,23 @@ extension StoryPageViewController: StoryContextViewControllerDelegate {
             context: previousContext,
             loadPositionIfRead: loadPositionIfRead,
             spoilerState: spoilerState,
-            delegate: self
+            delegate: self,
         )]
         self.willTransition(to: newControllers, fromDrag: false)
         setViewControllers(
             newControllers,
             direction: .reverse,
-            animated: true
+            animated: true,
         ) { completed in
             self.didFinishTransitioning(completed: completed)
         }
     }
 
     func storyContextViewController(_ storyContextViewController: StoryContextViewController, contextAfter context: StoryContext) -> StoryContext? {
-        guard let contextIndex = availableContexts.firstIndex(of: context),
-              let contextAfter = availableContexts[safe: contextIndex.advanced(by: 1)] else {
+        guard
+            let contextIndex = availableContexts.firstIndex(of: context),
+            let contextAfter = availableContexts[safe: contextIndex.advanced(by: 1)]
+        else {
             return nil
         }
         return contextAfter
@@ -475,32 +493,36 @@ extension StoryPageViewController: StoryContextViewControllerDelegate {
 }
 
 extension StoryPageViewController: UIViewControllerTransitioningDelegate {
-    public func animationController(
+    func animationController(
         forPresented presented: UIViewController,
         presenting: UIViewController,
-        source: UIViewController
+        source: UIViewController,
     ) -> UIViewControllerAnimatedTransitioning? {
-        guard let storyTransitionContext = try? storyTransitionContext(
-            presentingViewController: presenting,
-            isPresenting: true
-        ) else {
+        guard
+            let storyTransitionContext = try? storyTransitionContext(
+                presentingViewController: presenting,
+                isPresenting: true,
+            )
+        else {
             return nil
         }
         return StoryZoomAnimator(storyTransitionContext: storyTransitionContext)
     }
 
-    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        guard let presentingViewController = presentingViewController else { return nil }
-        guard let storyTransitionContext = try? storyTransitionContext(
-            presentingViewController: presentingViewController,
-            isPresenting: false
-        ) else {
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        guard let presentingViewController else { return nil }
+        guard
+            let storyTransitionContext = try? storyTransitionContext(
+                presentingViewController: presentingViewController,
+                isPresenting: false,
+            )
+        else {
             return StorySlideAnimator(coordinator: interactiveDismissCoordinator)
         }
         return StoryZoomAnimator(storyTransitionContext: storyTransitionContext)
     }
 
-    public func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+    func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         guard interactiveDismissCoordinator.interactionInProgress else { return nil }
         interactiveDismissCoordinator.mode = animator is StoryZoomAnimator ? .zoom : .slide
         return interactiveDismissCoordinator
@@ -508,14 +530,17 @@ extension StoryPageViewController: UIViewControllerTransitioningDelegate {
 
     private func storyTransitionContext(presentingViewController: UIViewController, isPresenting: Bool) throws -> StoryTransitionContext? {
         // If we're not presenting from the stories tab, use a default animation
-        guard let splitViewController = presentingViewController as? ConversationSplitViewController else { return nil }
-        guard splitViewController.homeVC.selectedHomeTab == .stories else { return nil }
+        guard
+            let homeTabBarController = presentingViewController as? HomeTabBarController,
+            homeTabBarController.selectedHomeTab == .stories
+        else { return nil }
 
         let thumbnailView: UIView
         let storyMessage: StoryMessage
         let thumbnailRepresentsStoryView: Bool
 
-        switch splitViewController.homeVC.storiesNavController.topViewController {
+        // Check which list story is being presented from: Stories or My Stories.
+        switch homeTabBarController.storiesSplitViewController.viewController(for: .primary)?.navigationController?.topViewController {
         case let storiesVC as StoriesViewController:
             // If the story cell isn't visible, use a default animation
             guard let storyCell = storiesVC.cell(for: currentContext) else { return nil }
@@ -524,7 +549,7 @@ extension StoryPageViewController: UIViewControllerTransitioningDelegate {
                 throw OWSAssertionError("Unexpectedly missing story model for presentation")
             }
 
-            if let currentMessage = currentMessage {
+            if let currentMessage {
                 storyMessage = currentMessage
             } else {
                 storyMessage = storyModel.messages.first(where: { $0.localUserViewedTimestamp == nil }) ?? storyModel.messages.first!
@@ -559,7 +584,7 @@ extension StoryPageViewController: UIViewControllerTransitioningDelegate {
             storyThumbnailSize: try storyThumbnailSize(for: storyMessage),
             thumbnailRepresentsStoryView: thumbnailRepresentsStoryView,
             pageViewController: self,
-            coordinator: interactiveDismissCoordinator
+            coordinator: interactiveDismissCoordinator,
         )
     }
 
@@ -625,13 +650,13 @@ extension StoryPageViewController: UIViewControllerTransitioningDelegate {
                 return PreloadedTextAttachment.from(
                     attachment,
                     storyMessage: presentingMessage,
-                    tx: tx
+                    tx: tx,
                 )
             }
             storyView = TextAttachmentView(
                 attachment: preloadedAttachment,
                 interactionIdentifier: .fromStoryMessage(presentingMessage),
-                spoilerState: spoilerState
+                spoilerState: spoilerState,
             ).asThumbnailView()
         }
 

@@ -3,9 +3,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
-
 #if TESTABLE_BUILD
+
+import Foundation
+public import UIKit
 
 open class MockAttachmentThumbnailService: AttachmentThumbnailService {
 
@@ -13,14 +14,14 @@ open class MockAttachmentThumbnailService: AttachmentThumbnailService {
 
     open func thumbnailImage(
         for attachmentStream: AttachmentStream,
-        quality: AttachmentThumbnailQuality
+        quality: AttachmentThumbnailQuality,
     ) async -> UIImage? {
         return nil
     }
 
     open func thumbnailImageSync(
         for attachmentStream: AttachmentStream,
-        quality: AttachmentThumbnailQuality
+        quality: AttachmentThumbnailQuality,
     ) -> UIImage? {
         return nil
     }

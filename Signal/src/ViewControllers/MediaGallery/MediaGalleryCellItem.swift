@@ -17,32 +17,54 @@ protocol MediaGalleryCollectionViewCell: UICollectionViewCell {
     func indexPathDidChange(_ indexPath: IndexPath, itemCount: Int)
 }
 
-enum MediaGalleryCellItem {
+enum MediaGalleryCellItem: MediaGallery.DownloadableItem {
     case photoVideo(MediaGalleryCellItemPhotoVideo)
     case audio(MediaGalleryCellItemAudio)
     case otherFile(MediaGalleryCellItemOtherFile)
 
-    var attachmentStream: ReferencedAttachmentStream? {
+    var referencedAttachment: ReferencedAttachment {
         switch self {
         case .photoVideo(let item):
-            return item.galleryItem.attachmentStream
+            return item.galleryItem.referencedAttachment
         case .audio(let audioItem):
-            return audioItem.attachmentStream
+            return audioItem.referencedAttachment
         case .otherFile(let fileItem):
-            return fileItem.attachmentStream
+            return fileItem.referencedAttachment
+        }
+    }
+
+    var receivedAtTimestamp: UInt64 {
+        switch self {
+        case .photoVideo(let item):
+            return item.galleryItem.message.receivedAtTimestamp
+        case .audio(let item):
+            return item.message.receivedAtTimestamp
+        case .otherFile(let item):
+            return item.message.receivedAtTimestamp
+        }
+    }
+
+    var threadRowId: Int64 {
+        switch self {
+        case .photoVideo(let item):
+            return item.galleryItem.threadRowId
+        case .audio(let item):
+            return item.thread.grdbId!.int64Value
+        case .otherFile(let item):
+            return item.thread.grdbId!.int64Value
         }
     }
 }
 
 extension MediaGalleryCellItem: Equatable {
-    public static func == (lhs: MediaGalleryCellItem, rhs: MediaGalleryCellItem) -> Bool {
+    static func ==(lhs: MediaGalleryCellItem, rhs: MediaGalleryCellItem) -> Bool {
         switch (lhs, rhs) {
         case let (.photoVideo(lvalue), .photoVideo(rvalue)):
             return lvalue === rvalue
         case let (.audio(lvalue), .audio(rvalue)):
-            return lvalue.attachmentStream.reference.attachmentRowId == rvalue.attachmentStream.reference.attachmentRowId
+            return lvalue.referencedAttachment.reference.attachmentRowId == rvalue.referencedAttachment.reference.attachmentRowId
         case let (.otherFile(lvalue), .otherFile(rvalue)):
-            return lvalue.attachmentStream.reference.attachmentRowId == rvalue.attachmentStream.reference.attachmentRowId
+            return lvalue.referencedAttachment.reference.attachmentRowId == rvalue.referencedAttachment.reference.attachmentRowId
         case (.photoVideo, _), (.audio, _), (.otherFile, _):
             return false
         }
@@ -53,32 +75,23 @@ struct MediaGalleryCellItemAudio {
     var message: TSMessage
     var interaction: TSInteraction
     var thread: TSThread
-    var attachmentStream: ReferencedAttachmentStream
+    var referencedAttachment: ReferencedAttachment
     var receivedAtDate: Date
     var isVoiceMessage: Bool
     var mediaCache: CVMediaCache
     var metadata: MediaMetadata
 
-    var size: UInt {
-        UInt(attachmentStream.attachmentStream.unencryptedByteCount)
-    }
-    var duration: TimeInterval {
-        switch attachmentStream.attachmentStream.contentType {
-        case .audio(let duration, _):
-            return duration
-        default:
-            return 0
-        }
-    }
-
     var localizedString: String {
         if isVoiceMessage {
-            return OWSLocalizedString("MEDIA_GALLERY_A11Y_VOICE_MESSAGE",
-                                      comment: "VoiceOver description for a voice messages in All Media")
+            return OWSLocalizedString(
+                "MEDIA_GALLERY_A11Y_VOICE_MESSAGE",
+                comment: "VoiceOver description for a voice messages in All Media",
+            )
         } else {
-            return OWSLocalizedString("MEDIA_GALLERY_A11Y_AUDIO_FILE",
-                                      comment: "VoiceOver description for a generic audio file in All Media")
-
+            return OWSLocalizedString(
+                "MEDIA_GALLERY_A11Y_AUDIO_FILE",
+                comment: "VoiceOver description for a generic audio file in All Media",
+            )
         }
     }
 }
@@ -87,19 +100,19 @@ struct MediaGalleryCellItemOtherFile {
     var message: TSMessage
     var interaction: TSInteraction
     var thread: TSThread
-    var attachmentStream: ReferencedAttachmentStream
+    var referencedAttachment: ReferencedAttachment
     var receivedAtDate: Date
     var mediaCache: CVMediaCache
     var metadata: MediaMetadata
 
-    var size: UInt {
-        UInt(attachmentStream.attachmentStream.unencryptedByteCount)
+    var size: UInt64 {
+        referencedAttachment.unencryptedByteCount() ?? 0
     }
 
     var localizedString: String {
         return OWSLocalizedString(
             "MEDIA_GALLERY_A11Y_OTHER_FILE",
-            comment: "VoiceOver description for a generic non-audiovisual file in All Media"
+            comment: "VoiceOver description for a generic non-audiovisual file in All Media",
         )
     }
 }
@@ -113,7 +126,9 @@ class MediaGalleryCellItemPhotoVideo: PhotoGridItem {
 
     var type: PhotoGridItemType {
         if galleryItem.isVideo {
-            return .video(videoDurationPromise)
+            return .video(
+                duration: galleryItem.referencedAttachment.asReferencedStream?.attachmentStream.cachedVideoDuration,
+            )
         } else if galleryItem.isAnimated {
             return .animated
         } else {
@@ -125,17 +140,6 @@ class MediaGalleryCellItemPhotoVideo: PhotoGridItem {
         galleryItem.thumbnailImage(completion: completion)
     }
 
-    private var videoDurationPromise: Promise<TimeInterval> {
-        owsPrecondition(galleryItem.isVideo)
-        let attachment = galleryItem.attachmentStream.attachmentStream
-        switch attachment.contentType {
-        case .file, .invalid, .image, .animatedImage, .audio:
-            owsFailDebug("Non video type!")
-            return .value(0)
-        case .video(let duration, _, _):
-            return .value(duration)
-        }
-    }
     var mediaMetadata: MediaMetadata? {
         return galleryItem.mediaMetadata
     }
@@ -146,8 +150,8 @@ extension MediaGalleryItem {
         return MediaMetadata(
             sender: sender?.name ?? "",
             abbreviatedSender: sender?.abbreviatedName ?? "",
-            byteSize: Int(attachmentStream.attachmentStream.unencryptedByteCount),
-            creationDate: receivedAtDate
+            byteSize: Int(clamping: referencedAttachment.unencryptedByteCount() ?? 0),
+            creationDate: receivedAtDate,
         )
     }
 }

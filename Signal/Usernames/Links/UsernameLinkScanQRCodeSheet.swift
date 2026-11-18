@@ -44,20 +44,21 @@ extension BaseMemberViewController: UsernameLinkScanDelegate {}
 
 extension UsernameLinkScanDelegate where Self: RecipientPickerDelegate & RecipientPickerContainerViewController {
     func usernameLinkScanned(_ usernameLink: Usernames.UsernameLink) {
-        dismiss(animated: true) {
-            SSKEnvironment.shared.databaseStorageRef.read { tx in
-                MainActor.assumeIsolated {
-                    UsernameQuerier().queryForUsernameLink(
+        dismiss(animated: true) { [self] in
+            Task { @MainActor in
+                guard
+                    let (_, aci) = await UsernameQuerier().queryForUsernameLink(
                         link: usernameLink,
                         fromViewController: self,
-                        tx: tx
-                    ) { _, aci in
-                        self.recipientPicker(
-                            self.recipientPicker,
-                            didSelectRecipient: .for(address: SignalServiceAddress(aci))
-                        )
-                    }
+                    )
+                else {
+                    return
                 }
+
+                recipientPicker(
+                    recipientPicker,
+                    didSelectRecipient: .for(address: SignalServiceAddress(aci)),
+                )
             }
         }
     }

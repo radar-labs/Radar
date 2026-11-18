@@ -4,6 +4,7 @@
 //
 
 import Foundation
+public import UIKit
 
 public struct AvatarModel: Equatable {
     public let identifier: String
@@ -11,7 +12,7 @@ public struct AvatarModel: Equatable {
     public var theme: AvatarTheme
 
     public init(identifier: String? = nil, type: AvatarType, theme: AvatarTheme) {
-        if let identifier = identifier {
+        if let identifier {
             if case .icon(let icon) = type { owsAssertDebug(identifier == icon.rawValue) }
             self.identifier = identifier
         } else {
@@ -46,7 +47,7 @@ public enum AvatarType: Equatable {
         }
     }
 
-    public static func == (lhs: AvatarType, rhs: AvatarType) -> Bool {
+    public static func ==(lhs: AvatarType, rhs: AvatarType) -> Bool {
         switch (lhs, rhs) {
         case (.image(let lhs), .image(let rhs)):
             // We implement a custom "Equatable", since two URLs
@@ -92,7 +93,7 @@ public enum AvatarIcon: String, CaseIterable {
 
     public var image: UIImage { UIImage(named: imageName)! }
 
-    public var imageName: String { "avatar_\(rawValue)"}
+    public var imageName: String { "avatar_\(rawValue)" }
 
     public static var defaultGroupIcons: [AvatarIcon] = [
         .heart,
@@ -106,7 +107,7 @@ public enum AvatarIcon: String, CaseIterable {
         .sunset,
         .surfboard,
         .soccerball,
-        .football
+        .football,
     ]
 
     public static var defaultProfileIcons: [AvatarIcon] = [
@@ -121,7 +122,7 @@ public enum AvatarIcon: String, CaseIterable {
         .dinosaur,
         .pig,
         .incognito,
-        .ghost
+        .ghost,
     ]
 }
 

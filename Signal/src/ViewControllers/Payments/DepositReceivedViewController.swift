@@ -11,12 +11,12 @@ class DepositReceivedViewController: HostingController<DepositReceivedView> {
     init(
         amountSats: String,
         onContinue: @escaping () -> Void,
-        onDepositMore: @escaping () -> Void
+        onDepositMore: @escaping () -> Void,
     ) {
         super.init(wrappedView: DepositReceivedView(
             amountSats: amountSats,
             onContinue: onContinue,
-            onDepositMore: onDepositMore
+            onDepositMore: onDepositMore,
         ))
         OWSTableViewController2.removeBackButtonText(viewController: self)
     }
@@ -41,7 +41,7 @@ struct DepositReceivedView: View {
 
                     Text(OWSLocalizedString(
                         "DEPOSIT_RECEIVED_TITLE",
-                        comment: "Title for the Deposit Received screen shown after a deposit is confirmed."
+                        comment: "Title for the Deposit Received screen shown after a deposit is confirmed.",
                     ))
                     .font(Font(UIFont.dynamicTypeFont(ofStandardSize: 28)))
                     .fontWeight(.semibold)
@@ -56,7 +56,7 @@ struct DepositReceivedView: View {
 
                 Text(OWSLocalizedString(
                     "DEPOSIT_RECEIVED_SUBTITLE",
-                    comment: "Subtitle on the Deposit Received screen encouraging the user to start sending payments."
+                    comment: "Subtitle on the Deposit Received screen encouraging the user to start sending payments.",
                 ))
                 .font(.body)
                 .foregroundStyle(Color.Signal.secondaryLabel)
@@ -81,7 +81,7 @@ struct DepositReceivedView: View {
             } label: {
                 Text(OWSLocalizedString(
                     "DEPOSIT_RECEIVED_DEPOSIT_MORE",
-                    comment: "Button on the Deposit Received screen that lets the user deposit additional funds."
+                    comment: "Button on the Deposit Received screen that lets the user deposit additional funds.",
                 ))
                 .font(.headline)
                 .foregroundStyle(Color.Signal.accent)
@@ -100,7 +100,7 @@ struct DepositReceivedView: View {
 
             Text(OWSLocalizedString(
                 "DEPOSIT_RECEIVED_SATS_LABEL",
-                comment: "Unit label 'sats' (satoshis) shown next to an amount on the Deposit Received screen."
+                comment: "Unit label 'sats' (satoshis) shown next to an amount on the Deposit Received screen.",
             ))
             .font(.system(size: 52, weight: .regular))
             .foregroundStyle(Color.Signal.label.opacity(0.5))
@@ -120,7 +120,7 @@ struct DepositReceivedView: View {
     DepositReceivedView(
         amountSats: "1,373",
         onContinue: {},
-        onDepositMore: {}
+        onDepositMore: {},
     )
 }
 

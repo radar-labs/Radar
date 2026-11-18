@@ -25,7 +25,26 @@ NS_ASSUME_NONNULL_BEGIN
     _archivedPaymentInfo = [[TSArchivedPaymentInfo alloc] initWithAmount:amount fee:fee note:note];
 
     return self;
-};
+}
+
+- (NSUInteger)hash
+{
+    NSUInteger result = [super hash];
+    result ^= self.archivedPaymentInfo.hash;
+    return result;
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (![super isEqual:other]) {
+        return NO;
+    }
+    OWSIncomingArchivedPaymentMessage *typedOther = (OWSIncomingArchivedPaymentMessage *)other;
+    if (![NSObject isObject:self.archivedPaymentInfo equalToObject:typedOther.archivedPaymentInfo]) {
+        return NO;
+    }
+    return YES;
+}
 
 // --- CODE GENERATION MARKER
 
@@ -53,7 +72,6 @@ NS_ASSUME_NONNULL_BEGIN
                isGroupStoryReply:(BOOL)isGroupStoryReply
                           isPoll:(BOOL)isPoll
   isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
-                       isStarred:(BOOL)isStarred
               isViewOnceComplete:(BOOL)isViewOnceComplete
                isViewOnceMessage:(BOOL)isViewOnceMessage
                      linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -94,7 +112,6 @@ NS_ASSUME_NONNULL_BEGIN
                  isGroupStoryReply:isGroupStoryReply
                             isPoll:isPoll
     isSmsMessageRestoredFromBackup:isSmsMessageRestoredFromBackup
-                         isStarred:isStarred
                 isViewOnceComplete:isViewOnceComplete
                  isViewOnceMessage:isViewOnceMessage
                        linkPreview:linkPreview

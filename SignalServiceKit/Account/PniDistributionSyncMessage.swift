@@ -24,7 +24,7 @@ final class PniDistributionSyncMessage {
         signedPreKey: LibSignalClient.SignedPreKeyRecord,
         pqLastResortPreKey: LibSignalClient.KyberPreKeyRecord,
         registrationId: UInt32,
-        e164: E164
+        e164: E164,
     ) {
         self.pniIdentityKeyPair = pniIdentityKeyPair
         self.signedPreKey = signedPreKey
@@ -45,7 +45,7 @@ final class PniDistributionSyncMessage {
         let syncMessageBuilder = SSKProtoSyncMessage.builder()
         syncMessageBuilder.setPniChangeNumber(changeNumberBuilder.buildInfallibly())
 
-        let syncMessageProto = try OWSOutgoingSyncMessage.buildSyncMessageProto(for: syncMessageBuilder)
+        let syncMessageProto = try OutgoingSyncMessage.buildSyncMessageProto(forMessageBuilder: syncMessageBuilder)
 
         let contentProto = SSKProtoContent.builder()
         contentProto.setSyncMessage(syncMessageProto)

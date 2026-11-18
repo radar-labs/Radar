@@ -11,7 +11,6 @@ class BadgeGiftingThanksSheet: OWSTableViewController2 {
     private let badge: ProfileBadge
 
     init(thread: TSContactThread, badge: ProfileBadge) {
-        owsAssertDebug(badge.assets != nil)
         self.thread = thread
         self.badge = badge
 
@@ -26,7 +25,7 @@ class BadgeGiftingThanksSheet: OWSTableViewController2 {
         }
     }
 
-    override public func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
         setUpTableContents()
     }
@@ -40,9 +39,11 @@ class BadgeGiftingThanksSheet: OWSTableViewController2 {
     }
 
     private func setUpTableContents() {
-        let avatarView = ConversationAvatarView(sizeClass: .eightyEight,
-                                                localUserDisplayMode: .asUser,
-                                                badged: true)
+        let avatarView = ConversationAvatarView(
+            sizeClass: .eightyEight,
+            localUserDisplayMode: .asUser,
+            badged: true,
+        )
         let recipientName = SSKEnvironment.shared.databaseStorageRef.read { transaction -> String in
             avatarView.update(transaction) { config in
                 config.dataSource = .thread(self.thread)
@@ -57,7 +58,7 @@ class BadgeGiftingThanksSheet: OWSTableViewController2 {
 
             let titleLabel = UILabel.title2Label(text: OWSLocalizedString(
                 "DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_TITLE",
-                comment: "When you donate on behalf of a friend, a thank-you sheet will appear. This is the title on that sheet."
+                comment: "When you donate on behalf of a friend, a thank-you sheet will appear. This is the title on that sheet.",
             ))
 
             cell.contentView.addSubview(titleLabel)
@@ -73,9 +74,9 @@ class BadgeGiftingThanksSheet: OWSTableViewController2 {
 
             let infoLabelFormat = OWSLocalizedString(
                 "DONATION_ON_BEHALF_OF_A_FRIEND_THANKS_BODY_FORMAT",
-                comment: "When you donate on behalf of a friend, a thank-you sheet will appear. This is the text on that sheet. Embeds {{recipient name}}."
+                comment: "When you donate on behalf of a friend, a thank-you sheet will appear. This is the text on that sheet. Embeds {{recipient name}}.",
             )
-            let infoLabel = UILabel.explanationTextLabel(text: String(format: infoLabelFormat, recipientName))
+            let infoLabel = UILabel.explanationTextLabel(text: String.nonPluralLocalizedStringWithFormat(infoLabelFormat, recipientName))
 
             cell.contentView.addSubview(infoLabel)
             infoLabel.autoPinEdgesToSuperviewMargins()
@@ -107,7 +108,7 @@ class BadgeGiftingThanksSheet: OWSTableViewController2 {
                 configuration: .largePrimary(title: CommonStrings.okayButton),
                 primaryAction: UIAction { [weak self] _ in
                     self?.dismiss(animated: true)
-                }
+                },
             )
             cell.contentView.addSubview(dismissButton)
             dismissButton.autoPinEdgesToSuperviewMargins()
@@ -115,9 +116,11 @@ class BadgeGiftingThanksSheet: OWSTableViewController2 {
             return cell
         }))
 
-        contents = OWSTableContents(sections: [titleSection,
-                                               infoSection,
-                                               avatarSection,
-                                               dismissButtonSection])
+        contents = OWSTableContents(sections: [
+            titleSection,
+            infoSection,
+            avatarSection,
+            dismissButtonSection,
+        ])
     }
 }

@@ -100,7 +100,7 @@ struct VisibleBadgeResolver {
 
 }
 
-class BadgeThanksSheet: OWSTableSheetViewController {
+class BadgeThanksSheet: HeroSheetViewController {
 
     enum ThanksType {
         /// We redeemed a badge that was paid for via bank transfer.
@@ -115,12 +115,17 @@ class BadgeThanksSheet: OWSTableSheetViewController {
     private let badge: ProfileBadge
     private let thanksType: ThanksType
 
-    private let initialVisibleBadgeResolver: VisibleBadgeResolver
-    private lazy var shouldMakeVisibleAndPrimary = self.initialVisibleBadgeResolver.switchDefault(for: self.badge.id)
+    private var shouldMakeVisibleAndPrimary: Bool
+
+    // For checking manual sheet dismissal in viewDidDisappear
+    private var didHandleResult = false
 
     convenience init(
-        receiptCredentialRedemptionSuccess: DonationReceiptCredentialRedemptionSuccess
+        receiptCredentialRedemptionSuccess: DonationReceiptCredentialRedemptionSuccess,
+        newBadge: ProfileBadge,
     ) {
+        owsPrecondition(receiptCredentialRedemptionSuccess.badgeID == newBadge.id)
+
         let thanksType: ThanksType = {
             switch receiptCredentialRedemptionSuccess.paymentMethod {
             case nil, .applePay, .creditOrDebitCard, .paypal:
@@ -131,9 +136,9 @@ class BadgeThanksSheet: OWSTableSheetViewController {
         }()
 
         self.init(
-            newBadge: receiptCredentialRedemptionSuccess.badge,
+            newBadge: newBadge,
             thanksType: thanksType,
-            oldBadgesSnapshot: receiptCredentialRedemptionSuccess.badgesSnapshotBeforeJob
+            oldBadgesSnapshot: receiptCredentialRedemptionSuccess.badgesSnapshotBeforeJob,
         )
     }
 
@@ -149,12 +154,14 @@ class BadgeThanksSheet: OWSTableSheetViewController {
     init(
         newBadge badge: ProfileBadge,
         thanksType: ThanksType,
-        oldBadgesSnapshot: ProfileBadgesSnapshot
+        oldBadgesSnapshot: ProfileBadgesSnapshot,
     ) {
-        owsAssertDebug(badge.assets != nil)
         self.badge = badge
         self.thanksType = thanksType
-        self.initialVisibleBadgeResolver = VisibleBadgeResolver(badgesSnapshot: oldBadgesSnapshot)
+
+        let visibleBadgeResolver = VisibleBadgeResolver(badgesSnapshot: oldBadgesSnapshot)
+        let shouldMakeVisibleAndPrimary = visibleBadgeResolver.switchDefault(for: badge.id)
+        self.shouldMakeVisibleAndPrimary = shouldMakeVisibleAndPrimary
 
         switch thanksType {
         case .badgeRedeemedViaBankPayment, .badgeRedeemedViaNonBankPayment:
@@ -163,13 +170,58 @@ class BadgeThanksSheet: OWSTableSheetViewController {
             owsAssertDebug(GiftBadgeIds.contains(badge.id))
         }
 
-        super.init()
+        // Assigned after super.init for the toggle and button callbacks.
+        weak var sheet: BadgeThanksSheet?
 
-        updateTableContents()
+        var bodyElements: [Body.Element] = [
+            .text(.plain(Self.bodyText(thanksType: thanksType, badge: badge))),
+        ]
+        if
+            let toggle = Self.visibilityToggle(
+                switchType: visibleBadgeResolver.switchType(for: badge.id),
+                isOn: shouldMakeVisibleAndPrimary,
+                onValueChanged: { sheet?.shouldMakeVisibleAndPrimary = $0 },
+            )
+        {
+            bodyElements.append(.toggle(toggle))
+        }
+
+        let primaryButton: Button
+        let secondaryButton: Button?
+        switch thanksType {
+        case let .giftReceived(_, notNowAction, incomingMessage):
+            primaryButton = Button(
+                title: CommonStrings.redeemGiftButton,
+                action: .custom { _ in sheet?.didTapRedeem(incomingMessage: incomingMessage) },
+            )
+            secondaryButton = Button(
+                title: CommonStrings.notNowButton,
+                style: .secondary,
+                action: .custom { _ in sheet?.didTapNotNow(notNowAction: notNowAction) },
+            )
+        case .badgeRedeemedViaBankPayment, .badgeRedeemedViaNonBankPayment:
+            primaryButton = Button(
+                title: CommonStrings.doneButton,
+                action: .custom { _ in sheet?.didTapDone() },
+            )
+            secondaryButton = nil
+        }
+
+        super.init(
+            hero: .image(badge.assets.universal160 ?? UIImage(), height: 80),
+            title: Self.titleText(thanksType: thanksType),
+            body: Body(bodyElements),
+            primary: .button(primaryButton),
+            secondary: secondaryButton.map { .button($0) },
+        )
+        sheet = self
     }
 
-    override func willDismissInteractively() {
-        super.willDismissInteractively()
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        guard isBeingDismissed, !didHandleResult else { return }
+        didHandleResult = true
 
         switch self.thanksType {
         case .badgeRedeemedViaBankPayment, .badgeRedeemedViaNonBankPayment:
@@ -197,18 +249,19 @@ class BadgeThanksSheet: OWSTableSheetViewController {
                     throw error
                 }
             })
+            self.didHandleResult = true
             self.dismiss(animated: true)
         }
     }
 
     private func saveVisibilityChanges(shouldMakeVisibleAndPrimary: Bool) async throws {
-        try await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { (tx) -> Promise<Void> in
+        try await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx -> Promise<Void> in
             let visibleBadgeResolver = VisibleBadgeResolver(
-                badgesSnapshot: .forLocalProfile(profileManager: SSKEnvironment.shared.profileManagerRef, tx: tx)
+                badgesSnapshot: .forLocalProfile(profileManager: SSKEnvironment.shared.profileManagerRef, tx: tx),
             )
             let visibleBadgeIds = visibleBadgeResolver.visibleBadgeIds(
                 adding: self.badge.id,
-                isVisibleAndFeatured: shouldMakeVisibleAndPrimary
+                isVisibleAndFeatured: shouldMakeVisibleAndPrimary,
             )
             if visibleBadgeIds == visibleBadgeResolver.currentlyVisibleBadgeIds() {
                 // No change, we can skip the profile update.
@@ -223,8 +276,8 @@ class BadgeThanksSheet: OWSTableSheetViewController {
                 visibleBadgeIds: .setTo(visibleBadgeIds),
                 unsavedRotatedProfileKey: nil,
                 userProfileWriter: .localUser,
-                authedAccount: .implicit(),
-                tx: tx
+                authedAccount: .implicit,
+                tx: tx,
             )
         }.awaitable()
     }
@@ -233,8 +286,8 @@ class BadgeThanksSheet: OWSTableSheetViewController {
         guard let giftBadge = incomingMessage.giftBadge else {
             throw OWSAssertionError("trying to redeem message without a badge")
         }
-        try await DonationSubscriptionManager.redeemReceiptCredentialPresentation(
-            receiptCredentialPresentation: try giftBadge.getReceiptCredentialPresentation()
+        try await DependenciesBridge.shared.donationSubscriptionManager.redeemReceiptCredentialPresentation(
+            receiptCredentialPresentation: try giftBadge.getReceiptCredentialPresentation(),
         )
         await Self.updateGiftBadge(incomingMessage: incomingMessage, state: .redeemed)
     }
@@ -251,232 +304,129 @@ class BadgeThanksSheet: OWSTableSheetViewController {
         }
     }
 
-    private var titleText: String {
+    private static func titleText(thanksType: ThanksType) -> String {
         switch thanksType {
         case .badgeRedeemedViaBankPayment:
             return OWSLocalizedString(
                 "BADGE_THANKS_BANK_DONATION_COMPLETE_TITLE",
-                comment: "Title for a sheet explaining that a bank transfer donation is complete, and that you have received a badge."
+                comment: "Title for a sheet explaining that a bank transfer donation is complete, and that you have received a badge.",
             )
         case .badgeRedeemedViaNonBankPayment:
             return OWSLocalizedString(
                 "BADGE_THANKS_TITLE",
-                comment: "When you make a donation to Signal, you will receive a badge. A thank-you sheet appears when this happens. This is the title of that sheet."
+                comment: "When you make a donation to Signal, you will receive a badge. A thank-you sheet appears when this happens. This is the title of that sheet.",
             )
         case let .giftReceived(shortName, _, _):
             let formatText = OWSLocalizedString(
                 "DONATION_ON_BEHALF_OF_A_FRIEND_REDEEM_BADGE_TITLE_FORMAT",
-                comment: "A friend has donated on your behalf and you received a badge. A sheet opens for you to redeem this badge. Embeds {{contact's short name, such as a first name}}."
+                comment: "A friend has donated on your behalf and you received a badge. A sheet opens for you to redeem this badge. Embeds {{contact's short name, such as a first name}}.",
             )
-            return String(format: formatText, shortName)
+            return String.nonPluralLocalizedStringWithFormat(formatText, shortName)
         }
     }
 
-    private var bodyText: String {
+    private static func bodyText(thanksType: ThanksType, badge: ProfileBadge) -> String {
         switch thanksType {
         case .badgeRedeemedViaBankPayment:
             return OWSLocalizedString(
                 "BADGE_THANKS_BANK_DONATION_COMPLETE_BODY",
-                comment: "Body for a sheet explaining that a bank transfer donation is complete, and that you have received a badge."
+                comment: "Body for a sheet explaining that a bank transfer donation is complete, and that you have received a badge.",
             )
         case .badgeRedeemedViaNonBankPayment:
             let formatText = OWSLocalizedString(
                 "BADGE_THANKS_BODY",
-                comment: "When you make a donation to Signal, you will receive a badge. A thank-you sheet appears when this happens. This is the body text on that sheet."
+                comment: "When you make a donation to Signal, you will receive a badge. A thank-you sheet appears when this happens. This is the body text on that sheet.",
             )
-            return String(format: formatText, self.badge.localizedName)
+            return String.nonPluralLocalizedStringWithFormat(formatText, badge.localizedName)
         case let .giftReceived(shortName, _, _):
             let formatText = OWSLocalizedString(
                 "DONATION_ON_BEHALF_OF_A_FRIEND_YOU_RECEIVED_A_BADGE_FORMAT",
-                comment: "A friend has donated on your behalf and you received a badge. This text says that you received a badge, and from whom. Embeds {{contact's short name, such as a first name}}."
+                comment: "A friend has donated on your behalf and you received a badge. This text says that you received a badge, and from whom. Embeds {{contact's short name, such as a first name}}.",
             )
-            return String(format: formatText, shortName)
+            return String.nonPluralLocalizedStringWithFormat(formatText, shortName)
         }
     }
 
     // MARK: -
 
-    public override func tableContents() -> OWSTableContents {
-        let contents = OWSTableContents()
-
-        let headerSection = OWSTableSection()
-        headerSection.hasBackground = false
-        headerSection.customHeaderHeight = 1
-        contents.add(headerSection)
-
-        headerSection.add(.init(customCellBlock: { [weak self] in
-            let cell = OWSTableItem.newCell()
-            guard let self = self else { return cell }
-            cell.selectionStyle = .none
-
-            let stackView = UIStackView()
-            stackView.axis = .vertical
-            stackView.alignment = .center
-
-            cell.contentView.addSubview(stackView)
-            stackView.autoPinEdgesToSuperviewMargins()
-
-            let badgeImageView = UIImageView()
-            badgeImageView.image = self.badge.assets?.universal160
-            badgeImageView.autoSetDimensions(to: CGSize(square: 80))
-            stackView.addArrangedSubview(badgeImageView)
-            stackView.setCustomSpacing(24, after: badgeImageView)
-
-            let titleLabel = UILabel.title2Label(text: self.titleText)
-            stackView.addArrangedSubview(titleLabel)
-            stackView.setCustomSpacing(12, after: titleLabel)
-
-            let bodyLabel = UILabel()
-            bodyLabel.font = .dynamicTypeSubheadlineClamped
-            bodyLabel.textColor = .Signal.secondaryLabel
-            bodyLabel.textAlignment = .center
-            bodyLabel.numberOfLines = 0
-            bodyLabel.text = self.bodyText
-            stackView.addArrangedSubview(bodyLabel)
-            stackView.setCustomSpacing(36, after: bodyLabel)
-
-            return cell
-        }, actionBlock: nil))
-
-        if let displayBadgeSection = self.buildDisplayBadgeSection() {
-            contents.add(displayBadgeSection)
-        }
-
-        switch self.thanksType {
-        case let .giftReceived(_, notNowAction, incomingMessage):
-            contents.add(self.buildRedeemButtonSection(notNowAction: notNowAction, incomingMessage: incomingMessage))
-        case .badgeRedeemedViaBankPayment, .badgeRedeemedViaNonBankPayment:
-            contents.add(self.buildDoneButtonSection())
-        }
-
-        return contents
-    }
-
-    private func buildDisplayBadgeSection() -> OWSTableSection? {
-        let switchText: String
-        let showFooter: Bool
-        switch self.initialVisibleBadgeResolver.switchType(for: self.badge.id) {
+    private static func visibilityToggle(
+        switchType: VisibleBadgeResolver.SwitchType,
+        isOn: Bool,
+        onValueChanged: @escaping (Bool) -> Void,
+    ) -> Body.Toggle? {
+        let title: String
+        let footer: String?
+        switch switchType {
         case .none:
             return nil
         case .displayOnProfile:
-            switchText = OWSLocalizedString(
+            title = OWSLocalizedString(
                 "BADGE_THANKS_DISPLAY_ON_PROFILE_LABEL",
-                comment: "Label prompting the user to display the new badge on their profile on the badge thank you sheet."
+                comment: "Label prompting the user to display the new badge on their profile on the badge thank you sheet.",
             )
-            showFooter = false
+            footer = nil
         case .makeFeaturedBadge:
-            switchText = OWSLocalizedString(
+            title = OWSLocalizedString(
                 "BADGE_THANKS_MAKE_FEATURED",
-                comment: "Label prompting the user to feature the new badge on their profile on the badge thank you sheet."
+                comment: "Label prompting the user to feature the new badge on their profile on the badge thank you sheet.",
             )
-            showFooter = true
-        }
-
-        let section = OWSTableSection()
-        section.add(.switch(
-            withText: switchText,
-            isOn: { self.shouldMakeVisibleAndPrimary },
-            target: self,
-            selector: #selector(didToggleDisplayOnProfile)
-        ))
-        if showFooter {
-            section.footerTitle = OWSLocalizedString(
+            footer = OWSLocalizedString(
                 "BADGE_THANKS_TOGGLE_FOOTER",
-                comment: "Footer explaining that only one badge can be featured at a time on the thank you sheet."
+                comment: "Footer explaining that only one badge can be featured at a time on the thank you sheet.",
             )
         }
-        return section
+        return Body.Toggle(
+            title: title,
+            footer: footer,
+            isOn: isOn,
+            onValueChanged: onValueChanged,
+        )
     }
 
-    @objc
-    private func didToggleDisplayOnProfile(_ sender: UISwitch) {
-        shouldMakeVisibleAndPrimary = sender.isOn
+    // MARK: - Actions
+
+    private func didTapDone() {
+        // Capture this value on the main thread.
+        let shouldMakeVisibleAndPrimary = self.shouldMakeVisibleAndPrimary
+        Task {
+            do {
+                try await self.performConfirmationAction {
+                    try await self.saveVisibilityChanges(shouldMakeVisibleAndPrimary: shouldMakeVisibleAndPrimary)
+                }
+            } catch {
+                self.didHandleResult = true
+                self.dismiss(animated: true)
+            }
+        }
     }
 
-    private func buildDoneButtonSection() -> OWSTableSection {
-        let section = OWSTableSection()
-        section.hasBackground = false
-        section.add(.init(customCellBlock: { [weak self] in
-            let cell = OWSTableItem.newCell()
-            cell.selectionStyle = .none
-            guard let self = self else { return cell }
-
-            let button = UIButton(
-                configuration: .largePrimary(title: CommonStrings.doneButton),
-                primaryAction: UIAction { [weak self] _ in
-                    guard let self = self else { return }
-                    // Capture this value on the main thread.
-                    let shouldMakeVisibleAndPrimary = self.shouldMakeVisibleAndPrimary
-                    Task {
-                        do {
-                            try await self.performConfirmationAction {
-                                try await self.saveVisibilityChanges(shouldMakeVisibleAndPrimary: shouldMakeVisibleAndPrimary)
-                            }
-                        } catch {
-                            self.dismiss(animated: true)
-                        }
-                    }
+    private func didTapRedeem(incomingMessage: TSIncomingMessage) {
+        // Capture this value on the main thread.
+        let shouldMakeVisibleAndPrimary = self.shouldMakeVisibleAndPrimary
+        Task {
+            do {
+                try await self.performConfirmationAction {
+                    try await Self.redeemGiftBadge(incomingMessage: incomingMessage)
+                    try await self.saveVisibilityChanges(shouldMakeVisibleAndPrimary: shouldMakeVisibleAndPrimary)
                 }
-            )
-            cell.contentView.addSubview(button)
-            button.autoPinEdgesToSuperviewMargins()
-            return cell
-        }, actionBlock: nil))
-        return section
+            } catch {
+                OWSActionSheets.showActionSheet(
+                    title: OWSLocalizedString(
+                        "FAILED_TO_REDEEM_BADGE_RECEIVED_AFTER_DONATION_FROM_A_FRIEND_TITLE",
+                        comment: "Shown as the title of an alert when failing to redeem a badge that was received after a friend donated on your behalf.",
+                    ),
+                    message: OWSLocalizedString(
+                        "FAILED_TO_REDEEM_BADGE_RECEIVED_AFTER_DONATION_FROM_A_FRIEND_BODY",
+                        comment: "Shown as the body of an alert when failing to redeem a badge that was received after a friend donated on your behalf.",
+                    ),
+                )
+            }
+        }
     }
 
-    private func buildRedeemButtonSection(notNowAction: @escaping () -> Void, incomingMessage: TSIncomingMessage) -> OWSTableSection {
-        let section = OWSTableSection()
-        section.hasBackground = false
-        section.add(.init(customCellBlock: { [weak self] in
-            let cell = OWSTableItem.newCell()
-            cell.selectionStyle = .none
-            guard let self = self else { return cell }
-
-            let redeemButton = UIButton(
-                configuration: .largePrimary(title: CommonStrings.redeemGiftButton),
-                primaryAction: UIAction { [weak self] _ in
-                    guard let self = self else { return }
-                    // Capture this value on the main thread.
-                    let shouldMakeVisibleAndPrimary = self.shouldMakeVisibleAndPrimary
-                    Task {
-                        do {
-                            try await self.performConfirmationAction {
-                                try await Self.redeemGiftBadge(incomingMessage: incomingMessage)
-                                try await self.saveVisibilityChanges(shouldMakeVisibleAndPrimary: shouldMakeVisibleAndPrimary)
-                            }
-                        } catch {
-                            OWSActionSheets.showActionSheet(
-                                title: OWSLocalizedString(
-                                    "FAILED_TO_REDEEM_BADGE_RECEIVED_AFTER_DONATION_FROM_A_FRIEND_TITLE",
-                                    comment: "Shown as the title of an alert when failing to redeem a badge that was received after a friend donated on your behalf."
-                                ),
-                                message: OWSLocalizedString(
-                                    "FAILED_TO_REDEEM_BADGE_RECEIVED_AFTER_DONATION_FROM_A_FRIEND_BODY",
-                                    comment: "Shown as the body of an alert when failing to redeem a badge that was received after a friend donated on your behalf."
-                                )
-                            )
-                        }
-                    }
-                }
-            )
-
-            let notNowButton = UIButton(
-                configuration: .largeSecondary(title: CommonStrings.notNowButton),
-                primaryAction: UIAction { [weak self] _ in
-                    notNowAction()
-                    self?.dismiss(animated: true)
-                }
-            )
-
-            let stackView = UIStackView.verticalButtonStack(buttons: [ redeemButton, notNowButton ], isFullWidthButtons: true)
-            stackView.directionalLayoutMargins.bottom = 0
-            cell.contentView.addSubview(stackView)
-            stackView.autoPinEdgesToSuperviewMargins()
-
-            return cell
-        }, actionBlock: nil))
-
-        return section
+    private func didTapNotNow(notNowAction: () -> Void) {
+        didHandleResult = true
+        notNowAction()
+        dismiss(animated: true)
     }
 }

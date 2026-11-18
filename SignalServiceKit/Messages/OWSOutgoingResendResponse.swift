@@ -6,22 +6,63 @@
 import Foundation
 import LibSignalClient
 
-@objc(OWSOutgoingResendResponse) // for Mantle
-final class OWSOutgoingResendResponse: TSOutgoingMessage {
-    @objc // for Mantle
+@objc(OWSOutgoingResendResponse)
+final class OWSOutgoingResendResponse: TransientOutgoingMessage {
+    override class var supportsSecureCoding: Bool { true }
+
+    required init?(coder: NSCoder) {
+        self.derivedContentHint = (coder.decodeObject(of: NSNumber.self, forKey: "derivedContentHint")?.intValue).flatMap(SealedSenderContentHint.init(rawValue:)) ?? .default
+        self.senderKeyId = coder.containsValue(forKey: "senderKeyId") ? coder.decodeInt64(forKey: "senderKeyId") : nil
+        self.originalGroupId = coder.decodeObject(of: NSData.self, forKey: "originalGroupId") as Data?
+        self.originalMessagePlaintext = coder.decodeObject(of: NSData.self, forKey: "originalMessagePlaintext") as Data?
+        self.originalThreadId = coder.decodeObject(of: NSString.self, forKey: "originalThreadId") as String?
+        super.init(coder: coder)
+    }
+
+    override func encode(with coder: NSCoder) {
+        super.encode(with: coder)
+        coder.encode(NSNumber(value: self.derivedContentHint.rawValue), forKey: "derivedContentHint")
+        if let senderKeyId {
+            coder.encode(senderKeyId, forKey: "senderKeyId")
+        }
+        if let originalGroupId {
+            coder.encode(originalGroupId, forKey: "originalGroupId")
+        }
+        if let originalMessagePlaintext {
+            coder.encode(originalMessagePlaintext, forKey: "originalMessagePlaintext")
+        }
+        if let originalThreadId {
+            coder.encode(originalThreadId, forKey: "originalThreadId")
+        }
+    }
+
+    override var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(super.hash)
+        hasher.combine(derivedContentHint)
+        hasher.combine(senderKeyId)
+        hasher.combine(originalGroupId)
+        hasher.combine(originalMessagePlaintext)
+        hasher.combine(originalThreadId)
+        return hasher.finalize()
+    }
+
+    override func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard super.isEqual(object) else { return false }
+        guard self.derivedContentHint == object.derivedContentHint else { return false }
+        guard self.senderKeyId == object.senderKeyId else { return false }
+        guard self.originalGroupId == object.originalGroupId else { return false }
+        guard self.originalMessagePlaintext == object.originalMessagePlaintext else { return false }
+        guard self.originalThreadId == object.originalThreadId else { return false }
+        return true
+    }
+
     private(set) var originalMessagePlaintext: Data?
-
-    @objc // for Mantle
     private(set) var originalThreadId: String?
-
-    @objc // for Mantle
     private(set) var originalGroupId: Data?
-
-    @objc // for Mantle
-    private var derivedContentHint: SealedSenderContentHint = .default
-
-    @objc // for Mantle
-    private(set) var didAppendSKDM: Bool = false
+    private var derivedContentHint: SealedSenderContentHint
+    private(set) var senderKeyId: SenderKeyRecord.RowId?
 
     private init(
         outgoingMessageBuilder: TSOutgoingMessageBuilder,
@@ -29,19 +70,19 @@ final class OWSOutgoingResendResponse: TSOutgoingMessage {
         originalThreadId: String?,
         originalGroupId: Data?,
         derivedContentHint: SealedSenderContentHint,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
+        self.derivedContentHint = derivedContentHint
         super.init(
             outgoingMessageWith: outgoingMessageBuilder,
             additionalRecipients: [],
             explicitRecipients: [],
             skippedRecipients: [],
-            transaction: tx
+            transaction: tx,
         )
         self.originalMessagePlaintext = originalMessagePlaintext
         self.originalThreadId = originalThreadId
         self.originalGroupId = originalGroupId
-        self.derivedContentHint = derivedContentHint
     }
 
     convenience init?(
@@ -49,19 +90,21 @@ final class OWSOutgoingResendResponse: TSOutgoingMessage {
         deviceId: DeviceId,
         failedTimestamp: UInt64,
         didResetSession: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         let targetThread = TSContactThread.getOrCreateThread(withContactAddress: SignalServiceAddress(aci), transaction: tx)
         let builder: TSOutgoingMessageBuilder = .withDefaultValues(thread: targetThread)
 
         let messageSendLog = SSKEnvironment.shared.messageSendLogRef
-        if let payloadRecord = messageSendLog.fetchPayload(
-            recipientAci: aci,
-            recipientDeviceId: deviceId,
-            timestamp: failedTimestamp,
-            tx: tx
-        ) {
-            let originalThread = TSThread.anyFetch(uniqueId: payloadRecord.uniqueThreadId, transaction: tx)
+        if
+            let payloadRecord = messageSendLog.fetchPayload(
+                recipientAci: aci,
+                recipientDeviceId: deviceId,
+                timestamp: failedTimestamp,
+                tx: tx,
+            )
+        {
+            let originalThread = TSThread.fetchViaCache(uniqueId: payloadRecord.uniqueThreadId, transaction: tx)
 
             // We should inherit the timestamp of the failed message. This allows the
             // recipient of this message to correlate the resend response with the
@@ -70,9 +113,24 @@ final class OWSOutgoingResendResponse: TSOutgoingMessage {
 
             // We also want to reset the delivery record for the failing address if
             // this was a sender key group. This will be re-marked as delivered on
-            // success if we included an SKDM in the resend response
-            if let originalThread, originalThread.isGroupThread {
-                SSKEnvironment.shared.senderKeyStoreRef.resetSenderKeyDeliveryRecord(for: originalThread, serviceId: aci, writeTx: tx)
+            // success if we include an SKDM in the resend response
+            let recipientStore = DependenciesBridge.shared.recipientDatabaseTable
+            let senderKeySendingManager = DependenciesBridge.shared.senderKeySendingManager
+            let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+            if
+                let originalThread,
+                originalThread.isGroupThread,
+                let registeredState = try? tsAccountManager.registeredState(tx: tx),
+                let deviceId = tsAccountManager.storedDeviceId(tx: tx).ifValid,
+                let senderKeyId = senderKeySendingManager.fetchSenderKeyId(
+                    forThreadUniqueId: originalThread.uniqueId,
+                    localAci: registeredState.localIdentifiers.aci,
+                    localDeviceId: deviceId,
+                    tx: tx,
+                ),
+                let recipient = recipientStore.fetchRecipient(serviceId: aci, transaction: tx)
+            {
+                senderKeySendingManager.resetDeliveryRecord(senderKeyId: senderKeyId, recipientId: recipient.id, tx: tx)
             }
 
             self.init(
@@ -81,7 +139,7 @@ final class OWSOutgoingResendResponse: TSOutgoingMessage {
                 originalThreadId: payloadRecord.uniqueThreadId,
                 originalGroupId: (originalThread as? TSGroupThread)?.groupId,
                 derivedContentHint: payloadRecord.contentHint,
-                tx: tx
+                tx: tx,
             )
         } else if didResetSession {
             Logger.info("Failed to find MSL record for resend request: \(failedTimestamp). Will reply with Null message")
@@ -91,7 +149,7 @@ final class OWSOutgoingResendResponse: TSOutgoingMessage {
                 originalThreadId: nil,
                 originalGroupId: nil,
                 derivedContentHint: .implicit,
-                tx: tx
+                tx: tx,
             )
         } else {
             Logger.warn("Failed to find MSL record for resend request: \(failedTimestamp). Declining to respond.")
@@ -99,27 +157,15 @@ final class OWSOutgoingResendResponse: TSOutgoingMessage {
         }
     }
 
-    required init!(coder: NSCoder) {
-        super.init(coder: coder)
-        // Discard invalid SealedSenderContentHint values.
-        self.derivedContentHint = SealedSenderContentHint(rawValue: self.derivedContentHint.rawValue) ?? .default
-    }
-
-    required init(dictionary dictionaryValue: [String: Any]!) throws {
-        try super.init(dictionary: dictionaryValue)
-    }
-
     override var shouldRecordSendLog: Bool { false }
 
     override func shouldSyncTranscript() -> Bool { false }
-
-    override var shouldBeSaved: Bool { false }
 
     override var contentHint: SealedSenderContentHint { self.derivedContentHint }
 
     override func envelopeGroupIdWithTransaction(_ transaction: DBReadTransaction) -> Data? { self.originalGroupId }
 
-    override func buildPlainTextData(_ thread: TSThread, transaction tx: DBWriteTransaction) -> Data? {
+    override func buildPlaintextData(inThread thread: TSThread, tx: DBWriteTransaction) throws -> Data {
         owsAssertDebug(self.recipientAddresses().count == 1)
 
         let contentBuilder: SSKProtoContentBuilder = {
@@ -134,26 +180,37 @@ final class OWSOutgoingResendResponse: TSOutgoingMessage {
             return nullMessageProtoBuilder()
         }()
 
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
         if
             let originalThreadId,
-            let originalThread = TSThread.anyFetch(uniqueId: originalThreadId, transaction: tx),
+            let originalThread = TSThread.fetchViaCache(uniqueId: originalThreadId, transaction: tx),
             originalThread.usesSenderKey,
             let recipientAddress = self.recipientAddresses().first,
-            originalThread.recipientAddresses(with: tx).contains(recipientAddress)
+            originalThread.recipientAddresses(with: tx).contains(recipientAddress),
+            let registeredState = try? tsAccountManager.registeredState(tx: tx),
+            let deviceId = tsAccountManager.storedDeviceId(tx: tx).ifValid
         {
-            let skdmData = SSKEnvironment.shared.senderKeyStoreRef.skdmBytesForThread(originalThread, tx: tx)
-            if let skdmData {
-                contentBuilder.setSenderKeyDistributionMessage(skdmData)
+            let senderKeySendingManager = DependenciesBridge.shared.senderKeySendingManager
+            do {
+                let senderKeyDistributionMessage = try senderKeySendingManager.buildSenderKeyDistributionMessage(
+                    forThreadUniqueId: originalThreadId,
+                    localAci: registeredState.localIdentifiers.aci,
+                    localDeviceId: deviceId,
+                    tx: tx,
+                )
+                contentBuilder.setSenderKeyDistributionMessage(senderKeyDistributionMessage.serialize())
+                self.senderKeyId = senderKeySendingManager.fetchSenderKeyId(
+                    forThreadUniqueId: originalThreadId,
+                    localAci: registeredState.localIdentifiers.aci,
+                    localDeviceId: deviceId,
+                    tx: tx,
+                ).owsFailUnwrap("must be able to fetch sender key we just used")
+            } catch {
+                owsFailDebug("couldn't append SKDM: \(error)")
             }
-            self.didAppendSKDM = skdmData != nil
         }
 
-        do {
-            return try contentBuilder.buildSerializedData()
-        } catch {
-            owsFailDebug("Failed to build plaintext message: \(error)")
-            return nil
-        }
+        return try contentBuilder.buildSerializedData()
     }
 
     private func resentProtoBuilder(from plaintextData: Data) throws -> SSKProtoContentBuilder {
@@ -168,20 +225,17 @@ final class OWSOutgoingResendResponse: TSOutgoingMessage {
 
     func didPerformMessageSend(_ sentMessages: [SentDeviceMessage], to serviceId: ServiceId, tx: DBWriteTransaction) {
         if
-            self.didAppendSKDM,
+            let senderKeyId,
             let originalThreadId,
-            let originalThread = TSThread.anyFetch(uniqueId: originalThreadId, transaction: tx),
+            let originalThread = TSThread.fetchViaCache(uniqueId: originalThreadId, transaction: tx),
             originalThread.usesSenderKey
         {
-            do {
-                try SSKEnvironment.shared.senderKeyStoreRef.recordSentSenderKeys(
-                    [SentSenderKey(recipient: serviceId, timestamp: self.timestamp, messages: sentMessages)],
-                    for: originalThread,
-                    writeTx: tx
-                )
-            } catch {
-                owsFailDebug("Couldn't update sender key after resend: \(error)")
-            }
+            let senderKeySendingManager = DependenciesBridge.shared.senderKeySendingManager
+            senderKeySendingManager.recordSentSenderKeys(
+                [SentSenderKey(recipient: serviceId, messages: sentMessages)],
+                forSenderKeyId: senderKeyId,
+                tx: tx,
+            )
         }
     }
 }

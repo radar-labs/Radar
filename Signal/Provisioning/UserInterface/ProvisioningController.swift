@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import LibSignalClient
 import SignalServiceKit
 import SignalUI
-import LibSignalClient
 
 class ProvisioningNavigationController: OWSNavigationController {
     private(set) var provisioningController: ProvisioningController
@@ -25,8 +25,6 @@ class ProvisioningNavigationController: OWSNavigationController {
 
 class ProvisioningController: NSObject {
 
-    private let appReadiness: AppReadinessSetter
-
     private lazy var registrationWebSocketManager = RegistrationWebSocketManagerImpl(
         chatConnectionManager: DependenciesBridge.shared.chatConnectionManager,
         messagePipelineSupervisor: SSKEnvironment.shared.messagePipelineSupervisorRef,
@@ -41,6 +39,7 @@ class ProvisioningController: NSObject {
             linkAndSyncManager: DependenciesBridge.shared.linkAndSyncManager,
             accountKeyStore: DependenciesBridge.shared.accountKeyStore,
             networkManager: SSKEnvironment.shared.networkManagerRef,
+            preferences: SSKEnvironment.shared.preferencesRef,
             preKeyManager: DependenciesBridge.shared.preKeyManager,
             profileManager: SSKEnvironment.shared.profileManagerImplRef,
             pushRegistrationManager: ProvisioningCoordinatorImpl.Wrappers.PushRegistrationManager(AppEnvironment.shared.pushRegistrationManagerRef),
@@ -54,29 +53,23 @@ class ProvisioningController: NSObject {
             syncManager: SSKEnvironment.shared.syncManagerRef,
             threadStore: ThreadStoreImpl(),
             tsAccountManager: DependenciesBridge.shared.tsAccountManager,
-            udManager: SSKEnvironment.shared.udManagerRef
         )
     }()
 
     private let provisioningSocketManager: ProvisioningSocketManager
 
     private init(
-        appReadiness: AppReadinessSetter,
-        provisioningSocketManager: ProvisioningSocketManager
+        provisioningSocketManager: ProvisioningSocketManager,
     ) {
-        self.appReadiness = appReadiness
         self.provisioningSocketManager = provisioningSocketManager
 
         super.init()
     }
 
     @MainActor
-    static func presentProvisioningFlow(appReadiness: AppReadinessSetter) {
+    static func presentProvisioningFlow(skipOnboarding: Bool) {
         let provisioningSocketManager = ProvisioningSocketManager(linkType: .linkDevice)
-        let provisioningController = ProvisioningController(
-            appReadiness: appReadiness,
-            provisioningSocketManager: provisioningSocketManager
-        )
+        let provisioningController = ProvisioningController(provisioningSocketManager: provisioningSocketManager)
         let navController = ProvisioningNavigationController(provisioningController: provisioningController)
         provisioningController.setUpDebugLogsGesture(on: navController)
 
@@ -92,51 +85,43 @@ class ProvisioningController: NSObject {
             // If we started a link'n'sync and terminated after committing
             // the restored backup but before finishing, reset the app data
             // and start over.
-            SignalApp.resetAppDataAndExit(
-                keyFetcher: SSKEnvironment.shared.databaseStorageRef.keyFetcher
+            SignalApp.shared.resetAppDataAndExit(
+                keyFetcher: SSKEnvironment.shared.databaseStorageRef.keyFetcher,
             )
         default:
             break
         }
 
-        let vc = ProvisioningSplashViewController(provisioningController: provisioningController)
-        navController.setViewControllers([vc], animated: false)
-
-        CurrentAppContext().mainWindow?.rootViewController = navController
-    }
-
-    static func presentRelinkingFlow(appReadiness: AppReadinessSetter) {
-        let provisioningSocketManager = ProvisioningSocketManager(linkType: .linkDevice)
-        let provisioningController = ProvisioningController(
-            appReadiness: appReadiness,
-            provisioningSocketManager: provisioningSocketManager
-        )
-        let navController = ProvisioningNavigationController(provisioningController: provisioningController)
-        provisioningController.setUpDebugLogsGesture(on: navController)
-
-        let vc = ProvisioningQRCodeViewController(
-            provisioningController: provisioningController,
-            provisioningSocketManager: provisioningSocketManager
-        )
-        navController.setViewControllers([vc], animated: false)
-        CurrentAppContext().mainWindow?.rootViewController = navController
-
-        Task {
-            await provisioningController.awaitProvisioning(
-                from: vc,
-                navigationController: navController
+        if skipOnboarding {
+            let qrCodeViewController = ProvisioningQRCodeViewController(
+                provisioningController: provisioningController,
+                provisioningSocketManager: provisioningSocketManager,
             )
+
+            navController.pushViewController(qrCodeViewController, animated: false)
+            CurrentAppContext().mainWindow?.rootViewController = navController
+
+            Task {
+                await provisioningController.awaitProvisioning(
+                    from: qrCodeViewController,
+                    navigationController: navController,
+                )
+            }
+        } else {
+            let vc = ProvisioningSplashViewController(provisioningController: provisioningController)
+            navController.setViewControllers([vc], animated: false)
+            CurrentAppContext().mainWindow?.rootViewController = navController
         }
     }
 
 #if DEBUG
     static func preview() -> ProvisioningController {
-        ProvisioningController(appReadiness: AppReadinessMock(), provisioningSocketManager: ProvisioningSocketManager(linkType: .linkDevice))
+        ProvisioningController(provisioningSocketManager: ProvisioningSocketManager(linkType: .linkDevice))
     }
 #endif
 
     private func setUpDebugLogsGesture(
-        on navigationController: UINavigationController
+        on navigationController: UINavigationController,
     ) {
         let submitLogsGesture = UITapGestureRecognizer(target: self, action: #selector(submitLogs))
         submitLogsGesture.numberOfTapsRequired = 8
@@ -147,7 +132,11 @@ class ProvisioningController: NSObject {
     @objc
     @MainActor
     private func submitLogs() {
-        DebugLogs.submitLogs(supportTag: "Onboarding", dumper: .fromGlobals())
+        guard let viewController = CurrentAppContext().frontmostViewController() else {
+            return
+        }
+        let logs = DebugLogs(dumper: .fromGlobals())
+        logs.promptToSubmitLogs(from: viewController, supportTag: "Onboarding")
     }
 
     // MARK: - Transitions
@@ -166,7 +155,21 @@ class ProvisioningController: NSObject {
 
         Logger.info("")
         let loader = RegistrationCoordinatorLoaderImpl(dependencies: .from(self))
-        SignalApp.shared.showRegistration(loader: loader, desiredMode: .registering, appReadiness: appReadiness)
+        SignalApp.shared.showRegistration(loader: loader, desiredMode: .registering)
+    }
+
+    @MainActor
+    func cancelProvisioning(from viewController: UIViewController) {
+        Logger.info("")
+
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        if tsAccountManager.registrationStateWithMaybeSneakyTransaction.deregisteredState?.isPrimary == false {
+            SignalApp.shared.showHomeTabBarController()
+        } else if RegistrationUtils.isPrimaryByDefault {
+            switchToPrimaryRegistration(viewController: viewController)
+        } else {
+            SignalApp.shared.showSecondaryProvisioning(skipOnboarding: false)
+        }
     }
 
     @MainActor
@@ -215,47 +218,70 @@ class ProvisioningController: NSObject {
 
     // MARK: - Transfer
 
-    func transferAccount(fromViewController: UIViewController) {
-        AssertIsOnMainThread()
-
+    @MainActor
+    func transferAccount(fromViewController: UIViewController) async {
         Logger.info("")
-
         guard let navigationController = fromViewController.navigationController else {
             owsFailDebug("Missing navigationController")
             return
         }
 
-        guard !(navigationController.topViewController is ProvisioningTransferQRCodeViewController) else {
+        if navigationController.topViewController is BaseQuickRestoreQRCodeViewController {
             // qr code view is already presented, we don't need to push it again.
             return
         }
 
-        let view = ProvisioningTransferQRCodeViewController(provisioningController: self)
-        navigationController.pushViewController(view, animated: true)
-    }
+        let view = BaseQuickRestoreQRCodeViewController()
+        await navigationController.awaitablePush(view, animated: true)
+        do {
+            let message = try await view.waitForMessage()
+            guard let restoreToken = message.restoreMethodToken else {
+                throw OWSAssertionError("Missing restore token")
+            }
 
-    func accountTransferInProgress(fromViewController: UIViewController, progress: Progress) {
-        AssertIsOnMainThread()
+            let useWifiAware = {
+                if
+                    DeviceTransfer.platformSupportsWifiAware(),
+                    Set(message.capabilites).contains(.wifiaware)
+                {
+                    return true
+                }
+                return false
+            }()
 
-        Logger.info("")
+            let transferState = try DeviceTransferCoordinator(
+                db: DependenciesBridge.shared.db,
+                deviceSleepManager: DependenciesBridge.shared.deviceSleepManager,
+                deviceTransferRestore: AppEnvironment.shared.deviceTransferRestore,
+                quickRestoreManager: AppEnvironment.shared.quickRestoreManager,
+                registrationStateChangeManager: DependenciesBridge.shared.registrationStateChangeManager,
+                restoreMethodToken: restoreToken,
+                restoreMode: .linked,
+                tsAccountManager: DependenciesBridge.shared.tsAccountManager,
+                supportsWifiAware: useWifiAware,
+            )
 
-        guard let navigationController = fromViewController.navigationController else {
-            owsFailDebug("Missing navigationController")
-            return
+            transferState.cancelTransferBlock = { [weak self] in
+                self?.pushTransferChoiceView(onto: navigationController)
+            }
+            transferState.onFailure = { [weak self] _ in
+                self?.pushTransferChoiceView(onto: navigationController)
+            }
+
+            await navigationController.awaitablePush(
+                DeviceTransferStatusViewController(coordinator: transferState),
+                animated: true,
+            )
+        } catch {
+            // Display error to the user
+            Logger.error("Failed to start transfer")
         }
-
-        guard !(navigationController.topViewController is ProvisioningTransferProgressViewController) else {
-            // qr code view is already presented, we don't need to push it again.
-            return
-        }
-
-        let view = ProvisioningTransferProgressViewController(provisioningController: self, progress: progress)
-        navigationController.pushViewController(view, animated: true)
     }
 
     // MARK: - Linking
 
-    func didConfirmSecondaryDevice(from viewController: ProvisioningPrepViewController) {
+    @MainActor
+    func didConfirmSecondaryDevice(from viewController: ProvisioningPrepViewController) async {
         guard let navigationController = viewController.navigationController else {
             owsFailDebug("navigationController was unexpectedly nil")
             return
@@ -263,22 +289,21 @@ class ProvisioningController: NSObject {
 
         let qrCodeViewController = ProvisioningQRCodeViewController(
             provisioningController: self,
-            provisioningSocketManager: provisioningSocketManager
+            provisioningSocketManager: provisioningSocketManager,
         )
-        navigationController.pushViewController(qrCodeViewController, animated: true)
 
-        Task {
-            await awaitProvisioning(
-                from: qrCodeViewController,
-                navigationController: navigationController
-            )
-        }
+        await navigationController.awaitablePush(qrCodeViewController, animated: true)
+
+        await awaitProvisioning(
+            from: qrCodeViewController,
+            navigationController: navigationController,
+        )
     }
 
     @MainActor
     private func awaitProvisioning(
         from viewController: ProvisioningQRCodeViewController,
-        navigationController: UINavigationController
+        navigationController: UINavigationController,
     ) async {
 
         let provisioningMessage = await waitForProvisioningMessage(navigationController: navigationController)
@@ -294,12 +319,12 @@ class ProvisioningController: NSObject {
             OWSActionSheets.showActionSheet(
                 title: OWSLocalizedString(
                     "SECONDARY_LINKING_ERROR_OLD_VERSION_TITLE",
-                    comment: "alert title for outdated linking device"
+                    comment: "alert title for outdated linking device",
                 ),
                 message: OWSLocalizedString(
                     "SECONDARY_LINKING_ERROR_OLD_VERSION_MESSAGE",
-                    comment: "alert message for outdated linking device"
-                )
+                    comment: "alert message for outdated linking device",
+                ),
             ) { _ in
                 navigationController.popViewController(animated: true)
             }
@@ -313,37 +338,38 @@ class ProvisioningController: NSObject {
                 try await self.provisioningCoordinator.completeProvisioning(
                     provisionMessage: provisioningMessage,
                     deviceName: UIDevice.current.name,
-                    progressViewModel: progressViewModel
+                    progressViewModel: progressViewModel,
                 )
             },
             viewController: viewController,
             navigationController: navigationController,
             willLinkAndSync: provisioningMessage.ephemeralBackupKey != nil,
-            progressViewModel: progressViewModel
+            progressViewModel: progressViewModel,
         )
     }
 
     @MainActor
     private func waitForProvisioningMessage(
-        navigationController: UINavigationController
+        navigationController: UINavigationController,
     ) async -> LinkingProvisioningMessage? {
         do {
-            return try await provisioningSocketManager.waitForMessage()
+            let messageData = try await provisioningSocketManager.waitForMessageData(ProvisioningProtos_ProvisionEnvelope.self)
+            return try LinkingProvisioningMessage(ProvisioningProtos_ProvisionMessage(serializedBytes: messageData))
         } catch let error {
-            Logger.error("Failed to decrypt provision envelope: \(error)")
+            Logger.warn("couldn't decrypt/decode provisioning envelope: \(error)")
             let alert = ActionSheetController(
                 title: OWSLocalizedString(
                     "SECONDARY_LINKING_ERROR_WAITING_FOR_SCAN",
-                    comment: "alert title"
+                    comment: "alert title",
                 ),
-                message: error.userErrorDescription
+                message: error.userErrorDescription,
             )
             alert.addAction(ActionSheetAction(
                 title: CommonStrings.cancelButton,
                 style: .cancel,
                 handler: { _ in
                     navigationController.popViewController(animated: true)
-                }
+                },
             ))
 
             navigationController.presentActionSheet(alert)
@@ -358,13 +384,13 @@ class ProvisioningController: NSObject {
             }
             return
         }
-        SignalApp.shared.showConversationSplitView(appReadiness: appReadiness)
+        SignalApp.shared.showHomeTabBarController()
     }
 
     @MainActor
     private func resetBackToQrCodeController(
         from viewController: ProvisioningQRCodeViewController,
-        navigationController: UINavigationController
+        navigationController: UINavigationController,
     ) async {
         Logger.warn("")
 
@@ -383,7 +409,7 @@ class ProvisioningController: NSObject {
         Task {
             await awaitProvisioning(
                 from: viewController,
-                navigationController: navigationController
+                navigationController: navigationController,
             )
         }
     }
@@ -394,7 +420,7 @@ class ProvisioningController: NSObject {
         viewController: ProvisioningQRCodeViewController,
         navigationController: UINavigationController,
         willLinkAndSync: Bool,
-        progressViewModel: LinkAndSyncSecondaryProgressViewModel
+        progressViewModel: LinkAndSyncSecondaryProgressViewModel,
     ) {
         if willLinkAndSync {
             Task { @MainActor in
@@ -409,7 +435,7 @@ class ProvisioningController: NSObject {
                                 viewController: viewController,
                                 navigationController: navigationController,
                                 willLinkAndSync: willLinkAndSync,
-                                progressViewModel: progressViewModel
+                                progressViewModel: progressViewModel,
                             )
                         })
                         return
@@ -417,7 +443,7 @@ class ProvisioningController: NSObject {
                 } else {
                     progressViewController = LinkAndSyncProvisioningProgressViewController(
                         provisioningController: self,
-                        viewModel: progressViewModel
+                        viewModel: progressViewModel,
                     )
                 }
                 progressViewController.linkNSyncTask = task
@@ -428,40 +454,38 @@ class ProvisioningController: NSObject {
                     // to that before jumping again to the chat list.
                     self.provisioningDidComplete(from: viewController)
                 } catch var error as CompleteProvisioningError {
-                    if case let .linkAndSyncError(provisioningLinkAndSyncError) = error {
-                        switch provisioningLinkAndSyncError.error {
-                        case .primaryFailedBackupExport(let continueWithoutSyncing):
+                    if case let .linkAndSyncError(linkAndSyncError) = error {
+                        switch linkAndSyncError.error {
+                        case SecondaryLinkNSyncError.primaryFailedBackupExport(let continueWithoutSyncing):
                             if continueWithoutSyncing {
                                 do {
-                                    try await provisioningLinkAndSyncError.continueWithoutSyncing()
+                                    try await linkAndSyncError.continueWithoutSyncing()
                                     self.provisioningDidComplete(from: viewController)
                                     return
                                 } catch let innerError as CompleteProvisioningError {
                                     error = innerError
                                 } catch {
                                     Logger.error("Encountered unexpected error: \(error)")
-                                    return
                                 }
                             } else {
                                 // Crash if this fails; things have gone horribly wrong.
-                                try! await provisioningLinkAndSyncError.restartProvisioning()
+                                try! await linkAndSyncError.restartProvisioning()
                                 await self.resetBackToQrCodeController(
                                     from: viewController,
-                                    navigationController: navigationController
+                                    navigationController: navigationController,
                                 )
                                 return
                             }
-                        case .cancelled:
+                        case is CancellationError:
                             // Exit provisioning if we cancelled
                             do {
-                                try await provisioningLinkAndSyncError.continueWithoutSyncing()
+                                try await linkAndSyncError.continueWithoutSyncing()
                                 self.provisioningDidComplete(from: viewController)
                                 return
                             } catch let innerError as CompleteProvisioningError {
                                 error = innerError
                             } catch {
                                 Logger.error("Encountered unexpected error: \(error)")
-                                return
                             }
                         default:
                             break
@@ -471,7 +495,7 @@ class ProvisioningController: NSObject {
                         error: error,
                         from: viewController,
                         navigationController: navigationController,
-                        progressViewModel: progressViewModel
+                        progressViewModel: progressViewModel,
                     )
                     if progressViewController.presentedViewController == nil {
                         progressViewController.presentActionSheet(errorActionSheet)
@@ -484,7 +508,7 @@ class ProvisioningController: NSObject {
             let presentingController = viewController.presentedViewController ?? viewController
             ModalActivityIndicatorViewController.present(
                 fromViewController: presentingController,
-                canCancel: false
+                canCancel: false,
             ) { modal async -> Void in
                 let result: CompleteProvisioningError?
                 do {
@@ -499,7 +523,7 @@ class ProvisioningController: NSObject {
                         error: $0,
                         from: viewController,
                         navigationController: navigationController,
-                        progressViewModel: progressViewModel
+                        progressViewModel: progressViewModel,
                     )
                 }
                 modal.dismiss {
@@ -517,7 +541,7 @@ class ProvisioningController: NSObject {
         error: CompleteProvisioningError,
         from viewController: ProvisioningQRCodeViewController,
         navigationController: UINavigationController,
-        progressViewModel: LinkAndSyncSecondaryProgressViewModel
+        progressViewModel: LinkAndSyncSecondaryProgressViewModel,
     ) -> ActionSheetController {
         let alert: ActionSheetController
         switch error {
@@ -525,27 +549,28 @@ class ProvisioningController: NSObject {
             Logger.warn("was previously linked/registered on different account!")
             let title = OWSLocalizedString(
                 "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_TITLE",
-                comment: "Title for error alert indicating that re-linking failed because the account did not match."
+                comment: "Title for error alert indicating that re-linking failed because the account did not match.",
             )
             let message = OWSLocalizedString(
                 "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_MESSAGE",
-                comment: "Message for error alert indicating that re-linking failed because the account did not match."
+                comment: "Message for error alert indicating that re-linking failed because the account did not match.",
             )
             alert = ActionSheetController(title: title, message: message)
             alert.addAction(ActionSheetAction(
                 title: OWSLocalizedString(
                     "SECONDARY_LINKING_ERROR_DIFFERENT_ACCOUNT_RESET_DEVICE",
-                    comment: "Label for the 'reset device' action in the 're-linking failed because the account did not match' alert."
+                    comment: "Label for the 'reset device' action in the 're-linking failed because the account did not match' alert.",
                 ),
                 style: .default,
                 handler: { _ in
-                    Task { @MainActor in
-                        await self.resetBackToQrCodeController(
-                            from: viewController,
-                            navigationController: navigationController
-                        )
+                    ModalActivityIndicatorViewController.present(
+                        fromViewController: viewController,
+                        title: CommonStrings.deletingModal,
+                    ) { _ in
+                        let keyFetcher = SSKEnvironment.shared.databaseStorageRef.keyFetcher
+                        SignalApp.shared.resetAppDataAndExit(keyFetcher: keyFetcher)
                     }
-                }
+                },
             ))
         case .deviceLimitExceededError(let error):
             alert = ActionSheetController(title: error.errorDescription, message: error.recoverySuggestion)
@@ -555,30 +580,30 @@ class ProvisioningController: NSObject {
                     Task { @MainActor in
                         await self.resetBackToQrCodeController(
                             from: viewController,
-                            navigationController: navigationController
+                            navigationController: navigationController,
                         )
                     }
-                }
+                },
             ))
         case .obsoleteLinkedDeviceError:
             Logger.warn("obsolete device error")
             let title = OWSLocalizedString(
                 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_TITLE",
-                comment: "Title for error alert indicating that a linked device must be upgraded before it can be linked."
+                comment: "Title for error alert indicating that a linked device must be upgraded before it can be linked.",
             )
             let message = OWSLocalizedString(
                 "SECONDARY_LINKING_ERROR_OBSOLETE_LINKED_DEVICE_MESSAGE",
-                comment: "Message for error alert indicating that a linked device must be upgraded before it can be linked."
+                comment: "Message for error alert indicating that a linked device must be upgraded before it can be linked.",
             )
             alert = ActionSheetController(title: title, message: message)
 
             let updateButtonText = OWSLocalizedString(
                 "APP_UPDATE_NAG_ALERT_UPDATE_BUTTON",
-                comment: "Label for the 'update' button in the 'new app version available' alert."
+                comment: "Label for the 'update' button in the 'new app version available' alert.",
             )
             let updateAction = ActionSheetAction(
                 title: updateButtonText,
-                style: .default
+                style: .default,
             ) { _ in
                 let url = TSConstants.appStoreUrl
                 UIApplication.shared.open(url, options: [:])
@@ -601,28 +626,28 @@ class ProvisioningController: NSObject {
                         Task { @MainActor in
                             await self.resetBackToQrCodeController(
                                 from: viewController,
-                                navigationController: navigationController
+                                navigationController: navigationController,
                             )
                         }
                     }
-                }
+                },
             ))
         case .linkAndSyncError(let error):
             return self.linkAndSyncRetryActionSheet(
                 error: error,
                 from: viewController,
                 navigationController: navigationController,
-                progressViewModel: progressViewModel
+                progressViewModel: progressViewModel,
             )
         }
         return alert
     }
 
     private func linkAndSyncRetryActionSheet(
-        error: ProvisioningLinkAndSyncError,
+        error: ProvisioningCoordinatorImpl.LinkAndSyncError,
         from viewController: ProvisioningQRCodeViewController,
         navigationController: UINavigationController,
-        progressViewModel: LinkAndSyncSecondaryProgressViewModel
+        progressViewModel: LinkAndSyncSecondaryProgressViewModel,
     ) -> ActionSheetController {
         enum ErrorPromptMode {
             case contactSupport
@@ -632,43 +657,33 @@ class ProvisioningController: NSObject {
 
         let errorPromptMode: ErrorPromptMode
         let errorMessage: String?
-        switch error.error {
-        case .errorRestoringBackup:
+        if case SecondaryLinkNSyncError.errorRestoringBackup = error.error {
             errorPromptMode = .contactSupport
             errorMessage = nil
-        case .errorDownloadingBackup, .networkError:
+        } else if error.error.isNetworkFailureOrTimeout {
             errorPromptMode = .networkErrorRetry
             errorMessage = OWSLocalizedString(
                 "SECONDARY_LINKING_SYNCING_NETWORK_ERROR_MESSAGE",
-                comment: "Message for action sheet when secondary device fails to sync messages due to network error."
+                comment: "Message for action sheet when secondary device fails to sync messages due to network error.",
             )
-        case .primaryFailedBackupExport:
-            owsFailDebug("No prompt for this case")
-            fallthrough
-        case .errorWaitingForBackup, .cancelled:
-            errorPromptMode = .restartProvisioning
-            errorMessage = OWSLocalizedString(
-                "SECONDARY_LINKING_SYNCING_OTHER_ERROR_MESSAGE",
-                comment: "Message for action sheet when secondary device fails to sync messages due to an unspecified error."
-            )
-        case .unsupportedBackupVersion:
+        } else if case BackupImportError.unsupportedVersion = error.error {
             let actionSheet = ActionSheetController(
                 title: OWSLocalizedString(
                     "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_TITLE",
-                    comment: "Title for action sheet when the secondary device fails to sync messages due to an app update being required."
+                    comment: "Title for action sheet when the secondary device fails to sync messages due to an app update being required.",
                 ),
                 message: OWSLocalizedString(
                     "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_ERROR_MESSAGE",
-                    comment: "Message for action sheet when the secondary device fails to sync messages due to an app update being required."
-                )
+                    comment: "Message for action sheet when the secondary device fails to sync messages due to an app update being required.",
+                ),
             )
 
             actionSheet.addAction(ActionSheetAction(
                 title: OWSLocalizedString(
                     "SECONDARY_LINKING_SYNCING_UPDATE_REQUIRED_CHECK_FOR_UPDATE_BUTTON",
-                    comment: "Button on an action sheet to open Signal on the App Store."
+                    comment: "Button on an action sheet to open Signal on the App Store.",
                 ),
-                style: .default
+                style: .default,
             ) { _ in
                 UIApplication.shared.open(TSConstants.appStoreUrl)
                 Task { @MainActor in
@@ -676,19 +691,25 @@ class ProvisioningController: NSObject {
                     try! await error.restartProvisioning()
                     await self.resetBackToQrCodeController(
                         from: viewController,
-                        navigationController: navigationController
+                        navigationController: navigationController,
                     )
                 }
             })
             return actionSheet
+        } else {
+            errorPromptMode = .restartProvisioning
+            errorMessage = OWSLocalizedString(
+                "SECONDARY_LINKING_SYNCING_OTHER_ERROR_MESSAGE",
+                comment: "Message for action sheet when secondary device fails to sync messages due to an unspecified error.",
+            )
         }
 
         let retryActionSheet = ActionSheetController(
             title: OWSLocalizedString(
                 "SECONDARY_LINKING_SYNCING_ERROR_TITLE",
-                comment: "Title for action sheet when secondary device fails to sync messages."
+                comment: "Title for action sheet when secondary device fails to sync messages.",
             ),
-            message: errorMessage
+            message: errorMessage,
         )
         retryActionSheet.isCancelable = false
 
@@ -700,7 +721,7 @@ class ProvisioningController: NSObject {
                     try! await error.restartProvisioning()
                     await self.resetBackToQrCodeController(
                         from: viewController,
-                        navigationController: navigationController
+                        navigationController: navigationController,
                     )
 
                     // Wait to present until we've reset back to the QR code
@@ -708,7 +729,7 @@ class ProvisioningController: NSObject {
                     ContactSupportActionSheet.present(
                         emailFilter: .backupImportFailed,
                         logDumper: .fromGlobals(),
-                        fromViewController: viewController
+                        fromViewController: viewController,
                     )
                 }
             })
@@ -721,7 +742,7 @@ class ProvisioningController: NSObject {
                     viewController: viewController,
                     navigationController: navigationController,
                     willLinkAndSync: true,
-                    progressViewModel: progressViewModel
+                    progressViewModel: progressViewModel,
                 )
             })
         case .restartProvisioning:
@@ -731,7 +752,7 @@ class ProvisioningController: NSObject {
                     try! await error.restartProvisioning()
                     await self.resetBackToQrCodeController(
                         from: viewController,
-                        navigationController: navigationController
+                        navigationController: navigationController,
                     )
                 }
             })
@@ -739,7 +760,7 @@ class ProvisioningController: NSObject {
 
         retryActionSheet.addAction(ActionSheetAction(
             title: CommonStrings.cancelButton,
-            style: .cancel
+            style: .cancel,
         ) { _ in
             self.performCoordinatorTaskWithModal(
                 task: Task {
@@ -748,7 +769,7 @@ class ProvisioningController: NSObject {
                 viewController: viewController,
                 navigationController: navigationController,
                 willLinkAndSync: false,
-                progressViewModel: progressViewModel
+                progressViewModel: progressViewModel,
             )
         })
 
@@ -760,7 +781,7 @@ private extension CommonStrings {
     static var linkNSyncImportErrorTitle: String {
         OWSLocalizedString(
             "SECONDARY_LINKING_SYNCING_ERROR_TITLE",
-            comment: "Title for action sheet when secondary device fails to sync messages."
+            comment: "Title for action sheet when secondary device fails to sync messages.",
         )
     }
 }

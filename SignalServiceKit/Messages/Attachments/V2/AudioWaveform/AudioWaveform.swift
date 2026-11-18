@@ -6,36 +6,69 @@
 import Accelerate
 import Foundation
 
-public class AudioWaveform: Equatable {
+public struct AudioWaveform: Equatable, Sendable {
 
-    /// The recorded samples for this waveform.
-    private let decibelSamples: [Float]
+    /// Display levels from 0 to 1, ready to display as-is.
+    private let levels: [Float]
 
-    public init(decibelSamples: [Float]) {
-        self.decibelSamples = decibelSamples
-    }
-
-    public static func == (lhs: AudioWaveform, rhs: AudioWaveform) -> Bool {
-        lhs.decibelSamples == rhs.decibelSamples
-    }
-
-    // MARK: - Caching
-
-    public init(archivedData: Data) throws {
-        let unarchivedSamples = try NSKeyedUnarchiver.unarchivedArrayOfObjects(ofClass: NSNumber.self, from: archivedData)
-        guard let unarchivedSamples else {
-            throw OWSAssertionError("Failed to unarchive decibel samples")
+    init(levels: [Float]) throws {
+        guard (1...Self.sampleCount).contains(levels.count) else {
+            throw OWSGenericError("Invalid waveform sample count! \(levels.count)")
         }
-        decibelSamples = unarchivedSamples.map { $0.floatValue }
+        self.levels = levels
     }
 
-    public func archive() throws -> Data {
-        return try NSKeyedArchiver.archivedData(withRootObject: decibelSamples, requiringSecureCoding: false)
+    /// Create a waveform from its serialized representation: one byte per
+    /// sample, each a bar height from 0 (silence) to `UInt8.max` (the loudest
+    /// bar we draw).
+    public init(waveformData: Data) throws {
+        try self.init(levels: waveformData.map { Self.level(fromByte: $0) })
     }
 
-    public func write(toFile filePath: String, atomically: Bool) throws {
-        let archivedData = try NSKeyedArchiver.archivedData(withRootObject: decibelSamples, requiringSecureCoding: false)
-        try archivedData.write(to: URL(fileURLWithPath: filePath), options: atomically ? .atomicWrite : .init())
+    /// This waveform serialized as one byte per sample; see
+    /// ``init(waveformData:)``.
+    public var waveformData: Data {
+        Data(levels.map { Self.byte(fromLevel: $0) })
+    }
+
+    // MARK: - Legacy waveform files
+
+    /// Reads the archived format that waveforms used to be stored in, which
+    /// nothing writes anymore; see ``AudioWaveformFileMigrator``.
+    public init(archivedData: Data) throws {
+        let unarchivedSamples = try NSKeyedUnarchiver.unarchivedArrayOfObjects(
+            ofClass: NSNumber.self,
+            from: archivedData,
+        )
+
+        guard let unarchivedSamples else {
+            throw OWSGenericError("Failed to unarchive decibel samples")
+        }
+
+        try self.init(
+            levels: unarchivedSamples.map { Self.level(fromDecibels: $0.floatValue) },
+        )
+    }
+
+    // MARK: -
+
+    /// Normalize a decibel value to a range of 0-1, with 0 being silence and 1
+    /// being the loudest value we render.
+    static func level(fromDecibels decibels: Float) -> Float {
+        decibels.inverseLerp(
+            AudioWaveform.silenceThreshold,
+            AudioWaveform.clippingThreshold,
+            shouldClamp: true,
+        )
+    }
+
+    private static func level(fromByte byte: UInt8) -> Float {
+        Float(byte) / Float(UInt8.max)
+    }
+
+    private static func byte(fromLevel level: Float) -> UInt8 {
+        guard level.isFinite else { return 0 }
+        return UInt8(clamping: Int((level * Float(UInt8.max)).rounded()))
     }
 
     // MARK: -
@@ -44,27 +77,14 @@ public class AudioWaveform: Equatable {
         // Do nothing if the number of requested samples is less than 1
         guard sampleCount > 0 else { return [] }
 
-        // Normalize to a range of 0-1 with 0 being silence and
-        // 1 being the loudest value we render.
-        func normalize(_ float: Float) -> Float {
-            float.inverseLerp(
-                AudioWaveform.silenceThreshold,
-                AudioWaveform.clippingThreshold,
-                shouldClamp: true
-            )
-        }
-
         // If we're trying to downsample to more samples than exist, just return what we have.
-        guard decibelSamples.count > sampleCount else {
-            return decibelSamples.map(normalize)
+        guard levels.count > sampleCount else {
+            return levels
         }
-
-        let downSampledData = Self.downsample(samples: decibelSamples, toSampleCount: sampleCount)
-
-        return downSampledData.map(normalize)
+        return Self.downsample(samples: levels, toSampleCount: sampleCount)
     }
 
-    static func downsample(samples: [Float], toSampleCount sampleCount: Int) -> [Float] {
+    private static func downsample(samples: [Float], toSampleCount sampleCount: Int) -> [Float] {
         // Do nothing if the number of requested samples is less than 1
         guard sampleCount > 0 else { return [] }
 
@@ -85,7 +105,7 @@ public class AudioWaveform: Equatable {
             filter,
             &downSampledData,
             vDSP_Length(sampleCount),
-            vDSP_Length(strideLength)
+            vDSP_Length(strideLength),
         )
 
         return downSampledData
@@ -93,7 +113,8 @@ public class AudioWaveform: Equatable {
 
     // MARK: - Constants
 
-    /// Anything below this decibel level is considered silent and clipped.
+    /// Decibel range used to render legacy archived waveforms. Anything below
+    /// `silenceThreshold` is considered silent and clipped.
     static let silenceThreshold: Float = -50
     static let clippingThreshold: Float = -20
 
@@ -104,7 +125,7 @@ public class AudioWaveform: Equatable {
     /// If rendering waveforms at a higher resolution, this value may
     /// need to be adjusted appropriately.
     ///
-    /// Currently, these samples are cached to disk, so we need to
-    /// make sure that sample count produces a reasonably file size.
-    static let sampleCount = 100
+    /// Samples are stored and sent one byte apiece, so this is also the
+    /// maximum size of a serialized waveform.
+    public static let sampleCount = 100
 }

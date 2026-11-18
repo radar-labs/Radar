@@ -13,6 +13,10 @@ class GroupDescriptionPreviewView: ManualLayoutView {
     var groupName: String?
     private static let viewFullDescriptionURL = URL(string: "view-full-description")!
 
+    private let groupThread: TSGroupThread?
+
+    weak var delegate: GroupDescriptionViewControllerDelegate?
+
     var font: UIFont? {
         get { textView.font }
         set { textView.font = newValue }
@@ -48,14 +52,30 @@ class GroupDescriptionPreviewView: ManualLayoutView {
         }
     }
 
-    init(shouldDeactivateConstraints: Bool = false) {
+    private init(
+        groupThread: TSGroupThread?,
+        shouldDeactivateConstraints: Bool,
+    ) {
+        self.groupThread = groupThread
+
         super.init(name: "GroupDescriptionPreview")
         self.shouldDeactivateConstraints = shouldDeactivateConstraints
+        self.setup()
+    }
 
+    convenience init(shouldDeactivateConstraints: Bool = false) {
+        self.init(groupThread: nil, shouldDeactivateConstraints: shouldDeactivateConstraints)
+    }
+
+    convenience init(editableGroupThread groupThread: TSGroupThread) {
+        self.init(groupThread: groupThread, shouldDeactivateConstraints: false)
+    }
+
+    private func setup() {
         textView.delegate = self
 
         addSubview(textView) { [weak self] view in
-            if shouldDeactivateConstraints {
+            if self?.shouldDeactivateConstraints == true {
                 self?.textView.frame = view.bounds
             }
             self?.truncateVisibleTextIfNecessary()
@@ -70,7 +90,7 @@ class GroupDescriptionPreviewView: ManualLayoutView {
     private static let moreTextPrefix = "… "
     private static let moreText = OWSLocalizedString(
         "GROUP_DESCRIPTION_MORE",
-        comment: "Text indication the user can tap to view the full group description"
+        comment: "Text indication the user can tap to view the full group description",
     )
     private static let moreTextPlusPrefixLength = (moreTextPrefix + moreText).utf16.count
 
@@ -81,7 +101,7 @@ class GroupDescriptionPreviewView: ManualLayoutView {
 
         guard width > 0 else { return }
 
-        guard let descriptionText = descriptionText else { return }
+        guard let descriptionText else { return }
 
         let cacheKey = "\(width)x\(height)-\(descriptionText)"
 
@@ -142,25 +162,25 @@ class GroupDescriptionPreviewView: ManualLayoutView {
             textView.dataDetectorTypes = .all
             textView.linkTextAttributes = [
                 .foregroundColor: textColor ?? Theme.secondaryTextAndIconColor,
-                .underlineStyle: NSUnderlineStyle.single.rawValue
+                .underlineStyle: NSUnderlineStyle.single.rawValue,
             ]
             textView.text = textThatFits
         } else {
             textView.dataDetectorTypes = []
             textView.linkTextAttributes = [
                 .foregroundColor: Theme.primaryTextColor,
-                .underlineStyle: 0
+                .underlineStyle: 0,
             ]
             textView.attributedText = NSAttributedString.composed(of: [
                 textThatFits.stripped,
                 Self.moreTextPrefix,
                 Self.moreText.styled(
-                    with: .link(Self.viewFullDescriptionURL)
-                )
+                    with: .link(Self.viewFullDescriptionURL),
+                ),
             ]).styled(
                 with: .font(font ?? .dynamicTypeBody),
                 .color(textColor ?? Theme.secondaryTextAndIconColor),
-                .alignment(textAlignment)
+                .alignment(textAlignment),
             )
         }
     }
@@ -170,18 +190,29 @@ extension GroupDescriptionPreviewView: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         guard URL == Self.viewFullDescriptionURL else { return true }
 
-        let vc = GroupDescriptionViewController(
-            helper: GroupAttributesEditorHelper(
-                groupId: Data(),
-                groupNameOriginal: groupName,
-                groupDescriptionOriginal: descriptionText,
-                avatarOriginalData: nil,
-                iconViewSize: 0
+        let vc: GroupDescriptionViewController
+
+        if let groupThread {
+            vc = GroupDescriptionViewController(
+                groupModel: groupThread.groupModel,
+                options: [.canEdit, .updateImmediately],
             )
-        )
+            vc.descriptionDelegate = self.delegate
+        } else {
+            vc = GroupDescriptionViewController(
+                helper: GroupAttributesEditorHelper(
+                    groupId: Data(),
+                    groupNameOriginal: groupName,
+                    groupDescriptionOriginal: descriptionText,
+                    avatarOriginalData: nil,
+                    iconViewSize: 0,
+                ),
+            )
+        }
+
         UIApplication.shared.frontmostViewController?.presentFormSheet(
             OWSNavigationController(rootViewController: vc),
-            animated: true
+            animated: true,
         )
 
         return false
@@ -199,8 +230,8 @@ private extension UITextView {
             let end = characterRange(
                 at: CGPoint(
                     x: contentOffset.x + bounds.maxX,
-                    y: contentOffset.y + bounds.maxY
-                )
+                    y: contentOffset.y + bounds.maxY,
+                ),
             )?.end
         else {
             return NSRange(location: 0, length: 0)
@@ -208,7 +239,7 @@ private extension UITextView {
 
         return NSRange(
             location: offset(from: beginningOfDocument, to: start),
-            length: offset(from: start, to: end)
+            length: offset(from: start, to: end),
         )
     }
 

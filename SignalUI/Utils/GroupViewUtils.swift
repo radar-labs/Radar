@@ -4,27 +4,58 @@
 //
 
 import Foundation
-import UIKit
 import SafariServices
-import SignalServiceKit
+public import SignalServiceKit
+import UIKit
 
 public class GroupViewUtils {
 
-    public static func formatGroupMembersLabel(memberCount: Int) -> String {
-        let format = OWSLocalizedString("GROUP_MEMBER_COUNT_LABEL_%d", tableName: "PluralAware",
-                                        comment: "The 'group member count' indicator when there are no members in the group.")
+    public static func formatGroupMembersLabel(memberCount: Int, isTerminated: Bool) -> String {
+        let format: String
+        if isTerminated {
+            format = OWSLocalizedString(
+                "CONVERSATION_SETTINGS_FORMER_MEMBERS_SECTION_TITLE_%d",
+                tableName: "PluralAware",
+                comment: "Format for the section title of the 'members' section in conversation settings view after a group has been terminated. Embeds: {{ the number of former group members }}.",
+            )
+        } else {
+            format = OWSLocalizedString(
+                "GROUP_MEMBER_COUNT_LABEL_%d",
+                tableName: "PluralAware",
+                comment: "The 'group member count' indicator when there are no members in the group.",
+            )
+        }
         return String.localizedStringWithFormat(format, memberCount)
+    }
+
+    /// Localized comma-separated list of members, with "You" at the end if present
+    public static func membersNamesPreview(for groupThread: TSGroupThread, tx: DBReadTransaction) -> String {
+        var hasYou = false
+        var memberNames = SSKEnvironment.shared.contactManagerRef
+            .sortedComparableNames(for: groupThread.groupModel.groupMembership.fullMembers, tx: tx)
+            .compactMap { comparableName -> String? in
+                if comparableName.address.isLocalAddress {
+                    hasYou = true
+                    return nil
+                }
+                return comparableName.resolvedValue(useShortNameIfAvailable: true)
+            }
+        if hasYou {
+            memberNames.append(CommonStrings.you)
+        }
+        return ListFormatter.localizedString(byJoining: memberNames)
     }
 
     @MainActor
     public static func updateGroupWithActivityIndicator(
         fromViewController: UIViewController,
         updateBlock: @escaping () async throws -> Void,
-        completion: (() -> Void)?
+        completion: (() -> Void)?,
     ) {
         // GroupsV2 TODO: Should we allow cancel here?
         ModalActivityIndicatorViewController.present(
             fromViewController: fromViewController,
+            title: CommonStrings.updatingModal,
             canCancel: false,
             asyncBlock: { modalActivityIndicator in
                 do {
@@ -40,7 +71,7 @@ public class GroupViewUtils {
                         GroupViewUtils.showUpdateErrorUI(error: error)
                     }
                 }
-            }
+            },
         )
     }
 
@@ -48,24 +79,49 @@ public class GroupViewUtils {
         AssertIsOnMainThread()
 
         if error.isNetworkFailureOrTimeout {
-            OWSActionSheets.showActionSheet(title: OWSLocalizedString("ERROR_NETWORK_FAILURE",
-                                                                     comment: "Error indicating network connectivity problems."),
-                                            message: OWSLocalizedString("UPDATE_GROUP_FAILED_DUE_TO_NETWORK",
-                                                                     comment: "Error indicating that a group could not be updated due to network connectivity problems."))
+            OWSActionSheets.showActionSheet(
+                title: OWSLocalizedString(
+                    "ERROR_NETWORK_FAILURE",
+                    comment: "Error indicating network connectivity problems.",
+                ),
+                message: OWSLocalizedString(
+                    "UPDATE_GROUP_FAILED_DUE_TO_NETWORK",
+                    comment: "Error indicating that a group could not be updated due to network connectivity problems.",
+                ),
+            )
         } else {
-            OWSActionSheets.showActionSheet(title: OWSLocalizedString("UPDATE_GROUP_FAILED",
-                                                                      comment: "Error indicating that a group could not be updated."))
+            switch error {
+            case GroupsV2Error.terminatedGroup:
+                OWSActionSheets.showActionSheet(
+                    title: nil,
+                    message: OWSLocalizedString(
+                        "END_GROUP_ACTION_ERROR",
+                        comment: "Description for error sheet that says the user can no longer take this action because the group has ended.",
+                    ),
+                )
+            default:
+                OWSActionSheets.showActionSheet(title: OWSLocalizedString(
+                    "UPDATE_GROUP_FAILED",
+                    comment: "Error indicating that a group could not be updated.",
+                ))
+            }
         }
     }
 
     public static func showInvalidGroupMemberAlert(fromViewController: UIViewController) {
-        let actionSheet = ActionSheetController(title: CommonStrings.errorAlertTitle,
-                                                message: OWSLocalizedString("EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER",
-                                                                           comment: "Error message indicating the a user can't be added to a group."))
+        let actionSheet = ActionSheetController(
+            title: CommonStrings.errorAlertTitle,
+            message: OWSLocalizedString(
+                "EDIT_GROUP_ERROR_CANNOT_ADD_MEMBER",
+                comment: "Error message indicating the a user can't be added to a group.",
+            ),
+        )
 
-        actionSheet.addAction(ActionSheetAction(title: CommonStrings.learnMore,
-                                                style: .default) { _ in
-                                                    self.showCantAddMemberView(fromViewController: fromViewController)
+        actionSheet.addAction(ActionSheetAction(
+            title: CommonStrings.learnMore,
+            style: .default,
+        ) { _ in
+            self.showCantAddMemberView(fromViewController: fromViewController)
         })
         actionSheet.addAction(OWSActionSheets.okayAction)
         fromViewController.presentActionSheet(actionSheet)

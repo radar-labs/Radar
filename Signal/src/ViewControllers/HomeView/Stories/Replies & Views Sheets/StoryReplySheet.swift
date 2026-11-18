@@ -3,11 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import Foundation
 import LibSignalClient
 import SignalServiceKit
 import SignalUI
-import UIKit
 
 protocol StoryReplySheet: OWSViewController, StoryReplyInputToolbarDelegate, MessageReactionPickerDelegate {
     var bottomBar: UIView { get }
@@ -25,7 +23,7 @@ extension StoryReplySheet {
         _ builder: TSOutgoingMessageBuilder,
         messageBody: ValidatedMessageBody?,
     ) {
-        guard let thread = thread else {
+        guard let thread else {
             return owsFailDebug("Unexpectedly missing thread")
         }
         let isThreadBlocked = SSKEnvironment.shared.databaseStorageRef.read { SSKEnvironment.shared.blockingManagerRef.isThreadBlocked(thread, transaction: $0) }
@@ -44,15 +42,16 @@ extension StoryReplySheet {
         // story on this device. If this happens, we accept that the hide will be undone if the
         // ordering is hide -> reply.
 
-        guard !SafetyNumberConfirmationSheet.presentIfNecessary(
-            addresses: thread.recipientAddressesWithSneakyTransaction,
-            confirmationText: SafetyNumberStrings.confirmSendButton,
-            forceDarkTheme: true,
-            completion: { [weak self] didConfirmIdentity in
-                guard didConfirmIdentity else { return }
-                self?.tryToSendMessage(builder, messageBody: messageBody)
-            }
-        ) else { return }
+        guard
+            !SafetyNumberConfirmationSheet.presentIfNecessary(
+                addresses: thread.recipientAddressesWithSneakyTransaction,
+                confirmationText: SafetyNumberStrings.confirmSendButton,
+                forceDarkTheme: true,
+                completion: { [weak self] didConfirmIdentity in
+                    guard didConfirmIdentity else { return }
+                    self?.tryToSendMessage(builder, messageBody: messageBody)
+                },
+            ) else { return }
 
         // We only use the thread's DM timer for 1:1 story replies,
         // group replies last for the lifetime of the story.
@@ -62,7 +61,7 @@ extension StoryReplySheet {
             ThreadUtil.addThreadToProfileWhitelistIfEmptyOrPendingRequest(
                 thread,
                 setDefaultTimerIfNecessary: shouldUseThreadDMTimer,
-                tx: transaction
+                tx: transaction,
             )
 
             if shouldUseThreadDMTimer {
@@ -74,7 +73,7 @@ extension StoryReplySheet {
 
             let unpreparedMessage = UnpreparedOutgoingMessage.forMessage(
                 builder.build(transaction: transaction),
-                body: messageBody
+                body: messageBody,
             )
             guard let preparedMessage = try? unpreparedMessage.prepare(tx: transaction) else {
                 owsFailDebug("Failed to prepare message")
@@ -97,20 +96,20 @@ extension StoryReplySheet {
     func tryToSendReaction(_ reaction: String) {
         owsAssertDebug(reaction.isSingleEmoji)
 
-        guard let thread = thread else {
+        guard let thread else {
             return owsFailDebug("Unexpectedly missing thread")
         }
 
         owsAssertDebug(
             !storyMessage.authorAddress.isSystemStoryAddress,
-            "Should be impossible to reply to system stories"
+            "Should be impossible to reply to system stories",
         )
 
         let builder: TSOutgoingMessageBuilder = .withDefaultValues(
             thread: thread,
             storyAuthorAci: storyMessage.authorAci,
             storyTimestamp: storyMessage.timestamp,
-            storyReactionEmoji: reaction
+            storyReactionEmoji: reaction,
         )
 
         tryToSendMessage(builder, messageBody: nil)
@@ -126,13 +125,14 @@ extension StoryReplySheet {
         tryToSendReaction(reaction)
     }
 
-    func didSelectAnyEmoji() {
+    func didSelectShowFullEmojiPicker() {
         // nil is intentional, the message is for showing other reactions already
         // on the message, which we don't wanna do for stories.
-        let sheet = EmojiPickerSheet(message: nil, forceDarkTheme: true) { [weak self] selectedEmoji in
-            guard let selectedEmoji = selectedEmoji else { return }
+        let sheet = EmojiPickerSheet(message: nil) { [weak self] selectedEmoji in
+            guard let selectedEmoji else { return }
             self?.tryToSendReaction(selectedEmoji.rawValue)
         }
+        sheet.overrideUserInterfaceStyle = .dark
         present(sheet, animated: true)
     }
 }
@@ -152,19 +152,19 @@ extension StoryReplySheet {
         let messageBody = try await DependenciesBridge.shared.attachmentContentValidator
             .prepareOversizeTextIfNeeded(originalMessageBody)
 
-        guard let thread = thread else {
+        guard let thread else {
             throw OWSAssertionError("Unexpectedly missing thread")
         }
         owsAssertDebug(
             !storyMessage.authorAddress.isSystemStoryAddress,
-            "Should be impossible to reply to system stories"
+            "Should be impossible to reply to system stories",
         )
 
         let builder: TSOutgoingMessageBuilder = .withDefaultValues(
             thread: thread,
             messageBody: messageBody,
             storyAuthorAci: storyMessage.authorAci,
-            storyTimestamp: storyMessage.timestamp
+            storyTimestamp: storyMessage.timestamp,
         )
 
         tryToSendMessage(builder, messageBody: messageBody)
@@ -174,7 +174,7 @@ extension StoryReplySheet {
     func storyReplyInputToolbarHeightDidChange(_ storyReplyInputToolbar: StoryReplyInputToolbar) {}
 
     func storyReplyInputToolbarMentionPickerPossibleAcis(_ storyReplyInputToolbar: StoryReplyInputToolbar, tx: DBReadTransaction) -> [Aci] {
-        guard let thread = thread, thread.isGroupThread else { return [] }
+        guard let thread, thread.isGroupThread else { return [] }
         return thread.recipientAddresses(with: tx).compactMap(\.aci)
     }
 

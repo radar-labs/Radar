@@ -35,6 +35,7 @@ class ScreenLockUI {
             ensureUI()
         }
     }
+
     private var appIsInBackground: Bool = false {
         didSet {
             AssertIsOnMainThread()
@@ -64,7 +65,39 @@ class ScreenLockUI {
     // * The user is also locked out if they spend more than
     //   "timeout" seconds outside the app.  When the user leaves
     //   the app, a "countdown" begins.
-    private var isScreenLockLocked: Bool = false
+    private var isScreenLockLocked: Bool = false {
+        didSet {
+            AssertIsOnMainThread()
+            guard !isScreenLockLocked else { return }
+            if let pending = pendingScreenUnlockContinuation {
+                pendingScreenUnlockContinuation = nil
+                pending.resume()
+            }
+        }
+    }
+
+    struct ScreenUnlockActionReplacedError: Error {}
+
+    private var pendingScreenUnlockContinuation: CheckedContinuation<Void, Error>?
+
+    @MainActor
+    func waitForScreenUnlockThrowingPrevious() async throws {
+        AssertIsOnMainThread()
+
+        tryToActivateScreenLockBasedOnCountdown()
+        ensureUI()
+
+        if !isScreenLockLocked {
+            return
+        }
+        if let existing = pendingScreenUnlockContinuation {
+            pendingScreenUnlockContinuation = nil
+            existing.resume(throwing: ScreenUnlockActionReplacedError())
+        }
+        try await withCheckedThrowingContinuation { continuation in
+            self.pendingScreenUnlockContinuation = continuation
+        }
+    }
 
     // The "countdown" until screen lock takes effect.
     private var screenLockCountdownTimestamp: UInt64?
@@ -80,12 +113,12 @@ class ScreenLockUI {
 
     private let appReadiness: AppReadiness
 
-    public init(appReadiness: AppReadiness) {
+    init(appReadiness: AppReadiness) {
         AssertIsOnMainThread()
         self.appReadiness = appReadiness
     }
 
-    // MARK: - Public
+    // MARK: -
 
     func setupWithRootWindow(_ rootWindow: UIWindow) {
         AssertIsOnMainThread()
@@ -94,33 +127,38 @@ class ScreenLockUI {
     }
 
     func startObserving() {
-        appIsInactiveOrBackground = UIApplication.shared.applicationState != .active
+        appIsInactiveOrBackground = !CurrentAppContext().isMainAppAndActive
 
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(applicationDidBecomeActive),
             name: NSNotification.Name.OWSApplicationDidBecomeActive,
-            object: nil)
+            object: nil,
+        )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(applicationWillResignActive),
             name: NSNotification.Name.OWSApplicationWillResignActive,
-            object: nil)
+            object: nil,
+        )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(applicationWillEnterForeground),
             name: NSNotification.Name.OWSApplicationWillEnterForeground,
-            object: nil)
+            object: nil,
+        )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(applicationDidEnterBackground),
             name: NSNotification.Name.OWSApplicationDidEnterBackground,
-            object: nil)
+            object: nil,
+        )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(screenLockDidChange),
             name: ScreenLock.ScreenLockDidChange,
-            object: nil)
+            object: nil,
+        )
 
         // Hide the screen blocking window until "app is ready" to
         // avoid blocking the loading view.
@@ -134,6 +172,21 @@ class ScreenLockUI {
             self.isScreenLockLocked = ScreenLock.shared.isScreenLockEnabled()
             self.ensureUI()
         }
+    }
+
+    // MARK: - Sensitive Content
+
+    /// Tracks view controllers displaying "sensitive content" that should be
+    /// hidden from the App Switcher.
+    private var sensitiveContentViewControllers: WeakArray<UIViewController> = []
+
+    @MainActor
+    func sensitiveContentDidLoad(inViewController viewController: UIViewController) {
+        if sensitiveContentViewControllers.contains(where: { $0 === viewController }) {
+            return
+        }
+
+        sensitiveContentViewControllers.append(viewController)
     }
 
     // MARK: - UI
@@ -187,7 +240,7 @@ class ScreenLockUI {
         updateScreenBlockingWindowWithUIState(desiredUIState)
 
         // Show the "iOS auth UI to unlock" if necessary.
-        if desiredUIState == .screenLock && !didLastUnlockAttemptFail {
+        if desiredUIState == .screenLock, !didLastUnlockAttemptFail {
             tryToPresentAuthUIToUnlockScreenLock()
         }
     }
@@ -216,11 +269,28 @@ class ScreenLockUI {
             return .none
         }
 
-        guard SSKEnvironment.shared.preferencesRef.isScreenSecurityEnabled else {
-            return .none
+        // Cull any "sensitive content" view controllers that aren't actually
+        // presenting content. (Their presence here may suggest a retain cycle.)
+        sensitiveContentViewControllers.removeAll(where: { viewController in
+            !viewController.isViewLoaded || viewController.view.window == nil
+        })
+
+        if SSKEnvironment.shared.preferencesRef.isScreenSecurityEnabled {
+            return .screenProtection
         }
 
-        return .screenProtection
+        if sensitiveContentViewControllers.elements.count > 0 {
+            return .screenProtection
+        }
+
+        // When we're blocking screenshots and not foreground, enable screen
+        // protection. Because screenshots are blocked the App Switcher will
+        // otherwise show a blank snapshot of the app.
+        if AppEnvironment.shared.windowManagerRef.blocksScreenshots {
+            return .screenProtection
+        }
+
+        return .none
     }
 
     private func tryToPresentAuthUIToUnlockScreenLock() {
@@ -240,22 +310,21 @@ class ScreenLockUI {
 
         isShowingScreenLockUI = true
 
-        ScreenLock.shared.tryToUnlockScreenLock(
-            success: {
+        Task { @MainActor in
+            switch await ScreenLock.shared.tryToUnlockScreenLock() {
+            case .success:
                 Logger.info("unlock screen lock succeeded.")
 
                 self.isShowingScreenLockUI = false
                 self.isScreenLockLocked = false
                 self.ensureUI()
-            },
-            failure: { error in
+            case .failure(let localizedErrorMessage):
                 Logger.info("unlock screen lock failed.")
 
                 self.clearAuthUIWhenActive()
                 self.didLastUnlockAttemptFail = true
-                self.showScreenLockFailureAlertWithMessage(error.userErrorDescription)
-            },
-            unexpectedFailure: { error in
+                self.showScreenLockFailureAlertWithMessage(localizedErrorMessage)
+            case .unexpectedFailure:
                 Logger.info("unlock screen lock unexpectedly failed.")
 
                 // Local Authentication isn't working properly.
@@ -264,8 +333,7 @@ class ScreenLockUI {
                 DispatchQueue.main.async {
                     self.clearAuthUIWhenActive()
                 }
-            },
-            cancel: {
+            case .cancel:
                 Logger.info("unlock screen lock cancelled.")
 
                 self.clearAuthUIWhenActive()
@@ -273,7 +341,7 @@ class ScreenLockUI {
                 // Re-show the unlock UI.
                 self.ensureUI()
             }
-        )
+        }
 
         ensureUI()
     }
@@ -288,7 +356,7 @@ class ScreenLockUI {
                 // After the alert, update the UI.
                 self.ensureUI()
             },
-            fromViewController: screenBlockingWindow.rootViewController
+            fromViewController: screenBlockingWindow.rootViewController,
         )
     }
 
@@ -324,7 +392,7 @@ class ScreenLockUI {
 
         let countdownTimestamp = screenLockCountdownTimestamp
         let currentTimestamp = monotonicTimestamp()
-        guard currentTimestamp >= countdownTimestamp && currentTimestamp != 0 && countdownTimestamp != 0 else {
+        guard currentTimestamp >= countdownTimestamp, currentTimestamp != 0, countdownTimestamp != 0 else {
             // If the clock is going backwards (shouldn't happen) or the
             // initial/current time couldn't be fetched (shouldn't happen), err on the
             // side of caution and lock the screen.

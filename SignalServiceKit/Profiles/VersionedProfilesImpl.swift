@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import CryptoKit
 import Foundation
 public import LibSignalClient
-import CryptoKit
 
 public struct VersionedProfileRequest {
     public let aci: Aci
@@ -17,7 +17,7 @@ public struct VersionedProfileRequest {
         aci: Aci,
         request: TSRequest,
         profileKey: ProfileKey,
-        requestContext: ProfileKeyCredentialRequestContext?
+        requestContext: ProfileKeyCredentialRequestContext?,
     ) {
         self.aci = aci
         self.request = request
@@ -31,26 +31,23 @@ public struct VersionedProfileRequest {
 public class VersionedProfilesImpl: VersionedProfiles {
 
     private enum CredentialStore {
-        private static let deprecatedCredentialStore = KeyValueStore(collection: "VersionedProfiles.credentialStore")
-
-        private static let expiringCredentialStore = KeyValueStore(collection: "VersionedProfilesImpl.expiringCredentialStore")
+        private static let expiringCredentialStore = NewKeyValueStore(collection: "VersionedProfilesImpl.expiringCredentialStore")
 
         private static func storeKey(for aci: Aci) -> String {
             return aci.serviceIdUppercaseString
         }
 
-        static func dropDeprecatedCredentialsIfNecessary(transaction: DBWriteTransaction) {
-            deprecatedCredentialStore.removeAll(transaction: transaction)
-        }
-
         static func getValidCredential(
             for aci: Aci,
-            transaction: DBReadTransaction
+            transaction: DBReadTransaction,
         ) throws -> ExpiringProfileKeyCredential? {
-            guard let credentialData = expiringCredentialStore.getData(
-                storeKey(for: aci),
-                transaction: transaction
-            ) else {
+            guard
+                let credentialData = expiringCredentialStore.fetchValue(
+                    Data.self,
+                    forKey: storeKey(for: aci),
+                    tx: transaction,
+                )
+            else {
                 return nil
             }
 
@@ -70,7 +67,7 @@ public class VersionedProfilesImpl: VersionedProfiles {
         static func setCredential(
             _ credential: ExpiringProfileKeyCredential,
             for aci: Aci,
-            transaction: DBWriteTransaction
+            transaction: DBWriteTransaction,
         ) throws {
             let credentialData = credential.serialize()
 
@@ -78,42 +75,35 @@ public class VersionedProfilesImpl: VersionedProfiles {
                 throw OWSAssertionError("Invalid credential data")
             }
 
-            expiringCredentialStore.setData(
+            expiringCredentialStore.writeValue(
                 credentialData,
-                key: storeKey(for: aci),
-                transaction: transaction
+                forKey: storeKey(for: aci),
+                tx: transaction,
             )
         }
 
         static func removeValue(for aci: Aci, transaction: DBWriteTransaction) {
-            expiringCredentialStore.removeValue(forKey: storeKey(for: aci), transaction: transaction)
+            expiringCredentialStore.removeValue(forKey: storeKey(for: aci), tx: transaction)
         }
 
         static func removeAll(transaction: DBWriteTransaction) {
-            expiringCredentialStore.removeAll(transaction: transaction)
+            expiringCredentialStore.removeAll(tx: transaction)
         }
     }
 
     // MARK: - Init
 
-    public init(appReadiness: AppReadiness) {
-        appReadiness.runNowOrWhenMainAppDidBecomeReadyAsync {
-            // Once we think all clients in the world have migrated to expiring
-            // credentials we can remove this.
-            SSKEnvironment.shared.databaseStorageRef.asyncWrite { transaction in
-                CredentialStore.dropDeprecatedCredentialsIfNecessary(transaction: transaction)
-            }
-        }
+    public init() {
     }
 
     // MARK: -
 
     public func clientZkProfileOperations() -> ClientZkProfileOperations {
-        return ClientZkProfileOperations(serverPublicParams: GroupsV2Protos.serverPublicParams())
+        return ClientZkProfileOperations(serverPublicParams: TSConstants.serverPublicParams())
     }
 
     // MARK: - Update
-    
+
     public func updateProfile(
         profileGivenName: OWSUserProfile.NameComponent?,
         profileFamilyName: OWSUserProfile.NameComponent?,
@@ -128,7 +118,7 @@ public class VersionedProfilesImpl: VersionedProfiles {
         let localAci = try tsAccountManager.localIdentifiersWithMaybeSneakyTransaction(authedAccount: authedAccount).aci
         let localProfileKey = try self.parseProfileKey(profileKey: profileKey)
         let profileKeyVersionString = try localProfileKey.getProfileKeyVersion(userId: localAci).asHexadecimalString()
-        
+
         return try await updateProfileWithProfileKeyVersion(
             profileKeyVersionString,
             profileGivenName: profileGivenName,
@@ -138,7 +128,7 @@ public class VersionedProfilesImpl: VersionedProfiles {
             profileAvatarMutation: profileAvatarMutation,
             visibleBadgeIds: visibleBadgeIds,
             profileKey: profileKey,
-            authedAccount: authedAccount
+            authedAccount: authedAccount,
         )
     }
 
@@ -172,7 +162,7 @@ public class VersionedProfilesImpl: VersionedProfiles {
             // profile-key rotation, etc.). The cache is cleared explicitly when the
             // user disables payments, so an empty cache here means "drop it" — and
             // the kill switch overrides regardless.
-            if SSKEnvironment.shared.paymentsHelperRef.isKillSwitchActive {
+            if !SSKEnvironment.shared.paymentsHelperRef.canUsePayments() {
                 return nil
             }
             guard
@@ -194,7 +184,7 @@ public class VersionedProfilesImpl: VersionedProfiles {
             return try OWSUserProfile.encrypt(
                 givenName: profileGivenName,
                 familyName: profileFamilyName,
-                profileKey: profileKey
+                profileKey: profileKey,
             )
         }()
 
@@ -251,7 +241,7 @@ public class VersionedProfilesImpl: VersionedProfiles {
             visibleBadgeIds: visibleBadgeIds,
             version: profileKeyVersion,
             commitment: commitmentData,
-            auth: authedAccount.chatServiceAuth
+            auth: authedAccount.chatServiceAuth,
         )
         let response = try await SSKEnvironment.shared.networkManagerRef.asyncRequest(request)
 
@@ -265,7 +255,7 @@ public class VersionedProfilesImpl: VersionedProfiles {
             let encryptedAvatarData = try OWSUserProfile.encrypt(profileData: avatarData, profileKey: profileKey)
             avatarUrlPath = .setTo(try await uploadAvatar(
                 formResponseData: response.responseBodyData,
-                encryptedAvatarData: encryptedAvatarData
+                encryptedAvatarData: encryptedAvatarData,
             ))
         }
 
@@ -290,14 +280,14 @@ public class VersionedProfilesImpl: VersionedProfiles {
         profileKeyVersion: String? = nil,
         shouldRequestCredential: Bool,
         udAccessKey: SMKUDAccessKey?,
-        auth chatServiceAuth: ChatServiceAuth
+        auth chatServiceAuth: ChatServiceAuth,
     ) throws -> VersionedProfileRequest {
         // We need to request a credential if we don't have a valid one already.
         var requestContext: ProfileKeyCredentialRequestContext?
         if shouldRequestCredential {
             requestContext = try self.clientZkProfileOperations().createProfileKeyCredentialRequestContext(
                 userId: aci,
-                profileKey: profileKey
+                profileKey: profileKey,
             )
         }
 
@@ -307,23 +297,23 @@ public class VersionedProfilesImpl: VersionedProfiles {
         } else {
             auth = .identified(chatServiceAuth)
         }
-        
-        let profileKeyVersion = if let profileKeyVersion = profileKeyVersion {
+
+        let profileKeyVersion = if let profileKeyVersion {
             profileKeyVersion
         } else {
             try profileKey.getProfileKeyVersion(userId: aci).asHexadecimalString()
         }
-        
+
         return VersionedProfileRequest(
             aci: aci,
             request: OWSRequestFactory.getVersionedProfileRequest(
                 aci: aci,
                 profileKeyVersion: profileKeyVersion,
                 credentialRequest: try requestContext?.getRequest().serialize(),
-                auth: auth
+                auth: auth,
             ),
             profileKey: profileKey,
-            requestContext: requestContext
+            requestContext: requestContext,
         )
     }
 
@@ -350,7 +340,7 @@ public class VersionedProfilesImpl: VersionedProfiles {
             let clientZkProfileOperations = self.clientZkProfileOperations()
             let profileKeyCredential = try clientZkProfileOperations.receiveExpiringProfileKeyCredential(
                 profileKeyCredentialRequestContext: requestContext,
-                profileKeyCredentialResponse: credentialResponse
+                profileKeyCredentialResponse: credentialResponse,
             )
 
             guard profile.serviceId == profileRequest.aci else {
@@ -381,7 +371,7 @@ public class VersionedProfilesImpl: VersionedProfiles {
 
     public func validProfileKeyCredential(
         for aci: Aci,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) throws -> ExpiringProfileKeyCredential? {
         try CredentialStore.getValidCredential(for: aci, transaction: transaction)
     }

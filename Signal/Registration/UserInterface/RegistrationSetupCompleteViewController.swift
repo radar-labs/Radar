@@ -35,7 +35,7 @@ struct RegistrationSetupCompleteView: View {
                 VStack(spacing: 24) {
                     Text(OWSLocalizedString(
                         "ONBOARDING_SETUP_COMPLETE_TITLE",
-                        comment: "Title for the setup complete screen shown at the end of the onboarding flow."
+                        comment: "Title for the setup complete screen shown at the end of the onboarding flow.",
                     ))
                     .font(Font(UIFont.dynamicTypeFont(ofStandardSize: 28)))
                     .fontWeight(.semibold)
@@ -44,7 +44,7 @@ struct RegistrationSetupCompleteView: View {
 
                     Text(OWSLocalizedString(
                         "ONBOARDING_SETUP_COMPLETE_SUBTITLE",
-                        comment: "Subtitle for the setup complete screen shown at the end of the onboarding flow."
+                        comment: "Subtitle for the setup complete screen shown at the end of the onboarding flow.",
                     ))
                     .font(.body)
                     .foregroundStyle(Color.Signal.secondaryLabel)

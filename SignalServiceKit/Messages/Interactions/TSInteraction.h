@@ -22,7 +22,9 @@ typedef NS_CLOSED_ENUM(NSInteger, OWSInteractionType) {
     OWSInteractionType_UnreadIndicator,
     OWSInteractionType_DateHeader,
     OWSInteractionType_UnknownThreadWarning,
-    OWSInteractionType_DefaultDisappearingMessageTimer
+    OWSInteractionType_DefaultDisappearingMessageTimer,
+    OWSInteractionType_CollapseSet,
+    OWSInteractionType_ReleaseNotesMessage,
 };
 
 NSString *NSStringFromOWSInteractionType(OWSInteractionType value);
@@ -39,6 +41,7 @@ NSString *NSStringFromOWSInteractionType(OWSInteractionType value);
 
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
+- (void)encodeWithCoder:(NSCoder *)coder;
 - (nullable instancetype)initWithCoder:(NSCoder *)coder NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithUniqueId:(NSString *)uniqueId NS_UNAVAILABLE;
 - (instancetype)initWithGrdbId:(int64_t)grdbId uniqueId:(NSString *)uniqueId NS_UNAVAILABLE;
@@ -46,7 +49,7 @@ NSString *NSStringFromOWSInteractionType(OWSInteractionType value);
 - (instancetype)initWithCustomUniqueId:(NSString *)uniqueId
                              timestamp:(uint64_t)timestamp
                    receivedAtTimestamp:(uint64_t)receivedAtTimestamp
-                                thread:(TSThread *)thread NS_DESIGNATED_INITIALIZER;
+                        threadUniqueId:(NSString *)threadUniqueId NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)initWithTimestamp:(uint64_t)timestamp
               receivedAtTimestamp:(uint64_t)receivedAtTimestamp

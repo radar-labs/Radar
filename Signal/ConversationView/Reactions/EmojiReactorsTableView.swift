@@ -6,7 +6,7 @@
 import SignalServiceKit
 import SignalUI
 
-class EmojiReactorsTableView: UITableView {
+class EmojiReactorsTableView: UITableView, UITableViewDataSource {
     struct ReactorItem {
         let address: SignalServiceAddress
         let displayName: String
@@ -38,37 +38,33 @@ class EmojiReactorsTableView: UITableView {
             return ReactorItem(
                 address: reaction.reactor,
                 displayName: displayName,
-                emoji: reaction.emoji
+                emoji: reaction.emoji,
             )
         }
     }
-}
 
-extension EmojiReactorsTableView: UITableViewDataSource {
+    // MARK: - UITableViewDataSource
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return reactorItems.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: EmojiReactorCell.reuseIdentifier, for: indexPath)
-        guard let contactCell = cell as? EmojiReactorCell else {
-            owsFailDebug("unexpected cell type")
-            return cell
-        }
+        let cell = tableView.dequeueReusableCell(EmojiReactorCell.self, for: indexPath)
 
         guard let item = reactorItems[safe: indexPath.row] else {
             owsFailDebug("unexpected indexPath")
             return cell
         }
 
-        contactCell.backgroundColor = .clear
-        contactCell.configure(item: item)
+        cell.backgroundColor = .clear
+        cell.configure(item: item)
 
-        return contactCell
+        return cell
     }
 }
 
-private class EmojiReactorCell: UITableViewCell {
+private class EmojiReactorCell: UITableViewCell, ReusableTableViewCell {
     static let reuseIdentifier = "EmojiReactorCell"
 
     let avatarView = ConversationAvatarView(sizeClass: .thirtySix, localUserDisplayMode: .asUser)

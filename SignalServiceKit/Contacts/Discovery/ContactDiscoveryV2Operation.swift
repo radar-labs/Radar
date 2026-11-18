@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import GRDB
 import Foundation
+import GRDB
 import LibSignalClient
 
 // MARK: -
@@ -58,7 +58,7 @@ extension LibSignalClient.Net: ContactDiscoveryConnection {
             e164s: request.newE164s.map(\.stringValue),
             prevE164s: request.prevE164s.map(\.stringValue),
             acisAndAccessKeys: request.acisAndAccessKeys,
-            token: request.token
+            token: request.token,
         )
         return try await self.cdsiLookup(auth: auth, request: request)
     }
@@ -66,7 +66,7 @@ extension LibSignalClient.Net: ContactDiscoveryConnection {
     func continueRequest(afterAckingToken tokenResult: CdsiLookup) async throws -> [ContactDiscoveryResult] {
         let response = try await tokenResult.complete()
         Logger.info("CDSv2: Consumed \(response.debugPermitsUsed) tokens")
-        return try response.entries.compactMap {entry in
+        return try response.entries.compactMap { entry in
             guard let pni = entry.pni else {
                 return nil
             }
@@ -101,7 +101,7 @@ final class ContactDiscoveryV2Operation<ConnectionType: ContactDiscoveryConnecti
 
     private let connectionImpl: ConnectionType
 
-    private let remoteAttestation: Shims.RemoteAttestation
+    private let remoteAttestationAuthFetcher: RemoteAttestationAuthFetcher
 
     convenience init(
         db: any DB,
@@ -109,7 +109,7 @@ final class ContactDiscoveryV2Operation<ConnectionType: ContactDiscoveryConnecti
         mode: ContactDiscoveryMode,
         udManager: any OWSUDManager,
         connectionImpl: ConnectionType,
-        remoteAttestation: any Shims.RemoteAttestation
+        remoteAttestationAuthFetcher: RemoteAttestationAuthFetcher,
     ) {
         self.init(
             db: db,
@@ -117,7 +117,7 @@ final class ContactDiscoveryV2Operation<ConnectionType: ContactDiscoveryConnecti
             persistentState: mode == .oneOffUserRequest ? nil : ContactDiscoveryV2PersistentStateImpl(),
             udManager: udManager,
             connectionImpl: connectionImpl,
-            remoteAttestation: remoteAttestation
+            remoteAttestationAuthFetcher: remoteAttestationAuthFetcher,
         )
     }
 
@@ -127,19 +127,22 @@ final class ContactDiscoveryV2Operation<ConnectionType: ContactDiscoveryConnecti
         persistentState: (any ContactDiscoveryV2PersistentState)?,
         udManager: any OWSUDManager,
         connectionImpl: ConnectionType,
-        remoteAttestation: any Shims.RemoteAttestation
+        remoteAttestationAuthFetcher: RemoteAttestationAuthFetcher,
     ) {
         self.db = db
         self.e164sToLookup = e164sToLookup
         self.persistentState = persistentState
         self.udManager = udManager
         self.connectionImpl = connectionImpl
-        self.remoteAttestation = remoteAttestation
+        self.remoteAttestationAuthFetcher = remoteAttestationAuthFetcher
     }
 
     func perform() async throws -> [ContactDiscoveryResult] {
         do {
-            let cdsiAuth = try await self.remoteAttestation.authForCDSI()
+            let cdsiAuth = try await self.remoteAttestationAuthFetcher.fetchAuth(
+                forService: .cdsi,
+                chatServiceAuth: .implicit(),
+            )
             let request = try self.buildRequest()
             let auth = LibSignalClient.Auth(username: cdsiAuth.username, password: cdsiAuth.password)
             let tokenResult = try await self.connectionImpl.performRequest(request, auth: auth)
@@ -148,7 +151,7 @@ final class ContactDiscoveryV2Operation<ConnectionType: ContactDiscoveryConnecti
             try await self.handle(
                 token: tokenResult.token,
                 initialRequestHadToken: request.token != nil,
-                newE164s: request.newE164s
+                newE164s: request.newE164s,
             )
             return try await self.connectionImpl.continueRequest(afterAckingToken: tokenResult)
         } catch {
@@ -185,19 +188,19 @@ final class ContactDiscoveryV2Operation<ConnectionType: ContactDiscoveryConnecti
             newE164s: newE164s,
             prevE164s: prevE164s,
             acisAndAccessKeys: acisAndAccessKeys,
-            token: prevToken
+            token: prevToken,
         )
     }
 
     private func handle(
         token: Data,
         initialRequestHadToken: Bool,
-        newE164s: Set<E164>
+        newE164s: Set<E164>,
     ) async throws {
         try await persistentState?.save(
             newToken: token,
             clearE164s: !initialRequestHadToken,
-            newE164s: newE164s
+            newE164s: newE164s,
         )
     }
 
@@ -224,10 +227,10 @@ final class ContactDiscoveryV2Operation<ConnectionType: ContactDiscoveryConnecti
             await persistentState?.reset()
             return ContactDiscoveryError.invalidToken
         case .networkProtocolError(let message),
-                .webSocketError(let message),
-                .connectionTimeoutError(let message),
-                .requestTimeoutError(let message),
-                .connectionFailed(let message):
+             .webSocketError(let message),
+             .connectionTimeoutError(let message),
+             .requestTimeoutError(let message),
+             .connectionFailed(let message):
             return ContactDiscoveryError.retryableError("connection error: \(message)")
         default:
             return ContactDiscoveryError.terminalError("libsignal-net error: \(libSignalError)")
@@ -265,12 +268,12 @@ struct CdsPreviousE164: Codable, FetchableRecord, PersistableRecord {
 }
 
 private class ContactDiscoveryV2PersistentStateImpl: ContactDiscoveryV2PersistentState {
-    private static let tokenStore = KeyValueStore(collection: "CdsMetadata")
+    private static let tokenStore = NewKeyValueStore(collection: "CdsMetadata")
     private static let tokenKey = "token"
 
     func load() -> (token: Data, e164s: Set<E164>)? {
         SSKEnvironment.shared.databaseStorageRef.read { transaction in
-            guard let existingToken = Self.tokenStore.getData(Self.tokenKey, transaction: transaction) else {
+            guard let existingToken = Self.tokenStore.fetchValue(Data.self, forKey: Self.tokenKey, tx: transaction) else {
                 return nil
             }
             let validatedE164s: Set<E164>
@@ -297,7 +300,7 @@ private class ContactDiscoveryV2PersistentStateImpl: ContactDiscoveryV2Persisten
         try await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
             let database = transaction.database
 
-            Self.tokenStore.setData(newToken, key: Self.tokenKey, transaction: transaction)
+            Self.tokenStore.writeValue(newToken, forKey: Self.tokenKey, tx: transaction)
 
             // If we didn't use an old token, clear any local e164s. On the initial
             // request, this should be a no-op. If we're trying to recover from a
@@ -318,31 +321,7 @@ private class ContactDiscoveryV2PersistentStateImpl: ContactDiscoveryV2Persisten
     func reset() async {
         Logger.warn("CDSv2: Resetting token")
         await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { transaction in
-            Self.tokenStore.removeValue(forKey: Self.tokenKey, transaction: transaction)
+            Self.tokenStore.removeValue(forKey: Self.tokenKey, tx: transaction)
         }
-    }
-}
-
-// MARK: - Shims
-
-extension ContactDiscoveryV2Operation {
-    enum Shims {
-        typealias RemoteAttestation = _ContactDiscoveryV2Operation_RemoteAttestationShim
-    }
-
-    enum Wrappers {
-        typealias RemoteAttestation = _ContactDiscoveryV2Operation_RemoteAttestationWrapper
-    }
-}
-
-protocol _ContactDiscoveryV2Operation_RemoteAttestationShim {
-    func authForCDSI() async throws -> RemoteAttestation.Auth
-}
-
-class _ContactDiscoveryV2Operation_RemoteAttestationWrapper: _ContactDiscoveryV2Operation_RemoteAttestationShim {
-    init() {}
-
-    func authForCDSI() async throws -> RemoteAttestation.Auth {
-        return try await RemoteAttestation.authForCDSI()
     }
 }

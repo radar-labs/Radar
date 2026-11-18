@@ -23,13 +23,13 @@ class DebugUISessionState: DebugUIPage {
                 OWSTableItem(title: "Delete All Sessions", actionBlock: {
                     SSKEnvironment.shared.databaseStorageRef.write { transaction in
                         let sessionStore = DependenciesBridge.shared.signalProtocolStoreManager.signalProtocolStore(for: .aci).sessionStore
-                        sessionStore.deleteAllSessions(for: contactThread.contactAddress.serviceId!, tx: transaction)
+                        sessionStore.deleteSessions(forServiceId: contactThread.contactAddress.serviceId!, tx: transaction)
                     }
                 }),
                 OWSTableItem(title: "Archive All Sessions", actionBlock: {
                     SSKEnvironment.shared.databaseStorageRef.write { transaction in
                         let sessionStore = DependenciesBridge.shared.signalProtocolStoreManager.signalProtocolStore(for: .aci).sessionStore
-                        sessionStore.archiveAllSessions(for: contactThread.contactAddress.serviceId!, tx: transaction)
+                        sessionStore.archiveSessions(forServiceId: contactThread.contactAddress.serviceId!, tx: transaction)
                     }
                 }),
             ]
@@ -56,7 +56,7 @@ class DebugUISessionState: DebugUIPage {
                 flippedKey[i] = currentKey[i] ^ 0xFF
             }
             owsAssertDebug(flippedKey.count == currentKey.count)
-            identityManager.saveIdentityKey(flippedKey, for: serviceId, tx: tx)
+            identityManager.saveIdentityKey(flippedKey, for: serviceId, shouldUpdateStorageService: true, tx: tx)
         }
     }
 }

@@ -8,8 +8,8 @@ final class BackupArchiveLearnedProfileChatUpdateArchiver {
     typealias ArchiveChatUpdateMessageResult = BackupArchive.ArchiveInteractionResult<Details>
     typealias RestoreChatUpdateMessageResult = BackupArchive.RestoreInteractionResult<Void>
 
-    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError<BackupArchive.InteractionUniqueId>
-    private typealias RestoreFrameError = BackupArchive.RestoreFrameError<BackupArchive.ChatItemId>
+    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError
+    private typealias RestoreFrameError = BackupArchive.RestoreFrameError
 
     private let interactionStore: BackupArchiveInteractionStore
 
@@ -22,17 +22,13 @@ final class BackupArchiveLearnedProfileChatUpdateArchiver {
     func archiveLearnedProfileChatUpdate(
         infoMessage: TSInfoMessage,
         threadInfo: BackupArchive.ChatArchivingContext.CachedThreadInfo,
-        context: BackupArchive.ChatArchivingContext
+        context: BackupArchive.ChatArchivingContext,
     ) -> ArchiveChatUpdateMessageResult {
         func messageFailure(
             _ errorType: ArchiveFrameError.ErrorType,
-            line: UInt = #line
+            line: UInt = #line,
         ) -> ArchiveChatUpdateMessageResult {
-            return .messageFailure([.archiveFrameError(
-                errorType,
-                infoMessage.uniqueInteractionId,
-                line: line
-            )])
+            return .messageFailure([.archiveFrameError(errorType, line: line)])
         }
 
         guard let displayNameBeforeLearningProfileKey = infoMessage.displayNameBeforeLearningProfileName else {
@@ -49,6 +45,8 @@ final class BackupArchiveLearnedProfileChatUpdateArchiver {
             learnedProfileChatUpdate.previousName = .e164(e164.uint64Value)
         case .username(let username):
             learnedProfileChatUpdate.previousName = .username(username)
+        case .sharedName(let sharedName):
+            learnedProfileChatUpdate.previousName = .sharedName(sharedName)
         }
 
         var chatUpdateMessage = BackupProto_ChatUpdateMessage()
@@ -59,13 +57,12 @@ final class BackupArchiveLearnedProfileChatUpdateArchiver {
             author: .localUser,
             directionalDetails: .directionless(BackupProto_ChatItem.DirectionlessMessageDetails()),
             dateCreated: infoMessage.timestamp,
-            expireStartDate: nil,
-            expiresInMs: nil,
             isSealedSender: false,
             chatItemType: .updateMessage(chatUpdateMessage),
             isSmsPreviouslyRestoredFromBackup: false,
             threadInfo: threadInfo,
-            context: context.recipientContext
+            pinMessageDetails: nil,
+            context: context.recipientContext,
         )
     }
 
@@ -75,17 +72,13 @@ final class BackupArchiveLearnedProfileChatUpdateArchiver {
         _ learnedProfileUpdateProto: BackupProto_LearnedProfileChatUpdate,
         chatItem: BackupProto_ChatItem,
         chatThread: BackupArchive.ChatThread,
-        context: BackupArchive.ChatItemRestoringContext
+        context: BackupArchive.ChatItemRestoringContext,
     ) -> RestoreChatUpdateMessageResult {
         func invalidProtoData(
             _ error: RestoreFrameError.ErrorType.InvalidProtoDataError,
-            line: UInt = #line
+            line: UInt = #line,
         ) -> RestoreChatUpdateMessageResult {
-            return .messageFailure([.restoreFrameError(
-                .invalidProtoData(error),
-                chatItem.id,
-                line: line
-            )])
+            return .messageFailure([.restoreFrameError(.invalidProtoData(error), line: line)])
         }
 
         guard case .contact(let contactThread) = chatThread.threadType else {
@@ -102,6 +95,8 @@ final class BackupArchiveLearnedProfileChatUpdateArchiver {
             displayNameBefore = .phoneNumber(e164.stringValue)
         case .username(let username):
             displayNameBefore = .username(username)
+        case .sharedName(let sharedName):
+            displayNameBefore = .sharedName(sharedName)
         case nil:
             // This isn't great, but we just use an empty username.
             displayNameBefore = .username("")
@@ -110,7 +105,7 @@ final class BackupArchiveLearnedProfileChatUpdateArchiver {
         let learnedProfileKeyInfoMessage: TSInfoMessage = .makeForLearnedProfileName(
             contactThread: contactThread,
             timestamp: chatItem.dateSent,
-            displayNameBefore: displayNameBefore
+            displayNameBefore: displayNameBefore,
         )
 
         do {
@@ -118,10 +113,10 @@ final class BackupArchiveLearnedProfileChatUpdateArchiver {
                 learnedProfileKeyInfoMessage,
                 in: chatThread,
                 chatId: chatItem.typedChatId,
-                context: context
+                context: context,
             )
         } catch let error {
-            return .messageFailure([.restoreFrameError(.databaseInsertionFailed(error), chatItem.id)])
+            return .messageFailure([.restoreFrameError(.databaseInsertionFailed(error))])
         }
 
         return .success(())

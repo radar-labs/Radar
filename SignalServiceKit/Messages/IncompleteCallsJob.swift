@@ -33,11 +33,11 @@ public class IncompleteCallsJob {
     private func updateIncompleteCallIfNecessary(
         _ uniqueId: String,
         count: inout Int,
-        transaction writeTx: DBWriteTransaction
+        transaction writeTx: DBWriteTransaction,
     ) {
         // Preconditions: Must be a valid call that started before the app launched.
         guard
-            let call = TSCall.anyFetchCall(uniqueId: uniqueId, transaction: writeTx),
+            let call = TSCall.fetchCallViaCache(uniqueId: uniqueId, transaction: writeTx),
             let callRowId = call.sqliteRowId,
             let contactThread = call.thread(tx: writeTx) as? TSContactThread
         else {
@@ -67,7 +67,7 @@ public class IncompleteCallsJob {
                 individualCallInteractionRowId: callRowId,
                 contactThread: contactThread,
                 newCallInteractionType: targetCallType,
-                tx: writeTx
+                tx: writeTx,
             )
         count += 1
 

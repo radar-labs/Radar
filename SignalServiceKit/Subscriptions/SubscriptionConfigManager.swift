@@ -4,9 +4,9 @@
 //
 
 public class SubscriptionConfigManager {
-    private struct SubscriptionConfig {
-        let donation: DonationSubscriptionConfiguration
-        let backup: BackupSubscriptionConfiguration
+    public struct SubscriptionConfig {
+        public let donation: DonationSubscriptionConfiguration
+        public let backup: BackupSubscriptionConfiguration
     }
 
     private enum StoreKeys {
@@ -18,6 +18,7 @@ public class SubscriptionConfigManager {
     private let db: DB
     private let kvStore: NewKeyValueStore
     private let networkManager: NetworkManager
+    private let taskQueue: ConcurrentTaskQueue = ConcurrentTaskQueue(concurrentLimit: 1)
 
     init(
         dateProvider: @escaping DateProvider,
@@ -30,21 +31,13 @@ public class SubscriptionConfigManager {
         self.networkManager = networkManager
     }
 
-    public func refreshIfNeeded() async throws {
-        if
-            let lastFetchDate = db.read(block: {
-                kvStore.fetchValue(Date.self, forKey: StoreKeys.lastFetchDate, tx: $0)
-            }),
-            dateProvider().timeIntervalSince(lastFetchDate) < .day
-        {
-            // Refresh daily, although we'll use a cached value for longer.
-            return
+    public func refresh() async throws -> SubscriptionConfig {
+        return try await taskQueue.runWithThrowingTask {
+            return try await _refresh()
         }
-
-        _ = try await refresh()
     }
 
-    private func refresh() async throws -> SubscriptionConfig {
+    private func _refresh() async throws -> SubscriptionConfig {
         var request = TSRequest(
             url: URL(string: "v1/subscription/configuration")!,
             method: "GET",
@@ -220,7 +213,7 @@ public struct DonationSubscriptionConfiguration {
         public let levels: [DonationSubscriptionLevel]
     }
 
-    public struct PaymentMethodsConfiguration: Equatable {
+    public struct PaymentMethodsConfiguration {
         public let supportedPaymentMethodsByCurrency: [Currency.Code: Set<DonationPaymentMethod>]
     }
 
@@ -233,12 +226,25 @@ public struct DonationSubscriptionConfiguration {
         boost: BoostConfiguration,
         gift: GiftConfiguration,
         subscription: SubscriptionConfiguration,
-        paymentMethods: PaymentMethodsConfiguration
+        paymentMethods: PaymentMethodsConfiguration,
     ) {
         self.boost = boost
         self.gift = gift
         self.subscription = subscription
         self.paymentMethods = paymentMethods
+    }
+
+    public var allProfileBadges: [ProfileBadge] {
+        var result = [ProfileBadge]()
+        result.append(boost.badge)
+        result.append(gift.badge)
+        result.append(contentsOf: subscription.levels.map { $0.badge })
+        return result
+    }
+
+    /// Returns the subscription level matching the given raw level, if any.
+    public func subscriptionLevel(forRawLevel rawLevel: UInt) -> DonationSubscriptionLevel? {
+        return subscription.levels.first { $0.level == rawLevel }
     }
 
     // MARK: -
@@ -288,13 +294,14 @@ public struct DonationSubscriptionConfiguration {
         let boostConfig: BoostConfiguration = {
             let minimumAmountsByCurrency: [Currency.Code: FiatMoney] = presetsByCurrency.mapValues { $0.boost.minimum }
             let presetAmounts: [Currency.Code: DonationUtilities.Preset] = presetsByCurrency.reduce(
-                into: [:], { partialResult, kv in
+                into: [:],
+                { partialResult, kv in
                     let (code, presets) = kv
                     partialResult[code] = DonationUtilities.Preset(
                         currencyCode: code,
-                        amounts: presets.boost.presets
+                        amounts: presets.boost.presets,
                     )
-                }
+                },
             )
 
             return BoostConfiguration(
@@ -302,7 +309,7 @@ public struct DonationSubscriptionConfiguration {
                 badge: levels.boost.badge,
                 presetAmounts: presetAmounts,
                 minimumAmountsByCurrency: minimumAmountsByCurrency,
-                maximumAmountViaSepa: sepaBoostMaximum
+                maximumAmountViaSepa: sepaBoostMaximum,
             )
         }()
 
@@ -314,7 +321,7 @@ public struct DonationSubscriptionConfiguration {
             return GiftConfiguration(
                 level: levels.gift.value,
                 badge: levels.gift.badge,
-                presetAmount: presetAmounts
+                presetAmount: presetAmounts,
             )
         }()
 
@@ -333,7 +340,7 @@ public struct DonationSubscriptionConfiguration {
                 return DonationSubscriptionLevel(
                     level: level.value,
                     badge: level.badge,
-                    amounts: presetsByCurrencyForLevel
+                    amounts: presetsByCurrencyForLevel,
                 )
             }
 
@@ -357,7 +364,7 @@ public struct DonationSubscriptionConfiguration {
             boost: boostConfig,
             gift: giftConfig,
             subscription: subscriptionConfig,
-            paymentMethods: paymentMethodsConfig
+            paymentMethods: paymentMethodsConfig,
         )
     }
 
@@ -405,7 +412,7 @@ public struct DonationSubscriptionConfiguration {
 
             partialResult[level] = BadgedLevel(
                 value: level,
-                badge: try ProfileBadge(jsonDictionary: try levelParser.required(key: "badge"))
+                badge: try ProfileBadge(jsonDictionary: try levelParser.required(key: "badge")),
             )
         }
 
@@ -425,14 +432,14 @@ public struct DonationSubscriptionConfiguration {
         return BadgedLevels(
             boost: boostBadge,
             gift: giftBadge,
-            subscription: Array(subscriptionLevels.values)
+            subscription: Array(subscriptionLevels.values),
         )
     }
 
     // MARK: - SEPA maximum boost
 
     private static func parseSepaBoostMaximum(
-        fromParser parser: ParamParser
+        fromParser parser: ParamParser,
     ) throws -> FiatMoney {
         let sepaMaxEurosInt: Int = try parser.required(key: "sepaMaximumEuros")
         return FiatMoney(currencyCode: "EUR", value: Decimal(sepaMaxEurosInt))
@@ -476,7 +483,7 @@ public struct DonationSubscriptionConfiguration {
     /// ```
     private static func parsePresets(
         fromParser parser: ParamParser,
-        forLevels levels: BadgedLevels
+        forLevels levels: BadgedLevels,
     ) throws -> PresetsByCurrency {
         let amountsByCurrency: [String: [String: Any]] = try parser.required(key: "currencies")
 
@@ -490,7 +497,7 @@ public struct DonationSubscriptionConfiguration {
             partialResult[currencyCode.uppercased()] = try parsePresets(
                 fromJson: json,
                 forCurrency: currencyCode.uppercased(),
-                withLevels: levels
+                withLevels: levels,
             )
         }
     }
@@ -498,30 +505,30 @@ public struct DonationSubscriptionConfiguration {
     private static func parsePresets(
         fromJson json: [String: Any],
         forCurrency code: Currency.Code,
-        withLevels levels: BadgedLevels
+        withLevels levels: BadgedLevels,
     ) throws -> Presets {
         let parser = ParamParser(json)
 
         let (boostPresets, giftPreset) = try parseOneTimePresets(
             fromParser: parser,
             forCurrency: code,
-            withLevels: levels
+            withLevels: levels,
         )
 
         let subscriptionPresets = try parseSubscriptionPresets(
             fromParser: parser,
-            forCurrency: code
+            forCurrency: code,
         )
 
         let supportedPaymentMethods = try parseSupportedPaymentMethods(
-            fromParser: parser
+            fromParser: parser,
         )
 
         return Presets(
             boost: boostPresets,
             gift: giftPreset,
             subscription: subscriptionPresets,
-            supportedPaymentMethods: supportedPaymentMethods
+            supportedPaymentMethods: supportedPaymentMethods,
         )
     }
 
@@ -546,7 +553,7 @@ public struct DonationSubscriptionConfiguration {
     private static func parseOneTimePresets(
         fromParser parser: ParamParser,
         forCurrency code: Currency.Code,
-        withLevels levels: BadgedLevels
+        withLevels levels: BadgedLevels,
     ) throws -> (BoostPresets, GiftPreset) {
         /// Create a ``FiatMoney`` from a parsed JSON integer value.
         func makeMoney(fromIntValue amount: Int) -> FiatMoney {
@@ -582,11 +589,11 @@ public struct DonationSubscriptionConfiguration {
         return (
             BoostPresets(
                 minimum: makeMoney(fromIntValue: try parser.required(key: "minimum")),
-                presets: boostPresetAmounts
+                presets: boostPresetAmounts,
             ),
             GiftPreset(
-                preset: giftPresetAmount
-            )
+                preset: giftPresetAmount,
+            ),
         )
     }
 
@@ -608,7 +615,7 @@ public struct DonationSubscriptionConfiguration {
     /// Each subscription level is assigned a single preset value.
     private static func parseSubscriptionPresets(
         fromParser parser: ParamParser,
-        forCurrency code: Currency.Code
+        forCurrency code: Currency.Code,
     ) throws -> SubscriptionPresets {
         /// Create a ``FiatMoney`` from a parsed JSON integer value.
         func makeMoney(fromIntValue amount: Int) -> FiatMoney {
@@ -628,7 +635,7 @@ public struct DonationSubscriptionConfiguration {
             }
 
         return SubscriptionPresets(
-            presetsByLevel: subscriptionAmounts
+            presetsByLevel: subscriptionAmounts,
         )
     }
 
@@ -646,7 +653,7 @@ public struct DonationSubscriptionConfiguration {
     /// Known payment methods include "CARD", which corresponds to Apple Pay
     /// and credit cards, and "PAYPAL", which corresponds to PayPal.
     private static func parseSupportedPaymentMethods(
-        fromParser parser: ParamParser
+        fromParser parser: ParamParser,
     ) throws -> Set<DonationPaymentMethod> {
         let paymentMethodStrings: [String] = try parser.required(key: "supportedPaymentMethods")
 

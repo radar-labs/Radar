@@ -4,11 +4,7 @@
 //
 
 extension Stripe {
-    public struct StripeError: Error, IsRetryableProvider {
+    public struct StripeError: Error {
         public let code: String
-
-        public var isRetryableProvider: Bool {
-            return false
-        }
     }
 }

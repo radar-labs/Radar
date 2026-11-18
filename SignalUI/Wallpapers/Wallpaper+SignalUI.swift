@@ -11,17 +11,25 @@ extension Wallpaper {
 
     public static func viewBuilder(for thread: TSThread? = nil, tx: DBReadTransaction) -> WallpaperViewBuilder? {
         AssertIsOnMainThread()
-
         let wallpaperStore = DependenciesBridge.shared.wallpaperStore
-        guard let resolvedWallpaper = wallpaperStore.fetchWallpaperForRendering(
-            for: thread?.uniqueId,
-            tx: tx
-        ) else {
-            return nil
+
+        let wallpaper: Wallpaper
+        if let thread, thread.isReleaseNotesThread {
+            wallpaper = .releaseNotes
+        } else {
+            guard
+                let resolvedWallpaper = wallpaperStore.fetchWallpaperForRendering(
+                    for: thread?.uniqueId,
+                    tx: tx,
+                )
+            else {
+                return nil
+            }
+            wallpaper = resolvedWallpaper
         }
 
         return viewBuilder(
-            for: resolvedWallpaper,
+            for: wallpaper,
             customPhoto: {
                 WallpaperStore.fetchResolvedValue(
                     for: thread,
@@ -31,7 +39,8 @@ extension Wallpaper {
                         } else {
                             DependenciesBridge.shared.wallpaperImageStore.loadGlobalThreadWallpaper(tx: tx)
                         }
-                    })
+                    },
+                )
             },
             shouldDimInDarkTheme: wallpaperStore.fetchDimInDarkModeForRendering(for: thread?.uniqueId, tx: tx),
         )
@@ -40,7 +49,7 @@ extension Wallpaper {
     public static func viewBuilder(
         for wallpaper: Wallpaper,
         customPhoto: () -> UIImage?,
-        shouldDimInDarkTheme: Bool
+        shouldDimInDarkTheme: Bool,
     ) -> WallpaperViewBuilder? {
         AssertIsOnMainThread()
 
@@ -48,6 +57,8 @@ extension Wallpaper {
             return .customPhoto(customPhoto, shouldDimInDarkMode: shouldDimInDarkTheme)
         } else if let colorOrGradientSetting = wallpaper.asColorOrGradientSetting {
             return .colorOrGradient(colorOrGradientSetting, shouldDimInDarkMode: shouldDimInDarkTheme)
+        } else if case .releaseNotes = wallpaper {
+            return .releaseNotes
         } else {
             owsFailDebug("Couldn't create wallpaper view builder.")
             return nil
@@ -60,6 +71,7 @@ extension Wallpaper {
 public enum WallpaperViewBuilder {
     case colorOrGradient(ColorOrGradientSetting, shouldDimInDarkMode: Bool)
     case customPhoto(UIImage, shouldDimInDarkMode: Bool)
+    case releaseNotes
 
     public func build() -> WallpaperView {
         switch self {
@@ -70,10 +82,12 @@ public enum WallpaperViewBuilder {
                 mode: .colorView(ColorOrGradientSwatchView(
                     setting: colorOrGradientSetting,
                     shapeMode: .rectangle,
-                    themeMode: shouldDimInDarkMode ? .auto : .alwaysLight
+                    themeMode: shouldDimInDarkMode ? .auto : .alwaysLight,
                 )),
-                shouldDimInDarkTheme: shouldDimInDarkMode
+                shouldDimInDarkTheme: shouldDimInDarkMode,
             )
+        case .releaseNotes:
+            return WallpaperView(mode: .releaseNotesView, shouldDimInDarkTheme: false)
         }
     }
 }
@@ -84,6 +98,7 @@ public class WallpaperView {
     fileprivate enum Mode {
         case colorView(UIView)
         case imageView(UIImage)
+        case releaseNotesView
     }
 
     public private(set) var contentView: UIView?
@@ -102,11 +117,11 @@ public class WallpaperView {
 
     public func asPreviewView() -> UIView {
         let previewView = UIView.container()
-        if let contentView = self.contentView {
+        if let contentView {
             previewView.addSubview(contentView)
             contentView.autoPinEdgesToSuperviewEdges()
         }
-        if let dimmingView = self.dimmingView {
+        if let dimmingView {
             previewView.addSubview(dimmingView)
             dimmingView.autoPinEdgesToSuperviewEdges()
         }
@@ -130,17 +145,25 @@ public class WallpaperView {
                     dimmingView.backgroundColor = .ows_blackAlpha20
                     self.dimmingView = dimmingView
                 }
-
+                return imageView
+            case .releaseNotesView:
+                let image = UIImage(named: "official-wallpaper")
+                let imageView = UIImageView(image: image)
+                imageView.tintColor = UIColor(
+                    light: UIColor(rgbHex: 0xE3E4E9),
+                    dark: UIColor(rgbHex: 0x272C3C),
+                )
+                imageView.backgroundColor = UIColor(
+                    light: UIColor(rgbHex: 0xECEDF4),
+                    dark: UIColor(rgbHex: 0x353A49),
+                )
+                imageView.contentMode = .scaleAspectFill
+                imageView.clipsToBounds = true
                 return imageView
             }
         }()
         self.contentView = contentView
-
-        addBlurProvider(contentView: contentView)
-    }
-
-    private func addBlurProvider(contentView: UIView) {
-        self.blurProvider = WallpaperBlurProviderImpl(contentView: contentView)
+        self.blurProvider = WallpaperBlurProviderImpl(contentView: contentView, shouldDimInDarkTheme: shouldDimInDarkTheme)
     }
 }
 
@@ -148,6 +171,7 @@ public class WallpaperView {
 
 private struct WallpaperBlurToken: Equatable {
     let contentSize: CGSize
+    let shouldDimInDarkTheme: Bool
     let isDarkThemeEnabled: Bool
 }
 
@@ -161,9 +185,11 @@ public class WallpaperBlurState: NSObject {
     private static let idCounter = AtomicUInt(0, lock: .sharedGlobal)
     public let id: UInt = WallpaperBlurState.idCounter.increment()
 
-    fileprivate init(image: UIImage,
-                     referenceView: UIView,
-                     token: WallpaperBlurToken) {
+    fileprivate init(
+        image: UIImage,
+        referenceView: UIView,
+        token: WallpaperBlurToken,
+    ) {
         self.image = image
         self.referenceView = referenceView
         self.token = token
@@ -179,12 +205,16 @@ public protocol WallpaperBlurProvider: AnyObject {
 // MARK: -
 
 public class WallpaperBlurProviderImpl: NSObject, WallpaperBlurProvider {
+
     private let contentView: UIView
+
+    private let shouldDimInDarkTheme: Bool
 
     private var cachedState: WallpaperBlurState?
 
-    init(contentView: UIView) {
+    init(contentView: UIView, shouldDimInDarkTheme: Bool) {
         self.contentView = contentView
+        self.shouldDimInDarkTheme = shouldDimInDarkTheme
     }
 
     @available(swift, obsoleted: 1.0)
@@ -192,42 +222,54 @@ public class WallpaperBlurProviderImpl: NSObject, WallpaperBlurProvider {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public static let contentDownscalingFactor: CGFloat = 8
-
     public var wallpaperBlurState: WallpaperBlurState? {
         AssertIsOnMainThread()
 
         // De-bounce.
         let bounds = contentView.bounds
         let isDarkThemeEnabled = Theme.isDarkThemeEnabled
-        let newToken = WallpaperBlurToken(contentSize: bounds.size,
-                                          isDarkThemeEnabled: isDarkThemeEnabled)
-        if let cachedState = self.cachedState,
-           cachedState.token == newToken {
+        let newToken = WallpaperBlurToken(
+            contentSize: bounds.size,
+            shouldDimInDarkTheme: shouldDimInDarkTheme,
+            isDarkThemeEnabled: isDarkThemeEnabled,
+        )
+        if let cachedState, cachedState.token == newToken {
             return cachedState
         }
 
         self.cachedState = nil
 
+        guard bounds.size.isNonEmpty else { return nil }
+
+        let blurRadius: CGFloat = 20
+        let colorOverlays: [(UIColor, UIImage.CompositingMode)]
+        // Replicate UIBlurEffect.Style.systemThinMaterialLight and .systemThinMaterialDark.
+        if isDarkThemeEnabled {
+            let mainOverlayAlpha = shouldDimInDarkTheme ? 0.8 : 0.9
+            colorOverlays = [
+                (UIColor(white: 0, alpha: mainOverlayAlpha), .sourceAtop),
+                (UIColor(white: 0.5, alpha: 0.04), .darken),
+            ]
+        } else {
+            colorOverlays = [
+                (UIColor(white: 1, alpha: 0.4), .sourceAtop),
+                (UIColor(white: 1, alpha: 0.16), .lighten),
+            ]
+        }
+
         do {
-            guard bounds.width > 0, bounds.height > 0 else {
-                return nil
-            }
-            let contentImage = contentView.renderAsImage()
-            // We approximate the behavior of UIVisualEffectView(effect: UIBlurEffect(style: .regular)).
-            let tintColor: UIColor = (isDarkThemeEnabled
-                                        ? UIColor.ows_black.withAlphaComponent(0.9)
-                                        : UIColor.white.withAlphaComponent(0.6))
-            let resizeDimension = contentImage.size.largerAxis / Self.contentDownscalingFactor
-            guard let scaledImage = contentImage.resized(maxDimensionPoints: resizeDimension) else {
-                owsFailDebug("Could not resize contentImage.")
-                return nil
-            }
-            let blurRadius: CGFloat = 32 / Self.contentDownscalingFactor
-            let blurredImage = try scaledImage.withGaussianBlur(radius: blurRadius, tintColor: tintColor)
-            let state = WallpaperBlurState(image: blurredImage,
-                                           referenceView: contentView,
-                                           token: newToken)
+            let contentImage = contentView.renderAsImage(opaque: true, scale: 1)
+            let blurredImage = try contentImage.withGaussianBlur(
+                radius: blurRadius,
+                colorOverlays: colorOverlays,
+                vibrancy: 0.2,
+                exposureAdjustment: 0.4,
+            )
+            let state = WallpaperBlurState(
+                image: blurredImage,
+                referenceView: contentView,
+                token: newToken,
+            )
             self.cachedState = state
             return state
         } catch {

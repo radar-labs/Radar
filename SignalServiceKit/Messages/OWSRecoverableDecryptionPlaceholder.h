@@ -32,7 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
                  isGroupStoryReply:(BOOL)isGroupStoryReply
                             isPoll:(BOOL)isPoll
     isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
-                         isStarred:(BOOL)isStarred
                 isViewOnceComplete:(BOOL)isViewOnceComplete
                  isViewOnceMessage:(BOOL)isViewOnceMessage
                        linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -53,10 +52,6 @@ NS_ASSUME_NONNULL_BEGIN
                                                sourceAci:(AciObjC *)sourceAci
                                         untrustedGroupId:(nullable NSData *)untrustedGroupId
                                              transaction:(DBWriteTransaction *)writeTx NS_DESIGNATED_INITIALIZER;
-
-- (nullable instancetype)initWithCoder:(NSCoder *)coder NS_DESIGNATED_INITIALIZER;
-
-@property (assign, nonatomic, readonly) BOOL supportsReplacement;
 
 // --- CODE GENERATION MARKER
 

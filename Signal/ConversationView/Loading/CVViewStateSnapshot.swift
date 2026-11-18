@@ -21,8 +21,8 @@ struct CVViewStateSnapshot {
     // the time the update is delivered, we should reject the update
     // and request a new one.
     let coreState: CVCoreState
-    public var conversationStyle: ConversationStyle { coreState.conversationStyle }
-    public var mediaCache: CVMediaCache { coreState.mediaCache }
+    var conversationStyle: ConversationStyle { coreState.conversationStyle }
+    var mediaCache: CVMediaCache { coreState.mediaCache }
 
     // TODO: We need to determine exactly what the desired behavior here is.
     let collapseCutoffDate = Date()
@@ -32,8 +32,8 @@ struct CVViewStateSnapshot {
     let uiMode: ConversationUIMode
     let previousUIMode: ConversationUIMode
 
-    public var isShowingSelectionUI: Bool { uiMode.hasSelectionUI }
-    public var wasShowingSelectionUI: Bool { previousUIMode.hasSelectionUI }
+    var isShowingSelectionUI: Bool { uiMode.hasSelectionUI }
+    var wasShowingSelectionUI: Bool { previousUIMode.hasSelectionUI }
 
     let searchText: String?
 
@@ -42,13 +42,15 @@ struct CVViewStateSnapshot {
     let hasActiveCall: Bool
     let currentGroupThreadCallGroupId: GroupIdentifier?
 
+    let expandedCollapseSetIds: Set<String>
+
     private static var currentCallProvider: any CurrentCallProvider { DependenciesBridge.shared.currentCallProvider }
 
     static func snapshot(
         viewState: CVViewState,
         typingIndicatorsSender: SignalServiceAddress?,
         oldestUnreadMessageSortId: UInt64?,
-        previousViewStateSnapshot: CVViewStateSnapshot?
+        previousViewStateSnapshot: CVViewStateSnapshot?,
     ) -> CVViewStateSnapshot {
         CVViewStateSnapshot(
             textExpansion: viewState.textExpansion.copy(),
@@ -61,13 +63,14 @@ struct CVViewStateSnapshot {
             searchText: viewState.lastSearchedText,
             oldestUnreadMessageSortId: oldestUnreadMessageSortId,
             hasActiveCall: currentCallProvider.hasCurrentCall,
-            currentGroupThreadCallGroupId: currentCallProvider.currentGroupThreadCallGroupId
+            currentGroupThreadCallGroupId: currentCallProvider.currentGroupThreadCallGroupId,
+            expandedCollapseSetIds: viewState.expandedCollapseSets,
         )
     }
 
     static func mockSnapshotForStandaloneItems(
         coreState: CVCoreState,
-        spoilerReveal: SpoilerRevealState
+        spoilerReveal: SpoilerRevealState,
     ) -> CVViewStateSnapshot {
         CVViewStateSnapshot(
             textExpansion: CVTextExpansion(),
@@ -80,7 +83,8 @@ struct CVViewStateSnapshot {
             searchText: nil,
             oldestUnreadMessageSortId: nil,
             hasActiveCall: false,
-            currentGroupThreadCallGroupId: nil
+            currentGroupThreadCallGroupId: nil,
+            expandedCollapseSetIds: [],
         )
     }
 }

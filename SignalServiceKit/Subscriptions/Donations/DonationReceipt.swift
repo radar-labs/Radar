@@ -7,15 +7,13 @@ import Foundation
 public import GRDB
 
 public final class DonationReceipt: SDSCodableModel, Decodable {
-    public static var recordType: UInt { 0 }
-
     public enum DonationReceiptType {
         case boost
         case subscription(subscriptionLevel: UInt)
         case gift
     }
 
-    public enum CodingKeys: String, CodingKey, ColumnExpression, CaseIterable {
+    public enum CodingKeys: String, CodingKey, ColumnExpression {
         case id
         case uniqueId
         case timestamp
@@ -38,17 +36,17 @@ public final class DonationReceipt: SDSCodableModel, Decodable {
         case .boost:
             return OWSLocalizedString(
                 "DONATION_RECEIPT_ONE_TIME",
-                comment: "Title for one-time donation receipts"
+                comment: "Title for one-time donation receipts",
             )
         case .subscription:
             return OWSLocalizedString(
                 "DONATION_RECEIPT_RECURRING",
-                comment: "Title for recurring donation receipts"
+                comment: "Title for recurring donation receipts",
             )
         case .gift:
             return OWSLocalizedString(
                 "DONATION_RECEIPT_FOR_DONATION_ON_BEHALF_OF_A_FRIEND",
-                comment: "Title for receipts for donations given on a friend's behalf"
+                comment: "Title for receipts for donations given on a friend's behalf",
             )
         }
     }
@@ -56,7 +54,7 @@ public final class DonationReceipt: SDSCodableModel, Decodable {
     public init(
         receiptType: DonationReceiptType,
         timestamp: Date,
-        amount: FiatMoney
+        amount: FiatMoney,
     ) {
         self.uniqueId = UUID().uuidString
         self.receiptType = receiptType
@@ -72,7 +70,7 @@ public final class DonationReceipt: SDSCodableModel, Decodable {
         timestamp = try container.decode(Date.self, forKey: .timestamp)
         amount = FiatMoney(
             currencyCode: try container.decode(Currency.Code.self, forKey: .currencyCode),
-            value: try container.decode(Decimal.self, forKey: .amount)
+            value: try container.decode(Decimal.self, forKey: .amount),
         )
 
         let subscriptionLevel = try container.decodeIfPresent(UInt.self, forKey: .subscriptionLevel)
@@ -80,7 +78,7 @@ public final class DonationReceipt: SDSCodableModel, Decodable {
         switch rawReceiptType {
         case nil:
             Logger.info("Parsing an older donation receipt")
-            if let subscriptionLevel = subscriptionLevel {
+            if let subscriptionLevel {
                 receiptType = .subscription(subscriptionLevel: subscriptionLevel)
             } else {
                 receiptType = .boost
@@ -88,7 +86,7 @@ public final class DonationReceipt: SDSCodableModel, Decodable {
         case 0:
             receiptType = .boost
         case 1:
-            guard let subscriptionLevel = subscriptionLevel else {
+            guard let subscriptionLevel else {
                 owsFail("Found a donation receipt, marked as a subscription, with no subscription level")
             }
             receiptType = .subscription(subscriptionLevel: subscriptionLevel)

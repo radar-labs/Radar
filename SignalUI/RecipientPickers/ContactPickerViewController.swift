@@ -15,7 +15,9 @@ public protocol ContactPickerDelegate: AnyObject {
 }
 
 public enum SubtitleCellValue {
-    case phoneNumber, email, none
+    case phoneNumber
+    case email
+    case none
 }
 
 open class ContactPickerViewController: OWSViewController, OWSNavigationChildController {
@@ -35,7 +37,7 @@ open class ContactPickerViewController: OWSViewController, OWSNavigationChildCon
 
     // MARK: UIViewController
 
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
 
         navigationItem.leftBarButtonItem = .cancelButton { [weak self] in
@@ -49,22 +51,16 @@ open class ContactPickerViewController: OWSViewController, OWSNavigationChildCon
             }
         }
 
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
+
         addChild(tableViewController)
         view.addSubview(tableViewController.view)
         tableView.autoPinEdgesToSuperviewEdges()
+        tableViewController.didMove(toParent: self)
 
         updateTableContents()
         applyTheme()
-    }
-
-    public override func viewSafeAreaInsetsDidChange() {
-        super.viewSafeAreaInsetsDidChange()
-        updateSearchBarMargins()
-    }
-
-    public override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        updateSearchBarMargins()
     }
 
     // MARK: UI
@@ -75,10 +71,9 @@ open class ContactPickerViewController: OWSViewController, OWSNavigationChildCon
         // Do not automatically deselect - keep cell selected until screen becomes not visible.
         viewController.selectionBehavior = .toggleSelectionWithAction
         viewController.defaultSeparatorInsetLeading = OWSTableViewController2.cellHInnerMargin
-        + CGFloat(AvatarBuilder.smallAvatarSizePoints) + ContactCellView.avatarTextHSpacing
+            + CGFloat(AvatarBuilder.smallAvatarSizePoints) + ContactCellView.avatarTextHSpacing
         viewController.tableView.register(ContactCell.self)
         viewController.tableView.allowsMultipleSelection = allowsMultipleSelection
-        viewController.tableView.tableHeaderView = searchBar
         viewController.view.setCompressionResistanceVerticalHigh()
         viewController.view.setContentHuggingVerticalHigh()
         return viewController
@@ -86,14 +81,12 @@ open class ContactPickerViewController: OWSViewController, OWSNavigationChildCon
 
     private var tableView: UITableView { tableViewController.tableView }
 
-    public override func themeDidChange() {
+    override public func themeDidChange() {
         super.themeDidChange()
         applyTheme()
     }
 
     private func applyTheme() {
-        searchBar.searchFieldBackgroundColorOverride = Theme.searchFieldElevatedBackgroundColor
-        tableView.sectionIndexColor = Theme.primaryTextColor
         if let owsNavigationController = navigationController as? OWSNavigationController {
             owsNavigationController.updateNavbarAppearance()
         }
@@ -101,7 +94,7 @@ open class ContactPickerViewController: OWSViewController, OWSNavigationChildCon
 
     public var preferredNavigationBarStyle: OWSNavigationBarStyle { .solid }
 
-    public var navbarBackgroundColorOverride: UIColor? { tableViewController.tableBackgroundColor }
+    public var navbarBackgroundColorOverride: UIColor? { OWSTableViewController2.tableBackgroundColor }
 
     // MARK: Contacts
 
@@ -130,14 +123,14 @@ open class ContactPickerViewController: OWSViewController, OWSNavigationChildCon
             let contactFetchRequest = CNContactFetchRequest(keysToFetch: allowedContactKeys)
             contactFetchRequest.sortOrder = .userDefault
             do {
-                try contactStore.enumerateContacts(with: contactFetchRequest) { (contact, _) -> Void in
+                try contactStore.enumerateContacts(with: contactFetchRequest) { contact, _ -> Void in
                     contacts.append(contact)
                 }
             } catch {
                 Logger.error("Failed to fetch contacts with error: \(error)")
             }
             contents = OWSTableContents(sections: contactsSections(for: contacts))
-            contents.sectionForSectionIndexTitleBlock = { [weak self] (sectionIndexTitle, index) in
+            contents.sectionForSectionIndexTitleBlock = { [weak self] sectionIndexTitle, index in
                 return self?.collation.section(forSectionIndexTitle: index) ?? 0
             }
             contents.sectionIndexTitlesForTableViewBlock = { [weak self] in
@@ -180,7 +173,7 @@ open class ContactPickerViewController: OWSViewController, OWSNavigationChildCon
             },
             actionBlock: { [weak self] in
                 self?.tryToSelectContact(systemContact)
-            }
+            },
         )
     }
 
@@ -191,7 +184,7 @@ open class ContactPickerViewController: OWSViewController, OWSNavigationChildCon
             systemContact: systemContact,
             sortOrder: sortOrder,
             subtitleType: subtitleCellType,
-            showsWhenSelected: allowsMultipleSelection
+            showsWhenSelected: allowsMultipleSelection,
         )
 
         if let delegate, !delegate.contactPicker(self, shouldSelect: systemContact) {
@@ -225,14 +218,12 @@ open class ContactPickerViewController: OWSViewController, OWSNavigationChildCon
 
     // MARK: Search
 
-    private lazy var searchBar: OWSSearchBar = {
-        let searchBar = OWSSearchBar()
-        searchBar.placeholder = CommonStrings.searchBarPlaceholder
-        searchBar.delegate = self
-        searchBar.sizeToFit()
-        searchBar.setCompressionResistanceVerticalHigh()
-        searchBar.setContentHuggingVerticalHigh()
-        return searchBar
+    private lazy var searchController: UISearchController = {
+        let controller = UISearchController(searchResultsController: nil)
+        controller.obscuresBackgroundDuringPresentation = false
+        controller.hidesNavigationBarDuringPresentation = false
+        controller.searchResultsUpdater = self
+        return controller
     }()
 
     private var _searchResults = Atomic<[CNContact]?>(wrappedValue: nil)
@@ -250,9 +241,9 @@ open class ContactPickerViewController: OWSViewController, OWSNavigationChildCon
     }
 
     private func performSearch() {
-        let searchText = searchBar.text?.stripped ?? ""
+        let searchText = searchController.searchBar.text?.stripped.nilIfEmpty
 
-        guard searchText.count > 1 else {
+        guard let searchText else {
             searchResults = nil
             return
         }
@@ -266,33 +257,17 @@ open class ContactPickerViewController: OWSViewController, OWSNavigationChildCon
             searchResults = nil
         }
     }
-
-    private func updateSearchBarMargins() {
-        // This should ideally compute the insets for self.tableView, but that
-        // view's size hasn't been updated when the viewDidLayoutSubviews method is
-        // called. As a quick fix, use self.view's size, which matches the eventual
-        // width of self.tableView. (A more complete fix would likely add a
-        // callback when self.tableView’s size is available.)
-        searchBar.layoutMargins = OWSTableViewController2.cellOuterInsets(in: view)
-    }
 }
 
-extension ContactPickerViewController: UISearchBarDelegate {
-
-    public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+extension ContactPickerViewController: UISearchResultsUpdating {
+    public func updateSearchResults(for searchController: UISearchController) {
         performSearch()
-    }
-
-    public func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        performSearch()
-        searchBar.resignFirstResponder()
     }
 }
 
 extension ContactPickerViewController: OWSTableViewControllerDelegate {
-
     public func tableViewWillBeginDragging(_ tableView: UITableView) {
-        searchBar.resignFirstResponder()
+        searchController.searchBar.resignFirstResponder()
     }
 }
 

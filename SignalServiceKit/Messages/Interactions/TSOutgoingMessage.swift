@@ -94,7 +94,7 @@ extension TSOutgoingMessage {
     }
 
     private func filterRecipientAddresses(
-        predicate: (TSOutgoingMessageRecipientState) -> Bool
+        predicate: (TSOutgoingMessageRecipientState) -> Bool,
     ) -> [SignalServiceAddress] {
         guard let recipientAddressStates else { return [] }
 
@@ -102,15 +102,12 @@ extension TSOutgoingMessage {
             predicate(state)
         }.map { $0.key }
     }
-}
 
-// MARK: - Update recipients
+    // MARK: - Update recipients
 
-public extension TSOutgoingMessage {
-    @objc
-    func updateWithRecipientAddressStates(
+    public func updateWithRecipientAddressStates(
         _ recipientAddressStates: [SignalServiceAddress: TSOutgoingMessageRecipientState]?,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         anyUpdateOutgoingMessage(transaction: tx) { outgoingMessage in
             outgoingMessage.recipientAddressStates = recipientAddressStates
@@ -119,9 +116,9 @@ public extension TSOutgoingMessage {
 
     /// Records a successful send to a one recipient.
     func updateWithSentRecipients(
-        _ serviceIds: [ServiceId],
+        _ serviceIds: some Sequence<ServiceId>,
         wasSentByUD: Bool,
-        transaction tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         anyUpdateOutgoingMessage(transaction: tx) { outgoingMessage in
             for serviceId in serviceIds {
@@ -140,7 +137,7 @@ public extension TSOutgoingMessage {
     /// Records a skipped send to multiple recipients.
     func updateWithSkippedRecipients(
         _ addresses: some Sequence<SignalServiceAddress>,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         anyUpdateOutgoingMessage(transaction: tx) { outgoingMessage in
             for address in addresses {
@@ -163,7 +160,7 @@ public extension TSOutgoingMessage {
     func updateRecipientsFromNonLocalDevice(
         _ nonLocalRecipientStates: [SignalServiceAddress: TSOutgoingMessageRecipientState],
         isSentUpdate: Bool,
-        transaction tx: DBWriteTransaction
+        transaction tx: DBWriteTransaction,
     ) {
         anyUpdateOutgoingMessage(transaction: tx) { outgoingMessage in
             let localRecipientStates = outgoingMessage.recipientAddressStates ?? [:]
@@ -208,16 +205,16 @@ public extension TSOutgoingMessage {
 
     /// Records failed sends to the given recipients.
     func updateWithFailedRecipients(
-        _ recipientErrors: some Collection<(serviceId: ServiceId, error: Error)>,
-        tx: DBWriteTransaction
+        _ recipientErrors: some Sequence<(serviceId: ServiceId, error: Error)>,
+        tx: DBWriteTransaction,
     ) {
-        let fatalErrors = recipientErrors.lazy.filter { !MessageSender.isRetryableError($0.error) }
-        let retryableErrors = recipientErrors.lazy.filter { MessageSender.isRetryableError($0.error) }
+        let fatalErrors = recipientErrors.filter { !MessageSenderImpl.isRetryableError($0.error) }
+        let retryableErrors = recipientErrors.filter { MessageSenderImpl.isRetryableError($0.error) }
 
         if fatalErrors.isEmpty {
-            Logger.warn("Couldn't send \(self.timestamp), but all errors are retryable: \(Array(retryableErrors))")
+            Logger.warn("Couldn't send \(self.timestamp), but all errors are retryable: \(retryableErrors)")
         } else {
-            Logger.warn("Couldn't send \(self.timestamp): \(Array(fatalErrors)); retryable errors: \(Array(retryableErrors))")
+            Logger.warn("Couldn't send \(self.timestamp): \(fatalErrors); retryable errors: \(retryableErrors)")
         }
 
         self.anyUpdateOutgoingMessage(transaction: tx) {
@@ -226,10 +223,10 @@ public extension TSOutgoingMessage {
                     owsFailDebug("Missing recipient state for \(serviceId)")
                     continue
                 }
-                if MessageSender.isRetryableError(error), recipientState.status == .sending {
+                if MessageSenderImpl.isRetryableError(error), recipientState.status == .sending {
                     // For retryable errors, we can just set the error code and leave the
                     // state set as Sending
-                } else if error is SpamChallengeRequiredError || error is SpamChallengeResolvedError {
+                } else if error is SpamChallengeRequiredError {
                     recipientState.updateStatusIfPossible(.pending)
                 } else {
                     recipientState.updateStatusIfPossible(.failed)
@@ -250,16 +247,16 @@ public extension TSOutgoingMessage {
     ///
     /// This should be called on app launch.
     @objc
-    func updateWithAllSendingRecipientsMarkedAsFailed(
+    public func updateWithAllSendingRecipientsMarkedAsFailed(
         error: (any Error)? = nil,
-        transaction tx: DBWriteTransaction
+        transaction tx: DBWriteTransaction,
     ) {
         anyUpdateOutgoingMessage(transaction: tx) { outgoingMessage in
             if error is AppExpiredError {
                 // TODO: Don't store rasterized strings in the database.
                 outgoingMessage.mostRecentFailureText = OWSLocalizedString(
                     "ERROR_SENDING_EXPIRED",
-                    comment: "Error indicating a send failure due to an expired application."
+                    comment: "Error indicating a send failure due to an expired application.",
                 )
             } else if error is NotRegisteredError {
                 // TODO: Don't store rasterized strings in the database.
@@ -296,7 +293,7 @@ public extension TSOutgoingMessage {
     ///
     /// This should be called when we start a message send.
     func updateAllUnsentRecipientsAsSending(
-        transaction tx: DBWriteTransaction
+        transaction tx: DBWriteTransaction,
     ) {
         anyUpdateOutgoingMessage(transaction: tx) { outgoingMessage in
             guard let recipientAddressStates = outgoingMessage.recipientAddressStates else {
@@ -314,76 +311,10 @@ public extension TSOutgoingMessage {
     /// Called when a message successfully sends.
     /// Subclasses that need to know when a message send succeeds can override this.
     @objc
-    func updateWithSendSuccess(tx: DBWriteTransaction) { }
-}
+    public func updateWithSendSuccess(tx: DBWriteTransaction) { }
 
-#if TESTABLE_BUILD
-public extension TSOutgoingMessage {
-    func updateWithFakeMessageState(
-        _ messageState: TSOutgoingMessageState,
-        tx: DBWriteTransaction
-    ) {
-        anyUpdateOutgoingMessage(transaction: tx) { outgoingMessage in
-            guard let recipientAddressStates = outgoingMessage.recipientAddressStates else {
-                return
-            }
+    // MARK: -
 
-            for recipientState in recipientAddressStates.values {
-                switch messageState {
-                case .sending:
-                    recipientState.updateStatusIfPossible(.sending)
-                case .failed:
-                    recipientState.updateStatusIfPossible(.failed)
-                case .sent:
-                    recipientState.updateStatusIfPossible(.sent)
-                case .pending:
-                    recipientState.updateStatusIfPossible(.pending)
-                case .sent_OBSOLETE, .delivered_OBSOLETE:
-                    break
-                }
-            }
-        }
-    }
-}
-#endif
-
-// MARK: -
-
-public extension TSOutgoingMessage {
-    @objc
-    static func messageStateForRecipientStates(
-        _ recipientStates: [TSOutgoingMessageRecipientState]
-    ) -> TSOutgoingMessageState {
-        var hasSendingReceipient = false
-        var hasPendingRecipient = false
-        var hasFailedRecipient = false
-
-        for recipientState in recipientStates {
-            switch recipientState.status {
-            case .sending:
-                hasSendingReceipient = true
-            case .pending:
-                hasPendingRecipient = true
-            case .failed:
-                hasFailedRecipient = true
-            case .skipped, .sent, .delivered, .read, .viewed:
-                break
-            }
-        }
-
-        if hasSendingReceipient {
-            return .sending
-        }
-        if hasPendingRecipient {
-            return .pending
-        }
-        if hasFailedRecipient {
-            return .failed
-        }
-        return .sent
-    }
-
-    @objc
     static func isEligibleToStartExpireTimer(recipientStates: [TSOutgoingMessageRecipientState]) -> Bool {
         let messageState = Self.messageStateForRecipientStates(recipientStates)
         return isEligibleToStartExpireTimer(messageState: messageState)
@@ -405,10 +336,182 @@ public extension TSOutgoingMessage {
     }
 
     @objc
-    var isStorySend: Bool { isGroupStoryReply }
+    public var isStorySend: Bool { isGroupStoryReply }
 
-    @objc(buildPniSignatureMessageIfNeededWithTransaction:)
-    func buildPniSignatureMessageIfNeeded(transaction tx: DBReadTransaction) -> SSKProtoPniSignatureMessage? {
+    @objc
+    func _buildPlaintextData(inThread thread: TSThread, tx: DBWriteTransaction) throws -> Data {
+        guard let contentBuilder = self.contentBuilder(thread: thread, transaction: tx) else {
+            throw OWSAssertionError("couldn't build protobuf")
+        }
+        if let pniSignatureMessage = self.buildPniSignatureMessageIfNeeded(tx: tx) {
+            contentBuilder.setPniSignatureMessage(pniSignatureMessage)
+        }
+        return try contentBuilder.buildSerializedData()
+    }
+
+    @objc
+    func _dataMessageBuilder(thread: TSThread, tx: DBReadTransaction) -> SSKProtoDataMessageBuilder? {
+        let builder = SSKProtoDataMessage.builder()
+        builder.setTimestamp(self.timestamp)
+
+        var requiredProtocolVersion = SSKProtoDataMessageProtocolVersion.initial.rawValue
+
+        if self.isViewOnceMessage {
+            builder.setIsViewOnce(true)
+            requiredProtocolVersion = max(requiredProtocolVersion, SSKProtoDataMessageProtocolVersion.viewOnceVideo.rawValue)
+        }
+
+        let trimmedBody = self.body?.trimToUtf8ByteCount(OWSMediaUtils.kOversizeTextMessageSizeThresholdBytes)
+        // It was historically possible to end up with a message in the database that
+        // exceeds this threshold, and therefore possible to hit this assert (by forwarding
+        // an older message). But it is good for us to know when this happens.
+        owsAssertDebug(self.body?.utf8.count == trimmedBody?.utf8.count)
+
+        if self.isPoll {
+            if let pollCreateProto = self.buildPollProto(tx: tx) {
+                builder.setPollCreate(pollCreateProto)
+            } else {
+                owsFailDebug("Could not build poll protobuf")
+            }
+            requiredProtocolVersion = max(requiredProtocolVersion, SSKProtoDataMessageProtocolVersion.polls.rawValue)
+        } else {
+            if let trimmedBody {
+                builder.setBody(trimmedBody)
+                let bodyRanges = self.bodyRanges?.toProtoBodyRanges(bodyLength: trimmedBody.utf16.count) ?? []
+                if !bodyRanges.isEmpty {
+                    builder.setBodyRanges(bodyRanges)
+                    requiredProtocolVersion = max(requiredProtocolVersion, SSKProtoDataMessageProtocolVersion.mentions.rawValue)
+                }
+            }
+        }
+
+        // Story Context
+        if let storyTimestamp, let storyAuthorAci {
+            if let storyReactionEmoji {
+                let reactionBuilder = SSKProtoDataMessageReaction.builder(emoji: storyReactionEmoji, timestamp: storyTimestamp.uint64Value)
+                reactionBuilder.setTargetAuthorAciBinary(storyAuthorAci.serviceIdBinary)
+
+                do {
+                    builder.setReaction(try reactionBuilder.build())
+                    requiredProtocolVersion = max(requiredProtocolVersion, SSKProtoDataMessageProtocolVersion.reactions.rawValue)
+                } catch {
+                    owsFailDebug("Could not build story reaction protobuf: \(error)")
+                }
+            }
+
+            let storyContextBuilder = SSKProtoDataMessageStoryContext.builder()
+            storyContextBuilder.setAuthorAciBinary(storyAuthorAci.serviceIdBinary)
+            storyContextBuilder.setSentTimestamp(storyTimestamp.uint64Value)
+
+            builder.setStoryContext(storyContextBuilder.buildInfallibly())
+        }
+
+        builder.setExpireTimer(self.expiresInSeconds)
+        if let expireTimerVersion {
+            owsAssertDebug(expireTimerVersion.uint32Value >= 1)
+            builder.setExpireTimerVersion(expireTimerVersion.uint32Value)
+        }
+
+        // Group Messages
+        if let thread = thread as? TSGroupThread {
+            switch thread.groupModel.groupsVersion {
+            case .V1:
+                Logger.error("[GV1] Cannot build data message for V1 group!")
+                return nil
+            case .V2:
+                break
+            }
+            let result = self.addGroupsV2ToDataMessageBuilder(builder, groupThread: thread, tx: tx)
+            switch result {
+            case .error:
+                return nil
+            case .addedWithoutGroupAvatar:
+                break
+            }
+        }
+
+        // Message Attachments
+
+        // Only inserted messages should have attachments, and if they are saveable
+        // they should be inserted by now.
+        if self.shouldBeSaved {
+            if grdbId != nil {
+                let attachments = buildProtosForBodyAttachments(tx: tx)
+                builder.setAttachments(attachments)
+            } else {
+                owsFailDebug("Saved message uninserted at proto build time!")
+            }
+        }
+
+        // Quoted Reply
+        if let quotedMessage {
+            do {
+                let quoteProto = try self.buildQuoteProto(quote: quotedMessage, tx: tx)
+                builder.setQuote(quoteProto)
+                if !quoteProto.bodyRanges.isEmpty {
+                    requiredProtocolVersion = max(requiredProtocolVersion, SSKProtoDataMessageProtocolVersion.mentions.rawValue)
+                }
+            } catch {
+                owsFailDebug("Could not build quote protobuf: \(error)")
+            }
+        }
+
+        // Contact Share
+        if let contactShare {
+            builder.addContact(self.buildContactShareProto(contactShare, tx: tx))
+        }
+
+        // Link Preview
+        if let linkPreview {
+            do {
+                let previewProto = try self.buildLinkPreviewProto(linkPreview: linkPreview, tx: tx)
+                builder.addPreview(previewProto)
+            } catch {
+                owsFailDebug("Could not build link preview protobuf: \(error)")
+            }
+        }
+
+        // Sticker
+        if let messageSticker {
+            do {
+                let stickerProto = try self.buildStickerProto(sticker: messageSticker, tx: tx)
+                builder.setSticker(stickerProto)
+            } catch {
+                owsFailDebug("Could not build sticker protobuf: \(error)")
+            }
+        }
+
+        // Gift badge
+        if let giftBadge {
+            let giftBadgeBuilder = SSKProtoDataMessageGiftBadge.builder()
+            if let redemptionCredential = giftBadge.redemptionCredential {
+                giftBadgeBuilder.setReceiptCredentialPresentation(redemptionCredential)
+            }
+            builder.setGiftBadge(giftBadgeBuilder.buildInfallibly())
+        }
+
+        builder.setRequiredProtocolVersion(UInt32(requiredProtocolVersion))
+        return builder
+    }
+
+    @objc
+    func _buildSyncTranscriptMessage(localThread: TSContactThread, tx: DBWriteTransaction) throws -> OutgoingSyncMessage {
+        owsAssertDebug(self.shouldSyncTranscript())
+
+        guard let messageThread = self.thread(tx: tx) else {
+            throw OWSAssertionError("missing thread for sent message")
+        }
+
+        return OutgoingSentMessageTranscript(
+            localThread: localThread,
+            messageThread: messageThread,
+            message: self,
+            isRecipientUpdate: self.hasSyncedTranscript,
+            tx: tx,
+        )
+    }
+
+    private func buildPniSignatureMessageIfNeeded(tx: DBReadTransaction) -> SSKProtoPniSignatureMessage? {
         guard recipientAddressStates?.count == 1 else {
             // This is probably a group message, nothing to be alarmed about.
             return nil
@@ -421,7 +524,8 @@ public extension TSOutgoingMessage {
             // No PNI signature needed.
             return nil
         }
-        guard let pni = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: tx)?.pni else {
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        guard let pni = tsAccountManager.localIdentifiers(tx: tx)?.pni else {
             owsFailDebug("missing PNI")
             return nil
         }
@@ -435,7 +539,8 @@ public extension TSOutgoingMessage {
         }
 
         let signature = pniIdentityKeyPair.identityKeyPair.signAlternateIdentity(
-            aciIdentityKeyPair.identityKeyPair.identityKey)
+            aciIdentityKeyPair.identityKeyPair.identityKey,
+        )
 
         let builder = SSKProtoPniSignatureMessage.builder()
         builder.setPni(pni.rawUUID.data)
@@ -443,11 +548,10 @@ public extension TSOutgoingMessage {
         return builder.buildInfallibly()
     }
 
-    @objc
-    func addGroupsV2ToDataMessageBuilder(
+    private func addGroupsV2ToDataMessageBuilder(
         _ builder: SSKProtoDataMessageBuilder,
         groupThread: TSGroupThread,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> OutgoingGroupProtoResult {
         guard let groupModel = groupThread.groupModel as? TSGroupModelV2 else {
             owsFailDebug("Invalid group model.")
@@ -457,7 +561,7 @@ public extension TSOutgoingMessage {
         do {
             let groupContextV2 = try GroupsV2Protos.buildGroupContextProto(
                 groupModel: groupModel,
-                groupChangeProtoData: self.changeActionsProtoData
+                groupChangeProtoData: self.changeActionsProtoData,
             )
             builder.setGroupV2(groupContextV2)
             return .addedWithoutGroupAvatar
@@ -467,10 +571,10 @@ public extension TSOutgoingMessage {
         }
     }
 
-    fileprivate func maybeClearShouldSharePhoneNumber(
+    private func maybeClearShouldSharePhoneNumber(
         for recipientAddress: SignalServiceAddress,
         recipientDeviceId deviceId: DeviceId,
-        transaction: DBWriteTransaction
+        transaction: DBWriteTransaction,
     ) {
         guard let aci = recipientAddress.serviceId as? Aci else {
             // We can't be sharing our phone number b/c there's no ACI.
@@ -494,7 +598,7 @@ public extension TSOutgoingMessage {
             recipientAci: aci,
             recipientDeviceId: deviceId,
             timestamp: timestamp,
-            tx: transaction
+            tx: transaction,
         )
         guard let messagePayload, let payloadId = messagePayload.payloadId else {
             // Can't check whether this message included a PNI signature.
@@ -504,20 +608,23 @@ public extension TSOutgoingMessage {
         let deviceIdsPendingDelivery = messageSendLog.deviceIdsPendingDelivery(
             for: payloadId,
             recipientAci: aci,
-            tx: transaction
+            tx: transaction,
         )
         guard let deviceIdsPendingDelivery, deviceIdsPendingDelivery == [deviceId] else {
             // Other devices still need the PniSignature.
             return
         }
 
-        guard let content = try? SSKProtoContent(serializedData: messagePayload.plaintextContent),
-              let messagePniData = content.pniSignatureMessage?.pni else {
+        guard
+            let content = try? SSKProtoContent(serializedData: messagePayload.plaintextContent),
+            let messagePniData = content.pniSignatureMessage?.pni
+        else {
             // No PNI signature in the message.
             return
         }
 
-        guard let currentPni = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: transaction)?.pni else {
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        guard let currentPni = tsAccountManager.localIdentifiers(tx: transaction)?.pni else {
             owsFailDebug("missing local PNI")
             return
         }
@@ -526,111 +633,95 @@ public extension TSOutgoingMessage {
             identityManager.clearShouldSharePhoneNumber(with: aci, tx: transaction)
         }
     }
-}
 
-// MARK: - Attachments
+    // MARK: - Attachments
 
-extension TSOutgoingMessage {
-
-    @objc
-    func buildProtosForBodyAttachments(tx: DBReadTransaction) throws -> [SSKProtoAttachmentPointer] {
-        let attachments = sqliteRowId.map { sqliteRowId in
+    private func buildProtosForBodyAttachments(tx: DBReadTransaction) -> [SSKProtoAttachmentPointer] {
+        let referencedAttachments = sqliteRowId.map { sqliteRowId in
             return DependenciesBridge.shared.attachmentStore.fetchReferencedAttachments(
                 owners: [
                     .messageOversizeText(messageRowId: sqliteRowId),
-                    .messageBodyAttachment(messageRowId: sqliteRowId)
+                    .messageBodyAttachment(messageRowId: sqliteRowId),
                 ],
-                tx: tx
+                tx: tx,
             )
         } ?? []
-        return attachments.compactMap { attachment in
-            guard
-                let pointer = attachment.attachment.asTransitTierPointer(),
-                case let .digestSHA256Ciphertext(digestSHA256Ciphertext) = pointer.info.integrityCheck
-            else {
-                owsFailDebug("Generating proto for non-uploaded attachment!")
+
+        return referencedAttachments.compactMap { referencedAttachment in
+            guard let attachmentProto = referencedAttachment.asProtoForSending() else {
+                owsFailDebug("Failed to generate proto for body attachment!")
                 return nil
             }
-            return DependenciesBridge.shared.attachmentManager.buildProtoForSending(
-                from: attachment.reference,
-                pointer: pointer,
-                digestSHA256Ciphertext: digestSHA256Ciphertext
-            )
+
+            return attachmentProto
         }
     }
 
-    @objc
-    func buildLinkPreviewProto(
+    private func buildLinkPreviewProto(
         linkPreview: OWSLinkPreview,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> SSKProtoPreview {
         return try DependenciesBridge.shared.linkPreviewManager.buildProtoForSending(
             linkPreview,
             parentMessage: self,
-            tx: tx
+            tx: tx,
         )
     }
 
-    @objc
-    func buildContactShareProto(
+    private func buildContactShareProto(
         _ contact: OWSContact,
-        tx: DBReadTransaction
-    ) throws -> SSKProtoDataMessageContact {
-        return try DependenciesBridge.shared.contactShareManager.buildProtoForSending(
+        tx: DBReadTransaction,
+    ) -> SSKProtoDataMessageContact {
+        return DependenciesBridge.shared.contactShareManager.buildProtoForSending(
             from: contact,
             parentMessage: self,
-            tx: tx
+            tx: tx,
         )
     }
 
-    @objc
-    func buildStickerProto(
+    private func buildStickerProto(
         sticker: MessageSticker,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> SSKProtoDataMessageSticker {
         return try DependenciesBridge.shared.messageStickerManager.buildProtoForSending(
             sticker,
             parentMessage: self,
-            tx: tx
+            tx: tx,
         )
     }
 
-    @objc
-    func buildQuoteProto(
+    private func buildQuoteProto(
         quote: TSQuotedMessage,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> SSKProtoDataMessageQuote {
         return try DependenciesBridge.shared.quotedReplyManager.buildProtoForSending(
             quote,
-            parentMessage: self,
-            tx: tx
+            outgoingMessage: self,
+            tx: tx,
         )
     }
 
     // MARK: - Polls
 
-    @objc
-    func buildPollProto(tx: DBReadTransaction) -> SSKProtoDataMessagePollCreate? {
+    private func buildPollProto(tx: DBReadTransaction) -> SSKProtoDataMessagePollCreate? {
         do {
             return try DependenciesBridge.shared.pollMessageManager.buildProtoForSending(
                 parentMessage: self,
-                tx: tx
+                tx: tx,
             )
         } catch {
             return nil
         }
     }
-}
 
-// MARK: - Receipts
+    // MARK: - Receipts
 
-extension TSOutgoingMessage {
     public func update(
         withDeliveredRecipient recipientAddress: SignalServiceAddress,
         deviceId: DeviceId,
         deliveryTimestamp timestamp: UInt64,
         context: DeliveryReceiptContext,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         handleReceipt(
             from: recipientAddress,
@@ -638,7 +729,8 @@ extension TSOutgoingMessage {
             receiptType: .delivered,
             receiptTimestamp: timestamp,
             tryToClearPhoneNumberSharing: true,
-            tx: tx
+            context: context,
+            tx: tx,
         )
     }
 
@@ -646,14 +738,15 @@ extension TSOutgoingMessage {
         withReadRecipient recipientAddress: SignalServiceAddress,
         deviceId: DeviceId,
         readTimestamp timestamp: UInt64,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         handleReceipt(
             from: recipientAddress,
             deviceId: deviceId,
             receiptType: .read,
             receiptTimestamp: timestamp,
-            tx: tx
+            context: PassthroughDeliveryReceiptContext(),
+            tx: tx,
         )
     }
 
@@ -661,14 +754,15 @@ extension TSOutgoingMessage {
         withViewedRecipient recipientAddress: SignalServiceAddress,
         deviceId: DeviceId,
         viewedTimestamp timestamp: UInt64,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         handleReceipt(
             from: recipientAddress,
             deviceId: deviceId,
             receiptType: .viewed,
             receiptTimestamp: timestamp,
-            tx: tx
+            context: PassthroughDeliveryReceiptContext(),
+            tx: tx,
         )
     }
 
@@ -692,7 +786,8 @@ extension TSOutgoingMessage {
         receiptType: IncomingReceiptType,
         receiptTimestamp: UInt64,
         tryToClearPhoneNumberSharing: Bool = false,
-        tx: DBWriteTransaction
+        context: any DeliveryReceiptContext,
+        tx: DBWriteTransaction,
     ) {
         owsAssertDebug(recipientAddress.isValid)
 
@@ -713,39 +808,42 @@ extension TSOutgoingMessage {
 
         let recipientStateMerger = RecipientStateMerger(
             recipientDatabaseTable: DependenciesBridge.shared.recipientDatabaseTable,
-            signalServiceAddressCache: SSKEnvironment.shared.signalServiceAddressCacheRef
+            signalServiceAddressCache: SSKEnvironment.shared.signalServiceAddressCacheRef,
         )
-        anyUpdateOutgoingMessage(transaction: tx) { message in
-            guard let recipientState: TSOutgoingMessageRecipientState = {
-                if let existingMatch = message.recipientAddressStates?[recipientAddress] {
-                    return existingMatch
+        context.addUpdate(
+            message: self,
+            transaction: tx,
+            update: { message in
+                guard
+                    let recipientState: TSOutgoingMessageRecipientState = {
+                        if let existingMatch = message.recipientAddressStates?[recipientAddress] {
+                            return existingMatch
+                        }
+                        if let normalizedAddress = recipientStateMerger.normalizedAddressIfNeeded(for: recipientAddress, tx: tx) {
+                            // If we get a receipt from a PNI, then normalizing PNIs -> ACIs won't fix
+                            // it, but normalizing the address from a PNI to an ACI might fix it.
+                            return message.recipientAddressStates?[normalizedAddress]
+                        } else {
+                            // If we get a receipt from an ACI, then we might have the PNI stored, and
+                            // we need to migrate it to the ACI before we'll be able to find it.
+                            recipientStateMerger.normalize(&message.recipientAddressStates, tx: tx)
+                            return message.recipientAddressStates?[recipientAddress]
+                        }
+                    }()
+                else {
+                    owsFailDebug("Missing recipient state for \(recipientAddress)")
+                    return
                 }
-                if let normalizedAddress = recipientStateMerger.normalizedAddressIfNeeded(for: recipientAddress, tx: tx) {
-                    // If we get a receipt from a PNI, then normalizing PNIs -> ACIs won't fix
-                    // it, but normalizing the address from a PNI to an ACI might fix it.
-                    return message.recipientAddressStates?[normalizedAddress]
-                } else {
-                    // If we get a receipt from an ACI, then we might have the PNI stored, and
-                    // we need to migrate it to the ACI before we'll be able to find it.
-                    recipientStateMerger.normalize(&message.recipientAddressStates, tx: tx)
-                    return message.recipientAddressStates?[recipientAddress]
-                }
-            }() else {
-                owsFailDebug("Missing recipient state for \(recipientAddress)")
-                return
-            }
 
-            recipientState.updateStatusIfPossible(
-                receiptType.asRecipientStatus,
-                statusTimestamp: receiptTimestamp
-            )
-        }
+                recipientState.updateStatusIfPossible(
+                    receiptType.asRecipientStatus,
+                    statusTimestamp: receiptTimestamp,
+                )
+            },
+        )
     }
-}
 
-// MARK: - Sender Key + Message Send Log
-
-extension TSOutgoingMessage {
+    // MARK: - Sender Key + Message Send Log
 
     /// A collection of message unique IDs related to the outgoing message
     ///
@@ -791,7 +889,7 @@ extension TSOutgoingMessage {
     var shouldRecordSendLog: Bool { true }
 
     /// Used in MessageSender to signal how a message should be encrypted before sending
-    /// Currently only overridden by OWSOutgoingResendRequest (this is asserted in the MessageSender implementation)
+    /// Currently only overridden by OutgoingResendRequest (this is asserted in the MessageSender implementation)
     @objc
     var encryptionStyle: EncryptionStyle { .whisper }
 
@@ -805,7 +903,7 @@ extension TSOutgoingMessage {
             message: self,
             recipientAci: aci,
             recipientDeviceId: deviceId,
-            tx: tx
+            tx: tx,
         )
     }
 
@@ -816,39 +914,5 @@ extension TSOutgoingMessage {
         }
         let messageSendLog = SSKEnvironment.shared.messageSendLogRef
         messageSendLog.sendComplete(message: self, tx: tx)
-    }
-}
-
-// MARK: - Transcripts
-
-public extension TSOutgoingMessage {
-    func sendSyncTranscript() async throws {
-        let messageSend = try await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
-            guard let localThread = TSContactThread.getOrCreateLocalThread(transaction: tx) else {
-                throw OWSAssertionError("Missing local thread")
-            }
-
-            guard let localIdentifiers = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: tx) else {
-                throw OWSAssertionError("Missing localIdentifiers.")
-            }
-
-            guard let transcript = self.buildTranscriptSyncMessage(localThread: localThread, transaction: tx) else {
-                throw OWSAssertionError("Failed to build transcript")
-            }
-
-            guard let serializedMessage = SSKEnvironment.shared.messageSenderRef.buildAndRecordMessage(transcript, in: localThread, tx: tx) else {
-                throw OWSAssertionError("Couldn't serialize message.")
-            }
-
-            return OWSMessageSend(
-                message: transcript,
-                plaintextContent: serializedMessage.plaintextData,
-                plaintextPayloadId: serializedMessage.payloadId,
-                thread: localThread,
-                serviceId: localIdentifiers.aci,
-                localIdentifiers: localIdentifiers
-            )
-        }
-        try await SSKEnvironment.shared.messageSenderRef.performMessageSend(messageSend, sealedSenderParameters: nil)
     }
 }

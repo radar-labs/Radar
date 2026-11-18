@@ -8,8 +8,8 @@ final class BackupArchiveProfileChangeChatUpdateArchiver {
     typealias ArchiveChatUpdateMessageResult = BackupArchive.ArchiveInteractionResult<Details>
     typealias RestoreChatUpdateMessageResult = BackupArchive.RestoreInteractionResult<Void>
 
-    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError<BackupArchive.InteractionUniqueId>
-    private typealias RestoreFrameError = BackupArchive.RestoreFrameError<BackupArchive.ChatItemId>
+    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError
+    private typealias RestoreFrameError = BackupArchive.RestoreFrameError
 
     private let interactionStore: BackupArchiveInteractionStore
 
@@ -22,17 +22,13 @@ final class BackupArchiveProfileChangeChatUpdateArchiver {
     func archive(
         infoMessage: TSInfoMessage,
         threadInfo: BackupArchive.ChatArchivingContext.CachedThreadInfo,
-        context: BackupArchive.ChatArchivingContext
+        context: BackupArchive.ChatArchivingContext,
     ) -> ArchiveChatUpdateMessageResult {
         func messageFailure(
             _ errorType: ArchiveFrameError.ErrorType,
-            line: UInt = #line
+            line: UInt = #line,
         ) -> ArchiveChatUpdateMessageResult {
-            return .messageFailure([.archiveFrameError(
-                errorType,
-                infoMessage.uniqueInteractionId,
-                line: line
-            )])
+            return .messageFailure([.archiveFrameError(errorType, line: line)])
         }
 
         guard let profileAddress = infoMessage.profileChangeAddress?.asSingleServiceIdBackupAddress() else {
@@ -58,13 +54,12 @@ final class BackupArchiveProfileChangeChatUpdateArchiver {
             author: .contact(profileAddress),
             directionalDetails: .directionless(BackupProto_ChatItem.DirectionlessMessageDetails()),
             dateCreated: infoMessage.timestamp,
-            expireStartDate: nil,
-            expiresInMs: nil,
             isSealedSender: false,
             chatItemType: .updateMessage(chatUpdateMessage),
             isSmsPreviouslyRestoredFromBackup: false,
             threadInfo: threadInfo,
-            context: context.recipientContext
+            pinMessageDetails: nil,
+            context: context.recipientContext,
         )
     }
 
@@ -74,7 +69,7 @@ final class BackupArchiveProfileChangeChatUpdateArchiver {
         _ profileChangeChatUpdateProto: BackupProto_ProfileChangeChatUpdate,
         chatItem: BackupProto_ChatItem,
         chatThread: BackupArchive.ChatThread,
-        context: BackupArchive.ChatItemRestoringContext
+        context: BackupArchive.ChatItemRestoringContext,
     ) -> RestoreChatUpdateMessageResult {
         let oldName = profileChangeChatUpdateProto.previousName
         let newName = profileChangeChatUpdateProto.newName
@@ -83,20 +78,17 @@ final class BackupArchiveProfileChangeChatUpdateArchiver {
             let profileChangeAuthor = context.recipientContext[chatItem.authorRecipientId],
             case .contact(let profileChangeAuthorContactAddress) = profileChangeAuthor
         else {
-            return .messageFailure([.restoreFrameError(
-                .invalidProtoData(.profileChangeUpdateNotFromContact),
-                chatItem.id
-            )])
+            return .messageFailure([.restoreFrameError(.invalidProtoData(.profileChangeUpdateNotFromContact))])
         }
 
         let profileChangeInfoMessage: TSInfoMessage = .makeForProfileChange(
             thread: chatThread.tsThread,
             timestamp: chatItem.dateSent,
             profileChanges: ProfileChanges(
-                address: profileChangeAuthorContactAddress.asInteropAddress(),
+                address: profileChangeAuthorContactAddress.asSignalServiceAddress(),
                 oldNameLiteral: oldName,
-                newNameLiteral: newName
-            )
+                newNameLiteral: newName,
+            ),
         )
 
         do {
@@ -104,10 +96,10 @@ final class BackupArchiveProfileChangeChatUpdateArchiver {
                 profileChangeInfoMessage,
                 in: chatThread,
                 chatId: chatItem.typedChatId,
-                context: context
+                context: context,
             )
         } catch let error {
-            return .messageFailure([.restoreFrameError(.databaseInsertionFailed(error), chatItem.id)])
+            return .messageFailure([.restoreFrameError(.databaseInsertionFailed(error))])
         }
 
         return .success(())

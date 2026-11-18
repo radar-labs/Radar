@@ -21,25 +21,23 @@ public class ContactThreadFinder: NSObject {
 
     func contactThreads(for serviceId: ServiceId, tx: DBReadTransaction) -> [TSContactThread] {
         let serviceIdString = serviceId.serviceIdUppercaseString
-        let sql = "SELECT * FROM \(ThreadRecord.databaseTableName) WHERE \(threadColumn: .contactUUID) = ?"
+        let sql = "SELECT * FROM \(TSThread.databaseTableName) WHERE \(contactThreadColumn: .contactUUID) = ?"
         return fetchContactThreads(sql: sql, arguments: [serviceIdString], tx: tx)
     }
 
     func contactThreads(for phoneNumber: String, tx: DBReadTransaction) -> [TSContactThread] {
-        let sql = "SELECT * FROM \(ThreadRecord.databaseTableName) WHERE \(threadColumn: .contactPhoneNumber) = ?"
+        let sql = "SELECT * FROM \(TSThread.databaseTableName) WHERE \(contactThreadColumn: .contactPhoneNumber) = ?"
         return fetchContactThreads(sql: sql, arguments: [phoneNumber], tx: tx)
     }
 
     private func fetchContactThreads(sql: String, arguments: StatementArguments, tx: DBReadTransaction) -> [TSContactThread] {
-        do {
-            let threads = try TSContactThread.grdbFetchCursor(
-                sql: sql,
-                arguments: arguments,
-                transaction: tx
-            ).all()
-            return threads.compactMap { $0 as? TSContactThread }
-        } catch {
-            return []
-        }
+        var threads = [TSThread]()
+        TSThread.anyEnumerate(
+            transaction: tx,
+            sql: sql,
+            arguments: arguments,
+            block: { thread, _ in threads.append(thread) },
+        )
+        return threads.compactMap { $0 as? TSContactThread }
     }
 }

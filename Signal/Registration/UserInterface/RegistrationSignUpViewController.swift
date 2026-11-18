@@ -19,7 +19,7 @@ public class RegistrationSignUpViewController: OWSViewController, OWSNavigationC
         super.init()
     }
 
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
 
         view.backgroundColor = .Signal.background
@@ -39,14 +39,14 @@ public class RegistrationSignUpViewController: OWSViewController, OWSNavigationC
         // Title.
         let titleLabel = UILabel.titleLabelForRegistration(text: OWSLocalizedString(
             "ONBOARDING_SIGN_UP_TITLE",
-            comment: "Title of the 'sign up' screen shown after the user taps 'I'm new to Radar' on the onboarding splash."
+            comment: "Title of the 'sign up' screen shown after the user taps 'I'm new to Radar' on the onboarding splash.",
         ))
         titleLabel.accessibilityIdentifier = "registration.signUp.titleLabel"
 
         // Body — first paragraph in secondary label color.
         let subtitleLabel = UILabel.explanationLabelForRegistration(text: OWSLocalizedString(
             "ONBOARDING_SIGN_UP_SUBTITLE",
-            comment: "Subtitle on the 'sign up' screen shown after the user taps 'I'm new to Radar' on the onboarding splash."
+            comment: "Subtitle on the 'sign up' screen shown after the user taps 'I'm new to Radar' on the onboarding splash.",
         ))
         subtitleLabel.accessibilityIdentifier = "registration.signUp.subtitleLabel"
 
@@ -63,11 +63,11 @@ public class RegistrationSignUpViewController: OWSViewController, OWSNavigationC
         let createAccountButton = UIButton(
             configuration: .largePrimary(title: OWSLocalizedString(
                 "ONBOARDING_SIGN_UP_CREATE_ACCOUNT_BUTTON_TITLE",
-                comment: "Primary button on the 'sign up' screen that begins the new account flow."
+                comment: "Primary button on the 'sign up' screen that begins the new account flow.",
             )),
             primaryAction: UIAction { [weak self] _ in
                 self?.didTapCreateNewAccount()
-            }
+            },
         )
         createAccountButton.enableMultilineLabel()
         createAccountButton.accessibilityIdentifier = "registration.signUp.createAccountButton"
@@ -75,11 +75,11 @@ public class RegistrationSignUpViewController: OWSViewController, OWSNavigationC
         let useSignalAccountButton = UIButton(
             configuration: .largeSecondary(title: OWSLocalizedString(
                 "ONBOARDING_SIGN_UP_USE_SIGNAL_ACCOUNT_BUTTON_TITLE",
-                comment: "Secondary text button on the 'sign up' screen that begins the restore / use existing Signal account flow."
+                comment: "Secondary text button on the 'sign up' screen that begins the restore / use existing Signal account flow.",
             )),
             primaryAction: UIAction { [weak self] _ in
                 self?.didTapUseSignalAccount()
-            }
+            },
         )
         useSignalAccountButton.enableMultilineLabel()
         useSignalAccountButton.accessibilityIdentifier = "registration.signUp.useSignalAccountButton"
@@ -118,20 +118,20 @@ public class RegistrationSignUpViewController: OWSViewController, OWSNavigationC
     private static func makeSignalInfoAttributedString() -> NSAttributedString {
         let highlight = OWSLocalizedString(
             "ONBOARDING_SIGN_UP_SIGNAL_INFO_HIGHLIGHT",
-            comment: "Highlighted leading phrase of the body text on the 'sign up' onboarding screen. Rendered in the app's accent color."
+            comment: "Highlighted leading phrase of the body text on the 'sign up' onboarding screen. Rendered in the app's accent color.",
         )
         let body = OWSLocalizedString(
             "ONBOARDING_SIGN_UP_SIGNAL_INFO_BODY",
-            comment: "Continuation of the body text on the 'sign up' onboarding screen. Begins with a leading space and follows the highlighted phrase."
+            comment: "Continuation of the body text on the 'sign up' onboarding screen. Begins with a leading space and follows the highlighted phrase.",
         )
 
         let result = NSMutableAttributedString(
             string: highlight,
-            attributes: [.foregroundColor: UIColor.Signal.accent]
+            attributes: [.foregroundColor: UIColor.Signal.accent],
         )
         result.append(NSAttributedString(
             string: body,
-            attributes: [.foregroundColor: UIColor.Signal.secondaryLabel]
+            attributes: [.foregroundColor: UIColor.Signal.secondaryLabel],
         ))
         return result
     }
@@ -155,7 +155,7 @@ public class RegistrationSignUpViewController: OWSViewController, OWSNavigationC
                 self?.dismiss(animated: true) {
                     self?.presenter?.showRelinking()
                 }
-            }
+            },
         )
         self.present(sheet, animated: true)
     }

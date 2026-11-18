@@ -8,20 +8,22 @@ import GRDB
 import LibSignalClient
 
 /// Archives ``SignalRecipient``s as ``BackupProto_Contact`` recipients.
-public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWriter {
+class BackupArchiveContactRecipientArchiver {
     typealias RecipientId = BackupArchive.RecipientId
     typealias RecipientAppId = BackupArchive.RecipientArchivingContext.Address
 
-    typealias ArchiveMultiFrameResult = BackupArchive.ArchiveMultiFrameResult<RecipientAppId>
-    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError<RecipientAppId>
+    typealias ArchiveMultiFrameResult = BackupArchive.ArchiveMultiFrameResult
+    private typealias ArchiveFrameError = BackupArchive.ArchiveFrameError
 
-    typealias RestoreFrameResult = BackupArchive.RestoreFrameResult<RecipientId>
-    private typealias RestoreFrameError = BackupArchive.RestoreFrameError<RecipientId>
+    typealias RestoreFrameResult = BackupArchive.RestoreFrameResult
+    private typealias RestoreFrameError = BackupArchive.RestoreFrameError
 
+    private let aciContactShareNameManager: AciContactShareNameManager
     private let avatarDefaultColorManager: AvatarDefaultColorManager
     private let avatarFetcher: BackupArchiveAvatarFetcher
     private let blockingManager: BackupArchive.Shims.BlockingManager
     private let contactManager: BackupArchive.Shims.ContactManager
+    private let keyTransparencyStore: KeyTransparencyStore
     private let nicknameManager: NicknameManager
     private let profileManager: BackupArchive.Shims.ProfileManager
     private let recipientHidingManager: RecipientHidingManager
@@ -33,11 +35,13 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
     private let tsAccountManager: TSAccountManager
     private let usernameLookupManager: UsernameLookupManager
 
-    public init(
+    init(
+        aciContactShareNameManager: AciContactShareNameManager,
         avatarDefaultColorManager: AvatarDefaultColorManager,
         avatarFetcher: BackupArchiveAvatarFetcher,
         blockingManager: BackupArchive.Shims.BlockingManager,
         contactManager: BackupArchive.Shims.ContactManager,
+        keyTransparencyStore: KeyTransparencyStore,
         nicknameManager: NicknameManager,
         profileManager: BackupArchive.Shims.ProfileManager,
         recipientHidingManager: RecipientHidingManager,
@@ -47,12 +51,14 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
         storyStore: BackupArchiveStoryStore,
         threadStore: BackupArchiveThreadStore,
         tsAccountManager: TSAccountManager,
-        usernameLookupManager: UsernameLookupManager
+        usernameLookupManager: UsernameLookupManager,
     ) {
+        self.aciContactShareNameManager = aciContactShareNameManager
         self.avatarDefaultColorManager = avatarDefaultColorManager
         self.avatarFetcher = avatarFetcher
         self.blockingManager = blockingManager
         self.contactManager = contactManager
+        self.keyTransparencyStore = keyTransparencyStore
         self.nicknameManager = nicknameManager
         self.profileManager = profileManager
         self.recipientHidingManager = recipientHidingManager
@@ -68,29 +74,20 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
     // MARK: -
 
     func archiveAllContactRecipients(
-        stream: BackupArchiveProtoOutputStream,
-        context: BackupArchive.RecipientArchivingContext
+        stream: BackupArchiveOutputStream,
+        context: BackupArchive.RecipientArchivingContext,
     ) throws(CancellationError) -> ArchiveMultiFrameResult {
-        let whitelistedAddresses = Set(profileManager.allWhitelistedAddresses(tx: context.tx))
-
-        let blockedRecipientIds: Set<SignalRecipient.RowId>
-        do {
-            blockedRecipientIds = try blockingManager.blockedRecipientIds(tx: context.tx)
-        } catch {
-            return .completeFailure(.fatalArchiveError(.blockedRecipientFetchError(error)))
-        }
-
         var errors = [ArchiveFrameError]()
 
         func writeToStream(
             contact: BackupProto_Contact,
             contactAddress: BackupArchive.ContactAddress,
             contactDbRowId: SignalRecipient.RowId?,
-            frameBencher: BackupArchive.Bencher.FrameBencher
+            frameBencher: BackupArchive.Bencher.FrameBencher,
         ) {
-            let maybeError: ArchiveFrameError? = Self.writeFrameToStream(
-                stream,
-                objectId: .contact(contactAddress),
+            let maybeError: ArchiveFrameError? = context.writeFrame(
+                toStream: stream,
+                flush: .afterWrite,
                 frameBencher: frameBencher,
                 frameBuilder: {
                     let recipientAddress = contactAddress.asArchivingAddress()
@@ -106,7 +103,7 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                     var frame = BackupProto_Frame()
                     frame.item = .recipient(recipient)
                     return frame
-                }
+                },
             )
 
             if let maybeError {
@@ -125,26 +122,32 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
         /// key" for contacts. They directly contain many of the fields we store
         /// in a `Contact` recipient, with the other fields keyed off data in
         /// the recipient.
-        let recipientBlock: (SignalRecipient, BackupArchive.Bencher.FrameBencher) -> Void = { recipient, frameBencher in
+        try context.wrapEnumeration(
+            enumerationBlock: { tx, block throws(CancellationError) in
+                try recipientStore.enumerateAllSignalRecipients(tx: tx, block: block)
+            },
+        ) { recipient, frameBencher -> Bool in
             guard
                 let contactAddress = BackupArchive.ContactAddress(
                     aci: recipient.aci,
                     pni: recipient.pni,
-                    e164: E164(recipient.phoneNumber?.stringValue)
+                    e164: E164(recipient.phoneNumber?.stringValue),
                 )
             else {
                 /// Skip recipients with no identifiers, but don't add to the
                 /// list of errors.
-                return
+                return true
             }
 
-            guard !context.localIdentifiers.containsAnyOf(
-                aci: contactAddress.aci,
-                phoneNumber: contactAddress.e164,
-                pni: contactAddress.pni
-            ) else {
+            guard
+                !context.localIdentifiers.containsAnyOf(
+                    aci: contactAddress.aci,
+                    phoneNumber: contactAddress.e164?.stringValue,
+                    pni: contactAddress.pni,
+                )
+            else {
                 // Skip the local user.
-                return
+                return true
             }
 
             /// Track the `ServiceId`s for this `SignalRecipient`, so we don't
@@ -164,13 +167,10 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                 do {
                     isStoryHidden = try self.storyStore.getOrCreateStoryContextAssociatedData(
                         for: aci,
-                        context: context
+                        context: context,
                     ).isHidden
                 } catch let error {
-                    errors.append(.archiveFrameError(
-                        .unableToReadStoryContextAssociatedData(error),
-                        .contact(contactAddress)
-                    ))
+                    errors.append(.archiveFrameError(.unableToReadStoryContextAssociatedData(error)))
                 }
             }
 
@@ -180,35 +180,46 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                     .filter(Column(OWSRecipientIdentity.CodingKeys.uniqueId) == recipient.uniqueId)
                     .fetchOne(context.tx.database)
             } catch let error {
-                errors.append(.archiveFrameError(
-                    .unableToFetchRecipientIdentity(error),
-                    .contact(contactAddress)
-                ))
-                return
+                errors.append(.archiveFrameError(.unableToFetchRecipientIdentity(error)))
+                return true
             }
+
+            let username: String? = recipient.aci
+                .flatMap { aci in
+                    self.usernameLookupManager.fetchUsername(
+                        forAci: aci,
+                        transaction: context.tx,
+                    )
+                }
+                .flatMap { username in
+                    // Pass through LibSignal to validate the username
+                    try? Username(username).value
+                }
 
             let contact = self.buildContactRecipient(
                 aci: contactAddress.aci,
                 pni: contactAddress.pni,
                 e164: contactAddress.e164,
-                username: recipient.aci.flatMap { aci in
-                    self.usernameLookupManager.fetchUsername(
-                        forAci: aci,
-                        transaction: context.tx
-                    )
-                },
+                username: username,
                 nicknameRecord: self.nicknameManager.fetchNickname(
                     for: recipient,
-                    tx: context.tx
+                    tx: context.tx,
                 ),
-                isBlocked: blockedRecipientIds.contains(recipient.id),
-                isWhitelisted: whitelistedAddresses.contains(recipient.address),
+                aciContactShareName: self.aciContactShareNameManager.fetchName(
+                    recipient: recipient,
+                    tx: context.tx,
+                ),
+                isBlocked: recipient.isBlocked,
+                blockedAt: recipient.blockedAt,
+                isWhitelisted: recipient.isWhitelisted,
                 isStoryHidden: isStoryHidden,
                 visibility: { () -> BackupProto_Contact.Visibility in
-                    guard let hiddenRecipient = self.recipientHidingManager.fetchHiddenRecipient(
-                        signalRecipient: recipient,
-                        tx: context.tx
-                    ) else {
+                    guard
+                        let hiddenRecipient = self.recipientHidingManager.fetchHiddenRecipient(
+                            recipientId: recipient.id,
+                            tx: context.tx,
+                        )
+                    else {
                         return .visible
                     }
 
@@ -217,9 +228,9 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                             hiddenRecipient: hiddenRecipient,
                             contactThread: self.threadStore.fetchContactThread(
                                 recipient: recipient,
-                                tx: context.tx
+                                tx: context.tx,
                             ),
-                            tx: context.tx
+                            tx: context.tx,
                         )
                     {
                         return .hiddenMessageRequest
@@ -246,35 +257,24 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                 }(),
                 userProfile: self.profileManager.getUserProfile(
                     for: recipient.address,
-                    tx: context.tx
+                    tx: context.tx,
                 ),
                 identity: identity,
                 signalAccount: self.contactManager.fetchSignalAccount(
                     recipient.address,
-                    tx: context.tx
+                    tx: context.tx,
                 ),
                 defaultAvatarColor: self.avatarDefaultColorManager.defaultColor(
                     useCase: .contact(recipient: recipient),
-                    tx: context.tx
-                )
+                    tx: context.tx,
+                ),
+                keyTransparencyBlob: recipient.aci.flatMap { aci in
+                    self.keyTransparencyStore.getKeyTransparencyBlob(aci: aci, tx: context.tx)
+                },
             )
 
             writeToStream(contact: contact, contactAddress: contactAddress, contactDbRowId: recipient.id, frameBencher: frameBencher)
-        }
-
-        do {
-            try context.bencher.wrapEnumeration(
-                recipientStore.enumerateAllSignalRecipients(tx:block:),
-                tx: context.tx
-            ) { recipient, frameBencher in
-                autoreleasepool {
-                    recipientBlock(recipient, frameBencher)
-                }
-            }
-        } catch let error as CancellationError {
-            throw error
-        } catch {
-            return .completeFailure(.fatalArchiveError(.recipientIteratorError(error)))
+            return true
         }
 
         /// After enumerating all `SignalRecipient`s, we enumerate
@@ -297,18 +297,18 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
         /// like `OWSUserProfile`. If, in the future, we have an enforced 1:1
         /// relationship between `SignalRecipient` and `OWSUserProfile`, we can
         /// remove this code.
-        context.bencher.wrapEnumeration(
-            profileManager.enumerateUserProfiles(tx:block:),
-            tx: context.tx
-        ) { userProfile, frameBencher in
-            autoreleasepool {
+        try context.wrapEnumeration(
+            enumerationBlock: { tx, block throws(CancellationError) in
+                try profileManager.enumerateUserProfiles(tx: tx, block: block)
+            },
+            perEnumerantBlock: { userProfile, frameBencher -> Bool in
                 if let serviceId = userProfile.serviceId {
                     let (inserted, _) = archivedServiceIds.insert(serviceId)
 
                     if !inserted {
                         /// Bail early if we've already archived a `Contact` for this
                         /// service ID.
-                        return
+                        return true
                     }
                 }
                 if let phoneNumber = userProfile.phoneNumber {
@@ -317,7 +317,7 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                     if !inserted {
                         /// Bail early if we've already archived a `Contact` for this
                         /// phone number.
-                        return
+                        return true
                     }
                 }
 
@@ -325,23 +325,22 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                     let contactAddress = BackupArchive.ContactAddress(
                         aci: userProfile.serviceId as? Aci,
                         pni: userProfile.serviceId as? Pni,
-                        e164: userProfile.phoneNumber.flatMap { E164($0) }
+                        e164: userProfile.phoneNumber.flatMap { E164($0) },
                     )
                 else {
                     /// Skip profiles with no identifiers, but don't add to the
                     /// list of errors.
-                    return
+                    return true
                 }
 
-                let signalServiceAddress: BackupArchive.InteropAddress
                 switch userProfile.internalAddress {
                 case .localUser:
                     /// Skip the local user. We need to check `internalAddress`
                     /// here, since the "local user profile" has historically been
                     /// persisted with a special, magic phone number.
-                    return
-                case .otherUser(let _signalServiceAddress):
-                    signalServiceAddress = _signalServiceAddress
+                    return true
+                case .otherUser:
+                    break
                 }
 
                 let contact = self.buildContactRecipient(
@@ -350,8 +349,10 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                     e164: contactAddress.e164,
                     username: nil, // If we have a user profile, we have no username.
                     nicknameRecord: nil, // Only contacts with SignalRecipients can have nicknames.
+                    aciContactShareName: nil, // Only contacts with SignalRecipients can have shared names.
                     isBlocked: false, // Only contacts with SignalRecipients can be blocked.
-                    isWhitelisted: whitelistedAddresses.contains(signalServiceAddress),
+                    blockedAt: .unspecified,
+                    isWhitelisted: false, // Only contacts with SignalRecipients can be whitelisted.
                     isStoryHidden: false, // Can't have a story if there's no recipient.
                     visibility: .visible, // Can't have hidden if there's no recipient.
                     registration: {
@@ -368,19 +369,22 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                     identity: nil,
                     signalAccount: nil,
                     defaultAvatarColor: self.avatarDefaultColorManager.defaultColor(
-                        useCase: .contactWithoutRecipient(address: contactAddress.asInteropAddress()),
-                        tx: context.tx
-                    )
+                        useCase: .contactWithoutRecipient(address: contactAddress.asSignalServiceAddress()),
+                        tx: context.tx,
+                    ),
+                    keyTransparencyBlob: nil, // Can't do Key Transparency without a recipient
                 )
 
                 writeToStream(
                     contact: contact,
                     contactAddress: contactAddress,
                     contactDbRowId: nil,
-                    frameBencher: frameBencher
+                    frameBencher: frameBencher,
                 )
-            }
-        }
+
+                return true
+            },
+        )
 
         if errors.isEmpty {
             return .success
@@ -397,23 +401,19 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
     /// to find a Recipient for the thread's address; in other words there was not a
     /// corresponding recipient that we archived earlier.
     func archiveContactRecipientForOrphanedContactThread(
-        _ contactThread: TSContactThread,
         address: BackupArchive.ContactAddress,
-        stream: BackupArchiveProtoOutputStream,
+        stream: BackupArchiveOutputStream,
         frameBencher: BackupArchive.Bencher.FrameBencher,
-        context: BackupArchive.ChatArchivingContext
-    ) -> BackupArchive.ArchiveSingleFrameResult<RecipientId, BackupArchive.ThreadUniqueId> {
+        context: BackupArchive.ChatArchivingContext,
+    ) -> BackupArchive.ArchiveSingleFrameResult<RecipientId> {
         let existingRecipient = recipientStore.fetchRecipient(
             for: address,
-            tx: context.tx
+            tx: context.tx,
         )
         // If we have an existing recipient, this is an error. It means we
         // _should_ have found the recipient on the context, but did not.
         guard existingRecipient == nil else {
-            return .failure(.archiveFrameError(
-                .referencedRecipientIdMissing(address.asArchivingAddress()),
-                .init(thread: contactThread)
-            ))
+            return .failure(.archiveFrameError(.referencedRecipientIdMissing(address.asArchivingAddress())))
         }
 
         // We don't know if they're registered; if we did there
@@ -427,9 +427,10 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
             e164: address.e164,
             username: nil,
             nicknameRecord: nil, // Only contacts with SignalRecipients can have nicknames.
+            aciContactShareName: nil, // Only contacts with SignalRecipients can have shared names.
             isBlocked: false, // only contacts with SignalRecipients can be blocked.
-            isWhitelisted: profileManager.allWhitelistedAddresses(tx: context.tx)
-                .contains(address.asInteropAddress()),
+            blockedAt: .unspecified,
+            isWhitelisted: false, // only contacts with SignalRecipients can be whitelisted.
             // If there's no recipient, neither can be hidden
             isStoryHidden: false,
             visibility: .visible,
@@ -438,18 +439,19 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
             identity: nil,
             signalAccount: nil,
             defaultAvatarColor: avatarDefaultColorManager.defaultColor(
-                useCase: .contactWithoutRecipient(address: address.asInteropAddress()),
-                tx: context.tx
-            )
+                useCase: .contactWithoutRecipient(address: address.asSignalServiceAddress()),
+                tx: context.tx,
+            ),
+            keyTransparencyBlob: nil,
         )
 
         let recipientAddress = address.asArchivingAddress()
         let recipientId = context.recipientContext.assignRecipientId(to: recipientAddress)
 
-        let maybeError: BackupArchive.ArchiveFrameError<BackupArchive.ThreadUniqueId>?
-        maybeError = Self.writeFrameToStream(
-            stream,
-            objectId: .init(thread: contactThread),
+        let maybeError: BackupArchive.ArchiveFrameError?
+        maybeError = context.writeFrame(
+            toStream: stream,
+            flush: .afterWrite,
             frameBencher: frameBencher,
             frameBuilder: {
                 var recipient = BackupProto_Recipient()
@@ -459,7 +461,7 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                 var frame = BackupProto_Frame()
                 frame.item = .recipient(recipient)
                 return frame
-            }
+            },
         )
 
         if let maybeError {
@@ -474,7 +476,9 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
         e164: E164?,
         username: String?,
         nicknameRecord: NicknameRecord?,
+        aciContactShareName: AciContactShareName?,
         isBlocked: Bool,
+        blockedAt: BlockedTimestamp,
         isWhitelisted: Bool,
         isStoryHidden: Bool,
         visibility: BackupProto_Contact.Visibility,
@@ -482,10 +486,12 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
         userProfile: OWSUserProfile?,
         identity: OWSRecipientIdentity?,
         signalAccount: SignalAccount?,
-        defaultAvatarColor: AvatarTheme
+        defaultAvatarColor: AvatarTheme,
+        keyTransparencyBlob: Data?,
     ) -> BackupProto_Contact {
         var contact = BackupProto_Contact()
         contact.blocked = isBlocked
+        contact.blockedAtTimestamp = blockedAt.asMilliseconds
         contact.profileSharing = isWhitelisted
         contact.hideStory = isStoryHidden
         contact.visibility = visibility
@@ -542,12 +548,26 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
         if let note = nicknameRecord?.note?.nilIfEmpty {
             contact.note = note
         }
+        if let aciContactShareName {
+            var sharedNameProto = BackupProto_Contact.Name()
+            if let givenName = aciContactShareName.givenName {
+                sharedNameProto.given = givenName
+            }
+            if let familyName = aciContactShareName.familyName {
+                sharedNameProto.family = familyName
+            }
+            contact.sharedName = sharedNameProto
+        }
         if let signalAccount {
             contact.systemGivenName = signalAccount.givenName
             contact.systemFamilyName = signalAccount.familyName
             contact.systemNickname = signalAccount.nickname
         }
         contact.avatarColor = defaultAvatarColor.asBackupProtoAvatarColor
+
+        if let keyTransparencyBlob {
+            contact.keyTransparencyData = keyTransparencyBlob
+        }
 
         return contact
     }
@@ -557,13 +577,13 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
     func restoreContactRecipientProto(
         _ contactProto: BackupProto_Contact,
         recipient: BackupProto_Recipient,
-        context: BackupArchive.RecipientRestoringContext
+        context: BackupArchive.RecipientRestoringContext,
     ) -> RestoreFrameResult {
         func restoreFrameError(
             _ error: RestoreFrameError.ErrorType,
-            line: UInt = #line
+            line: UInt = #line,
         ) -> RestoreFrameResult {
-            return .failure([.restoreFrameError(error, recipient.recipientId, line: line)])
+            return .failure([.restoreFrameError(error, line: line)])
         }
 
         let isRegistered: Bool
@@ -589,7 +609,7 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
             guard let aciUuid = UUID(data: contactProto.aci) else {
                 return restoreFrameError(.invalidProtoData(.invalidAci(protoClass: BackupProto_Contact.self)))
             }
-            aci = Aci.init(fromUUID: aciUuid)
+            aci = Aci(fromUUID: aciUuid)
         } else {
             aci = nil
         }
@@ -597,7 +617,7 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
             guard let pniUuid = UUID(data: contactProto.pni) else {
                 return restoreFrameError(.invalidProtoData(.invalidPni(protoClass: BackupProto_Contact.self)))
             }
-            pni = Pni.init(fromUUID: pniUuid)
+            pni = Pni(fromUUID: pniUuid)
         } else {
             pni = nil
         }
@@ -619,30 +639,32 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
         }
 
         /// This check will fail if all these identifiers are `nil`.
-        guard let backupContactAddress = BackupArchive.ContactAddress(
-            aci: aci,
-            pni: pni,
-            e164: e164
-        ) else {
+        guard
+            let backupContactAddress = BackupArchive.ContactAddress(
+                aci: aci,
+                pni: pni,
+                e164: e164,
+            )
+        else {
             return restoreFrameError(.invalidProtoData(.contactWithoutIdentifiers))
         }
         context[recipient.recipientId] = .contact(backupContactAddress)
 
-        // Stop early if this is the local user. That shouldn't happen.
         let profileInsertableAddress: OWSUserProfile.InsertableAddress
         if let serviceId = backupContactAddress.aci ?? backupContactAddress.pni {
             profileInsertableAddress = OWSUserProfile.insertableAddress(
                 serviceId: serviceId,
-                localIdentifiers: context.localIdentifiers
+                localIdentifiers: context.localIdentifiers,
             )
         } else if let phoneNumber = backupContactAddress.e164 {
             profileInsertableAddress = OWSUserProfile.insertableAddress(
                 legacyPhoneNumberFromBackupRestore: phoneNumber,
-                localIdentifiers: context.localIdentifiers
+                localIdentifiers: context.localIdentifiers,
             )
         } else {
             return restoreFrameError(.developerError(OWSAssertionError("How did we have no identifiers after constructing a backup contact address?")))
         }
+        // Stop early if this is the local user. That shouldn't happen.
         switch profileInsertableAddress {
         case .localUser:
             return restoreFrameError(.invalidProtoData(.otherContactWithLocalIdentifiers))
@@ -668,7 +690,7 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
         }
 
         let recipientProto = recipient
-        let recipient: SignalRecipient
+        var recipient: SignalRecipient
         do throws(GRDB.DatabaseError) {
             recipient = try SignalRecipient.insertRecord(
                 aci: backupContactAddress.aci,
@@ -680,7 +702,7 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
             )
             recipientStore.didInsertRecipient(recipient, tx: context.tx)
         } catch {
-            return .failure([.restoreFrameError(.databaseInsertionFailed(error), recipientProto.recipientId)])
+            return .failure([.restoreFrameError(.databaseInsertionFailed(error))])
         }
         context.setRecipientDbRowId(recipient.id, forBackupRecipientId: recipientProto.recipientId)
 
@@ -703,7 +725,7 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                     // 'keyBytes', which drops the keyType prefix
                     .publicKey.keyBytes
             } catch {
-                return .failure([.restoreFrameError(.invalidProtoData(.invalidContactIdentityKey), recipientProto.recipientId)])
+                return .failure([.restoreFrameError(.invalidProtoData(.invalidContactIdentityKey))])
             }
 
             let verificationState: OWSVerificationState
@@ -725,16 +747,13 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                 uniqueId: recipient.uniqueId,
                 identityKey: identityKey,
                 isFirstKnownKey: true,
-                createdAt: Date(millisecondsSince1970: context.startTimestampMs),
-                verificationState: verificationState
+                createdAt: context.startDate,
+                verificationState: verificationState,
             )
             do {
                 try identity.insert(context.tx.database)
             } catch {
-                return .failure([.restoreFrameError(
-                    .databaseInsertionFailed(error),
-                    recipientProto.recipientId
-                )])
+                return .failure([.restoreFrameError(.databaseInsertionFailed(error))])
             }
         }
 
@@ -746,51 +765,62 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                 recipient: recipient,
                 givenName: nicknameGivenName,
                 familyName: nicknameFamilyName,
-                note: nicknameNote
+                note: nicknameNote,
             )
             self.nicknameManager.createOrUpdate(
                 nicknameRecord: nicknameRecord,
                 updateStorageServiceFor: nil,
-                tx: context.tx
+                tx: context.tx,
+            )
+        }
+
+        if contactProto.hasSharedName {
+            aciContactShareNameManager.saveName(
+                givenName: contactProto.sharedName.given,
+                familyName: contactProto.sharedName.family,
+                recipient: recipient,
+                allowOverwrite: true,
+                updateStorageService: false,
+                tx: context.tx,
             )
         }
 
         if contactProto.profileSharing {
             // Add to the whitelist.
-            profileManager.addToWhitelist(recipient.address, tx: context.tx)
+            profileManager.addRecipientToProfileWhitelist(&recipient, tx: context.tx)
         }
 
         if contactProto.blocked {
-            blockingManager.addBlockedAddress(recipient.address, tx: context.tx)
+            blockingManager.addBlockedRecipient(
+                &recipient,
+                blockedAt: BlockedTimestamp(clamping: contactProto.blockedAtTimestamp),
+                tx: context.tx,
+            )
         }
 
-        do {
-            func addHiddenRecipient(isHiddenInKnownMessageRequestState: Bool) throws {
-                try recipientHidingManager.addHiddenRecipient(
-                    recipient,
-                    inKnownMessageRequestState: isHiddenInKnownMessageRequestState,
-                    wasLocallyInitiated: false,
-                    tx: context.tx
-                )
+        func addHiddenRecipient(isHiddenInKnownMessageRequestState: Bool) {
+            recipientHidingManager.addHiddenRecipient(
+                &recipient,
+                inKnownMessageRequestState: isHiddenInKnownMessageRequestState,
+                wasLocallyInitiated: false,
+                tx: context.tx,
+            )
 
-                context.setNeedsPostRestoreContactHiddenInfoMessage(
-                    recipientId: recipientProto.recipientId
-                )
-            }
-
-            switch contactProto.visibility {
-            case .hidden:
-                try addHiddenRecipient(isHiddenInKnownMessageRequestState: false)
-            case .hiddenMessageRequest:
-                try addHiddenRecipient(isHiddenInKnownMessageRequestState: true)
-            case .visible, .UNRECOGNIZED:
-                break
-            }
-        } catch let error {
-            return restoreFrameError(.databaseInsertionFailed(error))
+            context.setNeedsPostRestoreContactHiddenInfoMessage(
+                recipientId: recipientProto.recipientId,
+            )
         }
 
-        var partialErrors = [BackupArchive.RestoreFrameError<RecipientId>]()
+        switch contactProto.visibility {
+        case .hidden:
+            addHiddenRecipient(isHiddenInKnownMessageRequestState: false)
+        case .hiddenMessageRequest:
+            addHiddenRecipient(isHiddenInKnownMessageRequestState: true)
+        case .visible, .UNRECOGNIZED:
+            break
+        }
+
+        var partialErrors = [BackupArchive.RestoreFrameError]()
 
         // We only need to active hide, since unhidden is the default.
         if contactProto.hideStory, let aci = backupContactAddress.aci {
@@ -798,11 +828,11 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                 try storyStore.createStoryContextAssociatedData(
                     for: aci,
                     isHidden: true,
-                    context: context
+                    context: context,
                 )
             } catch let error {
                 // Don't fail entirely; the story will just be unhidden.
-                partialErrors.append(.restoreFrameError(.databaseInsertionFailed(error), recipientProto.recipientId))
+                partialErrors.append(.restoreFrameError(.databaseInsertionFailed(error)))
             }
         }
 
@@ -811,7 +841,7 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
             givenName: contactProto.profileGivenName.nilIfEmpty,
             familyName: contactProto.profileFamilyName.nilIfEmpty,
             profileKey: profileKey,
-            tx: context.tx
+            tx: context.tx,
         )
 
         let systemGivenName = contactProto.systemGivenName
@@ -820,7 +850,7 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
         let systemFullName = Contact.fullName(
             fromGivenName: systemGivenName,
             familyName: systemFamilyName,
-            nickname: systemNickname
+            nickname: systemNickname,
         )
         if let systemFullName {
             let systemContact = SignalAccount(
@@ -832,7 +862,7 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                 familyName: systemFamilyName,
                 nickname: systemNickname,
                 fullName: systemFullName,
-                contactAvatarHash: nil
+                contactAvatarHash: nil,
             )
 
             contactManager.insertSignalAccount(systemContact, tx: context.tx)
@@ -846,11 +876,22 @@ public class BackupArchiveContactRecipientArchiver: BackupArchiveProtoStreamWrit
                 try avatarDefaultColorManager.persistDefaultColor(
                     defaultAvatarColor,
                     recipientRowId: recipient.id,
-                    tx: context.tx
+                    tx: context.tx,
                 )
             } catch let error {
-                partialErrors.append(.restoreFrameError(.databaseInsertionFailed(error), recipientProto.recipientId))
+                partialErrors.append(.restoreFrameError(.databaseInsertionFailed(error)))
             }
+        }
+
+        if
+            contactProto.hasKeyTransparencyData,
+            let aci = backupContactAddress.aci
+        {
+            keyTransparencyStore.setKeyTransparencyBlob(
+                contactProto.keyTransparencyData,
+                aci: aci,
+                tx: context.tx,
+            )
         }
 
         if partialErrors.isEmpty {

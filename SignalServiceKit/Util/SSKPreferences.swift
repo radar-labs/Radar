@@ -85,18 +85,6 @@ public class SSKPreferences: NSObject {
         userDefaults.removeObject(forKey: didEverUseYdbKey)
     }
 
-    // MARK: - Badge Count
-
-    private static let includeMutedThreadsInBadgeCount = "includeMutedThreadsInBadgeCount"
-
-    public static func includeMutedThreadsInBadgeCount(transaction: DBReadTransaction) -> Bool {
-        return store.getBool(includeMutedThreadsInBadgeCount, defaultValue: false, transaction: transaction)
-    }
-
-    public static func setIncludeMutedThreadsInBadgeCount(_ value: Bool, transaction: DBWriteTransaction) {
-        store.setBool(value, key: includeMutedThreadsInBadgeCount, transaction: transaction)
-    }
-
     // MARK: - Profile avatar preference
 
     @objc
@@ -116,7 +104,8 @@ public class SSKPreferences: NSObject {
     public static func setPreferContactAvatars(
         _ value: Bool,
         updateStorageService: Bool = true,
-        transaction: DBWriteTransaction) {
+        transaction: DBWriteTransaction,
+    ) {
 
         let oldValue = store.getBool(preferContactAvatarsKey, transaction: transaction)
         store.setBool(value, key: preferContactAvatarsKey, transaction: transaction)
@@ -135,6 +124,7 @@ public class SSKPreferences: NSObject {
     public class var grdbSchemaVersionDefault: UInt {
         return GRDBSchemaMigrator.grdbSchemaVersionDefault
     }
+
     public class var grdbSchemaVersionLatest: UInt {
         return GRDBSchemaMigrator.grdbSchemaVersionLatest
     }

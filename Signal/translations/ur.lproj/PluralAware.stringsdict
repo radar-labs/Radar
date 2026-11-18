@@ -29,6 +29,22 @@
 			<string>%2$d سیکنڈ</string>
 		</dict>
 	</dict>
+	<key>ACCESSIBILITY_LABEL_MULTIPLE_ATTACHMENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d کا میڈیا آئٹم</string>
+			<key>other</key>
+			<string>%1$d کے میڈیا آئٹمز</string>
+		</dict>
+	</dict>
 	<key>ACCESSIBILITY_LABEL_SHORT_VOICE_MEMO_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -365,6 +381,70 @@
 			<string>ٹیکسٹ + میڈیا کے لیے %1$d ایام</string>
 		</dict>
 	</dict>
+	<key>COLLAPSE_SET_CALL_EVENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld کال</string>
+			<key>other</key>
+			<string>%1$ld کالز</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_CHAT_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld چیٹ کی اپ ڈیٹ</string>
+			<key>other</key>
+			<string>%1$ld چیٹ کی اپ ڈیٹس</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_GROUP_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld گروپ کی اپ ڈیٹ</string>
+			<key>other</key>
+			<string>%1$ld گروپ کی اپ ڈیٹس</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_TIMER_CHANGES_WITH_FINAL_TIMER_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld غائب ہونے والے ٹائمر میں تبدیلی · %2$@</string>
+			<key>other</key>
+			<string>%1$ld غائب ہونے والے میسج کے ٹائمر میں تبدیلیاں · %2$@</string>
+		</dict>
+	</dict>
 	<key>CONVERSATION_DELETE_CONFIRMATIONS_ALERT_TITLE_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -438,6 +518,22 @@
 			<string>میچ</string>
 			<key>other</key>
 			<string>کُل %2$d میچز</string>
+		</dict>
+	</dict>
+	<key>CONVERSATION_SETTINGS_FORMER_MEMBERS_SECTION_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d سابق ممبر</string>
+			<key>other</key>
+			<string>%1$d سابق ممبرز</string>
 		</dict>
 	</dict>
 	<key>CONVERSATION_SETTINGS_MEMBERS_SECTION_TITLE_%d</key>
@@ -563,9 +659,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal گروپس %1$d ممبر یا اس سے کم کے ساتھ بہترین کارکردگی کا مظاہرہ کرتے ہیں۔ مزید ممبرز کو شامل کرنے سے میسجز بھیجنے اور وصول کرنے میں تاخیر ہو گی۔</string>
+			<string>Radar گروپس %1$d ممبر یا اس سے کم کے ساتھ بہترین کارکردگی کا مظاہرہ کرتے ہیں۔ مزید ممبرز کو شامل کرنے سے میسجز بھیجنے اور وصول کرنے میں تاخیر ہو گی۔</string>
 			<key>other</key>
-			<string>Signal گروپس %1$d ممبرز یا اس سے کم کے ساتھ بہترین کارکردگی کا مظاہرہ کرتے ہیں۔ مزید ممبرز کو شامل کرنے سے میسجز بھیجنے اور وصول کرنے میں تاخیر ہو گی۔</string>
+			<string>Radar گروپس %1$d ممبرز یا اس سے کم کے ساتھ بہترین کارکردگی کا مظاہرہ کرتے ہیں۔ مزید ممبرز کو شامل کرنے سے میسجز بھیجنے اور وصول کرنے میں تاخیر ہو گی۔</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -723,9 +819,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal %2$@، %3$@، اور %1$d دیگر کو کال کرے گا</string>
+			<string>Radar %2$@، %3$@، اور %1$d دیگر کو کال کرے گا</string>
 			<key>other</key>
-			<string>Signal %2$@، %3$@، اور %1$d دیگر افراد کو کال کرے گا</string>
+			<string>Radar %2$@، %3$@، اور %1$d دیگر افراد کو کال کرے گا</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1011,9 +1107,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>&quot;%2$@&quot; کو مربوط رکھنے کے لیے، %1$d دن کے اندر اس ڈیوائس پر Signal کھولیں۔</string>
+			<string>&quot;%2$@&quot; کو مربوط رکھنے کے لیے، %1$d دن کے اندر اس ڈیوائس پر Radar کھولیں۔</string>
 			<key>other</key>
-			<string>&quot;%2$@&quot; کو مربوط رکھنے کے لیے، %1$d دنوں کے اندر اس ڈیوائس پر Signal کھولیں۔</string>
+			<string>&quot;%2$@&quot; کو مربوط رکھنے کے لیے، %1$d دنوں کے اندر اس ڈیوائس پر Radar کھولیں۔</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1219,9 +1315,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>تمام Signal کنکشنز · %1$d ناظر</string>
+			<string>تمام Radar کنکشنز · %1$d ناظر</string>
 			<key>other</key>
-			<string>تمام Signal کنکشنز · %1$d ناظرین</string>
+			<string>تمام Radar کنکشنز · %1$d ناظرین</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1235,9 +1331,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>تمام Signal کنکشنز · %1$d خارج</string>
+			<string>تمام Radar کنکشنز · %1$d خارج</string>
 			<key>other</key>
-			<string>تمام Signal کنکشن · %1$d خارج</string>
+			<string>تمام Radar کنکشن · %1$d خارج</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>
@@ -1384,6 +1480,22 @@
 			<string>&quot;%2$@&quot; کی طرف سے بھیجے گئے %1$d دعوت ناموں کو کالعدم کریں؟</string>
 		</dict>
 	</dict>
+	<key>PINNED_CONVERSATION_LIMIT</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>آپ صرف %1$d تک چیٹ پن کر سکتے ہیں۔</string>
+			<key>other</key>
+			<string>آپ صرف %1$d تک چیٹس پن کر سکتے ہیں۔</string>
+		</dict>
+	</dict>
 	<key>POLL_VOTE_COUNT</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -1448,10 +1560,10 @@
 			<string>%1$d کوششیں</string>
 		</dict>
 	</dict>
-	<key>STORIES_SHARESHEET_PARTIAL_SEND_SUBTITLE_%d</key>
+	<key>SETTINGS_CHANGE_PHONE_NUMBER_SPLASH_CANT_CHANGE_BODY</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%1$#@text@</string>
+		<string>%#@text@</string>
 		<key>text</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -1459,9 +1571,29 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>آپ کی منتخب کردہ کہانی میں سبھی آئٹمز نہیں بھیجے جا سکتے کیونکہ فائل کی قسم تعاون یافتہ نہیں ہے۔</string>
+			<string>چونکہ آپ نے حال ہی میں اس اکاؤنٹ کو رجسٹر کیا ہے، اس لیے آپ ابھی فون نمبرز تبدیل نہیں کر سکتے۔ انتظار کا مختصر دورانیہ آپ کے اکاؤنٹ کے تحفظ میں مدد کرتا ہے۔
+
+ %1$d گھنٹے میں دوبارہ کوشش کریں۔</string>
 			<key>other</key>
-			<string>چونکہ فائل کی قسم معاونت یافتہ نہیں ہے اس لیے تمام آئٹمز آپ کی منتخب کردہ سٹوریز میں نہیں بھیجے جا سکتے۔</string>
+			<string>چونکہ آپ نے حال ہی میں اس اکاؤنٹ کو رجسٹر کیا ہے، اس لیے آپ ابھی فون نمبرز تبدیل نہیں کر سکتے۔ انتظار کا مختصر دورانیہ آپ کے اکاؤنٹ کے تحفظ میں مدد کرتا ہے۔
+
+ %1$d گھنٹوں میں دوبارہ کوشش کریں۔</string>
+		</dict>
+	</dict>
+	<key>STICKER_PACK_STICKER_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d اسٹیکر</string>
+			<key>other</key>
+			<string>%1$d اسٹیکرز</string>
 		</dict>
 	</dict>
 	<key>STORY_REPLIES_COUNT_%d</key>
@@ -1558,6 +1690,22 @@
 			<string>&lt;bold&gt;%1$d&lt;/bold&gt; ویو</string>
 			<key>other</key>
 			<string>&lt;bold&gt;%1$d&lt;/bold&gt; ویوز</string>
+		</dict>
+	</dict>
+	<key>THREAD_DETAILS_MEMBERS_AND_INVITED_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%2$@ (+%1$ld کو مدعو کیا گیا)</string>
+			<key>other</key>
+			<string>%2$@ (+%1$ld مدعو کیے گئے)</string>
 		</dict>
 	</dict>
 	<key>THREAD_DETAILS_MORE_MUTUAL_GROUP_%3$ld</key>
@@ -1670,6 +1818,86 @@
 			<string>یوزر نیمز کے شروع میں کم از کم %1$d حرف لازمی ہونا چاہیئے</string>
 			<key>other</key>
 			<string>یوزر نیمز کے شروع میں کم از کم %1$d حروف لازمی ہونے چاہیئے</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ اور دیگر افراد کی جانب سے آپ کو %1$d بار مینشن کیا گیا</string>
+			<key>other</key>
+			<string>%2$@ اور دیگر افراد کی جانب سے آپ کو %1$d بار مینشن کیا گیا</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ اور %3$@ کی جانب سے آپ کو %1$d بار مینشن کیا گیا</string>
+			<key>other</key>
+			<string>%2$@ اور %3$@ کی جانب سے آپ کو %1$d بار مینشن کیا گیا</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__messages</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$dنہ پڑھا ہوا پیغام</string>
+			<key>other</key>
+			<string>%1$dنہ پڑھے ہوئے پیغامات</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ اور دیگر افراد کی طرف سے %1$d جوابات</string>
+			<key>other</key>
+			<string>%2$@ اور دیگر افراد کی طرف سے %1$d جوابات</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ اور %3$@ کی طرف سے %1$d جوابات</string>
+			<key>other</key>
+			<string>%2$@ اور %3$@ کی طرف سے %1$d جوابات</string>
 		</dict>
 	</dict>
 </dict>

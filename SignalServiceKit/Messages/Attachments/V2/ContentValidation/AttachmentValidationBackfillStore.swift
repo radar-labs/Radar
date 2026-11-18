@@ -13,11 +13,11 @@ public class AttachmentValidationBackfillStore {
     public init() {}
 
     /// If returns true, AttachmentValidationBackfillMigrator should be run.
-    public func needsToRun(tx: DBReadTransaction) throws -> Bool {
-        if backfillsThatNeedEnqueuing(tx: tx).isEmpty.negated {
+    public func needsToRun(tx: DBReadTransaction) -> Bool {
+        if !backfillsThatNeedEnqueuing(tx: tx).isEmpty {
             return true
         }
-        if try getNextAttachmentIdBatch(tx: tx).isEmpty.negated {
+        if !getNextAttachmentIdBatch(tx: tx).isEmpty {
             return true
         }
         return false
@@ -26,7 +26,7 @@ public class AttachmentValidationBackfillStore {
     /// For every backfill we do a single pass to enqueue all attachments that pass the filters for re-validation.
     /// Returns the backfills for which we have not yet done this enqueing pass.
     /// If empty, no enqueuing is necessary.
-    internal func backfillsThatNeedEnqueuing(tx: DBReadTransaction) -> [ValidationBackfill] {
+    func backfillsThatNeedEnqueuing(tx: DBReadTransaction) -> [ValidationBackfill] {
         let knownBackfills = ValidationBackfill.allCases
         guard let lastEnqueuedBackfill = self.getLastEnqueuedBackfill(tx: tx) else {
             // If we've never done it at all, we need to enqueue all of them.
@@ -36,42 +36,48 @@ public class AttachmentValidationBackfillStore {
         return knownBackfills.filter { $0.rawValue > lastEnqueuedBackfill.rawValue }
     }
 
-    internal func getLastEnqueuedBackfill(tx: DBReadTransaction) -> ValidationBackfill? {
+    func getLastEnqueuedBackfill(tx: DBReadTransaction) -> ValidationBackfill? {
         return (kvStore.getInt(Constants.enqueuedUpToBackfillKey, transaction: tx))
             .map(ValidationBackfill.init(rawValue:)) ?? nil
     }
 
-    internal func setLastEnqueuedBackfill(_ newValue: ValidationBackfill, tx: DBWriteTransaction) {
+    func setLastEnqueuedBackfill(_ newValue: ValidationBackfill, tx: DBWriteTransaction) {
         kvStore.setInt(newValue.rawValue, key: Constants.enqueuedUpToBackfillKey, transaction: tx)
     }
 
-    internal func enqueue(attachmentId: Attachment.IDType, tx: DBWriteTransaction) throws {
-        try tx.database.execute(
-            sql: "INSERT INTO \(Constants.queueTableName) VALUES(?);",
-            arguments: [attachmentId]
-        )
+    func enqueue(attachmentId: Attachment.IDType, tx: DBWriteTransaction) {
+        failIfThrows {
+            try tx.database.execute(
+                sql: "INSERT OR IGNORE INTO \(Constants.queueTableName) VALUES(?);",
+                arguments: [attachmentId],
+            )
+        }
     }
 
     /// Get the next batch of attachment IDs to re-validate.
     /// If returns an empty array, there's nothing left to re-validate and we're done.
-    internal func getNextAttachmentIdBatch(tx: DBReadTransaction) throws -> [Attachment.IDType] {
-        return try Attachment.IDType.fetchAll(
-            tx.database,
-            sql: """
+    func getNextAttachmentIdBatch(tx: DBReadTransaction) -> [Attachment.IDType] {
+        return failIfThrows {
+            return try Attachment.IDType.fetchAll(
+                tx.database,
+                sql: """
                 SELECT \(Constants.queueIdColumn.name)
                 FROM \(Constants.queueTableName)
                 ORDER BY \(Constants.queueIdColumn.name) DESC
                 LIMIT ?;
                 """,
-            arguments: [Constants.batchSize]
-        )
+                arguments: [Constants.batchSize],
+            )
+        }
     }
 
-    internal func dequeue(attachmentId: Attachment.IDType, tx: DBWriteTransaction) throws {
-        try tx.database.execute(
-            sql: "DELETE FROM \(Constants.queueTableName) WHERE \(Constants.queueIdColumn.name) = ?;",
-            arguments: [attachmentId]
-        )
+    func dequeue(attachmentId: Attachment.IDType, tx: DBWriteTransaction) {
+        failIfThrows {
+            try tx.database.execute(
+                sql: "DELETE FROM \(Constants.queueTableName) WHERE \(Constants.queueIdColumn.name) = ?;",
+                arguments: [attachmentId],
+            )
+        }
     }
 
     private enum Constants {

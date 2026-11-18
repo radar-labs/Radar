@@ -16,7 +16,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
         SSKEnvironment.shared.databaseStorageRef.write { tx in
             (DependenciesBridge.shared.registrationStateChangeManager as! RegistrationStateChangeManagerImpl).registerForTests(
                 localIdentifiers: .forUnitTests,
-                tx: tx
+                tx: tx,
             )
         }
         identityManager.generateAndPersistNewIdentityKey(for: .aci)
@@ -46,7 +46,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
 
             XCTAssertFalse(message.shouldStartExpireTimer())
 
-            message.updateWithSentRecipients([otherAci], wasSentByUD: false, transaction: transaction)
+            message.updateWithSentRecipients([otherAci], wasSentByUD: false, tx: transaction)
 
             XCTAssertFalse(message.shouldStartExpireTimer())
         }
@@ -64,7 +64,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
 
             XCTAssertFalse(message.shouldStartExpireTimer())
 
-            message.updateWithSentRecipients([otherAci], wasSentByUD: false, transaction: transaction)
+            message.updateWithSentRecipients([otherAci], wasSentByUD: false, tx: transaction)
 
             XCTAssertTrue(message.shouldStartExpireTimer())
         }
@@ -93,7 +93,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
             messageBuilder.timestamp = 100
             let message = messageBuilder.build(transaction: transaction)
             message.anyInsert(transaction: transaction)
-            let messageData = message.buildPlainTextData(thread, transaction: transaction)!
+            let messageData = try! message.buildPlaintextData(inThread: thread, tx: transaction)
             let content = try! SSKProtoContent(serializedData: messageData)
             XCTAssertNil(content.pniSignatureMessage)
         }
@@ -110,7 +110,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
             messageBuilder.timestamp = 100
             let message = messageBuilder.build(transaction: transaction)
             message.anyInsert(transaction: transaction)
-            let messageData = message.buildPlainTextData(thread, transaction: transaction)!
+            let messageData = try! message.buildPlaintextData(inThread: thread, tx: transaction)
             let content = try! SSKProtoContent(serializedData: messageData)
 
             let messagePni = content.pniSignatureMessage!.pni
@@ -120,7 +120,8 @@ class TSOutgoingMessageTest: SSKBaseTest {
             let pniKeyPair = identityManager.identityKeyPair(for: .pni, tx: transaction)!.identityKeyPair
             XCTAssert(try! pniKeyPair.identityKey.verifyAlternateIdentity(
                 aciKeyPair.identityKey,
-                signature: content.pniSignatureMessage!.signature!))
+                signature: content.pniSignatureMessage!.signature!,
+            ))
         }
     }
 
@@ -135,9 +136,9 @@ class TSOutgoingMessageTest: SSKBaseTest {
             messageBuilder.timestamp = Date.ows_millisecondTimestamp()
             let message = messageBuilder.build(transaction: transaction)
             message.anyInsert(transaction: transaction)
-            let messageData = message.buildPlainTextData(thread, transaction: transaction)!
+            let messageData = try! message.buildPlaintextData(inThread: thread, tx: transaction)
 
-            message.updateWithSentRecipients([otherAci], wasSentByUD: true, transaction: transaction)
+            message.updateWithSentRecipients([otherAci], wasSentByUD: true, tx: transaction)
 
             let messageSendLog = SSKEnvironment.shared.messageSendLogRef
             let payloadId = messageSendLog.recordPayload(messageData, for: message, tx: transaction)!
@@ -146,7 +147,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
                 recipientAci: otherAci,
                 recipientDeviceId: DeviceId(validating: 1)!,
                 message: message,
-                tx: transaction
+                tx: transaction,
             )
 
             // Nothing changed yet...
@@ -157,7 +158,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
                 deviceId: DeviceId(validating: 1)!,
                 deliveryTimestamp: NSDate.ows_millisecondTimeStamp(),
                 context: PassthroughDeliveryReceiptContext(),
-                tx: transaction
+                tx: transaction,
             )
 
             XCTAssertFalse(identityManager.shouldSharePhoneNumber(with: otherAci, tx: transaction))
@@ -175,9 +176,9 @@ class TSOutgoingMessageTest: SSKBaseTest {
             messageBuilder.timestamp = Date.ows_millisecondTimestamp()
             let message = messageBuilder.build(transaction: transaction)
             message.anyInsert(transaction: transaction)
-            let messageData = message.buildPlainTextData(thread, transaction: transaction)!
+            let messageData = try! message.buildPlaintextData(inThread: thread, tx: transaction)
 
-            message.updateWithSentRecipients([otherAci], wasSentByUD: true, transaction: transaction)
+            message.updateWithSentRecipients([otherAci], wasSentByUD: true, tx: transaction)
 
             let messageSendLog = SSKEnvironment.shared.messageSendLogRef
             let payloadId = messageSendLog.recordPayload(messageData, for: message, tx: transaction)!
@@ -186,14 +187,14 @@ class TSOutgoingMessageTest: SSKBaseTest {
                 recipientAci: otherAci,
                 recipientDeviceId: DeviceId(validating: 1)!,
                 message: message,
-                tx: transaction
+                tx: transaction,
             )
             messageSendLog.recordPendingDelivery(
                 payloadId: payloadId,
                 recipientAci: otherAci,
                 recipientDeviceId: DeviceId(validating: 2)!,
                 message: message,
-                tx: transaction
+                tx: transaction,
             )
 
             // Nothing changed yet...
@@ -204,7 +205,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
                 deviceId: DeviceId(validating: 1)!,
                 deliveryTimestamp: NSDate.ows_millisecondTimeStamp(),
                 context: PassthroughDeliveryReceiptContext(),
-                tx: transaction
+                tx: transaction,
             )
 
             // Still waiting on device #2!
@@ -215,7 +216,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
                 deviceId: DeviceId(validating: 2)!,
                 deliveryTimestamp: NSDate.ows_millisecondTimeStamp(),
                 context: PassthroughDeliveryReceiptContext(),
-                tx: transaction
+                tx: transaction,
             )
 
             // There we go.
@@ -234,9 +235,9 @@ class TSOutgoingMessageTest: SSKBaseTest {
             messageBuilder.timestamp = Date.ows_millisecondTimestamp()
             let message = messageBuilder.build(transaction: transaction)
             message.anyInsert(transaction: transaction)
-            let messageData = message.buildPlainTextData(thread, transaction: transaction)!
+            let messageData = try! message.buildPlaintextData(inThread: thread, tx: transaction)
 
-            message.updateWithSentRecipients([otherAci], wasSentByUD: false, transaction: transaction)
+            message.updateWithSentRecipients([otherAci], wasSentByUD: false, tx: transaction)
 
             let messageSendLog = SSKEnvironment.shared.messageSendLogRef
             let payloadId = messageSendLog.recordPayload(messageData, for: message, tx: transaction)!
@@ -245,7 +246,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
                 recipientAci: otherAci,
                 recipientDeviceId: DeviceId(validating: 1)!,
                 message: message,
-                tx: transaction
+                tx: transaction,
             )
 
             // Nothing changed yet...
@@ -256,7 +257,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
                 deviceId: DeviceId(validating: 1)!,
                 deliveryTimestamp: NSDate.ows_millisecondTimeStamp(),
                 context: PassthroughDeliveryReceiptContext(),
-                tx: transaction
+                tx: transaction,
             )
 
             // Still not changed!
@@ -274,9 +275,9 @@ class TSOutgoingMessageTest: SSKBaseTest {
             messageBuilder.timestamp = Date.ows_millisecondTimestamp()
             let message = messageBuilder.build(transaction: transaction)
             message.anyInsert(transaction: transaction)
-            let messageData = message.buildPlainTextData(thread, transaction: transaction)!
+            let messageData = try! message.buildPlaintextData(inThread: thread, tx: transaction)
 
-            message.updateWithSentRecipients([otherAci], wasSentByUD: true, transaction: transaction)
+            message.updateWithSentRecipients([otherAci], wasSentByUD: true, tx: transaction)
 
             let messageSendLog = SSKEnvironment.shared.messageSendLogRef
             let payloadId = messageSendLog.recordPayload(messageData, for: message, tx: transaction)!
@@ -285,7 +286,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
                 recipientAci: otherAci,
                 recipientDeviceId: DeviceId(validating: 1)!,
                 message: message,
-                tx: transaction
+                tx: transaction,
             )
 
             // If we set it now...
@@ -297,7 +298,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
                 deviceId: DeviceId(validating: 1)!,
                 deliveryTimestamp: NSDate.ows_millisecondTimeStamp(),
                 context: PassthroughDeliveryReceiptContext(),
-                tx: transaction
+                tx: transaction,
             )
 
             // ...it should stay active.
@@ -318,9 +319,9 @@ class TSOutgoingMessageTest: SSKBaseTest {
             messageBuilder.timestamp = Date.ows_millisecondTimestamp()
             message = messageBuilder.build(transaction: transaction)
             message.anyInsert(transaction: transaction)
-            let messageData = message.buildPlainTextData(thread, transaction: transaction)!
+            let messageData = try! message.buildPlaintextData(inThread: thread, tx: transaction)
 
-            message.updateWithSentRecipients([otherAci], wasSentByUD: true, transaction: transaction)
+            message.updateWithSentRecipients([otherAci], wasSentByUD: true, tx: transaction)
 
             let messageSendLog = SSKEnvironment.shared.messageSendLogRef
             let payloadId = messageSendLog.recordPayload(messageData, for: message, tx: transaction)!
@@ -329,21 +330,23 @@ class TSOutgoingMessageTest: SSKBaseTest {
                 recipientAci: otherAci,
                 recipientDeviceId: DeviceId(validating: 1)!,
                 message: message,
-                tx: transaction
+                tx: transaction,
             )
         }
 
         // Change our PNI, using registerForTests(...) instead of updateLocalPhoneNumber(...) because the latter kicks
         // off a request to check with the server.
-        let aci = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction!.aci
+        let aci = try! DependenciesBridge.shared.tsAccountManager.registeredStateWithMaybeSneakyTransaction().localIdentifiers.aci
         SSKEnvironment.shared.databaseStorageRef.write { tx in
             (DependenciesBridge.shared.registrationStateChangeManager as! RegistrationStateChangeManagerImpl).registerForTests(
-                localIdentifiers: .init(
+                localIdentifiers: LocalIdentifiers(
                     aci: aci,
-                    pni: Pni.randomForTesting(),
-                    e164: .init("+17775550199")!
+                    accountType: .phoneNumberfull(
+                        phoneNumber: "+17775550199",
+                        pni: .randomForTesting(),
+                    ),
                 ),
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -357,7 +360,7 @@ class TSOutgoingMessageTest: SSKBaseTest {
                 deviceId: DeviceId(validating: 1)!,
                 deliveryTimestamp: NSDate.ows_millisecondTimeStamp(),
                 context: PassthroughDeliveryReceiptContext(),
-                tx: transaction
+                tx: transaction,
             )
 
             // Still on, because our PNI changed!

@@ -6,82 +6,81 @@
 import SignalServiceKit
 import SignalUI
 
-class NotificationPermissionReminderMegaphone: MegaphoneView {
-    weak var actionSheetController: ActionSheetController?
-
+class NotificationPermissionReminderMegaphone: Megaphone {
     init(experienceUpgrade: ExperienceUpgrade, fromViewController: UIViewController) {
         super.init(experienceUpgrade: experienceUpgrade)
 
-        titleText = OWSLocalizedString("NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_TITLE",
-                                      comment: "Title for notification permission reminder megaphone")
-        bodyText = OWSLocalizedString("NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_BODY",
-                                     comment: "Body for notification permission reminder megaphone")
-        imageName = "notificationMegaphone"
+        titleText = OWSLocalizedString(
+            "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_TITLE",
+            comment: "Title for notification permission reminder megaphone",
+        )
+        bodyText = OWSLocalizedString(
+            "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_BODY",
+            comment: "Body for notification permission reminder megaphone",
+        )
+        image = .notificationMegaphone
 
-        let primaryButtonTitle = OWSLocalizedString("NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_ACTION",
-                                                   comment: "Action text for notification permission reminder megaphone")
+        let primaryButtonTitle = OWSLocalizedString(
+            "NOTIFICATION_PERMISSION_REMINDER_MEGAPHONE_ACTION",
+            comment: "Action text for notification permission reminder megaphone",
+        )
 
-        let primaryButton = MegaphoneView.Button(title: primaryButtonTitle) { [weak self] in
-            guard let self = self else { return }
+        let primaryButton = Button(title: primaryButtonTitle) {
+            let actionSheetController = ActionSheetController()
+            actionSheetController.isCancelable = true
 
             let turnOnView = TurnOnPermissionView(
+                fromActionSheetController: actionSheetController,
                 title: OWSLocalizedString(
                     "NOTIFICATION_PERMISSION_ACTION_SHEET_TITLE",
-                    comment: "Title for notification permission action sheet"
+                    comment: "Title for notification permission action sheet",
                 ),
                 message: OWSLocalizedString(
                     "NOTIFICATION_PERMISSION_ACTION_SHEET_BODY",
-                    comment: "Body for notification permission action sheet"
+                    comment: "Body for notification permission action sheet",
                 ),
                 steps: [
                     .init(
                         icon: nil,
                         text: OWSLocalizedString(
                             "NOTIFICATION_PERMISSION_ACTION_SHEET_STEP_ONE",
-                            comment: "First step for notification permission action sheet"
-                        )
+                            comment: "First step for notification permission action sheet",
+                        ),
                     ),
                     .init(
                         icon: #imageLiteral(resourceName: "notifications-32"),
                         text: OWSLocalizedString(
                             "NOTIFICATION_PERMISSION_ACTION_SHEET_STEP_TWO",
-                            comment: "Second step for notification permission action sheet"
-                        )
+                            comment: "Second step for notification permission action sheet",
+                        ),
                     ),
                     .init(
                         icon: UIImage(imageLiteralResourceName: "toggle-32"),
                         text: OWSLocalizedString(
                             "NOTIFICATION_PERMISSION_ACTION_SHEET_STEP_THREE",
-                            comment: "Third step for notification permission action sheet"
-                        )
-                    )
-                ]
+                            comment: "Third step for notification permission action sheet",
+                        ),
+                    ),
+                ],
             )
 
-            let actionSheetController = ActionSheetController()
             actionSheetController.customHeader = turnOnView
-            actionSheetController.isCancelable = true
             fromViewController.presentActionSheet(actionSheetController)
-            self.actionSheetController = actionSheetController
         }
 
         let secondaryButton = snoozeButton(
             fromViewController: fromViewController,
-            snoozeTitle: OWSLocalizedString("NOTIFICATION_PERMISSION_NOT_NOW_ACTION",
-                                           comment: "Snooze action text for contact permission reminder megaphone")
+            snoozeTitle: OWSLocalizedString(
+                "NOTIFICATION_PERMISSION_NOT_NOW_ACTION",
+                comment: "Snooze action text for contact permission reminder megaphone",
+            ),
         )
-        setButtons(primary: primaryButton, secondary: secondaryButton)
-    }
 
-    required init(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) {
-        super.dismiss(animated: animated, completion: completion)
-        actionSheetController?.dismiss(animated: animated)
+        buttons = [primaryButton, secondaryButton]
     }
 }
+
+// MARK: -
 
 class TurnOnPermissionView: UIStackView {
     struct Step {
@@ -89,7 +88,12 @@ class TurnOnPermissionView: UIStackView {
         let text: String
     }
 
-    init(title: String, message: String, steps: [Step], button: UIButton? = nil) {
+    init(
+        fromActionSheetController: ActionSheetController,
+        title: String,
+        message: String,
+        steps: [Step],
+    ) {
         super.init(frame: .zero)
 
         axis = .vertical
@@ -113,11 +117,15 @@ class TurnOnPermissionView: UIStackView {
         }
 
         // Button
-        let primaryButton = button ?? UIButton(
-            configuration: .largePrimary(title: title),
-            primaryAction: UIAction { [weak self] _ in
-                self?.goToSettings()
-            }
+        let primaryButton = UIButton(
+            configuration: .largePrimary(title: CommonStrings.goToSettingsButton),
+            primaryAction: UIAction { [weak self, weak fromActionSheetController] _ in
+                guard let self, let fromActionSheetController else { return }
+
+                fromActionSheetController.dismiss(animated: true) {
+                    self.goToSettings()
+                }
+            },
         )
         let buttonContainer = UIView.container()
         buttonContainer.addSubview(primaryButton)

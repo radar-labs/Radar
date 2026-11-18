@@ -7,7 +7,7 @@ public final class BulkDeleteInteractionJobQueue {
     private let jobRunnerFactory: BulkDeleteInteractionJobRunnerFactory
     private let jobQueueRunner: JobQueueRunner<
         JobRecordFinderImpl<BulkDeleteInteractionJobRecord>,
-        BulkDeleteInteractionJobRunnerFactory
+        BulkDeleteInteractionJobRunnerFactory,
     >
     private var jobSerializer = CompletionSerializer()
 
@@ -15,21 +15,23 @@ public final class BulkDeleteInteractionJobQueue {
         addressableMessageFinder: DeleteForMeAddressableMessageFinder,
         db: any DB,
         interactionDeleteManager: InteractionDeleteManager,
-        threadSoftDeleteManager: ThreadSoftDeleteManager,
-        threadStore: ThreadStore
+        threadDeletionManager: ThreadDeletionManager,
+        threadStore: ThreadStore,
+        tsAccountManager: any TSAccountManager,
     ) {
         self.jobRunnerFactory = BulkDeleteInteractionJobRunnerFactory(
             addressableMessageFinder: addressableMessageFinder,
             db: db,
             interactionDeleteManager: interactionDeleteManager,
-            threadSoftDeleteManager: threadSoftDeleteManager,
-            threadStore: threadStore
+            threadDeletionManager: threadDeletionManager,
+            threadStore: threadStore,
+            tsAccountManager: tsAccountManager,
         )
         self.jobQueueRunner = JobQueueRunner(
             canExecuteJobsConcurrently: false,
             db: db,
             jobFinder: JobRecordFinderImpl(db: db),
-            jobRunnerFactory: self.jobRunnerFactory
+            jobRunnerFactory: self.jobRunnerFactory,
         )
     }
 
@@ -41,7 +43,7 @@ public final class BulkDeleteInteractionJobQueue {
         anchorMessageRowId: Int64,
         isFullThreadDelete: Bool,
         threadUniqueId: String,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         let jobRecord = BulkDeleteInteractionJobRecord(
             anchorMessageRowId: anchorMessageRowId,
@@ -53,7 +55,7 @@ public final class BulkDeleteInteractionJobQueue {
 
                 return nil
             }(),
-            threadUniqueId: threadUniqueId
+            threadUniqueId: threadUniqueId,
         )
 
         jobRecord.anyInsert(transaction: tx)
@@ -77,8 +79,9 @@ private class BulkDeleteInteractionJobRunner: JobRunner {
     private let addressableMessageFinder: DeleteForMeAddressableMessageFinder
     private let db: any DB
     private let interactionDeleteManager: InteractionDeleteManager
-    private let threadSoftDeleteManager: ThreadSoftDeleteManager
+    private let threadDeletionManager: ThreadDeletionManager
     private let threadStore: ThreadStore
+    private let tsAccountManager: any TSAccountManager
 
     private let logger = PrefixedLogger(prefix: "[DeleteForMe]")
 
@@ -86,18 +89,20 @@ private class BulkDeleteInteractionJobRunner: JobRunner {
         addressableMessageFinder: DeleteForMeAddressableMessageFinder,
         db: any DB,
         interactionDeleteManager: InteractionDeleteManager,
-        threadSoftDeleteManager: ThreadSoftDeleteManager,
-        threadStore: ThreadStore
+        threadDeletionManager: ThreadDeletionManager,
+        threadStore: ThreadStore,
+        tsAccountManager: any TSAccountManager,
     ) {
         self.addressableMessageFinder = addressableMessageFinder
         self.db = db
         self.interactionDeleteManager = interactionDeleteManager
-        self.threadSoftDeleteManager = threadSoftDeleteManager
+        self.threadDeletionManager = threadDeletionManager
         self.threadStore = threadStore
+        self.tsAccountManager = tsAccountManager
     }
 
     func runJobAttempt(
-        _ jobRecord: BulkDeleteInteractionJobRecord
+        _ jobRecord: BulkDeleteInteractionJobRecord,
     ) async -> JobAttemptResult<Void> {
         return await JobAttemptResult.executeBlockWithDefaultErrorHandler(
             jobRecord: jobRecord,
@@ -105,7 +110,7 @@ private class BulkDeleteInteractionJobRunner: JobRunner {
             db: db,
             block: {
                 try await _runJobAttempt(jobRecord)
-            }
+            },
         )
     }
 
@@ -119,7 +124,7 @@ private class BulkDeleteInteractionJobRunner: JobRunner {
     }
 
     private func _runJobAttempt(
-        _ jobRecord: BulkDeleteInteractionJobRecord
+        _ jobRecord: BulkDeleteInteractionJobRecord,
     ) async throws {
         let anchorMessageRowId = jobRecord.anchorMessageRowId
         let fullThreadDeletionAnchorMessageRowId = jobRecord.fullThreadDeletionAnchorMessageRowId
@@ -127,15 +132,30 @@ private class BulkDeleteInteractionJobRunner: JobRunner {
 
         logger.info("Attempting to bulk-delete interactions for thread \(threadUniqueId), isFullThreadDelete \(fullThreadDeletionAnchorMessageRowId != nil).")
 
-        let deletedCount = await TimeGatedBatch.processAllAsync(db: db) { tx -> Int in
-            return self.deleteSomeInteractions(
+        var deletedCount = 0
+        await TimeGatedBatch.processAll(db: db) { tx -> TimeGatedBatch.ProcessBatchResult in
+            let batchDeletedCount = self.deleteSomeInteractions(
                 threadUniqueId: threadUniqueId,
                 anchorMessageRowId: anchorMessageRowId,
-                tx: tx
+                tx: tx,
             )
+            deletedCount += batchDeletedCount
+            return batchDeletedCount == 0 ? .done(()) : .more
         }
 
         logger.info("Deleted \(deletedCount) messages for thread \(threadUniqueId), isFullThreadDelete \(fullThreadDeletionAnchorMessageRowId != nil).")
+
+        // Handle cases where registration state gets corrupted while we're
+        // deleting. We can't delete the thread until things settle.
+        do throws(CancellationError) {
+            try await Preconditions([
+                NotificationPrecondition(notificationName: .registrationStateDidChange, isSatisfied: { [tsAccountManager] in
+                    return tsAccountManager.localIdentifiersWithMaybeSneakyTransaction != nil
+                }),
+            ]).waitUntilSatisfied()
+        } catch {
+            throw error
+        }
 
         await db.awaitableWrite { tx in
             jobRecord.anyRemove(transaction: tx)
@@ -167,20 +187,26 @@ private class BulkDeleteInteractionJobRunner: JobRunner {
             ///    created the bulk-delete job. This would indicate that while
             ///    all the remaining messages are non-addressable, one of them
             ///    was inserted while the bulk-delete was running.
-            if self.addressableMessageFinder.threadContainsAnyAddressableMessages(
-                threadUniqueId: threadUniqueId,
-                tx: tx
-            ) {
+            if
+                self.addressableMessageFinder.threadContainsAnyAddressableMessages(
+                    threadUniqueId: threadUniqueId,
+                    tx: tx,
+                )
+            {
                 self.logger.warn("Not doing thread soft-delete – thread contains addressable messages after delete.")
-            } else if InteractionFinder(threadUniqueId: threadUniqueId)
-                .mostRecentRowId(tx: tx) > fullThreadDeletionAnchorMessageRowId
+            } else if
+                InteractionFinder(threadUniqueId: threadUniqueId)
+                    .mostRecentRowId(tx: tx) > fullThreadDeletionAnchorMessageRowId
             {
                 self.logger.warn("Not doing thread soft-delete – most recent row ID was newer than when we started delete.")
             } else {
-                self.threadSoftDeleteManager.softDelete(
-                    threads: [thread],
+                let localIdentifiers = tsAccountManager.localIdentifiers(tx: tx).owsFailUnwrap("just waited until registered")
+                self.threadDeletionManager.deleteThreads(
+                    [thread],
                     sendDeleteForMeSyncMessage: false,
-                    tx: tx
+                    updateStorageService: false,
+                    localIdentifiers: localIdentifiers,
+                    tx: tx,
                 )
             }
         }
@@ -193,16 +219,16 @@ private class BulkDeleteInteractionJobRunner: JobRunner {
     private func deleteSomeInteractions(
         threadUniqueId: String,
         anchorMessageRowId: Int64,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> Int {
         let interactionsToDelete: [TSInteraction]
         do {
             interactionsToDelete = try InteractionFinder(
-                threadUniqueId: threadUniqueId
+                threadUniqueId: threadUniqueId,
             ).fetchAllInteractions(
                 rowIdFilter: .atOrBefore(anchorMessageRowId),
                 limit: Constants.deletionBatchSize,
-                tx: tx
+                tx: tx,
             )
         } catch {
             owsFailDebug("Failed to get interactions to delete!")
@@ -216,9 +242,9 @@ private class BulkDeleteInteractionJobRunner: JobRunner {
                 interaction,
                 sideEffects: .custom(
                     associatedCallDelete: .localDeleteOnly,
-                    updateThreadOnInteractionDelete: .doNotUpdate
+                    updateThreadOnInteractionDelete: .doNotUpdate,
                 ),
-                tx: tx
+                tx: tx,
             )
         }
 
@@ -230,14 +256,16 @@ private class BulkDeleteInteractionJobRunner: JobRunner {
         /// This will ensure that anyone who opens a transaction between our
         /// time-gated batches sees a thread with appropriately-updated values.
         tx.addFinalizationBlock(key: "BulkDeleteInteractionJobQueue") { tx in
-            if let thread = self.threadStore.fetchThread(
-                uniqueId: threadUniqueId,
-                tx: tx
-            ) {
+            if
+                let thread = self.threadStore.fetchThread(
+                    uniqueId: threadUniqueId,
+                    tx: tx,
+                )
+            {
                 thread.updateOnInteractionsRemoved(
                     needsToUpdateLastInteractionRowId: true,
                     needsToUpdateLastVisibleSortId: true,
-                    tx: tx
+                    tx: tx,
                 )
             }
         }
@@ -254,21 +282,24 @@ private class BulkDeleteInteractionJobRunnerFactory: JobRunnerFactory {
     private let addressableMessageFinder: DeleteForMeAddressableMessageFinder
     private let db: any DB
     private let interactionDeleteManager: InteractionDeleteManager
-    private let threadSoftDeleteManager: ThreadSoftDeleteManager
+    private let threadDeletionManager: ThreadDeletionManager
     private let threadStore: ThreadStore
+    private let tsAccountManager: any TSAccountManager
 
     init(
         addressableMessageFinder: DeleteForMeAddressableMessageFinder,
         db: any DB,
         interactionDeleteManager: InteractionDeleteManager,
-        threadSoftDeleteManager: ThreadSoftDeleteManager,
-        threadStore: ThreadStore
+        threadDeletionManager: ThreadDeletionManager,
+        threadStore: ThreadStore,
+        tsAccountManager: any TSAccountManager,
     ) {
         self.addressableMessageFinder = addressableMessageFinder
         self.db = db
         self.interactionDeleteManager = interactionDeleteManager
-        self.threadSoftDeleteManager = threadSoftDeleteManager
+        self.threadDeletionManager = threadDeletionManager
         self.threadStore = threadStore
+        self.tsAccountManager = tsAccountManager
     }
 
     func buildRunner() -> BulkDeleteInteractionJobRunner {
@@ -276,8 +307,9 @@ private class BulkDeleteInteractionJobRunnerFactory: JobRunnerFactory {
             addressableMessageFinder: addressableMessageFinder,
             db: db,
             interactionDeleteManager: interactionDeleteManager,
-            threadSoftDeleteManager: threadSoftDeleteManager,
-            threadStore: threadStore
+            threadDeletionManager: threadDeletionManager,
+            threadStore: threadStore,
+            tsAccountManager: tsAccountManager,
         )
     }
 }

@@ -15,7 +15,7 @@ public class StoryRecipientManager {
         recipientDatabaseTable: RecipientDatabaseTable,
         storyRecipientStore: StoryRecipientStore,
         storageServiceManager: any StorageServiceManager,
-        threadStore: any ThreadStore
+        threadStore: any ThreadStore,
     ) {
         self.recipientDatabaseTable = recipientDatabaseTable
         self.storyRecipientStore = storyRecipientStore
@@ -25,12 +25,12 @@ public class StoryRecipientManager {
 
     public func fetchRecipients(
         forStoryThread storyThread: TSPrivateStoryThread,
-        tx: DBReadTransaction
-    ) throws -> [SignalRecipient] {
-        let recipientIds = try storyRecipientStore.fetchRecipientIds(forStoryThreadId: storyThread.sqliteRowId!, tx: tx)
-        return try recipientIds.map { recipientId in
+        tx: DBReadTransaction,
+    ) -> [SignalRecipient] {
+        let recipientIds = storyRecipientStore.fetchRecipientIds(forStoryThreadId: storyThread.sqliteRowId!, tx: tx)
+        return recipientIds.map { recipientId in
             guard let recipient = recipientDatabaseTable.fetchRecipient(rowId: recipientId, tx: tx) else {
-                throw OWSAssertionError("Couldn't fetch recipient that must exist.")
+                owsFail("can't fetch recipient that must exist")
             }
             return recipient
         }
@@ -40,12 +40,12 @@ public class StoryRecipientManager {
         _ recipientIds: [SignalRecipient.RowId],
         for storyThread: TSPrivateStoryThread,
         shouldUpdateStorageService: Bool,
-        tx: DBWriteTransaction
-    ) throws {
+        tx: DBWriteTransaction,
+    ) {
         let storyThreadId = storyThread.sqliteRowId!
-        try storyRecipientStore.removeRecipientIds(forStoryThreadId: storyThreadId, tx: tx)
+        storyRecipientStore.removeRecipientIds(forStoryThreadId: storyThreadId, tx: tx)
         for recipientId in recipientIds {
-            try storyRecipientStore.insertRecipientId(recipientId, forStoryThreadId: storyThreadId, tx: tx)
+            storyRecipientStore.insertRecipientId(recipientId, forStoryThreadId: storyThreadId, tx: tx)
         }
         if shouldUpdateStorageService {
             updateStorageService(for: [storyThread], tx: tx)
@@ -56,11 +56,11 @@ public class StoryRecipientManager {
         _ recipientIds: [SignalRecipient.RowId],
         for storyThread: TSPrivateStoryThread,
         shouldUpdateStorageService: Bool,
-        tx: DBWriteTransaction
-    ) throws {
+        tx: DBWriteTransaction,
+    ) {
         let storyThreadId = storyThread.sqliteRowId!
         for recipientId in recipientIds {
-            try storyRecipientStore.insertRecipientId(recipientId, forStoryThreadId: storyThreadId, tx: tx)
+            storyRecipientStore.insertRecipientId(recipientId, forStoryThreadId: storyThreadId, tx: tx)
         }
         if shouldUpdateStorageService {
             updateStorageService(for: [storyThread], tx: tx)
@@ -71,11 +71,11 @@ public class StoryRecipientManager {
         _ recipientIds: [SignalRecipient.RowId],
         for storyThread: TSPrivateStoryThread,
         shouldUpdateStorageService: Bool,
-        tx: DBWriteTransaction
-    ) throws {
+        tx: DBWriteTransaction,
+    ) {
         let storyThreadId = storyThread.sqliteRowId!
         for recipientId in recipientIds {
-            try storyRecipientStore.removeRecipientId(recipientId, forStoryThreadId: storyThreadId, tx: tx)
+            storyRecipientStore.removeRecipientId(recipientId, forStoryThreadId: storyThreadId, tx: tx)
         }
         if shouldUpdateStorageService {
             updateStorageService(for: [storyThread], tx: tx)
@@ -93,9 +93,7 @@ public class StoryRecipientManager {
     /// (e.g., custom stories, "My Signal Connections Except..."). Doesn't
     /// remove it from already-deleted custom stories.
     public func removeRecipientIdFromAllPrivateStoryThreads(_ recipientId: SignalRecipient.RowId, shouldUpdateStorageService: Bool, tx: DBWriteTransaction) {
-        let threadIds = failIfThrows {
-            return try storyRecipientStore.fetchStoryThreadIds(forRecipientId: recipientId, tx: tx)
-        }
+        let threadIds = storyRecipientStore.fetchStoryThreadIds(forRecipientId: recipientId, tx: tx)
         var updatedStoryThreads = [TSPrivateStoryThread]()
         for threadId in threadIds {
             guard let storyThread = threadStore.fetchThread(rowId: threadId, tx: tx) as? TSPrivateStoryThread else {
@@ -105,9 +103,7 @@ public class StoryRecipientManager {
             case .default, .disabled:
                 continue
             case .explicit, .blockList:
-                failIfThrows {
-                    try storyRecipientStore.removeRecipientId(recipientId, forStoryThreadId: threadId, tx: tx)
-                }
+                storyRecipientStore.removeRecipientId(recipientId, forStoryThreadId: threadId, tx: tx)
                 updatedStoryThreads.append(storyThread)
             }
         }

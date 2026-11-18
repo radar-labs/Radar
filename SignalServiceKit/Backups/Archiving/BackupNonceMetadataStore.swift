@@ -12,14 +12,14 @@ public enum BackupNonce {
     /// An imprecise upper bound on the byte length of the MetadataHeader we prepend to
     /// the backup file, plus the length of the file signature and varint length we put before it.
     /// Before we download the full backup file, we fetch the first N bytes so we can
-    /// pull out the header to talk to SVR🐝 before proceeding. This is how many bytes
+    /// pull out the header to talk to SVRB before proceeding. This is how many bytes
     /// we initially fetch. If this fails, we fetch more. It is therefore most performant
     /// if this value is a reasonably tight overestimate of the length of the header, even if that
     /// length is variable.
     static let metadataHeaderByteLengthUpperBound: UInt16 =
         UInt16(magicFileSignature.count)
-        + varintLengthUpperBound
-        + metadataHeaderLengthUpperBound
+            + varintLengthUpperBound
+            + metadataHeaderLengthUpperBound
 
     /// SBACKUP\x01
     static let magicFileSignature = Data([83, 66, 65, 67, 75, 85, 80, 01])
@@ -32,10 +32,10 @@ public enum BackupNonce {
     ///
     /// This data can be (and is) exposed to the server, as it is in plaintext at the front
     /// of the backup file we upload to CDN.
-    public struct MetadataHeader: Codable {
-        public let data: Data
+    public struct MetadataHeader {
+        let data: Data
 
-        public init(data: Data) {
+        init(data: Data) {
             self.data = data
         }
     }
@@ -47,36 +47,18 @@ public enum BackupNonce {
     /// Backup N and read it back later when we create Backup {N+1} so that
     /// when we upload the next nonce to SVRB is it Nonce {N+1} and can be used
     /// to decrypt the prior backup, in case the next backup's upload fails.
-    public struct NextSecretMetadata: Codable {
-        public let data: Data
+    public struct NextSecretMetadata {
+        let data: Data
 
-        public init(data: Data) {
+        init(data: Data) {
             self.data = data
         }
     }
 }
 
-extension Svr🐝.StoreBackupResponse {
-
-    var headerMetadata: BackupNonce.MetadataHeader {
-        return BackupNonce.MetadataHeader(data: self.metadata)
-    }
-
-    var nextSecretMetadata: BackupNonce.NextSecretMetadata {
-        return BackupNonce.NextSecretMetadata(data: self.nextBackupSecretData)
-    }
-}
-
-extension Svr🐝.RestoreBackupResponse {
-
-    var nextSecretMetadata: BackupNonce.NextSecretMetadata {
-        return BackupNonce.NextSecretMetadata(data: self.nextBackupSecretData)
-    }
-}
-
 extension BackupNonce.MetadataHeader {
 
-    public enum ParsingError: Error {
+    enum ParsingError: Error {
         case unrecognizedFileSignature
         case dataMissingOrEmpty
         case headerTooLarge
@@ -87,11 +69,12 @@ extension BackupNonce.MetadataHeader {
     /// Parse a MetadataHeader from the first N bytes of a backup file.
     /// If the provided bytes do not cover the complete header, throws a ``ParsingError/moreDataNeeded(_:)`` error
     /// with the minimum necessary bytes to try parsing again.
-    public static func from(prefixBytes: Data?) throws(ParsingError) -> BackupNonce.MetadataHeader {
-        guard let rawData = prefixBytes?.nilIfEmpty else {
+    static func from(prefixBytes: Data?) throws(ParsingError) -> BackupNonce.MetadataHeader {
+        guard var rawData = prefixBytes?.nilIfEmpty else {
             owsFailDebug("Missing prefix data")
             throw .dataMissingOrEmpty
         }
+        let oldRawDataCount = rawData.count
 
         // Check the file signature
         let fileSignatureLength = BackupNonce.magicFileSignature.count
@@ -101,46 +84,38 @@ extension BackupNonce.MetadataHeader {
         guard rawData.prefix(fileSignatureLength) == BackupNonce.magicFileSignature else {
             throw .unrecognizedFileSignature
         }
+        rawData.removeFirst(fileSignatureLength)
 
         // Read the varint length of the header metadata.
-        let (headerLength, varintLength) = ChunkedInputStreamTransform.decodeVariableLengthInteger(
-            buffer: rawData,
-            start: fileSignatureLength
-        )
-        guard
-            headerLength > 0,
-            varintLength >= 0,
-            let varintLength = UInt64(exactly: varintLength)
-        else {
+        let headerLength = try? rawData.removeFirstVarint()
+        guard let headerLength, headerLength > 0 else {
             throw .moreDataNeeded(BackupNonce.metadataHeaderByteLengthUpperBound)
         }
-        guard let minLength = UInt16(exactly: UInt64(fileSignatureLength) + headerLength + varintLength) else {
-            // We enforce via swift compiler that the header fits in 2^16 bytes, which is
-            // way overkill and should always be enough. This should never happen.
-            owsFailDebug("Header larger than 2^16 bytes!")
-            throw .headerTooLarge
-        }
-        if minLength > rawData.count {
+        guard rawData.count >= headerLength else {
+            let signatureAndVarintLength = UInt64(oldRawDataCount - rawData.count)
+            let (minLength, overflow) = signatureAndVarintLength.addingReportingOverflow(headerLength)
+            guard !overflow, let minLength = UInt16(exactly: minLength) else {
+                // We enforce via swift compiler that the header fits in 2^16 bytes, which is
+                // way overkill and should always be enough. This should never happen.
+                owsFailDebug("Header larger than 2^16 bytes!")
+                throw .headerTooLarge
+            }
             throw .moreDataNeeded(minLength)
         }
-        let rawHeader = rawData
-            .suffix(from: fileSignatureLength + Int(varintLength))
-            .prefix(Int(headerLength))
+        let rawHeader = rawData.prefix(Int(headerLength))
         return BackupNonce.MetadataHeader(data: rawHeader)
     }
 
     /// Produce the full serialized prefix we should add to the backup file, including the file signature,
     /// varint header length, and header itself.
-    public func serializedBackupFilePrefix() -> Data {
-        let headerData = self.data
-        let varint = ChunkedOutputStreamTransform.writeVariableLengthUInt32(UInt32(headerData.count))
-        return BackupNonce.magicFileSignature + varint + headerData
+    func serializedBackupFilePrefix() -> Data {
+        return BackupNonce.magicFileSignature + self.data.prefixedWithVarintLength()
     }
 }
 
 public class BackupNonceMetadataStore {
 
-    private let kvStore = KeyValueStore(collection: "BackupNonceMetadataStore")
+    private let kvStore = NewKeyValueStore(collection: "BackupNonceMetadataStore")
 
     public init() {}
 
@@ -150,18 +125,18 @@ public class BackupNonceMetadataStore {
     /// a different backup key (e.g. an AEP rotation happened between then and now).
     public func getLastForwardSecrecyToken(
         for backupKey: MessageRootBackupKey,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> BackupForwardSecrecyToken? {
         var sha = SHA256()
         sha.update(data: backupKey.serialize())
         let hashedBackupKey = Data(sha.finalize())
         guard
-            let associatedBackupKeyHash = kvStore.getData(Keys.lastForwardSecrecyTokenAssociatedBackupKeyHash, transaction: tx),
+            let associatedBackupKeyHash = kvStore.fetchValue(Data.self, forKey: Keys.lastForwardSecrecyTokenAssociatedBackupKeyHash, tx: tx),
             associatedBackupKeyHash == hashedBackupKey
         else {
             return nil
         }
-        return try kvStore.getData(Keys.lastForwardSecrecyToken, transaction: tx).map(BackupForwardSecrecyToken.init(contents:))
+        return try kvStore.fetchValue(Data.self, forKey: Keys.lastForwardSecrecyToken, tx: tx).map(BackupForwardSecrecyToken.init(contents:))
     }
 
     /// We should only call this method in one place only:
@@ -169,16 +144,16 @@ public class BackupNonceMetadataStore {
     /// StoreBackupResponse as this BackupForwardSecrecyToken.
     ///
     /// - parameter backupKey: The message backup key used to encrypt the just-created backup.
-    public func setLastForwardSecrecyToken(
+    func setLastForwardSecrecyToken(
         _ token: BackupForwardSecrecyToken,
         for backupKey: MessageRootBackupKey,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         var sha = SHA256()
         sha.update(data: backupKey.serialize())
         let hashedBackupKey = Data(sha.finalize())
-        kvStore.setData(hashedBackupKey, key: Keys.lastForwardSecrecyTokenAssociatedBackupKeyHash, transaction: tx)
-        kvStore.setData(token.serialize(), key: Keys.lastForwardSecrecyToken, transaction: tx)
+        kvStore.writeValue(hashedBackupKey, forKey: Keys.lastForwardSecrecyTokenAssociatedBackupKeyHash, tx: tx)
+        kvStore.writeValue(token.serialize(), forKey: Keys.lastForwardSecrecyToken, tx: tx)
     }
 
     /// Get the next "secret metadata" which should be used to encrypt the next backup
@@ -187,18 +162,18 @@ public class BackupNonceMetadataStore {
     /// a different backup key (e.g. an AEP rotation happened between then and now).
     public func getNextSecretMetadata(
         for backupKey: MessageRootBackupKey,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> BackupNonce.NextSecretMetadata? {
         var sha = SHA256()
         sha.update(data: backupKey.serialize())
         let hashedBackupKey = Data(sha.finalize())
         guard
-            let associatedBackupKeyHash = kvStore.getData(Keys.nextSecretMetadataAssociatedBackupKeyHash, transaction: tx),
+            let associatedBackupKeyHash = kvStore.fetchValue(Data.self, forKey: Keys.nextSecretMetadataAssociatedBackupKeyHash, tx: tx),
             associatedBackupKeyHash == hashedBackupKey
         else {
             return nil
         }
-        return kvStore.getData(Keys.nextSecretMetadata, transaction: tx).map(BackupNonce.NextSecretMetadata.init(data:))
+        return kvStore.fetchValue(Data.self, forKey: Keys.nextSecretMetadata, tx: tx).map(BackupNonce.NextSecretMetadata.init(data:))
     }
 
     /// We should only call this method in two places:
@@ -206,25 +181,25 @@ public class BackupNonceMetadataStore {
     ///  StoreBackupResponse as this NextSecretMetadata.
     /// 2. As an initialization step the very first time we create a backup, since there was no prior backup to pull
     ///  the "next" metadata from.
-    /// 3. After restoring a backup on a new device, with the nextSecretMetadata we got from the SVR🐝 response,
+    /// 3. After restoring a backup on a new device, with the nextSecretMetadata we got from the SVRB response,
     /// to continue the chain on this device when it makes a backup for the first time.
     ///
     /// - parameter backupKey: The message backup key used to encrypt the just-created/restored backup.
     public func setNextSecretMetadata(
         _ metadata: BackupNonce.NextSecretMetadata,
         for backupKey: MessageRootBackupKey,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         var sha = SHA256()
         sha.update(data: backupKey.serialize())
         let hashedBackupKey = Data(sha.finalize())
-        kvStore.setData(hashedBackupKey, key: Keys.nextSecretMetadataAssociatedBackupKeyHash, transaction: tx)
-        kvStore.setData(metadata.data, key: Keys.nextSecretMetadata, transaction: tx)
+        kvStore.writeValue(hashedBackupKey, forKey: Keys.nextSecretMetadataAssociatedBackupKeyHash, tx: tx)
+        kvStore.writeValue(metadata.data, forKey: Keys.nextSecretMetadata, tx: tx)
     }
 
-    public func deleteNextSecretMetadata(tx: DBWriteTransaction) {
-        kvStore.removeValue(forKey: Keys.nextSecretMetadata, transaction: tx)
-        kvStore.removeValue(forKey: Keys.nextSecretMetadataAssociatedBackupKeyHash, transaction: tx)
+    func deleteNextSecretMetadata(tx: DBWriteTransaction) {
+        kvStore.removeValue(forKey: Keys.nextSecretMetadata, tx: tx)
+        kvStore.removeValue(forKey: Keys.nextSecretMetadataAssociatedBackupKeyHash, tx: tx)
     }
 
     private enum Keys {

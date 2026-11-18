@@ -10,57 +10,39 @@ import UIKit
 class FingerprintScanViewController: OWSViewController, OWSNavigationChildController {
 
     private let recipientAci: Aci
-    private let recipientIdentity: OWSRecipientIdentity
     private let contactName: String
-    private let identityKey: Data
-    private let fingerprint: OWSFingerprint
+    private let fingerprint: CombinedFingerprints
 
     private lazy var qrCodeScanViewController = QRCodeScanViewController(appearance: .framed)
 
     init(
         recipientAci: Aci,
-        recipientIdentity: OWSRecipientIdentity,
-        fingerprint: OWSFingerprint
+        recipientName: String,
+        fingerprint: CombinedFingerprints,
     ) {
         self.recipientAci = recipientAci
-        self.recipientIdentity = recipientIdentity
-        self.identityKey = recipientIdentity.identityKey
 
         self.fingerprint = fingerprint
-        self.contactName = SSKEnvironment.shared.databaseStorageRef.read { tx in
-            return SSKEnvironment.shared.contactManagerRef.displayName(for: SignalServiceAddress(recipientAci), tx: tx).resolvedValue()
-        }
+        self.contactName = recipientName
 
         super.init()
 
         title = CommonStrings.scanQRCodeTitle
     }
 
-    public var preferredNavigationBarStyle: OWSNavigationBarStyle {
-        return .solid
-    }
-
-    public var navbarBackgroundColorOverride: UIColor? {
-        return .ows_gray10
-    }
-
-    public var navbarTintColorOverride: UIColor? {
-        return Theme.lightThemePrimaryColor
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .black
+        view.backgroundColor = .Signal.background
 
         qrCodeScanViewController.delegate = self
         view.addSubview(qrCodeScanViewController.view)
         qrCodeScanViewController.view.autoPinWidthToSuperview()
-        qrCodeScanViewController.view.autoPin(toTopLayoutGuideOf: self, withInset: 0)
+        qrCodeScanViewController.view.autoPinEdge(toSuperviewSafeArea: .top)
         addChild(qrCodeScanViewController)
 
         let footerView = UIView()
-        footerView.backgroundColor = .ows_gray10
+        footerView.backgroundColor = .Signal.secondaryBackground
         view.addSubview(footerView)
         footerView.autoPinWidthToSuperview()
         footerView.autoPinEdge(.top, to: .bottom, of: qrCodeScanViewController.view)
@@ -69,17 +51,17 @@ class FingerprintScanViewController: OWSViewController, OWSNavigationChildContro
         let cameraInstructionLabel = UILabel()
         cameraInstructionLabel.text = NSLocalizedString(
             "SCAN_CODE_INSTRUCTIONS",
-            comment: "label presented once scanning (camera) view is visible."
+            comment: "label presented once scanning (camera) view is visible.",
         )
         cameraInstructionLabel.font = .systemFont(ofSize: .scaleFromIPhone5To7Plus(14, 18))
-        cameraInstructionLabel.textColor = .ows_gray60
+        cameraInstructionLabel.textColor = .Signal.secondaryLabel
         cameraInstructionLabel.textAlignment = .center
         cameraInstructionLabel.numberOfLines = 0
         cameraInstructionLabel.lineBreakMode = .byWordWrapping
         footerView.addSubview(cameraInstructionLabel)
         cameraInstructionLabel.autoPinWidthToSuperview(withMargin: .scaleFromIPhone5To7Plus(16, 30))
         let instructionsVMargin = CGFloat.scaleFromIPhone5To7Plus(10, 20)
-        cameraInstructionLabel.autoPin(toBottomLayoutGuideOf: self, withInset: instructionsVMargin)
+        cameraInstructionLabel.autoPinEdge(toSuperviewSafeArea: .bottom, withInset: instructionsVMargin)
         cameraInstructionLabel.autoPinEdge(toSuperviewEdge: .top, withInset: instructionsVMargin)
     }
 
@@ -100,10 +82,10 @@ class FingerprintScanViewController: OWSViewController, OWSNavigationChildContro
         func showSuccess() {
             FingerprintScanViewController.showVerificationSucceeded(
                 from: self,
-                identityKey: identityKey,
+                identityKey: fingerprint.remote.identityKey,
                 recipientAci: recipientAci,
                 contactName: contactName,
-                tag: "[\(type(of: self))]"
+                tag: "[\(type(of: self))]",
             )
         }
 
@@ -114,25 +96,52 @@ class FingerprintScanViewController: OWSViewController, OWSNavigationChildContro
                 localizedErrorDescription: localizedErrorDescription,
                 retry: { self.qrCodeScanViewController.tryToStartScanning() },
                 cancel: { self.navigationController?.popViewController(animated: true) },
-                tag: "[\(type(of: self))]"
+                tag: "[\(type(of: self))]",
             )
         }
 
-        switch fingerprint.matchesLogicalFingerprintsData(combinedFingerprintData) {
-        case .match:
+        let combinedFingerprints: Textsecure_CombinedFingerprints
+        do {
+            combinedFingerprints = try Textsecure_CombinedFingerprints(serializedBytes: combinedFingerprintData)
+        } catch {
+            Logger.warn("fingerprint failure: \(error)")
+            showFailure(localizedErrorDescription: OWSLocalizedString("PRIVACY_VERIFICATION_FAILURE_INVALID_QRCODE", comment: "alert body"))
+            return
+        }
+        do throws(CombinedFingerprints.MatchError) {
+            try fingerprint.checkAgainst(combinedFingerprints: combinedFingerprints)
             showSuccess()
-        case .noMatch(let localizedErrorDescription), .weHaveOldVersion(let localizedErrorDescription), .theyHaveOldVersion(let localizedErrorDescription):
-            // We reached the end, show the error for the last one.
-            showFailure(localizedErrorDescription: localizedErrorDescription)
+        } catch {
+            Logger.warn("verification failure: \(error)")
+            let message: String
+            switch error {
+            case .theyHaveOldVersion:
+                message = OWSLocalizedString("PRIVACY_VERIFICATION_FAILED_WITH_OLD_REMOTE_VERSION", comment: "alert body")
+            case .weHaveOldVersion:
+                message = OWSLocalizedString("PRIVACY_VERIFICATION_FAILED_WITH_OLD_LOCAL_VERSION", comment: "alert body")
+            case .theyHaveWrongKeyForUs:
+                let descriptionFormat = OWSLocalizedString(
+                    "PRIVACY_VERIFICATION_FAILED_THEY_HAVE_WRONG_KEY_FOR_ME",
+                    comment: "Alert body when verifying with {{contact name}}",
+                )
+                message = String.nonPluralLocalizedStringWithFormat(descriptionFormat, self.contactName)
+            case .weHaveWrongKeyForThem:
+                let descriptionFormat = OWSLocalizedString(
+                    "PRIVACY_VERIFICATION_FAILED_I_HAVE_WRONG_KEY_FOR_THEM",
+                    comment: "Alert body when verifying with {{contact name}}",
+                )
+                message = String.nonPluralLocalizedStringWithFormat(descriptionFormat, self.contactName)
+            }
+            showFailure(localizedErrorDescription: message)
         }
     }
 
     static func showVerificationSucceeded(
         from viewController: UIViewController,
-        identityKey: Data,
+        identityKey: IdentityKey,
         recipientAci: Aci,
         contactName: String,
-        tag: String
+        tag: String,
     ) {
         AssertIsOnMainThread()
 
@@ -141,26 +150,31 @@ class FingerprintScanViewController: OWSViewController, OWSNavigationChildContro
         let successTitle = NSLocalizedString("SUCCESSFUL_VERIFICATION_TITLE", comment: "")
         let descriptionFormat = NSLocalizedString(
             "SUCCESSFUL_VERIFICATION_DESCRIPTION",
-            comment: "Alert body after verifying privacy with {{other user's name}}"
+            comment: "Alert body after verifying privacy with {{other user's name}}",
         )
-        let successDescription = String(format: descriptionFormat, contactName)
+        let successDescription = String.nonPluralLocalizedStringWithFormat(descriptionFormat, contactName)
         let actionSheet = ActionSheetController(title: successTitle, message: successDescription)
         actionSheet.addAction(ActionSheetAction(
             title: NSLocalizedString(
                 "FINGERPRINT_SCAN_VERIFY_BUTTON",
-                comment: "Button that marks user as verified after a successful fingerprint scan."
+                comment: "Button that marks user as verified after a successful fingerprint scan.",
             ),
             style: .default,
             handler: { _ in
                 DependenciesBridge.shared.db.write { tx in
                     let identityManager = DependenciesBridge.shared.identityManager
-                    identityManager.saveIdentityKey(identityKey, for: recipientAci, tx: tx)
+                    identityManager.saveIdentityKey(
+                        identityKey,
+                        for: recipientAci,
+                        shouldUpdateStorageService: true,
+                        tx: tx,
+                    )
                     _ = identityManager.setVerificationState(
                         .verified,
-                        of: identityKey,
+                        of: identityKey.publicKey.keyBytes,
                         for: SignalServiceAddress(recipientAci),
                         isUserInitiatedChange: true,
-                        tx: tx
+                        tx: tx,
                     )
                 }
                 if let navigationController = viewController.navigationController {
@@ -168,7 +182,7 @@ class FingerprintScanViewController: OWSViewController, OWSNavigationChildContro
                 } else {
                     viewController.dismiss(animated: true)
                 }
-            }
+            },
         ))
         actionSheet.addAction(ActionSheetAction(
             title: CommonStrings.dismissButton,
@@ -179,7 +193,7 @@ class FingerprintScanViewController: OWSViewController, OWSNavigationChildContro
                 } else {
                     viewController.dismiss(animated: true)
                 }
-            }
+            },
         ))
 
         viewController.presentActionSheet(actionSheet)
@@ -191,14 +205,14 @@ class FingerprintScanViewController: OWSViewController, OWSNavigationChildContro
         localizedErrorDescription: String,
         retry: (() -> Void)? = nil,
         cancel: (() -> Void)? = nil,
-        tag: String
+        tag: String,
     ) {
         Logger.info("\(tag) Failed to verify safety numbers.")
 
         // We don't want to show a big scary "VERIFICATION FAILED" when it's just user error.
         let actionSheet = ActionSheetController(
             title: isUserError ? nil : NSLocalizedString("FAILED_VERIFICATION_TITLE", comment: "alert title"),
-            message: localizedErrorDescription
+            message: localizedErrorDescription,
         )
 
         if let retry {
@@ -207,11 +221,17 @@ class FingerprintScanViewController: OWSViewController, OWSNavigationChildContro
                 style: .default,
                 handler: { _ in
                     retry()
-                }
+                },
             ))
         }
 
-        actionSheet.addAction(OWSActionSheets.cancelAction)
+        actionSheet.addAction(ActionSheetAction(
+            title: CommonStrings.cancelButton,
+            style: .cancel,
+            handler: { _ in
+                cancel?()
+            },
+        ))
 
         viewController.presentActionSheet(actionSheet)
 
@@ -222,7 +242,7 @@ class FingerprintScanViewController: OWSViewController, OWSNavigationChildContro
 extension FingerprintScanViewController: QRCodeScanDelegate {
     func qrCodeScanViewScanned(
         qrCodeData: Data?,
-        qrCodeString: String?
+        qrCodeString: String?,
     ) -> QRCodeScanOutcome {
 
         guard let qrCodeData else {

@@ -10,11 +10,11 @@ import UniformTypeIdentifiers
 
 class SetWallpaperViewController: OWSTableViewController2 {
     private lazy var collectionView = WallpaperCollectionView(container: self, shouldDimInDarkMode: shouldDimInDarkMode) { [weak self] wallpaper in
-        guard let self = self else { return }
+        guard let self else { return }
         let vc = PreviewWallpaperViewController(
             mode: .preset(selectedWallpaper: wallpaper),
             thread: self.thread,
-            delegate: self
+            delegate: self,
         )
         self.presentFullScreen(UINavigationController(rootViewController: vc), animated: true)
     }
@@ -24,8 +24,8 @@ class SetWallpaperViewController: OWSTableViewController2 {
             thread: thread,
             shouldDimInDarkMode: DependenciesBridge.shared.wallpaperStore.fetchDimInDarkModeForRendering(
                 for: thread?.uniqueId,
-                tx: tx
-            )
+                tx: tx,
+            ),
         )
     }
 
@@ -38,7 +38,7 @@ class SetWallpaperViewController: OWSTableViewController2 {
         super.init()
     }
 
-    public override func viewDidLoad() {
+    override func viewDidLoad() {
         super.viewDidLoad()
 
         title = OWSLocalizedString("SET_WALLPAPER_TITLE", comment: "Title for the set wallpaper settings view.")
@@ -71,7 +71,6 @@ class SetWallpaperViewController: OWSTableViewController2 {
         tableView.reloadRows(at: [IndexPath(row: 0, section: 1)], with: .none)
     }
 
-    @objc
     private func updateTableContents() {
         let contents = OWSTableContents()
 
@@ -82,10 +81,10 @@ class SetWallpaperViewController: OWSTableViewController2 {
             icon: .buttonPhotoLibrary,
             withText: OWSLocalizedString(
                 "SET_WALLPAPER_CHOOSE_PHOTO",
-                comment: "Title for the wallpaper choose from photos option"
-            )
+                comment: "Title for the wallpaper choose from photos option",
+            ),
         ) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             let vc = UIImagePickerController()
             vc.delegate = self
             vc.sourceType = .photoLibrary
@@ -97,12 +96,14 @@ class SetWallpaperViewController: OWSTableViewController2 {
         contents.add(photosSection)
 
         let presetsSection = OWSTableSection()
-        presetsSection.headerTitle = OWSLocalizedString("SET_WALLPAPER_PRESETS",
-                                                       comment: "Title for the wallpaper presets section")
+        presetsSection.headerTitle = OWSLocalizedString(
+            "SET_WALLPAPER_PRESETS",
+            comment: "Title for the wallpaper presets section",
+        )
 
         let presetsItem = OWSTableItem { [weak self] in
             let cell = OWSTableItem.newCell()
-            guard let self = self else { return cell }
+            guard let self else { return cell }
             cell.contentView.addSubview(self.collectionView)
             self.collectionView.autoPinEdgesToSuperviewMargins()
             return cell
@@ -118,7 +119,7 @@ class SetWallpaperViewController: OWSTableViewController2 {
 extension SetWallpaperViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(
         _ picker: UIImagePickerController,
-        didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
+        didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any],
     ) {
         guard let rawImage = info[.originalImage] as? UIImage else {
             return owsFailDebug("Missing image")
@@ -127,7 +128,7 @@ extension SetWallpaperViewController: UIImagePickerControllerDelegate, UINavigat
         let vc = PreviewWallpaperViewController(
             mode: .photo(selectedPhoto: rawImage),
             thread: thread,
-            delegate: self
+            delegate: self,
         )
 
         picker.dismiss(animated: true) {
@@ -142,12 +143,12 @@ extension SetWallpaperViewController: UIImagePickerControllerDelegate, UINavigat
 
 extension SetWallpaperViewController: PreviewWallpaperDelegate {
     func previewWallpaperDidCancel(_ vc: PreviewWallpaperViewController) {
-        presentedViewController?.dismiss(animated: true)
+        vc.dismiss(animated: true)
     }
 
     func previewWallpaperDidComplete(_ vc: PreviewWallpaperViewController) {
-        presentedViewController?.dismiss(animated: true)
-        navigationController?.popViewController(animated: true)
+        navigationController?.popViewController(animated: false)
+        vc.dismiss(animated: true)
     }
 }
 
@@ -161,7 +162,7 @@ private class WallpaperCollectionView: UICollectionView {
     init(
         container: OWSTableViewController2,
         shouldDimInDarkMode: Bool,
-        selectionHandler: @escaping (Wallpaper) -> Void
+        selectionHandler: @escaping (Wallpaper) -> Void,
     ) {
         self.container = container
         self.shouldDimInDarkMode = shouldDimInDarkMode
@@ -212,7 +213,7 @@ extension WallpaperCollectionView: UICollectionViewDataSource, UICollectionViewD
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: WallpaperCell.reuseIdentifier,
-            for: indexPath
+            for: indexPath,
         )
 
         guard let wallpaperCell = cell as? WallpaperCell else {
@@ -253,10 +254,10 @@ private class WallpaperCell: UICollectionViewCell {
         wallpaperView = Wallpaper.viewBuilder(
             for: wallpaper,
             customPhoto: { nil },
-            shouldDimInDarkTheme: shouldDimInDarkMode
+            shouldDimInDarkTheme: shouldDimInDarkMode,
         )?.build().asPreviewView()
 
-        guard let wallpaperView = wallpaperView else {
+        guard let wallpaperView else {
             return owsFailDebug("Missing wallpaper view")
         }
 

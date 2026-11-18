@@ -8,13 +8,8 @@ public import SignalServiceKit
 
 public enum RegistrationMode: CustomDebugStringConvertible {
     case registering
-    case reRegistering(ReregistrationParams)
+    case reRegistering(ReregisteringLocalIdentifiers)
     case changingNumber(ChangeNumberParams)
-
-    public struct ReregistrationParams: Codable, Equatable {
-        public let e164: E164
-        @AciUuid public var aci: Aci
-    }
 
     public struct ChangeNumberParams: Codable, Equatable {
         public let oldE164: E164

@@ -301,7 +301,6 @@ class ParsedClass:
             #
             # Except the special-cased ones.
             force_optional = property.type_info().is_enum
-            force_optional = force_optional and property.name not in ["mentionNotificationMode", "storyViewMode"]
             property.force_optional = force_optional
             record_properties.append(property)
         for property in subclass_properties:
@@ -485,25 +484,7 @@ class TypeInfo:
             # Do nothing; we don't need to unpack this non-optional.
             pass
 
-        if value_name == "mentionNotificationMode":
-            value_statement = (
-                "let %s: %s = TSThreadMentionNotificationMode(rawValue: %s) ?? .default"
-                % (
-                    value_name,
-                    "TSThreadMentionNotificationMode",
-                    value_expr,
-                )
-            )
-        elif value_name == "storyViewMode":
-            value_statement = (
-                "let %s: %s = TSThreadStoryViewMode(rawValue: %s) ?? .default"
-                % (
-                    value_name,
-                    "TSThreadStoryViewMode",
-                    value_expr,
-                )
-            )
-        elif self.is_codable:
+        if self.is_codable:
             value_statement = "let %s: %s = %s" % (
                 value_name,
                 initializer_param_type,
@@ -511,34 +492,82 @@ class TypeInfo:
             )
         elif self.should_use_blob:
             blob_name = "%sSerialized" % (str(value_name),)
-            if is_optional or did_force_optional:
+            if is_optional:
                 serialized_statement = "let %s: Data? = %s" % (
                     blob_name,
                     value_expr,
                 )
+            elif did_force_optional:
+                serialized_statement = f'let {blob_name}: Data = try {value_expr} ?? {{ () -> Data in throw SDSError.missingRequiredField(fieldName: "{value_name}") }}()'
             else:
                 serialized_statement = "let %s: Data = %s" % (
                     blob_name,
                     value_expr,
                 )
+            from_name = "$0" if is_optional else blob_name
+            swift_type = self._swift_type
+            if swift_type == "[InfoMessageUserInfoKey: AnyObject]":
+                decode_statement = (
+                    'try SDSDeserialization.unarchivedInfoDictionary(from: %s)'
+                    % (
+                        from_name,
+                    )
+                )
+            elif ": " in swift_type:
+                assert swift_type.startswith("[")
+                assert swift_type.endswith("]")
+                divider_index = swift_type.index(": ")
+                key_type = swift_type[1:divider_index]
+                value_type = swift_type[divider_index + 2:-1]
+                decode_statement = (
+                    'try SDSDeserialization.unarchivedDictionary(ofKeyClass: %s.self, objectClass: %s.self, from: %s)'
+                    % (
+                        key_type,
+                        value_type,
+                        from_name,
+                    )
+                )
+            elif swift_type.startswith("["):
+                assert swift_type.endswith("]")
+                array_type = self._swift_type[1:-1]
+                objc_types = {
+                    "String": "NSString",
+                }
+                objc_type = objc_types.get(array_type, array_type)
+                decode_statement = (
+                    'try SDSDeserialization.unarchivedArrayOfObjects(ofClass: %s.self, from: %s)'
+                    % (
+                        objc_type,
+                        from_name,
+                    )
+                )
+                if array_type in objc_types:
+                    decode_statement += ' as ' + self._swift_type
+            else:
+                decode_statement = (
+                    'try SDSDeserialization.unarchivedObject(ofClass: %s.self, from: %s)'
+                    % (
+                        self._swift_type,
+                        from_name,
+                    )
+                )
             if is_optional:
                 value_statement = (
-                    'let %s: %s? = try SDSDeserialization.optionalUnarchive(%s, name: "%s")'
+                    'let %s: %s? = try %s.map({ %s })'
                     % (
                         value_name,
                         self._swift_type,
                         blob_name,
-                        value_name,
+                        decode_statement,
                     )
                 )
             else:
                 value_statement = (
-                    'let %s: %s = try SDSDeserialization.unarchive(%s, name: "%s")'
+                    'let %s: %s = %s'
                     % (
                         value_name,
                         self._swift_type,
-                        blob_name,
-                        value_name,
+                        decode_statement,
                     )
                 )
             return [
@@ -1119,7 +1148,7 @@ def generate_swift_extensions_for_model(clazz):
         return
 
     has_sds_superclass = clazz.has_sds_superclass()
-    has_remove_methods = clazz.name not in ("TSThread", "TSInteraction")
+    has_remove_methods = clazz.name not in ("TSInteraction")
     has_grdb_serializer = clazz.name in ("TSInteraction")
 
     swift_filename = os.path.basename(clazz.filepath)
@@ -1314,8 +1343,7 @@ public extension %s {
             property_name = property.column_name()
             swift_type = type_info.swift_type()
 
-            did_force_optional = property.name not in ["mentionNotificationMode", "storyViewMode"]
-            did_force_optional = did_force_optional and type_info.is_enum
+            did_force_optional = type_info.is_enum
 
             if property_name == "recordType":
                 # recordType is an enum, but its property info here doesn't
@@ -1415,8 +1443,7 @@ extension %s {
                 value_name = "%s" % property.name
 
                 if property.name not in ("uniqueId",):
-                    did_force_optional = property.name not in ["mentionNotificationMode", "storyViewMode"]
-                    did_force_optional = did_force_optional and property.name not in base_property_names
+                    did_force_optional = property.name not in base_property_names
                     did_force_optional = did_force_optional and not property.is_optional
                     did_force_optional = did_force_optional or property.type_info().is_enum
                     for statement in property.deserialize_record_invocation(
@@ -1736,8 +1763,7 @@ extension %(class_name)s: DeepCopyable {
             for property in deserialize_properties:
                 value_name = "%s" % property.name
 
-                did_force_optional = property.name not in ["mentionNotificationMode", "storyViewMode"]
-                did_force_optional = did_force_optional and property.name not in base_property_names
+                did_force_optional = property.name not in base_property_names
                 did_force_optional = did_force_optional and not property.is_optional
                 did_force_optional = did_force_optional or property.type_info().is_enum
                 for statement in property.deep_copy_record_invocation(
@@ -1897,9 +1923,10 @@ extension %sSerializer {
 
         # ---- Fetch ----
 
-        ignore_cache = ""
+        cached_method = "anyFetch"
+        uncached_method = "anyFetch"
         if cache_get_code_for_class(clazz) is not None:
-            ignore_cache = ", ignoreCache: true"
+            cached_method = "fetchViaCache"
 
         swift_body += """
 // MARK: - Save/Remove/Update
@@ -1920,7 +1947,7 @@ public extension %(class_name)s {
     // you are inserting or updating rather than calling this method.
     func anyUpsert(transaction: DBWriteTransaction) {
         let isInserting: Bool
-        if %(class_name)s.anyFetch(uniqueId: uniqueId, transaction: transaction) != nil {
+        if %(class_name)s.%(cached_method)s(uniqueId: uniqueId, transaction: transaction) != nil {
             isInserting = false
         } else {
             isInserting = true
@@ -1962,7 +1989,7 @@ public extension %(class_name)s {
             return
         }
 
-        guard let dbCopy = type(of: self).anyFetch(uniqueId: uniqueId, transaction: transaction%(ignore_cache)s) else {
+        guard let dbCopy = type(of: self).%(uncached_method)s(uniqueId: uniqueId, transaction: transaction) else {
             return
         }
 
@@ -1990,7 +2017,8 @@ public extension %(class_name)s {
     }
 """ % {
             "class_name": str(clazz.name),
-            "ignore_cache": ignore_cache,
+            "cached_method": cached_method,
+            "uncached_method": uncached_method,
         }
 
         if has_remove_methods:
@@ -2011,17 +2039,14 @@ public extension %(class_name)s {
 @objc
 public class %sCursor: NSObject, SDSCursor {
     private let transaction: DBReadTransaction
-    private let cursor: RecordCursor<%s>?
+    private let cursor: RecordCursor<%s>
 
-    init(transaction: DBReadTransaction, cursor: RecordCursor<%s>?) {
+    init(transaction: DBReadTransaction, cursor: RecordCursor<%s>) {
         self.transaction = transaction
         self.cursor = cursor
     }
 
     public func next() throws -> %s? {
-        guard let cursor = cursor else {
-            return nil
-        }
         guard let record = try cursor.next() else {
             return nil
         }""" % (
@@ -2076,54 +2101,43 @@ public extension %(class_name)s {
     @nonobjc
     class func grdbFetchCursor(transaction: DBReadTransaction) -> %(class_name)sCursor {
         let database = transaction.database
-        do {
+        return failIfThrows {
             let cursor = try %(record_name)s.fetchCursor(database)
             return %(class_name)sCursor(transaction: transaction, cursor: cursor)
-        } catch {
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(
-                userDefaults: CurrentAppContext().appUserDefaults(),
-                error: error
-            )
-            owsFailDebug("Read failed: \\(error)")
-            return %(class_name)sCursor(transaction: transaction, cursor: nil)
         }
     }
 """ % {
             "class_name": str(clazz.name),
             "record_name": record_name,
-        }
-
-        swift_body += """
-    // Fetches a single model by "unique id".
-    class func anyFetch(uniqueId: String,
-                        transaction: DBReadTransaction) -> %(class_name)s? {
-        assert(!uniqueId.isEmpty)
-""" % {
-            "class_name": str(clazz.name),
-            "record_name": record_name,
-            "record_identifier": record_identifier(clazz.name),
         }
 
         cache_code = cache_get_code_for_class(clazz)
-        if cache_code is not None:
-            swift_body += """
-        return anyFetch(uniqueId: uniqueId, transaction: transaction, ignoreCache: false)
-    }
-
+        assert cache_code is not None
+        swift_body += """
     // Fetches a single model by "unique id".
-    class func anyFetch(uniqueId: String,
-                        transaction: DBReadTransaction,
-                        ignoreCache: Bool) -> %(class_name)s? {
+    class func fetchViaCache(uniqueId: String, transaction: DBReadTransaction) -> %(class_name)s? {
         assert(!uniqueId.isEmpty)
 
-        if !ignoreCache,
-            let cachedCopy = %(cache_code)s {
+        if let cachedCopy = %(cache_code)s {
             return cachedCopy
         }
+
+        return anyFetch(uniqueId: uniqueId, transaction: transaction)
+    }
 """ % {
-                "class_name": str(clazz.name),
-                "cache_code": str(cache_code),
-            }
+            "class_name": str(clazz.name),
+            "cache_code": str(cache_code),
+        }
+
+        swift_body += """
+
+    // Fetches a single model by "unique id".
+    class func anyFetch(uniqueId: String, transaction: DBReadTransaction) -> %(class_name)s? {
+        assert(!uniqueId.isEmpty)
+
+""" % {
+            "class_name": str(clazz.name),
+        }
 
         swift_body += """
         let sql = "SELECT * FROM \\(%(record_name)s.databaseTableName) WHERE \\(%(record_identifier)sColumn: .uniqueId) = ?"
@@ -2139,54 +2153,26 @@ public extension %(class_name)s {
     // Records are not visited in any particular order.
     class func anyEnumerate(
         transaction: DBReadTransaction,
-        block: (%s, UnsafeMutablePointer<ObjCBool>) -> Void
-    ) {
-        anyEnumerate(transaction: transaction, batched: false, block: block)
-    }
-
-    // Traverses all records.
-    // Records are not visited in any particular order.
-    class func anyEnumerate(
-        transaction: DBReadTransaction,
-        batched: Bool = false,
-        block: (%s, UnsafeMutablePointer<ObjCBool>) -> Void
-    ) {
-        let batchSize = batched ? Batching.kDefaultBatchSize : 0
-        anyEnumerate(transaction: transaction, batchSize: batchSize, block: block)
-    }
-
-    // Traverses all records.
-    // Records are not visited in any particular order.
-    //
-    // If batchSize > 0, the enumeration is performed in autoreleased batches.
-    class func anyEnumerate(
-        transaction: DBReadTransaction,
-        batchSize: UInt,
-        block: (%s, UnsafeMutablePointer<ObjCBool>) -> Void
+        block: (%s) -> Void,
     ) {
         let cursor = %s.grdbFetchCursor(transaction: transaction)
-        Batching.loop(batchSize: batchSize,
-                        loopBlock: { stop in
-                            do {
-                                guard let value = try cursor.next() else {
-                                    stop.pointee = true
-                                    return
-                                }
-                                block(value, stop)
-                            } catch let error {
-                                owsFailDebug("Couldn't fetch model: \\(error)")
-                            }
-                            })
+        do {
+            while let value = try cursor.next() {
+                block(value)
+            }
+        } catch let error {
+            owsFailDebug("Couldn't fetch model: \\(error)")
+        }
     }
 """ % (
-            (str(clazz.name),) * 4
+            (str(clazz.name),) * 2
         )
 
         swift_body += """
     // Does not order the results.
     class func anyFetchAll(transaction: DBReadTransaction) -> [%s] {
         var result = [%s]()
-        anyEnumerate(transaction: transaction) { (model, _) in
+        anyEnumerate(transaction: transaction) { model in
             result.append(model)
         }
         return result
@@ -2215,17 +2201,10 @@ public extension %(class_name)s {
     class func grdbFetchCursor(sql: String,
                                arguments: StatementArguments = StatementArguments(),
                                transaction: DBReadTransaction) -> %(class_name)sCursor {
-        do {
+        return failIfThrows {
             let sqlRequest = SQLRequest<Void>(sql: sql, arguments: arguments, cached: true)
             let cursor = try %(record_name)s.fetchCursor(transaction.database, sqlRequest)
             return %(class_name)sCursor(transaction: transaction, cursor: cursor)
-        } catch {
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(
-                userDefaults: CurrentAppContext().appUserDefaults(),
-                error: error
-            )
-            owsFailDebug("Read failed: \\(error)")
-            return %(class_name)sCursor(transaction: transaction, cursor: nil)
         }
     }
 """ % {
@@ -2283,15 +2262,14 @@ public extension %(class_name)s {
 @objc
 public extension %s {
     // NOTE: This method will fail if the object has unexpected type.
-    class func anyFetch%s(
+    class func fetch%sViaCache(
         uniqueId: String,
         transaction: DBReadTransaction
     ) -> %s? {
         assert(!uniqueId.isEmpty)
 
-        guard let object = anyFetch(uniqueId: uniqueId,
-                                    transaction: transaction) else {
-                                        return nil
+        guard let object = fetchViaCache(uniqueId: uniqueId, transaction: transaction) else {
+            return nil
         }
         guard let instance = object as? %s else {
             owsFailDebug("Object has unexpected type: \\(type(of: object))")
@@ -2462,31 +2440,23 @@ record_type_map = {}
 # It's critical that our "record type" values are consistent, even if we add/remove/rename model classes.
 # Therefore we persist the mapping of known classes in a JSON file that is under source control.
 def update_record_type_map(record_type_swift_path, record_type_json_path):
-    record_type_map_filepath = record_type_json_path
+    old_record_types = {}
+    if os.path.exists(record_type_json_path):
+        with open(record_type_json_path, "r") as f:
+            old_record_types = json.load(f)
 
-    if os.path.exists(record_type_map_filepath):
-        with open(record_type_map_filepath, "rt") as f:
-            json_string = f.read()
-        json_data = json.loads(json_string)
-        record_type_map.update(json_data)
-
-    max_record_type = 0
-    for class_name in record_type_map:
-        if class_name.startswith("#"):
-            continue
-        record_type = record_type_map[class_name]
-        max_record_type = max(max_record_type, record_type)
+    max_record_type = old_record_types.get("#max", 0)
 
     for clazz in global_class_map.values():
-        if clazz.name not in record_type_map:
+        if not clazz.should_generate_extensions():
+            continue
+        if clazz.name in old_record_types:
+            record_type_map[clazz.name] = old_record_types[clazz.name]
+        else:
+            max_record_type += 1
+            record_type_map[clazz.name] = max_record_type
 
-            if not clazz.should_generate_extensions():
-                continue
-
-            max_record_type = int(max_record_type) + 1
-            record_type = max_record_type
-            record_type_map[clazz.name] = record_type
-
+    record_type_map["#max"] = max_record_type
     record_type_map["#comment"] = (
         "NOTE: This file is generated by %s. Do not manually edit it, instead run `sds_codegen.sh`."
         % (sds_common.pretty_module_path(__file__),)
@@ -2494,7 +2464,7 @@ def update_record_type_map(record_type_swift_path, record_type_json_path):
 
     json_string = json.dumps(record_type_map, sort_keys=True, indent=4)
 
-    sds_common.write_text_file_if_changed(record_type_map_filepath, json_string)
+    sds_common.write_text_file_if_changed(record_type_json_path, json_string)
 
     # TODO: We'll need to import SignalServiceKit for non-SSK classes.
 

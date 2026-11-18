@@ -4,8 +4,8 @@
 //
 
 import Foundation
-import SignalUI
 import SignalServiceKit
+import SignalUI
 
 class DonateChoosePaymentMethodSheet: StackSheetViewController {
     enum DonationMode {
@@ -28,26 +28,26 @@ class DonateChoosePaymentMethodSheet: StackSheetViewController {
         case .oneTime:
             let format = OWSLocalizedString(
                 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_ONE_TIME_DONATION",
-                comment: "When users make one-time donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\"."
+                comment: "When users make one-time donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\".",
             )
-            return String(format: format, currencyString)
+            return String.nonPluralLocalizedStringWithFormat(format, currencyString)
         case .monthly:
             let moneyPerMonthFormat = OWSLocalizedString(
                 "SUSTAINER_VIEW_PRICING",
-                comment: "Pricing text for sustainer view badges, embeds {{price}}"
+                comment: "Pricing text for sustainer view badges, embeds {{price}}",
             )
-            let moneyPerMonthString = String(format: moneyPerMonthFormat, currencyString)
+            let moneyPerMonthString = String.nonPluralLocalizedStringWithFormat(moneyPerMonthFormat, currencyString)
             let format = OWSLocalizedString(
                 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_MONTHLY_DONATION",
-                comment: "When users make monthly donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money per month}}, such as \"$5/month\"."
+                comment: "When users make monthly donations, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money per month}}, such as \"$5/month\".",
             )
-            return String(format: format, moneyPerMonthString)
+            return String.nonPluralLocalizedStringWithFormat(format, moneyPerMonthString)
         case .gift:
             let format = OWSLocalizedString(
                 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_TITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND",
-                comment: "When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\"."
+                comment: "When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the title on that sheet. Embeds {{amount of money}}, such as \"$5\".",
             )
-            return String(format: format, currencyString)
+            return String.nonPluralLocalizedStringWithFormat(format, currencyString)
         }
     }
 
@@ -56,22 +56,23 @@ class DonateChoosePaymentMethodSheet: StackSheetViewController {
         case .oneTime:
             let format = OWSLocalizedString(
                 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_SUBTITLE_FOR_ONE_TIME_DONATION",
-                comment: "When users make one-time donations, they see a sheet that lets them pick a payment method. It also tells them what they'll be doing when they pay: receive a badge for a month. This is the subtitle on that sheet. Embeds {{localized badge name}}, such as \"Boost\"." )
-            return String(format: format, badge.localizedName)
+                comment: "When users make one-time donations, they see a sheet that lets them pick a payment method. It also tells them what they'll be doing when they pay: receive a badge for a month. This is the subtitle on that sheet. Embeds {{localized badge name}}, such as \"Boost\".",
+            )
+            return String.nonPluralLocalizedStringWithFormat(format, badge.localizedName)
 
         case .monthly:
             let format = OWSLocalizedString(
                 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_SUBTITLE_FOR_MONTHLY_DONATION",
-                comment: "When users make monthly donations, they see a sheet that lets them pick a payment method. It also tells them what they'll be doing when they pay: receive a badge. This is the subtitle on that sheet. Embeds {{localized badge name}}, such as \"Planet\"."
+                comment: "When users make monthly donations, they see a sheet that lets them pick a payment method. It also tells them what they'll be doing when they pay: receive a badge. This is the subtitle on that sheet. Embeds {{localized badge name}}, such as \"Planet\".",
             )
-            return String(format: format, badge.localizedName)
+            return String.nonPluralLocalizedStringWithFormat(format, badge.localizedName)
 
         case let .gift(recipientFullName):
             let format = OWSLocalizedString(
                 "DONATE_CHOOSE_PAYMENT_METHOD_SHEET_SUBTITLE_FOR_DONATION_ON_BEHALF_OF_A_FRIEND",
-                comment: "When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the subtitle on that sheet. Embeds {{recipient's name}}."
+                comment: "When users make donations on a friend's behalf, they see a sheet that lets them pick a payment method. This is the subtitle on that sheet. Embeds {{recipient's name}}.",
             )
-            return String(format: format, recipientFullName)
+            return String.nonPluralLocalizedStringWithFormat(format, recipientFullName)
         }
     }
 
@@ -80,7 +81,7 @@ class DonateChoosePaymentMethodSheet: StackSheetViewController {
         badge: ProfileBadge,
         donationMode: DonationMode,
         supportedPaymentMethods: Set<DonationPaymentMethod>,
-        didChoosePaymentMethod: @escaping (DonateChoosePaymentMethodSheet, DonationPaymentMethod) -> Void
+        didChoosePaymentMethod: @escaping (DonateChoosePaymentMethodSheet, DonationPaymentMethod) -> Void,
     ) {
         self.amount = amount
         self.badge = badge
@@ -104,18 +105,16 @@ class DonateChoosePaymentMethodSheet: StackSheetViewController {
         stackView.spacing = 24
     }
 
-    public func headerStack() -> UIStackView {
+    func headerStack() -> UIStackView {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.alignment = .center
         stackView.spacing = 6
 
-        if let assets = badge.assets {
-            let badgeImageView = UIImageView(image: assets.universal160)
-            badgeImageView.autoSetDimensions(to: CGSize(square: 80))
-            stackView.addArrangedSubview(badgeImageView)
-            stackView.setCustomSpacing(12, after: badgeImageView)
-        }
+        let badgeImageView = UIImageView(image: badge.assets.universal160)
+        badgeImageView.autoSetDimensions(to: CGSize(square: 80))
+        stackView.addArrangedSubview(badgeImageView)
+        stackView.setCustomSpacing(12, after: badgeImageView)
 
         let titleLabel = UILabel.title2Label(text: titleText)
         stackView.addArrangedSubview(titleLabel)
@@ -130,16 +129,18 @@ class DonateChoosePaymentMethodSheet: StackSheetViewController {
 
     private func buttonsStack() -> UIView {
         let paymentMethods: [DonationPaymentMethod]
-        let applePayFirstRegions = PhoneNumberRegions(arrayLiteral: "1")
+        let applePayFirstRegions = PhoneNumberRegions(["1"])
 
-        if let localNumber = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.phoneNumber,
-           applePayFirstRegions.contains(e164: localNumber) {
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+        let localIdentifiers = tsAccountManager.localIdentifiersWithMaybeSneakyTransaction
+            .owsFailUnwrap("must have been registered at some point")
+        if applePayFirstRegions.contains(e164: localIdentifiers.phoneNumber) {
             paymentMethods = [
                 .applePay,
                 .creditOrDebitCard,
                 .paypal,
                 .sepa,
-                .ideal
+                .ideal,
             ]
         } else {
             paymentMethods = [
@@ -208,39 +209,24 @@ class DonateChoosePaymentMethodSheet: StackSheetViewController {
         }
     }
 
-    private func createPaypalButton() -> PaypalButton {
-        PaypalButton { [weak self] in
-            guard let self else { return }
-            self.didChoosePaymentMethod(self, .paypal)
-        }
-    }
-
-    private func createPaymentMethodButton(
-        title: String,
-        image: UIImage?,
-        action: @escaping () -> Void
-    ) -> UIButton {
-        var configuration: UIButton.Configuration
+    private func createPaypalButton() -> UIButton {
+        var configuration: UIButton.Configuration = if #available(iOS 26, *) { .prominentGlass() } else { .borderedProminent() }
+        configuration.image = UIImage(resource: .paypalLogo)
+        configuration.baseBackgroundColor = UIColor(rgbHex: 0xF6C757)
         if #available(iOS 26, *) {
-            configuration = UIButton.Configuration.glass()
+            configuration.cornerStyle = .capsule
         } else {
-            configuration = .bordered()
+            configuration.cornerStyle = .fixed
             configuration.background.cornerRadius = 12
-            configuration.baseForegroundColor = .label
-            configuration.baseBackgroundColor = .Signal.secondaryGroupedBackground
         }
 
-        configuration.title = title
-        configuration.titleTextAttributesTransformer = .defaultFont(.dynamicTypeHeadlineClamped)
-        configuration.image = image
-        configuration.imagePadding = 8
-        configuration.contentInsets = NSDirectionalEdgeInsets(hMargin: 16, vMargin: 12)
-
-        let button = UIButton(
+        return UIButton(
             configuration: configuration,
-            primaryAction: UIAction { _ in action() }
+            primaryAction: UIAction { [weak self] _ in
+                guard let self else { return }
+                self.didChoosePaymentMethod(self, .paypal)
+            },
         )
-        return button
     }
 
     private func createCreditOrDebitCardButton() -> UIButton {
@@ -254,7 +240,7 @@ class DonateChoosePaymentMethodSheet: StackSheetViewController {
 
         configuration.title = OWSLocalizedString(
             "DONATE_CHOOSE_CREDIT_OR_DEBIT_CARD_AS_PAYMENT_METHOD",
-            comment: "When users make donations, they can choose which payment method they want to use. This is the text on the button that lets them choose to pay with credit or debit card."
+            comment: "When users make donations, they can choose which payment method they want to use. This is the text on the button that lets them choose to pay with credit or debit card.",
         )
         configuration.titleTextAttributesTransformer = .defaultFont(.dynamicTypeHeadlineClamped)
         configuration.image = UIImage(named: "payment")
@@ -266,32 +252,66 @@ class DonateChoosePaymentMethodSheet: StackSheetViewController {
             primaryAction: UIAction { [weak self] _ in
                 guard let self else { return }
                 self.didChoosePaymentMethod(self, .creditOrDebitCard)
-            }
+            },
         )
         button.tintColor = UIColor.Signal.accent
         return button
     }
 
     private func createSEPAButton() -> UIButton {
-        createPaymentMethodButton(
-            title: OWSLocalizedString(
-                "DONATE_CHOOSE_BANK_TRANSFER_AS_PAYMENT_METHOD",
-                comment: "When users make donations, they can choose which payment method they want to use. This is the text on the button that lets them choose to pay with bank transfer."
-            ),
-            image: UIImage(named: "building")
-        ) { [weak self] in
-            guard let self else { return }
-            self.didChoosePaymentMethod(self, .sepa)
+        var configuration: UIButton.Configuration
+        if #available(iOS 26, *) {
+            configuration = .prominentGlass()
+        } else {
+            configuration = .bordered()
+            configuration.background.cornerRadius = 12
+            configuration.baseForegroundColor = .label
         }
+        configuration.baseBackgroundColor = .Signal.secondaryGroupedBackground
+
+        configuration.title = OWSLocalizedString(
+            "DONATE_CHOOSE_BANK_TRANSFER_AS_PAYMENT_METHOD",
+            comment: "When users make donations, they can choose which payment method they want to use. This is the text on the button that lets them choose to pay with bank transfer.",
+        )
+        configuration.titleTextAttributesTransformer = .defaultFont(.dynamicTypeHeadlineClamped)
+        configuration.image = UIImage(named: "building")
+        configuration.imagePadding = 8
+        configuration.contentInsets = NSDirectionalEdgeInsets(hMargin: 16, vMargin: 12)
+
+        let button = UIButton(
+            configuration: configuration,
+            primaryAction: UIAction { [weak self] _ in
+                guard let self else { return }
+                self.didChoosePaymentMethod(self, .sepa)
+            },
+        )
+        return button
     }
 
     private func createIDEALButton() -> UIButton {
-        createPaymentMethodButton(
-            title: LocalizationNotNeeded("iDEAL"),
-            image: UIImage(named: "logo_ideal")
-        ) { [weak self] in
-            guard let self else { return }
-            self.didChoosePaymentMethod(self, .ideal)
+        let backgroundColor = UIColor(rgbHex: 0xCCD6F2)
+        var configuration: UIButton.Configuration
+        if #available(iOS 26, *) {
+            configuration = UIButton.Configuration.prominentGlass()
+        } else {
+            configuration = .bordered()
+            configuration.background.cornerRadius = 12
+            configuration.baseForegroundColor = .label
         }
+        configuration.baseBackgroundColor = backgroundColor
+
+        configuration.image = UIImage(named: "logo_ideal")
+        configuration.imagePadding = 8
+        configuration.contentInsets = NSDirectionalEdgeInsets(hMargin: 16, vMargin: 12)
+
+        let button = UIButton(
+            configuration: configuration,
+            primaryAction: UIAction { [weak self] _ in
+                guard let self else { return }
+                self.didChoosePaymentMethod(self, .ideal)
+            },
+        )
+        button.tintColor = backgroundColor
+        return button
     }
 }

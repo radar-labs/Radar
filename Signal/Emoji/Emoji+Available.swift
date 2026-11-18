@@ -4,6 +4,7 @@
 //
 
 import SignalServiceKit
+import UIKit
 
 extension Emoji {
     private static let availableCache = AtomicDictionary<Emoji, Bool>(lock: .sharedGlobal)
@@ -15,8 +16,6 @@ extension Emoji {
 
     static func warmAvailableCache() {
         owsAssertDebug(!Thread.isMainThread)
-
-        guard CurrentAppContext().hasUI else { return }
 
         var availableCache = [Emoji: Bool]()
         var uncachedEmoji = [Emoji]()
@@ -59,8 +58,10 @@ extension Emoji {
             do {
                 // Use FileManager.createDirectory directly because OWSFileSystem.ensureDirectoryExists
                 // can modify the protection, and this is a system-managed directory.
-                try FileManager.default.createDirectory(at: Self.cacheUrl.deletingLastPathComponent(),
-                                                        withIntermediateDirectories: true)
+                try FileManager.default.createDirectory(
+                    at: Self.cacheUrl.deletingLastPathComponent(),
+                    withIntermediateDirectories: true,
+                )
                 try availableMap.write(to: Self.cacheUrl)
             } catch {
                 Logger.warn("Failed to save emoji availability cache; it will be recomputed next time! \(error)")
@@ -71,16 +72,12 @@ extension Emoji {
     }
 
     private static func isEmojiAvailable(_ emoji: Emoji) -> Bool {
-        owsAssertDebug(CurrentAppContext().hasUI)
-
         return emoji.rawValue.isUnicodeStringAvailable
     }
 
     /// Indicates whether the given emoji is available on this iOS
     /// version. We cache the availability in memory.
     var available: Bool {
-        owsAssertDebug(CurrentAppContext().hasUI)
-
         guard let available = Self.availableCache[self] else {
             let available = Self.isEmojiAvailable(self)
             Self.availableCache[self] = available

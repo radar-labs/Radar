@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import LibSignalClient
 import SignalServiceKit
 import SignalUI
 
@@ -22,6 +23,8 @@ class GroupViewHelper {
 
     let threadViewModel: ThreadViewModel
 
+    let memberLabelCoordinator: MemberLabelCoordinator?
+
     var thread: TSThread {
         return threadViewModel.threadRecord
     }
@@ -30,8 +33,9 @@ class GroupViewHelper {
         return delegate?.fromViewController
     }
 
-    init(threadViewModel: ThreadViewModel) {
+    init(threadViewModel: ThreadViewModel, memberLabelCoordinator: MemberLabelCoordinator?) {
         self.threadViewModel = threadViewModel
+        self.memberLabelCoordinator = memberLabelCoordinator
     }
 
     // MARK: - Accessors
@@ -39,15 +43,26 @@ class GroupViewHelper {
     // Don't use this method directly;
     // Use canEditConversationAttributes or canEditConversationMembership instead.
     private func canLocalUserEditConversation(v2AccessTypeBlock: (GroupAccess) -> GroupV2Access) -> Bool {
-        if threadViewModel.hasPendingMessageRequest {
+        guard let localAci = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.aci else {
+            owsFailDebug("Missing localAci.")
             return false
         }
-        guard isLocalUserFullMember else {
+        return canLocalUserEditConversation(localAci: localAci, v2AccessTypeBlock: v2AccessTypeBlock)
+    }
+
+    private func canLocalUserEditConversation(
+        localAci: Aci,
+        v2AccessTypeBlock: (GroupAccess) -> GroupV2Access,
+    ) -> Bool {
+        if threadViewModel.hasPendingMessageRequest {
             return false
         }
         guard let groupThread = thread as? TSGroupThread else {
             // Both users can edit contact threads.
             return true
+        }
+        guard groupThread.groupModel.groupMembership.isFullMember(localAci) else {
+            return false
         }
         guard !isGroupV1Thread else {
             return false
@@ -58,10 +73,6 @@ class GroupViewHelper {
         guard let groupModelV2 = groupThread.groupModel as? TSGroupModelV2 else {
             // All users can edit v1 groups.
             return true
-        }
-        guard let localAddress = DependenciesBridge.shared.tsAccountManager.localIdentifiersWithMaybeSneakyTransaction?.aciAddress else {
-            owsFailDebug("Missing localAddress.")
-            return false
         }
         // Use the block to pick the access type: attributes or members?
         let access = v2AccessTypeBlock(groupModelV2.access)
@@ -75,9 +86,9 @@ class GroupViewHelper {
         case .any:
             return true
         case .member:
-            return groupModelV2.groupMembership.isFullMember(localAddress)
+            return groupModelV2.groupMembership.isFullMember(localAci)
         case .administrator:
-            return (groupModelV2.groupMembership.isFullMemberAndAdministrator(localAddress))
+            return groupModelV2.groupMembership.isFullMemberAndAdministrator(localAci)
         }
     }
 
@@ -90,9 +101,16 @@ class GroupViewHelper {
     // * DM state
     // * Group title (if group)
     // * Group avatar (if group)
+    // * Pinned Messages (if group)
     var canEditConversationAttributes: Bool {
         return canLocalUserEditConversation { groupAccess in
             return groupAccess.attributes
+        }
+    }
+
+    var canEditMemberLabels: Bool {
+        return canLocalUserEditConversation { groupAccess in
+            return groupAccess.memberLabels
         }
     }
 
@@ -103,42 +121,60 @@ class GroupViewHelper {
         }
     }
 
+    /// Like the ``canEditConversationMembership`` property, for callers that already know
+    /// the local ACI.
+    func canEditConversationMembership(localAci: Aci) -> Bool {
+        return canLocalUserEditConversation(localAci: localAci) { groupAccess in
+            return groupAccess.members
+        }
+    }
+
     // Can local user edit group access and message send permission.
     var canEditPermissions: Bool {
         guard let groupThread = thread as? TSGroupThread else {
             return false
         }
-        return (
+        return
             !threadViewModel.hasPendingMessageRequest
-            && groupThread.isGroupV2Thread
-            && groupThread.groupModel.groupMembership.isLocalUserFullMemberAndAdministrator
-        )
+                && groupThread.isGroupV2Thread
+                && groupThread.groupModel.groupMembership.isLocalUserFullMemberAndAdministrator
+
     }
 
     var canRevokePendingInvites: Bool {
         guard let groupThread = thread as? TSGroupThread else {
             return false
         }
-        return (
+        return
             !threadViewModel.hasPendingMessageRequest
-            && groupThread.isGroupV2Thread
-            && groupThread.groupModel.groupMembership.isLocalUserFullMemberAndAdministrator
-        )
+                && groupThread.isGroupV2Thread
+                && groupThread.groupModel.groupMembership.isLocalUserFullMemberAndAdministrator
+
+    }
+
+    var isTerminatedGroup: Bool {
+        guard
+            let groupThread = thread as? TSGroupThread,
+            let groupModelV2 = groupThread.groupModel as? TSGroupModelV2
+        else {
+            return false
+        }
+        return groupModelV2.isTerminated
     }
 
     var canResendInvites: Bool {
-        return (!threadViewModel.hasPendingMessageRequest && isLocalUserFullMember)
+        return !threadViewModel.hasPendingMessageRequest && isLocalUserFullMember
     }
 
     var canApproveMemberRequests: Bool {
         guard let groupThread = thread as? TSGroupThread else {
             return false
         }
-        return (
+        return
             !threadViewModel.hasPendingMessageRequest
-            && groupThread.isGroupV2Thread
-            && groupThread.groupModel.groupMembership.isLocalUserFullMemberAndAdministrator
-        )
+                && groupThread.isGroupV2Thread
+                && groupThread.groupModel.groupMembership.isLocalUserFullMemberAndAdministrator
+
     }
 
     var isLocalUserFullMember: Bool {

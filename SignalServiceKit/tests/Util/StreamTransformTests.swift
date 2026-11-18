@@ -14,8 +14,8 @@ final class ChunkedStreamTransformTests: XCTestCase {
 
         let data1 = "TestString".data(using: .utf8)!
 
-        let transformedData = try outputStream.transform(data: data1)
-        let roundTripData = try inputStream.transform(data: transformedData)
+        let transformedData = try outputStream.transform(data: data1, options: [:])
+        let roundTripData = try inputStream.transform(data: transformedData, options: [:])
 
         XCTAssertEqual(data1, roundTripData)
     }
@@ -26,15 +26,15 @@ final class ChunkedStreamTransformTests: XCTestCase {
 
         let data1 = "TestString".data(using: .utf8)!
 
-        let transformedData = try outputStream.transform(data: data1)
+        let transformedData = try outputStream.transform(data: data1, options: [:])
 
         let part1 = transformedData.subdata(in: 0..<5)
         let part2 = transformedData.subdata(in: 5..<transformedData.count)
 
-        let result1 = try inputStream.transform(data: part1)
+        let result1 = try inputStream.transform(data: part1, options: [:])
         XCTAssertFalse(inputStream.hasPendingBytes)
 
-        let result2 = try inputStream.transform(data: part2)
+        let result2 = try inputStream.transform(data: part2, options: [:])
         XCTAssertFalse(inputStream.hasPendingBytes)
 
         XCTAssertEqual(result1, Data())
@@ -49,16 +49,16 @@ final class ChunkedStreamTransformTests: XCTestCase {
             "aa".data(using: .utf8)!,
             "bbb".data(using: .utf8)!,
             "cccc".data(using: .utf8)!,
-            "d".data(using: .utf8)!
+            "d".data(using: .utf8)!,
         ]
 
-        let transformedData = try data1.reduce(into: Data()) { $0.append(try outputStream.transform(data: $1)) }
+        let transformedData = try data1.reduce(into: Data()) { $0.append(try outputStream.transform(data: $1, options: [:])) }
 
         var results = [Data]()
 
-        results.append(try inputStream.transform(data: transformedData))
+        results.append(try inputStream.transform(data: transformedData, options: [:]))
         while true {
-            let result = try inputStream.transform(data: Data())
+            let result = try inputStream.transform(data: Data(), options: [:])
             guard result.count > 0 else { break }
             results.append(result)
         }
@@ -75,16 +75,16 @@ final class ChunkedStreamTransformTests: XCTestCase {
             "aa".data(using: .utf8)!,
             "bbb".data(using: .utf8)!,
             "cccc".data(using: .utf8)!,
-            "d".data(using: .utf8)!
+            "d".data(using: .utf8)!,
         ]
 
-        let transformedData = try data1.reduce(into: Data()) { $0.append(try outputStream.transform(data: $1)) }
+        let transformedData = try data1.reduce(into: Data()) { $0.append(try outputStream.transform(data: $1, options: [:])) }
 
         var results = [Data]()
 
-        results.append(try inputStream.transform(data: transformedData))
+        results.append(try inputStream.transform(data: transformedData, options: [:]))
         while true {
-            let result = try inputStream.transform(data: Data())
+            let result = try inputStream.transform(data: Data(), options: [:])
             guard result.count > 0 else { break }
             results.append(result)
         }
@@ -99,10 +99,10 @@ final class ChunkedStreamTransformTests: XCTestCase {
             "aa".data(using: .utf8)!,
             "bbb".data(using: .utf8)!,
             "cccc".data(using: .utf8)!,
-            "d".data(using: .utf8)!
+            "d".data(using: .utf8)!,
         ]
 
-        let transformedData = try data1.reduce(into: Data()) { $0.append(try outputStream.transform(data: $1)) }
+        let transformedData = try data1.reduce(into: Data()) { $0.append(try outputStream.transform(data: $1, options: [:])) }
 
         var results = [Data]()
 
@@ -110,9 +110,9 @@ final class ChunkedStreamTransformTests: XCTestCase {
         // This allows testing reads of chunks that span multiple buffered reads.
         let chunkSize: Int = 1
         var count: Int = 0
-        while count < transformedData.count  {
+        while count < transformedData.count {
             let chunk = transformedData.subdata(in: count..<chunkSize)
-            let result = try inputStream.transform(data: chunk)
+            let result = try inputStream.transform(data: chunk, options: [:])
             count += chunkSize
             guard result.count > 0 else { break }
             results.append(result)
@@ -129,10 +129,10 @@ final class GzipStreamTransformTests: XCTestCase {
 
         let data1 = "TestString".data(using: .utf8)!
 
-        var transformedData = try outputStream.transform(data: data1)
+        var transformedData = try outputStream.transform(data: data1, options: [:])
         transformedData.append(try outputStream.finalize())
 
-        var roundTripData = try inputStream.transform(data: transformedData)
+        var roundTripData = try inputStream.transform(data: transformedData, options: [:])
         roundTripData.append(try inputStream.finalize())
 
         XCTAssertEqual(data1, roundTripData)
@@ -145,10 +145,10 @@ final class GzipStreamTransformTests: XCTestCase {
 
         let data1 = Randomness.generateRandomBytes(68000)
 
-        var transformedData = try outputStream.transform(data: data1)
+        var transformedData = try outputStream.transform(data: data1, options: [:])
         transformedData.append(try outputStream.finalize())
 
-        var roundTripData = try inputStream.transform(data: transformedData)
+        var roundTripData = try inputStream.transform(data: transformedData, options: [:])
         roundTripData.append(try inputStream.finalize())
 
         XCTAssertEqual(data1, roundTripData)
@@ -160,10 +160,10 @@ final class GzipStreamTransformTests: XCTestCase {
 
         let data1 = String(repeating: "abcdefghijklmnopqrstuv", count: 1600).data(using: .utf8)!
 
-        var transformedData = try outputStream.transform(data: data1)
+        var transformedData = try outputStream.transform(data: data1, options: [:])
         transformedData.append(try outputStream.finalize())
 
-        var roundTripData = try inputStream.transform(data: transformedData)
+        var roundTripData = try inputStream.transform(data: transformedData, options: [:])
         roundTripData.append(try inputStream.finalize())
 
         XCTAssertEqual(data1, roundTripData)
@@ -176,14 +176,14 @@ final class GzipStreamTransformTests: XCTestCase {
 
         let data1 = Randomness.generateRandomBytes(4096)
 
-        var transformedData = try outputStream.transform(data: data1)
+        var transformedData = try outputStream.transform(data: data1, options: [:])
         let tmpData = try outputStream.finalize()
-        transformedData.append(tmpData.subdata(in: 0..<(tmpData.count - 2000)))
+        transformedData.append(tmpData.prefix(3))
         transformedData.append(1)
-        transformedData.append(tmpData.subdata(in: (tmpData.count - 2000)..<tmpData.count))
+        transformedData.append(tmpData.dropFirst(3))
 
         do {
-            _ = try inputStream.transform(data: transformedData)
+            _ = try inputStream.transform(data: transformedData, options: [:])
             XCTFail("Shouldn't reach here")
         } catch {
             switch error {
@@ -206,15 +206,38 @@ final class GzipStreamTransformTests: XCTestCase {
         let data3 = "C".data(using: .utf8)!
         let expectedResult = [data1, data2, data3].reduce(Data(), +)
 
-        var transformedData = try outputStream.transform(data: data1)
-        transformedData.append(try outputStream.transform(data: data2))
-        transformedData.append(try outputStream.transform(data: data3))
+        var transformedData = try outputStream.transform(data: data1, options: [:])
+        transformedData.append(try outputStream.transform(data: data2, options: [:]))
+        transformedData.append(try outputStream.transform(data: data3, options: [:]))
         transformedData.append(try outputStream.finalize())
 
-        var roundTripData = try inputStream.transform(data: transformedData)
+        var roundTripData = try inputStream.transform(data: transformedData, options: [:])
         roundTripData.append(try inputStream.finalize())
 
         XCTAssertEqual(expectedResult, roundTripData)
+    }
+
+    func testRoundtrip5() throws {
+
+        let outputStream = try GzipStreamTransform(.compress)
+        let inputStream = try GzipStreamTransform(.decompress)
+
+        var expectedResult = Data()
+        var transformedValues = [Data]()
+        for _ in 1...32 {
+            let randomData = Randomness.generateRandomBytes(1 << 14)
+            expectedResult += randomData
+            transformedValues.append(try outputStream.transform(data: randomData, options: [:]))
+        }
+        transformedValues.append(try outputStream.finalize())
+
+        var actualResult = Data()
+        for transformedValue in transformedValues {
+            actualResult += try inputStream.transform(data: transformedValue, options: [:])
+        }
+        actualResult += try inputStream.finalize()
+
+        XCTAssertEqual(actualResult, expectedResult)
     }
 
     func testRoundtripBigData() throws {
@@ -224,10 +247,10 @@ final class GzipStreamTransformTests: XCTestCase {
 
         let data1 = Randomness.generateRandomBytes(20242000)
 
-        var transformedData = try outputStream.transform(data: data1)
+        var transformedData = try outputStream.transform(data: data1, options: [:])
         transformedData.append(try outputStream.finalize())
 
-        var roundTripData = try inputStream.transform(data: transformedData)
+        var roundTripData = try inputStream.transform(data: transformedData, options: [:])
         roundTripData.append(try inputStream.finalize())
 
         XCTAssertEqual(data1, roundTripData)
@@ -244,10 +267,10 @@ final class EncryptionStreamTransformTests: XCTestCase {
 
         let data1 = "TestString".data(using: .utf8)!
 
-        var transformedData = try outputStream.transform(data: data1)
+        var transformedData = try outputStream.transform(data: data1, options: [:])
         transformedData.append(try outputStream.finalize())
 
-        var roundTripData = try inputStream.transform(data: transformedData)
+        var roundTripData = try inputStream.transform(data: transformedData, options: [:])
         roundTripData.append(try inputStream.finalize())
 
         XCTAssertEqual(data1, roundTripData)

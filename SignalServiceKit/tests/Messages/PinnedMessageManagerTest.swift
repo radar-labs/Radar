@@ -14,15 +14,23 @@ struct PinnedMessageManagerTest {
     private let pinnedMessageManager: PinnedMessageManager
 
     init() throws {
-        pinnedMessageManager = PinnedMessageManager()
+        pinnedMessageManager = PinnedMessageManager(
+            disappearingMessagesConfigurationStore: MockDisappearingMessagesConfigurationStore(),
+            interactionStore: MockInteractionStore(),
+            accountManager: MockTSAccountManager(),
+            db: db,
+            threadStore: MockThreadStore(),
+            dateProvider: Date.provider,
+            expirationJob: PinnedMessageExpirationJob(dateProvider: { Date() }, db: db),
+        )
     }
 
     private func createIncomingMessage(
         with thread: TSThread,
-        customizeBlock: ((TSIncomingMessageBuilder) -> Void)
+        customizeBlock: (TSIncomingMessageBuilder) -> Void,
     ) -> TSIncomingMessage {
         let messageBuilder: TSIncomingMessageBuilder = .withDefaultValues(
-            thread: thread
+            thread: thread,
         )
         customizeBlock(messageBuilder)
         let targetMessage = messageBuilder.build()
@@ -34,7 +42,7 @@ struct PinnedMessageManagerTest {
             let db = tx.database
 
             let messageBuilder: TSIncomingMessageBuilder = .withDefaultValues(
-                thread: thread
+                thread: thread,
             )
             let targetMessage = messageBuilder.build()
             try! targetMessage.asRecord().insert(db)
@@ -46,8 +54,8 @@ struct PinnedMessageManagerTest {
     @Test
     func testFetchPinnedMessagesForThread() throws {
         let thread = db.write { tx in
-            let thread = TSThread()
-            try! thread.asRecord().insert(tx.database)
+            let thread = TSThread(uniqueId: "")
+            try! thread.insert(tx.database)
             return thread
         }
 
@@ -58,14 +66,56 @@ struct PinnedMessageManagerTest {
             _ = try PinnedMessageRecord.insertRecord(
                 interactionId: interactionId2,
                 threadId: threadId,
-                tx: tx
+                sentTimestamp: NSDate.ows_millisecondTimeStamp(),
+                receivedTimestamp: NSDate.ows_millisecondTimeStamp(),
+                tx: tx,
             )
         }
 
         db.read { tx in
-            let pinnedMessageIds = pinnedMessageManager.fetchPinnedMessagesForThread(threadId: threadId, tx: tx)
-            #expect(pinnedMessageIds.count == 1)
-            #expect(pinnedMessageIds.first! == interactionId2)
+            let pinnedMessages = pinnedMessageManager.fetchPinnedMessagesForThread(threadId: threadId, tx: tx)
+            #expect(pinnedMessages.count == 1)
+            #expect(pinnedMessages.first!.grdbId?.int64Value == interactionId2)
+        }
+    }
+
+    @Test
+    func testSortedPinnedMessages() throws {
+        let thread = db.write { tx in
+            let thread = TSThread(uniqueId: "")
+            try! thread.insert(tx.database)
+            return thread
+        }
+
+        let (olderPinnedMessage, threadId) = insertMessage(thread: thread)
+        let (newerPinnedMessage, _) = insertMessage(thread: thread)
+
+        let olderTimestamp = Date().ows_millisecondsSince1970.advanced(by: -1000)
+        let newerTimestamp = Date().ows_millisecondsSince1970
+
+        try db.write { tx in
+            _ = try PinnedMessageRecord.insertRecord(
+                interactionId: olderPinnedMessage,
+                threadId: threadId,
+                sentTimestamp: olderTimestamp,
+                receivedTimestamp: olderTimestamp,
+                tx: tx,
+            )
+
+            _ = try PinnedMessageRecord.insertRecord(
+                interactionId: newerPinnedMessage,
+                threadId: threadId,
+                sentTimestamp: newerTimestamp,
+                receivedTimestamp: newerTimestamp,
+                tx: tx,
+            )
+        }
+
+        db.read { tx in
+            let pinnedMessages = pinnedMessageManager.fetchPinnedMessagesForThread(threadId: threadId, tx: tx)
+            #expect(pinnedMessages.count == 2)
+            #expect(pinnedMessages.first!.grdbId?.int64Value == newerPinnedMessage, "More recently pinned message should be first")
+            #expect(pinnedMessages.last!.grdbId?.int64Value == olderPinnedMessage)
         }
     }
 }

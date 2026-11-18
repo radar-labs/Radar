@@ -13,107 +13,125 @@ extension ChatListViewController {
     public func observeNotifications() {
         AssertIsOnMainThread()
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(signalAccountsDidChange),
-                                               name: .OWSContactsManagerSignalAccountsDidChange,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(applicationWillEnterForeground),
-                                               name: .OWSApplicationWillEnterForeground,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(applicationDidBecomeActive),
-                                               name: .OWSApplicationDidBecomeActive,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(applicationWillResignActive),
-                                               name: .OWSApplicationWillResignActive,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(registrationStateDidChange),
-                                               name: .registrationStateDidChange,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(outageStateDidChange),
-                                               name: OutageDetection.outageStateDidChange,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(localProfileDidChange),
-                                               name: UserProfileNotifications.localProfileDidChange,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(profileWhitelistDidChange),
-                                               name: UserProfileNotifications.profileWhitelistDidChange,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(otherProfileDidChange(_:)),
-                                               name: UserProfileNotifications.otherUsersProfileDidChange,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(appExpiryDidChange),
-                                               name: AppExpiry.AppExpiryDidChange,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(significantTimeChangeNotification),
-                                               name: UIApplication.significantTimeChangeNotification,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(preferContactAvatarsPreferenceDidChange),
-                                               name: SSKPreferences.preferContactAvatarsPreferenceDidChange,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(signalAccountsDidChange),
+            name: .OWSContactsManagerSignalAccountsDidChange,
+            object: nil,
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(applicationWillEnterForeground),
+            name: .OWSApplicationWillEnterForeground,
+            object: nil,
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(applicationDidBecomeActive),
+            name: .OWSApplicationDidBecomeActive,
+            object: nil,
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(applicationWillResignActive),
+            name: .OWSApplicationWillResignActive,
+            object: nil,
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(registrationStateDidChange),
+            name: .registrationStateDidChange,
+            object: nil,
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(outageStateDidChange),
+            name: OutageDetection.outageStateDidChange,
+            object: nil,
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(localProfileDidChange),
+            name: UserProfileNotifications.localProfileDidChange,
+            object: nil,
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(profileWhitelistDidChange),
+            name: UserProfileNotifications.profileWhitelistDidChange,
+            object: nil,
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(otherProfileDidChange(_:)),
+            name: UserProfileNotifications.otherUsersProfileDidChange,
+            object: nil,
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appExpiryDidChange),
+            name: AppExpiry.AppExpiryDidChange,
+            object: nil,
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(significantTimeChangeNotification),
+            name: UIApplication.significantTimeChangeNotification,
+            object: nil,
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(preferContactAvatarsPreferenceDidChange),
+            name: SSKPreferences.preferContactAvatarsPreferenceDidChange,
+            object: nil,
+        )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(paymentsDisplayPreferenceDidChange),
             name: PaymentsDisplayPreferences.balanceHiddenDidChange,
-            object: nil
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(paymentsDisplayPreferenceDidChange),
             name: PaymentsDisplayPreferences.amountTypeDidChange,
-            object: nil
+            object: nil,
         )
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(blockListDidChange),
-                                               name: BlockingManager.blockListDidChange,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(clearSearch),
-                                               name: ChatListViewController.clearSearch,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(clearSearch),
-                                               name: ReactionManager.localUserReacted,
-                                               object: nil)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(blockListDidChange),
+            name: BlockingManager.blockListDidChange,
+            object: nil,
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(clearSearch),
+            name: ChatListViewController.clearSearch,
+            object: nil,
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(clearSearch),
+            name: ReactionManager.localUserReacted,
+            object: nil,
+        )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(localUsernameStateDidChange),
             name: Usernames.localUsernameStateChangedNotification,
-            object: nil
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
-            selector: #selector(backupAttachmentDownloadQueueStatusDidChange(_:)),
-            name: .backupAttachmentDownloadQueueStatusDidChange(mode: .fullsize),
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(backupPlanDidChange(_:)),
-            name: .backupPlanChanged,
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(reloadExperienceUpgrades),
-            name: .inactivePrimaryDeviceChanged,
-            object: nil
+            selector: #selector(reconcileExperienceUpgrades),
+            name: .megaphoneStateDidChange,
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(lastBackupDetailsDidChange),
             name: .lastBackupDetailsDidChange,
-            object: nil
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
@@ -131,35 +149,27 @@ extension ChatListViewController {
             self,
             selector: #selector(hasConsumedMediaTierCapacityStateDidChange),
             name: .hasConsumedMediaTierCapacityStatusDidChange,
-            object: nil
+            object: nil,
         )
-
-        viewState.backupDownloadProgressViewState.downloadQueueStatus =
-            DependenciesBridge.shared.backupAttachmentDownloadQueueStatusReporter.currentStatus(for: .fullsize)
-        Task { @MainActor [self] in
-            self.viewState.backupDownloadProgressViewState.downloadProgressObserver = await DependenciesBridge.shared
-                .backupAttachmentDownloadProgress
-                .addObserver { [weak self] progress in
-                    DispatchQueue.main.asyncIfNecessary {
-                        guard let self else { return }
-                        self.viewState.backupDownloadProgressViewState.downloadProgress = progress
-                        self.viewState.backupDownloadProgressView.update(viewState: self.viewState.backupDownloadProgressViewState)
-                    }
-                }
-        }
-
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(showFYISheetIfNecessary),
             name: DonationReceiptCredentialRedemptionJob.didSucceedNotification,
-            object: nil
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(showFYISheetIfNecessary),
             name: DonationReceiptCredentialRedemptionJob.didFailNotification,
-            object: nil
+            object: nil,
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(smsVerificationCodeRequested),
+            name: .smsVerificationCodeRequested,
+            object: nil,
+        )
+        SafetyTipsManager.startObservingDarwinNotifications()
 
         SUIEnvironment.shared.contactsViewHelperRef.addObserver(self)
 
@@ -219,6 +229,7 @@ extension ChatListViewController {
         AssertIsOnMainThread()
 
         updateRegistrationReminderView()
+        reconcileExperienceUpgrades()
         loadCoordinator.loadIfNecessary()
     }
 
@@ -232,6 +243,13 @@ extension ChatListViewController {
 
     @objc
     private func localProfileDidChange(_ notification: NSNotification) {
+        AssertIsOnMainThread()
+
+        showFYISheetIfNecessary()
+    }
+
+    @objc
+    private func smsVerificationCodeRequested(_ notification: NSNotification) {
         AssertIsOnMainThread()
 
         showFYISheetIfNecessary()
@@ -264,11 +282,8 @@ extension ChatListViewController {
     private func applicationDidBecomeActive(_ notification: NSNotification) {
         AssertIsOnMainThread()
 
+        reconcileExperienceUpgrades()
         updateShouldBeUpdatingView()
-
-        if !ExperienceUpgradeManager.presentNext(fromViewController: self) {
-            presentGetStartedBannerIfNecessary()
-        }
     }
 
     @objc
@@ -287,19 +302,21 @@ extension ChatListViewController {
         let address: SignalServiceAddress? = notification.userInfo?[UserProfileNotifications.profileAddressKey] as? SignalServiceAddress
         let groupId: Data? = notification.userInfo?[UserProfileNotifications.profileGroupIdKey] as? Data
 
-        let changedThreadId: String? = SSKEnvironment.shared.databaseStorageRef.read { transaction in
-            if let address = address,
-               address.isValid {
+        let changedThreadUniqueId = SSKEnvironment.shared.databaseStorageRef.read { transaction -> String? in
+            if
+                let address,
+                address.isValid
+            {
                 return TSContactThread.getWithContactAddress(address, transaction: transaction)?.uniqueId
-            } else if let groupId = groupId {
-                return TSGroupThread.threadId(forGroupId: groupId, transaction: transaction)
+            } else if let groupId {
+                return TSGroupThread.threadUniqueId(forGroupIdData: groupId, tx: transaction)
             } else {
                 return nil
             }
         }
 
-        if let threadId = changedThreadId {
-            self.loadCoordinator.scheduleLoad(updatedThreadIds: Set([threadId]))
+        if let changedThreadUniqueId {
+            self.loadCoordinator.scheduleLoad(updatedThreadIds: Set([changedThreadUniqueId]))
         }
     }
 
@@ -310,14 +327,14 @@ extension ChatListViewController {
         let address = notification.userInfo?[UserProfileNotifications.profileAddressKey] as? SignalServiceAddress
 
         let changedThreadId: String? = SSKEnvironment.shared.databaseStorageRef.read { readTx in
-            if let address = address, address.isValid {
+            if let address, address.isValid {
                 return TSContactThread.getWithContactAddress(address, transaction: readTx)?.uniqueId
             } else {
                 return nil
             }
         }
 
-        if let changedThreadId = changedThreadId {
+        if let changedThreadId {
             self.loadCoordinator.scheduleLoad(updatedThreadIds: Set([changedThreadId]))
         }
     }
@@ -333,7 +350,7 @@ extension ChatListViewController {
     @objc
     private func clearSearch(_ notification: NSNotification) {
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.1) { [weak self] in
-            if let self = self {
+            if let self {
                 self.searchBar.delegate?.searchBarCancelButtonClicked?(self.searchBar)
             }
         }
@@ -344,27 +361,6 @@ extension ChatListViewController {
         updateUsernameReminderView()
         loadCoordinator.loadIfNecessary()
     }
-
-    @objc
-    private func backupAttachmentDownloadQueueStatusDidChange(_ notification: Notification) {
-        self.viewState.backupDownloadProgressViewState.downloadQueueStatus =
-            DependenciesBridge.shared.backupAttachmentDownloadQueueStatusReporter.currentStatus(for: .fullsize)
-        self.viewState.backupDownloadProgressView.update(viewState: self.viewState.backupDownloadProgressViewState)
-    }
-
-    @objc
-    private func backupPlanDidChange(_ notification: Notification) {
-        let db = DependenciesBridge.shared.db
-        db.read { viewState.backupDownloadProgressViewState.refetchDBState(tx: $0) }
-        viewState.backupDownloadProgressView.update(viewState: viewState.backupDownloadProgressViewState)
-    }
-
-    @objc
-    private func reloadExperienceUpgrades() {
-        AssertIsOnMainThread()
-
-        _ = ExperienceUpgradeManager.presentNext(fromViewController: self)
-    }
 }
 
 // MARK: - Notifications
@@ -372,7 +368,7 @@ extension ChatListViewController {
 extension ChatListViewController: DatabaseChangeDelegate {
 
     public func databaseChangesDidUpdate(databaseChanges: DatabaseChanges) {
-        if databaseChanges.didUpdate(tableName: TSPaymentModel.table.tableName) {
+        if databaseChanges.didUpdate(tableName: TSPaymentModel.databaseTableName) {
             updateUnreadPaymentNotificationsCountWithSneakyTransaction()
         }
 

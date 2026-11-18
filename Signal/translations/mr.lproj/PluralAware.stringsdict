@@ -29,6 +29,22 @@
 			<string>%2$d सेकंद</string>
 		</dict>
 	</dict>
+	<key>ACCESSIBILITY_LABEL_MULTIPLE_ATTACHMENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d मीडिया वस्तू</string>
+			<key>other</key>
+			<string>%1$d मीडिया वस्तू</string>
+		</dict>
+	</dict>
 	<key>ACCESSIBILITY_LABEL_SHORT_VOICE_MEMO_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -365,6 +381,70 @@
 			<string>मजकूर + मिडीयाचे %1$d दिवस</string>
 		</dict>
 	</dict>
+	<key>COLLAPSE_SET_CALL_EVENTS_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld कॉल</string>
+			<key>other</key>
+			<string>%1$ld कॉल्स</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_CHAT_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld चॅट अद्यतन</string>
+			<key>other</key>
+			<string>%1$ld चॅट अद्यतने</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_GROUP_UPDATES_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld गट अद्यतन</string>
+			<key>other</key>
+			<string>%1$ld गट अद्यतने</string>
+		</dict>
+	</dict>
+	<key>COLLAPSE_SET_TIMER_CHANGES_WITH_FINAL_TIMER_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%1$ld लुप्त होणाऱ्या टायमरमध्ये बदल%2$@</string>
+			<key>other</key>
+			<string>%1$ld लुप्त होणाऱ्या संदेश टायमरमधील बदल ·%2$@</string>
+		</dict>
+	</dict>
 	<key>CONVERSATION_DELETE_CONFIRMATIONS_ALERT_TITLE_%d</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -438,6 +518,22 @@
 			<string>जोड्या</string>
 			<key>other</key>
 			<string>पैकी %2$d जोड्या</string>
+		</dict>
+	</dict>
+	<key>CONVERSATION_SETTINGS_FORMER_MEMBERS_SECTION_TITLE_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d भूतपूर्व सदस्य</string>
+			<key>other</key>
+			<string>%1$d भूतपूर्व सदस्य</string>
 		</dict>
 	</dict>
 	<key>CONVERSATION_SETTINGS_MEMBERS_SECTION_TITLE_%d</key>
@@ -563,9 +659,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%1$d किंवा त्यापेक्षा कमी सदस्यांसह Signal ग्रुप्स सर्वोत्कृष्ट कार्य करतात. अधिक सदस्य जोडल्यामुळे संदेश पाठवणे आणि प्राप्त करणे यात विलंब होईल.</string>
+			<string>%1$d किंवा त्यापेक्षा कमी सदस्यांसह Radar ग्रुप्स सर्वोत्कृष्ट कार्य करतात. अधिक सदस्य जोडल्यामुळे संदेश पाठवणे आणि प्राप्त करणे यात विलंब होईल.</string>
 			<key>other</key>
-			<string>%1$d किंवा त्यापेक्षा कमी सदस्यांसह Signal ग्रुप्स सर्वोत्कृष्ट कार्य करतात. अधिक सदस्य जोडल्यामुळे संदेश पाठवणे आणि प्राप्त करणे यात विलंब होईल.</string>
+			<string>%1$d किंवा त्यापेक्षा कमी सदस्यांसह Radar ग्रुप्स सर्वोत्कृष्ट कार्य करतात. अधिक सदस्य जोडल्यामुळे संदेश पाठवणे आणि प्राप्त करणे यात विलंब होईल.</string>
 		</dict>
 	</dict>
 	<key>GROUP_CALL_HAS_MAX_DEVICES_%d</key>
@@ -723,9 +819,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>Signal %2$@, %3$@ आणि इतर %1$d जणांना रिंग देईल</string>
+			<string>Radar %2$@, %3$@ आणि इतर %1$d जणांना रिंग देईल</string>
 			<key>other</key>
-			<string>Signal %2$@, %3$@, आणि %1$d इतरांना रिंग देईल</string>
+			<string>Radar %2$@, %3$@, आणि %1$d इतरांना रिंग देईल</string>
 		</dict>
 	</dict>
 	<key>GROUP_INVITES_SENT_ALERT_TITLE_%d</key>
@@ -1011,9 +1107,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>&quot;%2$@&quot; ला लिंक केलेले ठेवण्यासाठी, दिवसामध्ये एकदा त्या डिव्हाइसवर Signal उघडा.</string>
+			<string>&quot;%2$@&quot; ला लिंक केलेले ठेवण्यासाठी, दिवसामध्ये एकदा त्या डिव्हाइसवर Radar उघडा.</string>
 			<key>other</key>
-			<string>&quot;%2$@&quot; ला लिंक केलेले ठेवण्यासाठी, %1$d दिवसांमध्ये त्या डिव्हाइसवर Signal उघडा.</string>
+			<string>&quot;%2$@&quot; ला लिंक केलेले ठेवण्यासाठी, %1$d दिवसांमध्ये त्या डिव्हाइसवर Radar उघडा.</string>
 		</dict>
 	</dict>
 	<key>LINK_DEVICE_CONFIRMATION_ALERT_TRANSFER_SUBTITLE_%d</key>
@@ -1219,9 +1315,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>सर्व Signal कनेक्शन्स · %1$d दर्शक</string>
+			<string>सर्व Radar कनेक्शन्स · %1$d दर्शक</string>
 			<key>other</key>
-			<string>सर्व Signal कनेक्शन्स · %1$d दर्शक</string>
+			<string>सर्व Radar कनेक्शन्स · %1$d दर्शक</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ALL_CONNECTIONS_EXCLUDING_%d</key>
@@ -1235,9 +1331,9 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>सर्व Signal कनेक्शन्स · %1$d वगळले</string>
+			<string>सर्व Radar कनेक्शन्स · %1$d वगळले</string>
 			<key>other</key>
-			<string>सर्व Signal कनेक्शन्स · %1$d वगळले</string>
+			<string>सर्व Radar कनेक्शन्स · %1$d वगळले</string>
 		</dict>
 	</dict>
 	<key>MY_STORY_VIEWERS_ONLY_%d</key>
@@ -1384,6 +1480,22 @@
 			<string>“%2$@”नी पाठवलेली %1$d आमंत्रणे मागे घ्यावयाची?</string>
 		</dict>
 	</dict>
+	<key>PINNED_CONVERSATION_LIMIT</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>तुम्ही जास्तीत जास्त फक्त %1$d चॅट पिन करु शकता.</string>
+			<key>other</key>
+			<string>तुम्ही जास्तीत जास्त फक्त %1$d चॅट्स पिन करु शकता.</string>
+		</dict>
+	</dict>
 	<key>POLL_VOTE_COUNT</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
@@ -1448,10 +1560,10 @@
 			<string>%1$d प्रयत्न</string>
 		</dict>
 	</dict>
-	<key>STORIES_SHARESHEET_PARTIAL_SEND_SUBTITLE_%d</key>
+	<key>SETTINGS_CHANGE_PHONE_NUMBER_SPLASH_CANT_CHANGE_BODY</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%1$#@text@</string>
+		<string>%#@text@</string>
 		<key>text</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -1459,9 +1571,29 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>आपण निवडलेले सर्व आयटम्स स्टोरी ला पाठवले जाऊ शकत नाही कारण फाईल प्रकार समर्थित नाही.</string>
+			<string>तुम्ही अलीकडेच हे खाते नोंदवलेले असल्यामुळे, तुम्हाला इतक्यात फोन नंबर बदलता येणार नाहीत. थोड्या प्रतीक्षा कालावाधीमुळे तुमच्या खात्याचे रक्षण करण्यास मदत होते.
+
+%1$dतासाने पुन्हा प्रयत्न करा.</string>
 			<key>other</key>
-			<string>आपण निवडलेले सर्व आयटम्स स्टोरीजना पाठवले जाऊ शकत नाही कारण फाईल प्रकार समर्थित नाही.</string>
+			<string>तुम्ही अलीकडेच हे खाते नोंदवलेले असल्यामुळे, तुम्हाला इतक्यात फोन नंबर बदलता येणार नाहीत. थोड्या प्रतीक्षा कालावाधीमुळे तुमच्या खात्याचे रक्षण करण्यास मदत होते.
+
+%1$dतासांनी पुन्हा प्रयत्न करा.</string>
+		</dict>
+	</dict>
+	<key>STICKER_PACK_STICKER_COUNT_%d</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d स्टिकर</string>
+			<key>other</key>
+			<string>%1$d स्टिकर्स</string>
 		</dict>
 	</dict>
 	<key>STORY_REPLIES_COUNT_%d</key>
@@ -1558,6 +1690,22 @@
 			<string>&lt;bold&gt;%1$d&lt;/bold&gt; दृश्य</string>
 			<key>other</key>
 			<string>&lt;bold&gt;%1$d&lt;/bold&gt; दृश्ये</string>
+		</dict>
+	</dict>
+	<key>THREAD_DETAILS_MEMBERS_AND_INVITED_%ld</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%2$@ (+%1$ld निमंत्रित)</string>
+			<key>other</key>
+			<string>%2$@ (+%1$ld निमंत्रित)</string>
 		</dict>
 	</dict>
 	<key>THREAD_DETAILS_MORE_MUTUAL_GROUP_%3$ld</key>
@@ -1670,6 +1818,86 @@
 			<string>वापरकर्ता नाव कमीतकमी %1$d वर्णाचे असायला हवे</string>
 			<key>other</key>
 			<string>वापरकर्ता नाव हे कमीत कमी %1$d वर्णांनी सुरू होणे आवश्यक आहे</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ आणि इतरांकडून तुमचा %1$d उल्लेख</string>
+			<key>other</key>
+			<string>%2$@ आणि इतरांकडून तुमचे %1$d उल्लेख</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__mentions_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ आणि %3$@ यांकडून तुमचा %1$d उल्लेख</string>
+			<key>other</key>
+			<string>%2$@ आणि %3$@ यांकडून तुमचे %1$d उल्लेख</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__messages</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%1$d न वाचलेला संदेश</string>
+			<key>other</key>
+			<string>%1$d न वाचलेले संदेश</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_many</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ आणि इतरांकडून तुम्हाला %1$d उत्तर</string>
+			<key>other</key>
+			<string>%2$@ आणि इतरांकडून तुम्हाला %1$d उत्तरे</string>
+		</dict>
+	</dict>
+	<key>UnreadReminderJob__replies_two</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%1$#@text@</string>
+		<key>text</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%2$@ आणि %3$@ यांकडून तुम्हाला %1$d उत्तर</string>
+			<key>other</key>
+			<string>%2$@ आणि %3$@ यांकडून तुम्हाला %1$d उत्तरे</string>
 		</dict>
 	</dict>
 </dict>

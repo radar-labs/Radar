@@ -4,9 +4,6 @@
 //
 
 #import "TSOutgoingMessage.h"
-#import "OWSOutgoingSyncMessage.h"
-#import "TSContactThread.h"
-#import "TSGroupThread.h"
 #import "TSQuotedMessage.h"
 #import <SignalServiceKit/SignalServiceKit-Swift.h>
 
@@ -49,7 +46,7 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
 
 @property (atomic) BOOL hasSyncedTranscript;
 @property (atomic, nullable) NSString *customMessage;
-@property (atomic) TSGroupMetaMessage groupMetaMessage;
+@property (atomic) NSInteger groupMetaMessage;
 @property (nonatomic, readonly) NSUInteger outgoingMessageSchemaVersion;
 
 @property (nonatomic, readonly) TSOutgoingMessageState legacyMessageState;
@@ -91,7 +88,6 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
                isGroupStoryReply:(BOOL)isGroupStoryReply
                           isPoll:(BOOL)isPoll
   isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
-                       isStarred:(BOOL)isStarred
               isViewOnceComplete:(BOOL)isViewOnceComplete
                isViewOnceMessage:(BOOL)isViewOnceMessage
                      linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -103,7 +99,7 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
                   storyTimestamp:(nullable NSNumber *)storyTimestamp
               wasRemotelyDeleted:(BOOL)wasRemotelyDeleted
                    customMessage:(nullable NSString *)customMessage
-                groupMetaMessage:(TSGroupMetaMessage)groupMetaMessage
+                groupMetaMessage:(NSInteger)groupMetaMessage
            hasLegacyMessageState:(BOOL)hasLegacyMessageState
              hasSyncedTranscript:(BOOL)hasSyncedTranscript
                   isVoiceMessage:(BOOL)isVoiceMessage
@@ -133,7 +129,6 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
                  isGroupStoryReply:isGroupStoryReply
                             isPoll:isPoll
     isSmsMessageRestoredFromBackup:isSmsMessageRestoredFromBackup
-                         isStarred:isStarred
                 isViewOnceComplete:isViewOnceComplete
                  isViewOnceMessage:isViewOnceMessage
                        linkPreview:linkPreview
@@ -168,20 +163,149 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
 
 // --- CODE GENERATION MARKER
 
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [super encodeWithCoder:coder];
+    NSData *changeActionsProtoData = self.changeActionsProtoData;
+    if (changeActionsProtoData != nil) {
+        [coder encodeObject:changeActionsProtoData forKey:@"changeActionsProtoData"];
+    }
+    NSString *customMessage = self.customMessage;
+    if (customMessage != nil) {
+        [coder encodeObject:customMessage forKey:@"customMessage"];
+    }
+    [coder encodeObject:[self valueForKey:@"groupMetaMessage"] forKey:@"groupMetaMessage"];
+    [coder encodeObject:[self valueForKey:@"hasLegacyMessageState"] forKey:@"hasLegacyMessageState"];
+    [coder encodeObject:[self valueForKey:@"hasSyncedTranscript"] forKey:@"hasSyncedTranscript"];
+    [coder encodeObject:[self valueForKey:@"isVoiceMessage"] forKey:@"isVoiceMessage"];
+    [coder encodeObject:[self valueForKey:@"legacyMessageState"] forKey:@"legacyMessageState"];
+    [coder encodeObject:[self valueForKey:@"legacyWasDelivered"] forKey:@"legacyWasDelivered"];
+    NSString *mostRecentFailureText = self.mostRecentFailureText;
+    if (mostRecentFailureText != nil) {
+        [coder encodeObject:mostRecentFailureText forKey:@"mostRecentFailureText"];
+    }
+    [coder encodeObject:[self valueForKey:@"outgoingMessageSchemaVersion"] forKey:@"outgoingMessageSchemaVersion"];
+    NSDictionary *recipientAddressStates = self.recipientAddressStates;
+    if (recipientAddressStates != nil) {
+        [coder encodeObject:recipientAddressStates forKey:@"recipientAddressStates"];
+    }
+    [coder encodeObject:[self valueForKey:@"storedMessageState"] forKey:@"storedMessageState"];
+    [coder encodeObject:[self valueForKey:@"wasNotCreatedLocally"] forKey:@"wasNotCreatedLocally"];
+}
+
 - (nullable instancetype)initWithCoder:(NSCoder *)coder
 {
     self = [super initWithCoder:coder];
-
-    if (self) {
-#ifndef TESTABLE_BUILD
-        OWSAssertDebug(self.outgoingMessageSchemaVersion >= 1);
-#endif
-
-        _outgoingMessageSchemaVersion = TSOutgoingMessageSchemaVersion;
+    if (!self) {
+        return self;
     }
+    self->_changeActionsProtoData = [coder decodeObjectOfClass:[NSData class] forKey:@"changeActionsProtoData"];
+    self->_customMessage = [coder decodeObjectOfClass:[NSString class] forKey:@"customMessage"];
+    self->_groupMetaMessage = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                               forKey:@"groupMetaMessage"] integerValue];
+    self->_hasLegacyMessageState = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                                    forKey:@"hasLegacyMessageState"] boolValue];
+    self->_hasSyncedTranscript = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                                  forKey:@"hasSyncedTranscript"] boolValue];
+    self->_isVoiceMessage = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                             forKey:@"isVoiceMessage"] boolValue];
+    self->_legacyMessageState = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                                 forKey:@"legacyMessageState"] integerValue];
+    self->_legacyWasDelivered = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                                 forKey:@"legacyWasDelivered"] boolValue];
+    self->_mostRecentFailureText = [coder decodeObjectOfClass:[NSString class] forKey:@"mostRecentFailureText"];
+    self->_outgoingMessageSchemaVersion =
+        [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                         forKey:@"outgoingMessageSchemaVersion"] unsignedIntegerValue];
+    self->_recipientAddressStates = [coder decodeObjectOfClasses:[NSSet setWithArray:@[
+        [NSDictionary class],
+        [SignalServiceAddress class],
+        [TSOutgoingMessageRecipientState class]
+    ]]
+                                                          forKey:@"recipientAddressStates"];
+    self->_storedMessageState = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                                 forKey:@"storedMessageState"] integerValue];
+    self->_wasNotCreatedLocally = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                                   forKey:@"wasNotCreatedLocally"] boolValue];
 
+#ifndef TESTABLE_BUILD
+    OWSAssertDebug(self.outgoingMessageSchemaVersion >= 1);
+#endif
+    _outgoingMessageSchemaVersion = TSOutgoingMessageSchemaVersion;
 
     return self;
+}
+
+- (NSUInteger)hash
+{
+    NSUInteger result = [super hash];
+    result ^= self.changeActionsProtoData.hash;
+    result ^= self.customMessage.hash;
+    result ^= (NSUInteger)self.groupMetaMessage;
+    result ^= self.hasLegacyMessageState;
+    result ^= self.hasSyncedTranscript;
+    result ^= self.isVoiceMessage;
+    result ^= (NSUInteger)self.legacyMessageState;
+    result ^= self.legacyWasDelivered;
+    result ^= self.mostRecentFailureText.hash;
+    result ^= self.outgoingMessageSchemaVersion;
+    result ^= self.recipientAddressStates.hash;
+    result ^= (NSUInteger)self.storedMessageState;
+    result ^= self.wasNotCreatedLocally;
+    return result;
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (![super isEqual:other]) {
+        return NO;
+    }
+    TSOutgoingMessage *typedOther = (TSOutgoingMessage *)other;
+    if (![NSObject isObject:self.changeActionsProtoData equalToObject:typedOther.changeActionsProtoData]) {
+        return NO;
+    }
+    if (![NSObject isObject:self.customMessage equalToObject:typedOther.customMessage]) {
+        return NO;
+    }
+    if (self.groupMetaMessage != typedOther.groupMetaMessage) {
+        return NO;
+    }
+    if (self.hasLegacyMessageState != typedOther.hasLegacyMessageState) {
+        return NO;
+    }
+    if (self.hasSyncedTranscript != typedOther.hasSyncedTranscript) {
+        return NO;
+    }
+    if (self.isVoiceMessage != typedOther.isVoiceMessage) {
+        return NO;
+    }
+    if (self.legacyMessageState != typedOther.legacyMessageState) {
+        return NO;
+    }
+    if (self.legacyWasDelivered != typedOther.legacyWasDelivered) {
+        return NO;
+    }
+    if (![NSObject isObject:self.mostRecentFailureText equalToObject:typedOther.mostRecentFailureText]) {
+        return NO;
+    }
+    if (self.outgoingMessageSchemaVersion != typedOther.outgoingMessageSchemaVersion) {
+        return NO;
+    }
+    if (![NSObject isObject:self.recipientAddressStates equalToObject:typedOther.recipientAddressStates]) {
+        return NO;
+    }
+    if (self.storedMessageState != typedOther.storedMessageState) {
+        return NO;
+    }
+    if (self.wasNotCreatedLocally != typedOther.wasNotCreatedLocally) {
+        return NO;
+    }
+    return YES;
 }
 
 - (instancetype)initOutgoingMessageWithBuilder:(TSOutgoingMessageBuilder *)outgoingMessageBuilder
@@ -207,7 +331,7 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
         [recipientAddresses addObject:localAddress];
     } else {
         // Most messages should only be sent to the current members of the group.
-        [recipientAddresses addObjectsFromArray:[thread recipientAddressesWithTransaction:transaction]];
+        [recipientAddresses addObjectsFromArray:[thread recipientAddressesWith:transaction]];
         // Some messages (eg certain call messages) go to a subset of the group.
         if (explicitRecipients.count > 0) {
             NSMutableSet<SignalServiceAddress *> *explicitRecipientAddresses = [[NSMutableSet alloc] init];
@@ -246,7 +370,6 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
     }
 
     _recipientAddressStates = [recipientAddressStates copy];
-    _groupMetaMessage = [[self class] groupMetaMessageForBuilder:outgoingMessageBuilder];
     _hasSyncedTranscript = NO;
     _outgoingMessageSchemaVersion = TSOutgoingMessageSchemaVersion;
     _changeActionsProtoData = outgoingMessageBuilder.groupChangeProtoData;
@@ -267,40 +390,13 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
     }
 
     _recipientAddressStates = [recipientAddressStates copy];
-    _groupMetaMessage = [[self class] groupMetaMessageForBuilder:outgoingMessageBuilder];
     _hasSyncedTranscript = NO;
     _outgoingMessageSchemaVersion = TSOutgoingMessageSchemaVersion;
     _changeActionsProtoData = outgoingMessageBuilder.groupChangeProtoData;
     _isVoiceMessage = outgoingMessageBuilder.isVoiceMessage;
+    _wasNotCreatedLocally = outgoingMessageBuilder.wasNotCreatedLocally;
 
     return self;
-}
-
-/// Compute the appropriate "group meta message" for a given message builder.
-///
-/// At the time of writing, the "meta message" property appears to be entirely
-/// unused except for determining if a given `TSOutgoingMessage` should be
-/// saved. It is, however, part of the `TSInteraction` database schema, so will
-/// be non-trivial to do away with entirely.
-///
-/// - SeeAlso ``shouldBeSaved``
-+ (TSGroupMetaMessage)groupMetaMessageForBuilder:(TSOutgoingMessageBuilder *)builder
-{
-    TSThread *thread = builder.thread;
-    TSGroupMetaMessage groupMetaMessage = builder.groupMetaMessage;
-
-    if ([thread isKindOfClass:TSGroupThread.class]) {
-        // Unless specified, we assume group messages are "deliver", or "normal" messages.
-        if (groupMetaMessage == TSGroupMetaMessageUnspecified) {
-            return TSGroupMetaMessageDeliver;
-        } else {
-            return groupMetaMessage;
-        }
-    } else {
-        // Explicit group meta message only makes sense for group threads.
-        OWSAssertDebug(groupMetaMessage == TSGroupMetaMessageUnspecified);
-        return TSGroupMetaMessageUnspecified;
-    }
 }
 
 #pragma mark -
@@ -331,21 +427,6 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
         return YES;
     }
     return (self.hasLegacyMessageState && self.messageState == TSOutgoingMessageStateSent);
-}
-
-- (BOOL)shouldBeSaved
-{
-    if (!super.shouldBeSaved) {
-        return NO;
-    }
-    if (self.groupMetaMessage == TSGroupMetaMessageDeliver || self.groupMetaMessage == TSGroupMetaMessageUnspecified) {
-        return YES;
-    }
-
-    // There's no need to save this message, since it's not displayed to the user.
-    //
-    // Should we find a need to save this in the future, we need to exclude any non-serializable properties.
-    return NO;
 }
 
 - (void)updateStoredMessageState
@@ -425,198 +506,7 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
 - (nullable SSKProtoDataMessageBuilder *)dataMessageBuilderWithThread:(TSThread *)thread
                                                           transaction:(DBReadTransaction *)transaction
 {
-    OWSAssertDebug(thread);
-
-    SSKProtoDataMessageBuilder *builder = [SSKProtoDataMessage builder];
-    [builder setTimestamp:self.timestamp];
-
-    NSUInteger requiredProtocolVersion = SSKProtoDataMessageProtocolVersionInitial;
-
-    if (self.isViewOnceMessage) {
-        [builder setIsViewOnce:YES];
-        requiredProtocolVersion = SSKProtoDataMessageProtocolVersionViewOnceVideo;
-    }
-
-    NSString *body = self.body;
-    NSString *trimmedBody =
-        [body trimToUtf8ByteCount:(NSInteger)OWSMediaUtilsObjc.kOversizeTextMessageSizeThresholdBytes];
-    // It was historically possible to end up with a message in the database that
-    // exceeds this threshold, and therefore possible to hit this assert (by forwarding
-    // an older message). But it is good for us to know when this happens.
-    OWSAssertDebug(body.length == trimmedBody.length);
-
-    if (self.isPoll) {
-        SSKProtoDataMessagePollCreate *_Nullable pollCreateProto = [self buildPollProtoWithTx:transaction];
-
-        if (!pollCreateProto) {
-            OWSFailDebug(@"Could not build poll protobuf");
-        }
-        [builder setPollCreate:pollCreateProto];
-
-        requiredProtocolVersion = SSKProtoDataMessageProtocolVersionPolls;
-    } else {
-        [builder setBody:trimmedBody];
-
-        NSArray<SSKProtoBodyRange *> *bodyRanges =
-            [self.bodyRanges toProtoBodyRangesWithBodyLength:(NSInteger)self.body.length];
-        if (bodyRanges.count > 0) {
-            [builder setBodyRanges:bodyRanges];
-
-            if (requiredProtocolVersion < SSKProtoDataMessageProtocolVersionMentions) {
-                requiredProtocolVersion = SSKProtoDataMessageProtocolVersionMentions;
-            }
-        }
-    }
-
-    // Story Context
-    if (self.storyTimestamp && self.storyAuthorUuidString) {
-        if (self.storyReactionEmoji) {
-            SSKProtoDataMessageReactionBuilder *reactionBuilder =
-                [SSKProtoDataMessageReaction builderWithEmoji:self.storyReactionEmoji
-                                                    timestamp:self.storyTimestamp.unsignedLongLongValue];
-            if (BuildFlagsObjC.serviceIdStrings) {
-                [reactionBuilder setTargetAuthorAci:self.storyAuthorAci.serviceIdString];
-            }
-            if (BuildFlagsObjC.serviceIdBinaryConstantOverhead) {
-                [reactionBuilder setTargetAuthorAciBinary:self.storyAuthorAci.serviceIdBinary];
-            }
-
-            NSError *error;
-            SSKProtoDataMessageReaction *_Nullable reaction = [reactionBuilder buildAndReturnError:&error];
-            if (error || !reaction) {
-                OWSFailDebug(@"Could not build story reaction protobuf: %@.", error);
-            } else {
-                [builder setReaction:reaction];
-
-                if (requiredProtocolVersion < SSKProtoDataMessageProtocolVersionReactions) {
-                    requiredProtocolVersion = SSKProtoDataMessageProtocolVersionReactions;
-                }
-            }
-        }
-
-        SSKProtoDataMessageStoryContextBuilder *storyContextBuilder = [SSKProtoDataMessageStoryContext builder];
-        if (BuildFlagsObjC.serviceIdStrings) {
-            [storyContextBuilder setAuthorAci:self.storyAuthorAci.serviceIdString];
-        }
-        if (BuildFlagsObjC.serviceIdBinaryConstantOverhead) {
-            [storyContextBuilder setAuthorAciBinary:self.storyAuthorAci.serviceIdBinary];
-        }
-        [storyContextBuilder setSentTimestamp:self.storyTimestamp.unsignedLongLongValue];
-
-        [builder setStoryContext:[storyContextBuilder buildInfallibly]];
-    }
-
-    [builder setExpireTimer:self.expiresInSeconds];
-    [builder setExpireTimerVersion:[self.expireTimerVersion unsignedIntValue]];
-
-
-    // Group Messages
-    if ([thread isKindOfClass:[TSGroupThread class]]) {
-        TSGroupThread *groupThread = (TSGroupThread *)thread;
-        OutgoingGroupProtoResult result;
-        switch (groupThread.groupModel.groupsVersion) {
-            case GroupsVersionV1:
-                OWSLogError(@"[GV1] Cannot build data message for V1 group!");
-                result = OutgoingGroupProtoResult_Error;
-                break;
-            case GroupsVersionV2:
-                result = [self addGroupsV2ToDataMessageBuilder:builder groupThread:groupThread tx:transaction];
-                break;
-        }
-        switch (result) {
-            case OutgoingGroupProtoResult_Error:
-                return nil;
-            case OutgoingGroupProtoResult_AddedWithoutGroupAvatar:
-                break;
-        }
-    }
-
-    // Message Attachments
-
-    // Only inserted messages should have attachments, and if they are saveable
-    // they should be inserted by now.
-    if ([self shouldBeSaved]) {
-        if (self.grdbId != nil) {
-            NSError *bodyError;
-            NSArray<SSKProtoAttachmentPointer *> *attachments = [self buildProtosForBodyAttachmentsWithTx:transaction
-                                                                                                    error:&bodyError];
-            if (bodyError) {
-                OWSFailDebug(@"Could not build body attachments");
-            } else {
-                [builder setAttachments:attachments];
-            }
-        } else {
-            OWSFailDebug(@"Saved message uninserted at proto build time!");
-        }
-    }
-
-    // Quoted Reply
-    if (self.quotedMessage) {
-        NSError *error;
-        SSKProtoDataMessageQuote *_Nullable quoteProto = [self buildQuoteProtoWithQuote:self.quotedMessage
-                                                                                     tx:transaction
-                                                                                  error:&error];
-        if (error || !quoteProto) {
-            OWSFailDebug(@"Could not build quote protobuf: %@.", error);
-        } else {
-            [builder setQuote:quoteProto];
-
-            if (quoteProto.bodyRanges.count > 0) {
-                if (requiredProtocolVersion < SSKProtoDataMessageProtocolVersionMentions) {
-                    requiredProtocolVersion = SSKProtoDataMessageProtocolVersionMentions;
-                }
-            }
-        }
-    }
-
-    // Contact Share
-    if (self.contactShare) {
-        NSError *error;
-        SSKProtoDataMessageContact *_Nullable contactProto = [self buildContactShareProto:self.contactShare
-                                                                                       tx:transaction
-                                                                                    error:&error];
-        if (error || !contactProto) {
-            OWSFailDebug(@"Could not build contact share protobuf: %@.", error);
-        } else {
-            [builder addContact:contactProto];
-        }
-    }
-
-    // Link Preview
-    if (self.linkPreview) {
-        NSError *error;
-        SSKProtoPreview *_Nullable previewProto = [self buildLinkPreviewProtoWithLinkPreview:self.linkPreview
-                                                                                          tx:transaction
-                                                                                       error:&error];
-        if (error || !previewProto) {
-            OWSFailDebug(@"Could not build link preview protobuf: %@.", error);
-        } else {
-            [builder addPreview:previewProto];
-        }
-    }
-
-    // Sticker
-    if (self.messageSticker) {
-        NSError *error;
-        SSKProtoDataMessageSticker *_Nullable stickerProto = [self buildStickerProtoWithSticker:self.messageSticker
-                                                                                             tx:transaction
-                                                                                          error:&error];
-        if (error || !stickerProto) {
-            OWSFailDebug(@"Could not build sticker protobuf: %@.", error);
-        } else {
-            [builder setSticker:stickerProto];
-        }
-    }
-
-    // Gift badge
-    if (self.giftBadge) {
-        SSKProtoDataMessageGiftBadgeBuilder *giftBadgeBuilder = [SSKProtoDataMessageGiftBadge builder];
-        [giftBadgeBuilder setReceiptCredentialPresentation:self.giftBadge.redemptionCredential];
-        [builder setGiftBadge:[giftBadgeBuilder buildInfallibly]];
-    }
-
-    [builder setRequiredProtocolVersion:(uint32_t)requiredProtocolVersion];
-    return builder;
+    return [self _dataMessageBuilderWithThread:thread tx:transaction];
 }
 
 
@@ -655,23 +545,11 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
     return contentBuilder;
 }
 
-- (nullable NSData *)buildPlainTextData:(TSThread *)thread transaction:(DBWriteTransaction *)transaction
+- (nullable NSData *)buildPlaintextDataInThread:(TSThread *)thread
+                                             tx:(DBWriteTransaction *)transaction
+                                          error:(NSError **)error
 {
-    SSKProtoContentBuilder *_Nullable contentBuilder = [self contentBuilderWithThread:thread transaction:transaction];
-    if (!contentBuilder) {
-        OWSFailDebug(@"could not build protobuf.");
-        return nil;
-    }
-
-    [contentBuilder setPniSignatureMessage:[self buildPniSignatureMessageIfNeededWithTransaction:transaction]];
-
-    NSError *error;
-    NSData *_Nullable contentData = [contentBuilder buildSerializedDataAndReturnError:&error];
-    if (error || !contentData) {
-        OWSFailDebug(@"could not serialize protobuf: %@", error);
-        return nil;
-    }
-    return contentData;
+    return [self _buildPlaintextDataInThread:thread tx:transaction error:error];
 }
 
 - (BOOL)shouldSyncTranscript
@@ -679,21 +557,11 @@ NSUInteger const TSOutgoingMessageSchemaVersion = 1;
     return YES;
 }
 
-- (nullable OWSOutgoingSyncMessage *)buildTranscriptSyncMessageWithLocalThread:(TSContactThread *)localThread
+- (nullable OWSOutgoingSyncMessage *)buildSyncTranscriptMessageWithLocalThread:(TSContactThread *)localThread
                                                                    transaction:(DBWriteTransaction *)transaction
+                                                                         error:(NSError **)error
 {
-    OWSAssertDebug(self.shouldSyncTranscript);
-
-    TSThread *messageThread = [self threadWithTx:transaction];
-    if (messageThread == nil) {
-        return nil;
-    }
-
-    return [[OWSOutgoingSentMessageTranscript alloc] initWithLocalThread:localThread
-                                                           messageThread:messageThread
-                                                         outgoingMessage:self
-                                                       isRecipientUpdate:self.hasSyncedTranscript
-                                                             transaction:transaction];
+    return [self _buildSyncTranscriptMessageWithLocalThread:localThread tx:transaction error:error];
 }
 
 @end

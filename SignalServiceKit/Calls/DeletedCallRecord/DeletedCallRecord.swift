@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import GRDB
+public import GRDB
 
 /// A record representing a ``CallRecord`` that was deleted.
 ///
@@ -16,18 +16,9 @@ import GRDB
 ///
 /// A ``DeletedCallRecord`` is kept for a short period – at the time of writing,
 /// the period is 8h – after which point we assume the call it refers to will
-/// have ended and it can be deleted. See ``DeletedCallRecordCleanupManager``
+/// have ended and it can be deleted. See ``DeletedCallRecordExpirationJob``
 /// for that cleanup of "expired" ``DeletedCallRecord``s.
-final class DeletedCallRecord: Codable, PersistableRecord, FetchableRecord {
-    enum CodingKeys: String, CodingKey {
-        case id
-        case callIdString = "callId"
-        case threadRowId
-        case callLinkRowId
-        case deletedAtTimestamp
-    }
-
-    public static let databaseTableName: String = "DeletedCallRecord"
+public final class DeletedCallRecord: Codable, PersistableRecord, FetchableRecord {
 
     /// This record's SQLite row ID, if it represents a record that has already
     /// been inserted.
@@ -45,7 +36,7 @@ final class DeletedCallRecord: Codable, PersistableRecord, FetchableRecord {
     init(
         callId: UInt64,
         conversationId: CallRecord.ConversationID,
-        deletedAtTimestamp: UInt64 = Date().ows_millisecondsSince1970
+        deletedAtTimestamp: UInt64 = Date().ows_millisecondsSince1970,
     ) {
         self.callId = callId
         self.conversationId = conversationId
@@ -55,15 +46,27 @@ final class DeletedCallRecord: Codable, PersistableRecord, FetchableRecord {
     convenience init(callRecord: CallRecord) {
         self.init(
             callId: callRecord.callId,
-            conversationId: callRecord.conversationId
+            conversationId: callRecord.conversationId,
         )
     }
+
+    // MARK: -
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case callIdString = "callId"
+        case threadRowId
+        case callLinkRowId
+        case deletedAtTimestamp
+    }
+
+    public static let databaseTableName: String = "DeletedCallRecord"
 
     public func didInsert(with rowID: Int64, for column: String?) {
         id = rowID
     }
 
-    init(from decoder: any Decoder) throws {
+    public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.id = try container.decodeIfPresent(Int64.self, forKey: .id)
         self.callId = UInt64(try container.decode(String.self, forKey: .callIdString))!
@@ -75,7 +78,7 @@ final class DeletedCallRecord: Codable, PersistableRecord, FetchableRecord {
         self.deletedAtTimestamp = UInt64(bitPattern: try container.decode(Int64.self, forKey: .deletedAtTimestamp))
     }
 
-    func encode(to encoder: any Encoder) throws {
+    public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(self.id, forKey: .id)
         try container.encode(String(self.callId), forKey: .callIdString)
@@ -93,19 +96,19 @@ final class DeletedCallRecord: Codable, PersistableRecord, FetchableRecord {
 
 extension DeletedCallRecord {
     func matches(callRecord: CallRecord) -> Bool {
-        return (
+        return
             self.callId == callRecord.callId
-            && self.conversationId == callRecord.conversationId
-        )
+                && self.conversationId == callRecord.conversationId
+
     }
 
     func matches(_ other: DeletedCallRecord) -> Bool {
-        return (
+        return
             self.id == other.id
-            && self.callId == other.callId
-            && self.conversationId == other.conversationId
-            && self.deletedAtTimestamp == other.deletedAtTimestamp
-        )
+                && self.callId == other.callId
+                && self.conversationId == other.conversationId
+                && self.deletedAtTimestamp == other.deletedAtTimestamp
+
     }
 }
 

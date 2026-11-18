@@ -33,10 +33,10 @@ public class FailedMessagesJob {
     private func updateFailedMessageIfNecessary(
         _ uniqueId: String,
         count: inout Int,
-        transaction writeTx: DBWriteTransaction
+        transaction writeTx: DBWriteTransaction,
     ) {
         // Preconditions
-        guard let message = TSOutgoingMessage.anyFetchOutgoingMessage(uniqueId: uniqueId, transaction: writeTx) else {
+        guard let message = TSOutgoingMessage.fetchOutgoingMessageViaCache(uniqueId: uniqueId, transaction: writeTx) else {
             owsFailDebug("Missing interaction with id: \(uniqueId)")
             return
         }

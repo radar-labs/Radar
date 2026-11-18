@@ -11,32 +11,31 @@ public import SDWebImage
 public class AttachmentStream {
 
     public let attachment: Attachment
-
     public let info: Attachment.StreamInfo
-
-    /// Filepath to the encrypted fullsize media file on local disk.
-    public let localRelativeFilePath: String
-
-    // MARK: - Convenience
 
     public var id: Attachment.IDType { attachment.id }
     public var mimeType: String { attachment.mimeType }
-    public var contentHash: Data { info.sha256ContentHash }
-    public var encryptedFileSha256Digest: Data { info.digestSHA256Ciphertext }
-    public var sha256ContentHash: Data { info.sha256ContentHash }
+    public var contentType: Attachment.ContentType { attachment.contentType }
+    public var audioDetails: Attachment.AudioDetails? { attachment.audioDetails }
+
+    public var ciphertextDigest: Data { info.ciphertextDigest }
+    public var plaintextHash: Data { info.plaintextHash }
+    public var mediaName: String { info.mediaName }
     public var encryptedByteCount: UInt32 { info.encryptedByteCount }
     public var unencryptedByteCount: UInt32 { info.unencryptedByteCount }
-    public var contentType: Attachment.ContentType { info.contentType }
+    public var cachedMediaSizePixels: CGSize? { info.cachedMediaSizePixels }
+    public var cachedVideoDuration: TimeInterval? { info.cachedVideoDuration }
+    public var cachedVideoStillFrameRelativeFilePath: String? { info.cachedVideoStillFrameRelativeFilePath }
+    public var localRelativeFilePath: String { info.localRelativeFilePath }
 
     // MARK: - Init
 
-    private init(
+    public init(
         attachment: Attachment,
-        info: Attachment.StreamInfo
+        info: Attachment.StreamInfo,
     ) {
         self.attachment = attachment
         self.info = info
-        self.localRelativeFilePath = info.localRelativeFilePath
     }
 
     public convenience init?(attachment: Attachment) {
@@ -47,9 +46,11 @@ public class AttachmentStream {
         }
         self.init(
             attachment: attachment,
-            info: info
+            info: info,
         )
     }
+
+    // MARK: -
 
     /// Generate a new (random) relative file path for an attachment file.
     /// Can be used for the primary file, thumbnail, audio waveform, etc.
@@ -78,6 +79,8 @@ public class AttachmentStream {
     public static func deleteAllAttachmentFiles() {
         OWSFileSystem.deleteContents(ofDirectory: attachmentsDirectory().path)
     }
+
+    // MARK: -
 
     public var fileURL: URL {
         return Self.absoluteAttachmentFileURL(relativeFilePath: self.localRelativeFilePath)
@@ -124,11 +127,15 @@ public class AttachmentStream {
 
             tmpURL = OWSFileSystem.temporaryFileUrl(
                 fileName: normalizedFilename,
-                fileExtension: pathExtension
+                fileExtension: pathExtension,
+                isAvailableWhileDeviceLocked: false,
             )
             try OWSFileSystem.deleteFileIfExists(url: tmpURL)
         } else {
-            tmpURL = OWSFileSystem.temporaryFileUrl(fileExtension: pathExtension)
+            tmpURL = OWSFileSystem.temporaryFileUrl(
+                fileExtension: pathExtension,
+                isAvailableWhileDeviceLocked: false,
+            )
         }
         // hmac and digest are validated at download time; no need to revalidate every read.
         try Cryptography.decryptFileWithoutValidating(
@@ -137,12 +144,10 @@ public class AttachmentStream {
                 key: AttachmentKey(combinedKey: attachment.encryptionKey),
                 plaintextLength: UInt64(safeCast: info.unencryptedByteCount),
             ),
-            output: tmpURL
+            output: tmpURL,
         )
         return tmpURL
     }
-
-    // MARK: - Accessing file data
 
     public func decryptedRawData() throws -> Data {
         // hmac and digest are validated at download time; no need to revalidate every read.
@@ -151,7 +156,7 @@ public class AttachmentStream {
             metadata: DecryptionMetadata(
                 key: AttachmentKey(combinedKey: attachment.encryptionKey),
                 plaintextLength: UInt64(safeCast: info.unencryptedByteCount),
-            )
+            ),
         )
     }
 
@@ -163,51 +168,59 @@ public class AttachmentStream {
         return text
     }
 
+    public func imageMetadata() -> ImageMetadata? {
+        switch contentType {
+        case .file, .video, .audio:
+            return nil
+        case .image:
+            break
+        }
+
+        do {
+            let attachmentKey = try AttachmentKey(combinedKey: attachment.encryptionKey)
+            let imageSource = try EncryptedFileHandleImageSource(
+                encryptedFileUrl: fileURL,
+                attachmentKey: attachmentKey,
+                plaintextLength: UInt64(safeCast: unencryptedByteCount),
+            )
+
+            return imageSource.imageMetadata()
+        } catch {
+            return nil
+        }
+    }
+
     public func decryptedImage() throws -> UIImage {
         switch contentType {
-        case .file, .invalid, .audio:
+        case .file, .audio:
             throw OWSAssertionError("Requesting image from non-visual attachment")
         case .image:
             return try UIImage.from(self)
-        case .animatedImage:
-            let data = try self.decryptedRawData()
-            let image: UIImage?
-            if mimeType.caseInsensitiveCompare(MimeType.imageWebp.rawValue) == .orderedSame {
-                /// Use SDAnimatedImage for webp.
-                image = SDAnimatedImage(data: data)
-            } else {
-                image = UIImage(data: data)
-            }
-
-            guard let image else {
-                throw OWSAssertionError("Failed to load image")
-            }
-            return image
-        case .video(_, _, let stillImageRelativeFilePath):
-            guard let stillImageRelativeFilePath else {
+        case .video:
+            guard let stillImageRelativeFilePath = info.cachedVideoStillFrameRelativeFilePath else {
                 throw OWSAssertionError("Still image unavailable for video")
             }
             return try UIImage.fromEncryptedFile(
                 at: Self.absoluteAttachmentFileURL(relativeFilePath: stillImageRelativeFilePath),
                 attachmentKey: AttachmentKey(combinedKey: attachment.encryptionKey),
                 plaintextLength: nil,
-                mimeType: OWSMediaUtils.videoStillFrameMimeType.rawValue
+                mimeType: OWSMediaUtils.videoStillFrameMimeType.rawValue,
             )
         }
     }
 
     public func decryptedSDAnimatedImage() throws -> SDAnimatedImage {
         switch contentType {
-        case .file, .invalid, .audio, .video:
+        case .file, .audio, .video:
             throw OWSAssertionError("Requesting image from non-visual attachment")
-        case .image, .animatedImage:
+        case .image:
             return try SDAnimatedImage.sdImage(from: self)
         }
     }
 
     public func decryptedAVAsset() throws -> AVAsset {
         switch contentType {
-        case .file, .invalid, .image, .animatedImage:
+        case .file, .image:
             throw OWSAssertionError("Requesting AVAsset from incompatible attachment")
         case .video, .audio:
             return try AVAsset.from(self)
@@ -224,15 +237,5 @@ public class AttachmentStream {
     public func thumbnailImageSync(quality: AttachmentThumbnailQuality) -> UIImage? {
         return DependenciesBridge.shared.attachmentThumbnailService
             .thumbnailImageSync(for: self, quality: quality)
-    }
-
-    // MARK: - Audio Waveform
-
-    public func audioWaveform() -> Task<AudioWaveform, Error> {
-        DependenciesBridge.shared.audioWaveformManager.audioWaveform(forAttachment: self, highPriority: false)
-    }
-
-    public func highPriorityAudioWaveform() -> Task<AudioWaveform, Error> {
-        DependenciesBridge.shared.audioWaveformManager.audioWaveform(forAttachment: self, highPriority: true)
     }
 }

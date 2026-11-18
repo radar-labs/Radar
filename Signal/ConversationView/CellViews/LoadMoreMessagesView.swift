@@ -4,19 +4,21 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
-public class LoadMoreMessagesView: UICollectionReusableView {
+class LoadMoreMessagesView: UICollectionReusableView {
 
-    public static let reuseIdentifier = "LoadMoreMessagesView"
+    static let reuseIdentifier = "LoadMoreMessagesView"
 
-    public static let fixedHeight: CGFloat = 60
+    static let fixedHeight: CGFloat = 60
 
     // MARK: Init
 
-    override public init(frame: CGRect) {
-        label.text = OWSLocalizedString("CONVERSATION_VIEW_LOADING_MORE_MESSAGES",
-                                       comment: "Indicates that the app is loading more messages in this conversation.")
+    override init(frame: CGRect) {
+        label.text = OWSLocalizedString(
+            "CONVERSATION_VIEW_LOADING_MORE_MESSAGES",
+            comment: "Indicates that the app is loading more messages in this conversation.",
+        )
         super.init(frame: frame)
         addSubview(label)
         label.autoPinEdgesToSuperviewEdges()
@@ -34,7 +36,7 @@ public class LoadMoreMessagesView: UICollectionReusableView {
 
     // MARK: Public
 
-    public func configureForDisplay() {
+    func configureForDisplay() {
         label.textColor = Theme.secondaryTextAndIconColor
         label.font = UIFont.semiboldFont(ofSize: 16)
     }

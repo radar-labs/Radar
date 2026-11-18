@@ -6,7 +6,7 @@
 import SignalServiceKit
 import SignalUI
 
-final class SAEScreenLockViewController: ScreenLockViewController {
+final class SAEScreenLockViewController: ScreenLockViewController, ScreenLockViewDelegate {
 
     private var completion: ((_ didUnlock: Bool) -> Void)?
 
@@ -28,10 +28,11 @@ final class SAEScreenLockViewController: ScreenLockViewController {
 
     // MARK: - UIViewController
 
-    override func loadView() {
-        super.loadView()
-        view.backgroundColor = Theme.launchScreenBackgroundColor
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
         title = OWSLocalizedString("SHARE_EXTENSION_VIEW_TITLE", comment: "Title for the 'share extension' view.")
+
         navigationItem.leftBarButtonItem = .systemItem(.stop) { [weak self] in
             Logger.debug("tapped dismiss share button")
             self?.cancelShareExperience()
@@ -49,7 +50,7 @@ final class SAEScreenLockViewController: ScreenLockViewController {
 
         ensureUI()
 
-        if !hasShownAuthUIOnce {
+        if hasShownAuthUIOnce == false {
             hasShownAuthUIOnce = true
             tryToPresentAuthUIToUnlockScreenLock()
         }
@@ -66,32 +67,24 @@ final class SAEScreenLockViewController: ScreenLockViewController {
     }
 
     private func tryToPresentAuthUIToUnlockScreenLock() {
-        AssertIsOnMainThread()
+        guard isShowingAuthUI == false else { return }
 
-        guard !isShowingAuthUI else { return }
         isShowingAuthUI = true
 
-        ScreenLock.shared.tryToUnlockScreenLock(
-            success: {
-                AssertIsOnMainThread()
-
+        Task { @MainActor in
+            switch await ScreenLock.shared.tryToUnlockScreenLock() {
+            case .success:
                 Logger.info("unlock screen lock succeeded.")
 
                 self.isShowingAuthUI = false
                 self.invokeCompletion(didUnlock: true)
-            },
-            failure: { error in
-                AssertIsOnMainThread()
-
+            case .failure(let localizedErrorMessage):
                 Logger.info("unlock screen lock failed.")
 
                 self.isShowingAuthUI = false
                 self.ensureUI()
-                self.showScreenLockFailureAlertWithMessage(error.userErrorDescription)
-            },
-            unexpectedFailure: { error in
-                AssertIsOnMainThread()
-
+                self.showScreenLockFailureAlertWithMessage(localizedErrorMessage)
+            case .unexpectedFailure:
                 Logger.info("unlock screen lock unexpectedly failed.")
 
                 self.isShowingAuthUI = false
@@ -102,46 +95,38 @@ final class SAEScreenLockViewController: ScreenLockViewController {
                 DispatchQueue.main.async {
                     self.ensureUI()
                 }
-            },
-            cancel: {
-                AssertIsOnMainThread()
-
+            case .cancel:
                 Logger.info("unlock screen lock cancelled.")
 
                 self.isShowingAuthUI = false
                 self.ensureUI()
             }
-        )
+        }
 
         ensureUI()
     }
 
     private func showScreenLockFailureAlertWithMessage(_ message: String) {
-        AssertIsOnMainThread()
-
         OWSActionSheets.showActionSheet(
             title: OWSLocalizedString(
                 "SCREEN_LOCK_UNLOCK_FAILED",
-                comment: "Title for alert indicating that screen lock could not be unlocked."
+                comment: "Title for alert indicating that screen lock could not be unlocked.",
             ),
             buttonAction: { _ in
                 // After the alert, update the UI.
                 self.ensureUI()
             },
-            fromViewController: self
+            fromViewController: self,
         )
     }
 
     private func cancelShareExperience() {
         invokeCompletion(didUnlock: false)
     }
-}
 
-extension SAEScreenLockViewController: ScreenLockViewDelegate {
+    // MARK: - ScreenLockViewDelegate:
 
     func unlockButtonWasTapped() {
-        AssertIsOnMainThread()
-
         Logger.info("unlockButtonWasTapped")
 
         tryToPresentAuthUIToUnlockScreenLock()

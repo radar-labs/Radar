@@ -4,6 +4,7 @@
 //
 
 import SignalServiceKit
+import UIKit
 
 protocol GifPickerLayoutDelegate: AnyObject {
     func imageInfosForLayout() -> [GiphyImageInfo]
@@ -12,7 +13,7 @@ protocol GifPickerLayoutDelegate: AnyObject {
 // A Pinterest-style waterfall layout.
 class GifPickerLayout: UICollectionViewLayout {
 
-    public weak var delegate: GifPickerLayoutDelegate?
+    weak var delegate: GifPickerLayoutDelegate?
 
     private var itemAttributesMap = [UInt: UICollectionViewLayoutAttributes]()
 
@@ -46,10 +47,10 @@ class GifPickerLayout: UICollectionViewLayout {
     override func prepare() {
         super.prepare()
 
-        guard let collectionView = collectionView else {
+        guard let collectionView else {
             return
         }
-        guard let delegate = delegate else {
+        guard let delegate else {
             return
         }
 
@@ -76,7 +77,7 @@ class GifPickerLayout: UICollectionViewLayout {
         var columnXs = [UInt]()
         // columnYs are the top edge of the next cell in each column.
         var columnYs = [UInt]()
-        for columnIndex in 0...columnCount-1 {
+        for columnIndex in 0...columnCount - 1 {
             var columnX = hInset + (columnWidth * columnIndex)
             if columnCount > 1 {
                 // We want to unevenly distribute the hSpacing between the columns
@@ -103,7 +104,7 @@ class GifPickerLayout: UICollectionViewLayout {
             }
             let cellX = columnXs[column]
             let cellWidth = columnWidth
-            let cellHeight = UInt(CGFloat(columnWidth) / imageInfo.originalAspectRatio)
+            let cellHeight = UInt(CGFloat(columnWidth) / imageInfo.previewAspectRatio)
 
             let indexPath = NSIndexPath(row: cellIndex, section: 0)
             let itemAttributes = UICollectionViewLayoutAttributes(forCellWith: indexPath as IndexPath)
@@ -136,7 +137,7 @@ class GifPickerLayout: UICollectionViewLayout {
     }
 
     override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
-        guard let collectionView = collectionView else {
+        guard let collectionView else {
             return false
         }
         return collectionView.width != newBounds.size.width

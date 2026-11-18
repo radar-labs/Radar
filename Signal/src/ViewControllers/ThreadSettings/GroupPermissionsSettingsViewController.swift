@@ -23,15 +23,17 @@ class GroupPermissionsSettingsViewController: OWSTableViewController2 {
     private var oldAccessMembers: GroupV2Access { groupModelV2.access.members }
     private var oldAccessAttributes: GroupV2Access { groupModelV2.access.attributes }
     private var oldIsAnnouncementsOnly: Bool { groupModelV2.isAnnouncementsOnly }
+    private var oldAccessMemberLabels: GroupV2Access { groupModelV2.access.memberLabels }
 
     private lazy var newAccessMembers = oldAccessMembers
     private lazy var newAccessAttributes = oldAccessAttributes
     private lazy var newIsAnnouncementsOnly = oldIsAnnouncementsOnly
+    private lazy var newAccessMemberLabels = oldAccessMemberLabels
 
     init(threadViewModel: ThreadViewModel, delegate: GroupPermissionsSettingsDelegate) {
         owsAssertDebug(threadViewModel.threadRecord.isGroupV2Thread)
         self.threadViewModel = threadViewModel
-        self.groupViewHelper = GroupViewHelper(threadViewModel: threadViewModel)
+        self.groupViewHelper = GroupViewHelper(threadViewModel: threadViewModel, memberLabelCoordinator: nil)
         self.permissionsDelegate = delegate
 
         super.init()
@@ -44,12 +46,12 @@ class GroupPermissionsSettingsViewController: OWSTableViewController2 {
 
         title = OWSLocalizedString(
             "CONVERSATION_SETTINGS_PERMISSIONS",
-            comment: "Label for 'permissions' action in conversation settings view."
+            comment: "Label for 'permissions' action in conversation settings view.",
         )
 
         navigationItem.leftBarButtonItem = .cancelButton(
             dismissingFrom: self,
-            hasUnsavedChanges: { [weak self] in self?.hasUnsavedChanges }
+            hasUnsavedChanges: { [weak self] in self?.hasUnsavedChanges },
         )
 
         navigationItem.rightBarButtonItem = .setButton { [weak self] in
@@ -65,9 +67,10 @@ class GroupPermissionsSettingsViewController: OWSTableViewController2 {
             return false
         }
 
-        return (oldAccessMembers != newAccessMembers ||
+        return oldAccessMembers != newAccessMembers ||
             oldAccessAttributes != newAccessAttributes ||
-            oldIsAnnouncementsOnly != newIsAnnouncementsOnly)
+            oldIsAnnouncementsOnly != newIsAnnouncementsOnly ||
+            oldAccessMemberLabels != newAccessMemberLabels
     }
 
     // Don't allow interactive dismiss when there are unsaved changes.
@@ -87,32 +90,32 @@ class GroupPermissionsSettingsViewController: OWSTableViewController2 {
         let accessMembersSection = OWSTableSection()
         accessMembersSection.headerTitle = OWSLocalizedString(
             "CONVERSATION_SETTINGS_EDIT_MEMBERSHIP_ACCESS",
-            comment: "Label for 'edit membership access' action in conversation settings view."
+            comment: "Label for 'edit membership access' action in conversation settings view.",
         )
         accessMembersSection.footerTitle = OWSLocalizedString(
             "CONVERSATION_SETTINGS_EDIT_MEMBERSHIP_ACCESS_FOOTER",
-            comment: "Description for the 'edit membership access'."
+            comment: "Description for the 'edit membership access'.",
         )
 
         accessMembersSection.add(.init(
             text: OWSLocalizedString(
                 "CONVERSATION_SETTINGS_EDIT_ATTRIBUTES_ACCESS_ALERT_MEMBERS_BUTTON",
-                comment: "Label for button that sets 'group attributes access' to 'members-only'."
+                comment: "Label for button that sets 'group attributes access' to 'members-only'.",
             ),
             actionBlock: { [weak self] in
                 self?.tryToSetAccessMembers(.member)
             },
-            accessoryType: newAccessMembers == .member ? .checkmark : .none
+            accessoryType: newAccessMembers == .member ? .checkmark : .none,
         ))
         accessMembersSection.add(.init(
             text: OWSLocalizedString(
                 "CONVERSATION_SETTINGS_EDIT_ATTRIBUTES_ACCESS_ALERT_ADMINISTRATORS_BUTTON",
-                comment: "Label for button that sets 'group attributes access' to 'administrators-only'."
+                comment: "Label for button that sets 'group attributes access' to 'administrators-only'.",
             ),
             actionBlock: { [weak self] in
                 self?.tryToSetAccessMembers(.administrator)
             },
-            accessoryType: newAccessMembers == .administrator ? .checkmark : .none
+            accessoryType: newAccessMembers == .administrator ? .checkmark : .none,
         ))
 
         contents.add(accessMembersSection)
@@ -120,32 +123,32 @@ class GroupPermissionsSettingsViewController: OWSTableViewController2 {
         let accessAttributesSection = OWSTableSection()
         accessAttributesSection.headerTitle = OWSLocalizedString(
             "CONVERSATION_SETTINGS_EDIT_ATTRIBUTES_ACCESS",
-            comment: "Label for 'edit attributes access' action in conversation settings view."
+            comment: "Label for 'edit attributes access' action in conversation settings view.",
         )
         accessAttributesSection.footerTitle = OWSLocalizedString(
-            "CONVERSATION_SETTINGS_ATTRIBUTES_ACCESS_SECTION_FOOTER",
-            comment: "Footer for the 'attributes access' section in conversation settings view."
+            "CONVERSATION_SETTINGS_ATTRIBUTES_ACCESS_SECTION_FOOTER_V2",
+            comment: "Footer for the 'attributes access' section in conversation settings view with pinned messages added.",
         )
 
         accessAttributesSection.add(.init(
             text: OWSLocalizedString(
                 "CONVERSATION_SETTINGS_EDIT_ATTRIBUTES_ACCESS_ALERT_MEMBERS_BUTTON",
-                comment: "Label for button that sets 'group attributes access' to 'members-only'."
+                comment: "Label for button that sets 'group attributes access' to 'members-only'.",
             ),
             actionBlock: { [weak self] in
                 self?.tryToSetAccessAttributes(.member)
             },
-            accessoryType: newAccessAttributes == .member ? .checkmark : .none
+            accessoryType: newAccessAttributes == .member ? .checkmark : .none,
         ))
         accessAttributesSection.add(.init(
             text: OWSLocalizedString(
                 "CONVERSATION_SETTINGS_EDIT_ATTRIBUTES_ACCESS_ALERT_ADMINISTRATORS_BUTTON",
-                comment: "Label for button that sets 'group attributes access' to 'administrators-only'."
+                comment: "Label for button that sets 'group attributes access' to 'administrators-only'.",
             ),
             actionBlock: { [weak self] in
                 self?.tryToSetAccessAttributes(.administrator)
             },
-            accessoryType: newAccessAttributes == .administrator ? .checkmark : .none
+            accessoryType: newAccessAttributes == .administrator ? .checkmark : .none,
         ))
 
         contents.add(accessAttributesSection)
@@ -155,35 +158,68 @@ class GroupPermissionsSettingsViewController: OWSTableViewController2 {
         let announcementOnlySection = OWSTableSection()
         announcementOnlySection.headerTitle = OWSLocalizedString(
             "CONVERSATION_SETTINGS_SEND_MESSAGES_SECTION_HEADER",
-            comment: "Label for 'send messages' action in conversation settings permissions view."
+            comment: "Label for 'send messages' action in conversation settings permissions view.",
         )
         announcementOnlySection.footerTitle = OWSLocalizedString(
             "CONVERSATION_SETTINGS_SEND_MESSAGES_SECTION_FOOTER",
-            comment: "Footer for the 'send messages' section in conversation settings permissions view."
+            comment: "Footer for the 'send messages' section in conversation settings permissions view.",
         )
 
         announcementOnlySection.add(.init(
             text: OWSLocalizedString(
                 "CONVERSATION_SETTINGS_SEND_MESSAGES_SECTION_ALL_MEMBERS",
-                comment: "Label for button that sets 'send messages permission' for a group to 'all members'."
+                comment: "Label for button that sets 'send messages permission' for a group to 'all members'.",
             ),
             actionBlock: { [weak self] in
                 self?.tryToSetIsAnnouncementsOnly(false)
             },
-            accessoryType: !isAnnouncementsOnly ? .checkmark : .none
+            accessoryType: !isAnnouncementsOnly ? .checkmark : .none,
         ))
         announcementOnlySection.add(.init(
             text: OWSLocalizedString(
                 "CONVERSATION_SETTINGS_SEND_MESSAGES_SECTION_ONLY_ADMINS",
-                comment: "Label for button that sets 'send messages permission' for a group to 'administrators only'."
+                comment: "Label for button that sets 'send messages permission' for a group to 'administrators only'.",
             ),
             actionBlock: { [weak self] in
                 self?.tryToSetIsAnnouncementsOnly(true)
             },
-            accessoryType: isAnnouncementsOnly ? .checkmark : .none
+            accessoryType: isAnnouncementsOnly ? .checkmark : .none,
         ))
 
         contents.add(announcementOnlySection)
+
+        let accessMemberLabelsSection = OWSTableSection()
+        accessMemberLabelsSection.headerTitle = OWSLocalizedString(
+            "CONVERSATION_SETTINGS_EDIT_MEMBER_LABELS_ACCESS",
+            comment: "Label for 'edit member label access' action in conversation settings view.",
+        )
+        accessMemberLabelsSection.footerTitle = OWSLocalizedString(
+            "CONVERSATION_SETTINGS_EDIT_MEMBER_LABELS_ACCESS_FOOTER",
+            comment: "Description for the 'edit member label access'.",
+        )
+
+        accessMemberLabelsSection.add(.init(
+            text: OWSLocalizedString(
+                "CONVERSATION_SETTINGS_MEMBER_LABELS_ACCESS_ALERT_MEMBERS_BUTTON",
+                comment: "Label for button that sets 'member labels access' to 'members-only'.",
+            ),
+            actionBlock: { [weak self] in
+                self?.tryToSetAccessMemberLabels(.member)
+            },
+            accessoryType: newAccessMemberLabels == .member ? .checkmark : .none,
+        ))
+        accessMemberLabelsSection.add(.init(
+            text: OWSLocalizedString(
+                "CONVERSATION_SETTINGS_MEMBER_LABELS_ACCESS_ADMINISTRATORS_BUTTON",
+                comment: "Label for button that sets 'member labels access' to 'administrators-only'.",
+            ),
+            actionBlock: { [weak self] in
+                self?.tryToSetAccessMemberLabels(.administrator)
+            },
+            accessoryType: newAccessMemberLabels == .administrator ? .checkmark : .none,
+        ))
+
+        contents.add(accessMemberLabelsSection)
     }
 
     private func tryToSetAccessMembers(_ value: GroupV2Access) {
@@ -196,11 +232,74 @@ class GroupPermissionsSettingsViewController: OWSTableViewController2 {
         self.updateNavigation()
     }
 
+    private func nonAdminsHaveMemberLabels() -> Bool {
+        let groupMembership = groupModelV2.groupMembership
+        let nonAdmins = groupMembership.fullMembers.filter { !groupMembership.isFullMemberAndAdministrator($0) }
+        for nonAdmin in nonAdmins {
+            if let aci = nonAdmin.aci, groupMembership.memberLabel(for: aci) != nil {
+                return true
+            }
+        }
+        return false
+    }
+
+    private func tryToSetAccessMemberLabels(_ value: GroupV2Access) {
+        guard groupViewHelper.canEditPermissions else {
+            showAdminOnlyWarningAlert()
+            return
+        }
+        let continueBlock = {
+            self.newAccessMemberLabels = value
+            self.updateTableContents()
+            self.updateNavigation()
+        }
+
+        switch value {
+        case .administrator:
+            if oldAccessMemberLabels != .administrator, nonAdminsHaveMemberLabels() {
+                showClearMemberLabelWarning(continueHandler: {
+                    continueBlock()
+                })
+            } else {
+                fallthrough
+            }
+        case .member, .unknown, .any, .unsatisfiable:
+            continueBlock()
+        }
+    }
+
+    private func showClearMemberLabelWarning(continueHandler: @escaping () -> Void) {
+        let actionSheet = ActionSheetController(
+            title: OWSLocalizedString(
+                "MEMBER_LABEL_CLEAR_WARNING_TITLE",
+                comment: "Title for action sheet when attempting to change the group attributes access to 'administrator'",
+            ),
+            message: OWSLocalizedString(
+                "MEMBER_LABEL_CLEAR_WARNING_BODY",
+                comment: "Body for action sheet when attempting to change the group attributes access to 'administrator'",
+            ),
+        )
+        actionSheet.addAction(.init(
+            title: OWSLocalizedString(
+                "MEMBER_LABEL_CLEAR_CHANGE_PERMISSION_CONTINUE",
+                comment: "Button label on action sheet when attempting to change the group attributes access to 'administrator' and then continue",
+            ),
+            style: .default,
+            handler: { _ in
+                continueHandler()
+            },
+        ))
+        actionSheet.addAction(.cancel)
+
+        self.presentActionSheet(actionSheet)
+    }
+
     private func tryToSetAccessAttributes(_ value: GroupV2Access) {
         guard groupViewHelper.canEditPermissions else {
             showAdminOnlyWarningAlert()
             return
         }
+
         self.newAccessAttributes = value
         self.updateTableContents()
         self.updateNavigation()
@@ -217,27 +316,31 @@ class GroupPermissionsSettingsViewController: OWSTableViewController2 {
     }
 
     private func showAdminOnlyWarningAlert() {
-        let message = OWSLocalizedString("GROUP_ADMIN_ONLY_WARNING",
-                                        comment: "Message indicating that a feature can only be used by group admins.")
+        let message = OWSLocalizedString(
+            "GROUP_ADMIN_ONLY_WARNING",
+            comment: "Message indicating that a feature can only be used by group admins.",
+        )
         presentToast(text: message)
         updateTableContents()
     }
 
     private func reloadThreadAndUpdateContent() {
         let didUpdate = SSKEnvironment.shared.databaseStorageRef.read { transaction -> Bool in
-            guard let newThread = TSThread.anyFetch(
-                uniqueId: self.thread.uniqueId,
-                transaction: transaction
-            ) else {
+            guard
+                let newThread = TSThread.fetchViaCache(
+                    uniqueId: self.thread.uniqueId,
+                    transaction: transaction,
+                )
+            else {
                 return false
             }
             let newThreadViewModel = ThreadViewModel(
                 thread: newThread,
                 forChatList: false,
-                transaction: transaction
+                transaction: transaction,
             )
             self.threadViewModel = newThreadViewModel
-            self.groupViewHelper = GroupViewHelper(threadViewModel: newThreadViewModel)
+            self.groupViewHelper = GroupViewHelper(threadViewModel: newThreadViewModel, memberLabelCoordinator: nil)
             self.groupViewHelper.delegate = self
             return true
         }
@@ -271,27 +374,34 @@ class GroupPermissionsSettingsViewController: OWSTableViewController2 {
 
                 if self.newAccessMembers != self.oldAccessMembers {
                     try await GroupManager.changeGroupMembershipAccessV2(
-                        groupModel: self.groupModelV2,
-                        access: self.newAccessMembers
+                        secretParams: self.groupModelV2.secretParams(),
+                        access: self.newAccessMembers,
                     )
                 }
                 if self.newAccessAttributes != self.oldAccessAttributes {
                     try await GroupManager.changeGroupAttributesAccessV2(
-                        groupModel: self.groupModelV2,
-                        access: self.newAccessAttributes
+                        secretParams: self.groupModelV2.secretParams(),
+                        access: self.newAccessAttributes,
                     )
                 }
                 if self.newIsAnnouncementsOnly != self.oldIsAnnouncementsOnly {
                     try await GroupManager.setIsAnnouncementsOnly(
-                        groupModel: self.groupModelV2,
-                        isAnnouncementsOnly: self.newIsAnnouncementsOnly
+                        secretParams: self.groupModelV2.secretParams(),
+                        isAnnouncementsOnly: self.newIsAnnouncementsOnly,
+                    )
+                }
+
+                if self.newAccessMemberLabels != self.oldAccessMemberLabels {
+                    try await GroupManager.changeGroupMemberLabelsAccessV2(
+                        secretParams: self.groupModelV2.secretParams(),
+                        access: self.newAccessMemberLabels,
                     )
                 }
             },
             completion: { [weak self] in
                 self?.permissionsDelegate?.groupPermissionSettingsDidUpdate()
                 self?.dismiss(animated: true)
-            }
+            },
         )
     }
 }

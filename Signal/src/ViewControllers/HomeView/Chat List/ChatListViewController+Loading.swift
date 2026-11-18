@@ -105,11 +105,13 @@ extension ChatListViewController {
 
         let previousRenderState = tableDataSource.renderState
 
-        guard validateDiffConsistency(
-            previousState: previousRenderState,
-            newState: renderState,
-            rowChanges: rowChanges
-        ) else {
+        guard
+            validateDiffConsistency(
+                previousState: previousRenderState,
+                newState: renderState,
+                rowChanges: rowChanges,
+            )
+        else {
             tableDataSource.renderState = renderState
             threadViewModelCache.clear()
             cellContentCache.clear()
@@ -234,7 +236,7 @@ extension ChatListViewController {
     private func validateDiffConsistency(
         previousState: CLVRenderState,
         newState: CLVRenderState,
-        rowChanges: [CLVRowChange]
+        rowChanges: [CLVRowChange],
     ) -> Bool {
         let prevTypes = previousState.sections.map(\.type)
         let newTypes = newState.sections.map(\.type)
@@ -257,22 +259,26 @@ extension ChatListViewController {
         for change in rowChanges {
             switch change.type {
             case .delete(let indexPath):
-                guard indexPath.section < simulatedCounts.count,
-                      simulatedCounts[indexPath.section] > 0 else { return false }
+                guard
+                    indexPath.section < simulatedCounts.count,
+                    simulatedCounts[indexPath.section] > 0 else { return false }
                 simulatedCounts[indexPath.section] -= 1
 
             case .insert(let indexPath):
-                guard indexPath.section < simulatedCounts.count,
-                      indexPath.section < newExpectedCounts.count,
-                      simulatedCounts[indexPath.section] < newExpectedCounts[indexPath.section] else {
+                guard
+                    indexPath.section < simulatedCounts.count,
+                    indexPath.section < newExpectedCounts.count,
+                    simulatedCounts[indexPath.section] < newExpectedCounts[indexPath.section]
+                else {
                     return false
                 }
                 simulatedCounts[indexPath.section] += 1
 
             case .move(let from, let to):
-                guard from.section < simulatedCounts.count,
-                      to.section < simulatedCounts.count,
-                      simulatedCounts[from.section] > 0 else { return false }
+                guard
+                    from.section < simulatedCounts.count,
+                    to.section < simulatedCounts.count,
+                    simulatedCounts[from.section] > 0 else { return false }
                 simulatedCounts[from.section] -= 1
                 simulatedCounts[to.section] += 1
 
@@ -325,10 +331,13 @@ public class CLVLoadCoordinator {
             lastSelectedThreadId: String?,
             hasVisibleReminders: Bool,
             shouldBackupDownloadProgressViewBeVisible: Bool,
+            shouldBackupExportProgressViewBeVisible: Bool,
+            shouldLocalFileBackupRestoreProgressViewBeVisible: Bool,
+            shouldLocalFileBackupExportProgressViewBeVisible: Bool,
             lastViewInfo: CLVViewInfo,
-            transaction: DBReadTransaction
+            transaction: DBReadTransaction,
         ) -> CLVLoadInfo {
-            let inboxFilter = inboxFilter ?? loadCoordinator.filterStore.inboxFilter(transaction: transaction) ?? .none
+            let inboxFilter = inboxFilter ?? loadCoordinator.filterStore.inboxFilter(transaction: transaction) ?? .unfiltered
 
             let viewInfo = CLVViewInfo.build(
                 chatListMode: chatListMode,
@@ -337,7 +346,10 @@ public class CLVLoadCoordinator {
                 lastSelectedThreadId: lastSelectedThreadId,
                 hasVisibleReminders: hasVisibleReminders,
                 shouldBackupDownloadProgressViewBeVisible: shouldBackupDownloadProgressViewBeVisible,
-                transaction: transaction
+                shouldBackupExportProgressViewBeVisible: shouldBackupExportProgressViewBeVisible,
+                shouldLocalFileBackupRestoreProgressViewBeVisible: shouldLocalFileBackupRestoreProgressViewBeVisible,
+                shouldLocalFileBackupExportProgressViewBeVisible: shouldLocalFileBackupExportProgressViewBeVisible,
+                transaction: transaction,
             )
 
             if shouldResetAll {
@@ -387,8 +399,10 @@ public class CLVLoadCoordinator {
         // app is foreground and active.  Therefore we need to make an
         // exception and update the view contents; otherwise, the home
         // view will briefly appear empty after launch.
-        let shouldForceLoad = (!viewController.hasEverAppeared &&
-                                viewController.tableDataSource.renderState.visibleThreadCount == 0)
+        let shouldForceLoad = (
+            !viewController.hasEverAppeared &&
+                viewController.tableDataSource.renderState.visibleThreadCount == 0,
+        )
 
         loadIfNecessary(suppressAnimations: true, shouldForceLoad: shouldForceLoad)
     }
@@ -397,7 +411,7 @@ public class CLVLoadCoordinator {
     public func applicationWillEnterForeground() {
         AssertIsOnMainThread()
 
-        guard let viewController = viewController else {
+        guard let viewController else {
             owsFailDebug("Missing viewController.")
             return
         }
@@ -425,9 +439,6 @@ public class CLVLoadCoordinator {
 
         // Copy the "current" load info, reset "next" load info.
 
-        let hasVisibleReminders = viewController.viewState.reminderViews.hasVisibleReminders
-        let shouldBackupDownloadProgressViewBeVisible = viewController.viewState.backupDownloadProgressView.shouldBeVisible
-
         let loadResult: CLVLoadResult = SSKEnvironment.shared.databaseStorageRef.read { transaction in
             // Decide what kind of load we prefer.
             let loadInfo = loadInfoBuilder.build(
@@ -436,10 +447,13 @@ public class CLVLoadCoordinator {
                 inboxFilter: viewController.viewState.inboxFilter,
                 isMultiselectActive: viewController.viewState.multiSelectState.isActive,
                 lastSelectedThreadId: viewController.viewState.lastSelectedThreadId,
-                hasVisibleReminders: hasVisibleReminders,
-                shouldBackupDownloadProgressViewBeVisible: shouldBackupDownloadProgressViewBeVisible,
+                hasVisibleReminders: MainActor.assumeIsolated { viewController.viewState.reminderViews.hasVisibleReminders },
+                shouldBackupDownloadProgressViewBeVisible: viewController.viewState.backupDownloadProgressView.shouldBeVisible,
+                shouldBackupExportProgressViewBeVisible: viewController.viewState.backupExportProgressView.shouldBeVisible,
+                shouldLocalFileBackupRestoreProgressViewBeVisible: viewController.viewState.localFileBackupRestoreProgressView.shouldBeVisible,
+                shouldLocalFileBackupExportProgressViewBeVisible: viewController.viewState.localFileBackupExportProgressView.shouldBeVisible,
                 lastViewInfo: viewController.renderState.viewInfo,
-                transaction: transaction
+                transaction: transaction,
             )
 
             // Reset the builder.
@@ -452,14 +466,14 @@ public class CLVLoadCoordinator {
             case .resetAll:
                 return viewController.loadRenderStateForReset(
                     viewInfo: loadInfo.viewInfo,
-                    transaction: transaction
+                    transaction: transaction,
                 )
 
             case .incrementalDiff(let updatedThreadIds):
                 return viewController.loadNewRenderStateWithDiff(
                     viewInfo: loadInfo.viewInfo,
                     updatedThreadIds: updatedThreadIds,
-                    transaction: transaction
+                    transaction: transaction,
                 )
 
             case .incrementalWithoutThreadUpdates:

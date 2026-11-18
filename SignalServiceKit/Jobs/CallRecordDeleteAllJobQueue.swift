@@ -22,20 +22,20 @@ public class CallRecordDeleteAllJobQueue {
     private let jobRunnerFactory: CallRecordDeleteAllJobRunnerFactory
     private let jobQueueRunner: JobQueueRunner<
         JobRecordFinderImpl<CallRecordDeleteAllJobRecord>,
-        CallRecordDeleteAllJobRunnerFactory
+        CallRecordDeleteAllJobRunnerFactory,
     >
     private var jobSerializer = CompletionSerializer()
 
     private let callRecordConversationIdAdapter: CallRecordSyncMessageConversationIdAdapter
 
     public init(
-        callLinkStore: any CallLinkRecordStore,
+        callLinkStore: CallLinkRecordStore,
         callRecordConversationIdAdapter: CallRecordSyncMessageConversationIdAdapter,
         callRecordDeleteManager: any CallRecordDeleteManager,
         callRecordQuerier: CallRecordQuerier,
         db: any DB,
         interactionDeleteManager: InteractionDeleteManager,
-        messageSenderJobQueue: MessageSenderJobQueue
+        messageSenderJobQueue: MessageSenderJobQueue,
     ) {
         self.jobRunnerFactory = CallRecordDeleteAllJobRunnerFactory(
             callLinkStore: callLinkStore,
@@ -44,13 +44,13 @@ public class CallRecordDeleteAllJobQueue {
             callRecordQuerier: callRecordQuerier,
             db: db,
             interactionDeleteManager: interactionDeleteManager,
-            messageSenderJobQueue: messageSenderJobQueue
+            messageSenderJobQueue: messageSenderJobQueue,
         )
         self.jobQueueRunner = JobQueueRunner(
             canExecuteJobsConcurrently: false,
             db: db,
             jobFinder: JobRecordFinderImpl(db: db),
-            jobRunnerFactory: self.jobRunnerFactory
+            jobRunnerFactory: self.jobRunnerFactory,
         )
 
         self.callRecordConversationIdAdapter = callRecordConversationIdAdapter
@@ -70,7 +70,7 @@ public class CallRecordDeleteAllJobQueue {
     public func addJob(
         sendDeleteAllSyncMessage: Bool,
         deleteAllBefore: DeleteAllBeforeOptions,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         let jobRecord: CallRecordDeleteAllJobRecord
 
@@ -88,14 +88,14 @@ public class CallRecordDeleteAllJobQueue {
                 sendDeleteAllSyncMessage: sendDeleteAllSyncMessage,
                 deleteAllBeforeCallId: callRecord.callId,
                 deleteAllBeforeConversationId: conversationId,
-                deleteAllBeforeTimestamp: callRecord.callBeganTimestamp
+                deleteAllBeforeTimestamp: callRecord.callBeganTimestamp,
             )
         case .timestamp(let timestamp):
             jobRecord = CallRecordDeleteAllJobRecord(
                 sendDeleteAllSyncMessage: sendDeleteAllSyncMessage,
                 deleteAllBeforeCallId: nil,
                 deleteAllBeforeConversationId: nil,
-                deleteAllBeforeTimestamp: timestamp
+                deleteAllBeforeTimestamp: timestamp,
             )
         }
 
@@ -119,7 +119,7 @@ private class CallRecordDeleteAllJobRunner: JobRunner {
 
     private var logger: CallRecordLogger { .shared }
 
-    private let callLinkStore: any CallLinkRecordStore
+    private let callLinkStore: CallLinkRecordStore
     private let callRecordConversationIdAdapter: CallRecordSyncMessageConversationIdAdapter
     private let callRecordDeleteManager: any CallRecordDeleteManager
     private let callRecordQuerier: CallRecordQuerier
@@ -128,13 +128,13 @@ private class CallRecordDeleteAllJobRunner: JobRunner {
     private let messageSenderJobQueue: MessageSenderJobQueue
 
     init(
-        callLinkStore: any CallLinkRecordStore,
+        callLinkStore: CallLinkRecordStore,
         callRecordConversationIdAdapter: CallRecordSyncMessageConversationIdAdapter,
         callRecordDeleteManager: any CallRecordDeleteManager,
         callRecordQuerier: CallRecordQuerier,
         db: any DB,
         interactionDeleteManager: InteractionDeleteManager,
-        messageSenderJobQueue: MessageSenderJobQueue
+        messageSenderJobQueue: MessageSenderJobQueue,
     ) {
         self.callLinkStore = callLinkStore
         self.callRecordConversationIdAdapter = callRecordConversationIdAdapter
@@ -148,19 +148,19 @@ private class CallRecordDeleteAllJobRunner: JobRunner {
     // MARK: -
 
     func runJobAttempt(
-        _ jobRecord: CallRecordDeleteAllJobRecord
+        _ jobRecord: CallRecordDeleteAllJobRecord,
     ) async -> JobAttemptResult<Void> {
         return await JobAttemptResult.executeBlockWithDefaultErrorHandler(
             jobRecord: jobRecord,
             retryLimit: Constants.maxRetries,
             db: db,
-            block: { try await _runJobAttempt(jobRecord) },
+            block: { await _runJobAttempt(jobRecord) },
         )
     }
 
     func didFinishJob(
         _ jobRecordId: JobRecord.RowId,
-        result: JobResult<Void>
+        result: JobResult<Void>,
     ) async {
         switch result.ranSuccessfullyOrError {
         case .success:
@@ -171,8 +171,8 @@ private class CallRecordDeleteAllJobRunner: JobRunner {
     }
 
     private func _runJobAttempt(
-        _ jobRecord: CallRecordDeleteAllJobRecord
-    ) async throws {
+        _ jobRecord: CallRecordDeleteAllJobRecord,
+    ) async {
         var deleteBeforeTimestamp: UInt64 = {
             /// We'll prefer the timestamp on the call record if we have it.
             /// They should be identical in the 99.999% case, but there's a
@@ -184,16 +184,11 @@ private class CallRecordDeleteAllJobRunner: JobRunner {
                 let callId = jobRecord.deleteAllBeforeCallId,
                 let conversationId = jobRecord.deleteAllBeforeConversationId,
                 let referencedCallRecord: CallRecord = db.read(block: { tx -> CallRecord? in
-                    do {
-                        return try callRecordConversationIdAdapter.hydrate(
-                            conversationId: conversationId,
-                            callId: callId,
-                            tx: tx
-                        )
-                    } catch {
-                        owsFailDebug("\(error)")
-                        return nil
-                    }
+                    return callRecordConversationIdAdapter.hydrate(
+                        conversationId: conversationId,
+                        callId: callId,
+                        tx: tx,
+                    )
                 })
             else {
                 return jobRecord.deleteAllBeforeTimestamp
@@ -204,10 +199,11 @@ private class CallRecordDeleteAllJobRunner: JobRunner {
 
         logger.info("Attempting to delete all call records before \(deleteBeforeTimestamp).")
 
-        let deletedCount = await TimeGatedBatch.processAllAsync(db: db) { tx in
-            let (deletedCount, earliestDeletedTimestamp) = self.deleteSomeCallRecords(
+        var deletedCount = 0
+        await TimeGatedBatch.processAll(db: db) { tx in
+            let (batchDeletedCount, earliestDeletedTimestamp) = self.deleteSomeCallRecords(
                 beforeTimestamp: deleteBeforeTimestamp,
-                tx: tx
+                tx: tx,
             )
             // We skip any call links for which we're the admin, so update
             // deleteBeforeTimestamp on each iteration to avoid fetching those call
@@ -215,7 +211,8 @@ private class CallRecordDeleteAllJobRunner: JobRunner {
             if let earliestDeletedTimestamp {
                 deleteBeforeTimestamp = earliestDeletedTimestamp
             }
-            return deletedCount
+            deletedCount += batchDeletedCount
+            return batchDeletedCount == 0 ? .done(()) : .more
         }
 
         logger.info("Deleted \(deletedCount) calls.")
@@ -228,7 +225,7 @@ private class CallRecordDeleteAllJobRunner: JobRunner {
                     callId: jobRecord.deleteAllBeforeCallId,
                     conversationId: jobRecord.deleteAllBeforeConversationId,
                     beforeTimestamp: deleteBeforeTimestamp,
-                    tx: tx
+                    tx: tx,
                 )
             }
 
@@ -245,17 +242,18 @@ private class CallRecordDeleteAllJobRunner: JobRunner {
     /// error.
     private func deleteSomeCallRecords(
         beforeTimestamp: UInt64,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> (deletedCount: Int, earliestDeletedTimestamp: UInt64?) {
         /// The passed timestamp will be the timestamp of the most-recent call
         /// when the user initiated the delete-all action. So as to ensure we
         /// delete that most-recent call, we'll shim the timestamp forward.
         let beforeTimestamp = beforeTimestamp + 1
 
-        guard let cursor = callRecordQuerier.fetchCursor(
-            ordering: .descendingBefore(timestamp: beforeTimestamp),
-            tx: tx
-        ) else { return (0, nil) }
+        guard
+            let cursor = callRecordQuerier.fetchCursor(
+                ordering: .descendingBefore(timestamp: beforeTimestamp),
+                tx: tx,
+            ) else { return (0, nil) }
 
         do {
             var earliestTimestamp: UInt64?
@@ -269,9 +267,8 @@ private class CallRecordDeleteAllJobRunner: JobRunner {
 
                 switch callRecord.conversationId {
                 case .callLink(let callLinkRowId):
-                    let callLinkRecord = try callLinkStore.fetch(rowId: callLinkRowId, tx: tx) ?? {
-                        throw OWSAssertionError("Can't fetch CallLink that must exist.")
-                    }()
+                    let callLinkRecord = callLinkStore.fetch(rowId: callLinkRowId, tx: tx)
+                        .owsFailUnwrap("FOREIGN KEYs mean this must exist.")
                     if callLinkRecord.adminPasskey != nil {
                         // These are deleted via Storage Service syncs.
                     } else {
@@ -289,13 +286,13 @@ private class CallRecordDeleteAllJobRunner: JobRunner {
             interactionDeleteManager.delete(
                 alongsideAssociatedCallRecords: callRecordsWithInteractions,
                 sideEffects: .custom(associatedCallDelete: .localDeleteOnly),
-                tx: tx
+                tx: tx,
             )
 
             callRecordDeleteManager.deleteCallRecords(
                 callRecordsWithoutInteractions,
                 sendSyncMessageOnDelete: false,
-                tx: tx
+                tx: tx,
             )
 
             return (callRecordsWithInteractions.count + callRecordsWithoutInteractions.count, earliestTimestamp)
@@ -310,28 +307,29 @@ private class CallRecordDeleteAllJobRunner: JobRunner {
         callId: UInt64?,
         conversationId: Data?,
         beforeTimestamp: UInt64,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
-        guard let localThread = TSContactThread.getOrCreateLocalThread(
-            transaction: tx
-        ) else { return }
+        guard
+            let localThread = TSContactThread.getOrCreateLocalThread(
+                transaction: tx,
+            ) else { return }
 
         let outgoingCallLogEventSyncMessage = OutgoingCallLogEventSyncMessage(
             callLogEvent: OutgoingCallLogEventSyncMessage.CallLogEvent(
                 eventType: .cleared,
                 callId: callId,
                 conversationId: conversationId,
-                timestamp: beforeTimestamp
+                timestamp: beforeTimestamp,
             ),
             localThread: localThread,
-            tx: tx
+            tx: tx,
         )
         let preparedMessage = PreparedOutgoingMessage.preprepared(
-            transientMessageWithoutAttachments: outgoingCallLogEventSyncMessage
+            transientMessageWithoutAttachments: outgoingCallLogEventSyncMessage,
         )
         messageSenderJobQueue.add(
             message: preparedMessage,
-            transaction: tx
+            transaction: tx,
         )
     }
 }
@@ -341,7 +339,7 @@ private class CallRecordDeleteAllJobRunner: JobRunner {
 private class CallRecordDeleteAllJobRunnerFactory: JobRunnerFactory {
     typealias JobRunnerType = CallRecordDeleteAllJobRunner
 
-    private let callLinkStore: any CallLinkRecordStore
+    private let callLinkStore: CallLinkRecordStore
     private let callRecordConversationIdAdapter: CallRecordSyncMessageConversationIdAdapter
     private let callRecordDeleteManager: any CallRecordDeleteManager
     private let callRecordQuerier: CallRecordQuerier
@@ -350,13 +348,13 @@ private class CallRecordDeleteAllJobRunnerFactory: JobRunnerFactory {
     private let messageSenderJobQueue: MessageSenderJobQueue
 
     init(
-        callLinkStore: any CallLinkRecordStore,
+        callLinkStore: CallLinkRecordStore,
         callRecordConversationIdAdapter: CallRecordSyncMessageConversationIdAdapter,
         callRecordDeleteManager: any CallRecordDeleteManager,
         callRecordQuerier: CallRecordQuerier,
         db: any DB,
         interactionDeleteManager: InteractionDeleteManager,
-        messageSenderJobQueue: MessageSenderJobQueue
+        messageSenderJobQueue: MessageSenderJobQueue,
     ) {
         self.callLinkStore = callLinkStore
         self.callRecordConversationIdAdapter = callRecordConversationIdAdapter
@@ -375,7 +373,7 @@ private class CallRecordDeleteAllJobRunnerFactory: JobRunnerFactory {
             callRecordQuerier: callRecordQuerier,
             db: db,
             interactionDeleteManager: interactionDeleteManager,
-            messageSenderJobQueue: messageSenderJobQueue
+            messageSenderJobQueue: messageSenderJobQueue,
         )
     }
 }

@@ -9,11 +9,11 @@ import Foundation
 /// wrapper around OutputStream, but allows for easier testing and
 /// proxying of the OutputStream class itself.
 public protocol OutputStreamable: Streamable {
-    func write(data: Data) throws
+    func write(data: Data, options: StreamTransform.Options) throws
 }
 
 extension OutputStream: OutputStreamable {
-    public func write(data: Data) throws {
+    public func write(data: Data, options: StreamTransform.Options) throws {
         let writeLen = data.withUnsafeBytes {
             guard let bytes = $0.baseAddress?.assumingMemoryBound(to: Int8.self) else {
                 return 0
@@ -21,7 +21,7 @@ extension OutputStream: OutputStreamable {
             return self.write(bytes, maxLength: data.count)
         }
         if writeLen != data.count {
-            owsFailDebug("The amount written doesn't match amount that was attempted.")
+            owsFailDebug("The amount written doesn't match amount that was attempted, streamError: \(String(describing: self.streamError?.shortDescription))")
         }
     }
 }

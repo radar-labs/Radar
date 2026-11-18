@@ -6,24 +6,26 @@
 import GRDB
 import LibSignalClient
 
-public class BackupArchiveReactionStore {
+class BackupArchiveReactionStore {
 
-    public init() {}
+    init() {}
 
     // MARK: - Archiving
 
     /// Returns a list of all reactions to this message
     func allReactions(
         message: TSMessage,
-        context: BackupArchive.RecipientArchivingContext
-    ) throws -> [OWSReaction] {
+        context: BackupArchive.RecipientArchivingContext,
+    ) -> [OWSReaction] {
         let sql = """
             SELECT * FROM \(OWSReaction.databaseTableName)
             WHERE \(OWSReaction.columnName(.uniqueMessageId)) = ?
             ORDER BY \(OWSReaction.columnName(.id)) DESC
         """
-        let statement = try context.tx.database.cachedStatement(sql: sql)
-        return try OWSReaction.fetchAll(statement, arguments: [message.uniqueId])
+        return failIfThrows {
+            let statement = try context.tx.database.cachedStatement(sql: sql)
+            return try OWSReaction.fetchAll(statement, arguments: [message.uniqueId])
+        }
     }
 
     // MARK: - Restoring
@@ -33,17 +35,18 @@ public class BackupArchiveReactionStore {
         emoji: String,
         reactorAci: Aci,
         sentAtTimestamp: UInt64,
-        sortOrder: UInt64,
-        context: BackupArchive.RecipientRestoringContext
-    ) throws {
-        let reaction = OWSReaction.fromRestoredBackup(
+        context: BackupArchive.RecipientRestoringContext,
+    ) {
+        let reaction = OWSReaction(
             uniqueMessageId: uniqueMessageId,
             emoji: emoji,
             reactorAci: reactorAci,
+            reactorPhoneNumber: nil,
             sentAtTimestamp: sentAtTimestamp,
-            sortOrder: sortOrder
         )
-        try reaction.insert(context.tx.database)
+        failIfThrows {
+            try reaction.insert(context.tx.database)
+        }
     }
 
     /// In the olden days before the introduction of Acis, reactions were sent by e164s.
@@ -52,16 +55,17 @@ public class BackupArchiveReactionStore {
         emoji: String,
         reactorE164: E164,
         sentAtTimestamp: UInt64,
-        sortOrder: UInt64,
-        context: BackupArchive.RecipientRestoringContext
-    ) throws {
-        let reaction = OWSReaction.fromRestoredBackup(
+        context: BackupArchive.RecipientRestoringContext,
+    ) {
+        let reaction = OWSReaction(
             uniqueMessageId: uniqueMessageId,
             emoji: emoji,
-            reactorE164: reactorE164,
+            reactorAci: nil,
+            reactorPhoneNumber: reactorE164.stringValue,
             sentAtTimestamp: sentAtTimestamp,
-            sortOrder: sortOrder
         )
-        try reaction.insert(context.tx.database)
+        failIfThrows {
+            try reaction.insert(context.tx.database)
+        }
     }
 }

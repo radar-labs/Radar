@@ -113,6 +113,12 @@ extension TSInfoMessage.PersistableGroupUpdateItem {
                 return updaterAci.wrappedValue
             case .attributesAccessChangedByUnknownUser:
                 return nil
+            case .memberLabelsAccessChangedByLocalUser:
+                return nil
+            case .memberLabelsAccessChangedByUnknownUser:
+                return nil
+            case .memberLabelsAccessChangedByOtherUser(let updaterAci, _):
+                return updaterAci.wrappedValue
             case .announcementOnlyEnabledByLocalUser:
                 return nil
             case .announcementOnlyEnabledByOtherUser(let updaterAci):
@@ -281,6 +287,12 @@ extension TSInfoMessage.PersistableGroupUpdateItem {
                 return nil
             case .otherUserJoinedViaInviteLink(let userAci):
                 return userAci.wrappedValue
+            case .groupTerminatedByLocalUser:
+                return nil
+            case .groupTerminatedByOtherUser(let updaterAci):
+                return updaterAci.wrappedValue
+            case .groupTerminatedByUnknownUser:
+                return nil
             }
         }()
 

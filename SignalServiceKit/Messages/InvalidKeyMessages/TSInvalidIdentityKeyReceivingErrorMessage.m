@@ -4,7 +4,6 @@
 //
 
 #import "TSInvalidIdentityKeyReceivingErrorMessage.h"
-#import "TSContactThread.h"
 #import <SignalServiceKit/SignalServiceKit-Swift.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -20,13 +19,30 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark -
 
 @implementation TSInvalidIdentityKeyReceivingErrorMessage {
-    // Not using a property declaration in order to exclude from DB serialization
     SSKProtoEnvelope *_Nullable _envelope;
 }
 
-- (nullable instancetype)initWithCoder:(NSCoder *)coder
+- (NSUInteger)hash
 {
-    return [super initWithCoder:coder];
+    NSUInteger result = [super hash];
+    result ^= self.authorId.hash;
+    result ^= self.envelopeData.hash;
+    return result;
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (![super isEqual:other]) {
+        return NO;
+    }
+    TSInvalidIdentityKeyReceivingErrorMessage *typedOther = (TSInvalidIdentityKeyReceivingErrorMessage *)other;
+    if (![NSObject isObject:self.authorId equalToObject:typedOther.authorId]) {
+        return NO;
+    }
+    if (![NSObject isObject:self.envelopeData equalToObject:typedOther.envelopeData]) {
+        return NO;
+    }
+    return YES;
 }
 
 // --- CODE GENERATION MARKER
@@ -55,7 +71,6 @@ NS_ASSUME_NONNULL_BEGIN
                isGroupStoryReply:(BOOL)isGroupStoryReply
                           isPoll:(BOOL)isPoll
   isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
-                       isStarred:(BOOL)isStarred
               isViewOnceComplete:(BOOL)isViewOnceComplete
                isViewOnceMessage:(BOOL)isViewOnceMessage
                      linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -93,7 +108,6 @@ NS_ASSUME_NONNULL_BEGIN
                  isGroupStoryReply:isGroupStoryReply
                             isPoll:isPoll
     isSmsMessageRestoredFromBackup:isSmsMessageRestoredFromBackup
-                         isStarred:isStarred
                 isViewOnceComplete:isViewOnceComplete
                  isViewOnceMessage:isViewOnceMessage
                        linkPreview:linkPreview

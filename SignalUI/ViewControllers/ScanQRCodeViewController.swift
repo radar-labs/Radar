@@ -12,13 +12,22 @@ public protocol QRCodeSampleBufferScannerDelegate: AnyObject {
     /// A boolean indicating if the scanner should attempt to process QR codes.
     /// This property will be accessed off the main thread.
     var shouldProcessQRCodes: Bool { get }
+
     /// Informs the delegate that a QR code has been found.
-    /// This function will be called on the main thread.
-    func qrCodeFound(string qrCodeString: String?, data qrCodeData: Data?)
+    @MainActor
+    func qrCodeSampleBufferScanner(
+        _ sampleBufferScanner: QRCodeSampleBufferScanner,
+        didFindStringValue stringValue: String?,
+        dataValue: Data?,
+    )
+
     /// Informs the delegate that there was an error in the
     /// `VNDetectBarcodesRequest`.
-    /// This function will be called on the main thread.
-    func scanFailed(error: any Error)
+    @MainActor
+    func qrCodeSampleBufferScanner(
+        _ sampleBufferScanner: QRCodeSampleBufferScanner,
+        didFailWithError error: any Error,
+    )
 }
 
 public class QRCodeSampleBufferScanner: NSObject {
@@ -30,23 +39,25 @@ public class QRCodeSampleBufferScanner: NSObject {
 
     private lazy var detectQRCodeRequest: VNDetectBarcodesRequest = {
         let request = VNDetectBarcodesRequest { [weak self] request, error in
-            guard let self = self else { return }
-            if let error = error {
+            if let error {
                 DispatchQueue.main.async {
-                    self.delegate?.scanFailed(error: error)
+                    guard let self else { return }
+                    self.delegate?.qrCodeSampleBufferScanner(self, didFailWithError: error)
                 }
                 return
             }
-            self.processClassification(request: request)
+            self?.processClassification(request: request)
         }
 
-        request.symbologies = [ .qr ]
+        request.symbologies = [.qr]
 
         return request
     }()
 
     private func processClassification(request: VNRequest) {
-        guard let delegate, delegate.shouldProcessQRCodes else { return }
+        guard delegate?.shouldProcessQRCodes == true else {
+            return
+        }
 
         typealias QRCode = (string: String?, data: Data?)
         let qrCode: QRCode? = (request.results ?? [])
@@ -54,8 +65,8 @@ public class QRCodeSampleBufferScanner: NSObject {
             .compactMap { $0 as? VNBarcodeObservation }
             .filter { (barcode: VNBarcodeObservation) -> Bool in
                 barcode.symbology == .qr
-                && barcode.barcodeDescriptor is CIQRCodeDescriptor
-                && barcode.confidence > 0.9
+                    && barcode.barcodeDescriptor is CIQRCodeDescriptor
+                    && barcode.confidence > 0.9
             }
             .sorted { $0.confidence > $1.confidence }
             .compactMap { (barcode: VNBarcodeObservation) -> QRCode? in
@@ -67,7 +78,7 @@ public class QRCodeSampleBufferScanner: NSObject {
                 let qrCodeString: String? = barcode.payloadStringValue
                 let qrCodeData: Data? = QRCodePayload.parse(
                     codewords: qrCodeCodewords,
-                    qrCodeVersion: qrCodeVersion
+                    qrCodeVersion: qrCodeVersion,
                 )?.data
 
                 guard qrCodeString != nil || qrCodeData != nil else {
@@ -78,12 +89,14 @@ public class QRCodeSampleBufferScanner: NSObject {
             }
             .first
 
-        guard let qrCode else { return }
+        guard let qrCode else {
+            return
+        }
 
         Logger.info("Scanned QR Code.")
 
         DispatchQueue.main.async {
-            delegate.qrCodeFound(string: qrCode.string, data: qrCode.data)
+            self.delegate?.qrCodeSampleBufferScanner(self, didFindStringValue: qrCode.string, dataValue: qrCode.data)
         }
     }
 }
@@ -92,14 +105,14 @@ extension QRCodeSampleBufferScanner: AVCaptureVideoDataOutputSampleBufferDelegat
     public func captureOutput(
         _ output: AVCaptureOutput,
         didOutput sampleBuffer: CMSampleBuffer,
-        from connection: AVCaptureConnection
+        from connection: AVCaptureConnection,
     ) {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
             return
         }
         let imageRequestHandler = VNImageRequestHandler(
             cvPixelBuffer: pixelBuffer,
-            orientation: .right
+            orientation: .right,
         )
         do {
             try imageRequestHandler.perform([detectQRCodeRequest])
@@ -116,6 +129,7 @@ public enum QRCodeScanOutcome: UInt {
 
 // MARK: -
 
+@MainActor
 public protocol QRCodeScanDelegate: AnyObject {
     // A QR code scan might yield a String payload, Data payload or both.
     //
@@ -143,7 +157,7 @@ public protocol QRCodeScanDelegate: AnyObject {
     @discardableResult
     func qrCodeScanViewScanned(
         qrCodeData: Data?,
-        qrCodeString: String?
+        qrCodeString: String?,
     ) -> QRCodeScanOutcome
 
     // QRCodeScanViewController DRYs up asking for camera permissions, etc.
@@ -171,7 +185,7 @@ public class QRCodeScanViewController: OWSViewController {
         fileprivate var backgroundColor: UIColor {
             switch self {
             case .framed:
-                return .ows_black
+                return .Signal.background
             case .unadorned:
                 return .clear
             }
@@ -183,11 +197,7 @@ public class QRCodeScanViewController: OWSViewController {
 
     public weak var delegate: QRCodeScanDelegate?
 
-    private let delegateHasAcceptedScanResults = AtomicBool(false, lock: .init())
-
     private var scanner: QRCodeScanner?
-
-    private lazy var sampleBufferScanner = QRCodeSampleBufferScanner(delegate: self)
 
     public var prefersFrontFacingCamera = false {
         didSet {
@@ -201,53 +211,40 @@ public class QRCodeScanViewController: OWSViewController {
         super.init()
     }
 
-    public override var prefersStatusBarHidden: Bool {
+    override public var prefersStatusBarHidden: Bool {
         return !DependenciesBridge.shared.currentCallProvider.hasCurrentCall
     }
 
-    public override var prefersHomeIndicatorAutoHidden: Bool {
+    override public var prefersHomeIndicatorAutoHidden: Bool {
         return true
     }
 
-    private lazy var uploadPhotoButton: UIButton = {
-        let button = OWSRoundedButton { [weak self] in
+    private lazy var uploadPhotoButton = UIButton(
+        configuration: .roundMaterial(image: Theme.iconImage(.buttonPhotoLibrary)),
+        primaryAction: UIAction { [weak self] _ in
             guard let self else { return }
             self.delegate?.didTapUploadPhotoButton(self)
-        }
-
-        button.ows_contentEdgeInsets = UIEdgeInsets(margin: 14)
-
-        // Always use dark theming since it sits over the scan mask.
-        button.setTemplateImageName(
-            Theme.iconName(.buttonPhotoLibrary),
-            tintColor: .ows_white
-        )
-        button.backgroundColor = .ows_whiteAlpha20
-
-        return button
-    }()
+        },
+    )
 
     // MARK: - View Lifecycle
 
-    public override func viewDidLoad() {
-        AssertIsOnMainThread()
-
+    override public func viewDidLoad() {
         super.viewDidLoad()
 
+        overrideUserInterfaceStyle = .dark
         view.backgroundColor = appearance.backgroundColor
 
         addObservers()
     }
 
-    public override func viewDidAppear(_ animated: Bool) {
-        AssertIsOnMainThread()
-
+    override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         tryToStartScanning()
     }
 
-    public override func viewWillTransition(to size: CGSize, with coordinator: any UIViewControllerTransitionCoordinator) {
+    override public func viewWillTransition(to size: CGSize, with coordinator: any UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
 
         if let interfaceOrientation = self.view.window?.windowScene?.interfaceOrientation {
@@ -255,9 +252,7 @@ public class QRCodeScanViewController: OWSViewController {
         }
     }
 
-    public override func viewDidDisappear(_ animated: Bool) {
-        AssertIsOnMainThread()
-
+    override public func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
 
         stopScanning()
@@ -266,45 +261,39 @@ public class QRCodeScanViewController: OWSViewController {
     // MARK: - Notifications
 
     private func addObservers() {
-        AssertIsOnMainThread()
-
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(didEnterBackground),
             name: .OWSApplicationDidEnterBackground,
-            object: nil
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(didBecomeActive),
             name: .OWSApplicationDidBecomeActive,
-            object: nil
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(logSessionRuntimeError),
             name: .AVCaptureSessionRuntimeError,
-            object: nil
+            object: nil,
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(logSessionInterruptError),
             name: .AVCaptureSessionWasInterrupted,
-            object: nil
+            object: nil,
         )
     }
 
     @objc
     private func didEnterBackground() {
-        AssertIsOnMainThread()
-
         stopScanning()
     }
 
     @objc
     private func didBecomeActive() {
-        AssertIsOnMainThread()
-
         if self.view.window != nil {
             tryToStartScanning()
         }
@@ -323,8 +312,10 @@ public class QRCodeScanViewController: OWSViewController {
     @objc
     private func logSessionInterruptError(notification: Notification) {
         if let userInfo = notification.userInfo {
-            guard let reasonValue = userInfo[AVCaptureSessionInterruptionReasonKey] as? NSNumber,
-                  let reason = AVCaptureSession.InterruptionReason(rawValue: reasonValue.intValue) else {
+            guard
+                let reasonValue = userInfo[AVCaptureSessionInterruptionReasonKey] as? NSNumber,
+                let reason = AVCaptureSession.InterruptionReason(rawValue: reasonValue.intValue)
+            else {
                 Logger.info("session was interrupted for no apparent reason")
                 return
             }
@@ -342,15 +333,13 @@ public class QRCodeScanViewController: OWSViewController {
 
     @objc
     public func tryToStartScanning() {
-        AssertIsOnMainThread()
-
         guard nil == scanner else {
             Logger.info("Early return because scanner is not nil")
             return
         }
 
         self.ows_askForCameraPermissions { [weak self] granted in
-            guard let self = self else { return }
+            guard let self else { return }
 
             if granted {
                 self.startScanning()
@@ -377,7 +366,7 @@ public class QRCodeScanViewController: OWSViewController {
         let animator = UIViewPropertyAnimator(
             duration: 0.35,
             springDamping: 1,
-            springResponse: 0.35
+            springResponse: 0.35,
         )
         animator.addAnimations {
             frame.transform = isReversed ? .identity : .scale(1.1)
@@ -391,19 +380,14 @@ public class QRCodeScanViewController: OWSViewController {
     }
 
     private func startScanning() {
-        AssertIsOnMainThread()
-
-        guard
-            scanner == nil,
-            !delegateHasAcceptedScanResults.get()
-        else {
-            Logger.info("Early return. Scanner is not nil or delegate has already accepted scan results")
+        guard scanner == nil else {
+            owsFailDebug("already scanning")
             return
         }
 
         let scanner = QRCodeScanner(
             prefersFrontFacingCamera: self.prefersFrontFacingCamera,
-            sampleBufferDelegate: self.sampleBufferScanner
+            scannerDelegate: self,
         )
         self.scanner = scanner
 
@@ -425,7 +409,7 @@ public class QRCodeScanViewController: OWSViewController {
             frame.autoHCenterInSuperview()
             frame.centerYAnchor.constraint(
                 equalTo: self.view.safeAreaLayoutGuide.centerYAnchor,
-                constant: showUploadPhotoButton ? -16 : 0
+                constant: showUploadPhotoButton ? -16 : 0,
             ).isActive = true
 
             frame.layer.opacity = 0
@@ -435,7 +419,7 @@ public class QRCodeScanViewController: OWSViewController {
             let entranceAnimator = UIViewPropertyAnimator(
                 duration: 0.3,
                 springDamping: 1,
-                springResponse: 0.3
+                springResponse: 0.3,
             )
             entranceAnimator.addAnimations {
                 frame.layer.opacity = 1
@@ -463,7 +447,7 @@ public class QRCodeScanViewController: OWSViewController {
             Logger.info("Ready.")
         }.catch { [weak self] error in
             owsFailDebug("Error: \(error)")
-            guard let self = self else { return }
+            guard let self else { return }
             self.showFailureUI(error: error)
         }
     }
@@ -471,13 +455,15 @@ public class QRCodeScanViewController: OWSViewController {
     private func showFailureUI(error: Error) {
         Logger.error("error: \(error)")
 
-        OWSActionSheets.showActionSheet(title: nil,
-                                        message: error.userErrorDescription,
-                                        buttonTitle: CommonStrings.dismissButton,
-                                        buttonAction: { [weak self] _ in
-                                            guard let self = self else { return }
-                                            self.delegate?.qrCodeScanViewDismiss(self)
-                                        })
+        OWSActionSheets.showActionSheet(
+            title: nil,
+            message: error.userErrorDescription,
+            buttonTitle: CommonStrings.dismissButton,
+            buttonAction: { [weak self] _ in
+                guard let self else { return }
+                self.delegate?.qrCodeScanViewDismiss(self)
+            },
+        )
     }
 }
 
@@ -513,6 +499,7 @@ public class QRCodePayload {
     public var data: Data {
         Data(bytes)
     }
+
     public var asString: String? {
         String(data: data, encoding: .utf8)
     }
@@ -523,7 +510,7 @@ public class QRCodePayload {
         self.bytes = bytes
     }
 
-    // There are even more modes, but it'll improve logging a bit 
+    // There are even more modes, but it'll improve logging a bit
     // to identify these modes even though we don't support them.
     //
     // TODO: We currently only support .byte mode.
@@ -534,8 +521,10 @@ public class QRCodePayload {
         case kanji = 8
     }
 
-    public static func parse(codewords: Data,
-                             qrCodeVersion version: Int) -> QRCodePayload? {
+    public static func parse(
+        codewords: Data,
+        qrCodeVersion version: Int,
+    ) -> QRCodePayload? {
         // QR Code Standard
         // ISO/IEC 18004:2015
         // https://www.iso.org/standard/62021.html
@@ -560,8 +549,10 @@ public class QRCodePayload {
                 throw QRCodeError.unsupportedConfiguration
             }
 
-            let characterCountLength = try characterCountIndicatorLengthBits(version: version,
-                                                                             mode: mode)
+            let characterCountLength = try characterCountIndicatorLengthBits(
+                version: version,
+                mode: mode,
+            )
             let characterCount = try bitstream.readUInt32(bitCount: characterCountLength)
             guard characterCount > 0 else {
                 Logger.error("Invalid length: \(characterCount)")
@@ -580,8 +571,10 @@ public class QRCodePayload {
         }
     }
 
-    private static func characterCountIndicatorLengthBits(version: Int,
-                                                          mode: Mode) throws -> UInt {
+    private static func characterCountIndicatorLengthBits(
+        version: Int,
+        mode: Mode,
+    ) throws -> UInt {
         if version >= 1, version <= 9 {
             switch mode {
             case .numeric:
@@ -676,36 +669,39 @@ private class QRCodeBitStream {
 // MARK: -
 
 extension QRCodeScanViewController: QRCodeSampleBufferScannerDelegate {
-    public var shouldProcessQRCodes: Bool {
-        !delegateHasAcceptedScanResults.get()
-    }
 
-    public func qrCodeFound(string qrCodeString: String?, data qrCodeData: Data?) {
-        guard
-            let delegate = self.delegate,
-            !delegateHasAcceptedScanResults.get()
-        else {
-            Logger.info("Early return, delegate has already accepted scan results")
+    public var shouldProcessQRCodes: Bool { true }
+
+    @MainActor
+    public func qrCodeSampleBufferScanner(
+        _ sampleBufferScanner: QRCodeSampleBufferScanner,
+        didFindStringValue qrCodeString: String?,
+        dataValue qrCodeData: Data?,
+    ) {
+        guard self.scanner?.owns(sampleBufferScanner: sampleBufferScanner) == true else {
+            Logger.warn("ignoring scan result from old scanner")
             return
         }
 
-        let outcome = delegate.qrCodeScanViewScanned(
+        let outcome = self.delegate?.qrCodeScanViewScanned(
             qrCodeData: qrCodeData,
-            qrCodeString: qrCodeString
+            qrCodeString: qrCodeString,
         )
 
         switch outcome {
         case .stopScanning:
-            self.delegateHasAcceptedScanResults.set(true)
             self.stopScanning()
-
             ImpactHapticFeedback.impactOccurred(style: .medium)
+        case nil:
+            Logger.warn("ignoring scan result because there's no delegate")
+            fallthrough
         case .continueScanning:
             break
         }
     }
 
-    public func scanFailed(error: Error) {
+    @MainActor
+    public func qrCodeSampleBufferScanner(_ sampleBufferScanner: QRCodeSampleBufferScanner, didFailWithError error: any Error) {
         showFailureUI(error: error)
     }
 }
@@ -715,14 +711,13 @@ extension QRCodeScanViewController: QRCodeSampleBufferScannerDelegate {
 enum QRCodeScanError: Error {
     case assertionError(description: String)
     case initializationFailed
-    case captureFailed
 }
 
 // MARK: -
 
 private class QRCodeScanner {
 
-    lazy private(set) var previewView = QRCodeScanPreviewView(session: session)
+    private(set) lazy var previewView = QRCodeScanPreviewView(session: session)
 
     private let sessionQueue = DispatchQueue(label: "org.signal.qrcode-scanner")
 
@@ -743,10 +738,10 @@ private class QRCodeScanner {
 
     init(
         prefersFrontFacingCamera: Bool,
-        sampleBufferDelegate: AVCaptureVideoDataOutputSampleBufferDelegate
+        scannerDelegate: any QRCodeSampleBufferScannerDelegate,
     ) {
         self.prefersFrontFacingCamera = prefersFrontFacingCamera
-        output = QRCodeScanOutput(sampleBufferDelegate: sampleBufferDelegate)
+        self.output = QRCodeScanOutput(scannerDelegate: scannerDelegate)
 
         if #available(iOS 16.0, *) {
             if session.isMultitaskingCameraAccessSupported {
@@ -763,6 +758,10 @@ private class QRCodeScanner {
         }.catch { error in
             owsFailDebug("Error: \(error)")
         }
+    }
+
+    func owns(sampleBufferScanner: QRCodeSampleBufferScanner) -> Bool {
+        return (self.output.sampleBufferScanner as QRCodeSampleBufferScanner) === sampleBufferScanner
     }
 
     // MARK: - Public
@@ -789,7 +788,7 @@ private class QRCodeScanner {
         }
     }
 
-    public var prefersFrontFacingCamera: Bool {
+    var prefersFrontFacingCamera: Bool {
         didSet {
             sessionQueue.async {
                 guard self.session.isRunning else {
@@ -803,9 +802,7 @@ private class QRCodeScanner {
         }
     }
 
-    public func startVideoCapture(initialOrientation: UIInterfaceOrientation) -> Promise<Void> {
-        AssertIsOnMainThread()
-
+    func startVideoCapture(initialOrientation: UIInterfaceOrientation) -> Promise<Void> {
         guard !Platform.isSimulator else {
             // Trying to actually set up the capture session will fail on a simulator
             // since we don't have actual capture devices. But it's useful to be able
@@ -822,7 +819,7 @@ private class QRCodeScanner {
         let initialCaptureOrientation = AVCaptureVideoOrientation(interfaceOrientation: initialOrientation) ?? .portrait
 
         return sessionQueue.async(.promise) { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
 
             self.session.beginConfiguration()
             defer { self.session.commitConfiguration() }
@@ -851,13 +848,13 @@ private class QRCodeScanner {
         }
     }
 
-    public func assertIsOnSessionQueue() {
+    func assertIsOnSessionQueue() {
         assertOnQueue(sessionQueue)
     }
 
     // This method should be called on the serial queue,
     // and between calls to session.beginConfiguration/commitConfiguration
-    public func setCurrentInput() throws {
+    func setCurrentInput() throws {
         assertIsOnSessionQueue()
 
         let device = try selectCaptureDevice()
@@ -885,6 +882,16 @@ private class QRCodeScanner {
             session.removeInput($0)
         }
         session.addInput(newInput)
+
+        // The default videoZoomFactor is the ultrawide lens when there is one,
+        // so set it to the main lens and let it switch to the ultrawide for
+        // macro mode automatically. This only works after it's added to the
+        // session for some reason 🤷‍♀️
+        if let wideAngleZoomFactor = device.virtualDeviceSwitchOverVideoZoomFactors.first {
+            try device.lockForConfiguration()
+            device.videoZoomFactor = CGFloat(truncating: wideAngleZoomFactor)
+            device.unlockForConfiguration()
+        }
     }
 
     private func selectCaptureDevice() throws -> AVCaptureDevice {
@@ -892,11 +899,11 @@ private class QRCodeScanner {
 
         // Camera types in descending order of preference.
         var deviceTypes = [AVCaptureDevice.DeviceType]()
+        deviceTypes.append(.builtInTripleCamera)
+        deviceTypes.append(.builtInDualWideCamera)
+        deviceTypes.append(.builtInDualCamera)
         deviceTypes.append(.builtInWideAngleCamera)
         deviceTypes.append(.builtInUltraWideCamera)
-        deviceTypes.append(.builtInDualWideCamera)
-        deviceTypes.append(.builtInTripleCamera)
-        deviceTypes.append(.builtInDualCamera)
         deviceTypes.append(.builtInTelephotoCamera)
 
         func selectDevice(session: AVCaptureDevice.DiscoverySession) -> AVCaptureDevice? {
@@ -917,7 +924,7 @@ private class QRCodeScanner {
         let preferredSession = AVCaptureDevice.DiscoverySession(
             deviceTypes: deviceTypes,
             mediaType: .video,
-            position: preferredPosition
+            position: preferredPosition,
         )
         if let device = selectDevice(session: preferredSession) {
             return device
@@ -928,7 +935,7 @@ private class QRCodeScanner {
         let failoverSession = AVCaptureDevice.DiscoverySession(
             deviceTypes: deviceTypes,
             mediaType: .video,
-            position: failoverPosition
+            position: failoverPosition,
         )
         if let device = selectDevice(session: failoverSession) {
             return device
@@ -1000,15 +1007,17 @@ private class QRCodeScanPreviewView: UIView {
 private class QRCodeScanOutput {
 
     let videoDataOutput = AVCaptureVideoDataOutput()
+    let sampleBufferScanner: QRCodeSampleBufferScanner
 
     // MARK: - Init
 
-    init(sampleBufferDelegate: AVCaptureVideoDataOutputSampleBufferDelegate) {
-        videoDataOutput.videoSettings =
-            [kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA)]
+    init(scannerDelegate: any QRCodeSampleBufferScannerDelegate) {
+        self.sampleBufferScanner = QRCodeSampleBufferScanner(delegate: scannerDelegate)
+        videoDataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA)]
         videoDataOutput.setSampleBufferDelegate(
-            sampleBufferDelegate,
-            queue: DispatchQueue.global(qos: DispatchQoS.QoSClass.default))
+            self.sampleBufferScanner,
+            queue: DispatchQueue(label: "qr-code-scan-output", qos: .default),
+        )
     }
 }
 

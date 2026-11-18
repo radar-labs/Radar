@@ -6,7 +6,7 @@
 import Foundation
 import GRDB
 
-public class BackupAttachmentUploadStore {
+public struct BackupAttachmentUploadStore {
 
     public init() {}
 
@@ -25,8 +25,8 @@ public class BackupAttachmentUploadStore {
         tx: DBWriteTransaction,
         file: StaticString? = #file,
         function: StaticString? = #function,
-        line: UInt? = #line
-    ) throws {
+        line: UInt? = #line,
+    ) {
         if let file, let function, let line {
             Logger.info("Enqueuing \(attachment.id) fullsize? \(fullsize) from \(file) \(line): \(function)")
         }
@@ -51,10 +51,12 @@ public class BackupAttachmentUploadStore {
             ) ?? .max),
         )
 
-        let existingRecord = try QueuedBackupAttachmentUpload
+        let existingRecordQuery = QueuedBackupAttachmentUpload
             .filter(Column(QueuedBackupAttachmentUpload.CodingKeys.attachmentRowId) == attachment.id)
             .filter(Column(QueuedBackupAttachmentUpload.CodingKeys.isFullsize) == fullsize)
-            .fetchOne(db)
+        let existingRecord = failIfThrows {
+            try existingRecordQuery.fetchOne(db)
+        }
 
         if var existingRecord {
             // Only update if done or the new one has higher priority; otherwise leave untouched.
@@ -65,12 +67,15 @@ public class BackupAttachmentUploadStore {
             if shouldUpdate {
                 existingRecord.highestPriorityOwnerType = newRecord.highestPriorityOwnerType
                 existingRecord.state = newRecord.state
-                try existingRecord.update(db)
+                failIfThrows {
+                    try existingRecord.update(db)
+                }
             }
         } else {
             // If there's no existing record, insert and we're done.
-            try newRecord.checkAllUInt64FieldsFitInInt64()
-            try newRecord.insert(db)
+            failIfThrows {
+                try newRecord.insert(db)
+            }
         }
     }
 
@@ -81,36 +86,42 @@ public class BackupAttachmentUploadStore {
     public func fetchNextUploads(
         count: UInt,
         isFullsize: Bool,
-        tx: DBReadTransaction
-    ) throws -> [QueuedBackupAttachmentUpload] {
+        tx: DBReadTransaction,
+    ) -> [QueuedBackupAttachmentUpload] {
         // NULLS FIRST is unsupported in GRDB so we bridge to raw SQL;
         // we want thread wallpapers to go first (null timestamp) and then
         // descending order after that.
-        return try QueuedBackupAttachmentUpload
-            .fetchAll(
+        let sql = """
+        SELECT * FROM \(QueuedBackupAttachmentUpload.databaseTableName)
+        WHERE
+            \(QueuedBackupAttachmentUpload.CodingKeys.state.rawValue) = ?
+            AND \(QueuedBackupAttachmentUpload.CodingKeys.isFullsize.rawValue) = ?
+        ORDER BY
+            \(QueuedBackupAttachmentUpload.CodingKeys.maxOwnerTimestamp.rawValue) DESC NULLS FIRST
+        LIMIT ?
+        """
+
+        return failIfThrows {
+            try QueuedBackupAttachmentUpload.fetchAll(
                 tx.database,
-                sql: """
-                    SELECT * FROM \(QueuedBackupAttachmentUpload.databaseTableName)
-                    WHERE
-                      \(QueuedBackupAttachmentUpload.CodingKeys.state.rawValue) = ?
-                      AND \(QueuedBackupAttachmentUpload.CodingKeys.isFullsize.rawValue) = ?
-                    ORDER BY
-                        \(QueuedBackupAttachmentUpload.CodingKeys.maxOwnerTimestamp.rawValue) DESC NULLS FIRST
-                    LIMIT ?
-                    """,
-                arguments: [QueuedBackupAttachmentUpload.State.ready.rawValue, isFullsize, count]
+                sql: sql,
+                arguments: [QueuedBackupAttachmentUpload.State.ready.rawValue, isFullsize, count],
             )
+        }
     }
 
     public func getEnqueuedUpload(
         for attachmentId: Attachment.IDType,
         fullsize: Bool,
-        tx: DBReadTransaction
-    ) throws -> QueuedBackupAttachmentUpload? {
-        return try QueuedBackupAttachmentUpload
+        tx: DBReadTransaction,
+    ) -> QueuedBackupAttachmentUpload? {
+        let query = QueuedBackupAttachmentUpload
             .filter(Column(QueuedBackupAttachmentUpload.CodingKeys.attachmentRowId) == attachmentId)
             .filter(Column(QueuedBackupAttachmentUpload.CodingKeys.isFullsize) == fullsize)
-            .fetchOne(tx.database)
+
+        return failIfThrows {
+            try query.fetchOne(tx.database)
+        }
     }
 
     /// Remove the upload from the queue. Should be called once uploaded (or permanently failed).
@@ -129,34 +140,39 @@ public class BackupAttachmentUploadStore {
         tx: DBWriteTransaction,
         file: StaticString? = #file,
         function: StaticString? = #function,
-        line: UInt? = #line
-    ) throws -> QueuedBackupAttachmentUpload? {
+        line: UInt? = #line,
+    ) -> QueuedBackupAttachmentUpload? {
         if let file, let function, let line {
             Logger.info("Marking \(attachmentId) done. fullsize? \(fullsize) from \(file) \(line): \(function)")
         }
-        var record = try QueuedBackupAttachmentUpload
+        let recordQuery = QueuedBackupAttachmentUpload
             .filter(Column(QueuedBackupAttachmentUpload.CodingKeys.attachmentRowId) == attachmentId)
             .filter(Column(QueuedBackupAttachmentUpload.CodingKeys.isFullsize) == fullsize)
-            .fetchOne(tx.database)
-        record?.state = .done
-        try record?.update(tx.database)
-        return record
+
+        return failIfThrows {
+            var record = try recordQuery.fetchOne(tx.database)
+            record?.state = .done
+            try record?.update(tx.database)
+            return record
+        }
     }
 
-    public func totalEstimatedFullsizeBytesToUpload(tx: DBReadTransaction) throws -> UInt64 {
-        return try UInt64
-            .fetchOne(
+    public func totalEstimatedFullsizeBytesToUpload(tx: DBReadTransaction) -> UInt64 {
+        let sql = """
+        SELECT SUM(\(QueuedBackupAttachmentUpload.CodingKeys.estimatedByteCount.rawValue))
+        FROM \(QueuedBackupAttachmentUpload.databaseTableName)
+        WHERE
+            \(QueuedBackupAttachmentUpload.CodingKeys.state.rawValue) = ?
+            AND \(QueuedBackupAttachmentUpload.CodingKeys.isFullsize.rawValue) = ?
+        """
+
+        return failIfThrows {
+            try UInt64.fetchOne(
                 tx.database,
-                sql: """
-                    SELECT SUM(\(QueuedBackupAttachmentUpload.CodingKeys.estimatedByteCount.rawValue))
-                    FROM \(QueuedBackupAttachmentUpload.databaseTableName)
-                    WHERE
-                      \(QueuedBackupAttachmentUpload.CodingKeys.state.rawValue) = ?
-                      AND \(QueuedBackupAttachmentUpload.CodingKeys.isFullsize.rawValue) = ?
-                    """,
-                arguments: [QueuedBackupAttachmentUpload.State.ready.rawValue, true]
+                sql: sql,
+                arguments: [QueuedBackupAttachmentUpload.State.ready.rawValue, true],
             )
-            ?? 0
+        } ?? 0
     }
 }
 
@@ -168,6 +184,7 @@ extension QueuedBackupAttachmentUpload.OwnerType {
         // Thread wallpapers are higher priority, they always win.
         case (.threadWallpaper, _):
             return true
+
         case (.message(_), .threadWallpaper):
             return false
 

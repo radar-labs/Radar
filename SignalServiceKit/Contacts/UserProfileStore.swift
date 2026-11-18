@@ -18,7 +18,7 @@ public class UserProfileStoreImpl: UserProfileStore {
     public init() {}
 
     public func fetchUserProfile(for rowId: OWSUserProfile.RowId, tx: DBReadTransaction) -> OWSUserProfile? {
-        return SDSCodableModelDatabaseInterfaceImpl().fetchModel(modelType: OWSUserProfile.self, rowId: rowId, tx: tx)
+        return SDSCodableModelDatabaseInterface().fetchModel(modelType: OWSUserProfile.self, rowId: rowId, tx: tx)
     }
 
     public func fetchUserProfiles(for serviceId: ServiceId, tx: DBReadTransaction) -> [OWSUserProfile] {
@@ -57,7 +57,7 @@ class MockUserProfileStore: UserProfileStore {
 
     func updateUserProfile(_ userProfile: OWSUserProfile, tx: DBWriteTransaction) {
         let index = userProfiles.firstIndex(where: { $0.uniqueId == userProfile.uniqueId })!
-        userProfiles[index] = userProfile.copy() as! OWSUserProfile
+        userProfiles[index] = userProfile.shallowCopy()
     }
 
     func removeUserProfile(_ userProfile: OWSUserProfile, tx: DBWriteTransaction) {

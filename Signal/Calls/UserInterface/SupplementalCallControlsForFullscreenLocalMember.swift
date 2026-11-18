@@ -24,10 +24,10 @@ class SupplementalCallControlsForFullscreenLocalMember: UIView {
 
     private lazy var flipCameraImageView = {
         let imageView = UIImageView(image: UIImage(named: "switch-camera-28"))
-        imageView.tintColor = .ows_white
+        imageView.tintColor = .white
         imageView.autoSetDimension(
             .height,
-            toSize: 24
+            toSize: 24,
         )
         imageView.autoMatch(.width, to: .height, of: imageView)
         return imageView
@@ -42,15 +42,17 @@ class SupplementalCallControlsForFullscreenLocalMember: UIView {
 
         button.autoSetDimension(
             .height,
-            toSize: 48
+            toSize: 48,
         )
         button.autoMatch(.width, to: .height, of: button)
         button.accessibilityLabel = flipCameraButtonAccessibilityLabel
-        button.addTarget(self, action: #selector(didPressFlipCamera), for: .touchUpInside)
+        button.addAction(
+            UIAction { [weak self] _ in self?.didPressFlipCamera() },
+            for: .primaryActionTriggered,
+        )
         return button
     }()
 
-    @objc
     private func didPressFlipCamera() {
         if let isUsingFrontCamera = call.videoCaptureController.isUsingFrontCamera {
             callService.updateCameraSource(call: call, isUsingFrontCamera: !isUsingFrontCamera)
@@ -60,7 +62,7 @@ class SupplementalCallControlsForFullscreenLocalMember: UIView {
     private var flipCameraButtonAccessibilityLabel: String {
         return OWSLocalizedString(
             "CALL_VIEW_SWITCH_CAMERA_DIRECTION",
-            comment: "Accessibility label to toggle front- vs. rear-facing camera"
+            comment: "Accessibility label to toggle front- vs. rear-facing camera",
         )
     }
 
@@ -75,7 +77,7 @@ class SupplementalCallControlsForFullscreenLocalMember: UIView {
     init(
         call: SignalCall,
         groupCall: GroupCall,
-        callService: CallService
+        callService: CallService,
     ) {
         self.call = call
         self.groupCall = groupCall

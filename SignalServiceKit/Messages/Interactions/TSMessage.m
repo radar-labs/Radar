@@ -4,9 +4,7 @@
 //
 
 #import "TSMessage.h"
-#import "OWSDisappearingMessagesConfiguration.h"
 #import "TSQuotedMessage.h"
-#import "TSThread.h"
 #import <SignalServiceKit/SignalServiceKit-Swift.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -54,12 +52,7 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
 
 @property (nonatomic, nullable) NSString *storyReactionEmoji;
 
-// This property is only intended to be used by GRDB queries.
-@property (nonatomic, readonly) BOOL storedShouldStartExpireTimer;
-
 @property (nonatomic) BOOL isPoll;
-
-@property (nonatomic) BOOL isStarred;
 
 @end
 
@@ -134,7 +127,6 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
                isGroupStoryReply:(BOOL)isGroupStoryReply
                           isPoll:(BOOL)isPoll
   isSmsMessageRestoredFromBackup:(BOOL)isSmsMessageRestoredFromBackup
-                       isStarred:(BOOL)isStarred
               isViewOnceComplete:(BOOL)isViewOnceComplete
                isViewOnceMessage:(BOOL)isViewOnceMessage
                      linkPreview:(nullable OWSLinkPreview *)linkPreview
@@ -170,7 +162,6 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
     _isGroupStoryReply = isGroupStoryReply;
     _isPoll = isPoll;
     _isSmsMessageRestoredFromBackup = isSmsMessageRestoredFromBackup;
-    _isStarred = isStarred;
     _isViewOnceComplete = isViewOnceComplete;
     _isViewOnceMessage = isViewOnceMessage;
     _linkPreview = linkPreview;
@@ -196,17 +187,120 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
     [self updateExpiresAt];
 }
 
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [super encodeWithCoder:coder];
+    NSString *body = self.body;
+    if (body != nil) {
+        [coder encodeObject:body forKey:@"body"];
+    }
+    MessageBodyRanges *bodyRanges = self.bodyRanges;
+    if (bodyRanges != nil) {
+        [coder encodeObject:bodyRanges forKey:@"bodyRanges"];
+    }
+    OWSContact *contactShare = self.contactShare;
+    if (contactShare != nil) {
+        [coder encodeObject:contactShare forKey:@"contactShare"];
+    }
+    NSArray *deprecated_attachmentIds = self.deprecated_attachmentIds;
+    if (deprecated_attachmentIds != nil) {
+        [coder encodeObject:deprecated_attachmentIds forKey:@"deprecated_attachmentIds"];
+    }
+    [coder encodeObject:[self valueForKey:@"editState"] forKey:@"editState"];
+    [coder encodeObject:[self valueForKey:@"expireStartedAt"] forKey:@"expireStartedAt"];
+    NSNumber *expireTimerVersion = self.expireTimerVersion;
+    if (expireTimerVersion != nil) {
+        [coder encodeObject:expireTimerVersion forKey:@"expireTimerVersion"];
+    }
+    [coder encodeObject:[self valueForKey:@"expiresAt"] forKey:@"expiresAt"];
+    [coder encodeObject:[self valueForKey:@"expiresInSeconds"] forKey:@"expiresInSeconds"];
+    OWSGiftBadge *giftBadge = self.giftBadge;
+    if (giftBadge != nil) {
+        [coder encodeObject:giftBadge forKey:@"giftBadge"];
+    }
+    [coder encodeObject:[self valueForKey:@"isGroupStoryReply"] forKey:@"isGroupStoryReply"];
+    [coder encodeObject:[self valueForKey:@"isPoll"] forKey:@"isPoll"];
+    [coder encodeObject:[self valueForKey:@"isSmsMessageRestoredFromBackup"] forKey:@"isSmsMessageRestoredFromBackup"];
+    [coder encodeObject:[self valueForKey:@"isViewOnceComplete"] forKey:@"isViewOnceComplete"];
+    [coder encodeObject:[self valueForKey:@"isViewOnceMessage"] forKey:@"isViewOnceMessage"];
+    OWSLinkPreview *linkPreview = self.linkPreview;
+    if (linkPreview != nil) {
+        [coder encodeObject:linkPreview forKey:@"linkPreview"];
+    }
+    MessageSticker *messageSticker = self.messageSticker;
+    if (messageSticker != nil) {
+        [coder encodeObject:messageSticker forKey:@"messageSticker"];
+    }
+    TSQuotedMessage *quotedMessage = self.quotedMessage;
+    if (quotedMessage != nil) {
+        [coder encodeObject:quotedMessage forKey:@"quotedMessage"];
+    }
+    [coder encodeObject:[self valueForKey:@"schemaVersion"] forKey:@"schemaVersion"];
+    [coder encodeObject:[self valueForKey:@"storedShouldStartExpireTimer"] forKey:@"storedShouldStartExpireTimer"];
+    NSString *storyAuthorUuidString = self.storyAuthorUuidString;
+    if (storyAuthorUuidString != nil) {
+        [coder encodeObject:storyAuthorUuidString forKey:@"storyAuthorUuidString"];
+    }
+    NSString *storyReactionEmoji = self.storyReactionEmoji;
+    if (storyReactionEmoji != nil) {
+        [coder encodeObject:storyReactionEmoji forKey:@"storyReactionEmoji"];
+    }
+    NSNumber *storyTimestamp = self.storyTimestamp;
+    if (storyTimestamp != nil) {
+        [coder encodeObject:storyTimestamp forKey:@"storyTimestamp"];
+    }
+    [coder encodeObject:[self valueForKey:@"wasRemotelyDeleted"] forKey:@"wasRemotelyDeleted"];
+}
+
 - (nullable instancetype)initWithCoder:(NSCoder *)coder
 {
     self = [super initWithCoder:coder];
     if (!self) {
         return self;
     }
+    self->_body = [coder decodeObjectOfClass:[NSString class] forKey:@"body"];
+    self->_bodyRanges = [coder decodeObjectOfClass:[MessageBodyRanges class] forKey:@"bodyRanges"];
+    self->_contactShare = [coder decodeObjectOfClass:[OWSContact class] forKey:@"contactShare"];
+    self->_deprecated_attachmentIds =
+        [coder decodeObjectOfClasses:[NSSet setWithArray:@[ [NSArray class], [NSString class] ]]
+                              forKey:@"deprecated_attachmentIds"];
+    self->_editState = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class] forKey:@"editState"] integerValue];
+    self->_expireStartedAt = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                              forKey:@"expireStartedAt"] unsignedLongLongValue];
+    self->_expireTimerVersion = [coder decodeObjectOfClass:[NSNumber class] forKey:@"expireTimerVersion"];
+    self->_expiresAt = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                        forKey:@"expiresAt"] unsignedLongLongValue];
+    self->_expiresInSeconds = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                               forKey:@"expiresInSeconds"] unsignedIntValue];
+    self->_giftBadge = [coder decodeObjectOfClass:[OWSGiftBadge class] forKey:@"giftBadge"];
+    self->_isGroupStoryReply = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                                forKey:@"isGroupStoryReply"] boolValue];
+    self->_isPoll = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class] forKey:@"isPoll"] boolValue];
+    self->_isSmsMessageRestoredFromBackup =
+        [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class] forKey:@"isSmsMessageRestoredFromBackup"] boolValue];
+    self->_isViewOnceComplete = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                                 forKey:@"isViewOnceComplete"] boolValue];
+    self->_isViewOnceMessage = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                                forKey:@"isViewOnceMessage"] boolValue];
+    self->_linkPreview = [coder decodeObjectOfClass:[OWSLinkPreview class] forKey:@"linkPreview"];
+    self->_messageSticker = [coder decodeObjectOfClass:[MessageSticker class] forKey:@"messageSticker"];
+    self->_quotedMessage = [coder decodeObjectOfClass:[TSQuotedMessage class] forKey:@"quotedMessage"];
+    self->_schemaVersion = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                            forKey:@"schemaVersion"] unsignedIntegerValue];
+    self->_storedShouldStartExpireTimer =
+        [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class] forKey:@"storedShouldStartExpireTimer"] boolValue];
+    self->_storyAuthorUuidString = [coder decodeObjectOfClass:[NSString class] forKey:@"storyAuthorUuidString"];
+    self->_storyReactionEmoji = [coder decodeObjectOfClass:[NSString class] forKey:@"storyReactionEmoji"];
+    self->_storyTimestamp = [coder decodeObjectOfClass:[NSNumber class] forKey:@"storyTimestamp"];
+    self->_wasRemotelyDeleted = [(NSNumber *)[coder decodeObjectOfClass:[NSNumber class]
+                                                                 forKey:@"wasRemotelyDeleted"] boolValue];
 
     if (_schemaVersion < 2) {
         // renamed _attachments to _attachmentIds
         if (!_deprecated_attachmentIds) {
-            _deprecated_attachmentIds = [coder decodeObjectForKey:@"attachments"];
+            _deprecated_attachmentIds =
+                [coder decodeObjectOfClasses:[NSSet setWithArray:@[ [NSArray class], [NSString class] ]]
+                                      forKey:@"attachments"];
         }
     }
 
@@ -246,16 +340,128 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
     //       per-message expiration was never released to
     //       production.
     NSNumber *_Nullable perMessageExpirationDurationSeconds =
-        [coder decodeObjectForKey:@"perMessageExpirationDurationSeconds"];
+        [coder decodeObjectOfClass:[NSNumber class] forKey:@"perMessageExpirationDurationSeconds"];
     if (perMessageExpirationDurationSeconds.unsignedIntegerValue > 0) {
         _isViewOnceMessage = YES;
     }
-    NSNumber *_Nullable perMessageExpirationHasExpired = [coder decodeObjectForKey:@"perMessageExpirationHasExpired"];
+    NSNumber *_Nullable perMessageExpirationHasExpired = [coder decodeObjectOfClass:[NSNumber class]
+                                                                             forKey:@"perMessageExpirationHasExpired"];
     if (perMessageExpirationHasExpired.boolValue > 0) {
         _isViewOnceComplete = YES;
     }
 
     return self;
+}
+
+- (NSUInteger)hash
+{
+    NSUInteger result = [super hash];
+    result ^= self.body.hash;
+    result ^= self.bodyRanges.hash;
+    result ^= self.contactShare.hash;
+    result ^= self.deprecated_attachmentIds.hash;
+    result ^= (NSUInteger)self.editState;
+    result ^= self.expireStartedAt;
+    result ^= self.expireTimerVersion.hash;
+    result ^= self.expiresAt;
+    result ^= self.expiresInSeconds;
+    result ^= self.giftBadge.hash;
+    result ^= self.isGroupStoryReply;
+    result ^= self.isPoll;
+    result ^= self.isSmsMessageRestoredFromBackup;
+    result ^= self.isViewOnceComplete;
+    result ^= self.isViewOnceMessage;
+    result ^= self.linkPreview.hash;
+    result ^= self.messageSticker.hash;
+    result ^= self.quotedMessage.hash;
+    result ^= self.schemaVersion;
+    result ^= self.storedShouldStartExpireTimer;
+    result ^= self.storyAuthorUuidString.hash;
+    result ^= self.storyReactionEmoji.hash;
+    result ^= self.storyTimestamp.hash;
+    result ^= self.wasRemotelyDeleted;
+    return result;
+}
+
+- (BOOL)isEqual:(id)other
+{
+    if (![super isEqual:other]) {
+        return NO;
+    }
+    TSMessage *typedOther = (TSMessage *)other;
+    if (![NSObject isObject:self.body equalToObject:typedOther.body]) {
+        return NO;
+    }
+    if (![NSObject isObject:self.bodyRanges equalToObject:typedOther.bodyRanges]) {
+        return NO;
+    }
+    if (![NSObject isObject:self.contactShare equalToObject:typedOther.contactShare]) {
+        return NO;
+    }
+    if (![NSObject isObject:self.deprecated_attachmentIds equalToObject:typedOther.deprecated_attachmentIds]) {
+        return NO;
+    }
+    if (self.editState != typedOther.editState) {
+        return NO;
+    }
+    if (self.expireStartedAt != typedOther.expireStartedAt) {
+        return NO;
+    }
+    if (![NSObject isObject:self.expireTimerVersion equalToObject:typedOther.expireTimerVersion]) {
+        return NO;
+    }
+    if (self.expiresAt != typedOther.expiresAt) {
+        return NO;
+    }
+    if (self.expiresInSeconds != typedOther.expiresInSeconds) {
+        return NO;
+    }
+    if (![NSObject isObject:self.giftBadge equalToObject:typedOther.giftBadge]) {
+        return NO;
+    }
+    if (self.isGroupStoryReply != typedOther.isGroupStoryReply) {
+        return NO;
+    }
+    if (self.isPoll != typedOther.isPoll) {
+        return NO;
+    }
+    if (self.isSmsMessageRestoredFromBackup != typedOther.isSmsMessageRestoredFromBackup) {
+        return NO;
+    }
+    if (self.isViewOnceComplete != typedOther.isViewOnceComplete) {
+        return NO;
+    }
+    if (self.isViewOnceMessage != typedOther.isViewOnceMessage) {
+        return NO;
+    }
+    if (![NSObject isObject:self.linkPreview equalToObject:typedOther.linkPreview]) {
+        return NO;
+    }
+    if (![NSObject isObject:self.messageSticker equalToObject:typedOther.messageSticker]) {
+        return NO;
+    }
+    if (![NSObject isObject:self.quotedMessage equalToObject:typedOther.quotedMessage]) {
+        return NO;
+    }
+    if (self.schemaVersion != typedOther.schemaVersion) {
+        return NO;
+    }
+    if (self.storedShouldStartExpireTimer != typedOther.storedShouldStartExpireTimer) {
+        return NO;
+    }
+    if (![NSObject isObject:self.storyAuthorUuidString equalToObject:typedOther.storyAuthorUuidString]) {
+        return NO;
+    }
+    if (![NSObject isObject:self.storyReactionEmoji equalToObject:typedOther.storyReactionEmoji]) {
+        return NO;
+    }
+    if (![NSObject isObject:self.storyTimestamp equalToObject:typedOther.storyTimestamp]) {
+        return NO;
+    }
+    if (self.wasRemotelyDeleted != typedOther.wasRemotelyDeleted) {
+        return NO;
+    }
+    return YES;
 }
 
 - (void)setExpireStartedAt:(uint64_t)expireStartedAt
@@ -302,15 +508,6 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
     return [[AciObjC alloc] initWithAciString:self.storyAuthorUuidString];
 }
 
-- (nullable SignalServiceAddress *)storyAuthorAddress
-{
-    AciObjC *storyAuthorAci = self.storyAuthorAci;
-    if (storyAuthorAci == nil) {
-        return nil;
-    }
-    return [[SignalServiceAddress alloc] initWithServiceIdObjC:storyAuthorAci];
-}
-
 - (BOOL)isStoryReply
 {
     return self.storyAuthorUuidString != nil;
@@ -330,8 +527,6 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
     [super anyWillInsertWithTransaction:transaction];
 
     [self insertMentionsInDatabaseWithTx:transaction];
-
-    [self updateStoredShouldStartExpireTimer];
 }
 
 - (void)anyDidInsertWithTransaction:(DBWriteTransaction *)transaction
@@ -348,8 +543,6 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
 - (void)anyWillUpdateWithTransaction:(DBWriteTransaction *)transaction
 {
     [super anyWillUpdateWithTransaction:transaction];
-
-    [self updateStoredShouldStartExpireTimer];
 }
 
 - (void)anyDidUpdateWithTransaction:(DBWriteTransaction *)transaction
@@ -373,14 +566,9 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
         return;
     }
     uint64_t nowMs = [NSDate ows_millisecondTimeStamp];
-    [SSKEnvironment.shared.disappearingMessagesJobRef startAnyExpirationForMessage:self
-                                                               expirationStartedAt:nowMs
-                                                                       transaction:transaction];
-}
-
-- (void)updateStoredShouldStartExpireTimer
-{
-    _storedShouldStartExpireTimer = [self shouldStartExpireTimer];
+    [DisappearingMessagesExpirationJobObjcBridge startExpirationForMessage:self
+                                                       expirationStartedAt:nowMs
+                                                                        tx:transaction];
 }
 
 - (BOOL)hasPerConversationExpiration
@@ -461,15 +649,6 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
     [self anyUpdateMessageWithTransaction:transaction block:^(TSMessage *message) { message.isPoll = isPoll; }];
 }
 
-// MARK: - Starred Message
-
-- (void)updateWithIsStarred:(BOOL)isStarred transaction:(DBWriteTransaction *)transaction
-{
-    OWSAssertDebug(transaction);
-
-    [self anyUpdateMessageWithTransaction:transaction block:^(TSMessage *message) { message.isStarred = isStarred; }];
-}
-
 #ifdef TESTABLE_BUILD
 
 // This method is for testing purposes only.
@@ -502,6 +681,8 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
     OWSAssertDebug(!self.wasRemotelyDeleted);
 
     [self removeAllReactionsWithTransaction:transaction];
+
+    [self unpinMessageIfNeededWithTx:transaction];
 
     [self removeAllRenderableContentWithTransaction:transaction
                                  messageUpdateBlock:^(TSMessage *message) { message.wasRemotelyDeleted = YES; }];

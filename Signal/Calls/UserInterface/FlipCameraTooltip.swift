@@ -13,20 +13,20 @@ class FlipCameraTooltipManager {
         self.db = db
     }
 
-    private static let keyValueStore = KeyValueStore(collection: "FlipCameraButton")
+    private static let keyValueStore = NewKeyValueStore(collection: "FlipCameraButton")
     private static let tooltipWasSeenKey = "tooltipWasSeen"
 
     private var flipCameraTooltip: FlipCameraTooltipView?
 
     private func markTooltipAsRead() {
         db.write { tx in
-            Self.keyValueStore.setBool(true, key: Self.tooltipWasSeenKey, transaction: tx)
+            Self.keyValueStore.writeValue(true, forKey: Self.tooltipWasSeenKey, tx: tx)
         }
     }
 
     private func isTooltipRead() -> Bool {
         return db.read { tx in
-            Self.keyValueStore.getBool(Self.tooltipWasSeenKey, defaultValue: false, transaction: tx)
+            Self.keyValueStore.fetchValue(Bool.self, forKey: Self.tooltipWasSeenKey, tx: tx) ?? false
         }
     }
 
@@ -35,7 +35,7 @@ class FlipCameraTooltipManager {
         widthReferenceView: UIView,
         tailReferenceView: UIView,
         tailDirection: TooltipView.TailDirection,
-        isVideoMuted: Bool
+        isVideoMuted: Bool,
     ) {
         guard !isTooltipRead() else {
             // Tooltip already seen once. Don't show again.
@@ -48,7 +48,7 @@ class FlipCameraTooltipManager {
             fromView: fromView,
             widthReferenceView: widthReferenceView,
             tailReferenceView: tailReferenceView,
-            tailDirection: tailDirection
+            tailDirection: tailDirection,
         ) { [weak self] in
             self?.dismissTooltip()
         }
@@ -65,7 +65,7 @@ class FlipCameraTooltipManager {
 #if USE_DEBUG_UI
     func markTooltipAsUnread() {
         db.write { tx in
-            Self.keyValueStore.setBool(false, key: Self.tooltipWasSeenKey, transaction: tx)
+            Self.keyValueStore.writeValue(false, forKey: Self.tooltipWasSeenKey, tx: tx)
         }
     }
 #endif
@@ -74,19 +74,19 @@ class FlipCameraTooltipManager {
 class FlipCameraTooltipView: TooltipView {
     private var _tailDir: TailDirection
 
-    public class func present(
+    class func present(
         fromView: UIView,
         widthReferenceView: UIView,
         tailReferenceView: UIView,
         tailDirection: TailDirection,
-        wasTappedBlock: (() -> Void)?
+        wasTappedBlock: (() -> Void)?,
     ) -> FlipCameraTooltipView {
         FlipCameraTooltipView(
             fromView: fromView,
             widthReferenceView: widthReferenceView,
             tailReferenceView: tailReferenceView,
             tailDirection: tailDirection,
-            wasTappedBlock: wasTappedBlock
+            wasTappedBlock: wasTappedBlock,
         )
     }
 
@@ -95,14 +95,14 @@ class FlipCameraTooltipView: TooltipView {
         widthReferenceView: UIView,
         tailReferenceView: UIView,
         tailDirection: TailDirection,
-        wasTappedBlock: (() -> Void)?
+        wasTappedBlock: (() -> Void)?,
     ) {
         self._tailDir = tailDirection
         super.init(
             fromView: fromView,
             widthReferenceView: widthReferenceView,
             tailReferenceView: tailReferenceView,
-            wasTappedBlock: wasTappedBlock
+            wasTappedBlock: wasTappedBlock,
         )
     }
 
@@ -110,14 +110,14 @@ class FlipCameraTooltipView: TooltipView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override func bubbleContentView() -> UIView {
+    override func bubbleContentView() -> UIView {
         let label = UILabel()
         label.text = OWSLocalizedString(
             "FLIP_CAMERA_BUTTON_MOVED_TO_PIP_TOOLTIP",
-            comment: "Tooltip notifying users that the flip camera button moved to the picture-in-picture view of themselves in a call"
+            comment: "Tooltip notifying users that the flip camera button moved to the picture-in-picture view of themselves in a call",
         )
         label.font = .dynamicTypeSubheadline
-        label.textColor = .ows_white
+        label.textColor = .white
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
         return horizontalStack(forSubviews: [label])
@@ -128,7 +128,7 @@ class FlipCameraTooltipView: TooltipView {
     }
 
     override var bubbleColor: UIColor {
-        .ows_accentBlue
+        .Signal.accent
     }
 
     override var tailReferenceViewUsesAutolayout: Bool {

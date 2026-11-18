@@ -3,15 +3,21 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-@testable import SignalServiceKit
 import XCTest
+@testable import SignalServiceKit
+
+private extension OWSProgress {
+    func progressForChild(label: String) -> ChildProgress? {
+        return self.descendantProgresses(withLabel: label).first
+    }
+}
 
 class OWSProgressTest: XCTestCase {
 
     func testSimpleSourceSink() async {
         let (sink, stream) = OWSProgress.createSink()
         Task {
-            let source = await sink.addSource(withLabel: "1", unitCount: 100)
+            let source = sink.addSource(withLabel: "1", unitCount: 100)
             for _ in 0..<10 {
                 await Task.yield()
                 source.incrementCompletedUnitCount(by: 10)
@@ -27,7 +33,7 @@ class OWSProgressTest: XCTestCase {
                 XCTAssertEqual(progress.progressForChild(label: "1")?.totalUnitCount, 100)
                 XCTAssertEqual(
                     progress.progressForChild(label: "1")?.completedUnitCount,
-                    progress.completedUnitCount
+                    progress.completedUnitCount,
                 )
             } else {
                 XCTFail("Unexpected unit count")
@@ -44,8 +50,8 @@ class OWSProgressTest: XCTestCase {
     func testTwoSources() async {
         let (sink, stream) = OWSProgress.createSink()
         Task {
-            let source1 = await sink.addSource(withLabel: "1", unitCount: 50)
-            let source2 = await sink.addSource(withLabel: "2", unitCount: 50)
+            let source1 = sink.addSource(withLabel: "1", unitCount: 50)
+            let source2 = sink.addSource(withLabel: "2", unitCount: 50)
             let inputTask1 = Task {
                 for _ in 0..<5 {
                     await Task.yield()
@@ -79,7 +85,7 @@ class OWSProgressTest: XCTestCase {
                 XCTAssertEqual(progress.progressForChild(label: "2")?.totalUnitCount, 50)
                 XCTAssertEqual(
                     progress.progressForChild(label: "1")!.completedUnitCount + progress.progressForChild(label: "2")!.completedUnitCount,
-                    progress.completedUnitCount
+                    progress.completedUnitCount,
                 )
             } else {
                 XCTFail("Unexpected unit count")
@@ -97,9 +103,9 @@ class OWSProgressTest: XCTestCase {
     func testTwoLayers() async {
         let (sink, stream) = OWSProgress.createSink()
         Task {
-            let source1 = await sink.addSource(withLabel: "1", unitCount: 50)
-            let child = await sink.addChild(withLabel: "a", unitCount: 50)
-            let source2 = await child.addSource(withLabel: "2", unitCount: 100)
+            let source1 = sink.addSource(withLabel: "1", unitCount: 50)
+            let child = sink.addChild(withLabel: "a", unitCount: 50)
+            let source2 = child.addSource(withLabel: "2", unitCount: 100)
             source1.incrementCompletedUnitCount(by: 50)
             let inputTask = Task {
                 for _ in 0..<10 {
@@ -133,14 +139,14 @@ class OWSProgressTest: XCTestCase {
                     XCTAssertEqual(
                         progress.completedUnitCount,
                         progress.progressForChild(label: "1")!.completedUnitCount
-                        + progress.progressForChild(label: "a")!.completedUnitCount
+                            + progress.progressForChild(label: "a")!.completedUnitCount,
                     )
                     XCTAssertEqual(progress.progressForChild(label: "1")?.totalUnitCount, 50)
                     XCTAssertEqual(progress.progressForChild(label: "a")?.totalUnitCount, 50)
                     XCTAssertEqual(progress.progressForChild(label: "2")?.totalUnitCount, 100)
                     XCTAssertEqual(
                         progress.progressForChild(label: "a")?.completedUnitCount,
-                        (progress.progressForChild(label: "2")?.completedUnitCount ?? 0) / 2
+                        (progress.progressForChild(label: "2")?.completedUnitCount ?? 0) / 2,
                     )
                 }
             } else {
@@ -176,26 +182,26 @@ class OWSProgressTest: XCTestCase {
 
         let expectedCompletedUnitCount: UInt64 =
             unitCountA1
-            + unitCountB1
-            + unitCountBZ1
-            + unitCountBZ2
-            + unitCountC2
+                + unitCountB1
+                + unitCountBZ1
+                + unitCountBZ2
+                + unitCountC2
 
         let (sink, stream) = OWSProgress.createSink()
         Task {
-            let childA = await sink.addChild(withLabel: "A", unitCount: 100)
-            let sourceA1 = await childA.addSource(withLabel: "A1", unitCount: 100)
-            _ = await childA.addSource(withLabel: "A2", unitCount: 100)
-            let childB = await sink.addChild(withLabel: "B", unitCount: 100)
-            let sourceB1 = await childB.addSource(withLabel: "B1", unitCount: 50)
-            _ = await childB.addSource(withLabel: "B2", unitCount: 100)
-            let childBZ = await childB.addChild(withLabel: "BZ", unitCount: 50)
-            let sourceBZ1 = await childBZ.addSource(withLabel: "BZ1", unitCount: 10)
-            let sourceBZ2 = await childBZ.addSource(withLabel: "BZ2", unitCount: 10)
-            _ = await childBZ.addSource(withLabel: "BZ3", unitCount: 10)
-            let childC = await sink.addChild(withLabel: "C", unitCount: 200)
-            _ = await childC.addSource(withLabel: "C1", unitCount: 1)
-            let sourceC2 = await childC.addSource(withLabel: "C2", unitCount: 10)
+            let childA = sink.addChild(withLabel: "A", unitCount: 100)
+            let sourceA1 = childA.addSource(withLabel: "A1", unitCount: 100)
+            _ = childA.addSource(withLabel: "A2", unitCount: 100)
+            let childB = sink.addChild(withLabel: "B", unitCount: 100)
+            let sourceB1 = childB.addSource(withLabel: "B1", unitCount: 50)
+            _ = childB.addSource(withLabel: "B2", unitCount: 100)
+            let childBZ = childB.addChild(withLabel: "BZ", unitCount: 50)
+            let sourceBZ1 = childBZ.addSource(withLabel: "BZ1", unitCount: 10)
+            let sourceBZ2 = childBZ.addSource(withLabel: "BZ2", unitCount: 10)
+            _ = childBZ.addSource(withLabel: "BZ3", unitCount: 10)
+            let childC = sink.addChild(withLabel: "C", unitCount: 200)
+            _ = childC.addSource(withLabel: "C1", unitCount: 1)
+            let sourceC2 = childC.addSource(withLabel: "C2", unitCount: 10)
 
             // Make partial progress on every layer of the subtree.
             sourceA1.incrementCompletedUnitCount(by: 100)
@@ -227,10 +233,10 @@ class OWSProgressTest: XCTestCase {
         // You are allowed to add a second source B2 to B
         // after A1 emits but not after B1 emits.
         let (sink, stream) = OWSProgress.createSink()
-        let childA = await sink.addChild(withLabel: "A", unitCount: 100)
-        let sourceA1 = await childA.addSource(withLabel: "A1", unitCount: 100)
-        let childB = await sink.addChild(withLabel: "B", unitCount: 100)
-        _ = await childB.addSource(withLabel: "B1", unitCount: 50)
+        let childA = sink.addChild(withLabel: "A", unitCount: 100)
+        let sourceA1 = childA.addSource(withLabel: "A1", unitCount: 100)
+        let childB = sink.addChild(withLabel: "B", unitCount: 100)
+        _ = childB.addSource(withLabel: "B1", unitCount: 50)
 
         Task {
             sourceA1.incrementCompletedUnitCount(by: 50)
@@ -251,8 +257,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 100,
                         label: "A",
-                        parentLabel: nil
-                    )
+                        parentLabel: nil,
+                    ),
                 )
             } else if progress.progressForChild(label: "B") == nil {
                 XCTAssertEqual(progress.completedUnitCount, 0)
@@ -263,8 +269,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 100,
                         label: "A",
-                        parentLabel: nil
-                    )
+                        parentLabel: nil,
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "A1"),
@@ -272,8 +278,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 100,
                         label: "A1",
-                        parentLabel: "A"
-                    )
+                        parentLabel: "A",
+                    ),
                 )
             } else if progress.progressForChild(label: "B1") == nil {
                 XCTAssertEqual(progress.completedUnitCount, 0)
@@ -284,8 +290,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 100,
                         label: "A",
-                        parentLabel: nil
-                    )
+                        parentLabel: nil,
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "A1"),
@@ -293,8 +299,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 100,
                         label: "A1",
-                        parentLabel: "A"
-                    )
+                        parentLabel: "A",
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "B"),
@@ -302,8 +308,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 100,
                         label: "B",
-                        parentLabel: nil
-                    )
+                        parentLabel: nil,
+                    ),
                 )
             } else if progress.completedUnitCount == 0 {
                 XCTAssertEqual(progress.totalUnitCount, 200)
@@ -313,8 +319,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 100,
                         label: "A",
-                        parentLabel: nil
-                    )
+                        parentLabel: nil,
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "A1"),
@@ -322,8 +328,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 100,
                         label: "A1",
-                        parentLabel: "A"
-                    )
+                        parentLabel: "A",
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "B"),
@@ -331,8 +337,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 100,
                         label: "B",
-                        parentLabel: nil
-                    )
+                        parentLabel: nil,
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "B1"),
@@ -340,8 +346,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 50,
                         label: "B1",
-                        parentLabel: "B"
-                    )
+                        parentLabel: "B",
+                    ),
                 )
             } else if progress.completedUnitCount == 50 {
                 XCTAssertEqual(progress.totalUnitCount, 200)
@@ -351,8 +357,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "A",
-                        parentLabel: nil
-                    )
+                        parentLabel: nil,
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "A1"),
@@ -360,8 +366,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "A1",
-                        parentLabel: "A"
-                    )
+                        parentLabel: "A",
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "B"),
@@ -369,8 +375,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 100,
                         label: "B",
-                        parentLabel: nil
-                    )
+                        parentLabel: nil,
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "B1"),
@@ -378,8 +384,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 50,
                         label: "B1",
-                        parentLabel: "B"
-                    )
+                        parentLabel: "B",
+                    ),
                 )
                 break
             } else {
@@ -390,7 +396,7 @@ class OWSProgressTest: XCTestCase {
         XCTAssertGreaterThanOrEqual(outputs.count, 1)
 
         Task {
-            let sourceB2 = await childB.addSource(withLabel: "B2", unitCount: 50)
+            let sourceB2 = childB.addSource(withLabel: "B2", unitCount: 50)
             sourceB2.incrementCompletedUnitCount(by: 50)
         }
 
@@ -404,8 +410,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "A",
-                        parentLabel: nil
-                    )
+                        parentLabel: nil,
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "A1"),
@@ -413,8 +419,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "A1",
-                        parentLabel: "A"
-                    )
+                        parentLabel: "A",
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "B"),
@@ -422,8 +428,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 100,
                         label: "B",
-                        parentLabel: nil
-                    )
+                        parentLabel: nil,
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "B1"),
@@ -431,8 +437,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 50,
                         label: "B1",
-                        parentLabel: "B"
-                    )
+                        parentLabel: "B",
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "B2"),
@@ -440,8 +446,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 50,
                         label: "B2",
-                        parentLabel: "B"
-                    )
+                        parentLabel: "B",
+                    ),
                 )
             } else if progress.completedUnitCount == 100 {
                 XCTAssertEqual(progress.totalUnitCount, 200)
@@ -451,8 +457,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "A",
-                        parentLabel: nil
-                    )
+                        parentLabel: nil,
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "A1"),
@@ -460,8 +466,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "A1",
-                        parentLabel: "A"
-                    )
+                        parentLabel: "A",
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "B"),
@@ -469,8 +475,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "B",
-                        parentLabel: nil
-                    )
+                        parentLabel: nil,
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "B1"),
@@ -478,8 +484,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 50,
                         label: "B1",
-                        parentLabel: "B"
-                    )
+                        parentLabel: "B",
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "B2"),
@@ -487,8 +493,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 50,
                         label: "B2",
-                        parentLabel: "B"
-                    )
+                        parentLabel: "B",
+                    ),
                 )
                 break
             } else {
@@ -514,17 +520,17 @@ class OWSProgressTest: XCTestCase {
         // * "reset" C and all its children by re-adding it to the root
         // * "reset" D and all its children by re-adding it to C
         let (sink, stream) = OWSProgress.createSink()
-        var source1 = await sink.addSource(withLabel: "1", unitCount: 100)
-        let childA = await sink.addChild(withLabel: "A", unitCount: 100)
-        let childB = await sink.addChild(withLabel: "B", unitCount: 100)
-        var childC = await sink.addChild(withLabel: "C", unitCount: 100)
-        let source2 = await childA.addSource(withLabel: "2", unitCount: 100)
-        var source3 = await childB.addSource(withLabel: "3", unitCount: 100)
-        let source4 = await childB.addSource(withLabel: "4", unitCount: 100)
-        var childD = await childB.addChild(withLabel: "D", unitCount: 100)
-        let source5 = await childC.addSource(withLabel: "5", unitCount: 100)
-        let source6 = await childD.addSource(withLabel: "6", unitCount: 100)
-        _ = await childD.addChild(withLabel: "E", unitCount: 0)
+        var source1 = sink.addSource(withLabel: "1", unitCount: 100)
+        let childA = sink.addChild(withLabel: "A", unitCount: 100)
+        let childB = sink.addChild(withLabel: "B", unitCount: 100)
+        var childC = sink.addChild(withLabel: "C", unitCount: 100)
+        let source2 = childA.addSource(withLabel: "2", unitCount: 100)
+        var source3 = childB.addSource(withLabel: "3", unitCount: 100)
+        let source4 = childB.addSource(withLabel: "4", unitCount: 100)
+        var childD = childB.addChild(withLabel: "D", unitCount: 100)
+        let source5 = childC.addSource(withLabel: "5", unitCount: 100)
+        let source6 = childD.addSource(withLabel: "6", unitCount: 100)
+        _ = childD.addChild(withLabel: "E", unitCount: 0)
 
         // Complete everything by 50%
         source1.incrementCompletedUnitCount(by: 50)
@@ -544,8 +550,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "1",
-                        parentLabel: nil
-                    )
+                        parentLabel: nil,
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "A"),
@@ -553,8 +559,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "A",
-                        parentLabel: nil
-                    )
+                        parentLabel: nil,
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "2"),
@@ -562,8 +568,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "2",
-                        parentLabel: "A"
-                    )
+                        parentLabel: "A",
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "B"),
@@ -571,8 +577,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "B",
-                        parentLabel: nil
-                    )
+                        parentLabel: nil,
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "3"),
@@ -580,8 +586,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "3",
-                        parentLabel: "B"
-                    )
+                        parentLabel: "B",
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "4"),
@@ -589,8 +595,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "4",
-                        parentLabel: "B"
-                    )
+                        parentLabel: "B",
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "D"),
@@ -598,8 +604,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "D",
-                        parentLabel: "B"
-                    )
+                        parentLabel: "B",
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "C"),
@@ -607,8 +613,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "C",
-                        parentLabel: nil
-                    )
+                        parentLabel: nil,
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "5"),
@@ -616,8 +622,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "5",
-                        parentLabel: "C"
-                    )
+                        parentLabel: "C",
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "6"),
@@ -625,8 +631,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 50,
                         totalUnitCount: 100,
                         label: "6",
-                        parentLabel: "D"
-                    )
+                        parentLabel: "D",
+                    ),
                 )
                 XCTAssertEqual(
                     progress.progressForChild(label: "E"),
@@ -634,8 +640,8 @@ class OWSProgressTest: XCTestCase {
                         completedUnitCount: 0,
                         totalUnitCount: 0,
                         label: "E",
-                        parentLabel: "D"
-                    )
+                        parentLabel: "D",
+                    ),
                 )
                 break
             }
@@ -643,7 +649,7 @@ class OWSProgressTest: XCTestCase {
 
         // Now "reset" source1, and use a new unit count to boot
         let oldSource1 = source1
-        source1 = await sink.addSource(withLabel: "1", unitCount: 200)
+        source1 = sink.addSource(withLabel: "1", unitCount: 200)
         for await progress in stream {
             XCTAssertEqual(progress.completedUnitCount, 150)
             XCTAssertEqual(progress.totalUnitCount, 500)
@@ -653,8 +659,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 0,
                     totalUnitCount: 200,
                     label: "1",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "A"),
@@ -662,8 +668,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "A",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "2"),
@@ -671,8 +677,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "2",
-                    parentLabel: "A"
-                )
+                    parentLabel: "A",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "B"),
@@ -680,8 +686,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "B",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "3"),
@@ -689,8 +695,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "3",
-                    parentLabel: "B"
-                )
+                    parentLabel: "B",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "4"),
@@ -698,8 +704,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "4",
-                    parentLabel: "B"
-                )
+                    parentLabel: "B",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "D"),
@@ -707,8 +713,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "D",
-                    parentLabel: "B"
-                )
+                    parentLabel: "B",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "C"),
@@ -716,8 +722,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "C",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "5"),
@@ -725,8 +731,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "5",
-                    parentLabel: "C"
-                )
+                    parentLabel: "C",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "6"),
@@ -734,8 +740,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "6",
-                    parentLabel: "D"
-                )
+                    parentLabel: "D",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "E"),
@@ -743,8 +749,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 0,
                     totalUnitCount: 0,
                     label: "E",
-                    parentLabel: "D"
-                )
+                    parentLabel: "D",
+                ),
             )
             break
         }
@@ -755,7 +761,7 @@ class OWSProgressTest: XCTestCase {
 
         // Now reset source 3.
         let oldSource3 = source3
-        source3 = await childB.addSource(withLabel: "3", unitCount: 100)
+        source3 = childB.addSource(withLabel: "3", unitCount: 100)
         for await progress in stream {
             XCTAssertEqual(progress.completedUnitCount, 134)
             XCTAssertEqual(progress.totalUnitCount, 500)
@@ -765,8 +771,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 0,
                     totalUnitCount: 200,
                     label: "1",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "A"),
@@ -774,8 +780,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "A",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "2"),
@@ -783,8 +789,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "2",
-                    parentLabel: "A"
-                )
+                    parentLabel: "A",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "B"),
@@ -792,8 +798,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 34,
                     totalUnitCount: 100,
                     label: "B",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "3"),
@@ -801,8 +807,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 0,
                     totalUnitCount: 100,
                     label: "3",
-                    parentLabel: "B"
-                )
+                    parentLabel: "B",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "4"),
@@ -810,8 +816,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "4",
-                    parentLabel: "B"
-                )
+                    parentLabel: "B",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "D"),
@@ -819,8 +825,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "D",
-                    parentLabel: "B"
-                )
+                    parentLabel: "B",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "C"),
@@ -828,8 +834,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "C",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "5"),
@@ -837,8 +843,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "5",
-                    parentLabel: "C"
-                )
+                    parentLabel: "C",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "6"),
@@ -846,8 +852,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "6",
-                    parentLabel: "D"
-                )
+                    parentLabel: "D",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "E"),
@@ -855,8 +861,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 0,
                     totalUnitCount: 0,
                     label: "E",
-                    parentLabel: "D"
-                )
+                    parentLabel: "D",
+                ),
             )
             break
         }
@@ -867,7 +873,7 @@ class OWSProgressTest: XCTestCase {
 
         // Now reset child C
         let oldSource5 = source5
-        childC = await sink.addChild(withLabel: "C", unitCount: 200)
+        childC = sink.addChild(withLabel: "C", unitCount: 200)
         for await progress in stream {
             XCTAssertEqual(progress.completedUnitCount, 84)
             XCTAssertEqual(progress.totalUnitCount, 600)
@@ -877,8 +883,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 0,
                     totalUnitCount: 200,
                     label: "1",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "A"),
@@ -886,8 +892,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "A",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "2"),
@@ -895,8 +901,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "2",
-                    parentLabel: "A"
-                )
+                    parentLabel: "A",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "B"),
@@ -904,8 +910,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 34,
                     totalUnitCount: 100,
                     label: "B",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "3"),
@@ -913,8 +919,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 0,
                     totalUnitCount: 100,
                     label: "3",
-                    parentLabel: "B"
-                )
+                    parentLabel: "B",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "4"),
@@ -922,8 +928,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "4",
-                    parentLabel: "B"
-                )
+                    parentLabel: "B",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "D"),
@@ -931,8 +937,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "D",
-                    parentLabel: "B"
-                )
+                    parentLabel: "B",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "C"),
@@ -940,8 +946,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 0,
                     totalUnitCount: 200,
                     label: "C",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "6"),
@@ -949,8 +955,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "6",
-                    parentLabel: "D"
-                )
+                    parentLabel: "D",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "E"),
@@ -958,8 +964,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 0,
                     totalUnitCount: 0,
                     label: "E",
-                    parentLabel: "D"
-                )
+                    parentLabel: "D",
+                ),
             )
             break
         }
@@ -969,7 +975,7 @@ class OWSProgressTest: XCTestCase {
         oldSource5.incrementCompletedUnitCount(by: 50)
 
         // Now reset D
-        childD = await childB.addChild(withLabel: "D", unitCount: 100)
+        childD = childB.addChild(withLabel: "D", unitCount: 100)
         for await progress in stream {
             XCTAssertEqual(progress.completedUnitCount, 67)
             XCTAssertEqual(progress.totalUnitCount, 600)
@@ -979,8 +985,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 0,
                     totalUnitCount: 200,
                     label: "1",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "A"),
@@ -988,8 +994,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "A",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "2"),
@@ -997,8 +1003,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "2",
-                    parentLabel: "A"
-                )
+                    parentLabel: "A",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "B"),
@@ -1006,8 +1012,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 17,
                     totalUnitCount: 100,
                     label: "B",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "3"),
@@ -1015,8 +1021,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 0,
                     totalUnitCount: 100,
                     label: "3",
-                    parentLabel: "B"
-                )
+                    parentLabel: "B",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "4"),
@@ -1024,8 +1030,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "4",
-                    parentLabel: "B"
-                )
+                    parentLabel: "B",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "D"),
@@ -1033,8 +1039,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 0,
                     totalUnitCount: 100,
                     label: "D",
-                    parentLabel: "B"
-                )
+                    parentLabel: "B",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "C"),
@@ -1042,15 +1048,15 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 0,
                     totalUnitCount: 200,
                     label: "C",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             break
         }
 
         // We should be allowed to add a new source with the same
         // label (1) at another layer of the tree (to D)
-        await childD.addSource(withLabel: "1", unitCount: 100)
+        childD.addSource(withLabel: "1", unitCount: 100)
             .incrementCompletedUnitCount(by: 100)
         for await progress in stream {
             if progress.completedUnitCount == 67 {
@@ -1059,21 +1065,23 @@ class OWSProgressTest: XCTestCase {
             }
             XCTAssertEqual(progress.completedUnitCount, 100)
             XCTAssertEqual(progress.totalUnitCount, 600)
-            let progressesFor1 = progress.progressesForAllChildren(withLabel: "1")
+            let progressesFor1 = progress.descendantProgresses(withLabel: "1")
             XCTAssertEqual(progressesFor1.count, 2)
-            XCTAssert(progressesFor1.contains(OWSProgress.ChildProgress(
+            XCTAssert(progressesFor1.contains(
+                OWSProgress.ChildProgress(
                     completedUnitCount: 0,
                     totalUnitCount: 200,
                     label: "1",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             ))
-            XCTAssert(progressesFor1.contains(OWSProgress.ChildProgress(
+            XCTAssert(progressesFor1.contains(
+                OWSProgress.ChildProgress(
                     completedUnitCount: 100,
                     totalUnitCount: 100,
                     label: "1",
-                    parentLabel: "D"
-                )
+                    parentLabel: "D",
+                ),
             ))
             XCTAssertEqual(
                 progress.progressForChild(label: "A"),
@@ -1081,8 +1089,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "A",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "2"),
@@ -1090,8 +1098,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "2",
-                    parentLabel: "A"
-                )
+                    parentLabel: "A",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "B"),
@@ -1099,8 +1107,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "B",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "3"),
@@ -1108,8 +1116,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 0,
                     totalUnitCount: 100,
                     label: "3",
-                    parentLabel: "B"
-                )
+                    parentLabel: "B",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "4"),
@@ -1117,8 +1125,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 50,
                     totalUnitCount: 100,
                     label: "4",
-                    parentLabel: "B"
-                )
+                    parentLabel: "B",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "D"),
@@ -1126,8 +1134,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 100,
                     totalUnitCount: 100,
                     label: "D",
-                    parentLabel: "B"
-                )
+                    parentLabel: "B",
+                ),
             )
             XCTAssertEqual(
                 progress.progressForChild(label: "C"),
@@ -1135,8 +1143,8 @@ class OWSProgressTest: XCTestCase {
                     completedUnitCount: 0,
                     totalUnitCount: 200,
                     label: "C",
-                    parentLabel: nil
-                )
+                    parentLabel: nil,
+                ),
             )
             break
         }
@@ -1153,9 +1161,9 @@ class OWSProgressTest: XCTestCase {
             }
         }
 
-        let source1 = await rootProgress.addSource(withLabel: "source1", unitCount: 10)
-        let sinkA = await rootProgress.addChild(withLabel: "sinkA", unitCount: 10)
-        let sourceA1 = await sinkA.addSource(withLabel: "sourceA1", unitCount: 100)
+        let source1 = rootProgress.addSource(withLabel: "source1", unitCount: 10)
+        let sinkA = rootProgress.addChild(withLabel: "sinkA", unitCount: 10)
+        let sourceA1 = sinkA.addSource(withLabel: "sourceA1", unitCount: 100)
 
         source1.incrementCompletedUnitCount(by: 5)
         await wait(label: "source1", percent: 0.5)
@@ -1166,7 +1174,7 @@ class OWSProgressTest: XCTestCase {
         sourceA1.incrementCompletedUnitCount(by: 50)
         await wait(label: "sourceA1", percent: 0.5)
 
-        let sourceA2 = await sinkA.addSource(withLabel: "sourceA2", unitCount: 200)
+        let sourceA2 = sinkA.addSource(withLabel: "sourceA2", unitCount: 200)
         await wait(label: "sourceA2", percent: 0)
 
         sourceA2.incrementCompletedUnitCount(by: 200)
@@ -1175,7 +1183,7 @@ class OWSProgressTest: XCTestCase {
         sourceA1.incrementCompletedUnitCount(by: 50)
         await wait(label: "sourceA1", percent: 1)
 
-        let source2 = await rootProgress.addSource(withLabel: "source2", unitCount: 20)
+        let source2 = rootProgress.addSource(withLabel: "source2", unitCount: 20)
         await wait(label: "source2", percent: 0)
 
         source2.incrementCompletedUnitCount(by: 20)
@@ -1184,15 +1192,12 @@ class OWSProgressTest: XCTestCase {
 
     func testUpdatePeriodically_estimatedTimeFinishesFirst() async {
         let (sink, stream) = OWSProgress.createSink()
-        Task {
-            let source = await sink.addSource(withLabel: "1", unitCount: 100)
-            let inputTask = Task {
-                try await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
-            }
+        _ = Task {
+            let source = sink.addSource(withLabel: "1", unitCount: 100)
             try await source.updatePeriodically(
                 timeInterval: 0.001,
-                estimatedTimeToCompletion: 50,
-                work: { try await inputTask.value }
+                estimatedTimeToCompletion: 0.005,
+                work: { try await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC) },
             )
         }
 
@@ -1207,15 +1212,12 @@ class OWSProgressTest: XCTestCase {
 
     func testUpdatePeriodically_WorkFinishesFirst() async {
         let (sink, stream) = OWSProgress.createSink()
-        Task {
-            let source = await sink.addSource(withLabel: "1", unitCount: 100)
-            let inputTask = Task {
-                try await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
-            }
+        _ = Task {
+            let source = sink.addSource(withLabel: "1", unitCount: 100)
             try await source.updatePeriodically(
                 timeInterval: 0.001,
                 estimatedTimeToCompletion: 200,
-                work: { try await inputTask.value }
+                work: { try await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC) },
             )
         }
 
@@ -1231,16 +1233,15 @@ class OWSProgressTest: XCTestCase {
     func testUpdatePeriodically_NonThrowing() async {
         let (sink, stream) = OWSProgress.createSink()
         Task {
-            let source = await sink.addSource(withLabel: "1", unitCount: 100)
+            let source = sink.addSource(withLabel: "1", unitCount: 100)
             // If the task doesn't throw the updatePeriodically call shouldn't throw either.
-            let inputTask = Task {
-                try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
-                return "Hello, World!"
-            }
             let stringResult = await source.updatePeriodically(
                 timeInterval: 0.001,
                 estimatedTimeToCompletion: 200,
-                work: { await inputTask.value }
+                work: {
+                    try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
+                    return "Hello, World!"
+                },
             )
             XCTAssertEqual(stringResult, "Hello, World!")
         }
@@ -1257,15 +1258,14 @@ class OWSProgressTest: XCTestCase {
     func testUpdatePeriodically_OptionalResult() async {
         let (sink, stream) = OWSProgress.createSink()
         Task {
-            let source = await sink.addSource(withLabel: "1", unitCount: 100)
-            let inputTask: Task<String?, Never> = Task {
-                try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
-                return nil
-            }
+            let source = sink.addSource(withLabel: "1", unitCount: 100)
             let stringResult = await source.updatePeriodically(
                 timeInterval: 0.001,
                 estimatedTimeToCompletion: 200,
-                work: { await inputTask.value }
+                work: { () async -> String? in
+                    try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
+                    return nil
+                },
             )
             XCTAssertNil(stringResult)
         }
@@ -1276,6 +1276,26 @@ class OWSProgressTest: XCTestCase {
         }
 
         XCTAssertLessThanOrEqual(outputs.count, 102)
+        XCTAssertEqual(outputs.last, 100)
+    }
+
+    func testUpdatePeriodically_NonZeroStart() async {
+        let (sink, stream) = OWSProgress.createSink()
+        _ = Task {
+            let source = sink.addSource(withLabel: "1", unitCount: 100)
+            source.incrementCompletedUnitCount(by: 50)
+            try await source.updatePeriodically(
+                timeInterval: 0.001,
+                estimatedTimeToCompletion: 0.1,
+                work: { try await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC) },
+            )
+        }
+
+        var outputs = [UInt64]()
+        for await progress in stream {
+            XCTAssert(0 <= progress.completedUnitCount || progress.completedUnitCount >= 50)
+            outputs.append(progress.completedUnitCount)
+        }
         XCTAssertEqual(outputs.last, 100)
     }
 
@@ -1291,7 +1311,7 @@ class OWSProgressTest: XCTestCase {
                     }
                 }
                 sinkRef = sink
-                let source = await sink.addSource(withLabel: "1", unitCount: 100)
+                let source = sink.addSource(withLabel: "1", unitCount: 100)
                 let inputTask = Task {
                     for _ in 0..<10 {
                         await Task.yield()
@@ -1313,7 +1333,7 @@ class OWSProgressTest: XCTestCase {
 
     func testZeroUnitCount_sourceOnRoot() async {
         let (sink, stream) = OWSProgress.createSink()
-        let source = await sink.addSource(withLabel: "source", unitCount: 0)
+        let source = sink.addSource(withLabel: "source", unitCount: 0)
         // Incrementing is irrelevant.
         source.incrementCompletedUnitCount(by: 0)
         source.incrementCompletedUnitCount(by: 100)
@@ -1335,8 +1355,8 @@ class OWSProgressTest: XCTestCase {
 
     func testZeroUnitCount_childOnRoot() async {
         let (sink, stream) = OWSProgress.createSink()
-        let child = await sink.addChild(withLabel: "child", unitCount: 0)
-        let source = await child.addSource(withLabel: "source", unitCount: 100)
+        let child = sink.addChild(withLabel: "child", unitCount: 0)
+        let source = child.addSource(withLabel: "source", unitCount: 100)
         // Incrementing is irrelevant.
         source.incrementCompletedUnitCount(by: 0)
         source.incrementCompletedUnitCount(by: 50)
@@ -1358,8 +1378,8 @@ class OWSProgressTest: XCTestCase {
 
     func testZeroUnitCount_nestedSource() async {
         let (sink, stream) = OWSProgress.createSink()
-        let child = await sink.addChild(withLabel: "child", unitCount: 100)
-        let source = await child.addSource(withLabel: "source", unitCount: 0)
+        let child = sink.addChild(withLabel: "child", unitCount: 100)
+        let source = child.addSource(withLabel: "source", unitCount: 0)
         // Incrementing is irrelevant.
         source.incrementCompletedUnitCount(by: 0)
         source.incrementCompletedUnitCount(by: 100)
@@ -1387,8 +1407,8 @@ class OWSProgressTest: XCTestCase {
 
     func testZeroUnitCount_manyChildrenOnRoot() async {
         let (sink, stream) = OWSProgress.createSink()
-        let source1 = await sink.addSource(withLabel: "1", unitCount: 100)
-        _ = await sink.addSource(withLabel: "2", unitCount: 0)
+        let source1 = sink.addSource(withLabel: "1", unitCount: 100)
+        _ = sink.addSource(withLabel: "2", unitCount: 0)
         // Should get 2 progress updates for the setup.
         var numUpdates = 0
         loop: for await progress in stream {
@@ -1426,9 +1446,9 @@ class OWSProgressTest: XCTestCase {
 
     func testZeroUnitCount_manyChildrenOnChild() async {
         let (sink, stream) = OWSProgress.createSink()
-        let child = await sink.addChild(withLabel: "A", unitCount: 100)
-        let source1 = await child.addSource(withLabel: "1", unitCount: 100)
-        _ = await child.addSource(withLabel: "2", unitCount: 0)
+        let child = sink.addChild(withLabel: "A", unitCount: 100)
+        let source1 = child.addSource(withLabel: "1", unitCount: 100)
+        _ = child.addSource(withLabel: "2", unitCount: 0)
         // Should get 3 progress updates for the setup.
         var numUpdates = 0
         loop: for await progress in stream {
@@ -1481,11 +1501,11 @@ class OWSProgressTest: XCTestCase {
             }
         }
 
-        let (root, stream) = await OWSSequentialProgress<Step>.createSink()
-        let source1a = await root.child(for: .first).addSource(withLabel: "a", unitCount: 1)
-        let source2b = await root.child(for: .second).addSource(withLabel: "b", unitCount: 1)
-        let source2c = await root.child(for: .second).addSource(withLabel: "c", unitCount: 1)
-        let source3d = await root.child(for: .third).addSource(withLabel: "d", unitCount: 1)
+        let (root, stream) = OWSSequentialProgress<Step>.createSink()
+        let source1a = root.child(for: .first).addSource(withLabel: "a", unitCount: 1)
+        let source2b = root.child(for: .second).addSource(withLabel: "b", unitCount: 1)
+        let source2c = root.child(for: .second).addSource(withLabel: "c", unitCount: 1)
+        let source3d = root.child(for: .third).addSource(withLabel: "d", unitCount: 1)
 
         // Skip over the updates from the first 6 setup steps.
         var numUpdates = 0

@@ -10,30 +10,38 @@ import SignalUI
 
 class DebugUIDiskUsage: DebugUIPage {
 
-    let name =  "Orphans & Disk Usage"
+    let name = "Orphans & Disk Usage"
 
     func section(thread: TSThread?) -> OWSTableSection? {
         return OWSTableSection(title: name, items: [
-            OWSTableItem(title: "Audit & Log",
-                         actionBlock: { OWSOrphanDataCleaner.auditAndCleanup(false) }),
-            OWSTableItem(title: "Audit & Clean Up",
-                         actionBlock: { OWSOrphanDataCleaner.auditAndCleanup(true) }),
-            OWSTableItem(title: "Clear All Attachment Thumbnails",
-                         actionBlock: { DebugUIDiskUsage.clearAllAttachmentThumbnails() }),
+            OWSTableItem(
+                title: "Audit & Log",
+                actionBlock: { Task { try? await OWSOrphanDataCleaner.cleanUp(shouldRemoveOrphanedData: false) } },
+            ),
+            OWSTableItem(
+                title: "Audit & Clean Up",
+                actionBlock: { Task { try? await OWSOrphanDataCleaner.cleanUp(shouldRemoveOrphanedData: true) } },
+            ),
+            OWSTableItem(
+                title: "Clear All Attachment Thumbnails",
+                actionBlock: { DebugUIDiskUsage.clearAllAttachmentThumbnails() },
+            ),
         ])
     }
 
     private static func clearAllAttachmentThumbnails() {
         let fileManager = FileManager.default
-        guard let cacheContents = fileManager.enumerator(
-            at: URL(fileURLWithPath: OWSFileSystem.cachesDirectoryPath()),
-            includingPropertiesForKeys: nil,
-            options: [ .skipsSubdirectoryDescendants ],
-            errorHandler: { url, error in
-                Logger.warn("could not visit \(url): \(error)")
-                return true
-            }
-        ) else {
+        guard
+            let cacheContents = fileManager.enumerator(
+                at: URL(fileURLWithPath: OWSFileSystem.cachesDirectoryPath()),
+                includingPropertiesForKeys: nil,
+                options: [.skipsSubdirectoryDescendants],
+                errorHandler: { url, error in
+                    Logger.warn("could not visit \(url): \(error)")
+                    return true
+                },
+            )
+        else {
             Logger.error("Failed to enumerate caches.")
             return
         }

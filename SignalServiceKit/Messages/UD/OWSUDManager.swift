@@ -13,27 +13,6 @@ public enum OWSUDError: Error {
 
 // MARK: -
 
-extension OWSUDError: IsRetryableProvider {
-    public var isRetryableProvider: Bool {
-        switch self {
-        case .assertionError, .invalidData:
-            return false
-        }
-    }
-}
-
-// MARK: -
-
-public enum OWSUDCertificateExpirationPolicy: Int {
-    // We want to try to rotate the sender certificate
-    // on a frequent basis, but we don't want to block
-    // sending on this.
-    case strict
-    case permissive
-}
-
-// MARK: -
-
 public enum UnidentifiedAccessMode: Int {
     case unknown
     case enabled
@@ -82,7 +61,7 @@ public struct OWSUDAccess {
 // MARK: -
 
 public struct SenderCertificates {
-    let defaultCert: SenderCertificate
+    let defaultCert: SenderCertificate?
     let uuidOnlyCert: SenderCertificate
 }
 
@@ -104,7 +83,7 @@ public protocol OWSUDManager {
 
     // MARK: Sender Certificate
 
-    func fetchSenderCertificates(certificateExpirationPolicy: OWSUDCertificateExpirationPolicy) async throws -> SenderCertificates
+    func fetchSenderCertificates() async throws -> SenderCertificates
 
     func removeSenderCertificates(transaction: DBWriteTransaction)
     func removeSenderCertificates(tx: DBWriteTransaction)
@@ -123,7 +102,7 @@ public protocol OWSUDManager {
     func setPhoneNumberSharingMode(
         _ mode: PhoneNumberSharingMode,
         updateStorageServiceAndProfile: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 }
 
@@ -139,63 +118,35 @@ public class OWSUDManagerImpl: OWSUDManager {
     // These keys contain the word "Production" for historical reasons, but
     // they store sender certificates in both production & staging builds.
     private let kUDCurrentSenderCertificateKey = "kUDCurrentSenderCertificateKey_Production-uuid"
-    private let kUDCurrentSenderCertificateDateKey = "kUDCurrentSenderCertificateDateKey_Production-uuid"
 
     private let kUDUnrestrictedAccessKey = "kUDUnrestrictedAccessKey"
 
     // MARK: Recipient State
 
+    private let db: any DB
+    private let tsAccountManager: any TSAccountManager
+
     // Exposed for testing
     public internal(set) var trustRoots: [PublicKey]
 
-    private let appReadiness: AppReadiness
-
-    public init(appReadiness: AppReadiness) {
-        self.appReadiness = appReadiness
+    public init(
+        cron: Cron,
+        db: any DB,
+        tsAccountManager: any TSAccountManager,
+    ) {
+        self.db = db
         self.trustRoots = OWSUDManagerImpl.trustRoots()
-
-        SwiftSingletons.register(self)
-
-        appReadiness.runNowOrWhenAppDidBecomeReadySync {
-            self.setup()
-        }
-    }
-
-    private func setup() {
-        owsAssertDebug(appReadiness.isAppReady)
-
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(registrationStateDidChange),
-                                               name: .registrationStateDidChange,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(didBecomeActive),
-                                               name: .OWSApplicationDidBecomeActive,
-                                               object: nil)
+        self.tsAccountManager = tsAccountManager
 
         // We can fill in any missing sender certificate async; message sending
         // will fill in the sender certificate sooner if it needs it.
-        Task {
-            _ = try? await self.fetchSenderCertificates(certificateExpirationPolicy: .strict)
-        }
-    }
-
-    @objc
-    private func registrationStateDidChange() {
-        owsAssertDebug(appReadiness.isAppReady)
-
-        Task {
-            _ = try? await fetchSenderCertificates(certificateExpirationPolicy: .strict)
-        }
-    }
-
-    @objc
-    private func didBecomeActive() {
-        owsAssertDebug(appReadiness.isAppReady)
-
-        Task {
-            _ = try? await fetchSenderCertificates(certificateExpirationPolicy: .strict)
-        }
+        cron.schedulePeriodically(
+            uniqueKey: .fetchSenderCertificates,
+            approximateInterval: .day,
+            mustBeRegistered: true,
+            mustBeConnected: true,
+            operation: { _ = try await self.fetchSenderCertificates(forceRefresh: true) },
+        )
     }
 
     // MARK: - Recipient state
@@ -213,7 +164,7 @@ public class OWSUDManagerImpl: OWSUDManager {
     public func setUnidentifiedAccessMode(
         _ mode: UnidentifiedAccessMode,
         for aci: Aci,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         aciAccessStore.setInt(mode.rawValue, key: aci.serviceIdUppercaseString, transaction: tx)
     }
@@ -276,26 +227,18 @@ public class OWSUDManagerImpl: OWSUDManager {
 
     // MARK: - Sender Certificate
 
-    private func senderCertificate(aciOnly: Bool, certificateExpirationPolicy: OWSUDCertificateExpirationPolicy) -> SenderCertificate? {
-        let (dateValue, dataValue) = SSKEnvironment.shared.databaseStorageRef.read { tx in
-            return (
-                self.keyValueStore.getDate(self.senderCertificateDateKey(aciOnly: aciOnly), transaction: tx),
-                self.keyValueStore.getData(self.senderCertificateKey(aciOnly: aciOnly), transaction: tx)
-            )
+    private func loadSenderCertificate(aciOnly: Bool) -> SenderCertificate? {
+        let dataValue = self.db.read { tx in
+            return self.keyValueStore.getData(self.senderCertificateKey(aciOnly: aciOnly), transaction: tx)
         }
 
-        guard let dateValue, let dataValue else {
-            return nil
-        }
-
-        // Discard certificates that we obtained more than 24 hours ago.
-        if certificateExpirationPolicy == .strict, -dateValue.timeIntervalSinceNow >= .day {
+        guard let dataValue else {
             return nil
         }
 
         do {
             let senderCertificate = try SenderCertificate(dataValue)
-            try validateCertificate(senderCertificate)
+            try validateCertificate(senderCertificate, aciOnly: aciOnly)
             return senderCertificate
         } catch {
             Logger.warn("Ignoring invalid cached sender certificate: \(error)")
@@ -305,15 +248,12 @@ public class OWSUDManagerImpl: OWSUDManager {
 
     func setSenderCertificate(aciOnly: Bool, certificateData: Data) async {
         await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { tx in
-            self.keyValueStore.setDate(Date(), key: self.senderCertificateDateKey(aciOnly: aciOnly), transaction: tx)
             self.keyValueStore.setData(certificateData, key: self.senderCertificateKey(aciOnly: aciOnly), transaction: tx)
         }
     }
 
     public func removeSenderCertificates(transaction: DBWriteTransaction) {
-        keyValueStore.removeValue(forKey: senderCertificateDateKey(aciOnly: true), transaction: transaction)
         keyValueStore.removeValue(forKey: senderCertificateKey(aciOnly: true), transaction: transaction)
-        keyValueStore.removeValue(forKey: senderCertificateDateKey(aciOnly: false), transaction: transaction)
         keyValueStore.removeValue(forKey: senderCertificateKey(aciOnly: false), transaction: transaction)
     }
 
@@ -330,41 +270,37 @@ public class OWSUDManagerImpl: OWSUDManager {
         }
     }
 
-    private func senderCertificateDateKey(aciOnly: Bool) -> String {
-        let baseKey = kUDCurrentSenderCertificateDateKey
-        if aciOnly {
-            return "\(baseKey)-withoutPhoneNumber"
-        } else {
-            return baseKey
-        }
-    }
-
     private let fetchQueue = ConcurrentTaskQueue(concurrentLimit: 1)
 
-    public func fetchSenderCertificates(certificateExpirationPolicy: OWSUDCertificateExpirationPolicy) async throws -> SenderCertificates {
-        return try await fetchQueue.run {
-            return try await _fetchSenderCertificates(certificateExpirationPolicy: certificateExpirationPolicy)
+    public func fetchSenderCertificates() async throws -> SenderCertificates {
+        try await fetchSenderCertificates(forceRefresh: false)
+    }
+
+    private func fetchSenderCertificates(forceRefresh: Bool) async throws -> SenderCertificates {
+        return try await fetchQueue.runWithThrowingTask {
+            return try await _fetchSenderCertificates(forceRefresh: forceRefresh)
         }
     }
 
-    private func _fetchSenderCertificates(certificateExpirationPolicy: OWSUDCertificateExpirationPolicy) async throws -> SenderCertificates {
-        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
-        guard tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered else {
-            // We don't want to assert but we should log and fail.
-            throw OWSGenericError("Not registered and ready.")
+    private func _fetchSenderCertificates(forceRefresh: Bool) async throws -> SenderCertificates {
+        let registeredState = try self.tsAccountManager.registeredStateWithMaybeSneakyTransaction()
+        async let aciOnlyCert = fetchSenderCertificate(aciOnly: true, forceRefresh: forceRefresh)
+        var defaultCert: SenderCertificate?
+        if registeredState.localIdentifiers.hasPhoneNumber {
+            defaultCert = try await fetchSenderCertificate(aciOnly: false, forceRefresh: forceRefresh)
         }
-        async let defaultCert = fetchSenderCertificate(aciOnly: false, certificateExpirationPolicy: certificateExpirationPolicy)
-        async let aciOnlyCert = fetchSenderCertificate(aciOnly: true, certificateExpirationPolicy: certificateExpirationPolicy)
         return SenderCertificates(
-            defaultCert: try await defaultCert,
-            uuidOnlyCert: try await aciOnlyCert
+            defaultCert: defaultCert,
+            uuidOnlyCert: try await aciOnlyCert,
         )
     }
 
-    private func fetchSenderCertificate(aciOnly: Bool, certificateExpirationPolicy: OWSUDCertificateExpirationPolicy) async throws -> SenderCertificate {
-        // If there is a valid cached sender certificate, use that.
-        if let certificate = senderCertificate(aciOnly: aciOnly, certificateExpirationPolicy: certificateExpirationPolicy) {
-            return certificate
+    private func fetchSenderCertificate(aciOnly: Bool, forceRefresh: Bool) async throws -> SenderCertificate {
+        if !forceRefresh {
+            // If there is a valid cached sender certificate, use that.
+            if let certificate = loadSenderCertificate(aciOnly: aciOnly) {
+                return certificate
+            }
         }
 
         let senderCertificate: SenderCertificate
@@ -395,28 +331,27 @@ public class OWSUDManagerImpl: OWSUDManager {
         }()
 
         let senderCertificate = try SenderCertificate(certificateData)
-        try validateCertificate(senderCertificate)
+        try validateCertificate(senderCertificate, aciOnly: aciOnly)
         return senderCertificate
     }
 
-    private func validateCertificate(_ certificate: SenderCertificate) throws {
-        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
-
+    private func validateCertificate(_ certificate: SenderCertificate, aciOnly: Bool) throws {
         guard
             let deviceId = DeviceId(validating: certificate.deviceId),
-            tsAccountManager.storedDeviceIdWithMaybeTransaction.equals(deviceId)
+            self.tsAccountManager.storedDeviceIdWithMaybeTransaction.equals(deviceId)
         else {
             throw OWSUDError.invalidData(description: "Sender certificate has incorrect device ID")
         }
 
-        let localIdentifiers = tsAccountManager.localIdentifiersWithMaybeSneakyTransaction
+        let registeredState = try self.tsAccountManager.registeredStateWithMaybeSneakyTransaction()
+        let localIdentifiers = registeredState.localIdentifiers
 
         let sender = certificate.sender
-        guard sender.e164 == nil || sender.e164 == localIdentifiers?.phoneNumber else {
+        guard sender.e164 == (aciOnly ? nil : localIdentifiers.phoneNumber) else {
             throw OWSUDError.invalidData(description: "Sender certificate has incorrect phone number")
         }
 
-        guard sender.senderAci == localIdentifiers!.aci else {
+        guard sender.senderAci == localIdentifiers.aci else {
             throw OWSUDError.invalidData(description: "Sender certificate has incorrect ACI")
         }
 
@@ -451,7 +386,7 @@ public class OWSUDManagerImpl: OWSUDManager {
     // MARK: - Unrestricted Access
 
     public func shouldAllowUnrestrictedAccessLocal() -> Bool {
-        return SSKEnvironment.shared.databaseStorageRef.read { transaction in
+        return self.db.read { transaction in
             return self.shouldAllowUnrestrictedAccessLocal(transaction: transaction)
         }
     }
@@ -461,7 +396,7 @@ public class OWSUDManagerImpl: OWSUDManager {
     }
 
     public func setShouldAllowUnrestrictedAccessLocal(_ value: Bool) {
-        SSKEnvironment.shared.databaseStorageRef.write { transaction in
+        self.db.write { transaction in
             setShouldAllowUnrestrictedAccessLocal(value, tx: transaction)
         }
     }
@@ -469,16 +404,8 @@ public class OWSUDManagerImpl: OWSUDManager {
     public func setShouldAllowUnrestrictedAccessLocal(_ value: Bool, tx: DBWriteTransaction) {
         self.keyValueStore.setBool(value, key: self.kUDUnrestrictedAccessKey, transaction: tx)
 
-        // Try to update the account attributes to reflect this change.
-        tx.addSyncCompletion {
-            Task {
-                do {
-                    try await DependenciesBridge.shared.accountAttributesUpdater.updateAccountAttributes(authedAccount: .implicit())
-                } catch {
-                    Logger.warn("Error: \(error)")
-                }
-            }
-        }
+        let accountAttributesUpdater = DependenciesBridge.shared.accountAttributesUpdater
+        accountAttributesUpdater.scheduleAccountAttributesUpdate(authedAccount: .implicit, tx: tx)
     }
 
     // MARK: - Phone Number Sharing
@@ -495,7 +422,7 @@ public class OWSUDManagerImpl: OWSUDManager {
     public func setPhoneNumberSharingMode(
         _ mode: PhoneNumberSharingMode,
         updateStorageServiceAndProfile: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         keyValueStore.setInt(mode.rawValue, key: Self.phoneNumberSharingModeKey, transaction: tx)
 
@@ -506,8 +433,8 @@ public class OWSUDManagerImpl: OWSUDManager {
             _ = SSKEnvironment.shared.profileManagerRef.reuploadLocalProfile(
                 unsavedRotatedProfileKey: nil,
                 mustReuploadAvatar: false,
-                authedAccount: .implicit(),
-                tx: tx
+                authedAccount: .implicit,
+                tx: tx,
             )
         }
     }
@@ -536,8 +463,10 @@ public class OWSMockUDManager: OWSUDManager {
     public func setUnidentifiedAccessMode(_ mode: UnidentifiedAccessMode, for aci: LibSignalClient.Aci, tx: DBWriteTransaction) {
     }
 
+    public var udAccessKeyMock: (LibSignalClient.Aci) -> SMKUDAccessKey? = { _ in nil }
+
     public func udAccessKey(for aci: LibSignalClient.Aci, tx: DBReadTransaction) -> SMKUDAccessKey? {
-        return nil
+        return udAccessKeyMock(aci)
     }
 
     public func udAccess(for aci: LibSignalClient.Aci, tx: DBReadTransaction) -> OWSUDAccess? {
@@ -548,7 +477,7 @@ public class OWSMockUDManager: OWSUDManager {
         return [:]
     }
 
-    public func fetchSenderCertificates(certificateExpirationPolicy: OWSUDCertificateExpirationPolicy) async throws -> SenderCertificates {
+    public func fetchSenderCertificates() async throws -> SenderCertificates {
         fatalError("not implemented")
     }
 

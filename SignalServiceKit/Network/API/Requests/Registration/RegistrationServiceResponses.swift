@@ -4,24 +4,11 @@
 //
 
 import Foundation
-public import LibSignalClient
+import LibSignalClient
 
 public enum RegistrationServiceResponses {
 
     // MARK: - Registration Session Endpoints
-
-    public enum BeginSessionResponseCodes: Int, UnknownEnumCodable {
-        /// Success. Response body has `RegistrationSession` object.
-        case success = 200
-        case missingArgument = 400
-        case invalidArgument = 422
-        /// The caller is not permitted to create a verification session and must wait before trying again.
-        /// Response will include a 'retry-after' header.
-        case retry = 429
-        case unexpectedError = -1
-
-        static public var unknown: Self { .unexpectedError }
-    }
 
     public enum FetchSessionResponseCodes: Int, UnknownEnumCodable {
         /// Success. Response body has `RegistrationSession` object.
@@ -30,21 +17,7 @@ public enum RegistrationServiceResponses {
         case missingSession = 404
         case unexpectedError = -1
 
-        static public var unknown: Self { .unexpectedError }
-    }
-
-    public enum FulfillChallengeResponseCodes: Int, UnknownEnumCodable {
-        /// Success. Response body has `RegistrationSession` object.
-        case success = 200
-        /// E.g. the challenge token provided did not match.
-        /// Response body has `RegistrationSession` object.
-        case notAccepted = 403
-        /// No session was found with the given ID. A new session should be initiated.
-        case missingSession = 404
-        case malformedRequest = 422
-        case unexpectedError = -1
-
-        static public var unknown: Self { .unexpectedError }
+        public static var unknown: Self { .unexpectedError }
     }
 
     public enum RequestVerificationCodeResponseCodes: Int, UnknownEnumCodable {
@@ -70,7 +43,7 @@ public enum RegistrationServiceResponses {
         case providerFailure = 440
         case unexpectedError = -1
 
-        static public var unknown: Self { .unexpectedError }
+        public static var unknown: Self { .unexpectedError }
     }
 
     public enum SubmitVerificationCodeResponseCodes: Int, UnknownEnumCodable {
@@ -94,7 +67,7 @@ public enum RegistrationServiceResponses {
         case retry = 429
         case unexpectedError = -1
 
-        static public var unknown: Self { .unexpectedError }
+        public static var unknown: Self { .unexpectedError }
     }
 
     public struct RegistrationSession: Codable {
@@ -167,18 +140,6 @@ public enum RegistrationServiceResponses {
 
     // MARK: - SVR2 Auth Check
 
-    public enum SVR2AuthCheckResponseCodes: Int, UnknownEnumCodable {
-        /// Success. Response body has `SVR2AuthCheckResponse` object.
-        case success = 200
-        /// The server couldn't parse the set of credentials.
-        case malformedRequest = 422
-        /// The POST request body is not valid JSON.
-        case invalidJSON = 400
-        case unexpectedError = -1
-
-        static public var unknown: Self { .unexpectedError }
-    }
-
     public struct SVR2AuthCheckResponse: Codable {
         public let matches: [String: Result]
 
@@ -193,7 +154,7 @@ public enum RegistrationServiceResponses {
             case invalid
 
             // Server API explicitly says clients should treat unrecognized values as invalid.
-            static public var unknown: Self { return .invalid }
+            public static var unknown: Self { return .invalid }
         }
 
         public func result(for credential: SVR2AuthCredential) -> Result? {
@@ -203,105 +164,6 @@ public enum RegistrationServiceResponses {
     }
 
     // MARK: - Account Creation/Change Number
-
-    public enum AccountCreationResponseCodes: Int, UnknownEnumCodable {
-        /// Success. Response body has `AccountIdentityResponse`.
-        case success = 200
-        /// Incorrect request body shape, missing required Authorization header,
-        /// or Authorization e164 did not match e164 from session.
-        /// Response body has a string error message.
-        case malformedRequest = 400
-        /// The Authorization header was invalid or the provided credentials were insufficient
-        /// to verify ownership of the given phone number.
-        /// Response body has an optional string error message.
-        case unauthorized = 401
-        /// The provided registration recovery password is either incorrect
-        /// or registration via reg recovery password is impossible for this number.
-        case regRecoveryPasswordRejected = 403
-        /// The caller has not explicitly elected to skip transferring data
-        /// from another device, but a device transfer is technically possible.
-        case deviceTransferPossible = 409
-        /// Response body has an optional string error message.
-        ///
-        /// NOTE: if `requireAtomic` is set on the request but other
-        /// atomic account creation fields are nil, the server will return 422.
-        case invalidArgument = 422
-        /// An account with the given phone number already exists and has a registration lock,
-        /// and the client has not provided appropriate reglock credentials (either because the
-        /// user inputted the wrong PIN, or because the client has the wrong random number
-        /// used to generate the master key).
-        /// Response body has `RegistrationLockFailureResponse`.
-        case reglockFailed = 423
-        /// The caller is not permitted to create an account and must wait before trying again.
-        /// Response will include a 'retry-after' header.
-        case retry = 429
-        case unexpectedError = -1
-
-        static public var unknown: Self { .unexpectedError }
-    }
-
-    public enum ChangeNumberResponseCodes: Int, UnknownEnumCodable {
-        /// Success. Response body has `AccountIdentityResponse`.
-        case success = 200
-        /// Incorrect request body shape, missing required Authorization header,
-        /// or Authorization e164 did not match e164 from session.
-        /// Response body has a string error message.
-        case malformedRequest = 400
-        /// The provided credentials were insufficient to verify ownership of the given phone number.
-        case unauthorized = 401
-        /// The provided registration recovery password is either incorrect
-        /// or registration via reg recovery password is impossible for this number.
-        case regRecoveryPasswordRejected = 403
-        /// The devices to notify in the request did not match the known
-        /// linked devices.
-        case mismatchedDevicesToNotify = 409
-        /// The devices to notify in the request were correct, but their
-        /// provided registrationIds did not match.
-        case mismatchedDevicesToNotifyRegistrationIds = 410
-        /// Response body has an optional string error message.
-        case invalidArgument = 422
-        /// An account with the given phone number already exists and has a registration lock,
-        /// and the client has not provided appropriate reglock credentials (either because the
-        /// user inputted the wrong PIN, or because the client has the wrong random number
-        /// used to generate the master key).
-        /// Response body has `RegistrationLockFailureResponse`.
-        case reglockFailed = 423
-        /// The caller is not permitted to change the number and must wait before trying again.
-        /// Response will include a 'retry-after' header.
-        case retry = 429
-        case unexpectedError = -1
-
-        static public var unknown: Self { .unexpectedError }
-    }
-
-    public struct AccountIdentityResponse: Codable, Equatable {
-        /// The users account identifier.
-        @AciUuid public var aci: Aci
-        /// The user's phone number identifier.
-        @PniUuid public var pni: Pni
-        /// The phone number associated with the PNI.
-        public let e164: E164
-        /// The username associated with the ACI.
-        public let username: String?
-        /// Whether the account has any data in SVR.
-        public let hasPreviouslyUsedSVR: Bool
-
-        public init(aci: Aci, pni: Pni, e164: E164, username: String?, hasPreviouslyUsedSVR: Bool) {
-            self._aci = aci.codableUuid
-            self._pni = pni.codableUuid
-            self.e164 = e164
-            self.username = username
-            self.hasPreviouslyUsedSVR = hasPreviouslyUsedSVR
-        }
-
-        public enum CodingKeys: String, CodingKey {
-            case aci = "uuid"
-            case pni
-            case e164 = "number"
-            case username
-            case hasPreviouslyUsedSVR = "storageCapable"
-        }
-    }
 
     public struct RegistrationLockFailureResponse: Decodable {
         /// Time remaining until the registration lock expires and the account
@@ -319,7 +181,7 @@ public enum RegistrationServiceResponses {
 
         public init(
             timeRemainingMs: Int,
-            svr2AuthCredential: SVR2AuthCredential
+            svr2AuthCredential: SVR2AuthCredential,
         ) {
             self.timeRemainingMs = timeRemainingMs
             self.svr2AuthCredential = svr2AuthCredential
@@ -328,7 +190,7 @@ public enum RegistrationServiceResponses {
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             timeRemainingMs = try container.decode(Int.self, forKey: .timeRemainingMs)
-            let svr2Credential = try container.decode(RemoteAttestation.Auth.self, forKey: .svr2AuthCredential)
+            let svr2Credential = try container.decode(RemoteAttestationAuth.self, forKey: .svr2AuthCredential)
             self.svr2AuthCredential = .init(credential: svr2Credential)
         }
     }

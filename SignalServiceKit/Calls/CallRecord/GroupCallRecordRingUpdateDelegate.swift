@@ -19,17 +19,18 @@ public protocol GroupCallRecordRingUpdateDelegate: AnyObject {
     /// "canceled" this will be ourselves, as the cancellation will have come
     /// from another of our own devices.
     func didReceiveRingUpdate(
-        groupId: Data,
+        groupId: GroupIdentifier,
         ringId: Int64,
         ringUpdate: RingUpdate,
         ringUpdateSender: Aci,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 }
 
 @available(iOSApplicationExtension, unavailable)
 public final class GroupCallRecordRingUpdateHandler: GroupCallRecordRingUpdateDelegate {
     private let callRecordStore: CallRecordStore
+    private let disappearingMessagesConfigurationStore: DisappearingMessagesConfigurationStore
     private let groupCallRecordManager: GroupCallRecordManager
     private let interactionStore: InteractionStore
     private let threadStore: ThreadStore
@@ -38,22 +39,24 @@ public final class GroupCallRecordRingUpdateHandler: GroupCallRecordRingUpdateDe
 
     public init(
         callRecordStore: CallRecordStore,
+        disappearingMessagesConfigurationStore: DisappearingMessagesConfigurationStore,
         groupCallRecordManager: GroupCallRecordManager,
         interactionStore: InteractionStore,
-        threadStore: ThreadStore
+        threadStore: ThreadStore,
     ) {
         self.callRecordStore = callRecordStore
+        self.disappearingMessagesConfigurationStore = disappearingMessagesConfigurationStore
         self.groupCallRecordManager = groupCallRecordManager
         self.interactionStore = interactionStore
         self.threadStore = threadStore
     }
 
     public func didReceiveRingUpdate(
-        groupId: Data,
+        groupId: GroupIdentifier,
         ringId: Int64,
         ringUpdate: RingUpdate,
         ringUpdateSender: Aci,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         let ringUpdateLogger = logger.suffixed(with: "\(ringUpdate)")
 
@@ -61,7 +64,7 @@ public final class GroupCallRecordRingUpdateHandler: GroupCallRecordRingUpdateDe
         let callEventTimestamp = Date().ows_millisecondsSince1970
 
         guard
-            let groupThread = threadStore.fetchGroupThread(groupId: groupId, tx: tx),
+            let groupThread = threadStore.fetchThread(forGroupId: groupId, tx: tx),
             let groupThreadRowId = groupThread.sqliteRowId
         else {
             logger.error("Received ring update, but missing group thread!")
@@ -82,7 +85,7 @@ public final class GroupCallRecordRingUpdateHandler: GroupCallRecordRingUpdateDe
         switch callRecordStore.fetch(
             callId: callId,
             conversationId: .thread(threadRowId: groupThreadRowId),
-            tx: tx
+            tx: tx,
         ) {
         case .matchDeleted:
             ringUpdateLogger.warn("Ignoring ring update: existing record was deleted!")
@@ -175,7 +178,7 @@ public final class GroupCallRecordRingUpdateHandler: GroupCallRecordRingUpdateDe
                 newGroupCallRingerAci: ringerAci,
                 callEventTimestamp: callEventTimestamp,
                 shouldSendSyncMessage: false,
-                tx: tx
+                tx: tx,
             )
         case .matchNotFound:
             let groupCallStatus: CallRecord.CallStatus.GroupCallStatus = {
@@ -199,26 +202,23 @@ public final class GroupCallRecordRingUpdateHandler: GroupCallRecordRingUpdateDe
             let (newGroupCallInteraction, interactionRowId) = interactionStore.insertGroupCallInteraction(
                 groupThread: groupThread,
                 callEventTimestamp: callEventTimestamp,
-                tx: tx
+                expiresInSeconds: disappearingMessagesConfigurationStore.durationSeconds(for: groupThread, tx: tx),
+                tx: tx,
             )
 
             ringUpdateLogger.info("Creating group call record for ring update.")
-            do {
-                _ = try groupCallRecordManager.createGroupCallRecord(
-                    callId: callId,
-                    groupCallInteraction: newGroupCallInteraction,
-                    groupCallInteractionRowId: interactionRowId,
-                    groupThreadRowId: groupThreadRowId,
-                    callDirection: .incoming,
-                    groupCallStatus: groupCallStatus,
-                    groupCallRingerAci: ringerAci,
-                    callEventTimestamp: callEventTimestamp,
-                    shouldSendSyncMessage: false,
-                    tx: tx
-                )
-            } catch let error {
-                owsFailBeta("Failed to insert call record: \(error)")
-            }
+            _ = groupCallRecordManager.createGroupCallRecord(
+                callId: callId,
+                groupCallInteraction: newGroupCallInteraction,
+                groupCallInteractionRowId: interactionRowId,
+                groupThreadRowId: groupThreadRowId,
+                callDirection: .incoming,
+                groupCallStatus: groupCallStatus,
+                groupCallRingerAci: ringerAci,
+                callEventTimestamp: callEventTimestamp,
+                shouldSendSyncMessage: false,
+                tx: tx,
+            )
         }
     }
 }

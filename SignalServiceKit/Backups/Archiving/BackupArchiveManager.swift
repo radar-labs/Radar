@@ -4,7 +4,9 @@
 //
 
 import Foundation
-public import LibSignalClient
+import LibSignalClient
+
+public enum BackupArchive {}
 
 public enum BackupRestoreState: Int, Codable {
     /// Has never restored from a backup in this database's history
@@ -28,13 +30,15 @@ public protocol BackupArchiveManager {
     func backupCdnInfo(
         backupKey: MessageRootBackupKey,
         backupAuth: BackupServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> BackupCdnInfo
 
     /// Download the encrypted backup for the current user to a local file.
     func downloadEncryptedBackup(
         backupKey: MessageRootBackupKey,
         backupAuth: BackupServiceAuth,
-        progress: OWSProgressSink?
+        progress: OWSProgressSink?,
+        logger: PrefixedLogger,
     ) async throws -> URL
 
     /// Upload the local encrypted backup identified by the given metadata for
@@ -44,6 +48,7 @@ public protocol BackupArchiveManager {
         metadata: Upload.EncryptedBackupUploadMetadata,
         auth: ChatServiceAuth,
         progress: OWSProgressSink?,
+        logger: PrefixedLogger,
     ) async throws -> Upload.Result<Upload.EncryptedBackupUploadMetadata>
 
     // MARK: - Export
@@ -53,8 +58,24 @@ public protocol BackupArchiveManager {
     func exportEncryptedBackup(
         localIdentifiers: LocalIdentifiers,
         backupPurpose: BackupExportPurpose,
-        progress: OWSProgressSink?
+        progress: OWSProgressSink?,
+        logger: PrefixedLogger,
     ) async throws -> Upload.EncryptedBackupUploadMetadata
+
+    /// Export a plaintext Backup file for a user-initiated takeout, at the
+    /// returned file URL.
+    ///
+    /// - Important
+    /// The resulting Backup file is in JSONL format.
+    ///
+    /// - Parameter attachmentCollector
+    /// Collects attachments referenced by the Backup file. If `nil`,
+    /// attachments are not collected.
+    func exportPlaintextBackupForTakeout(
+        localIdentifiers: LocalIdentifiers,
+        attachmentCollector: LocalFileBackupAttachmentCollector?,
+        progress: OWSProgressSink?,
+    ) async throws -> URL
 
 #if TESTABLE_BUILD
     /// Export a plaintext backup binary at the returned file URL, for use in
@@ -77,7 +98,8 @@ public protocol BackupArchiveManager {
         localIdentifiers: LocalIdentifiers,
         isPrimaryDevice: Bool,
         source: BackupImportSource,
-        progress: OWSProgressSink?
+        progress: OWSProgressSink?,
+        logger: PrefixedLogger,
     ) async throws
 
 #if TESTABLE_BUILD
@@ -94,7 +116,7 @@ public protocol BackupArchiveManager {
     /// but MUST call this method to finish the in-progress import finalization steps. This method is idempotent; import is not.
     func finalizeBackupImport(progress: OWSProgressSink?) async throws
 
-    /// Schedule an SVR🐝 restore.  This value is checked at the beginning of backup export
-    /// and will block on a completing the SVR🐝 fetch before beginning the export.
-    func scheduleRestoreFromSVR🐝BeforeNextExport(tx: DBWriteTransaction)
+    /// Schedule an SVRB restore.  This value is checked at the beginning of backup export
+    /// and will block on a completing the SVRB fetch before beginning the export.
+    func scheduleRestoreFromSVRBBeforeNextExport(tx: DBWriteTransaction)
 }

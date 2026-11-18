@@ -6,26 +6,75 @@
 public import Contacts
 
 @objc(OWSContactName)
-public class OWSContactName: MTLModel {
+public final class OWSContactName: NSObject, NSSecureCoding {
+    public static var supportsSecureCoding: Bool { true }
 
-    @objc
-    public fileprivate(set) var givenName: String?
-    @objc
-    public fileprivate(set) var familyName: String?
-    @objc
-    public fileprivate(set) var namePrefix: String?
-    @objc
-    public fileprivate(set) var nameSuffix: String?
-    @objc
-    public fileprivate(set) var middleName: String?
-    @objc
-    public fileprivate(set) var nickname: String?
-    @objc
-    public fileprivate(set) var organizationName: String?
-
-    public override init() {
-        super.init()
+    public init?(coder: NSCoder) {
+        self.familyName = coder.decodeObject(of: NSString.self, forKey: "familyName") as String?
+        self.givenName = coder.decodeObject(of: NSString.self, forKey: "givenName") as String?
+        self.middleName = coder.decodeObject(of: NSString.self, forKey: "middleName") as String?
+        self.namePrefix = coder.decodeObject(of: NSString.self, forKey: "namePrefix") as String?
+        self.nameSuffix = coder.decodeObject(of: NSString.self, forKey: "nameSuffix") as String?
+        self.nickname = coder.decodeObject(of: NSString.self, forKey: "nickname") as String?
+        self.organizationName = coder.decodeObject(of: NSString.self, forKey: "organizationName") as String?
     }
+
+    public func encode(with coder: NSCoder) {
+        if let familyName {
+            coder.encode(familyName, forKey: "familyName")
+        }
+        if let givenName {
+            coder.encode(givenName, forKey: "givenName")
+        }
+        if let middleName {
+            coder.encode(middleName, forKey: "middleName")
+        }
+        if let namePrefix {
+            coder.encode(namePrefix, forKey: "namePrefix")
+        }
+        if let nameSuffix {
+            coder.encode(nameSuffix, forKey: "nameSuffix")
+        }
+        if let nickname {
+            coder.encode(nickname, forKey: "nickname")
+        }
+        if let organizationName {
+            coder.encode(organizationName, forKey: "organizationName")
+        }
+    }
+
+    override public var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(familyName)
+        hasher.combine(givenName)
+        hasher.combine(middleName)
+        hasher.combine(namePrefix)
+        hasher.combine(nameSuffix)
+        hasher.combine(nickname)
+        hasher.combine(organizationName)
+        return hasher.finalize()
+    }
+
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard type(of: self) == type(of: object) else { return false }
+        guard self.familyName == object.familyName else { return false }
+        guard self.givenName == object.givenName else { return false }
+        guard self.middleName == object.middleName else { return false }
+        guard self.namePrefix == object.namePrefix else { return false }
+        guard self.nameSuffix == object.nameSuffix else { return false }
+        guard self.nickname == object.nickname else { return false }
+        guard self.organizationName == object.organizationName else { return false }
+        return true
+    }
+
+    public let givenName: String?
+    public let familyName: String?
+    public let namePrefix: String?
+    public let nameSuffix: String?
+    public let middleName: String?
+    public let nickname: String?
+    public let organizationName: String?
 
     public init(
         givenName: String? = nil,
@@ -34,7 +83,7 @@ public class OWSContactName: MTLModel {
         nameSuffix: String? = nil,
         middleName: String? = nil,
         nickname: String? = nil,
-        organizationName: String? = nil
+        organizationName: String? = nil,
     ) {
         self.givenName = givenName
         self.familyName = familyName
@@ -55,16 +104,8 @@ public class OWSContactName: MTLModel {
             nameSuffix: cnContact.nameSuffix.stripped,
             middleName: cnContact.middleName.stripped,
             nickname: cnContact.nickname.stripped,
-            organizationName: cnContact.organizationName.stripped
+            organizationName: cnContact.organizationName.stripped,
         )
-    }
-
-    required init!(coder: NSCoder!) {
-        super.init(coder: coder)
-    }
-
-    required init(dictionary dictionaryValue: [String: Any]!) throws {
-        try super.init(dictionary: dictionaryValue)
     }
 
     // MARK: Display Name
@@ -83,14 +124,10 @@ public class OWSContactName: MTLModel {
         return displayName
     }
 
-    internal func ensureDisplayName() {
+    func ensureDisplayName() {
         if _displayName.isEmptyOrNil {
             if let cnContact = systemContactForName() {
-                if let nickname = cnContact.nickname.nilIfEmpty {
-                    _displayName = nickname
-                } else {
-                    _displayName = CNContactFormatter.string(from: cnContact, style: .fullName)
-                }
+                _displayName = CNContactFormatter.string(from: cnContact, style: .fullName)
             }
         }
 
@@ -104,7 +141,7 @@ public class OWSContactName: MTLModel {
         }
     }
 
-    internal func updateDisplayName() {
+    func updateDisplayName() {
         _displayName = nil
         ensureDisplayName()
     }
@@ -125,7 +162,7 @@ public class OWSContactName: MTLModel {
     // Returns true if any of the name parts (which doesn't include
     // organization name) is non-empty.
     public var hasAnyNamePart: Bool {
-        let components: [String?] = [ givenName, middleName, familyName, namePrefix, nameSuffix, nickname ]
+        let components: [String?] = [givenName, middleName, familyName, namePrefix, nameSuffix, nickname]
         for component in components {
             if component?.strippedOrNil != nil {
                 return true

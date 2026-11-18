@@ -11,7 +11,7 @@ import Testing
 struct ConnectionLockTest {
     @Test
     func testEachPriority() async throws {
-        let filePath = OWSTemporaryDirectory().appendingPathComponent("\(UUID().uuidString).lock")
+        let filePath = OWSFileSystem.temporaryFilePath(fileExtension: "lock", isAvailableWhileDeviceLocked: false)
         for priority in 1...3 {
             let connectionLock = ConnectionLock(filePath: filePath, priority: priority, of: 3)
             defer { connectionLock.close() }

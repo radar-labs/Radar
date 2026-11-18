@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import LibSignalClient
 import GRDB
+import LibSignalClient
 
 class MessageSendLogObjC: NSObject {
     @objc
@@ -21,7 +21,7 @@ public class MessageSendLog {
 
     public init(
         db: any DB,
-        dateProvider: @escaping DateProvider
+        dateProvider: @escaping DateProvider,
     ) {
         self.db = db
         self.dateProvider = dateProvider
@@ -54,7 +54,7 @@ public class MessageSendLog {
             contentHint: SealedSenderContentHint,
             sentTimestamp: UInt64,
             uniqueThreadId: String,
-            sendComplete: Bool
+            sendComplete: Bool,
         ) {
             self.plaintextContent = plaintextContent
             self.contentHint = contentHint
@@ -84,7 +84,7 @@ public class MessageSendLog {
         let uniqueId: String
     }
 
-    func recordPayload(_ plaintext: Data, for message: TSOutgoingMessage, tx: DBWriteTransaction) -> Int64? {
+    func recordPayload(_ plaintext: Data, for message: any SendableMessage, tx: DBWriteTransaction) -> Int64? {
         guard !RemoteConfig.current.messageResendKillSwitch else {
             return nil
         }
@@ -124,7 +124,7 @@ public class MessageSendLog {
             // not a major issue. The MSL is critical for correct behavior of sender
             // key messages. For non sender key messages, it's a nice-to-have in case
             // some unforeseen decryption failure happens.
-            owsAssertDebug(message is OWSOutgoingSyncMessage, "Found an MSL inconsistency for a non-sync message.")
+            owsAssertDebug(message is OutgoingSyncMessage, "Found an MSL inconsistency for a non-sync message.")
             return nil
         }
 
@@ -134,8 +134,8 @@ public class MessageSendLog {
                 plaintextContent: plaintext,
                 contentHint: message.contentHint,
                 sentTimestamp: message.timestamp,
-                uniqueThreadId: message.uniqueThreadId,
-                sendComplete: false
+                uniqueThreadId: message.threadUniqueId,
+                sendComplete: false,
             )
             try payload.insert(tx.database)
 
@@ -168,9 +168,15 @@ public class MessageSendLog {
         recipientAci: Aci,
         recipientDeviceId: DeviceId,
         timestamp: UInt64,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> Payload? {
         guard !RemoteConfig.current.messageResendKillSwitch else {
+            return nil
+        }
+
+        // We can't possibly have a payload for a such-huge timestamp, and we'll
+        // crash trying to query for it.
+        guard SDS.fitsInInt64(timestamp) else {
             return nil
         }
 
@@ -197,7 +203,7 @@ public class MessageSendLog {
         return existingValue.payload
     }
 
-    public func sendComplete(message: TSOutgoingMessage, tx: DBWriteTransaction) {
+    func sendComplete(message: any SendableMessage, tx: DBWriteTransaction) {
         guard !RemoteConfig.current.messageResendKillSwitch else {
             return
         }
@@ -221,16 +227,16 @@ public class MessageSendLog {
     }
 
     private func fetchUniquePayload(
-        for message: TSOutgoingMessage,
-        tx: DBReadTransaction
+        for message: any SendableMessage,
+        tx: DBReadTransaction,
     ) throws -> (Int64, Payload)? {
-        let query = fetchRequest(threadUniqueId: message.uniqueThreadId).filter(Column("sentTimestamp") == message.timestamp)
+        let query = fetchRequest(threadUniqueId: message.threadUniqueId).filter(Column("sentTimestamp") == message.timestamp)
         return try fetchUniquePayload(query: query, tx: tx)
     }
 
     private func fetchUniquePayload(
         query: QueryInterfaceRequest<Payload>,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> (Int64, Payload)? {
         let payloads = try query.fetchAll(tx.database)
         guard let payload = payloads.first else {
@@ -264,7 +270,7 @@ public class MessageSendLog {
     func deviceIdsPendingDelivery(
         for payloadId: Int64,
         recipientAci: Aci,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> [DeviceId?]? {
         do {
             return try Recipient
@@ -283,8 +289,8 @@ public class MessageSendLog {
         payloadId: Int64,
         recipientAci: Aci,
         recipientDeviceId: DeviceId,
-        message: TSOutgoingMessage,
-        tx: DBWriteTransaction
+        message: any SendableMessage,
+        tx: DBWriteTransaction,
     ) {
         guard !RemoteConfig.current.messageResendKillSwitch else {
             return
@@ -293,7 +299,7 @@ public class MessageSendLog {
             try Recipient(
                 payloadId: payloadId,
                 recipientUUID: recipientAci.serviceIdUppercaseString,
-                recipientDeviceId: Int64(recipientDeviceId.uint32Value)
+                recipientDeviceId: Int64(recipientDeviceId.uint32Value),
             ).insert(tx.database)
         } catch let error as DatabaseError where error.extendedResultCode == .SQLITE_CONSTRAINT_FOREIGNKEY {
             // There's a tiny race where a recipient could send a delivery receipt before we record an MSL entry
@@ -302,7 +308,7 @@ public class MessageSendLog {
             // the payload is now missing.
 
             // This block of code just avoids a spurious assert by only asserting if the message has not been marked delivered:
-            let dbCopy = TSOutgoingMessage.anyFetchOutgoingMessage(uniqueId: message.uniqueId, transaction: tx)
+            let dbCopy = TSOutgoingMessage.fetchOutgoingMessageViaCache(uniqueId: message.uniqueId, transaction: tx)
             switch dbCopy?.recipientState(for: SignalServiceAddress(recipientAci))?.status {
             case .delivered, .read, .viewed:
                 break
@@ -315,10 +321,10 @@ public class MessageSendLog {
     }
 
     func recordSuccessfulDelivery(
-        message: TSOutgoingMessage,
+        message: any SendableMessage,
         recipientAci: Aci,
         recipientDeviceId: DeviceId,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         guard !RemoteConfig.current.messageResendKillSwitch else {
             return
@@ -343,7 +349,7 @@ public class MessageSendLog {
 
     func deleteAllPayloadsForInteraction(
         _ interaction: TSInteraction,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         do {
             let db = tx.database
@@ -356,42 +362,26 @@ public class MessageSendLog {
         }
     }
 
-    public func cleanUpAndScheduleNextOccurrence() {
-        AssertIsOnMainThread()
-        let backgroundTask = OWSBackgroundTask(label: #function)
-        DispatchQueue.global(qos: .utility).async { [self] in
-            defer {
-                DispatchQueue.main.async(backgroundTask.end)
-            }
-
-            do {
-                try self.cleanUpExpiredEntries()
-            } catch {
-                Logger.warn("Couldn't prune stale MSL entries \(error)")
-            }
-
-            DispatchQueue.main.asyncAfter(wallDeadline: .now() + .day) { [weak self] in
-                self?.cleanUpAndScheduleNextOccurrence()
-            }
-        }
-    }
-
-    public func cleanUpExpiredEntries() throws {
+    public func cleanUpExpiredEntries() async throws {
         let cutoffTimestamp = currentExpiredPayloadTimestamp()
         let fetchRequest = Payload
             .select(Column("payloadId"), as: Int64.self)
             .filter(Column("sentTimestamp") < cutoffTimestamp)
             .limit(Constants.cleanupLimit)
-        let count = try TimeGatedBatch.processAll(db: db) { tx in
+        var count = 0
+        try await TimeGatedBatch.processAll(db: db) { tx in
+            try Task.checkCancellation()
             do {
                 let db = tx.database
                 let payloadIds = try fetchRequest.fetchAll(db)
                 try Payload.filter(keys: payloadIds).deleteAll(db)
-                return payloadIds.count
+                count += payloadIds.count
+                return payloadIds.isEmpty ? .done(()) : .more
             } catch {
                 throw error.grdbErrorForLogging
             }
         }
+
         if count > 0 {
             Logger.info("Deleted \(count) stale MSL entries")
         }

@@ -33,8 +33,10 @@ public extension SDSRecord {
     // This is a "fault-tolerant" save method that will upsert in production.
     // In DEBUG builds it will fail if the intention (insert v. update)
     // doesn't match the database contents.
-    func sdsSave(saveMode: SDSSaveMode,
-                 transaction: DBWriteTransaction) {
+    func sdsSave(
+        saveMode: SDSSaveMode,
+        transaction: DBWriteTransaction,
+    ) {
         // GRDB TODO: the record has an id property, but we can't use it here
         //            until we modify the upsert logic.
         //            grdbIdByUniqueId() verifies that the model hasn't been
@@ -53,65 +55,50 @@ public extension SDSRecord {
     }
 
     private func sdsUpdate(grdbId: Int64, transaction: DBWriteTransaction) {
-        do {
+        failIfThrows {
             var recordCopy = self
             recordCopy.id = grdbId
             try recordCopy.update(transaction.database)
-        } catch {
-            DatabaseCorruptionState.flagDatabaseCorruptionIfNecessary(
-                userDefaults: CurrentAppContext().appUserDefaults(),
-                error: error
-            )
-            owsFail("Update failed: \(error.grdbErrorForLogging)")
         }
     }
 
     private func sdsInsert(transaction: DBWriteTransaction) {
-        do {
+        failIfThrows {
             try self.insert(transaction.database)
-        } catch {
-            DatabaseCorruptionState.flagDatabaseCorruptionIfNecessary(
-                userDefaults: CurrentAppContext().appUserDefaults(),
-                error: error
-            )
-            owsFail("Insert failed: \(error.grdbErrorForLogging)")
         }
     }
 }
 
 // MARK: -
 
-fileprivate extension SDSRecord {
+private extension SDSRecord {
 
     func grdbIdByUniqueId(transaction: DBReadTransaction) -> Int64? {
-        BaseModel.grdbIdByUniqueId(tableMetadata: tableMetadata,
-                                   uniqueIdColumnName: uniqueIdColumnName,
-                                   uniqueIdColumnValue: uniqueIdColumnValue,
-                                   transaction: transaction)
+        BaseModel.grdbIdByUniqueId(
+            tableMetadata: tableMetadata,
+            uniqueIdColumnName: uniqueIdColumnName,
+            uniqueIdColumnValue: uniqueIdColumnValue,
+            transaction: transaction,
+        )
     }
 }
 
 // MARK: -
 
 extension BaseModel {
-    static func grdbIdByUniqueId(tableMetadata: SDSTableMetadata,
-                                 uniqueIdColumnName: String,
-                                 uniqueIdColumnValue: String,
-                                 transaction: DBReadTransaction) -> Int64? {
-        do {
+    static func grdbIdByUniqueId(
+        tableMetadata: SDSTableMetadata,
+        uniqueIdColumnName: String,
+        uniqueIdColumnValue: String,
+        transaction: DBReadTransaction,
+    ) -> Int64? {
+        return failIfThrows {
             let tableName = tableMetadata.tableName
             let sql = "SELECT id FROM \(tableName.quotedDatabaseIdentifier) WHERE \(uniqueIdColumnName.quotedDatabaseIdentifier)=?"
             guard let value = try Int64.fetchOne(transaction.database, sql: sql, arguments: [uniqueIdColumnValue]) else {
                 return nil
             }
             return value
-        } catch {
-            DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(
-                userDefaults: CurrentAppContext().appUserDefaults(),
-                error: error
-            )
-            owsFailDebug("Could not find grdb id: \(error)")
-            return nil
         }
     }
 }

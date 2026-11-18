@@ -28,6 +28,9 @@ public class MessageAction: NSObject {
         case edit
         case showPaymentDetails
         case endPoll
+        case pin
+        case unpin
+        case viewStickerPack
         case star
         case unstar
 
@@ -41,26 +44,31 @@ public class MessageAction: NSObject {
             case .share: 4
             case .save: 5
             case .endPoll: 6
-            case .select: 7
-            case .showPaymentDetails: 8
-            case .speak: 9
-            case .stopSpeaking: 10
-            case .info: 11
-            case .delete: 12
-            case .star: 13
-            case .unstar: 13
+            case .viewStickerPack: 7
+            case .select: 8
+            case .showPaymentDetails: 9
+            case .speak: 10
+            case .stopSpeaking: 11
+            case .info: 12
+            case .pin: 13
+            case .unpin: 14
+            case .delete: 15
+            case .star: 16
+            case .unstar: 16
             }
         }
     }
 
     let actionType: MessageActionType
 
-    public init(_ actionType: MessageActionType,
-                accessibilityLabel: String,
-                accessibilityIdentifier: String,
-                contextMenuTitle: String,
-                contextMenuAttributes: ContextMenuAction.Attributes,
-                block: @escaping (_ sender: Any?) -> Void) {
+    public init(
+        _ actionType: MessageActionType,
+        accessibilityLabel: String,
+        accessibilityIdentifier: String,
+        contextMenuTitle: String,
+        contextMenuAttributes: ContextMenuAction.Attributes,
+        block: @escaping (_ sender: Any?) -> Void,
+    ) {
         self.actionType = actionType
         self.accessibilityIdentifier = accessibilityIdentifier
         self.contextMenuTitle = contextMenuTitle
@@ -99,6 +107,12 @@ public class MessageAction: NSObject {
                 return .settingsPayments
             case .endPoll:
                 return .pollStopLight
+            case .pin:
+                return .pin
+            case .unpin:
+                return .unpin
+            case .viewStickerPack:
+                return .stickerPack
             case .star:
                 return .contextMenuStarEmpty
             case .unstar:
@@ -134,9 +148,12 @@ public class MessageActionsToolbar: UIView {
 
     enum Mode {
         case normal(messagesActions: [MessageAction])
-        case selection(deleteMessagesAction: MessageAction,
-                       forwardMessagesAction: MessageAction)
+        case selection(
+            deleteMessagesAction: MessageAction,
+            forwardMessagesAction: MessageAction,
+        )
     }
+
     private let mode: Mode
 
     private let toolbar = UIToolbar()
@@ -162,7 +179,7 @@ public class MessageActionsToolbar: UIView {
                 self,
                 selector: #selector(themeDidChange),
                 name: .themeDidChange,
-                object: nil
+                object: nil,
             )
         }
 
@@ -194,21 +211,20 @@ public class MessageActionsToolbar: UIView {
         case .normal(let messagesActions):
             buildNormalItems(messagesActions: messagesActions)
         case .selection(let deleteMessagesAction, let forwardMessagesAction):
-            buildSelectionItems(deleteMessagesAction: deleteMessagesAction,
-                                forwardMessagesAction: forwardMessagesAction)
+            buildSelectionItems(
+                deleteMessagesAction: deleteMessagesAction,
+                forwardMessagesAction: forwardMessagesAction,
+            )
         }
     }
 
     private var actionItems = [MessageAction.MessageActionType: UIBarButtonItem]()
 
     private func barButtonItem(for messageAction: MessageAction) -> UIBarButtonItem {
-        let barButtonItem = UIBarButtonItem(
-            image: messageAction.barButtonImage,
-            primaryAction: UIAction { [weak self] _ in
-                guard let self else { return }
-                self.actionDelegate?.messageActionsToolbar(self, executedAction: messageAction)
-            }
-        )
+        let barButtonItem = UIBarButtonItem.button(image: messageAction.barButtonImage) { [weak self] in
+            guard let self else { return }
+            self.actionDelegate?.messageActionsToolbar(self, executedAction: messageAction)
+        }
         if #unavailable(iOS 26) {
             barButtonItem.tintColor = Theme.primaryIconColor
         }
@@ -238,8 +254,10 @@ public class MessageActionsToolbar: UIView {
         toolbar.items = newItems
     }
 
-    private func buildSelectionItems(deleteMessagesAction: MessageAction,
-                                     forwardMessagesAction: MessageAction) {
+    private func buildSelectionItems(
+        deleteMessagesAction: MessageAction,
+        forwardMessagesAction: MessageAction,
+    ) {
 
         let deleteItem = barButtonItem(for: deleteMessagesAction)
         actionItems[deleteMessagesAction.actionType] = deleteItem
@@ -248,8 +266,11 @@ public class MessageActionsToolbar: UIView {
         actionItems[forwardMessagesAction.actionType] = forwardItem
 
         let selectedCount: Int = actionDelegate?.messageActionsToolbarSelectedInteractionCount ?? 0
-        let labelFormat = OWSLocalizedString("MESSAGE_ACTIONS_TOOLBAR_CAPTION_%d", tableName: "PluralAware",
-                                             comment: "Label for the toolbar used in the multi-select mode. The number of selected items (1 or more) is passed.")
+        let labelFormat = OWSLocalizedString(
+            "MESSAGE_ACTIONS_TOOLBAR_CAPTION_%d",
+            tableName: "PluralAware",
+            comment: "Label for the toolbar used in the multi-select mode. The number of selected items (1 or more) is passed.",
+        )
         let labelTitle = String.localizedStringWithFormat(labelFormat, selectedCount)
         let label = UILabel()
         label.text = labelTitle

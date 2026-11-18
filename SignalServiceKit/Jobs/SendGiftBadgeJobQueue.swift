@@ -11,7 +11,7 @@ public import LibSignalClient
 public class SendGiftBadgeJobQueue {
     private let jobQueueRunner: JobQueueRunner<
         JobRecordFinderImpl<SendGiftBadgeJobRecord>,
-        SendGiftBadgeJobRunnerFactory
+        SendGiftBadgeJobRunnerFactory,
     >
     private let jobRunnerFactory: SendGiftBadgeJobRunnerFactory
 
@@ -21,7 +21,7 @@ public class SendGiftBadgeJobQueue {
             canExecuteJobsConcurrently: true,
             db: db,
             jobFinder: JobRecordFinderImpl(db: db),
-            jobRunnerFactory: self.jobRunnerFactory
+            jobRunnerFactory: self.jobRunnerFactory,
         )
         self.jobQueueRunner.listenForReachabilityChanges(reachabilityManager: reachabilityManager)
     }
@@ -38,7 +38,7 @@ public class SendGiftBadgeJobQueue {
         receiptRequest: (context: ReceiptCredentialRequestContext, request: ReceiptCredentialRequest),
         amount: FiatMoney,
         thread: TSContactThread,
-        messageText: String
+        messageText: String,
     ) -> SendGiftBadgeJobRecord {
         let paymentProcessor: DonationPaymentProcessor
         var stripePaymentIntent: Stripe.PaymentIntent?
@@ -70,13 +70,13 @@ public class SendGiftBadgeJobQueue {
             paypalPaymentId: paypalPaymentId,
             paypalPaymentToken: paypalApprovalParams?.paymentToken,
             threadId: thread.uniqueId,
-            messageText: messageText
+            messageText: messageText,
         )
     }
 
     public func addJob(
         _ jobRecord: SendGiftBadgeJobRecord,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> (chargePromise: Promise<Void>, completionPromise: Promise<Void>) {
         let (chargePromise, chargeFuture) = Promise<Void>.pending()
         let (completionPromise, completionFuture) = Promise<Void>.pending()
@@ -109,18 +109,12 @@ private func jobExists(threadId: String, transaction: DBReadTransaction) -> Bool
     """
     let arguments: StatementArguments = [
         threadId,
-        SDSRecordType.sendGiftBadgeJobRecord.rawValue,
+        JobRecord.JobRecordType.sendGiftBadge.rawValue,
         SendGiftBadgeJobRecord.Status.permanentlyFailed.rawValue,
-        SendGiftBadgeJobRecord.Status.obsolete.rawValue
+        SendGiftBadgeJobRecord.Status.obsolete.rawValue,
     ]
-    do {
+    return failIfThrows {
         return try Bool.fetchOne(transaction.database, sql: sql, arguments: arguments) ?? false
-    } catch {
-        DatabaseCorruptionState.flagDatabaseReadCorruptionIfNecessary(
-            userDefaults: CurrentAppContext().appUserDefaults(),
-            error: error
-        )
-        owsFail("Unable to find job")
     }
 }
 
@@ -143,11 +137,11 @@ private class SendGiftBadgeJobRunner: JobRunner {
         case forStripe(
             paymentIntentClientSecret: String,
             paymentIntentId: String,
-            paymentMethodId: String
+            paymentMethodId: String,
         )
         case forBraintree(
             paypalApprovalParams: Paypal.OneTimePaymentWebAuthApprovalParams,
-            paymentId: String
+            paymentId: String,
         )
 
         var processor: DonationPaymentProcessor {
@@ -171,7 +165,7 @@ private class SendGiftBadgeJobRunner: JobRunner {
             jobRecord: jobRecord,
             retryLimit: Constants.maxRetries,
             db: DependenciesBridge.shared.db,
-            block: { try await _runJobAttempt(jobRecord) }
+            block: { try await _runJobAttempt(jobRecord) },
         )
     }
 
@@ -203,7 +197,7 @@ private class SendGiftBadgeJobRunner: JobRunner {
                 return Payment.forStripe(
                     paymentIntentClientSecret: paymentIntentClientSecret,
                     paymentIntentId: paymentIntentId,
-                    paymentMethodId: paymentMethodId
+                    paymentMethodId: paymentMethodId,
                 )
             case .braintree:
                 guard
@@ -215,7 +209,7 @@ private class SendGiftBadgeJobRunner: JobRunner {
                 }
                 return Payment.forBraintree(
                     paypalApprovalParams: .init(payerId: paypalPayerId, paymentToken: paypalPaymentToken),
-                    paymentId: paypalPaymentId
+                    paymentId: paypalPaymentId,
                 )
             }
         }()
@@ -240,13 +234,13 @@ private class SendGiftBadgeJobRunner: JobRunner {
             payment: payment,
             paymentIntentId: paymentIntentId,
             receiptCredentialRequest: receiptCredentialRequest,
-            receiptCredentialRequestContext: receiptCredentialRequestContext
+            receiptCredentialRequestContext: receiptCredentialRequestContext,
         )
 
         let messageBody: ValidatedMessageBody?
         if let text = jobRecord.messageText.nilIfEmpty {
             messageBody = try await DependenciesBridge.shared.attachmentContentValidator
-                    .prepareOversizeTextIfNeeded(MessageBody(text: text, ranges: .empty))
+                .prepareOversizeTextIfNeeded(MessageBody(text: text, ranges: .empty))
         } else {
             messageBody = nil
         }
@@ -257,7 +251,7 @@ private class SendGiftBadgeJobRunner: JobRunner {
                 threadUniqueId: jobRecord.threadId,
                 messageBody: messageBody,
                 receiptCredentialPresentation: receiptCredentialPresentation,
-                tx: tx
+                tx: tx,
             )
             DonationReceipt(receiptType: .gift, timestamp: Date(), amount: amount).anyInsert(transaction: tx)
             jobRecord.anyRemove(transaction: tx)
@@ -265,7 +259,7 @@ private class SendGiftBadgeJobRunner: JobRunner {
     }
 
     private func getValidatedThread(threadUniqueId: String, tx: DBReadTransaction) throws -> TSContactThread {
-        guard let thread = TSContactThread.anyFetchContactThread(uniqueId: threadUniqueId, transaction: tx) else {
+        guard let thread = TSContactThread.fetchContactThreadViaCache(uniqueId: threadUniqueId, transaction: tx) else {
             throw OWSGenericError("Thread for gift badge sending no longer exists")
         }
         guard !SSKEnvironment.shared.blockingManagerRef.isThreadBlocked(thread, transaction: tx) else {
@@ -290,7 +284,7 @@ private class SendGiftBadgeJobRunner: JobRunner {
                 paymentIntentId: paymentIntentId,
                 paymentMethodId: paymentMethodId,
                 callbackURL: nil,
-                idempotencyKey: idempotencyKey
+                idempotencyKey: idempotencyKey,
             )
             return paymentIntentId
         case let .forBraintree(paypalApprovalParams, paymentId):
@@ -298,7 +292,7 @@ private class SendGiftBadgeJobRunner: JobRunner {
                 amount: amount,
                 level: .giftBadge(.signalGift),
                 paymentId: paymentId,
-                approvalParams: paypalApprovalParams
+                approvalParams: paypalApprovalParams,
             )
         }
     }
@@ -307,7 +301,7 @@ private class SendGiftBadgeJobRunner: JobRunner {
         payment: Payment,
         paymentIntentId: String,
         receiptCredentialRequest: ReceiptCredentialRequest,
-        receiptCredentialRequestContext: ReceiptCredentialRequestContext
+        receiptCredentialRequestContext: ReceiptCredentialRequestContext,
     ) async throws -> ReceiptCredentialPresentation {
         let receiptCredential = try await ReceiptCredentialManager(
             dateProvider: { Date() },
@@ -326,7 +320,7 @@ private class SendGiftBadgeJobRunner: JobRunner {
         )
 
         return try ReceiptCredentialManager.generateReceiptCredentialPresentation(
-            receiptCredential: receiptCredential
+            receiptCredential: receiptCredential,
         )
     }
 
@@ -334,7 +328,7 @@ private class SendGiftBadgeJobRunner: JobRunner {
         threadUniqueId: String,
         messageBody: ValidatedMessageBody?,
         receiptCredentialPresentation: ReceiptCredentialPresentation,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) throws {
         func send(_ unpreparedMessage: UnpreparedOutgoingMessage) throws {
             let preparedMessage = try unpreparedMessage.prepare(tx: tx)
@@ -346,7 +340,7 @@ private class SendGiftBadgeJobRunner: JobRunner {
         try send(UnpreparedOutgoingMessage.build(
             giftBadgeReceiptCredentialPresentation: receiptCredentialPresentation,
             thread: thread,
-            tx: tx
+            tx: tx,
         ))
 
         if let messageBody {
@@ -361,7 +355,7 @@ extension UnpreparedOutgoingMessage {
     fileprivate static func build(
         giftBadgeReceiptCredentialPresentation: ReceiptCredentialPresentation,
         thread: TSThread,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> UnpreparedOutgoingMessage {
         let dmConfigurationStore = DependenciesBridge.shared.disappearingMessagesConfigurationStore
         let dmConfig = dmConfigurationStore.fetchOrBuildDefault(for: .thread(thread), tx: tx)
@@ -369,7 +363,7 @@ extension UnpreparedOutgoingMessage {
             thread: thread,
             expiresInSeconds: dmConfig.durationSeconds,
             expireTimerVersion: dmConfig.timerVersion,
-            giftBadge: OWSGiftBadge(redemptionCredential: giftBadgeReceiptCredentialPresentation.serialize())
+            giftBadge: OWSGiftBadge(redemptionCredential: giftBadgeReceiptCredentialPresentation.serialize()),
         )
         return .forMessage(builder.build(transaction: tx), body: nil)
     }
@@ -377,7 +371,7 @@ extension UnpreparedOutgoingMessage {
     fileprivate static func build(
         messageBody: ValidatedMessageBody,
         thread: TSThread,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> UnpreparedOutgoingMessage {
         let dmConfigurationStore = DependenciesBridge.shared.disappearingMessagesConfigurationStore
         let dmConfig = dmConfigurationStore.fetchOrBuildDefault(for: .thread(thread), tx: tx)
@@ -385,7 +379,7 @@ extension UnpreparedOutgoingMessage {
             thread: thread,
             messageBody: messageBody,
             expiresInSeconds: dmConfig.durationSeconds,
-            expireTimerVersion: dmConfig.timerVersion
+            expireTimerVersion: dmConfig.timerVersion,
         )
         return .forMessage(builder.build(transaction: tx), body: messageBody)
     }

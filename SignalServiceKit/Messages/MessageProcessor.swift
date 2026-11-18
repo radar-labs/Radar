@@ -8,6 +8,14 @@ import GRDB
 import LibSignalClient
 
 public class MessageProcessor {
+
+    private enum Constants {
+        // We want a value that is just high enough to yield perf benefits.
+        static let incomingMessageBatchLimit = 16
+
+        static let incomingReceiptBatchLimit = 32
+    }
+
     public static let messageProcessorDidDrainQueue = Notification.Name("messageProcessorDidDrainQueue")
 
     private var hasPendingEnvelopes: Bool {
@@ -38,13 +46,13 @@ public class MessageProcessor {
         if stages.contains(.messageProcessor) {
             preconditions.append(NotificationPrecondition(
                 notificationName: Self.messageProcessorDidDrainQueue,
-                isSatisfied: { !self.hasPendingEnvelopes }
+                isSatisfied: { !self.hasPendingEnvelopes },
             ))
         }
         if stages.contains(.groupMessageProcessor) {
             preconditions.append(NotificationPrecondition(
                 notificationName: GroupMessageProcessorManager.didFlushGroupsV2MessageQueue,
-                isSatisfied: { !SSKEnvironment.shared.groupMessageProcessorManagerRef.isProcessing() }
+                isSatisfied: { !SSKEnvironment.shared.groupMessageProcessorManagerRef.isProcessing() },
             ))
         }
         try await Preconditions(preconditions).waitUntilSatisfied()
@@ -55,8 +63,6 @@ public class MessageProcessor {
     public init(appReadiness: AppReadiness) {
         self.appReadiness = appReadiness
 
-        SwiftSingletons.register(self)
-
         appReadiness.runNowOrWhenAppDidBecomeReadySync {
             SSKEnvironment.shared.messagePipelineSupervisorRef.register(pipelineStage: self)
 
@@ -64,7 +70,7 @@ public class MessageProcessor {
                 self,
                 selector: #selector(self.registrationStateDidChange),
                 name: .registrationStateDidChange,
-                object: nil
+                object: nil,
             )
         }
     }
@@ -73,7 +79,7 @@ public class MessageProcessor {
         _ envelopeData: Data,
         serverDeliveryTimestamp: UInt64,
         envelopeSource: EnvelopeSource,
-        completion: @escaping () -> Void
+        completion: @escaping () -> Void,
     ) {
         self.queueForEnqueueing.async {
             self._enqueueReceivedEnvelopeData(
@@ -93,12 +99,18 @@ public class MessageProcessor {
         _ envelopeData: Data,
         serverDeliveryTimestamp: UInt64,
         envelopeSource: EnvelopeSource,
-        completion: @escaping () -> Void
+        completion: @escaping () -> Void,
     ) {
         assertOnQueue(self.queueForEnqueueing)
 
         guard !envelopeData.isEmpty else {
             owsFailDebug("Empty envelope, envelopeSource: \(envelopeSource).")
+            completion()
+            return
+        }
+
+        guard SDS.fitsInInt64(serverDeliveryTimestamp) else {
+            owsFailDebug("Invalid serverDeliveryTimestamp, envelopeSource: \(envelopeSource).")
             completion()
             return
         }
@@ -123,9 +135,9 @@ public class MessageProcessor {
             ReceivedEnvelope(
                 envelope: protoEnvelope,
                 serverDeliveryTimestamp: serverDeliveryTimestamp,
-                completion: completion
+                completion: completion,
             ),
-            envelopeSource: envelopeSource
+            envelopeSource: envelopeSource,
         )
     }
 
@@ -139,9 +151,9 @@ public class MessageProcessor {
     private let queueForEnqueueing = DispatchQueue(label: "org.signal.message-processor-enqueue")
     private let queueForProcessing = DispatchQueue(label: "org.signal.message-processor-process", autoreleaseFrequency: .workItem)
 
-    #if TESTABLE_BUILD
+#if TESTABLE_BUILD
     var serialQueueForTests: DispatchQueue { queueForProcessing }
-    #endif
+#endif
 
     private var pendingEnvelopes = PendingEnvelopes()
 
@@ -157,9 +169,11 @@ public class MessageProcessor {
     }
 
     private func drainPendingEnvelopes() {
-        guard CurrentAppContext().shouldProcessIncomingMessages else { return }
-        guard DependenciesBridge.shared.tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered else { return }
+        let tsAccountManager = DependenciesBridge.shared.tsAccountManager
 
+        guard CurrentAppContext().shouldProcessIncomingMessages else { return }
+        guard tsAccountManager.registrationStateWithMaybeSneakyTransaction.isRegistered else { return }
+        guard tsAccountManager.storedDeviceIdWithMaybeTransaction.ifValid != nil else { return }
         guard SSKEnvironment.shared.messagePipelineSupervisorRef.isMessageProcessingPermitted else { return }
 
         queueForProcessing.async {
@@ -184,14 +198,15 @@ public class MessageProcessor {
             return false
         }
 
-        // We want a value that is just high enough to yield perf benefits.
-        let kIncomingMessageBatchSize = 16
         // If the app is in the background, use batch size of 1.
         // This reduces the risk of us never being able to drain any
         // messages from the queue. We should fine tune this number
         // to yield the best perf we can get.
-        let batchSize = CurrentAppContext().isInBackground() ? 1 : kIncomingMessageBatchSize
-        let batch = pendingEnvelopes.nextBatch(batchSize: batchSize)
+        let batchLimitUpperBound = CurrentAppContext().isInBackground() ? 1 : max(
+            Constants.incomingMessageBatchLimit,
+            Constants.incomingReceiptBatchLimit,
+        )
+        let batch = pendingEnvelopes.nextBatch(batchSize: batchLimitUpperBound)
         let batchEnvelopes = batch.batchEnvelopes
         let pendingEnvelopesCount = batch.pendingEnvelopesCount
 
@@ -206,36 +221,51 @@ public class MessageProcessor {
         var startTime: CFTimeInterval = 0
 
         var processedEnvelopesCount = 0
+
+        var messageCount = 0
+        var receiptCount = 0
+
         SSKEnvironment.shared.databaseStorageRef.write { tx in
             // Start the timer once we acquire a write transaction.
             startTime = CACurrentMediaTime()
 
             // This is only called via `drainPendingEnvelopes`, and that confirms that
-            // we're registered. If we're registered, we must have `LocalIdentifiers`,
-            // so this (generally) shouldn't fail.
-            guard let localIdentifiers = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: tx) else {
+            // we're registered. Consequently, this generally shouldn't fail.
+            let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+            guard let registeredState = try? tsAccountManager.registeredState(tx: tx) else {
                 return
             }
-            let localDeviceId = DependenciesBridge.shared.tsAccountManager.storedDeviceId(tx: tx)
+            guard let localDeviceId = tsAccountManager.storedDeviceId(tx: tx).ifValid else {
+                return
+            }
 
             var remainingEnvelopes = batchEnvelopes[...]
-            while !remainingEnvelopes.isEmpty {
+            while
+                !remainingEnvelopes.isEmpty,
+                messageCount < Constants.incomingMessageBatchLimit,
+                receiptCount < Constants.incomingReceiptBatchLimit
+            {
                 guard SSKEnvironment.shared.messagePipelineSupervisorRef.isMessageProcessingPermitted else {
                     break
                 }
                 autoreleasepool {
                     // If we build a request, we must handle it to ensure it's not lost if we
                     // stop processing envelopes.
-                    let combinedRequest = buildNextCombinedRequest(
+                    let relatedRequests = buildNextCombinedRequest(
                         envelopes: &remainingEnvelopes,
-                        localIdentifiers: localIdentifiers,
+                        localIdentifiers: registeredState.localIdentifiers,
                         localDeviceId: localDeviceId,
-                        tx: tx
+                        tx: tx,
                     )
+                    if relatedRequests.first?.deliveryReceiptMessageTimestamps != nil {
+                        receiptCount += relatedRequests.count
+                    } else {
+                        messageCount += relatedRequests.count
+                    }
                     handle(
-                        combinedRequest: combinedRequest,
-                        localIdentifiers: localIdentifiers,
-                        transaction: tx
+                        relatedRequests: relatedRequests,
+                        registeredState: registeredState,
+                        transaction: tx,
                     )
                 }
             }
@@ -264,34 +294,34 @@ public class MessageProcessor {
     private func buildNextCombinedRequest(
         envelopes: inout ArraySlice<ReceivedEnvelope>,
         localIdentifiers: LocalIdentifiers,
-        localDeviceId: LocalDeviceId,
-        tx: DBWriteTransaction
-    ) -> RelatedProcessingRequests {
-        let result = RelatedProcessingRequests()
+        localDeviceId: DeviceId,
+        tx: DBWriteTransaction,
+    ) -> [ProcessingRequest] {
+        var results = [ProcessingRequest]()
         while let envelope = envelopes.first {
             envelopes.removeFirst()
             let request = processingRequest(
                 for: envelope,
                 localIdentifiers: localIdentifiers,
                 localDeviceId: localDeviceId,
-                tx: tx
+                tx: tx,
             )
-            result.add(request)
+            results.append(request)
             if request.deliveryReceiptMessageTimestamps == nil {
                 // If we hit a non-delivery receipt envelope, handle it immediately to avoid
                 // keeping potentially large decrypted envelopes in memory.
                 break
             }
         }
-        return result
+        return results
     }
 
-    private func handle(combinedRequest: RelatedProcessingRequests, localIdentifiers: LocalIdentifiers, transaction: DBWriteTransaction) {
+    private func handle(relatedRequests: [ProcessingRequest], registeredState: RegisteredState, transaction: DBWriteTransaction) {
         // Efficiently handle delivery receipts for the same message by fetching the sent message only
         // once and only using one updateWith... to update the message with new recipient state.
         BatchingDeliveryReceiptContext.withDeferredUpdates(transaction: transaction) { context in
-            for request in combinedRequest.processingRequests {
-                handleProcessingRequest(request, context: context, localIdentifiers: localIdentifiers, tx: transaction)
+            for request in relatedRequests {
+                handleProcessingRequest(request, context: context, registeredState: registeredState, tx: transaction)
             }
         }
     }
@@ -299,8 +329,8 @@ public class MessageProcessor {
     private func reallyHandleProcessingRequest(
         _ request: ProcessingRequest,
         context: DeliveryReceiptContext,
-        localIdentifiers: LocalIdentifiers,
-        transaction: DBWriteTransaction
+        registeredState: RegisteredState,
+        transaction: DBWriteTransaction,
     ) {
         switch request.state {
         case .completed(error: let error):
@@ -310,11 +340,11 @@ public class MessageProcessor {
                 envelope: decryptedEnvelope,
                 envelopeData: envelopeData,
                 serverDeliveryTimestamp: request.receivedEnvelope.serverDeliveryTimestamp,
-                tx: transaction
+                tx: transaction,
             )
             SSKEnvironment.shared.messageReceiverRef.finishProcessingEnvelope(decryptedEnvelope, tx: transaction)
         case .messageReceiverRequest(let messageReceiverRequest):
-            SSKEnvironment.shared.messageReceiverRef.handleRequest(messageReceiverRequest, context: context, localIdentifiers: localIdentifiers, tx: transaction)
+            SSKEnvironment.shared.messageReceiverRef.handleRequest(messageReceiverRequest, context: context, registeredState: registeredState, tx: transaction)
             SSKEnvironment.shared.messageReceiverRef.finishProcessingEnvelope(messageReceiverRequest.decryptedEnvelope, tx: transaction)
         case .clearPlaceholdersOnly(let decryptedEnvelope):
             SSKEnvironment.shared.messageReceiverRef.finishProcessingEnvelope(decryptedEnvelope, tx: transaction)
@@ -326,10 +356,10 @@ public class MessageProcessor {
     private func handleProcessingRequest(
         _ request: ProcessingRequest,
         context: DeliveryReceiptContext,
-        localIdentifiers: LocalIdentifiers,
-        tx: DBWriteTransaction
+        registeredState: RegisteredState,
+        tx: DBWriteTransaction,
     ) {
-        reallyHandleProcessingRequest(request, context: context, localIdentifiers: localIdentifiers, transaction: tx)
+        reallyHandleProcessingRequest(request, context: context, registeredState: registeredState, transaction: tx)
         tx.addSyncCompletion { request.receivedEnvelope.completion() }
     }
 
@@ -378,18 +408,10 @@ private struct ProcessingRequest {
     }
 }
 
-private class RelatedProcessingRequests {
-    private(set) var processingRequests = [ProcessingRequest]()
-
-    func add(_ processingRequest: ProcessingRequest) {
-        processingRequests.append(processingRequest)
-    }
-}
-
 private struct ProcessingRequestBuilder {
     let receivedEnvelope: ReceivedEnvelope
     let blockingManager: BlockingManager
-    let localDeviceId: LocalDeviceId
+    let localDeviceId: DeviceId
     let localIdentifiers: LocalIdentifiers
     let messageDecrypter: OWSMessageDecrypter
     let messageReceiver: MessageReceiver
@@ -397,10 +419,10 @@ private struct ProcessingRequestBuilder {
     init(
         _ receivedEnvelope: ReceivedEnvelope,
         blockingManager: BlockingManager,
-        localDeviceId: LocalDeviceId,
+        localDeviceId: DeviceId,
         localIdentifiers: LocalIdentifiers,
         messageDecrypter: OWSMessageDecrypter,
-        messageReceiver: MessageReceiver
+        messageReceiver: MessageReceiver,
     ) {
         self.receivedEnvelope = receivedEnvelope
         self.blockingManager = blockingManager
@@ -416,7 +438,7 @@ private struct ProcessingRequestBuilder {
                 messageDecrypter: messageDecrypter,
                 localIdentifiers: localIdentifiers,
                 localDeviceId: localDeviceId,
-                tx: tx
+                tx: tx,
             )
             switch decryptionResult {
             case .serverReceipt(let receiptEnvelope):
@@ -437,7 +459,7 @@ private struct ProcessingRequestBuilder {
 
     private func processingStep(
         for decryptedEnvelope: DecryptedIncomingEnvelope,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> ProcessingStep {
         guard
             let contentProto = decryptedEnvelope.content,
@@ -447,10 +469,12 @@ private struct ProcessingRequestBuilder {
             return .processNow(shouldDiscardVisibleMessages: false)
         }
 
-        guard GroupMessageProcessorManager.canContextBeProcessedImmediately(
-            groupContext: groupContextV2,
-            tx: tx
-        ) else {
+        guard
+            GroupMessageProcessorManager.canContextBeProcessedImmediately(
+                groupContext: groupContextV2,
+                tx: tx,
+            )
+        else {
             // Some v2 group messages required group state to be
             // updated before they can be processed.
             return .enqueueForGroupProcessing
@@ -458,7 +482,7 @@ private struct ProcessingRequestBuilder {
         let discardMode = SpecificGroupMessageProcessor.discardMode(
             forMessageFrom: decryptedEnvelope.sourceAci,
             groupContext: groupContextV2,
-            tx: tx
+            tx: tx,
         )
         switch discardMode {
         case .discard:
@@ -475,7 +499,7 @@ private struct ProcessingRequestBuilder {
 
     private func processingRequest(
         for decryptedEnvelope: DecryptedIncomingEnvelope,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) -> ProcessingRequest.State {
         owsPrecondition(CurrentAppContext().shouldProcessIncomingMessages)
 
@@ -532,7 +556,7 @@ private struct ProcessingRequestBuilder {
                 for: decryptedEnvelope,
                 serverDeliveryTimestamp: receivedEnvelope.serverDeliveryTimestamp,
                 shouldDiscardVisibleMessages: shouldDiscardVisibleMessages,
-                tx: tx
+                tx: tx,
             )
 
             switch buildResult {
@@ -551,8 +575,8 @@ private extension MessageProcessor {
     func processingRequest(
         for envelope: ReceivedEnvelope,
         localIdentifiers: LocalIdentifiers,
-        localDeviceId: LocalDeviceId,
-        tx: DBWriteTransaction
+        localDeviceId: DeviceId,
+        tx: DBWriteTransaction,
     ) -> ProcessingRequest {
         assertOnQueue(queueForProcessing)
         if let serverGuid = ValidatedIncomingEnvelope.parseServerGuid(fromEnvelope: envelope.envelope), recentlyProcessedGuids.contains(serverGuid) {
@@ -564,7 +588,7 @@ private extension MessageProcessor {
             localDeviceId: localDeviceId,
             localIdentifiers: localIdentifiers,
             messageDecrypter: SSKEnvironment.shared.messageDecrypterRef,
-            messageReceiver: SSKEnvironment.shared.messageReceiverRef
+            messageReceiver: SSKEnvironment.shared.messageReceiverRef,
         )
         return ProcessingRequest(envelope, state: builder.build(tx: tx))
     }
@@ -593,8 +617,8 @@ private struct ReceivedEnvelope {
     func decryptIfNeeded(
         messageDecrypter: OWSMessageDecrypter,
         localIdentifiers: LocalIdentifiers,
-        localDeviceId: LocalDeviceId,
-        tx: DBWriteTransaction
+        localDeviceId: DeviceId,
+        tx: DBWriteTransaction,
     ) throws -> DecryptionResult {
         // Figure out what type of envelope we're dealing with.
         let validatedEnvelope = try ValidatedIncomingEnvelope(envelope, localIdentifiers: localIdentifiers)
@@ -605,14 +629,21 @@ private struct ReceivedEnvelope {
         case .identifiedSender(let cipherType):
             return .decryptedMessage(
                 try messageDecrypter.decryptIdentifiedEnvelope(
-                    validatedEnvelope, cipherType: cipherType, localIdentifiers: localIdentifiers, tx: tx
-                )
+                    validatedEnvelope,
+                    cipherType: cipherType,
+                    localIdentifiers: localIdentifiers,
+                    localDeviceId: localDeviceId,
+                    tx: tx,
+                ),
             )
         case .unidentifiedSender:
             return .decryptedMessage(
                 try messageDecrypter.decryptUnidentifiedSenderEnvelope(
-                    validatedEnvelope, localIdentifiers: localIdentifiers, localDeviceId: localDeviceId, tx: tx
-                )
+                    validatedEnvelope,
+                    localIdentifiers: localIdentifiers,
+                    localDeviceId: localDeviceId,
+                    tx: tx,
+                ),
             )
         }
     }
@@ -651,7 +682,7 @@ private class PendingEnvelopes {
         unfairLock.withLock {
             Batch(
                 batchEnvelopes: Array(pendingEnvelopes.prefix(batchSize)),
-                pendingEnvelopesCount: pendingEnvelopes.count
+                pendingEnvelopesCount: pendingEnvelopes.count,
             )
         }
     }

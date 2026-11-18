@@ -5,20 +5,20 @@
 
 import Foundation
 
-public final class OWSSyncContactsMessage: OWSOutgoingSyncMessage {
+public final class OWSSyncContactsMessage: OutgoingSyncMessage {
 
     private let uploadedAttachment: Upload.Result<Upload.LocalUploadMetadata>
 
     public init(
         uploadedAttachment: Upload.Result<Upload.LocalUploadMetadata>,
         localThread: TSContactThread,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) {
         self.uploadedAttachment = uploadedAttachment
-        super.init(localThread: localThread, transaction: tx)
+        super.init(localThread: localThread, tx: tx)
     }
 
-    public override func encode(with coder: NSCoder!) {
+    override public func encode(with coder: NSCoder) {
         owsFail("Doesn't support serialization.")
     }
 
@@ -27,13 +27,9 @@ public final class OWSSyncContactsMessage: OWSOutgoingSyncMessage {
         return nil
     }
 
-    required init(dictionary dictionaryValue: [String: Any]!) throws {
-        throw OWSAssertionError("Doesn't support serialization.")
-    }
+    override public var isUrgent: Bool { false }
 
-    public override var isUrgent: Bool { false }
-
-    public override func syncMessageBuilder(transaction tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
+    override public func syncMessageBuilder(tx: DBReadTransaction) -> SSKProtoSyncMessageBuilder? {
 
         let attachmentBuilder = SSKProtoAttachmentPointer.builder()
 

@@ -5,105 +5,28 @@
 
 import Foundation
 
-public enum BackupAttachmentUploadEnqueueMode: Equatable {
-    case fullsizeOnly
-    case thumbnailOnly
-    case fullsizeAndThumbnailAsNeeded
-}
+public struct BackupAttachmentUploadEnqueueMode: OptionSet {
+    public let rawValue: Int
 
-public protocol BackupAttachmentUploadScheduler {
-
-    /// Returns true if the provided attachment is eligible to be uploaded
-    /// to backup/media tier, independently of the current backupPlan state.
-    ///
-    /// - parameter fullsize: true to check eligibility to upload fullsize,
-    /// false to check eligibility to upload the thumbnail.
-    func isEligibleToUpload(
-        _ attachment: Attachment,
-        fullsize: Bool,
-        currentUploadEra: String,
-        tx: DBReadTransaction
-    ) -> Bool
-
-    /// "Enqueue" an attachment from a backup for upload, if needed and eligible, otherwise do nothing.
-    ///
-    /// Fetches all attachment owners and uses the highest priority one available.
-    ///
-    /// Doesn't actually trigger an upload; callers must later call
-    /// ``BackupAttachmentUploadQueueRunner.backUpAllAttachments()`` to upload.
-    func enqueueUsingHighestPriorityOwnerIfNeeded(
-        _ attachment: Attachment,
-        mode: BackupAttachmentUploadEnqueueMode,
-        tx: DBWriteTransaction,
-        file: StaticString?,
-        function: StaticString?,
-        line: UInt?
-    ) throws
-
-    /// "Enqueue" an attachment from a backup for upload, if needed and eligible via the provided
-    /// owner, otherwise do nothing.
-    ///
-    /// The attachment may or may not already be enqueued for upload using via other owners;
-    /// if so the provided owner (if eligible) may increase the priority.
-    ///
-    /// Doesn't actually trigger an upload; callers must later call
-    /// ``BackupAttachmentUploadQueueRunner.backUpAllAttachments()`` to upload.
-    func enqueueIfNeededWithOwner(
-        _ attachment: Attachment,
-        owner: AttachmentReference.Owner,
-        tx: DBWriteTransaction,
-        file: StaticString?,
-        function: StaticString?,
-        line: UInt?
-    ) throws
-}
-
-extension BackupAttachmentUploadScheduler {
-
-    public func enqueueUsingHighestPriorityOwnerIfNeeded(
-        _ attachment: Attachment,
-        mode: BackupAttachmentUploadEnqueueMode = .fullsizeAndThumbnailAsNeeded,
-        tx: DBWriteTransaction,
-        file: StaticString? = #file,
-        function: StaticString? = #function,
-        line: UInt? = #line
-    ) throws {
-        try enqueueUsingHighestPriorityOwnerIfNeeded(
-            attachment,
-            mode: mode,
-            tx: tx,
-            file: file,
-            function: function,
-            line: line
-        )
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
     }
 
-    func enqueueIfNeededWithOwner(
-        _ attachment: Attachment,
-        owner: AttachmentReference.Owner,
-        tx: DBWriteTransaction,
-        file: StaticString? = #file,
-        function: StaticString? = #function,
-        line: UInt? = #line
-    ) throws {
-        try enqueueIfNeededWithOwner(
-            attachment,
-            owner: owner,
-            tx: tx,
-            file: file,
-            function: function,
-            line: line
-        )
-    }
+    public static let fullsize = Self(rawValue: 1 << 0)
+    public static let thumbnail = Self(rawValue: 1 << 1)
+
+    static let all: BackupAttachmentUploadEnqueueMode = [.fullsize, .thumbnail]
 }
 
-public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadScheduler {
+public class BackupAttachmentUploadScheduler {
 
     private let attachmentStore: AttachmentStore
     private let backupAttachmentUploadStore: BackupAttachmentUploadStore
     private let backupAttachmentUploadEraStore: BackupAttachmentUploadEraStore
     private let dateProvider: DateProvider
     private let interactionStore: InteractionStore
+    private let remoteConfigProvider: any RemoteConfigProvider
+    private let tsAccountManager: TSAccountManager
 
     public init(
         attachmentStore: AttachmentStore,
@@ -111,49 +34,72 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
         backupAttachmentUploadEraStore: BackupAttachmentUploadEraStore,
         dateProvider: @escaping DateProvider,
         interactionStore: InteractionStore,
+        remoteConfigProvider: any RemoteConfigProvider,
+        tsAccountManager: TSAccountManager,
     ) {
         self.attachmentStore = attachmentStore
         self.backupAttachmentUploadStore = backupAttachmentUploadStore
         self.backupAttachmentUploadEraStore = backupAttachmentUploadEraStore
         self.dateProvider = dateProvider
         self.interactionStore = interactionStore
+        self.remoteConfigProvider = remoteConfigProvider
+        self.tsAccountManager = tsAccountManager
     }
 
+    /// Returns true if the provided attachment is eligible to be uploaded
+    /// to backup/media tier, independently of the current backupPlan state.
+    ///
+    /// - parameter mode: OptionSet instructing what eligibility type to check
     public func isEligibleToUpload(
         _ attachment: Attachment,
-        fullsize: Bool,
+        mode: BackupAttachmentUploadEnqueueMode,
         currentUploadEra: String,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> Bool {
-        guard let stream = attachment.asStream() else {
-            return false
-        }
-        let eligibility = Eligibility(
-            stream,
-            currentUploadEra: currentUploadEra
-        )
-        if fullsize, !eligibility.needsUploadFullsize {
-            return false
-        }
-        if !fullsize, !eligibility.needsUploadThumbnail {
+        guard
+            tsAccountManager.registrationState(tx: tx).isRegisteredPrimaryDevice,
+            let stream = attachment.asStream()
+        else {
             return false
         }
 
-        let highestPriorityEligibleOwner = try? self.highestPriorityEligibleOwner(
+        let eligibility = Eligibility.forAttachment(
+            stream,
+            currentUploadEra: currentUploadEra,
+            remoteConfig: remoteConfigProvider.currentConfig(),
+        )
+        if mode.contains(.fullsize), !eligibility.needsUploadFullsize {
+            return false
+        }
+        if mode.contains(.thumbnail), !eligibility.needsUploadThumbnail {
+            return false
+        }
+
+        let highestPriorityEligibleOwner = self.highestPriorityEligibleOwner(
             attachment,
-            tx: tx
+            tx: tx,
         )
         return highestPriorityEligibleOwner != nil
     }
 
+    /// "Enqueue" an attachment from a backup for upload, if needed and eligible, otherwise do nothing.
+    ///
+    /// Fetches all attachment owners and uses the highest priority one available.
+    ///
+    /// Doesn't actually trigger an upload; callers must later call
+    /// ``BackupAttachmentUploadQueueRunner.backUpAllAttachments()`` to upload.
     public func enqueueUsingHighestPriorityOwnerIfNeeded(
         _ attachment: Attachment,
         mode: BackupAttachmentUploadEnqueueMode,
         tx: DBWriteTransaction,
         file: StaticString? = #file,
         function: StaticString? = #function,
-        line: UInt? = #line
-    ) throws {
+        line: UInt? = #line,
+    ) {
+        guard tsAccountManager.registrationState(tx: tx).isRegisteredPrimaryDevice else {
+            return
+        }
+
         // Before we fetch references, check if the attachment is
         // eligible to begin with.
         guard let stream = attachment.asStream() else {
@@ -165,9 +111,10 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
 
         let currentUploadEra = backupAttachmentUploadEraStore.currentUploadEra(tx: tx)
 
-        let eligibility = Eligibility(
+        let eligibility = Eligibility.forAttachment(
             stream,
-            currentUploadEra: currentUploadEra
+            currentUploadEra: currentUploadEra,
+            remoteConfig: remoteConfigProvider.currentConfig(),
         )
         guard eligibility.needsUploadFullsize || eligibility.needsUploadThumbnail else {
             if let file, let function, let line {
@@ -177,7 +124,7 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
         }
 
         guard
-            let uploadOwnerType = try highestPriorityEligibleOwner(attachment, tx: tx)
+            let uploadOwnerType = highestPriorityEligibleOwner(attachment, tx: tx)
         else {
             if let file, let function, let line {
                 Logger.info("No eligible owners; skipping enqueue of \(attachment.id) from \(file) \(line): \(function)")
@@ -185,31 +132,31 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
             return
         }
 
-        if mode != .thumbnailOnly {
+        if mode.contains(.fullsize) {
             if eligibility.needsUploadFullsize {
-                try backupAttachmentUploadStore.enqueue(
+                backupAttachmentUploadStore.enqueue(
                     stream,
                     owner: uploadOwnerType,
                     fullsize: true,
                     tx: tx,
                     file: file,
                     function: function,
-                    line: line
+                    line: line,
                 )
             } else if let file, let function, let line {
                 Logger.info("Skipping enqueue of fullsize \(attachment.id) from \(file) \(line): \(function)")
             }
         }
-        if mode != .fullsizeOnly {
+        if mode.contains(.thumbnail) {
             if eligibility.needsUploadThumbnail {
-                try backupAttachmentUploadStore.enqueue(
+                backupAttachmentUploadStore.enqueue(
                     stream,
                     owner: uploadOwnerType,
                     fullsize: false,
                     tx: tx,
                     file: file,
                     function: function,
-                    line: line
+                    line: line,
                 )
             } else if let file, let function, let line {
                 Logger.info("Skipping enqueue of thumbnail \(attachment.id) from \(file) \(line): \(function)")
@@ -217,14 +164,26 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
         }
     }
 
+    /// "Enqueue" an attachment from a backup for upload, if needed and eligible via the provided
+    /// owner, otherwise do nothing.
+    ///
+    /// The attachment may or may not already be enqueued for upload using via other owners;
+    /// if so the provided owner (if eligible) may increase the priority.
+    ///
+    /// Doesn't actually trigger an upload; callers must later call
+    /// ``BackupAttachmentUploadQueueRunner.backUpAllAttachments()`` to upload.
     public func enqueueIfNeededWithOwner(
         _ attachment: Attachment,
         owner: AttachmentReference.Owner,
         tx: DBWriteTransaction,
         file: StaticString? = #file,
         function: StaticString? = #function,
-        line: UInt? = #line
-    ) throws {
+        line: UInt? = #line,
+    ) {
+        guard tsAccountManager.registrationState(tx: tx).isRegisteredPrimaryDevice else {
+            return
+        }
+
         guard let stream = attachment.asStream() else {
             if let file, let function, let line {
                 Logger.info("Skipping enqueue of non-stream \(attachment.id) from \(file) \(line): \(function)")
@@ -234,9 +193,10 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
 
         let currentUploadEra = backupAttachmentUploadEraStore.currentUploadEra(tx: tx)
 
-        let eligibility = Eligibility(
+        let eligibility = Eligibility.forAttachment(
             stream,
-            currentUploadEra: currentUploadEra
+            currentUploadEra: currentUploadEra,
+            remoteConfig: remoteConfigProvider.currentConfig(),
         )
         guard eligibility.needsUploadFullsize || eligibility.needsUploadThumbnail else {
             if let file, let function, let line {
@@ -253,44 +213,47 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
             if let file, let function, let line {
                 Logger.info(
                     "Passed in owner not eligible (may be eligible with other owners);"
-                    + " skipping enqueue of \(attachment.id) from \(file) \(line): \(function)"
+                        + " skipping enqueue of \(attachment.id) from \(file) \(line): \(function)",
                 )
             }
             return
         }
 
         if eligibility.needsUploadFullsize {
-            try backupAttachmentUploadStore.enqueue(
+            backupAttachmentUploadStore.enqueue(
                 stream,
                 owner: uploadOwnerType,
                 fullsize: true,
-                tx: tx
+                tx: tx,
             )
         } else if let file, let function, let line {
             Logger.info("Skipping enqueue of fullsize \(attachment.id) from \(file) \(line): \(function)")
         }
         if eligibility.needsUploadThumbnail {
-            try backupAttachmentUploadStore.enqueue(
+            backupAttachmentUploadStore.enqueue(
                 stream,
                 owner: uploadOwnerType,
                 fullsize: false,
-                tx: tx
+                tx: tx,
             )
         } else if let file, let function, let line {
             Logger.info("Skipping enqueue of thumbnail \(attachment.id) from \(file) \(line): \(function)")
         }
     }
 
+    // MARK: - Eligibility
+
     private struct Eligibility {
         let needsUploadFullsize: Bool
         let needsUploadThumbnail: Bool
 
-        init(
+        static func forAttachment(
             _ attachment: AttachmentStream,
-            currentUploadEra: String
-        ) {
-            self.needsUploadFullsize = {
-                if attachment.encryptedByteCount > OWSMediaUtils.kMaxAttachmentUploadSizeBytes {
+            currentUploadEra: String,
+            remoteConfig: RemoteConfig,
+        ) -> Self {
+            let needsUploadFullsize = { () -> Bool in
+                if attachment.encryptedByteCount > remoteConfig.backupAttachmentMaxEncryptedBytes {
                     Logger.info("Skipping upload of too-large attachment \(attachment.id), \(attachment.encryptedByteCount) bytes")
                     return false
                 }
@@ -300,40 +263,44 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
                     return true
                 }
             }()
-            self.needsUploadThumbnail = {
+            let needsUploadThumbnail = { () -> Bool in
                 if let thumbnailMediaTierInfo = attachment.attachment.thumbnailMediaTierInfo {
                     return !thumbnailMediaTierInfo.isUploaded(currentUploadEra: currentUploadEra)
                 } else {
                     return AttachmentBackupThumbnail.canBeThumbnailed(attachment.attachment)
                 }
             }()
+            return Self(
+                needsUploadFullsize: needsUploadFullsize,
+                needsUploadThumbnail: needsUploadThumbnail,
+            )
         }
     }
 
     private func asEligibleUploadOwnerType(
         _ owner: AttachmentReference.Owner,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> QueuedBackupAttachmentUpload.OwnerType? {
         switch owner {
         case .message(let messageSource):
-            switch messageSource.rawMessageOwnerType {
+            switch messageSource {
             case .oversizeText:
                 // We inline oversize text in the backup, and don't back
                 // up the corresponding attachment.
                 return nil
             case
-                    .bodyAttachment,
-                    .contactAvatar,
-                    .linkPreview,
-                    .quotedReplyAttachment,
-                    .sticker:
+                .bodyAttachment,
+                .contactAvatar,
+                .linkPreview,
+                .quotedReply,
+                .sticker:
                 break
             }
 
             guard
                 let message = interactionStore.fetchInteraction(
                     rowId: messageSource.messageRowId,
-                    tx: tx
+                    tx: tx,
                 ) as? TSMessage
             else {
                 owsFailDebug("Missing message!")
@@ -343,13 +310,11 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
             // attachment for it in a remote backup. If we wouldn't, that
             // reference shouldn't be used as the anchor for upload (and if
             // it is the only reference, we shouldn't upload at all!)
-            let includedContentFilter = BackupArchive.IncludedContentFilter(
-                backupPurpose: .remoteBackup
-            )
+            let includedContentFilter = BackupArchive.IncludedContentFilter.remoteBackup
             if
                 includedContentFilter.shouldSkipAttachment(
                     owningMessage: message,
-                    currentTimestamp: dateProvider().ows_millisecondsSince1970
+                    currentTimestamp: dateProvider().ows_millisecondsSince1970,
                 )
             {
                 return nil
@@ -367,31 +332,52 @@ public class BackupAttachmentUploadSchedulerImpl: BackupAttachmentUploadSchedule
 
     private func highestPriorityEligibleOwner(
         _ attachment: Attachment,
-        tx: DBReadTransaction
-    ) throws -> QueuedBackupAttachmentUpload.OwnerType? {
+        tx: DBReadTransaction,
+    ) -> QueuedBackupAttachmentUpload.OwnerType? {
+        var ineligibleOwners = [AttachmentReference.Owner]()
+        var eligibleOwner: AttachmentReference.Owner?
+
         // Backup uploads are prioritized by attachment owner. Find the highest
         // priority owner to use.
         var uploadOwnerType: QueuedBackupAttachmentUpload.OwnerType?
-        try attachmentStore.enumerateAllReferences(
+        attachmentStore.enumerateAllReferences(
             toAttachmentId: attachment.id,
-            tx: tx
+            tx: tx,
         ) { reference, _ in
             guard
                 let ownerType = self.asEligibleUploadOwnerType(
                     reference.owner,
-                    tx: tx
+                    tx: tx,
                 )
             else {
+                ineligibleOwners.append(reference.owner)
                 return
             }
             if uploadOwnerType?.isHigherPriority(than: ownerType) != true {
+                eligibleOwner = reference.owner
                 uploadOwnerType = ownerType
             }
+        }
+
+        // If an eligible owner was found, and an ineligible owner also exists,
+        // log this info for debugging
+        if ineligibleOwners.isEmpty == false, let eligibleOwner {
+            func debugString(_ type: AttachmentReference.Owner) -> String {
+                return switch type {
+                case .message: "message"
+                case .thread: "thread"
+                case .storyMessage: "story"
+                }
+            }
+            Logger.info("Attachment \(attachment.id): eligible owner: \(debugString(eligibleOwner)) [\(eligibleOwner.id)]")
+            ineligibleOwners.forEach { Logger.info("Attachment \(attachment.id): inegible owner: \(debugString($0)) [\($0.id)]") }
         }
 
         return uploadOwnerType
     }
 }
+
+// MARK: -
 
 extension Attachment.MediaTierInfo {
 
@@ -407,45 +393,3 @@ extension Attachment.ThumbnailMediaTierInfo {
             && cdnNumber != nil
     }
 }
-
-#if TESTABLE_BUILD
-
-open class BackupAttachmentUploadSchedulerMock: BackupAttachmentUploadScheduler {
-
-    public init() {}
-
-    public func isEligibleToUpload(
-        _ attachment: Attachment,
-        fullsize: Bool,
-        currentUploadEra: String,
-        tx: DBReadTransaction
-    ) -> Bool {
-        return false
-    }
-
-    var enqueuedAttachmentIds = [Attachment.IDType]()
-
-    public func enqueueUsingHighestPriorityOwnerIfNeeded(
-        _ attachment: Attachment,
-        mode: BackupAttachmentUploadEnqueueMode,
-        tx: DBWriteTransaction,
-        file: StaticString?,
-        function: StaticString?,
-        line: UInt?
-    ) throws {
-        enqueuedAttachmentIds.append(attachment.id)
-    }
-
-    public func enqueueIfNeededWithOwner(
-        _ attachment: Attachment,
-        owner: AttachmentReference.Owner,
-        tx: DBWriteTransaction,
-        file: StaticString?,
-        function: StaticString?,
-        line: UInt?
-    ) throws {
-        // Do nothing
-    }
-}
-
-#endif

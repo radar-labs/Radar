@@ -6,13 +6,15 @@ on:
 
 jobs:
   stale:
+    # Radar: upstream Signal workflow, gated to signalapp repositories.
+    if: ${{ github.repository_owner == 'signalapp' }}
     permissions:
       issues: write
       pull-requests: write
 
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/stale@v9
+    - uses: actions/stale@v10
       with:
         stale-issue-message: >
           This issue has been automatically marked as stale because it has not had

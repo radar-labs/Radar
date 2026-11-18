@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import LibSignalClient
 public import GRDB
+public import LibSignalClient
 
 @objc
 public class DBReadTransaction: NSObject {
@@ -43,7 +43,7 @@ public class DBWriteTransaction: DBReadTransaction, LibSignalClient.StoreContext
     deinit {
         owsAssertDebug(
             transactionState == .finalized,
-            "Write transaction deallocated without finalization!"
+            "Write transaction deallocated without finalization!",
         )
     }
 

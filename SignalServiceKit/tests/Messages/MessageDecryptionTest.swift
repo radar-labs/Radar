@@ -3,14 +3,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
+import LibSignalClient
 import XCTest
 @testable import SignalServiceKit
-import LibSignalClient
 
 class MessageDecryptionTest: SSKBaseTest {
-    let localE164Identifier = "+13235551234"
-    let localAci = UUID()
-    let localPni = UUID()
+    let localIdentifiers = LocalIdentifiers.forUnitTests
 
     let remoteE164Identifier = "+14715355555"
     lazy var remoteClient: TestSignalClient = FakeSignalClient.generate(e164Identifier: remoteE164Identifier)
@@ -20,10 +18,6 @@ class MessageDecryptionTest: SSKBaseTest {
     let runner = TestProtocolRunner()
 
     let sealedSenderTrustRoot = IdentityKeyPair.generate()
-
-    private var fakeMessageSender: FakeMessageSender {
-        SSKEnvironment.shared.messageSenderRef as! FakeMessageSender
-    }
 
     // MARK: - Hooks
 
@@ -36,12 +30,8 @@ class MessageDecryptionTest: SSKBaseTest {
         identityManager.generateAndPersistNewIdentityKey(for: .pni)
         SSKEnvironment.shared.databaseStorageRef.write { tx in
             (DependenciesBridge.shared.registrationStateChangeManager as! RegistrationStateChangeManagerImpl).registerForTests(
-                localIdentifiers: .init(
-                    aci: .init(fromUUID: localAci),
-                    pni: .init(fromUUID: localPni),
-                    e164: .init(localE164Identifier)!
-                ),
-                tx: tx
+                localIdentifiers: localIdentifiers,
+                tx: tx,
             )
 
             DependenciesBridge.shared.tsAccountManager.setRegistrationId(RegistrationIdGenerator.generate(), for: .aci, tx: tx)
@@ -62,7 +52,7 @@ class MessageDecryptionTest: SSKBaseTest {
         destinationServiceId: ServiceId? = nil,
         hasSignedPreKey: Bool = true,
         hasOneTimePreKey: Bool = true,
-        handleResult: (Result<DecryptedIncomingEnvelope, Error>, SSKProtoEnvelope) -> Void
+        handleResult: (Result<DecryptedIncomingEnvelope, Error>, SSKProtoEnvelope) -> Void,
     ) {
         write { transaction in
             let localClient: TestSignalClient
@@ -70,10 +60,10 @@ class MessageDecryptionTest: SSKBaseTest {
             switch destinationIdentity {
             case .aci:
                 localClient = self.localClient
-                localDestinationServiceId = Aci(fromUUID: localAci)
+                localDestinationServiceId = localIdentifiers.aci
             case .pni:
                 localClient = self.localPniClient
-                localDestinationServiceId = Pni(fromUUID: localPni)
+                localDestinationServiceId = localIdentifiers.pni!
             }
 
             switch type {
@@ -104,10 +94,12 @@ class MessageDecryptionTest: SSKBaseTest {
             contentProto.dataMessage.timestamp = timestamp
             contentProto.dataMessage.body = message
 
-            let ciphertext = try! runner.encrypt(try! contentProto.serializedData().paddedMessageBody,
-                                                 senderClient: remoteClient,
-                                                 recipient: localClient.protocolAddress,
-                                                 context: transaction)
+            let ciphertext = try! runner.encrypt(
+                try! contentProto.serializedData().paddedMessageBody,
+                senderClient: remoteClient,
+                recipient: localClient.protocolAddress,
+                context: transaction,
+            )
 
             let envelopeBuilder = SSKProtoEnvelope.builder(timestamp: timestamp)
             envelopeBuilder.setType(type)
@@ -120,14 +112,17 @@ class MessageDecryptionTest: SSKBaseTest {
                     senderAddress: try! SealedSenderAddress(
                         e164: remoteClient.e164Identifier,
                         aci: remoteClient.serviceId as! Aci,
-                        deviceId: remoteClient.deviceId
+                        deviceId: remoteClient.deviceId,
                     ),
                     identityKey: remoteClient.identityKeyPair.identityKeyPair.publicKey,
-                    expirationTimestamp: 13337)
-                let usmc = try! UnidentifiedSenderMessageContent(ciphertext,
-                                                                 from: senderCert,
-                                                                 contentHint: .default,
-                                                                 groupId: [])
+                    expirationTimestamp: 13337,
+                )
+                let usmc = try! UnidentifiedSenderMessageContent(
+                    ciphertext,
+                    from: senderCert,
+                    contentHint: .default,
+                    groupId: [],
+                )
                 envelopeBuilder.setContent(try! sealedSenderEncrypt(
                     usmc,
                     for: localClient.protocolAddress,
@@ -144,6 +139,7 @@ class MessageDecryptionTest: SSKBaseTest {
             let envelope = try! envelopeBuilder.build()
 
             let localIdentifiers = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: transaction)!
+            let localDeviceId = DependenciesBridge.shared.tsAccountManager.storedDeviceId(tx: transaction).ifValid!
             let decryptedEnvelope: Result<DecryptedIncomingEnvelope, Error> = Result {
                 let validatedEnvelope = try ValidatedIncomingEnvelope(envelope, localIdentifiers: localIdentifiers)
                 switch validatedEnvelope.kind {
@@ -153,15 +149,16 @@ class MessageDecryptionTest: SSKBaseTest {
                     return try SSKEnvironment.shared.messageDecrypterRef.decryptUnidentifiedSenderEnvelope(
                         validatedEnvelope,
                         localIdentifiers: localIdentifiers,
-                        localDeviceId: DependenciesBridge.shared.tsAccountManager.storedDeviceId(tx: transaction),
-                        tx: transaction
+                        localDeviceId: localDeviceId,
+                        tx: transaction,
                     )
                 case .identifiedSender(let cipherType):
                     return try SSKEnvironment.shared.messageDecrypterRef.decryptIdentifiedEnvelope(
                         validatedEnvelope,
                         cipherType: cipherType,
                         localIdentifiers: localIdentifiers,
-                        tx: transaction
+                        localDeviceId: localDeviceId,
+                        tx: transaction,
                     )
                 }
             }
@@ -271,7 +268,7 @@ class MessageDecryptionTest: SSKBaseTest {
 
         fakeMessageSender.stubbedFailingErrors = [nil]
         fakeMessageSender.sendMessageWasCalledBlock = { message in
-            guard let resendRequest = message as? OWSOutgoingResendRequest else {
+            guard let resendRequest = message as? OutgoingResendRequest else {
                 return
             }
             self.fakeMessageSender.sendMessageWasCalledBlock = nil
@@ -287,8 +284,12 @@ class MessageDecryptionTest: SSKBaseTest {
     }
 
     private func checkRemoteRatchetKey(expected: PublicKey) {
-        guard let session = try! remoteClient.sessionStore.loadSession(for: localClient.protocolAddress,
-                                                                       context: NullContext()) else {
+        guard
+            let session = try! remoteClient.sessionStore.loadSession(
+                for: localClient.protocolAddress,
+                context: NullContext(),
+            )
+        else {
             XCTFail("no session established")
             return
         }

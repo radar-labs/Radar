@@ -12,7 +12,7 @@ class MediaDismissAnimationController: NSObject {
 
     var transitionView: UIView?
     var fromMediaFrame: CGRect?
-    var pendingCompletion: ((CGVector?) -> Void)?
+    var pendingCompletion: (() -> Void)?
 
     init(galleryItem: MediaGalleryItem, interactionController: MediaInteractiveDismiss) {
         self.item = .gallery(galleryItem)
@@ -26,13 +26,17 @@ class MediaDismissAnimationController: NSObject {
 }
 
 extension MediaDismissAnimationController: UIViewControllerAnimatedTransitioning {
+
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return kIsDebuggingMediaPresentationAnimations ? 2.5 : 0.25
+        return MediaPresentationContext.animationDuration
     }
 
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+
         let containerView = transitionContext.containerView
-        let isTransitionInteractive = transitionContext.isInteractive
+
+        // Bunch of checks to ensure everything is set up for the animated transition.
+        // If there's anything wrong the transition would complete without animation.
 
         guard let fromVC = transitionContext.viewController(forKey: .from) else {
             owsFailDebug("fromVC was unexpectedly nil")
@@ -73,7 +77,7 @@ extension MediaDismissAnimationController: UIViewControllerAnimatedTransitioning
         // toView will be nil if doing a modal dismiss, in which case we don't want to add the view -
         // it's already in the view hierarchy, behind the VC we're dismissing.
         if let toView = transitionContext.view(forKey: .to) {
-            containerView.insertSubview(toView, at: 0)
+            containerView.addSubview(toView)
         }
 
         guard let fromView = transitionContext.view(forKey: .from) else {
@@ -93,9 +97,12 @@ extension MediaDismissAnimationController: UIViewControllerAnimatedTransitioning
                 return
             }
             toContextProvider = contextProvider
-        case let splitViewController as ConversationSplitViewController:
-            guard let contextProvider = splitViewController.topViewController as? MediaPresentationContextProvider else {
-                owsFailDebug("unexpected context: \(String(describing: splitViewController.topViewController))")
+        case let homeTabBarController as HomeTabBarController:
+            guard
+                let splitViewController = homeTabBarController.selectedSplitViewController,
+                let contextProvider = splitViewController.topViewController as? MediaPresentationContextProvider
+            else {
+                owsFailDebug("unexpected contextProvider: \(String(describing: homeTabBarController.selectedSplitViewController?.topViewController))")
                 transitionContext.completeTransition(false)
                 return
             }
@@ -108,82 +115,58 @@ extension MediaDismissAnimationController: UIViewControllerAnimatedTransitioning
 
         let toMediaContext = toContextProvider.mediaPresentationContext(item: item, in: containerView)
 
-        guard let presentationImage = item.image else {
-            owsFailDebug("presentationImage was unexpectedly nil")
-            // Complete transition immediately.
-            fromContextProvider.mediaWillPresent(fromContext: fromMediaContext)
-            if let toMediaContext = toMediaContext {
-                toContextProvider.mediaWillPresent(toContext: toMediaContext)
-            }
-            DispatchQueue.main.async {
-                fromContextProvider.mediaDidPresent(fromContext: fromMediaContext)
-                if let toMediaContext = toMediaContext {
-                    toContextProvider.mediaDidPresent(toContext: toMediaContext)
-                }
-                transitionContext.completeTransition(true)
-            }
-            return
-        }
+        // All is good, set up the view hierarchy and view animations.
 
-        // Dims content underneath the media view while user is gragging the media around.
-        let dimmerView: UIView?
-        if isTransitionInteractive {
-            let view = UIView(frame: containerView.bounds)
-            view.alpha = 0
-            view.backgroundColor = .ows_blackAlpha40
-            containerView.addSubview(view)
-            dimmerView = view
-        } else {
-            dimmerView = nil
-        }
+        let isTransitionInteractive = transitionContext.isInteractive
 
+        let backgroundView = UIView(frame: containerView.bounds)
+        backgroundView.backgroundColor = fromMediaContext.backgroundColor
+        backgroundView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        containerView.addSubview(backgroundView)
+
+        // Sometimes the initial (from) or the final (to) media view is partially obscured
+        // (by navigation bar at the top and by the bottom bar at the bottom).
+        // To animate from one "viewport" to another we set up a clipping
+        // view that will contain the transitional media view.
         let clippingView = UIView(frame: containerView.bounds)
         clippingView.clipsToBounds = true
-        if let clippingAreaInsets = fromMediaContext.clippingAreaInsets, clippingAreaInsets.isNonEmpty {
-            let maskLayer = CALayer()
-            maskLayer.frame = clippingView.layer.bounds.inset(by: clippingAreaInsets)
-            maskLayer.backgroundColor = UIColor.black.cgColor
-            clippingView.layer.mask = maskLayer
+        if let clippingAreaInsets = fromMediaContext.clippingAreaInsets {
+            clippingView.frame = containerView.bounds.inset(by: clippingAreaInsets)
         }
         containerView.addSubview(clippingView)
 
         // Can't do rounded corners and drop shadow at the same time,
         // so put image into a container view.
-        let transitionView = UIView(frame: fromMediaContext.presentationFrame)
+        let transitionViewFrame = clippingView.convert(fromMediaContext.presentationFrame, from: containerView)
+        let transitionView = UIView(frame: transitionViewFrame)
         transitionView.layer.shadowColor = UIColor.ows_blackAlpha20.cgColor
         transitionView.layer.shadowOffset = CGSize(width: 0, height: 32)
         transitionView.layer.shadowRadius = 48
         transitionView.layer.shadowOpacity = 0
-        self.transitionView = transitionView
         clippingView.addSubview(transitionView)
+        self.transitionView = transitionView
 
-        let imageView = MediaTransitionImageView(image: presentationImage)
-        imageView.contentMode = .scaleAspectFill
-        imageView.autoresizingMask = [ .flexibleWidth, .flexibleHeight ]
-        imageView.layer.masksToBounds = true
-        imageView.shape = fromMediaContext.mediaViewShape
-        imageView.frame = transitionView.bounds
-        transitionView.addSubview(imageView)
-
-        let fromTransitionalOverlayView: UIView?
-        if let (overlayView, overlayViewFrame) = fromContextProvider.snapshotOverlayView(in: containerView) {
-            fromTransitionalOverlayView = overlayView
-            containerView.addSubview(overlayView)
-            overlayView.frame = overlayViewFrame
+        let transitionImageView: MediaTransitionImageView?
+        if let presentationImage = item.image {
+            let imageView = MediaTransitionImageView(image: presentationImage)
+            imageView.contentMode = .scaleAspectFill
+            imageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            imageView.layer.masksToBounds = true
+            imageView.shape = fromMediaContext.mediaViewShape
+            imageView.frame = transitionView.bounds
+            transitionView.addSubview(imageView)
+            transitionImageView = imageView
         } else {
-            fromTransitionalOverlayView = nil
+            transitionImageView = nil
         }
 
-        assert(toContextProvider.snapshotOverlayView(in: containerView) == nil)
-
         // Because toggling `isHidden` causes UIStack view layouts to change, we instead toggle `alpha`
-        fromTransitionalOverlayView?.alpha = 1
         fromMediaContext.mediaView.alpha = 0
         toMediaContext?.mediaView.alpha = 0
 
         let duration = transitionDuration(using: transitionContext)
 
-        let completion: (CGVector?) -> Void = { velocity in
+        let completion = {
             let destinationFrame: CGRect
             let destinationMediaViewShape: MediaViewShape
             if transitionContext.transitionWasCancelled {
@@ -201,36 +184,31 @@ extension MediaDismissAnimationController: UIViewControllerAnimatedTransitioning
                 destinationMediaViewShape = fromMediaContext.mediaViewShape
             }
 
-            if !transitionContext.transitionWasCancelled, let clippingAreaInsets = toMediaContext?.clippingAreaInsets, clippingAreaInsets.isNonEmpty {
-                let maskLayer = CALayer()
-                maskLayer.frame = clippingView.layer.bounds.inset(by: clippingAreaInsets)
-                maskLayer.backgroundColor = UIColor.black.cgColor
-                clippingView.layer.mask = maskLayer
-            }
-
             let animator = UIViewPropertyAnimator(
                 duration: duration,
                 springDamping: 1,
-                springResponse: 0.3,
-                initialVelocity: velocity ?? .zero
+                springResponse: 0.25,
             )
             animator.addAnimations {
-                if !transitionContext.transitionWasCancelled {
-                    fromTransitionalOverlayView?.alpha = 0
+                if transitionContext.transitionWasCancelled == false {
                     fromView.alpha = 0
-                    dimmerView?.alpha = 0
+                    backgroundView.backgroundColor = toMediaContext?.backgroundColor
+
+                    if let clippingAreaInsets = toMediaContext?.clippingAreaInsets {
+                        clippingView.frame = containerView.bounds.inset(by: clippingAreaInsets)
+                    } else {
+                        clippingView.frame = containerView.bounds
+                    }
                 }
 
-                imageView.shape = destinationMediaViewShape
+                transitionImageView?.shape = destinationMediaViewShape
                 transitionView.transform = .identity
-                transitionView.bounds.size = destinationFrame.size
-                transitionView.center = destinationFrame.center
+                transitionView.frame = clippingView.convert(destinationFrame, from: containerView)
                 transitionView.layer.shadowOpacity = 0
             }
             animator.addCompletion { _ in
-                fromTransitionalOverlayView?.removeFromSuperview()
                 clippingView.removeFromSuperview()
-                dimmerView?.removeFromSuperview()
+                backgroundView.removeFromSuperview()
 
                 fromMediaContext.mediaView.alpha = 1
                 toMediaContext?.mediaView.alpha = 1
@@ -256,7 +234,7 @@ extension MediaDismissAnimationController: UIViewControllerAnimatedTransitioning
         }
 
         fromContextProvider.mediaWillDismiss(fromContext: fromMediaContext)
-        if let toMediaContext = toMediaContext {
+        if let toMediaContext {
             toContextProvider.mediaWillDismiss(toContext: toMediaContext)
         }
 
@@ -267,12 +245,11 @@ extension MediaDismissAnimationController: UIViewControllerAnimatedTransitioning
             // and has exceeded distance threshold specified in MediaInteractiveDismiss.
             // UIKit will reverse the animation if user drags the image back to the starting point.
             UIView.animate(
-                withDuration: duration,
+                withDuration: 0.2,
                 delay: 0,
                 animations: {
-                    fromTransitionalOverlayView?.alpha = 0
                     fromView.alpha = 0
-                    dimmerView?.alpha = 1
+                    backgroundView.backgroundColor = toMediaContext?.backgroundColor
 
                     transitionView.transform = .scale(0.8)
                     transitionView.layer.shadowOpacity = 1
@@ -283,11 +260,11 @@ extension MediaDismissAnimationController: UIViewControllerAnimatedTransitioning
                     }
 
                     self.pendingCompletion = nil
-                    pendingCompletion(nil)
-                }
+                    pendingCompletion()
+                },
             )
         } else {
-            completion(nil)
+            completion()
         }
     }
 }
@@ -298,7 +275,7 @@ extension MediaDismissAnimationController: InteractiveDismissDelegate {
     func interactiveDismiss(
         _ interactiveDismiss: UIPercentDrivenInteractiveTransition,
         didChangeProgress progress: CGFloat,
-        touchOffset offset: CGPoint
+        touchOffset offset: CGPoint,
     ) {
         guard let transitionView else {
             // transition hasn't started yet.
@@ -313,13 +290,10 @@ extension MediaDismissAnimationController: InteractiveDismissDelegate {
         transitionView.center = fromMediaFrame.offsetBy(dx: offset.x, dy: offset.y).center
     }
 
-    func interactiveDismiss(
-        _ interactiveDismiss: UIPercentDrivenInteractiveTransition,
-        didFinishWithVelocity velocity: CGVector?
-    ) {
+    func interactiveDismissDidFinish(_ interactiveDismiss: UIPercentDrivenInteractiveTransition) {
         if let pendingCompletion {
             self.pendingCompletion = nil
-            pendingCompletion(velocity)
+            pendingCompletion()
         }
     }
 

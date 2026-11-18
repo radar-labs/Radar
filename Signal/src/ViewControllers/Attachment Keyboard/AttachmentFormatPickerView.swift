@@ -39,10 +39,8 @@ class AttachmentFormatPickerView: UIView {
             let subview = AttachmentTypeView(attachmentType: attachmentType)
             subview.isVerticallyCompactAppearance = traitCollection.verticalSizeClass == .compact
             subview.button.addAction(
-                UIAction(handler: { [weak self] _ in
-                    self?.didTapAttachmentButton(attachmentType: attachmentType)
-                }),
-                for: .touchUpInside
+                UIAction { [weak self] _ in self?.didTapAttachmentButton(attachmentType: attachmentType) },
+                for: .primaryActionTriggered,
             )
             return subview
         }
@@ -95,7 +93,7 @@ class AttachmentFormatPickerView: UIView {
             contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
             contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
-            contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor)
+            contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
         ])
     }
 
@@ -116,12 +114,12 @@ class AttachmentFormatPickerView: UIView {
     override var intrinsicContentSize: CGSize {
         let isVerticallyCompact = traitCollection.verticalSizeClass == .compact
         let height: CGFloat =
-        switch (isVerticallyCompact, shouldLeaveSpaceForPermissions) {
-        case (false, false): 122
-        case (false, true): 100
-        case (true, false): 86
-        case (true, true): 76
-        }
+            switch (isVerticallyCompact, shouldLeaveSpaceForPermissions) {
+            case (false, false): 122
+            case (false, true): 100
+            case (true, false): 86
+            case (true, true): 76
+            }
         return CGSize(width: UIView.noIntrinsicMetric, height: height)
     }
 
@@ -186,7 +184,7 @@ class AttachmentFormatPickerView: UIView {
         case payment
 
         private static var contactCases: [AttachmentType] {
-            var casesToExclude: [AttachmentType] = [.poll]
+            var casesToExclude: [AttachmentType] = []
             if !SSKEnvironment.shared.paymentsHelperRef.arePaymentsEnabled {
                 casesToExclude.append(.payment)
             }
@@ -195,17 +193,14 @@ class AttachmentFormatPickerView: UIView {
         }
 
         private static var groupCases: [AttachmentType] {
-            if !RemoteConfig.current.pollCreate {
-                return cases(except: [.payment, .poll])
-            }
             return cases(except: [.payment])
         }
 
         private static func cases(except: [AttachmentType]) -> [AttachmentType] {
             let showGifSearch = RemoteConfig.current.enableGifSearch
             return allCases.filter { (value: AttachmentType) in
-                if value == .gif && showGifSearch.negated { return false }
-                return except.contains(value).negated
+                if value == .gif, !showGifSearch { return false }
+                return !except.contains(value)
             }
         }
 
@@ -251,12 +246,8 @@ class AttachmentFormatPickerView: UIView {
 
         let button: UIButton = {
             let button: UIButton
-            if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable {
-#if compiler(>=6.2)
+            if #available(iOS 26, *) {
                 button = UIButton(configuration: .glass())
-#else
-                button = UIButton(configuration: .plain())
-#endif
             } else {
                 button = ShrinkingOnTapButton(configuration: .gray())
                 button.configuration?.background.backgroundColorTransformer = UIConfigurationColorTransformer { [weak button] _ in
@@ -289,7 +280,7 @@ class AttachmentFormatPickerView: UIView {
         private let textLabel: UILabel = {
             let label = UILabel()
             label.font = .dynamicTypeFootnoteClamped.medium()
-            if #available(iOS 26, *), BuildFlags.iOS26SDKIsAvailable {
+            if #available(iOS 26, *) {
                 label.textColor = .Signal.label
             } else {
                 label.textColor = .Signal.secondaryLabel
@@ -311,7 +302,7 @@ class AttachmentFormatPickerView: UIView {
             addSubview(button)
             NSLayoutConstraint.activate([
                 button.widthAnchor.constraint(equalToConstant: 76),
-                buttonHeightConstraint
+                buttonHeightConstraint,
             ])
             button.autoPinEdges(toSuperviewEdgesExcludingEdge: .bottom)
 
@@ -323,7 +314,7 @@ class AttachmentFormatPickerView: UIView {
         }
 
         @available(*, unavailable, message: "Unimplemented")
-        required public init?(coder aDecoder: NSCoder) {
+        required init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
 
@@ -358,6 +349,9 @@ class AttachmentFormatPickerView: UIView {
             textLabel.text = text
             button.configuration?.image = UIImage(imageLiteralResourceName: imageName)
             accessibilityIdentifier = UIView.accessibilityIdentifier(in: self, name: "format-\(attachmentType.rawValue)")
+            isAccessibilityElement = true
+            accessibilityLabel = text
+            accessibilityTraits = .button
         }
     }
 }

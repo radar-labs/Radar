@@ -7,6 +7,7 @@ import AVFoundation
 import Foundation
 import SignalRingRTC
 import SignalServiceKit
+import UIKit
 
 class CallMemberVideoView: UIView, CallMemberComposableView {
     private let type: CallMemberView.MemberType
@@ -16,7 +17,7 @@ class CallMemberVideoView: UIView, CallMemberComposableView {
     init(type: CallMemberView.MemberType) {
         self.type = type
         super.init(frame: .zero)
-        backgroundColor = .ows_black
+        backgroundColor = .black
         isUserInteractionEnabled = false
         switch type {
         case .local:
@@ -41,6 +42,7 @@ class CallMemberVideoView: UIView, CallMemberComposableView {
         case remoteInIndividual(RemoteVideoView)
         case remoteInGroup(GroupCallRemoteVideoView)
     }
+
     private var callViewWrapper: CallViewWrapper?
 
     func remoteVideoViewIfApplicable() -> RemoteVideoView? {
@@ -55,7 +57,7 @@ class CallMemberVideoView: UIView, CallMemberComposableView {
     func configure(
         call: SignalCall,
         isFullScreen: Bool = false,
-        remoteGroupMemberDeviceState: RemoteDeviceState?
+        remoteGroupMemberDeviceState: RemoteDeviceState?,
     ) {
         layer.cornerRadius = isFullScreen ? 0 : CallMemberView.Constants.defaultPipCornerRadius
         clipsToBounds = true
@@ -71,7 +73,7 @@ class CallMemberVideoView: UIView, CallMemberComposableView {
             guard let remoteGroupMemberDeviceState else { return }
             self.blurredAvatarBackgroundView.update(
                 type: self.type,
-                remoteGroupMemberDeviceState: remoteGroupMemberDeviceState
+                remoteGroupMemberDeviceState: remoteGroupMemberDeviceState,
             )
             if remoteGroupMemberDeviceState.mediaKeysReceived, remoteGroupMemberDeviceState.videoTrack != nil {
                 self.isHidden = (remoteGroupMemberDeviceState.videoMuted == true)
@@ -99,7 +101,7 @@ class CallMemberVideoView: UIView, CallMemberComposableView {
 
     func configureRemoteVideo(
         device: RemoteDeviceState,
-        context: CallMemberVisualContext
+        context: CallMemberVisualContext,
     ) {
         if case let .remoteInGroup(videoView) = callViewWrapper {
             if videoView.superview == self { videoView.removeFromSuperview() }

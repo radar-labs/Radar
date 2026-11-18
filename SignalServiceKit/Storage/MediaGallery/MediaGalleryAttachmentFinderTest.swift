@@ -9,7 +9,7 @@ import XCTest
 @testable import SignalServiceKit
 
 class MediaGalleryAttachmentFinderTest: XCTestCase {
-
+    private let attachmentStore = AttachmentStore()
     private var db: InMemoryDB!
 
     override func setUp() async throws {
@@ -23,63 +23,63 @@ class MediaGalleryAttachmentFinderTest: XCTestCase {
         let threadRowId = thread.sqliteRowId!
 
         // Insert one matching content type before the date range
-        try insertAttachment(
+        insertAttachment(
             messageRowId: messageRowId,
             threadRowId: threadRowId,
             receivedAtTimestamp: 100,
-            contentType: .image,
-            orderInOwner: 0
+            mimeType: "image/jpeg",
+            orderInMessage: 0,
         )
         // ...and one matching content type after the date range
-        try insertAttachment(
+        insertAttachment(
             messageRowId: messageRowId,
             threadRowId: threadRowId,
             receivedAtTimestamp: 300,
-            contentType: .image,
-            orderInOwner: 1
+            mimeType: "image/jpeg",
+            orderInMessage: 1,
         )
         // ...and one non-matching content type within the date range
-        try insertAttachment(
+        insertAttachment(
             messageRowId: messageRowId,
             threadRowId: threadRowId,
             receivedAtTimestamp: 200,
-            contentType: .audio,
-            orderInOwner: 2
+            mimeType: "audio/mp3",
+            orderInMessage: 2,
         )
         // ...and two matching content type within the date range
-        try insertAttachment(
+        insertAttachment(
             messageRowId: messageRowId,
             threadRowId: threadRowId,
             receivedAtTimestamp: 200,
-            contentType: .image,
-            orderInOwner: 3
+            mimeType: "image/jpeg",
+            orderInMessage: 3,
         )
-        try insertAttachment(
+        insertAttachment(
             messageRowId: messageRowId,
             threadRowId: threadRowId,
             receivedAtTimestamp: 200,
-            contentType: .image,
-            orderInOwner: 4
+            mimeType: "image/jpeg",
+            orderInMessage: 4,
         )
         // ...and one within the date range that we will exclude.
-        try insertAttachment(
+        insertAttachment(
             messageRowId: messageRowId,
             threadRowId: threadRowId,
             receivedAtTimestamp: 200,
-            contentType: .image,
-            orderInOwner: 5
+            mimeType: "image/jpeg",
+            orderInMessage: 5,
         )
         // ...and a view once attachment that will be excluded.
-        try insertAttachment(
+        insertAttachment(
             messageRowId: messageRowId,
             threadRowId: threadRowId,
             receivedAtTimestamp: 200,
-            contentType: .image,
+            mimeType: "image/jpeg",
+            orderInMessage: 6,
             isViewOnce: true,
-            orderInOwner: 6
         )
         let exclusionSet = Set<AttachmentReferenceId>([
-            .init(ownerId: .messageBodyAttachment(messageRowId: messageRowId), orderInOwner: 5)
+            .init(ownerId: .messageBodyAttachment(messageRowId: messageRowId), orderInMessage: 5),
         ])
 
         let finder = MediaGalleryAttachmentFinder(threadId: thread.grdbId!.int64Value, filter: .allPhotoVideoCategory)
@@ -88,11 +88,11 @@ class MediaGalleryAttachmentFinderTest: XCTestCase {
         var query = finder.galleryItemQuery(
             in: .init(
                 start: .init(millisecondsSince1970: 150),
-                end: .init(millisecondsSince1970: 250)
+                end: .init(millisecondsSince1970: 250),
             ),
             excluding: exclusionSet,
             offset: 0,
-            ascending: true
+            ascending: true,
         )
 
         var results = try db.read { tx in
@@ -109,11 +109,11 @@ class MediaGalleryAttachmentFinderTest: XCTestCase {
         query = finder.galleryItemQuery(
             in: .init(
                 start: .init(millisecondsSince1970: 150),
-                end: .init(millisecondsSince1970: 250)
+                end: .init(millisecondsSince1970: 250),
             ),
             excluding: exclusionSet,
             offset: 1,
-            ascending: true
+            ascending: true,
         )
 
         results = try db.read { tx in
@@ -123,6 +123,67 @@ class MediaGalleryAttachmentFinderTest: XCTestCase {
         XCTAssertEqual(results.count, 1)
         XCTAssertEqual(results[0].receivedAtTimestamp, 200)
         XCTAssertEqual(results[0].orderInMessage, 4)
+    }
+
+    func testFiltersDistinguishGifsAndPhotos() throws {
+        let (thread, messageRowId) = insertThreadAndInteraction()
+        let threadRowId = thread.sqliteRowId!
+
+        // Four representative cases the gifs/photos virtual columns must distinguish:
+        // - image/jpeg → photo
+        // - image/gif → gif (regardless of renderingFlag)
+        // - looping mp4 (renderingFlag=shouldLoop) → gif
+        // - non-looping mp4 → video
+        let jpegId = insertAttachment(
+            messageRowId: messageRowId,
+            threadRowId: threadRowId,
+            receivedAtTimestamp: 100,
+            mimeType: "image/jpeg",
+            orderInMessage: 0,
+        )
+        let gifFileId = insertAttachment(
+            messageRowId: messageRowId,
+            threadRowId: threadRowId,
+            receivedAtTimestamp: 200,
+            mimeType: "image/gif",
+            orderInMessage: 1,
+        )
+        let loopingMp4Id = insertAttachment(
+            messageRowId: messageRowId,
+            threadRowId: threadRowId,
+            receivedAtTimestamp: 300,
+            mimeType: "video/mp4",
+            orderInMessage: 2,
+            renderingFlag: .shouldLoop,
+        )
+        let nonLoopingMp4Id = insertAttachment(
+            messageRowId: messageRowId,
+            threadRowId: threadRowId,
+            receivedAtTimestamp: 400,
+            mimeType: "video/mp4",
+            orderInMessage: 3,
+        )
+
+        func attachmentRowIds(filter: AllMediaFilter) throws -> Set<Attachment.IDType> {
+            let finder = MediaGalleryAttachmentFinder(threadId: threadRowId, filter: filter)
+            let query = finder.galleryItemQuery(
+                in: nil,
+                excluding: [],
+                offset: 0,
+                ascending: true,
+            )
+            return try db.read { tx in
+                Set(try query.fetchAll(tx.database).map(\.attachmentRowId))
+            }
+        }
+
+        XCTAssertEqual(try attachmentRowIds(filter: .gifs), [gifFileId, loopingMp4Id])
+        XCTAssertEqual(try attachmentRowIds(filter: .photos), [jpegId])
+        XCTAssertEqual(try attachmentRowIds(filter: .videos), [nonLoopingMp4Id])
+        XCTAssertEqual(
+            try attachmentRowIds(filter: .allPhotoVideoCategory),
+            [jpegId, gifFileId, loopingMp4Id, nonLoopingMp4Id],
+        )
     }
 
     // MARK: - Index Usage
@@ -137,29 +198,24 @@ class MediaGalleryAttachmentFinderTest: XCTestCase {
             nil,
             .init(
                 start: .init(millisecondsSince1970: 100),
-                end: .init(millisecondsSince1970: 200)
-            )
+                end: .init(millisecondsSince1970: 200),
+            ),
         ]
         let exclusionSets: [Set<AttachmentReferenceId>] = [
             Set(),
-            Set([.init(ownerId: .messageBodyAttachment(messageRowId: 100), orderInOwner: nil)]),
-            Set([.init(ownerId: .messageBodyAttachment(messageRowId: 200), orderInOwner: 5)]),
+            Set([.init(ownerId: .messageBodyAttachment(messageRowId: 100), orderInMessage: nil)]),
+            Set([.init(ownerId: .messageBodyAttachment(messageRowId: 200), orderInMessage: 5)]),
             Set([
-                .init(ownerId: .messageBodyAttachment(messageRowId: 100), orderInOwner: nil),
-                .init(ownerId: .messageBodyAttachment(messageRowId: 200), orderInOwner: nil),
-                .init(ownerId: .messageBodyAttachment(messageRowId: 300), orderInOwner: 5)
-            ])
+                .init(ownerId: .messageBodyAttachment(messageRowId: 100), orderInMessage: nil),
+                .init(ownerId: .messageBodyAttachment(messageRowId: 200), orderInMessage: nil),
+                .init(ownerId: .messageBodyAttachment(messageRowId: 300), orderInMessage: 5),
+            ]),
         ]
         let offsets: [Int] = [0, 5]
         let limits: [Int] = [5, 100]
         let ascendings: [Bool] = [true, false]
 
         for filter in AllMediaFilter.allCases {
-            if filter == .gifs {
-                // Skip gif filter; it uses a b-tree for sorting and doesn't
-                // use a simple index.
-                continue
-            }
             let finder = MediaGalleryAttachmentFinder(threadId: thread.grdbId!.int64Value, filter: filter)
             var queries = [QueryInterfaceRequest<RecordType>]()
 
@@ -171,7 +227,7 @@ class MediaGalleryAttachmentFinderTest: XCTestCase {
                                 in: dateInterval,
                                 excluding: exclusionSet,
                                 offset: offset,
-                                ascending: ascending
+                                ascending: ascending,
                             ))
                         }
                     }
@@ -184,7 +240,7 @@ class MediaGalleryAttachmentFinderTest: XCTestCase {
                             queries.append(finder.enumerateMediaAttachmentsQuery(
                                 in: dateInterval,
                                 excluding: exclusionSet,
-                                range: .init(location: offset, length: limit)
+                                range: .init(location: offset, length: limit),
                             ))
                         }
                     }
@@ -198,14 +254,14 @@ class MediaGalleryAttachmentFinderTest: XCTestCase {
                             afterDate: nil,
                             excluding: exclusionSet,
                             count: limit,
-                            ascending: false
+                            ascending: false,
                         ))
                         queries.append(finder.enumerateTimestampsQuery(
                             beforeDate: nil,
                             afterDate: dateInterval?.start,
                             excluding: exclusionSet,
                             count: limit,
-                            ascending: true
+                            ascending: true,
                         ))
                     }
                 }
@@ -220,16 +276,18 @@ class MediaGalleryAttachmentFinderTest: XCTestCase {
                     let queryPlan: [String] = try Row.fetchAll(
                         tx.database,
                         sql: "EXPLAIN QUERY PLAN \(preparedStatement.sql);",
-                        arguments: preparedStatement.arguments
-                    ).map{ $0["detail"] }
+                        arguments: preparedStatement.arguments,
+                    ).map { $0["detail"] }
 
                     // Ensure we use the relevant indexes and...
                     // * we use all the columns up to the ordering columns
                     // * we DONT use expensive B trees for ordering
                     let allowedQueryPlans: [String] = [
-                        "SEARCH MessageAttachmentReference USING INDEX message_attachment_reference_media_gallery_single_content_type_index (threadRowId=? AND ownerType=? AND contentType=?",
-                        "SEARCH MessageAttachmentReference USING INDEX message_attachment_reference_media_gallery_visualMedia_content_type_index (threadRowId=? AND ownerType=? AND isVisualMediaContentType=?",
-                        "SEARCH MessageAttachmentReference USING INDEX message_attachment_reference_media_gallery_fileOrInvalid_content_type_index (threadRowId=? AND ownerType=? AND isInvalidOrFileContentType=?"
+                        "SEARCH MessageAttachmentReference USING INDEX message_attachment_reference_media_gallery_single_content_type_index",
+                        "SEARCH MessageAttachmentReference USING INDEX message_attachment_reference_media_gallery_visualMedia_content_type_index",
+                        "SEARCH MessageAttachmentReference USING INDEX message_attachment_reference_media_gallery_fileOrInvalid_content_type_index",
+                        "SEARCH MessageAttachmentReference USING INDEX message_attachment_reference_media_gallery_gifs_index",
+                        "SEARCH MessageAttachmentReference USING INDEX message_attachment_reference_media_gallery_photos_index",
                     ]
                     XCTAssert(queryPlan.allSatisfy { queryPlan in
                         for allowedQueryPlan in allowedQueryPlans {
@@ -240,7 +298,7 @@ class MediaGalleryAttachmentFinderTest: XCTestCase {
                         return false
                     })
                     // There should NOT be expensive B-TREE usage.
-                    XCTAssert(queryPlan.allSatisfy { $0.contains("USE TEMP B-TREE").negated })
+                    XCTAssert(queryPlan.allSatisfy { !$0.contains("USE TEMP B-TREE") })
                 }
             }
         }
@@ -255,7 +313,7 @@ class MediaGalleryAttachmentFinderTest: XCTestCase {
         let interaction = TSInteraction(timestamp: 0, receivedAtTimestamp: 0, thread: thread)
 
         db.write { tx in
-            try! thread.asRecord().insert(tx.database)
+            try! thread.insert(tx.database)
             try! interaction.asRecord().insert(tx.database)
         }
 
@@ -267,57 +325,42 @@ class MediaGalleryAttachmentFinderTest: XCTestCase {
         messageRowId: Int64,
         threadRowId: Int64,
         receivedAtTimestamp: UInt64,
-        contentType: AttachmentReference.ContentType,
-        caption: String? = nil,
-        renderingFlag: AttachmentReference.RenderingFlag = .default,
+        mimeType: String,
+        orderInMessage: UInt32,
         isViewOnce: Bool = false,
-        isPastEditRevision: Bool = false,
-        orderInOwner: UInt32,
-        idInOwner: UUID? = nil
-    ) throws -> Attachment.IDType {
-        let attachmentParams = Attachment.ConstructionParams.mockStream(
-            streamInfo: .mock(
-                contentType: {
-                    switch contentType {
-                    case .invalid:
-                        return .invalid
-                    case .animatedImage:
-                        return .animatedImage(pixelSize: .square(100))
-                    case .audio:
-                        return .audio(duration: 1, waveformRelativeFilePath: nil)
-                    case .file:
-                        return .file
-                    case .image:
-                        return .image(pixelSize: .square(100))
-                    case .video:
-                        return .video(duration: 1, pixelSize: .square(100), stillFrameRelativeFilePath: nil)
-                    }
-                }()
+        renderingFlag: AttachmentReference.RenderingFlag = .default,
+    ) -> Attachment.IDType {
+        db.write { tx in
+            var attachmentRecord = Attachment.Record.mockStream(
+                mimeType: mimeType,
             )
-        )
-        let referenceParams = AttachmentReference.ConstructionParams.mock(
-            owner: .message(.bodyAttachment(.init(
-                messageRowId: messageRowId,
-                receivedAtTimestamp: receivedAtTimestamp,
-                threadRowId: threadRowId,
-                contentType: contentType,
-                isPastEditRevision: isPastEditRevision,
-                caption: caption,
-                renderingFlag: renderingFlag,
-                orderInOwner: orderInOwner,
-                idInOwner: idInOwner,
-                isViewOnce: isViewOnce
-            )))
-        )
+            try! attachmentRecord.insert(tx.database)
 
-        var attachmentRecord = Attachment.Record(params: attachmentParams)
+            let attachment = Attachment(record: attachmentRecord)
 
-        try db.write { tx in
-            try attachmentRecord.insert(tx.database)
-            let referenceRecord = try referenceParams.buildRecord(attachmentRowId: attachmentRecord.sqliteId!)
-            try referenceRecord.insert(tx.database)
+            let referenceParams = AttachmentReference.ConstructionParams.mock(
+                owner: .message(.bodyAttachment(.init(
+                    messageRowId: messageRowId,
+                    receivedAtTimestamp: receivedAtTimestamp,
+                    threadRowId: threadRowId,
+                    contentType: attachment.contentType,
+                    mimeType: attachment.mimeType,
+                    isPastEditRevision: false,
+                    caption: nil,
+                    renderingFlag: renderingFlag,
+                    orderInMessage: orderInMessage,
+                    idInOwner: nil,
+                    isViewOnce: isViewOnce,
+                ))),
+            )
+
+            attachmentStore.addReference(
+                referenceParams,
+                attachmentRowId: attachment.id,
+                tx: tx,
+            )
+
+            return attachment.id
         }
-
-        return attachmentRecord.sqliteId!
     }
 }

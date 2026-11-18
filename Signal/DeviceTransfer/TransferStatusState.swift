@@ -11,9 +11,10 @@ enum TransferState {
     case starting
     case connecting
     case transferring(Double)
+    case finishing
     case done
     case cancelled
-    case error(DeviceTransferService.Error)
+    case error(Error)
 }
 
 class TransferStatusViewModel: ObservableObject {
@@ -23,63 +24,94 @@ class TransferStatusViewModel: ObservableObject {
             case connecting
             case cancelling
 
-            func title(isNewDevice: Bool) -> String {
+            func title(isNewDevice: Bool, supportsWifiAware: Bool) -> String {
                 switch self {
                 case .starting:
                     if isNewDevice {
                         OWSLocalizedString(
                             "DEVICE_TRANSFER_STATUS_NEW_DEVICE_STARTING",
-                            comment: "Status message on new device when transfer is starting."
+                            comment: "Status message on new device when transfer is starting.",
                         )
                     } else {
-                        OWSLocalizedString(
-                            "DEVICE_TRANSFER_STATUS_OLD_DEVICE_STARTING",
-                            comment: "Status message on old device when transfer is starting."
-                        )
+                        if supportsWifiAware {
+                            OWSLocalizedString(
+                                "DEVICE_TRANSFER_STATUS_OLD_DEVICE_STARTING_WIFI_AWARE",
+                                comment: "Status message on old device when WiFiAware transfer is starting.",
+                            )
+                        } else {
+                            OWSLocalizedString(
+                                "DEVICE_TRANSFER_STATUS_OLD_DEVICE_STARTING",
+                                comment: "Status message on old device when transfer is starting.",
+                            )
+                        }
                     }
                 case .connecting:
                     if isNewDevice {
                         OWSLocalizedString(
                             "DEVICE_TRANSFER_STATUS_NEW_DEVICE_CONNECTING",
-                            comment: "Status message on new device when connecting to old device."
+                            comment: "Status message on new device when connecting to old device.",
                         )
                     } else {
                         OWSLocalizedString(
                             "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CONNECTING",
-                            comment: "Status message on new device when connecting to new device."
+                            comment: "Status message on new device when connecting to new device.",
                         )
                     }
                 case .cancelling:
                     if isNewDevice {
                         OWSLocalizedString(
                             "DEVICE_TRANSFER_STATUS_NEW_DEVICE_CANCELLING",
-                            comment: "Status message on new device when cancelling transfer."
+                            comment: "Status message on new device when cancelling transfer.",
                         )
                     } else {
                         OWSLocalizedString(
                             "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CANCELLING",
-                            comment: "Status message on old device when cancelling transfer."
+                            comment: "Status message on old device when cancelling transfer.",
                         )
                     }
                 }
             }
 
-            func message(isNewDevice: Bool) -> String {
+            func message(isNewDevice: Bool, supportsWifiAware: Bool) -> String {
                 if isNewDevice {
-                    OWSLocalizedString(
-                        "DEVICE_TRANSFER_STATUS_NEW_DEVICE_CONNECTING_MESSAGE",
-                        comment: "Description message on new device displayed during device transfer."
-                    )
+                    if supportsWifiAware {
+                        OWSLocalizedString(
+                            "DEVICE_TRANSFER_STATUS_NEW_DEVICE_CONNECTING_WIFI_AWARE_MESSAGE",
+                            comment: "Description message on new device displayed during device transfer when using WiFiAware.",
+                        )
+                    } else {
+                        OWSLocalizedString(
+                            "DEVICE_TRANSFER_STATUS_NEW_DEVICE_CONNECTING_MESSAGE",
+                            comment: "Description message on new device displayed during device transfer.",
+                        )
+                    }
                 } else {
-                    OWSLocalizedString(
-                        "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CONNECTING_MESSAGE",
-                        comment: "Description message on old device displayed during device transfer."
-                    )
+                    if supportsWifiAware {
+                        switch self {
+                        case .starting:
+                            OWSLocalizedString(
+                                "DEVICE_TRANSFER_STATUS_OLD_DEVICE_STARTING_WIFI_AWARE_MESSAGE",
+                                comment: "Description message on old device displayed during device discovery when using WiFiAware.",
+                            )
+                        case .connecting, .cancelling:
+                            OWSLocalizedString(
+                                "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CONNECTING_WIFI_AWARE_MESSAGE",
+                                comment: "Description message on old device displayed during device connection when using WiFiAware.",
+                            )
+                        }
+                    } else {
+                        OWSLocalizedString(
+                            "DEVICE_TRANSFER_STATUS_OLD_DEVICE_CONNECTING_MESSAGE",
+                            comment: "Description message on old device displayed during device transfer.",
+                        )
+                    }
                 }
             }
         }
+
         case indefinite(Indefinite)
         case transferring(Double)
+        case finishing
         case error(Error)
     }
 
@@ -94,6 +126,8 @@ class TransferStatusViewModel: ObservableObject {
             case .transferring(let progress):
                 viewState = .transferring(progress)
                 self.progressDidUpdate(currentProgress: progress)
+            case .finishing:
+                viewState = .finishing
             case .done:
                 viewState = .transferring(1)
             case .cancelled:
@@ -105,8 +139,23 @@ class TransferStatusViewModel: ObservableObject {
         }
     }
 
-    var onCancel: (() -> Void) = {}
-    var onSuccess: (() -> Void) = {}
+    @Published var supportsWifiAware: Bool = false
+    @Published var selectedPeer: (any DeviceTransfer.Peer)?
+    @Published var discoveredPeers: [any DeviceTransfer.Peer] = []
+
+    var confirmCancellation: (() async -> Bool) = { return true }
+    var cancelTransferBlock: (() -> Void) = {}
+    var choosePeerBlock: (() -> Void) = {}
+    var onPeerDiscovered: (@MainActor (any DeviceTransfer.Peer) -> Void) = { _ in }
+    var onPeerSelected: (@MainActor (any DeviceTransfer.Peer) -> Void) = { _ in }
+    var onSuccess: (@MainActor () -> Void) = {}
+    var onFailure: ((Error) -> Void) = { _ in }
+
+    @MainActor
+    func propmtUserToCancelTransfer() async {
+        guard await confirmCancellation() else { return }
+        cancelTransferBlock()
+    }
 
     // Take up space so it doesn't pop in when appearing
     @Published var progressEstimateLabel = " "
@@ -117,7 +166,7 @@ class TransferStatusViewModel: ObservableObject {
         var previouslyCompletedPortion = currentProgress
         throughputTimer = Timer.scheduledTimer(
             withTimeInterval: 1,
-            repeats: true
+            repeats: true,
         ) { [weak self] timer in
             guard let self, case let .transferring(progress) = self.state else {
                 self?.throughput = nil
@@ -138,12 +187,14 @@ class TransferStatusViewModel: ObservableObject {
                 let newAverageThroughput = 0.2 * progressOverLastSecond + 0.8 * throughput
                 self.throughput = newAverageThroughput
                 estimatedTimeRemaining = remainingPortion / newAverageThroughput
-            } else {
+            } else if progressOverLastSecond > 0 {
                 self.throughput = progressOverLastSecond
                 estimatedTimeRemaining = remainingPortion / progressOverLastSecond
+            } else {
+                return
             }
 
-            self.progressEstimateLabel = timeEstimateFormatter.string(from: estimatedTimeRemaining) ?? " "
+            self.progressEstimateLabel = timeEstimateFormatter.string(from: max(estimatedTimeRemaining, 0)) ?? " "
         }
     }
 
@@ -173,6 +224,8 @@ extension TransferStatusViewModel {
             state = .transferring(progress)
             try await Task.sleep(nanoseconds: UInt64.random(in: 60...120) * NSEC_PER_MSEC)
         }
+        state = .finishing
+        try await Task.sleep(nanoseconds: 2 * NSEC_PER_SEC)
         state = .done
         onSuccess()
     }

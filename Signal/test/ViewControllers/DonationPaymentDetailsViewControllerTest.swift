@@ -7,6 +7,7 @@ import XCTest
 @testable import Signal
 
 final class DonationPaymentDetailsViewControllerTest: XCTestCase {
+
     // MARK: - Formatting tests
 
     func testFormatCardNumber() {
@@ -30,12 +31,12 @@ final class DonationPaymentDetailsViewControllerTest: XCTestCase {
             "42",
             "4242 4242 ",
             "4242 4242 4242 4242",
-            "4242 4242 4242 4242424"
+            "4242 4242 4242 4242424",
         ]
 
         for testCase in testCases {
             let reformatted = DonationPaymentDetailsViewController.formatCardNumber(
-                unformatted: testCase.asciiDigitsOnly
+                unformatted: testCase.asciiDigitsOnly,
             )
             XCTAssertEqual(reformatted, testCase)
         }
@@ -70,12 +71,12 @@ final class DonationPaymentDetailsViewControllerTest: XCTestCase {
             // We mostly want to ensure they don't crash.
             "1/345",
             "0/0",
-            "0/000"
+            "0/000",
         ]
 
         for testCase in testCases {
             let reformatted = DonationPaymentDetailsViewController.formatExpirationDate(
-                unformatted: testCase.asciiDigitsOnly
+                unformatted: testCase.asciiDigitsOnly,
             )
             XCTAssertEqual(reformatted, testCase)
         }
@@ -99,7 +100,7 @@ final class DonationPaymentDetailsViewControllerTest: XCTestCase {
 
     private func assertFullyValid(
         _ formState: DonationPaymentDetailsViewController.FormState,
-        _ message: String = "Form state not fully valid"
+        _ message: String = "Form state not fully valid",
     ) {
         switch formState {
         case .fullyValid:
@@ -113,13 +114,13 @@ final class DonationPaymentDetailsViewControllerTest: XCTestCase {
         cardNumber: String = "4242424242424242",
         isCardNumberFieldFocused: Bool = false,
         expirationDate: String = DonationPaymentDetailsViewControllerTest.validRawExpiration(),
-        cvv: String = "123"
+        cvv: String = "123",
     ) -> DonationPaymentDetailsViewController.FormState {
         DonationPaymentDetailsViewController.formState(
             cardNumber: cardNumber,
             isCardNumberFieldFocused: isCardNumberFieldFocused,
             expirationDate: expirationDate,
-            cvv: cvv
+            cvv: cvv,
         )
     }
 
@@ -130,7 +131,7 @@ final class DonationPaymentDetailsViewControllerTest: XCTestCase {
             cardNumber: "4242424242424242",
             expirationMonth: 9,
             expirationTwoDigitYear: UInt8(Self.nextYearTwoDigits())!,
-            cvv: "123"
+            cvv: "123",
         ))))
     }
 
@@ -154,13 +155,13 @@ final class DonationPaymentDetailsViewControllerTest: XCTestCase {
             "009 / \(year)",
             "09 / \(year)x",
             "09 / \(year) /",
-            "00 / \(year)"
+            "00 / \(year)",
         ]
         for expirationDate in invalids {
             XCTAssertEqual(
                 fs(expirationDate: expirationDate),
                 .invalid(invalidFields: [.expirationDate]),
-                expirationDate
+                expirationDate,
             )
         }
 
@@ -172,13 +173,13 @@ final class DonationPaymentDetailsViewControllerTest: XCTestCase {
             "13",
             "09 /",
             "1 / 3",
-            "0 / \(year)"
+            "0 / \(year)",
         ]
         for expirationDate in potentiallyValids {
             XCTAssertEqual(
                 fs(expirationDate: expirationDate),
                 .potentiallyValid,
-                expirationDate
+                expirationDate,
             )
         }
 
@@ -190,7 +191,7 @@ final class DonationPaymentDetailsViewControllerTest: XCTestCase {
             "1 / \(year)",
             "9 / \(year)",
             "09 / \(year)",
-            "  12   /   \(year)  "
+            "  12   /   \(year)  ",
         ]
         for expirationDate in fullyValids {
             assertFullyValid(fs(expirationDate: expirationDate), expirationDate)

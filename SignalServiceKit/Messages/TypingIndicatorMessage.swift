@@ -5,24 +5,46 @@
 
 import Foundation
 
-@objc(OWSTypingIndicatorAction)
-public enum TypingIndicatorAction: Int {
+public enum TypingIndicatorAction {
     case started
     case stopped
 }
 
-@objc(OWSTypingIndicatorMessage)
-public class TypingIndicatorMessage: TSOutgoingMessage {
-    // Marked @objc so that Mantle can encode/decode it.
-    @objc
-    private var action: TypingIndicatorAction = .started
+public final class TypingIndicatorMessage: TransientOutgoingMessage {
+    override public class var supportsSecureCoding: Bool { true }
+
+    public required init?(coder: NSCoder) {
+        // Doesn't support serialization.
+        return nil
+    }
+
+    override public func encode(with coder: NSCoder) {
+        owsFail("Doesn't support serialization.")
+    }
+
+    override public var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(super.hash)
+        hasher.combine(action)
+        return hasher.finalize()
+    }
+
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard super.isEqual(object) else { return false }
+        guard self.action == object.action else { return false }
+        return true
+    }
+
+    private let action: TypingIndicatorAction
 
     // MARK: Initializers
 
-    @objc
-    public init(thread: TSThread,
-                action: TypingIndicatorAction,
-                transaction: DBReadTransaction) {
+    public init(
+        thread: TSThread,
+        action: TypingIndicatorAction,
+        transaction: DBReadTransaction,
+    ) {
         self.action = action
 
         let builder: TSOutgoingMessageBuilder = .withDefaultValues(thread: thread)
@@ -31,32 +53,22 @@ public class TypingIndicatorMessage: TSOutgoingMessage {
             additionalRecipients: [],
             explicitRecipients: [],
             skippedRecipients: [],
-            transaction: transaction
+            transaction: transaction,
         )
     }
 
     @objc
-    public required init!(coder: NSCoder) {
-        super.init(coder: coder)
-    }
-
-    @objc
-    public required init(dictionary dictionaryValue: [String: Any]!) throws {
-        try super.init(dictionary: dictionaryValue)
-    }
-
-    @objc
-    public override func shouldSyncTranscript() -> Bool {
+    override public func shouldSyncTranscript() -> Bool {
         return false
     }
 
     @objc
-    public override var isOnline: Bool {
+    override public var isOnline: Bool {
         return true
     }
 
     @objc
-    public override var isUrgent: Bool { false }
+    override public var isUrgent: Bool { false }
 
     private func protoAction(forAction action: TypingIndicatorAction) -> SSKProtoTypingMessageAction {
         switch action {
@@ -67,8 +79,10 @@ public class TypingIndicatorMessage: TSOutgoingMessage {
         }
     }
 
-    public override func contentBuilder(thread: TSThread,
-                                        transaction: DBReadTransaction) -> SSKProtoContentBuilder? {
+    override public func contentBuilder(
+        thread: TSThread,
+        transaction: DBReadTransaction,
+    ) -> SSKProtoContentBuilder? {
         let typingBuilder = SSKProtoTypingMessage.builder(timestamp: self.timestamp)
         typingBuilder.setAction(protoAction(forAction: action))
 
@@ -90,12 +104,7 @@ public class TypingIndicatorMessage: TSOutgoingMessage {
     // MARK: TSYapDatabaseObject overrides
 
     @objc
-    public override var shouldBeSaved: Bool {
-        return false
-    }
-
-    @objc
-    public override var debugDescription: String {
+    override public var debugDescription: String {
         return "typingIndicatorMessage"
     }
 

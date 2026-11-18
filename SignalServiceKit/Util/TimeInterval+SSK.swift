@@ -53,15 +53,3 @@ extension TimeInterval {
         return min(actualValue, UInt64(Int64.max))
     }
 }
-
-@objcMembers
-@available(swift, obsoleted: 1)
-public class NSTimeIntervalConstants: NSObject {
-    public static let second: TimeInterval = .second
-    public static let minute: TimeInterval = .minute
-    public static let hour: TimeInterval = .hour
-    public static let day: TimeInterval = .day
-    public static let week: TimeInterval = .week
-    public static let month: TimeInterval = .month
-    public static let year: TimeInterval = .year
-}

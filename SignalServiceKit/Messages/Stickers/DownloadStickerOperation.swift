@@ -7,38 +7,26 @@ import Foundation
 
 enum DownloadStickerOperation {
 
-    // MARK: - Cache
-
-    private static let cache = LRUCache<String, URL>(maxSize: 256)
-
-    private static func cachedUrl(for stickerInfo: StickerInfo) -> URL? {
-        guard let stickerUrl = cache.object(forKey: stickerInfo.asKey()) else {
-            return nil
-        }
-        guard OWSFileSystem.fileOrFolderExists(url: stickerUrl) else { return nil }
-        return stickerUrl
-    }
-
-    private static func setCachedUrl(_ url: URL, for stickerInfo: StickerInfo) {
-        cache.setObject(url, forKey: stickerInfo.asKey())
-    }
-
-    public static func run(stickerInfo: StickerInfo) async throws -> URL {
+    static func run(stickerInfo: StickerInfo) async throws -> Data {
         return try await Retry.performWithBackoff(maxAttempts: 4) {
             return try await _run(stickerInfo: stickerInfo)
         }
     }
 
-    private static func _run(stickerInfo: StickerInfo) async throws -> URL {
+    private static func _run(stickerInfo: StickerInfo) async throws -> Data {
         assert(stickerInfo.packId.count > 0)
         assert(stickerInfo.packKey.count > 0)
 
-        if let stickerUrl = DownloadStickerOperation.cachedUrl(for: stickerInfo) {
-            return stickerUrl
-        }
+        let stickerManager = DependenciesBridge.shared.stickerManager
+        let db = DependenciesBridge.shared.db
 
-        if let stickerUrl = loadInstalledStickerUrl(stickerInfo: stickerInfo) {
-            return stickerUrl
+        if
+            let installedStickerMetadata = db.read(block: { tx in
+                stickerManager.installedStickerMetadata(stickerInfo: stickerInfo, transaction: tx)
+            })
+        {
+            // Already installed.
+            return try installedStickerMetadata.readStickerData()
         }
 
         // https://cdn.signal.org/stickers/<pack_id>/full/<sticker_id>
@@ -46,24 +34,17 @@ enum DownloadStickerOperation {
 
         let encryptedFileUrl: URL = try await CDNDownloadOperation.tryToDownload(
             urlPath: urlPath,
-            maxDownloadSize: CDNDownloadOperation.kMaxStickerDataDownloadSize
+            maxDownloadSize: CDNDownloadOperation.kMaxStickerDataDownloadSize,
         )
 
-        let decryptedFileUrl: URL
+        let stickerData: Data
         do {
-            decryptedFileUrl = try StickerManager.decrypt(at: encryptedFileUrl, packKey: stickerInfo.packKey)
+            stickerData = try StickerManager.decrypt(at: encryptedFileUrl, packKey: stickerInfo.packKey)
         } catch {
-            owsFailDebug("Decryption failed: \(error)")
             CDNDownloadOperation.markUrlPathAsCorrupt(urlPath)
-            throw SSKUnretryableError.stickerDecryptionFailure
+            throw OWSAssertionError("Decryption failed: \(error)")
         }
 
-        DownloadStickerOperation.setCachedUrl(decryptedFileUrl, for: stickerInfo)
-        return decryptedFileUrl
-
-    }
-
-    private static func loadInstalledStickerUrl(stickerInfo: StickerInfo) -> URL? {
-        return StickerManager.stickerDataUrlWithSneakyTransaction(stickerInfo: stickerInfo, verifyExists: true)
+        return stickerData
     }
 }

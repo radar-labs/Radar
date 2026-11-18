@@ -8,7 +8,7 @@ import SignalServiceKit
 import SignalUI
 
 class StoryGroupReplyLoader {
-    private let messageBatchFetcher: StoryGroupReplyBatchFetcher
+    private let messageCursorFactory: StoryGroupReplyCursorFactory
     private let messageLoader: MessageLoader
     private let threadUniqueId: String
     private let storyMessage: StoryMessage
@@ -16,6 +16,7 @@ class StoryGroupReplyLoader {
     private var replyUniqueIds = [String]() {
         didSet { AssertIsOnMainThread() }
     }
+
     private var replyItems = [String: StoryGroupReplyViewItem]() {
         didSet { AssertIsOnMainThread() }
     }
@@ -28,7 +29,7 @@ class StoryGroupReplyLoader {
 
     var isScrolledToBottom: Bool {
         AssertIsOnMainThread()
-        guard let tableView = tableView else { return false }
+        guard let tableView else { return false }
 
         let lastIndexPath = IndexPath(row: replyUniqueIds.count - 1, section: 0)
 
@@ -43,7 +44,7 @@ class StoryGroupReplyLoader {
 
     @MainActor
     init?(storyMessage: StoryMessage, threadUniqueId: String?, tableView: UITableView) {
-        guard let threadUniqueId = threadUniqueId else {
+        guard let threadUniqueId else {
             owsFailDebug("Unexpectedly missing threadUniqueId")
             return nil
         }
@@ -51,13 +52,13 @@ class StoryGroupReplyLoader {
         self.threadUniqueId = threadUniqueId
         self.storyMessage = storyMessage
         self.tableView = tableView
-        self.messageBatchFetcher = StoryGroupReplyBatchFetcher(
+        self.messageCursorFactory = StoryGroupReplyCursorFactory(
             storyAuthor: storyMessage.authorAci,
-            storyTimestamp: storyMessage.timestamp
+            storyTimestamp: storyMessage.timestamp,
         )
         self.messageLoader = MessageLoader(
-            batchFetcher: messageBatchFetcher,
-            interactionFetchers: [SSKEnvironment.shared.modelReadCachesRef.interactionReadCache, SDSInteractionFetcherImpl()]
+            cursorFactory: messageCursorFactory,
+            interactionFetchers: [SSKEnvironment.shared.modelReadCachesRef.interactionReadCache, SDSInteractionFetcherImpl()],
         )
 
         // Load the first page synchronously.
@@ -98,7 +99,7 @@ class StoryGroupReplyLoader {
     func reload(
         updatedInteractionIds: Set<String>? = nil,
         deletedInteractionIds: Set<String>? = nil,
-        canReuseInteractions: Bool = true
+        canReuseInteractions: Bool = true,
     ) {
         LoadingMode.reload.async {
             SSKEnvironment.shared.databaseStorageRef.read { self.load(
@@ -106,7 +107,7 @@ class StoryGroupReplyLoader {
                 canReuseInteractions: canReuseInteractions,
                 updatedInteractionIds: updatedInteractionIds,
                 deletedInteractionIds: deletedInteractionIds,
-                transaction: $0
+                transaction: $0,
             ) }
         }
     }
@@ -139,7 +140,7 @@ class StoryGroupReplyLoader {
         canReuseInteractions: Bool = true,
         updatedInteractionIds: Set<String>? = nil,
         deletedInteractionIds: Set<String>? = nil,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) {
         assertOnQueue(mode.queue)
 
@@ -149,7 +150,7 @@ class StoryGroupReplyLoader {
         if canReuseInteractions {
             let loadedInteractions = messageLoader.loadedInteractions
             reusableInteractions = loadedInteractions.reduce(
-                into: [String: TSInteraction]()
+                into: [String: TSInteraction](),
             ) { partialResult, interaction in
                 guard updatedInteractionIds?.contains(interaction.uniqueId) != true else { return }
                 partialResult[interaction.uniqueId] = interaction
@@ -158,34 +159,43 @@ class StoryGroupReplyLoader {
             reusableInteractions = [:]
         }
 
-        messageBatchFetcher.refetch(tx: transaction)
+        messageCursorFactory.refetch(tx: transaction)
+
+        let messageLoaderPreprocessingContext = MessageLoaderPreprocessingContext(
+            threadUniqueId: threadUniqueId,
+            oldestUnreadSortId: nil,
+        )
 
         do {
             switch mode {
             case .initial:
                 try self.messageLoader.loadInitialMessagePage(
-                    focusMessageId: messageBatchFetcher.uniqueIdsAndRowIds.first?.uniqueId,
+                    focusMessageId: messageCursorFactory.uniqueIdsAndRowIds.first?.uniqueId,
                     reusableInteractions: reusableInteractions,
                     deletedInteractionIds: deletedInteractionIds,
-                    tx: transaction
+                    preprocessingContext: messageLoaderPreprocessingContext,
+                    tx: transaction,
                 )
             case .newer:
                 try self.messageLoader.loadNewerMessagePage(
                     reusableInteractions: reusableInteractions,
                     deletedInteractionIds: deletedInteractionIds,
-                    tx: transaction
+                    preprocessingContext: messageLoaderPreprocessingContext,
+                    tx: transaction,
                 )
             case .older:
                 try self.messageLoader.loadOlderMessagePage(
                     reusableInteractions: reusableInteractions,
                     deletedInteractionIds: deletedInteractionIds,
-                    tx: transaction
+                    preprocessingContext: messageLoaderPreprocessingContext,
+                    tx: transaction,
                 )
             case .reload:
                 try self.messageLoader.loadSameLocation(
                     reusableInteractions: reusableInteractions,
                     deletedInteractionIds: deletedInteractionIds,
-                    tx: transaction
+                    preprocessingContext: messageLoaderPreprocessingContext,
+                    tx: transaction,
                 )
             }
         } catch {
@@ -193,7 +203,7 @@ class StoryGroupReplyLoader {
         }
 
         let newReplyItems = buildItems(reusableInteractionIds: Array(reusableInteractions.keys), transaction: transaction)
-        let replyUniqueIds = messageBatchFetcher.uniqueIdsAndRowIds.map { $0.uniqueId }
+        let replyUniqueIds = messageCursorFactory.uniqueIdsAndRowIds.map { $0.uniqueId }
         let oldestLoadedRow = messageLoader.loadedInteractions.first.flatMap { replyUniqueIds.firstIndex(of: $0.uniqueId) }
         let newestLoadedRow = messageLoader.loadedInteractions.last.flatMap { replyUniqueIds.firstIndex(of: $0.uniqueId) }
 
@@ -211,7 +221,7 @@ class StoryGroupReplyLoader {
     }
 
     private func buildItems(reusableInteractionIds: [String], transaction: DBReadTransaction) -> [String: StoryGroupReplyViewItem] {
-        guard let groupThread = TSGroupThread.anyFetchGroupThread(uniqueId: threadUniqueId, transaction: transaction) else {
+        guard let groupThread = TSGroupThread.fetchGroupThreadViaCache(uniqueId: threadUniqueId, transaction: transaction) else {
             owsFailDebug("Missing group thread for story")
             return replyItems
         }
@@ -233,10 +243,10 @@ class StoryGroupReplyLoader {
             }
         }
 
-        let groupNameColors = GroupNameColors.forThread(groupThread, localAci: localIdentifiers.aci)
+        let groupNameColors = GroupNameColors.forThread(groupThread)
         let displayNamesByAddress = SSKEnvironment.shared.contactManagerImplRef.displayNamesByAddress(
             for: Array(authorAddresses),
-            transaction: transaction
+            transaction: transaction,
         )
 
         var newReplyItems = [String: StoryGroupReplyViewItem]()
@@ -262,13 +272,13 @@ class StoryGroupReplyLoader {
                     authorDisplayName: displayName,
                     authorColor: groupNameColors.color(for: authorAddress.aci),
                     recipientStatus: recipientStatus,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             }
 
             newReplyItems[message.uniqueId] = replyItem
 
-            if let previousItem = previousItem, canCollapse(item: replyItem, previousItem: previousItem) {
+            if let previousItem, canCollapse(item: replyItem, previousItem: previousItem) {
                 switch previousItem.cellType.position {
                 case .standalone:
                     previousItem.cellType.position = .top
@@ -300,8 +310,8 @@ class StoryGroupReplyLoader {
         case .reaction: return true
         case .text:
             return previousItem.authorAddress == item.authorAddress &&
-            previousItem.timeString == item.timeString &&
-            ![.pending, .uploading, .sending, .failed].contains(previousItem.recipientStatus)
+                previousItem.timeString == item.timeString &&
+                ![.pending, .uploading, .sending, .failed].contains(previousItem.recipientStatus)
         }
     }
 }
@@ -311,7 +321,7 @@ extension StoryGroupReplyLoader: DatabaseChangeDelegate {
         guard let storyId = storyMessage.id, databaseChanges.storyMessageRowIds.contains(storyId) else { return }
         reload(
             updatedInteractionIds: databaseChanges.interactionUniqueIds,
-            deletedInteractionIds: databaseChanges.interactionDeletedUniqueIds
+            deletedInteractionIds: databaseChanges.interactionDeletedUniqueIds,
         )
     }
 
@@ -324,9 +334,9 @@ extension StoryGroupReplyLoader: DatabaseChangeDelegate {
     }
 }
 
-// MARK: - Batch Fetcher
+// MARK: - Cursor Factory
 
-private class StoryGroupReplyBatchFetcher: MessageLoaderBatchFetcher {
+private class StoryGroupReplyCursorFactory: MessageLoaderCursorFactory {
     private let storyAuthor: Aci
     private let storyTimestamp: UInt64
 
@@ -341,11 +351,14 @@ private class StoryGroupReplyBatchFetcher: MessageLoaderBatchFetcher {
         uniqueIdsAndRowIds = InteractionFinder.groupReplyUniqueIdsAndRowIds(
             storyAuthor: storyAuthor,
             storyTimestamp: storyTimestamp,
-            transaction: tx
+            transaction: tx,
         )
     }
 
-    func fetchUniqueIds(filter: InteractionFinder.RowIdFilter, limit: Int, tx: DBReadTransaction) throws -> [String] {
+    func buildUniqueIdCursor(
+        filter: InteractionFinder.RowIdFilter,
+        tx: DBReadTransaction,
+    ) -> MessageLoaderUniqueIdCursor {
         // This design is extremely weird. However, we already fetch all the
         // uniqueIds for a given story when rendering the view, and while we could
         // design a bunch of equivalent database queries to do the same thing, we
@@ -355,17 +368,44 @@ private class StoryGroupReplyBatchFetcher: MessageLoaderBatchFetcher {
         // do just as often as we invoked this method (from a big-O perspective)).
         // In the future, we should support proper paging on this view, but for
         // now, this is probably faster than what we had before.
+        //
+        // Like the database-backed cursor, this must yield uniqueIds newest
+        // first for the `.newest`, `.atOrBefore`, and `.before` filters, and
+        // oldest first for the `.after` and `.range` filters.
+        let uniqueIds: [String]
         switch filter {
         case .newest:
-            return Array(uniqueIdsAndRowIds.lazy.suffix(limit).map { $0.uniqueId })
+            uniqueIds = uniqueIdsAndRowIds.reversed().map { $0.uniqueId }
         case .atOrBefore(let rowId):
-            return Array(uniqueIdsAndRowIds.lazy.filter { $0.rowId <= rowId }.suffix(limit).map { $0.uniqueId })
+            uniqueIds = uniqueIdsAndRowIds.reversed().filter { $0.rowId <= rowId }.map { $0.uniqueId }
         case .before(let rowId):
-            return Array(uniqueIdsAndRowIds.lazy.filter { $0.rowId < rowId }.suffix(limit).map { $0.uniqueId })
+            uniqueIds = uniqueIdsAndRowIds.reversed().filter { $0.rowId < rowId }.map { $0.uniqueId }
         case .after(let rowId):
-            return Array(uniqueIdsAndRowIds.lazy.filter { $0.rowId > rowId }.prefix(limit).map { $0.uniqueId })
+            uniqueIds = uniqueIdsAndRowIds.filter { $0.rowId > rowId }.map { $0.uniqueId }
         case .range(let rowIds):
-            return Array(uniqueIdsAndRowIds.lazy.filter { rowIds.contains($0.rowId) }.prefix(limit).map { $0.uniqueId })
+            uniqueIds = uniqueIdsAndRowIds.filter { rowIds.contains($0.rowId) }.map { $0.uniqueId }
         }
+        return InMemoryUniqueIdCursor(uniqueIds: uniqueIds)
+    }
+}
+
+// MARK: -
+
+/// Yields the given `uniqueIds`, in the given order.
+struct InMemoryUniqueIdCursor: MessageLoaderUniqueIdCursor {
+    private var uniqueIds: ArraySlice<String>
+    private let onNext: (() -> Void)?
+
+    init(uniqueIds: [String], onNext: (() -> Void)? = nil) {
+        self.uniqueIds = uniqueIds[...]
+        self.onNext = onNext
+    }
+
+    mutating func next() -> String? {
+        guard let uniqueId = uniqueIds.popFirst() else {
+            return nil
+        }
+        onNext?()
+        return uniqueId
     }
 }

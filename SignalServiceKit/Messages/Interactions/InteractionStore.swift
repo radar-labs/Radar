@@ -9,41 +9,41 @@ public import LibSignalClient
 
 public protocol InteractionStore {
 
-    // MARK: - 
+    // MARK: -
 
     /// Fetch the interaction with the given SQLite row ID, if one exists.
     func fetchInteraction(
         rowId interactionRowId: Int64,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> TSInteraction?
 
     func fetchInteraction(
         uniqueId: String,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> TSInteraction?
 
     func findMessage(
         withTimestamp timestamp: UInt64,
         threadId: String,
         author: SignalServiceAddress,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> TSMessage?
 
     func fetchInteractions(
         timestamp: UInt64,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> [TSInteraction]
 
     func fetchCursor(
         minRowIdExclusive: Int64?,
-        maxRowIdInclusive: Int64?,
-        tx: DBReadTransaction
-    ) throws -> AnyCursor<TSInteraction>
+        maxRowIdInclusive: Int64,
+        tx: DBReadTransaction,
+    ) -> AnyCursor<InteractionRecord>
 
     func insertedMessageHasRenderableContent(
         message: TSMessage,
         rowId: Int64,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> Bool
 
     /// Fetch the message with the given timestamp and incomingMessageAuthor. If
@@ -51,7 +51,9 @@ public protocol InteractionStore {
     func fetchMessage(
         timestamp: UInt64,
         incomingMessageAuthor: Aci?,
-        transaction: DBReadTransaction) throws -> TSMessage?
+        threadUniqueId: String,
+        transaction: DBReadTransaction,
+    ) throws -> TSMessage?
 
     // MARK: -
 
@@ -63,28 +65,20 @@ public protocol InteractionStore {
     func updateInteraction<InteractionType: TSInteraction>(
         _ interaction: InteractionType,
         tx: DBWriteTransaction,
-        block: (InteractionType) -> Void
+        block: (InteractionType) -> Void,
     )
 
     // MARK: -
 
     func buildOutgoingMessage(
         builder: TSOutgoingMessageBuilder,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> TSOutgoingMessage
-
-    func buildOutgoingArchivedPaymentMessage(
-        builder: TSOutgoingMessageBuilder,
-        amount: String?,
-        fee: String?,
-        note: String?,
-        tx: DBReadTransaction
-    ) -> OWSOutgoingArchivedPaymentMessage
 
     func insertOrReplacePlaceholder(
         for interaction: TSInteraction,
         from sender: SignalServiceAddress,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 
     // MARK: - TSOutgoingMessage state updates
@@ -93,7 +87,7 @@ public protocol InteractionStore {
         _ message: TSOutgoingMessage,
         recipientStates: [SignalServiceAddress: TSOutgoingMessageRecipientState],
         isSentUpdate: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     )
 }
 
@@ -107,67 +101,67 @@ public class InteractionStoreImpl: InteractionStore {
 
     public func fetchInteraction(
         rowId interactionRowId: Int64,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> TSInteraction? {
         return InteractionFinder.fetch(
-            rowId: interactionRowId, transaction: tx
+            rowId: interactionRowId,
+            transaction: tx,
         )
     }
 
     public func fetchInteraction(
         uniqueId: String,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> TSInteraction? {
-        return TSInteraction.anyFetch(uniqueId: uniqueId, transaction: tx)
+        return TSInteraction.fetchViaCache(uniqueId: uniqueId, transaction: tx)
     }
 
     public func findMessage(
         withTimestamp timestamp: UInt64,
         threadId: String,
         author: SignalServiceAddress,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> TSMessage? {
         return InteractionFinder.findMessage(
             withTimestamp: timestamp,
             threadId: threadId,
             author: author,
-            transaction: tx
+            transaction: tx,
         )
     }
 
     public func fetchInteractions(
         timestamp: UInt64,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> [TSInteraction] {
         return try InteractionFinder.fetchInteractions(
             timestamp: timestamp,
-            transaction: tx
+            transaction: tx,
         )
     }
 
     public func fetchCursor(
         minRowIdExclusive: Int64?,
-        maxRowIdInclusive: Int64?,
-        tx: DBReadTransaction
-    ) throws -> AnyCursor<TSInteraction> {
+        maxRowIdInclusive: Int64,
+        tx: DBReadTransaction,
+    ) -> AnyCursor<InteractionRecord> {
         let idColumn = Column(InteractionRecord.CodingKeys.id)
         var query = InteractionRecord
             .order(idColumn.asc)
         if let minRowIdExclusive {
             query = query.filter(idColumn > minRowIdExclusive)
         }
-        if let maxRowIdInclusive {
-            query = query.filter(idColumn <= maxRowIdInclusive)
+        query = query.filter(idColumn <= maxRowIdInclusive)
+        return failIfThrows {
+            let cursor = try query.fetchCursor(tx.database)
+            return AnyCursor(cursor)
         }
-        let cursor = try query.fetchCursor(tx.database)
-            .map(TSInteraction.fromRecord(_:))
-        return AnyCursor(cursor)
     }
 
     public func insertedMessageHasRenderableContent(
         message: TSMessage,
         rowId: Int64,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> Bool {
         return message.insertedMessageHasRenderableContent(rowId: rowId, tx: tx)
     }
@@ -181,7 +175,7 @@ public class InteractionStoreImpl: InteractionStore {
     public func updateInteraction<InteractionType: TSInteraction>(
         _ interaction: InteractionType,
         tx: DBWriteTransaction,
-        block: (InteractionType) -> Void
+        block: (InteractionType) -> Void,
     ) {
         interaction.anyUpdate(transaction: tx) { interaction in
             guard let interaction = interaction as? InteractionType else {
@@ -197,37 +191,21 @@ public class InteractionStoreImpl: InteractionStore {
 
     public func buildOutgoingMessage(
         builder: TSOutgoingMessageBuilder,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> TSOutgoingMessage {
         return TSOutgoingMessage(
             outgoingMessageWith: builder,
             additionalRecipients: [],
             explicitRecipients: [],
             skippedRecipients: [],
-            transaction: tx
-        )
-    }
-
-    public func buildOutgoingArchivedPaymentMessage(
-        builder: TSOutgoingMessageBuilder,
-        amount: String?,
-        fee: String?,
-        note: String?,
-        tx: DBReadTransaction
-    ) -> OWSOutgoingArchivedPaymentMessage {
-        return OWSOutgoingArchivedPaymentMessage(
-            outgoingArchivedPaymentMessageWith: builder,
-            amount: amount,
-            fee: fee,
-            note: note,
-            transaction: tx
+            transaction: tx,
         )
     }
 
     public func insertOrReplacePlaceholder(
         for interaction: TSInteraction,
         from sender: SignalServiceAddress,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         interaction.insertOrReplacePlaceholder(from: sender, transaction: tx)
     }
@@ -238,28 +216,30 @@ public class InteractionStoreImpl: InteractionStore {
         _ message: TSOutgoingMessage,
         recipientStates: [SignalServiceAddress: TSOutgoingMessageRecipientState],
         isSentUpdate: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         message.updateRecipientsFromNonLocalDevice(
             recipientStates,
             isSentUpdate: isSentUpdate,
-            transaction: tx
+            transaction: tx,
         )
     }
 
     public func fetchMessage(
         timestamp: UInt64,
         incomingMessageAuthor: Aci?,
-        transaction: DBReadTransaction
+        threadUniqueId: String,
+        transaction: DBReadTransaction,
     ) throws -> TSMessage? {
         let records = try InteractionRecord.fetchAll(
             transaction.database,
             sql: """
-                SELECT *
-                FROM \(InteractionRecord.databaseTableName)
-                WHERE \(interactionColumn: .timestamp) = ?
-                """,
-            arguments: [timestamp]
+            SELECT *
+            FROM \(InteractionRecord.databaseTableName)
+            WHERE \(interactionColumn: .timestamp) = ?
+            AND \(interactionColumn: .threadUniqueId) = ?
+            """,
+            arguments: [timestamp, threadUniqueId],
         )
 
         for record in records {
@@ -267,9 +247,11 @@ public class InteractionStoreImpl: InteractionStore {
                 return outgoingMessage
             }
 
-            if let incomingMessage = try TSInteraction.fromRecord(record) as? TSIncomingMessage,
-               let authorUUID = incomingMessage.authorUUID,
-               try ServiceId.parseFrom(serviceIdString: authorUUID) == incomingMessageAuthor {
+            if
+                let incomingMessage = try TSInteraction.fromRecord(record) as? TSIncomingMessage,
+                let authorUUID = incomingMessage.authorUUID,
+                try ServiceId.parseFrom(serviceIdString: authorUUID) == incomingMessageAuthor
+            {
                 return incomingMessage
             }
         }
@@ -293,7 +275,7 @@ open class MockInteractionStore: InteractionStore {
 
     open func fetchInteraction(
         rowId interactionRowId: Int64,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> TSInteraction? {
         return insertedInteractions.first(where: { $0.sqliteRowId == interactionRowId })
     }
@@ -306,7 +288,7 @@ open class MockInteractionStore: InteractionStore {
         withTimestamp timestamp: UInt64,
         threadId: String,
         author: SignalServiceAddress,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> TSMessage? {
         return insertedInteractions
             .lazy
@@ -333,23 +315,23 @@ open class MockInteractionStore: InteractionStore {
 
     public func fetchInteractions(
         timestamp: UInt64,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) throws -> [TSInteraction] {
         return insertedInteractions.filter { $0.timestamp == timestamp }
     }
 
     open func fetchCursor(
         minRowIdExclusive: Int64?,
-        maxRowIdInclusive: Int64?,
-        tx: DBReadTransaction
-    ) throws -> AnyCursor<TSInteraction> {
+        maxRowIdInclusive: Int64,
+        tx: DBReadTransaction,
+    ) -> AnyCursor<InteractionRecord> {
         let filtered = insertedInteractions.lazy
             .filter { interaction in
                 guard let rowId = interaction.sqliteRowId else { return false }
                 if let minRowIdExclusive, rowId <= minRowIdExclusive {
                     return false
                 }
-                if let maxRowIdInclusive, rowId > maxRowIdInclusive {
+                if rowId > maxRowIdInclusive {
                     return false
                 }
                 return true
@@ -357,17 +339,18 @@ open class MockInteractionStore: InteractionStore {
             .sorted(by: { lhs, rhs in
                 return lhs.sqliteRowId! < rhs.sqliteRowId!
             })
+            .map { $0.asRecord() as! InteractionRecord }
 
         class Iterator: IteratorProtocol {
             var index = 0
-            var array: [TSInteraction]
+            var array: [InteractionRecord]
 
-            init(index: Int = 0, array: [TSInteraction]) {
+            init(index: Int = 0, array: [InteractionRecord]) {
                 self.index = index
                 self.array = array
             }
 
-            func next() -> TSInteraction? {
+            func next() -> InteractionRecord? {
                 guard index < array.count else {
                     return nil
                 }
@@ -375,7 +358,7 @@ open class MockInteractionStore: InteractionStore {
                 return array[index]
             }
 
-            typealias Element = TSInteraction
+            typealias Element = InteractionRecord
         }
 
         return AnyCursor(iterator: Iterator(array: filtered))
@@ -384,7 +367,7 @@ open class MockInteractionStore: InteractionStore {
     open func insertedMessageHasRenderableContent(
         message: TSMessage,
         rowId: Int64,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> Bool {
         return true
     }
@@ -403,31 +386,31 @@ open class MockInteractionStore: InteractionStore {
     open func update(
         _ message: TSMessage,
         with quotedMessage: TSQuotedMessage,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {}
 
     public func update(
         _ message: TSMessage,
         with linkPreview: OWSLinkPreview,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {}
 
     public func update(
         _ message: TSMessage,
         with contact: OWSContact,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {}
 
     public func update(
         _ message: TSMessage,
         with sticker: MessageSticker,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {}
 
     open func updateInteraction<InteractionType: TSInteraction>(
         _ interaction: InteractionType,
         tx: DBWriteTransaction,
-        block: (InteractionType) -> Void
+        block: (InteractionType) -> Void,
     ) {
         block(interaction)
     }
@@ -436,29 +419,19 @@ open class MockInteractionStore: InteractionStore {
 
     open func buildOutgoingMessage(
         builder: TSOutgoingMessageBuilder,
-        tx: DBReadTransaction
+        tx: DBReadTransaction,
     ) -> TSOutgoingMessage {
         // Override in a subclass if you want recipient states populated.
         return TSOutgoingMessage(
             outgoingMessageWith: builder,
-            recipientAddressStates: [:]
+            recipientAddressStates: [:],
         )
-    }
-
-    public func buildOutgoingArchivedPaymentMessage(
-        builder: TSOutgoingMessageBuilder,
-        amount: String?,
-        fee: String?,
-        note: String?,
-        tx: DBReadTransaction
-    ) -> OWSOutgoingArchivedPaymentMessage {
-        owsFail("Not implemented, because this message type really needs an DBReadTransaction to be initialized, and at the time of writing no caller cares.")
     }
 
     open func insertOrReplacePlaceholder(
         for interaction: TSInteraction,
         from sender: SignalServiceAddress,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         // Do nothing
     }
@@ -469,7 +442,7 @@ open class MockInteractionStore: InteractionStore {
         _ message: TSOutgoingMessage,
         recipientStates: [SignalServiceAddress: TSOutgoingMessageRecipientState],
         isSentUpdate: Bool,
-        tx: DBWriteTransaction
+        tx: DBWriteTransaction,
     ) {
         // Unimplemented
     }
@@ -477,7 +450,8 @@ open class MockInteractionStore: InteractionStore {
     public func fetchMessage(
         timestamp: UInt64,
         incomingMessageAuthor: Aci?,
-        transaction: DBReadTransaction
+        threadUniqueId: String,
+        transaction: DBReadTransaction,
     ) throws -> TSMessage? {
         // Unimplemented
         return nil

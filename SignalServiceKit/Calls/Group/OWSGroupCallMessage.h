@@ -39,6 +39,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// - SeeAlso ``OWSReadTracking``
 @property (nonatomic, getter=wasRead) BOOL read;
 
+@property (nonatomic, readonly) uint32_t expiresInSeconds;
+@property (nonatomic) uint64_t expireStartedAt;
+@property (nonatomic, readonly) uint64_t expiresAt;
+
 /// This property is deprecated, but remains here to preserve compatibility with
 /// legacy data. Specifically, it will only be populated on old messages -
 /// recent messages will instead have a corresponding ``CallRecord`` storing a
@@ -48,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithCustomUniqueId:(NSString *)uniqueId
                              timestamp:(uint64_t)timestamp
                    receivedAtTimestamp:(uint64_t)receivedAtTimestamp
-                                thread:(TSThread *)thread NS_UNAVAILABLE;
+                        threadUniqueId:(nonnull NSString *)threadUniqueId NS_UNAVAILABLE;
 - (instancetype)initWithTimestamp:(uint64_t)timestamp
               receivedAtTimestamp:(uint64_t)receivedAtTimestamp
                            thread:(TSThread *)thread NS_UNAVAILABLE;
@@ -59,12 +63,13 @@ NS_ASSUME_NONNULL_BEGIN
                      timestamp:(uint64_t)timestamp
                 uniqueThreadId:(NSString *)uniqueThreadId NS_UNAVAILABLE;
 
-- (nullable instancetype)initWithCoder:(NSCoder *)coder NS_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder *)coder NS_UNAVAILABLE;
 
 - (instancetype)initWithJoinedMemberAcis:(NSArray<AciObjC *> *)joinedMemberAcis
                               creatorAci:(nullable AciObjC *)creatorAci
                                   thread:(TSGroupThread *)thread
-                         sentAtTimestamp:(uint64_t)sentAtTimestamp NS_DESIGNATED_INITIALIZER;
+                         sentAtTimestamp:(uint64_t)sentAtTimestamp
+                        expiresInSeconds:(uint32_t)expiresInSeconds NS_DESIGNATED_INITIALIZER;
 
 // --- CODE GENERATION MARKER
 
@@ -81,10 +86,13 @@ NS_ASSUME_NONNULL_BEGIN
                   uniqueThreadId:(NSString *)uniqueThreadId
                      creatorUuid:(nullable NSString *)creatorUuid
                            eraId:(nullable NSString *)eraId
+                 expireStartedAt:(uint64_t)expireStartedAt
+                       expiresAt:(uint64_t)expiresAt
+                expiresInSeconds:(unsigned int)expiresInSeconds
                         hasEnded:(BOOL)hasEnded
                joinedMemberUuids:(nullable NSArray<NSString *> *)joinedMemberUuids
                             read:(BOOL)read
-NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp:sortId:timestamp:uniqueThreadId:creatorUuid:eraId:hasEnded:joinedMemberUuids:read:));
+NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp:sortId:timestamp:uniqueThreadId:creatorUuid:eraId:expireStartedAt:expiresAt:expiresInSeconds:hasEnded:joinedMemberUuids:read:));
 
 // clang-format on
 

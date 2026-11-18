@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-import SignalUI
 import SignalRingRTC
 import SignalServiceKit
+import SignalUI
 
 // MARK: - RaisedHandsToastDelegate
 
@@ -33,29 +33,38 @@ class RaisedHandsToast: UIView {
 
     private let deps = Dependencies(
         db: SSKEnvironment.shared.databaseStorageRef,
-        contactsManager: SSKEnvironment.shared.contactManagerRef
+        contactsManager: SSKEnvironment.shared.contactManagerRef,
     )
 
     private let outerHStack = UIStackView()
     private let iconLabelContainer = UIView()
     private let labelContainer = UIView()
     private let label = UILabel()
-    private lazy var viewButton = OWSButton(
-        title: CommonStrings.viewButton,
-        tintColor: .ows_white,
-        dimsWhenHighlighted: true
-    ) { [weak self] in
-        self?.delegate?.didTapViewRaisedHands()
-    }
-    private lazy var lowerHandButton = OWSButton(
-        title: CallStrings.lowerHandButton,
-        tintColor: .ows_white,
-        dimsWhenHighlighted: true
-    ) { [weak self] in
-        self?.call.ringRtcCall.raiseHand(raise: false)
+
+    private static func buttonConfig(title: String) -> UIButton.Configuration {
+        var config = UIButton.Configuration.plain()
+        config.baseForegroundColor = .white
+        config.title = title
+        config.titleTextAttributesTransformer = .defaultFont(.dynamicTypeSubheadline.bold())
+        return config
     }
 
+    private lazy var viewButton = UIButton(
+        configuration: RaisedHandsToast.buttonConfig(title: CommonStrings.viewButton),
+        primaryAction: UIAction { [weak self] _ in
+            self?.delegate?.didTapViewRaisedHands()
+        },
+    )
+
+    private lazy var lowerHandButton = UIButton(
+        configuration: RaisedHandsToast.buttonConfig(title: CallStrings.lowerHandButton),
+        primaryAction: UIAction { [weak self] _ in
+            self?.call.ringRtcCall.raiseHand(raise: false)
+        },
+    )
+
     private var isCollapsed = false
+    private var isSuggestingLowerHand = false
 
     private var collapsedText: String = ""
     private var expandedText: String = ""
@@ -91,7 +100,7 @@ class RaisedHandsToast: UIView {
         raisedHandIcon.attributedText = .with(
             image: UIImage(named: "raise_hand")!,
             font: .dynamicTypeTitle3,
-            attributes: [.foregroundColor: UIColor.white]
+            attributes: [.foregroundColor: UIColor.white],
         )
         raisedHandIcon.setContentCompressionResistancePriority(.required, for: .horizontal)
         raisedHandIcon.contentMode = .scaleAspectFit
@@ -122,7 +131,7 @@ class RaisedHandsToast: UIView {
         labelContainer.autoVCenterInSuperview()
         labelContainer.autoPinEdge(.leading, to: .trailing, of: raisedHandIcon, withOffset: 12)
 
-        for button in [self.viewButton, self.lowerHandButton] {
+        for button in [viewButton, lowerHandButton] {
             outerHStack.addArrangedSubview(button)
             button.setContentCompressionResistancePriority(.required, for: .horizontal)
             button.setContentHuggingHorizontalHigh()
@@ -130,13 +139,12 @@ class RaisedHandsToast: UIView {
             // far as the superview's margins, so if we had
             // isLayoutMarginsRelativeArrangement on outerHStack, the button wouldn't
             // slide all the way off, so instead set margins on the button itself.
-            button.ows_contentEdgeInsets = .init(
+            button.configuration?.contentInsets = .init(
                 top: 8,
                 leading: 8,
                 bottom: 8,
-                trailing: Constants.hMarginExpanded
+                trailing: Constants.hMarginExpanded,
             )
-            button.titleLabel?.font = .dynamicTypeSubheadline.bold()
         }
 
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(toggleExpanded))
@@ -165,12 +173,27 @@ class RaisedHandsToast: UIView {
     /// `isCollapsed` to `false` so it is expanded for its next presentation.
     func wasHidden() {
         self.isCollapsed = false
+        self.isSuggestingLowerHand = false
         self.updateExpansionState(animated: false)
+    }
+
+    func suggestLowerHand() {
+        guard self.yourHandIsRaised else { return }
+
+        self.isSuggestingLowerHand = true
+        self.isCollapsed = false
+        self.refreshTexts()
+        self.updateExpansionState(animated: true)
+        self.queueCollapse()
     }
 
     @objc
     private func toggleExpanded() {
         self.isCollapsed.toggle()
+        if self.isCollapsed {
+            self.isSuggestingLowerHand = false
+            self.refreshTexts()
+        }
         self.updateExpansionState(animated: true)
 
         guard !self.isCollapsed else { return }
@@ -179,9 +202,12 @@ class RaisedHandsToast: UIView {
 
     private func queueCollapse() {
         self.autoCollapseTimer?.invalidate()
-        self.autoCollapseTimer = Timer.scheduledTimer(withTimeInterval: 4, repeats: false) { [weak self] _ in
+        let autoCollapseDelay: TimeInterval = self.isSuggestingLowerHand ? 10 : 4
+        self.autoCollapseTimer = Timer.scheduledTimer(withTimeInterval: autoCollapseDelay, repeats: false) { [weak self] _ in
             guard let self else { return }
             self.isCollapsed = true
+            self.isSuggestingLowerHand = false
+            self.refreshTexts()
             self.updateExpansionState(animated: true)
             self.autoCollapseTimer = nil
         }
@@ -210,7 +236,7 @@ class RaisedHandsToast: UIView {
             self.outerHStack.layer.cornerRadius = self.isCollapsed ? self.outerHStack.height / 2 : 10
             self.iconLabelContainer.layoutMargins = .init(
                 hMargin: self.isCollapsed ? Constants.hMarginCollapsed : Constants.hMarginExpanded,
-                vMargin: Constants.vMargin
+                vMargin: Constants.vMargin,
             )
         }
 
@@ -230,68 +256,19 @@ class RaisedHandsToast: UIView {
     private func updateRaisedHands(_ raisedHands: [DemuxId], oldValue: [DemuxId]) {
         guard raisedHands != oldValue else { return }
 
-        guard let firstRaisedHandDemuxID = raisedHands.first else {
+        guard raisedHands.first != nil else {
             // Parent handles hiding. Don't update state.
             // Prevent auto collapse while it's disappearing.
             self.autoCollapseTimer?.invalidate()
+            self.isSuggestingLowerHand = false
             return
         }
 
-        self.collapsedText = if self.yourHandIsRaised, raisedHands.count > 1 {
-            String(
-                format: OWSLocalizedString(
-                    "RAISED_HANDS_TOAST_YOU_PLUS_OTHERS_COUNT",
-                    comment: "A compact member count on the call view's raised hands toast indicating that you and a number of other users raised a hand. Embeds {{number of other users}}"
-                ),
-                raisedHands.count - 1
-            )
-        } else if self.yourHandIsRaised {
-            CommonStrings.you
-        } else {
-            "\(raisedHands.count)"
+        if !self.yourHandIsRaised {
+            self.isSuggestingLowerHand = false
         }
 
-        self.expandedText = {
-            if self.yourHandIsRaised, raisedHands.count == 1 {
-                return OWSLocalizedString(
-                    "RAISED_HANDS_TOAST_YOUR_HAND_MESSAGE",
-                    comment: "A message appearing on the call view's raised hands toast indicating that you raised your own hand."
-                )
-            }
-
-            let firstRaisedHandMemberName: String
-            if self.yourHandIsRaised {
-                firstRaisedHandMemberName = CommonStrings.you
-            } else if let firstRaisedHandRemoteDeviceState = self.call.ringRtcCall.remoteDeviceStates[firstRaisedHandDemuxID] {
-                firstRaisedHandMemberName = self.deps.db.read { tx -> String in
-                    self.deps.contactsManager.displayName(
-                        for: firstRaisedHandRemoteDeviceState.address,
-                        tx: tx
-                    ).resolvedValue(useShortNameIfAvailable: true)
-                }
-            } else {
-                owsFailDebug("Could not find remote device state for demux ID")
-                firstRaisedHandMemberName = CommonStrings.unknownUser
-            }
-
-            if raisedHands.count > 1 {
-                let otherMembersCount = raisedHands.count - 1
-                let format = OWSLocalizedString(
-                    "RAISED_HANDS_TOAST_MULTIPLE_HANDS_MESSAGE",
-                    tableName: "PluralAware",
-                    comment: "A message appearing on the call view's raised hands toast indicating that multiple members have raised their hands. Example: 'Alice +4 raised a hand'. Embeds {{number of other users}}, {{name}}"
-                )
-                return String.localizedStringWithFormat(format, otherMembersCount, firstRaisedHandMemberName)
-            }
-
-            return String(
-                format: OWSLocalizedString(
-                    "RAISED_HANDS_TOAST_SINGLE_HAND_MESSAGE",
-                    comment: "A message appearing on the call view's raised hands toast indicating that another named member has raised their hand."
-                ),
-                firstRaisedHandMemberName
-            )
-        }()
+        self.refreshTexts()
 
         var youJustRaisedYourHand: Bool {
             self.call.ringRtcCall.localDeviceState.demuxId.map({ yourDemuxID in
@@ -305,6 +282,74 @@ class RaisedHandsToast: UIView {
 
         self.updateExpansionState(animated: !oldValue.isEmpty)
         self.queueCollapse()
+    }
+
+    private func refreshTexts() {
+        guard let firstRaisedHandDemuxID = raisedHands.first else {
+            self.collapsedText = ""
+            self.expandedText = ""
+            return
+        }
+
+        self.collapsedText = if self.yourHandIsRaised, raisedHands.count > 1 {
+            String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
+                    "RAISED_HANDS_TOAST_YOU_PLUS_OTHERS_COUNT",
+                    comment: "A compact member count on the call view's raised hands toast indicating that you and a number of other users raised a hand. Embeds {{number of other users}}",
+                ),
+                String(raisedHands.count - 1),
+            )
+        } else if self.yourHandIsRaised {
+            CommonStrings.you
+        } else {
+            "\(raisedHands.count)"
+        }
+
+        self.expandedText = {
+            if self.isSuggestingLowerHand, self.yourHandIsRaised {
+                return CallStrings.lowerHandSuggestion
+            }
+
+            if self.yourHandIsRaised, raisedHands.count == 1 {
+                return OWSLocalizedString(
+                    "RAISED_HANDS_TOAST_YOUR_HAND_MESSAGE",
+                    comment: "A message appearing on the call view's raised hands toast indicating that you raised your own hand.",
+                )
+            }
+
+            let firstRaisedHandMemberName: String
+            if self.yourHandIsRaised {
+                firstRaisedHandMemberName = CommonStrings.you
+            } else if let firstRaisedHandRemoteDeviceState = self.call.ringRtcCall.remoteDeviceStates[firstRaisedHandDemuxID] {
+                firstRaisedHandMemberName = self.deps.db.read { tx -> String in
+                    self.deps.contactsManager.displayName(
+                        for: firstRaisedHandRemoteDeviceState.address,
+                        tx: tx,
+                    ).resolvedValue(useShortNameIfAvailable: true)
+                }
+            } else {
+                owsFailDebug("Could not find remote device state for demux ID")
+                firstRaisedHandMemberName = CommonStrings.unknownUser
+            }
+
+            if raisedHands.count > 1 {
+                let otherMembersCount = raisedHands.count - 1
+                let format = OWSLocalizedString(
+                    "RAISED_HANDS_TOAST_MULTIPLE_HANDS_MESSAGE",
+                    tableName: "PluralAware",
+                    comment: "A message appearing on the call view's raised hands toast indicating that multiple members have raised their hands. Example: 'Alice +4 raised a hand'. Embeds {{number of other users}}, {{name}}",
+                )
+                return String.localizedStringWithFormat(format, otherMembersCount, firstRaisedHandMemberName)
+            }
+
+            return String.nonPluralLocalizedStringWithFormat(
+                OWSLocalizedString(
+                    "RAISED_HANDS_TOAST_SINGLE_HAND_MESSAGE",
+                    comment: "A message appearing on the call view's raised hands toast indicating that another named member has raised their hand.",
+                ),
+                firstRaisedHandMemberName,
+            )
+        }()
     }
 
 }

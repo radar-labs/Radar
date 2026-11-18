@@ -21,7 +21,7 @@ public struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
         archivedPayment: ArchivedPayment,
         address: SignalServiceAddress?,
         displayName: String,
-        interaction: TSInteraction
+        interaction: TSInteraction,
     ) {
         self.archivedPayment = archivedPayment
         self.displayName = displayName
@@ -40,7 +40,7 @@ public struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
     }
 
     public var isOutgoing: Bool {
-       !isIncoming
+        !isIncoming
     }
 
     public var isUnidentified: Bool {
@@ -60,9 +60,11 @@ public struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
     }
 
     public var paymentAmount: TSPaymentAmount? {
-        guard let unmasked = SUIEnvironment.shared.paymentsImplRef.unmaskReceiptAmount(
-            data: archivedPayment.receipt
-        ) else {
+        guard
+            let unmasked = SUIEnvironment.shared.paymentsImplRef.unmaskReceiptAmount(
+                data: archivedPayment.receipt,
+            )
+        else {
             return nil
         }
         // picoMob field stores sats in this codebase (picoMobPerSatoshi == 1).
@@ -75,7 +77,7 @@ public struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
         return PaymentsFormat.format(
             amountString: fee,
             withCurrency: .bitcoin,
-            withSpace: true
+            withSpace: true,
         )
     }
 
@@ -116,7 +118,7 @@ public struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
             amountString: amount,
             withCurrency: nil,
             withSpace: false,
-            isIncoming: isIncoming
+            isIncoming: isIncoming,
         )
         return PaymentsFormat.attributedFormat(bitcoinString: formattedAmount, withSpace: true)
     }
@@ -126,14 +128,14 @@ public struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
             return PaymentsFormat.formattedBalance(
                 recovered,
                 isShortForm: true,
-                paymentType: paymentType
+                paymentType: paymentType,
             ).string
         }
         guard let amount = paymentInfo.amount else { return nil }
         return PaymentsFormat.format(
             amountString: amount,
             withCurrency: .bitcoin,
-            withSpace: true
+            withSpace: true,
         )
     }
 
@@ -148,7 +150,7 @@ public struct ArchivedPaymentHistoryItem: PaymentsHistoryItem {
             withSpace: true,
         )
     }
-    
+
     public var formattedFiatPaymentAmount: String? {
         return nil
     }

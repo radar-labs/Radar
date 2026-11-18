@@ -8,7 +8,6 @@ public import LibSignalClient
 @objcMembers
 public class TSOutgoingMessageBuilder: TSMessageBuilder {
     public var isVoiceMessage: Bool
-    public var groupMetaMessage: TSGroupMetaMessage
     public var groupChangeProtoData: Data?
     public var wasNotCreatedLocally: Bool
 
@@ -23,7 +22,6 @@ public class TSOutgoingMessageBuilder: TSMessageBuilder {
         expireTimerVersion: UInt32?,
         expireStartedAt: UInt64?,
         isVoiceMessage: Bool,
-        groupMetaMessage: TSGroupMetaMessage,
         isSmsMessageRestoredFromBackup: Bool,
         isViewOnceMessage: Bool,
         isViewOnceComplete: Bool,
@@ -39,10 +37,8 @@ public class TSOutgoingMessageBuilder: TSMessageBuilder {
         messageSticker: MessageSticker?,
         giftBadge: OWSGiftBadge?,
         isPoll: Bool,
-        isStarred: Bool,
     ) {
         self.isVoiceMessage = isVoiceMessage
-        self.groupMetaMessage = groupMetaMessage
         self.groupChangeProtoData = groupChangeProtoData
         self.wasNotCreatedLocally = wasNotCreatedLocally
 
@@ -68,7 +64,6 @@ public class TSOutgoingMessageBuilder: TSMessageBuilder {
             messageSticker: messageSticker,
             giftBadge: giftBadge,
             isPoll: isPoll,
-            isStarred: isStarred
         )
     }
 
@@ -83,7 +78,6 @@ public class TSOutgoingMessageBuilder: TSMessageBuilder {
         expireTimerVersion: UInt32? = nil,
         expireStartedAt: UInt64? = nil,
         isVoiceMessage: Bool = false,
-        groupMetaMessage: TSGroupMetaMessage = .unspecified,
         isSmsMessageRestoredFromBackup: Bool = false,
         isViewOnceMessage: Bool = false,
         isViewOnceComplete: Bool = false,
@@ -99,7 +93,6 @@ public class TSOutgoingMessageBuilder: TSMessageBuilder {
         messageSticker: MessageSticker? = nil,
         giftBadge: OWSGiftBadge? = nil,
         isPoll: Bool = false,
-        isStarred: Bool = false,
     ) -> TSOutgoingMessageBuilder {
         return TSOutgoingMessageBuilder(
             thread: thread,
@@ -111,7 +104,6 @@ public class TSOutgoingMessageBuilder: TSMessageBuilder {
             expireTimerVersion: expireTimerVersion,
             expireStartedAt: expireStartedAt,
             isVoiceMessage: isVoiceMessage,
-            groupMetaMessage: groupMetaMessage,
             isSmsMessageRestoredFromBackup: isSmsMessageRestoredFromBackup,
             isViewOnceMessage: isViewOnceMessage,
             isViewOnceComplete: isViewOnceComplete,
@@ -127,21 +119,20 @@ public class TSOutgoingMessageBuilder: TSMessageBuilder {
             messageSticker: messageSticker,
             giftBadge: giftBadge,
             isPoll: isPoll,
-            isStarred: isStarred
         )
     }
 
     // MARK: -
 
     public static func outgoingMessageBuilder(
-        thread: TSThread
+        thread: TSThread,
     ) -> TSOutgoingMessageBuilder {
         return .withDefaultValues(thread: thread)
     }
 
     public static func outgoingMessageBuilder(
         thread: TSThread,
-        messageBody: ValidatedInlineMessageBody?
+        messageBody: ValidatedInlineMessageBody?,
     ) -> TSOutgoingMessageBuilder {
         return .withDefaultValues(thread: thread, messageBody: messageBody)
     }
@@ -162,7 +153,7 @@ public class TSOutgoingMessageBuilder: TSMessageBuilder {
             additionalRecipients: [],
             explicitRecipients: [],
             skippedRecipients: [],
-            transaction: transaction
+            transaction: transaction,
         )
     }
 }

@@ -4,44 +4,39 @@
 //
 
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
-public class CVComponentQuotedReply: CVComponentBase, CVComponent {
+class CVComponentQuotedReply: CVComponentBase, CVComponent, CVAccessibilityComponent {
 
-    public var componentKey: CVComponentKey { .quotedReply }
+    var componentKey: CVComponentKey { .quotedReply }
 
     private let quotedReply: CVComponentState.QuotedReply
     private var quotedReplyModel: QuotedReplyModel {
         quotedReply.quotedReplyModel
     }
+
     private let sharpCornersForQuotedMessage: OWSDirectionalRectCorner
 
-    init(itemModel: CVItemModel,
-         quotedReply: CVComponentState.QuotedReply,
-         sharpCornersForQuotedMessage: OWSDirectionalRectCorner) {
+    init(
+        itemModel: CVItemModel,
+        quotedReply: CVComponentState.QuotedReply,
+        sharpCornersForQuotedMessage: OWSDirectionalRectCorner,
+    ) {
         self.quotedReply = quotedReply
         self.sharpCornersForQuotedMessage = sharpCornersForQuotedMessage
 
         super.init(itemModel: itemModel)
     }
 
-    public func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
+    func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
         CVComponentViewQuotedReply()
     }
 
-    public override func updateScrollingContent(componentView: CVComponentView) {
-        super.updateScrollingContent(componentView: componentView)
-
-        guard let componentView = componentView as? CVComponentViewQuotedReply else {
-            owsFailDebug("Unexpected componentView.")
-            return
-        }
-        componentView.quotedMessageView.updateAppearance()
-    }
-
-    public func configureForRendering(componentView componentViewParam: CVComponentView,
-                                      cellMeasurement: CVCellMeasurement,
-                                      componentDelegate: CVComponentDelegate) {
+    func configureForRendering(
+        componentView componentViewParam: CVComponentView,
+        cellMeasurement: CVCellMeasurement,
+        componentDelegate: CVComponentDelegate,
+    ) {
         guard let componentView = componentViewParam as? CVComponentViewQuotedReply else {
             owsFailDebug("Unexpected componentView.")
             componentViewParam.reset()
@@ -49,35 +44,43 @@ public class CVComponentQuotedReply: CVComponentBase, CVComponent {
         }
 
         let quotedMessageView = componentView.quotedMessageView
-        let adapter = QuotedMessageViewAdapter(interactionUniqueId: interaction.uniqueId)
-        quotedMessageView.configureForRendering(state: quotedReply.viewState,
-                                                delegate: adapter,
-                                                componentDelegate: componentDelegate,
-                                                sharpCorners: sharpCornersForQuotedMessage,
-                                                cellMeasurement: cellMeasurement)
+        let adapter = CVQuotedMessageViewAdapter(interactionUniqueId: interaction.uniqueId)
+        quotedMessageView.configureForRendering(
+            state: quotedReply.viewState,
+            delegate: adapter,
+            componentDelegate: componentDelegate,
+            sharpCorners: sharpCornersForQuotedMessage,
+            cellMeasurement: cellMeasurement,
+        )
     }
 
     private var stackConfig: CVStackViewConfig {
-        CVStackViewConfig(axis: .vertical,
-                          alignment: .fill,
-                          spacing: 0,
-                          layoutMargins: .zero)
+        CVStackViewConfig(
+            axis: .vertical,
+            alignment: .fill,
+            spacing: 0,
+            layoutMargins: .zero,
+        )
     }
 
-    public func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
+    func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
         owsAssertDebug(maxWidth > 0)
 
-        return QuotedMessageView.measure(state: quotedReply.viewState,
-                                         maxWidth: maxWidth,
-                                         measurementBuilder: measurementBuilder)
+        return CVQuotedMessageView.measure(
+            state: quotedReply.viewState,
+            maxWidth: maxWidth,
+            measurementBuilder: measurementBuilder,
+        )
     }
 
     // MARK: - Events
 
-    public override func handleTap(sender: UIGestureRecognizer,
-                                   componentDelegate: CVComponentDelegate,
-                                   componentView: CVComponentView,
-                                   renderItem: CVRenderItem) -> Bool {
+    override func handleTap(
+        sender: UIGestureRecognizer,
+        componentDelegate: CVComponentDelegate,
+        componentView: CVComponentView,
+        renderItem: CVRenderItem,
+    ) -> Bool {
 
         componentDelegate.didTapQuotedReply(quotedReplyModel)
         return true
@@ -87,48 +90,49 @@ public class CVComponentQuotedReply: CVComponentBase, CVComponent {
 
     // Used for rendering some portion of an Conversation View item.
     // It could be the entire item or some part thereof.
-    public class CVComponentViewQuotedReply: NSObject, CVComponentView {
+    class CVComponentViewQuotedReply: CVComponentView {
 
-        fileprivate let quotedMessageView = QuotedMessageView(name: "quotedMessageView")
+        fileprivate let quotedMessageView = CVQuotedMessageView(name: "quotedMessageView")
 
-        public var isDedicatedCellView = false
+        var isDedicatedCellView = false
 
-        public var rootView: UIView {
+        var rootView: UIView {
             quotedMessageView
         }
 
-        public func setIsCellVisible(_ isCellVisible: Bool) {
+        func setIsCellVisible(_ isCellVisible: Bool) {
             quotedMessageView.setIsCellVisible(isCellVisible)
         }
 
-        public func reset() {
+        func reset() {
             quotedMessageView.reset()
         }
 
     }
-}
 
-extension CVComponentQuotedReply: CVAccessibilityComponent {
-    public var accessibilityDescription: String {
+    // MARK: - CVAccessibilityComponent
+
+    var accessibilityDescription: String {
         let format = OWSLocalizedString(
             "QUOTED_REPLY_ACCESSIBILITY_LABEL_FORMAT",
-            comment: "Accessibility label stating the author of the message to which you are replying. Embeds: {{ the author of the message to which you are replying }}."
+            comment: "Accessibility label stating the author of the message to which you are replying. Embeds: {{ the author of the message to which you are replying }} {{ original message }}.",
         )
 
+        let originalMessage = self.quotedReply.viewState.quotedReplyModel.originalMessageAccessibilityLabel ?? ""
+
         if quotedReply.quotedReplyModel.isOriginalMessageAuthorLocalUser {
-            return String(format: format, CommonStrings.you)
+            return String.nonPluralLocalizedStringWithFormat(format, CommonStrings.you, originalMessage)
         } else {
-            return String(
-                format: format,
-                self.quotedReply.viewState.quotedAuthorName
+            return String.nonPluralLocalizedStringWithFormat(
+                format,
+                self.quotedReply.viewState.quotedAuthorName,
+                originalMessage,
             )
         }
     }
 }
 
-// MARK: -
-
-private class QuotedMessageViewAdapter: QuotedMessageViewDelegate {
+private class CVQuotedMessageViewAdapter: CVQuotedMessageViewDelegate {
 
     private let interactionUniqueId: String
 
@@ -138,18 +142,15 @@ private class QuotedMessageViewAdapter: QuotedMessageViewDelegate {
 
     func didTapDownloadQuotedReplyAttachment(_ quotedReply: QuotedReplyModel) {
         SSKEnvironment.shared.databaseStorageRef.write { tx in
-            guard let message = TSMessage.anyFetchMessage(uniqueId: interactionUniqueId, transaction: tx) else {
+            guard let message = TSMessage.fetchMessageViaCache(uniqueId: interactionUniqueId, transaction: tx) else {
                 return
             }
             DependenciesBridge.shared.attachmentDownloadManager.enqueueDownloadOfAttachmentsForMessage(
                 message,
                 priority: .userInitiated,
-                tx: tx
+                useThumbnails: false,
+                tx: tx,
             )
         }
-    }
-
-    func didCancelQuotedReply() {
-        owsFailDebug("Unexpected method invocation.")
     }
 }

@@ -4,12 +4,9 @@
 //
 
 import SignalServiceKit
+import UIKit
 
-final class InactiveLinkedDeviceReminderMegaphone: MegaphoneView {
-    private var inactiveLinkedDeviceFinder: InactiveLinkedDeviceFinder {
-        DependenciesBridge.shared.inactiveLinkedDeviceFinder
-    }
-
+final class InactiveLinkedDeviceReminderMegaphone: Megaphone {
     private let inactiveLinkedDevice: InactiveLinkedDevice
 
     /// The number of days until the linked device represented by this megaphone
@@ -17,7 +14,7 @@ final class InactiveLinkedDeviceReminderMegaphone: MegaphoneView {
     private var daysUntilExpiration: Int {
         let daysUntilExpiration: Int = DateUtil.daysFrom(
             firstDate: Date(),
-            toSecondDate: inactiveLinkedDevice.expirationDate
+            toSecondDate: inactiveLinkedDevice.expirationDate,
         )
 
         // If there's less than 1 day till expiration, round up to one day.
@@ -27,7 +24,7 @@ final class InactiveLinkedDeviceReminderMegaphone: MegaphoneView {
     init(
         inactiveLinkedDevice: InactiveLinkedDevice,
         fromViewController: UIViewController,
-        experienceUpgrade: ExperienceUpgrade
+        experienceUpgrade: ExperienceUpgrade,
     ) {
         self.inactiveLinkedDevice = inactiveLinkedDevice
 
@@ -35,49 +32,44 @@ final class InactiveLinkedDeviceReminderMegaphone: MegaphoneView {
 
         titleText = OWSLocalizedString(
             "INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_TITLE",
-            comment: "Title for an in-app megaphone about a user's inactive linked device."
+            comment: "Title for an in-app megaphone about a user's inactive linked device.",
         )
 
         let bodyTextFormat = OWSLocalizedString(
             "INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_BODY_%d",
             tableName: "PluralAware",
-            comment: "Title for an in-app megaphone about a user's inactive linked device. Embeds {{ %d: the number of days until that device's expiration; %2$@: the name of the device }}."
+            comment: "Title for an in-app megaphone about a user's inactive linked device. Embeds {{ %d: the number of days until that device's expiration; %2$@: the name of the device }}.",
         )
         bodyText = String.localizedStringWithFormat(
             bodyTextFormat,
             daysUntilExpiration,
-            inactiveLinkedDevice.displayName
+            inactiveLinkedDevice.displayName,
         )
 
-        imageName = "inactive-linked-device-reminder-megaphone"
+        image = .inactiveLinkedDeviceReminderMegaphone
         imageContentMode = .center
 
         let dontRemindMeButton = Button(title: OWSLocalizedString(
             "INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_DONT_REMIND_ME_BUTTON",
-            comment: "Title for a button in an in-app megaphone about a user's inactive linked device, indicating the user doesn't want to be reminded."
-        )) { [self] in
-            DependenciesBridge.shared.db.asyncWrite(
-                block: { tx in
-                    self.inactiveLinkedDeviceFinder.permanentlyDisableFinders(tx: tx)
-                },
-                completionQueue: .main,
-                completion: { [weak self] in
-                    self?.dismiss()
-                }
-            )
+            comment: "Title for a button in an in-app megaphone about a user's inactive linked device, indicating the user doesn't want to be reminded.",
+        )) {
+            let db = DependenciesBridge.shared.db
+            let inactiveLinkedDeviceFinder = DependenciesBridge.shared.inactiveLinkedDeviceFinder
+
+            db.write { tx in
+                inactiveLinkedDeviceFinder.permanentlyDisableFinders(tx: tx)
+            }
+
+            NotificationCenter.default.post(name: .megaphoneStateDidChange, object: nil)
         }
         let gotItButton = snoozeButton(
             fromViewController: fromViewController,
             snoozeTitle: OWSLocalizedString(
                 "INACTIVE_LINKED_DEVICE_REMINDER_MEGAPHONE_GOT IT_BUTTON",
-                comment: "Title for a button in an in-app megaphone about a user's inactive linked device, temporarily dismissing the megaphone."
-            )
+                comment: "Title for a button in an in-app megaphone about a user's inactive linked device, temporarily dismissing the megaphone.",
+            ),
         )
-        setButtons(primary: gotItButton, secondary: dontRemindMeButton)
-    }
 
-    @available(*, unavailable, message: "Use other constructor!")
-    required init(coder: NSCoder) {
-        owsFail("Use other constructor!")
+        buttons = [gotItButton, dontRemindMeButton]
     }
 }

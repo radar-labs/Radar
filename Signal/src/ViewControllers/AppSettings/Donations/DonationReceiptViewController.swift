@@ -18,27 +18,12 @@ class DonationReceiptViewController: OWSTableViewController2 {
     private lazy var shareReceiptButton = UIButton(
         configuration: .largePrimary(title: OWSLocalizedString(
             "DONATION_RECEIPT_EXPORT_RECEIPT_BUTTON",
-            comment: "Text on the button that exports the receipt"
+            comment: "Text on the button that exports the receipt",
         )),
         primaryAction: UIAction { [weak self] _ in
             self?.showShareReceiptActivity()
-        }
+        },
     )
-
-    private lazy var shareReceiptButtonContainer: UIView = {
-        let stackView = UIStackView.verticalButtonStack(buttons: [shareReceiptButton])
-        let containerView = UIView()
-        containerView.preservesSuperviewLayoutMargins = true
-        containerView.addSubview(stackView)
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: containerView.topAnchor),
-            stackView.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor),
-            stackView.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor),
-            stackView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
-        ])
-        return containerView
-    }()
 
     private lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -70,7 +55,7 @@ class DonationReceiptViewController: OWSTableViewController2 {
     private func updateSignalLogoImage() {
         let signalLogoImage = UIImage(named: "signal-full-logo")
         if traitCollection.userInterfaceStyle == .dark {
-            signalLogoView.image = signalLogoImage?.tintedImage(color: .ows_white)
+            signalLogoView.image = signalLogoImage?.tintedImage(color: .white)
         } else {
             signalLogoView.image = signalLogoImage
         }
@@ -104,7 +89,7 @@ class DonationReceiptViewController: OWSTableViewController2 {
                 content.autoPinEdgesToSuperviewMargins()
 
                 return cell
-            })
+            }),
         ])
     }
 
@@ -113,28 +98,27 @@ class DonationReceiptViewController: OWSTableViewController2 {
             .item(
                 name: OWSLocalizedString("DONATION_RECEIPT_TYPE", comment: "Section title for donation type on receipts"),
                 subtitle: model.localizedName,
-                accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "donation_receipt_details_type")
+                accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "donation_receipt_details_type"),
             ),
             .item(
                 name: OWSLocalizedString("DONATION_RECEIPT_DATE_PAID", comment: "Section title for donation date on receipts"),
                 subtitle: dateFormatter.string(from: model.timestamp),
-                accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "donation_receipt_details_date")
-            )
+                accessibilityIdentifier: UIView.accessibilityIdentifier(in: self, name: "donation_receipt_details_date"),
+            ),
         ])
     }
 
     // MARK: - Share button
 
-    open override var bottomFooter: UIView? {
-        get { shareReceiptButtonContainer }
-        set {}
+    override open func bottomFooter() -> UIView? {
+        OWSTableViewController2.buildHeaderFooterView(for: UIStackView.verticalButtonStack(buttons: [shareReceiptButton]))
     }
 
     private func showShareReceiptActivity() {
         ShareActivityUtil.present(
             activityItems: [DonationReceiptImageActivityItemProvider(donationReceipt: model)],
             from: self,
-            sourceView: shareReceiptButton
+            sourceView: shareReceiptButton,
         )
     }
 
@@ -143,7 +127,7 @@ class DonationReceiptViewController: OWSTableViewController2 {
     private class DonationReceiptImageActivityItemProvider: UIActivityItemProvider, @unchecked Sendable {
         let donationReceiptImage: UIImage
 
-        public override var item: Any { donationReceiptImage }
+        override var item: Any { donationReceiptImage }
 
         init(donationReceipt: DonationReceipt) {
             donationReceiptImage = Self.getDonationReceiptImage(donationReceipt: donationReceipt)
@@ -178,7 +162,7 @@ class DonationReceiptViewController: OWSTableViewController2 {
                 (Self.donationTypeView(donationReceipt: donationReceipt), 10),
                 (Self.dividerView(color: .ows_gray20), 20),
                 (Self.datePaidView(donationReceipt: donationReceipt), 22),
-                (Self.footerView(), 0)
+                (Self.footerView(), 0),
             ]
             for (subview, spacing) in subviewsWithSpacings {
                 stackView.addArrangedSubview(subview)
@@ -188,13 +172,19 @@ class DonationReceiptViewController: OWSTableViewController2 {
             let containerWidth: CGFloat = 612
             let containerMargins = UIEdgeInsets(hMargin: 65, vMargin: 32)
 
-            let stackViewSize = stackView.systemLayoutSizeFitting(CGSize(width: containerWidth - containerMargins.leading - containerMargins.trailing,
-                                                                         height: CGFloat.greatestFiniteMagnitude),
-                                                                  withHorizontalFittingPriority: .required,
-                                                                  verticalFittingPriority: .fittingSizeLevel)
+            let stackViewSize = stackView.systemLayoutSizeFitting(
+                CGSize(
+                    width: containerWidth - containerMargins.leading - containerMargins.trailing,
+                    height: CGFloat.greatestFiniteMagnitude,
+                ),
+                withHorizontalFittingPriority: .required,
+                verticalFittingPriority: .fittingSizeLevel,
+            )
             let containerView = UIView()
-            containerView.frame.size = CGSize(width: stackViewSize.width + containerMargins.leading + containerMargins.trailing,
-                                              height: stackViewSize.height + containerMargins.top + containerMargins.bottom)
+            containerView.frame.size = CGSize(
+                width: stackViewSize.width + containerMargins.leading + containerMargins.trailing,
+                height: stackViewSize.height + containerMargins.top + containerMargins.bottom,
+            )
             containerView.backgroundColor = .white
             containerView.isOpaque = true
             containerView.addSubview(stackView)
@@ -209,10 +199,12 @@ class DonationReceiptViewController: OWSTableViewController2 {
 
             signalLogoView.autoSetDimensions(to: CGSize(width: 140, height: 40))
 
-            let currentDateView = label(dateFormatter().string(from: Date()),
-                                        fontSize: 13,
-                                        textColor: .ows_gray60,
-                                        isAlignedToEdge: true)
+            let currentDateView = label(
+                dateFormatter().string(from: Date()),
+                fontSize: 13,
+                textColor: .ows_gray60,
+                isAlignedToEdge: true,
+            )
 
             let headerView = UIStackView(arrangedSubviews: [signalLogoView, currentDateView])
             headerView.axis = .horizontal
@@ -223,14 +215,16 @@ class DonationReceiptViewController: OWSTableViewController2 {
         }
 
         private class func titleView() -> UIView {
-            label(OWSLocalizedString("DONATION_RECEIPT_TITLE", comment: "Title on donation receipts"),
-                  fontSize: 20)
+            label(
+                OWSLocalizedString("DONATION_RECEIPT_TITLE", comment: "Title on donation receipts"),
+                fontSize: 20,
+            )
         }
 
         private class func amountView(donationReceipt: DonationReceipt) -> UIView {
             let arrangedSubviews = [
                 label(OWSLocalizedString("DONATION_RECEIPT_AMOUNT", comment: "Section title for donation amount on receipts")),
-                label(CurrencyFormatter.format(money: donationReceipt.amount), isAlignedToEdge: true)
+                label(CurrencyFormatter.format(money: donationReceipt.amount), isAlignedToEdge: true),
             ]
             let amountView = UIStackView(arrangedSubviews: arrangedSubviews)
             amountView.axis = .horizontal
@@ -240,25 +234,33 @@ class DonationReceiptViewController: OWSTableViewController2 {
         }
 
         private class func donationTypeView(donationReceipt: DonationReceipt) -> UIView {
-            detailView(title: OWSLocalizedString("DONATION_RECEIPT_TYPE", comment: "Section title for donation type on receipts"),
-                       subtitle: donationReceipt.localizedName)
+            detailView(
+                title: OWSLocalizedString("DONATION_RECEIPT_TYPE", comment: "Section title for donation type on receipts"),
+                subtitle: donationReceipt.localizedName,
+            )
         }
 
         private class func datePaidView(donationReceipt: DonationReceipt) -> UIView {
-            detailView(title: OWSLocalizedString("DONATION_RECEIPT_DATE_PAID", comment: "Section title for donation date on receipts"),
-                       subtitle: dateFormatter().string(from: donationReceipt.timestamp))
+            detailView(
+                title: OWSLocalizedString("DONATION_RECEIPT_DATE_PAID", comment: "Section title for donation date on receipts"),
+                subtitle: dateFormatter().string(from: donationReceipt.timestamp),
+            )
         }
 
         private class func footerView() -> UIView {
-            label(OWSLocalizedString("DONATION_RECEIPT_FOOTER", comment: "Footer text at the bottom of donation receipts"),
-                  fontSize: 12,
-                  textColor: .ows_gray60)
+            label(
+                OWSLocalizedString("DONATION_RECEIPT_FOOTER", comment: "Footer text at the bottom of donation receipts"),
+                fontSize: 12,
+                textColor: .ows_gray60,
+            )
         }
 
-        private class func label(_ text: String,
-                                 fontSize: CGFloat = 17,
-                                 textColor: UIColor = .ows_gray95,
-                                 isAlignedToEdge: Bool = false) -> UILabel {
+        private class func label(
+            _ text: String,
+            fontSize: CGFloat = 17,
+            textColor: UIColor = .ows_gray95,
+            isAlignedToEdge: Bool = false,
+        ) -> UILabel {
             let result = UILabel()
             result.text = text
             result.textColor = textColor
@@ -280,7 +282,7 @@ class DonationReceiptViewController: OWSTableViewController2 {
         private class func detailView(title: String, subtitle: String) -> UIView {
             let arrangedSubviews = [
                 label(title),
-                label(subtitle, fontSize: 13, textColor: .ows_gray45)
+                label(subtitle, fontSize: 13, textColor: .ows_gray45),
             ]
             let detailView = UIStackView(arrangedSubviews: arrangedSubviews)
             detailView.axis = .vertical
@@ -296,3 +298,19 @@ class DonationReceiptViewController: OWSTableViewController2 {
         }
     }
 }
+
+#if DEBUG
+@available(iOS 17, *)
+#Preview {
+    NavigationPreviewController(
+        viewController: DonationReceiptViewController(
+            model: DonationReceipt(
+                receiptType: .gift,
+                timestamp: .now - .hour,
+                amount: FiatMoney(currencyCode: "USD", value: 10),
+            ),
+        ),
+    )
+}
+
+#endif

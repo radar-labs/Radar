@@ -6,29 +6,75 @@
 import Foundation
 public import LibSignalClient
 
-public class OutgoingPollVoteMessage: TSOutgoingMessage {
-    @objc
-    var targetPollTimestamp: UInt64 = 0
+public class OutgoingPollVoteMessage: TransientOutgoingMessage {
+    override public class var supportsSecureCoding: Bool { true }
 
-    @objc
-    var targetPollAuthorAciBinary: Data?
+    public required init?(coder: NSCoder) {
+        guard
+            let targetPollAuthorAciBinary = coder.decodeObject(of: NSData.self, forKey: "targetPollAuthorAciBinary") as Data?,
+            let targetPollAuthorAci = try? Aci.parseFrom(serviceIdBinary: targetPollAuthorAciBinary)
+        else {
+            return nil
+        }
+        self.targetPollAuthorAci = targetPollAuthorAci
+        guard let targetPollTimestamp = coder.decodeObject(of: NSNumber.self, forKey: "targetPollTimestamp") else {
+            return nil
+        }
+        self.targetPollTimestamp = targetPollTimestamp.uint64Value
+        guard let voteCount = coder.decodeObject(of: NSNumber.self, forKey: "voteCount") else {
+            return nil
+        }
+        self.voteCount = voteCount.int32Value
+        guard let voteOptionIndexes = coder.decodeArrayOfObjects(ofClass: NSNumber.self, forKey: "voteOptionIndexes") else {
+            return nil
+        }
+        self.voteOptionIndexes = voteOptionIndexes.map(\.uint32Value)
+        super.init(coder: coder)
+    }
 
-    @objc
-    var voteOptionIndexes: [UInt32]?
+    override public func encode(with coder: NSCoder) {
+        super.encode(with: coder)
+        coder.encode(self.targetPollAuthorAci.serviceIdBinary, forKey: "targetPollAuthorAciBinary")
+        coder.encode(NSNumber(value: self.targetPollTimestamp), forKey: "targetPollTimestamp")
+        coder.encode(NSNumber(value: self.voteCount), forKey: "voteCount")
+        coder.encode(self.voteOptionIndexes, forKey: "voteOptionIndexes")
+    }
 
-    @objc
-    var voteCount: UInt32 = 0
+    override public var hash: Int {
+        var hasher = Hasher()
+        hasher.combine(super.hash)
+        hasher.combine(targetPollAuthorAci)
+        hasher.combine(targetPollTimestamp)
+        hasher.combine(voteCount)
+        hasher.combine(voteOptionIndexes)
+        return hasher.finalize()
+    }
+
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? Self else { return false }
+        guard super.isEqual(object) else { return false }
+        guard self.targetPollAuthorAci == object.targetPollAuthorAci else { return false }
+        guard self.targetPollTimestamp == object.targetPollTimestamp else { return false }
+        guard self.voteCount == object.voteCount else { return false }
+        guard self.voteOptionIndexes == object.voteOptionIndexes else { return false }
+        return true
+    }
+
+    let targetPollTimestamp: UInt64
+    let targetPollAuthorAci: Aci
+    let voteOptionIndexes: [UInt32]
+    let voteCount: Int32
 
     public init(
-        thread: TSGroupThread,
+        thread: TSThread,
         targetPollTimestamp: UInt64,
         targetPollAuthorAci: Aci,
         voteOptionIndexes: [UInt32],
-        voteCount: UInt32,
-        tx: DBReadTransaction
+        voteCount: Int32,
+        tx: DBReadTransaction,
     ) {
         self.targetPollTimestamp = targetPollTimestamp
-        self.targetPollAuthorAciBinary = targetPollAuthorAci.serviceIdBinary
+        self.targetPollAuthorAci = targetPollAuthorAci
         self.voteOptionIndexes = voteOptionIndexes
         self.voteCount = voteCount
 
@@ -37,30 +83,22 @@ public class OutgoingPollVoteMessage: TSOutgoingMessage {
             additionalRecipients: [],
             explicitRecipients: [],
             skippedRecipients: [],
-            transaction: tx
+            transaction: tx,
         )
     }
-
-    required public init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
-
-    required public init(dictionary dictionaryValue: [String: Any]!) throws {
-        try super.init(dictionary: dictionaryValue)
-    }
-
-    override public var shouldBeSaved: Bool { false }
 
     override var contentHint: SealedSenderContentHint { .implicit }
 
     override public func dataMessageBuilder(
         with thread: TSThread,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> SSKProtoDataMessageBuilder? {
-        guard let dataMessageBuilder = super.dataMessageBuilder(
-            with: thread,
-            transaction: transaction
-        ) else {
+        guard
+            let dataMessageBuilder = super.dataMessageBuilder(
+                with: thread,
+                transaction: transaction,
+            )
+        else {
             return nil
         }
 
@@ -68,45 +106,37 @@ public class OutgoingPollVoteMessage: TSOutgoingMessage {
 
         pollVoteBuilder.setTargetSentTimestamp(targetPollTimestamp)
 
-        if let targetPollAuthorAciBinary {
-            pollVoteBuilder.setTargetAuthorAciBinary(targetPollAuthorAciBinary)
-        }
+        pollVoteBuilder.setTargetAuthorAciBinary(targetPollAuthorAci.serviceIdBinary)
 
-        if let voteOptionIndexes {
-            pollVoteBuilder.setOptionIndexes(voteOptionIndexes)
-        }
+        pollVoteBuilder.setOptionIndexes(voteOptionIndexes)
 
-        pollVoteBuilder.setVoteCount(voteCount)
+        pollVoteBuilder.setVoteCount(UInt32(clamping: voteCount))
 
         dataMessageBuilder.setPollVote(
-            pollVoteBuilder.buildInfallibly()
+            pollVoteBuilder.buildInfallibly(),
         )
 
         return dataMessageBuilder
     }
 
-    public override func updateWithSendSuccess(tx: DBWriteTransaction) {
-        guard let targetPollAuthorAciBinary, let voteOptionIndexes else {
-            owsFailDebug("Missing required fields in poll vote message")
-            return
-        }
-
+    override public func updateWithSendSuccess(tx: DBWriteTransaction) {
         do {
             try DependenciesBridge.shared.pollMessageManager.processPollVoteMessageDidSend(
                 targetPollTimestamp: targetPollTimestamp,
-                targetPollAuthorAci: Aci.parseFrom(serviceIdBinary: targetPollAuthorAciBinary),
+                targetPollAuthorAci: targetPollAuthorAci,
                 optionIndexes: voteOptionIndexes,
                 voteCount: voteCount,
-                tx: tx
+                threadUniqueId: threadUniqueId,
+                tx: tx,
             )
         } catch {
             Logger.error("Failed to update vote message as sent: \(error)")
         }
     }
 
-    public override func updateWithAllSendingRecipientsMarkedAsFailed(
+    override public func updateWithAllSendingRecipientsMarkedAsFailed(
         error: (any Error)? = nil,
-        transaction tx: DBWriteTransaction
+        transaction tx: DBWriteTransaction,
     ) {
         super.updateWithAllSendingRecipientsMarkedAsFailed(error: error, transaction: tx)
 
@@ -121,11 +151,13 @@ public class OutgoingPollVoteMessage: TSOutgoingMessage {
             return
         }
 
-        guard let localAci = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: tx)?.aci,
-              let localRecipientId = DependenciesBridge.shared.recipientDatabaseTable.fetchRecipient(
-            serviceId: localAci,
-            transaction: tx
-        )?.id else {
+        guard
+            let localAci = DependenciesBridge.shared.tsAccountManager.localIdentifiers(tx: tx)?.aci,
+            let localRecipientId = DependenciesBridge.shared.recipientDatabaseTable.fetchRecipient(
+                serviceId: localAci,
+                transaction: tx,
+            )?.id
+        else {
             owsFailDebug("Missing local aci or recipient")
             return
         }
@@ -133,29 +165,24 @@ public class OutgoingPollVoteMessage: TSOutgoingMessage {
         Logger.error("Failed to send vote to all recipients.")
 
         do {
-            guard let targetPollAuthorAciBinary else {
-                owsFailDebug("Can't parse author aci")
-                return
-            }
-
-            let targetPollAuthorAci = try Aci.parseFrom(serviceIdBinary: targetPollAuthorAciBinary)
-
-            guard let targetMessage = try DependenciesBridge.shared.interactionStore.fetchMessage(
-                timestamp: targetPollTimestamp,
-                incomingMessageAuthor: targetPollAuthorAci == localAci ? nil : targetPollAuthorAci,
-                transaction: tx
-            ),
-                  let interactionId = targetMessage.grdbId?.int64Value
+            guard
+                let targetMessage = try DependenciesBridge.shared.interactionStore.fetchMessage(
+                    timestamp: targetPollTimestamp,
+                    incomingMessageAuthor: targetPollAuthorAci == localAci ? nil : targetPollAuthorAci,
+                    threadUniqueId: threadUniqueId,
+                    transaction: tx,
+                ),
+                let interactionId = targetMessage.grdbId?.int64Value
             else {
                 Logger.error("Can't find target poll")
                 return
             }
 
             try PollStore().revertVoteCount(
-                voteCount: Int32(voteCount),
+                voteCount: voteCount,
                 interactionId: interactionId,
                 voteAuthorId: localRecipientId,
-                transaction: tx
+                transaction: tx,
             )
 
             SSKEnvironment.shared.databaseStorageRef.touch(interaction: targetMessage, shouldReindex: false, tx: tx)

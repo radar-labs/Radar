@@ -5,10 +5,8 @@
 
 import Foundation
 
-/// A DataSource for an attachment to be created locally, with
-/// additional required metadata.
+/// A data source for creating attachments locally.
 public enum AttachmentDataSource {
-
     case existingAttachment(ExistingAttachmentSource)
     case pendingAttachment(PendingAttachment)
 
@@ -61,7 +59,7 @@ public enum AttachmentDataSource {
 
     public static func forwarding(
         existingAttachment: AttachmentStream,
-        with reference: AttachmentReference
+        with reference: AttachmentReference,
     ) -> AttachmentDataSource {
         return .existingAttachment(.init(
             id: existingAttachment.attachment.id,
@@ -69,14 +67,8 @@ public enum AttachmentDataSource {
             renderingFlag: reference.renderingFlag,
             sourceFilename: reference.sourceFilename,
             sourceUnencryptedByteCount: reference.sourceUnencryptedByteCount,
-            sourceMediaSizePixels: reference.sourceMediaSizePixels
+            sourceMediaSizePixels: reference.sourceMediaSizePixels,
         ))
-    }
-
-    public static func from(
-        pendingAttachment: PendingAttachment
-    ) -> AttachmentDataSource {
-        return .pendingAttachment(pendingAttachment)
     }
 
     public func removeBorderlessRenderingFlagIfPresent() -> Self {

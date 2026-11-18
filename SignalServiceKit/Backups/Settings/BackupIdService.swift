@@ -16,15 +16,18 @@ public protocol BackupIdService {
     func registerBackupIDIfNecessary(
         localAci: Aci,
         auth: ChatServiceAuth,
+        logger: PrefixedLogger,
     ) async throws
 
     func updateMessageBackupIdForRegistration(
         key: MessageRootBackupKey,
-        auth: ChatServiceAuth
+        auth: ChatServiceAuth,
+        logger: PrefixedLogger,
     ) async throws
 
     func fetchBackupIDLimits(
-        auth: ChatServiceAuth
+        auth: ChatServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> BackupIdLimits
 }
 
@@ -60,7 +63,7 @@ final class BackupIdServiceImpl: BackupIdService {
         localAci: Aci,
         tx: DBWriteTransaction,
     ) throws -> (MessageRootBackupKey, MediaRootBackupKey) {
-        guard let messageRootBackupKey = try? accountKeyStore.getMessageRootBackupKey(aci: localAci, tx: tx) else {
+        guard let messageRootBackupKey = accountKeyStore.getMessageRootBackupKey(aci: localAci, tx: tx) else {
             throw OWSAssertionError("Missing message root backup key! Do we not have an AEP?")
         }
 
@@ -73,7 +76,8 @@ final class BackupIdServiceImpl: BackupIdService {
 
     func registerBackupIDIfNecessary(
         localAci: Aci,
-        auth: ChatServiceAuth
+        auth: ChatServiceAuth,
+        logger: PrefixedLogger,
     ) async throws {
         let (
             haveSetBackupId,
@@ -103,7 +107,8 @@ final class BackupIdServiceImpl: BackupIdService {
             localAci: localAci,
             messageBackupKey: messageBackupKey,
             mediaBackupKey: mediaBackupKey,
-            auth: auth
+            auth: auth,
+            logger: logger,
         )
 
         await db.awaitableWrite { tx in
@@ -113,26 +118,34 @@ final class BackupIdServiceImpl: BackupIdService {
 
     func updateMessageBackupIdForRegistration(
         key: MessageRootBackupKey,
-        auth: ChatServiceAuth
+        auth: ChatServiceAuth,
+        logger: PrefixedLogger,
     ) async throws {
         try await registerBackupId(
             localAci: key.aci,
             messageBackupKey: key,
             mediaBackupKey: nil,
-            auth: auth
+            auth: auth,
+            logger: logger,
         )
     }
 
     func fetchBackupIDLimits(
-        auth: ChatServiceAuth
+        auth: ChatServiceAuth,
+        logger: PrefixedLogger,
     ) async throws -> BackupIdLimits {
-        let response = try await networkManager.asyncRequest(.fetchBackupIdLimits(auth: auth))
+        let response = try await networkManager.asyncRequest(
+            .fetchBackupIdLimits(
+                auth: auth,
+                logger: logger,
+            ),
+        )
         guard let jsonData = response.responseBodyData else {
             throw OWSAssertionError("Missing or invalid JSON!")
         }
         return try JSONDecoder().decode(
             BackupIdLimits.self,
-            from: jsonData
+            from: jsonData,
         )
     }
 
@@ -140,17 +153,18 @@ final class BackupIdServiceImpl: BackupIdService {
         localAci: Aci,
         messageBackupKey: MessageRootBackupKey,
         mediaBackupKey: MediaRootBackupKey?,
-        auth: ChatServiceAuth
+        auth: ChatServiceAuth,
+        logger: PrefixedLogger,
     ) async throws {
         let messageBackupRequestContext: BackupAuthCredentialRequestContext = .create(
             backupKey: messageBackupKey.serialize(),
-            aci: localAci.rawUUID
+            aci: localAci.rawUUID,
         )
         let base64MessageRequestContext = messageBackupRequestContext.getRequest().serialize().base64EncodedString()
         let base64MediaRequestContext = mediaBackupKey.map {
             let mediaBackupRequestContext: BackupAuthCredentialRequestContext = .create(
                 backupKey: $0.serialize(),
-                aci: localAci.rawUUID
+                aci: localAci.rawUUID,
             )
             return mediaBackupRequestContext.getRequest().serialize().base64EncodedString()
         }
@@ -159,7 +173,8 @@ final class BackupIdServiceImpl: BackupIdService {
             .registerBackupId(
                 backupId: base64MessageRequestContext,
                 mediaBackupId: base64MediaRequestContext,
-                auth: auth
+                auth: auth,
+                logger: logger,
             ),
         )
     }
@@ -171,9 +186,10 @@ private extension TSRequest {
     static func registerBackupId(
         backupId: String,
         mediaBackupId: String?,
-        auth: ChatServiceAuth
+        auth: ChatServiceAuth,
+        logger: PrefixedLogger,
     ) -> TSRequest {
-        var parameters = [ "messagesBackupAuthCredentialRequest": backupId ]
+        var parameters = ["messagesBackupAuthCredentialRequest": backupId]
         if let mediaBackupId {
             parameters["mediaBackupAuthCredentialRequest"] = mediaBackupId
         }
@@ -181,19 +197,22 @@ private extension TSRequest {
         var request = TSRequest(
             url: URL(string: "v1/archives/backupid")!,
             method: "PUT",
-            parameters: parameters
+            parameters: parameters,
+            logger: logger,
         )
         request.auth = .identified(auth)
         return request
     }
 
     static func fetchBackupIdLimits(
-        auth: ChatServiceAuth
+        auth: ChatServiceAuth,
+        logger: PrefixedLogger,
     ) -> TSRequest {
         var request = TSRequest(
             url: URL(string: "v1/archives/backupid/limits")!,
             method: "GET",
-            parameters: nil
+            parameters: nil,
+            logger: logger,
         )
         request.auth = .identified(auth)
         return request
@@ -205,15 +224,15 @@ private extension TSRequest {
 #if TESTABLE_BUILD
 
 class MockBackupIdService: BackupIdService {
-    func fetchBackupIDLimits(auth: ChatServiceAuth) async throws -> BackupIdLimits {
+    func fetchBackupIDLimits(auth: ChatServiceAuth, logger: PrefixedLogger) async throws -> BackupIdLimits {
         fatalError("Not implemented")
     }
 
-    func updateMessageBackupIdForRegistration(key: MessageRootBackupKey, auth: ChatServiceAuth) async throws {
+    func updateMessageBackupIdForRegistration(key: MessageRootBackupKey, auth: ChatServiceAuth, logger: PrefixedLogger) async throws {
         // Do nothing
     }
 
-    func registerBackupIDIfNecessary(localAci: Aci, auth: ChatServiceAuth) async throws {
+    func registerBackupIDIfNecessary(localAci: Aci, auth: ChatServiceAuth, logger: PrefixedLogger) async throws {
         // Do nothing
     }
 }

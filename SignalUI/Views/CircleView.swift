@@ -8,11 +8,11 @@ import UIKit
 public class CircleView: UIView {
 
     @available(*, unavailable, message: "use other constructor instead.")
-    required public init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override init(frame: CGRect) {
+    override public init(frame: CGRect) {
         super.init(frame: frame)
     }
 
@@ -39,14 +39,15 @@ public class CircleView: UIView {
     }
 }
 
+@available(iOS, deprecated: 26)
 public class CircleBlurView: UIVisualEffectView {
 
     @available(*, unavailable, message: "use other constructor instead.")
-    required public init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override init(effect: UIVisualEffect?) {
+    override public init(effect: UIVisualEffect?) {
         super.init(effect: effect)
         frame = .zero
     }
@@ -78,7 +79,7 @@ public class CircleBlurView: UIVisualEffectView {
 
 open class PillView: UIView {
 
-    public override init(frame: CGRect) {
+    override public init(frame: CGRect) {
         super.init(frame: frame)
 
         layer.masksToBounds = true
@@ -93,7 +94,7 @@ open class PillView: UIView {
         }
     }
 
-    required public init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -111,5 +112,71 @@ open class PillView: UIView {
 
     private func updateRadius() {
         layer.cornerRadius = bounds.size.height / 2
+    }
+}
+
+public class RingView: UIView {
+
+    override public class var layerClass: AnyClass {
+        CAShapeLayer.self
+    }
+
+    private var shapeLayer: CAShapeLayer { layer as! CAShapeLayer }
+
+    public var lineWidth: CGFloat {
+        get {
+            shapeLayer.lineWidth
+        }
+        set {
+            shapeLayer.lineWidth = newValue
+            updatePath()
+        }
+    }
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+
+        shapeLayer.fillColor = UIColor.clear.cgColor
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override public var frame: CGRect {
+        didSet {
+            if bounds.size != oldValue.size {
+                updatePath()
+            }
+        }
+    }
+
+    override public var bounds: CGRect {
+        didSet {
+            if bounds.size != oldValue.size {
+                updatePath()
+            }
+        }
+    }
+
+    override public var tintColor: UIColor! {
+        didSet {
+            updateColor()
+        }
+    }
+
+    override public func tintColorDidChange() {
+        super.tintColorDidChange()
+        updateColor()
+    }
+
+    private func updatePath() {
+        let inset = lineWidth / 2
+        let insetRect = layer.bounds.insetBy(dx: inset, dy: inset)
+        shapeLayer.path = UIBezierPath(ovalIn: insetRect).cgPath
+    }
+
+    private func updateColor() {
+        shapeLayer.strokeColor = tintColor?.cgColor
     }
 }

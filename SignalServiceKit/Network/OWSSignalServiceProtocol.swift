@@ -24,18 +24,12 @@ public protocol OWSSignalServiceProtocol: AnyObject {
         for signalServiceInfo: SignalServiceInfo,
         endpoint: OWSURLSessionEndpoint,
         configuration: URLSessionConfiguration?,
-        maxResponseSize: Int?
     ) -> OWSURLSessionProtocol
 
-    func sharedUrlSessionForCdn(
-        cdnNumber: UInt32,
-        maxResponseSize: UInt?
-    ) async -> OWSURLSessionProtocol
+    func sharedUrlSessionForCdn(cdnNumber: UInt32) async -> OWSURLSessionProtocol
 }
 
 public enum SignalServiceType {
-    case mainSignalServiceIdentified
-    case mainSignalServiceUnidentified
     case storageService
     case updates
     case updates2
@@ -49,19 +43,13 @@ public extension OWSSignalServiceProtocol {
     private func buildUrlSession(
         for signalServiceType: SignalServiceType,
         configuration: URLSessionConfiguration? = nil,
-        maxResponseSize: Int? = nil
     ) -> OWSURLSessionProtocol {
         let signalServiceInfo = signalServiceType.signalServiceInfo()
         return buildUrlSession(
             for: signalServiceInfo,
             endpoint: buildUrlEndpoint(for: signalServiceInfo),
             configuration: configuration,
-            maxResponseSize: maxResponseSize
         )
-    }
-
-    func urlSessionForMainSignalService() -> OWSURLSessionProtocol {
-        buildUrlSession(for: .mainSignalServiceIdentified)
     }
 
     func urlSessionForStorageService() -> OWSURLSessionProtocol {
@@ -81,6 +69,7 @@ public extension OWSSignalServiceProtocol {
 
 public struct SignalServiceInfo {
     let baseUrl: URL
+    let assumesHTTP3Capable: Bool
     let censorshipCircumventionSupported: Bool
     let censorshipCircumventionPathPrefix: String
     let shouldUseSignalCertificate: Bool
@@ -92,59 +81,45 @@ extension SignalServiceType {
 
     public func signalServiceInfo() -> SignalServiceInfo {
         switch self {
-        case .mainSignalServiceIdentified:
-            return SignalServiceInfo(
-                baseUrl: URL(string: TSConstants.mainServiceIdentifiedURL)!,
-                censorshipCircumventionSupported: true,
-                censorshipCircumventionPathPrefix: TSConstants.serviceCensorshipPrefix,
-                shouldUseSignalCertificate: true,
-                shouldHandleRemoteDeprecation: true,
-                type: self
-            )
-        case .mainSignalServiceUnidentified:
-            return SignalServiceInfo(
-                baseUrl: URL(string: TSConstants.mainServiceUnidentifiedURL)!,
-                censorshipCircumventionSupported: true,
-                censorshipCircumventionPathPrefix: TSConstants.serviceCensorshipPrefix,
-                shouldUseSignalCertificate: true,
-                shouldHandleRemoteDeprecation: true,
-                type: self
-            )
         case .storageService:
             return SignalServiceInfo(
                 baseUrl: URL(string: TSConstants.storageServiceURL)!,
+                assumesHTTP3Capable: false,
                 censorshipCircumventionSupported: true,
                 censorshipCircumventionPathPrefix: TSConstants.storageServiceCensorshipPrefix,
                 shouldUseSignalCertificate: true,
                 shouldHandleRemoteDeprecation: true,
-                type: self
+                type: self,
             )
         case .updates:
             return SignalServiceInfo(
                 baseUrl: URL(string: TSConstants.updatesURL)!,
+                assumesHTTP3Capable: true,
                 censorshipCircumventionSupported: false,
                 censorshipCircumventionPathPrefix: "unimplemented",
                 shouldUseSignalCertificate: false,
                 shouldHandleRemoteDeprecation: false,
-                type: self
+                type: self,
             )
         case .updates2:
             return SignalServiceInfo(
                 baseUrl: URL(string: TSConstants.updates2URL)!,
+                assumesHTTP3Capable: true,
                 censorshipCircumventionSupported: false,
                 censorshipCircumventionPathPrefix: "unimplemented", // BADGES TODO
                 shouldUseSignalCertificate: true,
                 shouldHandleRemoteDeprecation: false,
-                type: self
+                type: self,
             )
         case .svr2:
             return SignalServiceInfo(
                 baseUrl: URL(string: TSConstants.svr2URL)!,
+                assumesHTTP3Capable: false,
                 censorshipCircumventionSupported: true,
                 censorshipCircumventionPathPrefix: TSConstants.svr2CensorshipPrefix,
                 shouldUseSignalCertificate: true,
                 shouldHandleRemoteDeprecation: false,
-                type: self
+                type: self,
             )
         }
     }

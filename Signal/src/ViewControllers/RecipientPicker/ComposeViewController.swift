@@ -6,7 +6,6 @@
 import SignalServiceKit
 import SignalUI
 
-@objc
 class ComposeViewController: RecipientPickerContainerViewController {
 
     override func viewDidLoad() {
@@ -14,7 +13,7 @@ class ComposeViewController: RecipientPickerContainerViewController {
 
         title = OWSLocalizedString("MESSAGE_COMPOSEVIEW_TITLE", comment: "Title for the compose view.")
 
-        view.backgroundColor = Theme.backgroundColor
+        view.backgroundColor = .Signal.background
 
         recipientPicker.shouldShowInvites = true
         recipientPicker.shouldShowNewGroup = true
@@ -34,8 +33,10 @@ class ComposeViewController: RecipientPickerContainerViewController {
         owsAssertDebug(address.isValid)
 
         let thread = SSKEnvironment.shared.databaseStorageRef.write { transaction in
-            TSContactThread.getOrCreateThread(withContactAddress: address,
-                                              transaction: transaction)
+            TSContactThread.getOrCreateThread(
+                withContactAddress: address,
+                transaction: transaction,
+            )
         }
         self.newConversation(thread: thread)
     }
@@ -52,7 +53,7 @@ class ComposeViewController: RecipientPickerContainerViewController {
                     SignalApp.shared.presentConversationForThread(
                         threadUniqueId: thread.uniqueId,
                         action: .compose,
-                        animated: false
+                        animated: false,
                     )
                 }
             }
@@ -62,7 +63,7 @@ class ComposeViewController: RecipientPickerContainerViewController {
             SignalApp.shared.presentConversationForThread(
                 threadUniqueId: thread.uniqueId,
                 action: .compose,
-                animated: false
+                animated: false,
             )
         }
     }
@@ -77,14 +78,14 @@ extension ComposeViewController: RecipientPickerDelegate, UsernameLinkScanDelega
     func recipientPicker(
         _ recipientPickerViewController: RecipientPickerViewController,
         selectionStyleForRecipient recipient: PickedRecipient,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> UITableViewCell.SelectionStyle {
         return .default
     }
 
     func recipientPicker(
         _ recipientPickerViewController: RecipientPickerViewController,
-        didSelectRecipient recipient: PickedRecipient
+        didSelectRecipient recipient: PickedRecipient,
     ) {
         switch recipient.identifier {
         case .address(let address):
@@ -97,7 +98,7 @@ extension ComposeViewController: RecipientPickerDelegate, UsernameLinkScanDelega
     func recipientPicker(
         _ recipientPickerViewController: RecipientPickerViewController,
         accessoryMessageForRecipient recipient: PickedRecipient,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) -> String? {
         switch recipient.identifier {
         case .address:
@@ -108,9 +109,11 @@ extension ComposeViewController: RecipientPickerDelegate, UsernameLinkScanDelega
         }
     }
 
-    func recipientPicker(_ recipientPickerViewController: RecipientPickerViewController,
-                         attributedSubtitleForRecipient recipient: PickedRecipient,
-                         transaction: DBReadTransaction) -> NSAttributedString? {
+    func recipientPicker(
+        _ recipientPickerViewController: RecipientPickerViewController,
+        attributedSubtitleForRecipient recipient: PickedRecipient,
+        transaction: DBReadTransaction,
+    ) -> NSAttributedString? {
         switch recipient.identifier {
         case .address(let address):
             guard !address.isLocalAddress else {

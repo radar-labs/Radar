@@ -3,23 +3,23 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-public import SignalServiceKit
-public import SignalUI
+import SignalServiceKit
+import SignalUI
 
-public class CVComponentBodyText: CVComponentBase, CVComponent {
+class CVComponentBodyText: CVComponentBase, CVComponent, CVAccessibilityComponent {
 
-    public var componentKey: CVComponentKey { .bodyText }
+    var componentKey: CVComponentKey { .bodyText }
 
     struct State: Equatable {
         let bodyText: CVComponentState.BodyText
         let isTextExpanded: Bool
         let searchText: String?
-        let revealedSpoilerIds: Set<Int>
+        let revealedSpoilerIds: Set<StyleId>
         let shouldUseAttributedText: Bool
         let hasPendingMessageRequest: Bool
         fileprivate let items: [CVTextLabel.Item]
 
-        public var canUseDedicatedCell: Bool {
+        var canUseDedicatedCell: Bool {
             if searchText != nil {
                 return false
             }
@@ -27,6 +27,8 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
             case .bodyText(_, let hasTapForMore):
                 return !hasTapForMore
             case .oversizeTextDownloading:
+                return false
+            case .oversizeTextSkipped:
                 return false
             case .oversizeTextUndownloadable:
                 return false
@@ -39,27 +41,34 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
             bodyText.textValue(isTextExpanded: isTextExpanded)
         }
     }
+
     private let bodyTextState: State
 
     private var bodyText: CVComponentState.BodyText {
         bodyTextState.bodyText
     }
+
     private var textValue: CVTextValue? {
         bodyTextState.textValue
     }
+
     private var isTextExpanded: Bool {
         bodyTextState.isTextExpanded
     }
+
     private var searchText: String? {
         bodyTextState.searchText
     }
-    private var revealedSpoilerIds: Set<Int> {
+
+    private var revealedSpoilerIds: Set<StyleId> {
         bodyTextState.revealedSpoilerIds
     }
+
     private var hasPendingMessageRequest: Bool {
         bodyTextState.hasPendingMessageRequest
     }
-    public var shouldUseAttributedText: Bool {
+
+    var shouldUseAttributedText: Bool {
         bodyTextState.shouldUseAttributedText
     }
 
@@ -69,7 +78,7 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
         super.init(itemModel: itemModel)
     }
 
-    public func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
+    func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
         CVComponentViewBodyText(componentDelegate: componentDelegate)
     }
 
@@ -81,6 +90,7 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
         // this interferes with "tap to retry".
         return outgoingMessage.messageState == .failed
     }
+
     private var shouldIgnoreEvents: Bool { Self.shouldIgnoreEvents(interaction: interaction) }
 
     // TODO:
@@ -120,14 +130,14 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
 
     private static let unfairLock = UnfairLock()
 
-    public static func detectItems(
+    static func detectItems(
         text: DisplayableText,
         hasPendingMessageRequest: Bool,
         shouldAllowLinkification: Bool,
         textWasTruncated: Bool,
-        revealedSpoilerIds: Set<StyleIdType>,
+        revealedSpoilerIds: Set<StyleId>,
         interactionUniqueId: String,
-        interactionIdentifier: InteractionSnapshotIdentifier
+        interactionIdentifier: InteractionSnapshotIdentifier,
     ) -> [CVTextLabel.Item] {
 
         // Use a lock to ensure that measurement on and off the main thread
@@ -169,7 +179,7 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
                 items = messageBody
                     .tappableItems(
                         revealedSpoilerIds: revealedSpoilerIds,
-                        dataDetector: dataDetector
+                        dataDetector: dataDetector,
                     )
                     .compactMap {
                         switch $0 {
@@ -178,12 +188,12 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
                                 spoilerId: unrevealedSpoilerItem.id,
                                 interactionUniqueId: interactionUniqueId,
                                 interactionIdentifier: interactionIdentifier,
-                                range: unrevealedSpoilerItem.range
+                                range: unrevealedSpoilerItem.range,
                             ))
                         case .mention(let mentionItem):
                             return .mention(mentionItem: CVTextLabel.MentionItem(
                                 mentionAci: mentionItem.mentionAci,
-                                range: mentionItem.range
+                                range: mentionItem.range,
                             ))
                         case .data(let dataItem):
                             // TODO: omit data items ending before elipsis down in tappableItems
@@ -196,10 +206,12 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
         }
     }
 
-    static func buildState(interaction: TSInteraction,
-                           bodyText: CVComponentState.BodyText,
-                           viewStateSnapshot: CVViewStateSnapshot,
-                           hasPendingMessageRequest: Bool) -> State {
+    static func buildState(
+        interaction: TSInteraction,
+        bodyText: CVComponentState.BodyText,
+        viewStateSnapshot: CVViewStateSnapshot,
+        hasPendingMessageRequest: Bool,
+    ) -> State {
         let textExpansion = viewStateSnapshot.textExpansion
         let searchText = viewStateSnapshot.searchText
         let isTextExpanded = textExpansion.isTextExpanded(interactionId: interaction.uniqueId)
@@ -219,7 +231,7 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
                 textWasTruncated: textWasTruncated,
                 revealedSpoilerIds: revealedSpoilerIds,
                 interactionUniqueId: interaction.uniqueId,
-                interactionIdentifier: .fromInteraction(interaction)
+                interactionIdentifier: .fromInteraction(interaction),
             )
 
             switch displayableText.textValue(isTextExpanded: isTextExpanded) {
@@ -244,19 +256,22 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
             items = []
         }
 
-        return State(bodyText: bodyText,
-                     isTextExpanded: isTextExpanded,
-                     searchText: searchText,
-                     revealedSpoilerIds: revealedSpoilerIds,
-                     shouldUseAttributedText: shouldUseAttributedText,
-                     hasPendingMessageRequest: hasPendingMessageRequest,
-                     items: items)
+        return State(
+            bodyText: bodyText,
+            isTextExpanded: isTextExpanded,
+            searchText: searchText,
+            revealedSpoilerIds: revealedSpoilerIds,
+            shouldUseAttributedText: shouldUseAttributedText,
+            hasPendingMessageRequest: hasPendingMessageRequest,
+            items: items,
+        )
     }
 
     static func buildComponentState(
         message: TSMessage,
+        skippedAttachmentIds: Set<Attachment.IDType>,
         viewStateSnapshot: CVViewStateSnapshot,
-        transaction: DBReadTransaction
+        transaction: DBReadTransaction,
     ) throws -> CVComponentState.BodyText? {
 
         func build(displayableText: DisplayableText) -> CVComponentState.BodyText? {
@@ -268,7 +283,7 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
                     return false
                 }
                 let isTruncatedTextVisible = viewStateSnapshot.textExpansion.isTextExpanded(
-                    interactionId: message.uniqueId
+                    interactionId: message.uniqueId,
                 )
                 return !isTruncatedTextVisible
             }()
@@ -281,7 +296,7 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
                     text: body,
                     ranges: message.bodyRanges,
                     interaction: message,
-                    transaction: transaction
+                    transaction: transaction,
                 )
             } else {
                 return nil
@@ -291,32 +306,49 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
         // TODO: We might want to treat text that is completely stripped
         // as not present.
         if let oversizeTextAttachment = message.oversizeTextAttachment(transaction: transaction) {
+            // We have a fully downloaded oversize text attachment.
             if let oversizeTextAttachmentStream = oversizeTextAttachment.asStream() {
                 let displayableText = CVComponentState.displayableBodyText(
                     oversizeTextAttachment: oversizeTextAttachmentStream,
                     ranges: message.bodyRanges,
                     interaction: message,
-                    transaction: transaction
+                    transaction: transaction,
                 )
                 return build(displayableText: displayableText)
-            } else if oversizeTextAttachment.asAnyPointer() != nil {
-                return .oversizeTextDownloading
-            } else {
+            }
+
+            // We can't possibly download this; show a terminal error.
+            if oversizeTextAttachment.asAnyPointer() == nil {
                 if let displayableText = bodyDisplayableText() {
                     return .oversizeTextUndownloadable(truncatedBody: displayableText)
-                } else {
-                    return nil
                 }
+                return nil
             }
-        } else if let displayableText = bodyDisplayableText() {
-            return build(displayableText: displayableText)
-        } else {
-            // No body text.
+
+            // We aren't downloading this for some reason; show a download button.
+            if skippedAttachmentIds.contains(oversizeTextAttachment.id) {
+                if let displayableText = bodyDisplayableText() {
+                    return .oversizeTextSkipped(truncatedBody: displayableText)
+                }
+                return nil
+            }
+
+            // It's not downloaded and hasn't failed, so it must be downloading.
+            if let displayableText = bodyDisplayableText() {
+                return .oversizeTextDownloading(truncatedBody: displayableText)
+            }
             return nil
         }
+
+        if let displayableText = bodyDisplayableText() {
+            return build(displayableText: displayableText)
+        }
+
+        // No body text.
+        return nil
     }
 
-    public var textMessageFont: UIFont {
+    var textMessageFont: UIFont {
         owsAssertDebug(DisplayableText.kMaxJumbomojiCount == 5)
 
         if let jumbomojiCount = bodyText.jumbomojiCount {
@@ -358,11 +390,11 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
         return [
             .underlineStyle: NSUnderlineStyle.single.rawValue,
             .underlineColor: foregroundColor,
-            .foregroundColor: foregroundColor
+            .foregroundColor: foregroundColor,
         ]
     }
 
-    public func bodyTextLabelConfig(textViewConfig: CVTextViewConfig) -> CVTextLabel.Config {
+    func bodyTextLabelConfig(textViewConfig: CVTextViewConfig) -> CVTextLabel.Config {
         CVTextLabel.Config(
             text: textViewConfig.text,
             displayConfig: textViewConfig.displayConfiguration,
@@ -373,12 +405,12 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
             lineBreakMode: .byWordWrapping,
             numberOfLines: 0,
             cacheKey: textViewConfig.cacheKey,
-            items: bodyTextState.items,
-            linkifyStyle: textViewConfig.linkifyStyle
+            items: textViewConfig.linkItems,
+            linkifyStyle: textViewConfig.linkifyStyle,
         )
     }
 
-    public func bodyTextLabelConfig(labelConfig: CVLabelConfig) -> CVTextLabel.Config {
+    func bodyTextLabelConfig(labelConfig: CVLabelConfig) -> CVTextLabel.Config {
         // CVTextLabel requires that attributedString has
         // default attributes applied to the entire string's range.
         let textAlignment: NSTextAlignment = labelConfig.textAlignment ?? .natural
@@ -396,13 +428,15 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
             numberOfLines: 0,
             cacheKey: labelConfig.cacheKey,
             items: bodyTextState.items,
-            linkifyStyle: linkifyStyle
+            linkifyStyle: linkifyStyle,
         )
     }
 
-    public func configureForRendering(componentView: CVComponentView,
-                                      cellMeasurement: CVCellMeasurement,
-                                      componentDelegate: CVComponentDelegate) {
+    func configureForRendering(
+        componentView: CVComponentView,
+        cellMeasurement: CVCellMeasurement,
+        componentDelegate: CVComponentDelegate,
+    ) {
         AssertIsOnMainThread()
         guard let componentView = componentView as? CVComponentViewBodyText else {
             owsFailDebug("Unexpected componentView.")
@@ -414,7 +448,7 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
             componentView: componentView,
             bodyTextLabelConfig: bodyTextLabelConfig,
             cellMeasurement: cellMeasurement,
-            spoilerAnimationManager: componentDelegate.spoilerState.animationManager
+            spoilerAnimationManager: componentDelegate.spoilerState.animationManager,
         )
     }
 
@@ -422,7 +456,7 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
         componentView: CVComponentViewBodyText,
         bodyTextLabelConfig: CVTextLabel.Config,
         cellMeasurement: CVCellMeasurement,
-        spoilerAnimationManager: SpoilerAnimationManager
+        spoilerAnimationManager: SpoilerAnimationManager,
     ) {
         AssertIsOnMainThread()
 
@@ -432,57 +466,150 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
         if bodyTextLabel.view.superview == nil {
             let stackView = componentView.stackView
             stackView.reset()
-            stackView.configure(config: stackViewConfig,
-                                cellMeasurement: cellMeasurement,
-                                measurementKey: Self.measurementKey_stackView,
-                                subviews: [ bodyTextLabel.view ])
+            stackView.configure(
+                config: stackViewConfig,
+                cellMeasurement: cellMeasurement,
+                measurementKey: Self.measurementKey_stackView,
+                subviews: [bodyTextLabel.view],
+            )
         }
     }
 
-    public func buildBodyTextLabelConfig() -> CVTextLabel.Config {
+    func buildBodyTextLabelConfig() -> CVTextLabel.Config {
         switch bodyText {
-        case .bodyText(let displayableText, _), .oversizeTextUndownloadable(let displayableText):
+        case .bodyText(let displayableText, _), .oversizeTextUndownloadable(let displayableText), .oversizeTextSkipped(let displayableText), .oversizeTextDownloading(let displayableText):
             return bodyTextLabelConfig(textViewConfig: textConfig(displayableText: displayableText))
-        case .oversizeTextDownloading:
-            return bodyTextLabelConfig(labelConfig: labelConfigForOversizeTextDownloading)
         case .remotelyDeleted:
-            return bodyTextLabelConfig(labelConfig: labelConfigForRemotelyDeleted)
+            return bodyTextLabelConfig(textViewConfig: textViewConfigForRemotelyDeleted)
         }
     }
 
     private var stackViewConfig: CVStackViewConfig {
-        CVStackViewConfig(axis: .vertical,
-                          alignment: .fill,
-                          spacing: 0,
-                          layoutMargins: .zero)
-    }
-
-    private var labelConfigForRemotelyDeleted: CVLabelConfig {
-        let text = (isIncoming
-                        ? OWSLocalizedString("THIS_MESSAGE_WAS_DELETED", comment: "text indicating the message was remotely deleted")
-                        : OWSLocalizedString("YOU_DELETED_THIS_MESSAGE", comment: "text indicating the message was remotely deleted by you"))
-        return CVLabelConfig(
-            text: .text(text),
-            displayConfig: .forUnstyledText(font: textMessageFont.italic(), textColor: bodyTextColor),
-            font: textMessageFont.italic(),
-            textColor: bodyTextColor,
-            numberOfLines: 0,
-            lineBreakMode: .byWordWrapping,
-            textAlignment: .center
+        CVStackViewConfig(
+            axis: .vertical,
+            alignment: .fill,
+            spacing: 0,
+            layoutMargins: .zero,
         )
     }
 
-    private var labelConfigForOversizeTextDownloading: CVLabelConfig {
-        let text = OWSLocalizedString("MESSAGE_STATUS_DOWNLOADING",
-                                     comment: "message status while message is downloading.")
-        return CVLabelConfig(
-            text: .text(text),
-            displayConfig: .forUnstyledText(font: textMessageFont.italic(), textColor: bodyTextColor),
-            font: textMessageFont.italic(),
-            textColor: bodyTextColor,
-            numberOfLines: 0,
-            lineBreakMode: .byWordWrapping,
-            textAlignment: .center
+    private func buildAdminDeleteAttributedString(displayName: String, adminNameColor: UIColor) -> NSAttributedString {
+        let format = OWSLocalizedString(
+            "DELETED_BY_ADMIN",
+            comment: "Text indicating the message was remotely deleted by an admin. Embeds {{admin display name}}",
+        )
+
+        let attributedString = NSAttributedString.make(
+            fromFormat: format,
+            attributedFormatArgs: [
+                .string(
+                    displayName,
+                    attributes: [.font: textMessageFont.bold(), .foregroundColor: adminNameColor],
+                ),
+            ],
+        )
+
+        return attributedString
+    }
+
+    private func rangeOfFirstSubstring(
+        in attributedString: NSAttributedString,
+        withColor color: UIColor,
+    ) -> NSRange? {
+        var matchingRange: NSRange?
+        attributedString.enumerateAttribute(
+            .foregroundColor,
+            in: NSRange(location: 0, length: attributedString.length),
+            options: [],
+        ) { value, range, stop in
+            if
+                let currentColor = value as? UIColor,
+                currentColor == color
+            {
+                matchingRange = range
+                stop.pointee = true
+            }
+        }
+        return matchingRange
+    }
+
+    private var textViewConfigForRemotelyDeleted: CVTextViewConfig {
+        let text = NSMutableAttributedString()
+        text.append(
+            SignalSymbol.xCircle.attributedString(
+                dynamicTypeBaseSize: textMessageFont.pointSize,
+            ) + " ",
+        )
+
+        var textColor = UIColor.Signal.secondaryLabel
+        if conversationStyle.hasWallpaper {
+            textColor = conversationStyle.bubbleSecondaryTextColor(isIncoming: isIncoming)
+        }
+
+        var linkItems: [CVTextLabel.Item] = []
+        switch bodyText {
+        case .remotelyDeleted(let deleteAuthor):
+            switch deleteAuthor {
+            case .admin(let aci, let displayName):
+                let adminNameColor: UIColor
+                if conversationStyle.hasWallpaper, isOutgoing {
+                    adminNameColor = .white
+                } else {
+                    adminNameColor = GroupNameColors.forThread(thread).color(for: aci)
+                }
+                let attributedString = buildAdminDeleteAttributedString(
+                    displayName: displayName,
+                    adminNameColor: adminNameColor,
+                )
+                text.append(attributedString)
+
+                if
+                    let tapItemRange = rangeOfFirstSubstring(
+                        in: text,
+                        withColor: adminNameColor,
+                    )
+                {
+                    linkItems.append(.deleteAuthor(deleteAuthorItem: CVTextLabel.DeleteAuthorItem(
+                        deleteAuthorAci: aci,
+                        range: tapItemRange,
+                    )))
+                } else {
+                    owsFailDebug("Admin delete is missing tappable range")
+                }
+
+            case .regular(let displayName):
+                let format = OWSLocalizedString(
+                    "DELETED_THIS_MESSAGE",
+                    comment: "Text indicating the message was remotely deleted by its author. Embeds {{ author name }}",
+                )
+                text.append(
+                    NSAttributedString(
+                        string: String.nonPluralLocalizedStringWithFormat(format, displayName),
+                    ),
+                )
+
+            case .localUser:
+                text.append(NSAttributedString(string: OWSLocalizedString("YOU_DELETED_THIS_MESSAGE", comment: "text indicating the message was remotely deleted by you")))
+            }
+        default:
+            owsFailDebug("Should be remotelyDeleted")
+        }
+
+        let displayConfiguration = HydratedMessageBody.DisplayConfiguration.messageBubble(
+            isIncoming: isIncoming,
+            revealedSpoilerIds: revealedSpoilerIds,
+            searchRanges: .matchedRanges([]),
+        )
+
+        return CVTextViewConfig(
+            text: .attributedText(text),
+            font: textMessageFont,
+            textColor: textColor,
+            textAlignment: .natural,
+            displayConfiguration: displayConfiguration,
+            linkifyStyle: linkifyStyle,
+            linkItems: linkItems,
+            matchedSearchRanges: [],
         )
     }
 
@@ -492,13 +619,17 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
         return self.textViewConfig(displayableText: displayableText)
     }
 
-    public static func configureTextView(_ textView: UITextView,
-                                         interaction: TSInteraction,
-                                         displayableText: DisplayableText) {
+    static func configureTextView(
+        _ textView: UITextView,
+        interaction: TSInteraction,
+        displayableText: DisplayableText,
+    ) {
         let dataDetectorTypes: UIDataDetectorTypes = {
             // If we're link-ifying with NSDataDetector, UITextView doesn't need to do data detection.
-            guard !shouldIgnoreEvents(interaction: interaction),
-                  displayableText.shouldAllowLinkification else {
+            guard
+                !shouldIgnoreEvents(interaction: interaction),
+                displayableText.shouldAllowLinkification
+            else {
                 return []
             }
             return [.link, .address, .calendarEvent, .phoneNumber]
@@ -513,23 +644,27 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
     private var linkTextAttributes: [NSAttributedString.Key: Any] {
         return [
             NSAttributedString.Key.foregroundColor: bodyTextColor,
-            NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue
+            NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue,
         ]
     }
 
     private var linkifyStyle: CVTextLabel.LinkifyStyle { .underlined(bodyTextColor: bodyTextColor) }
 
     private func textViewConfig(displayableText: DisplayableText) -> CVTextViewConfig {
-        let textAlignment = (isTextExpanded
-                                ? displayableText.fullTextNaturalAlignment
-                                : displayableText.displayTextNaturalAlignment)
+        let textAlignment = (
+            isTextExpanded
+                ? displayableText.fullTextNaturalAlignment
+                : displayableText.displayTextNaturalAlignment,
+        )
 
         let text = displayableText.textValue(isTextExpanded: isTextExpanded)
         let linkItems = bodyTextState.items
 
         var matchedSearchRanges = [NSRange]()
-        if let searchText = searchText,
-           searchText.count >= ConversationSearchController.kMinimumSearchTextLength {
+        if
+            let searchText,
+            searchText.count >= ConversationSearchController.kMinimumSearchTextLength
+        {
             let searchableText = FullTextSearchIndexer.normalizeText(searchText)
             let pattern = NSRegularExpression.escapedPattern(for: searchableText)
             do {
@@ -558,7 +693,7 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
         let displayConfiguration = HydratedMessageBody.DisplayConfiguration.messageBubble(
             isIncoming: isIncoming,
             revealedSpoilerIds: revealedSpoilerIds,
-            searchRanges: .matchedRanges(matchedSearchRanges)
+            searchRanges: .matchedRanges(matchedSearchRanges),
         )
 
         var extraCacheKeyFactors = [String]()
@@ -577,7 +712,7 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
             linkifyStyle: linkifyStyle,
             linkItems: linkItems,
             matchedSearchRanges: matchedSearchRanges,
-            extraCacheKeyFactors: extraCacheKeyFactors
+            extraCacheKeyFactors: extraCacheKeyFactors,
         )
     }
 
@@ -586,16 +721,16 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
     private static let measurementKey_maxWidth = "CVComponentBodyText.measurementKey_maxWidth"
 
     // Extract the max width used for measuring for this component.
-    public static func bodyTextMaxWidth(measurementBuilder: CVCellMeasurement.Builder) -> CGFloat? {
+    static func bodyTextMaxWidth(measurementBuilder: CVCellMeasurement.Builder) -> CGFloat? {
         measurementBuilder.getValue(key: measurementKey_maxWidth)
     }
 
     // Extract the overall measurement for this component.
-    public static func bodyTextMeasurement(measurementBuilder: CVCellMeasurement.Builder) -> CVTextLabel.Measurement? {
+    static func bodyTextMeasurement(measurementBuilder: CVCellMeasurement.Builder) -> CVTextLabel.Measurement? {
         measurementBuilder.getObject(key: measurementKey_textMeasurement) as? CVTextLabel.Measurement
     }
 
-    public func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
+    func measure(maxWidth: CGFloat, measurementBuilder: CVCellMeasurement.Builder) -> CGSize {
         owsAssertDebug(maxWidth > 0)
         let maxWidth = max(maxWidth, 0)
 
@@ -606,20 +741,24 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
         measurementBuilder.setValue(key: Self.measurementKey_maxWidth, value: maxWidth)
         let textSize = textMeasurement.size.ceil
         let textInfo = textSize.asManualSubviewInfo
-        let stackMeasurement = ManualStackView.measure(config: stackViewConfig,
-                                                       measurementBuilder: measurementBuilder,
-                                                       measurementKey: Self.measurementKey_stackView,
-                                                       subviewInfos: [ textInfo ],
-                                                       maxWidth: maxWidth)
+        let stackMeasurement = ManualStackView.measure(
+            config: stackViewConfig,
+            measurementBuilder: measurementBuilder,
+            measurementKey: Self.measurementKey_stackView,
+            subviewInfos: [textInfo],
+            maxWidth: maxWidth,
+        )
         return stackMeasurement.measuredSize
     }
 
     // MARK: - Events
 
-    public override func handleTap(sender: UIGestureRecognizer,
-                                   componentDelegate: CVComponentDelegate,
-                                   componentView: CVComponentView,
-                                   renderItem: CVRenderItem) -> Bool {
+    override func handleTap(
+        sender: UIGestureRecognizer,
+        componentDelegate: CVComponentDelegate,
+        componentView: CVComponentView,
+        renderItem: CVRenderItem,
+    ) -> Bool {
         guard let componentView = componentView as? CVComponentViewBodyText else {
             owsFailDebug("Unexpected componentView.")
             return false
@@ -643,17 +782,26 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
         case .oversizeTextUndownloadable:
             componentDelegate.didTapUndownloadableOversizeText()
             return true
-        default:
+        case .oversizeTextSkipped:
+            guard let message = interaction as? TSMessage else {
+                owsFailDebug("invalid interaction")
+                return false
+            }
+            componentDelegate.didTapSkippedDownloads(message)
+            return true
+        case .bodyText, .remotelyDeleted, .oversizeTextDownloading:
             break
         }
 
         return false
     }
 
-    public override func findLongPressHandler(sender: UIGestureRecognizer,
-                                              componentDelegate: CVComponentDelegate,
-                                              componentView: CVComponentView,
-                                              renderItem: CVRenderItem) -> CVLongPressHandler? {
+    override func findLongPressHandler(
+        sender: UIGestureRecognizer,
+        componentDelegate: CVComponentDelegate,
+        componentView: CVComponentView,
+        renderItem: CVRenderItem,
+    ) -> CVLongPressHandler? {
 
         guard let componentView = componentView as? CVComponentViewBodyText else {
             owsFailDebug("Unexpected componentView.")
@@ -669,16 +817,18 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
             return nil
         }
         bodyTextLabel.animate(selectedItem: item)
-        return CVLongPressHandler(delegate: componentDelegate,
-                                  renderItem: renderItem,
-                                  gestureLocation: .bodyText(item: item))
+        return CVLongPressHandler(
+            delegate: componentDelegate,
+            renderItem: renderItem,
+            gestureLocation: .bodyText(item: item),
+        )
     }
 
     // MARK: -
 
     fileprivate class BodyTextRootView: ManualStackView {}
 
-    public static func findBodyTextRootView(_ view: UIView) -> UIView? {
+    static func findBodyTextRootView(_ view: UIView) -> UIView? {
         if view is BodyTextRootView {
             return view
         }
@@ -694,31 +844,29 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
 
     // Used for rendering some portion of an Conversation View item.
     // It could be the entire item or some part thereof.
-    public class CVComponentViewBodyText: NSObject, CVComponentView {
+    class CVComponentViewBodyText: CVComponentView {
 
-        public weak var componentDelegate: CVComponentDelegate?
+        weak var componentDelegate: CVComponentDelegate?
 
         fileprivate let stackView = BodyTextRootView(name: "bodyText")
 
-        public let bodyTextLabel = CVTextLabel()
+        let bodyTextLabel = CVTextLabel()
 
-        public var isDedicatedCellView = false
+        var isDedicatedCellView = false
 
-        public var rootView: UIView {
+        var rootView: UIView {
             stackView
         }
 
         init(componentDelegate: CVComponentDelegate) {
             self.componentDelegate = componentDelegate
-
-            super.init()
         }
 
-        public func setIsCellVisible(_ isCellVisible: Bool) {
+        func setIsCellVisible(_ isCellVisible: Bool) {
             bodyTextLabel.setIsCellVisible(isCellVisible)
         }
 
-        public func reset() {
+        func reset() {
             if !isDedicatedCellView {
                 stackView.reset()
             }
@@ -726,20 +874,16 @@ public class CVComponentBodyText: CVComponentBase, CVComponent {
             bodyTextLabel.reset()
         }
     }
-}
 
-// MARK: -
+    // MARK: - CVAccessibilityComponent
 
-extension CVComponentBodyText: CVAccessibilityComponent {
-    public var accessibilityDescription: String {
+    var accessibilityDescription: String {
         switch bodyText {
-        case .bodyText(let displayableText, _), .oversizeTextUndownloadable(let displayableText):
+        case .bodyText(let displayableText, _), .oversizeTextUndownloadable(let displayableText), .oversizeTextSkipped(let displayableText), .oversizeTextDownloading(let displayableText):
             // NOTE: we use the full text.
             return displayableText.fullTextValue.accessibilityDescription
-        case .oversizeTextDownloading:
-            return labelConfigForOversizeTextDownloading.text.accessibilityDescription
         case .remotelyDeleted:
-            return labelConfigForRemotelyDeleted.text.accessibilityDescription
+            return textViewConfigForRemotelyDeleted.text.accessibilityDescription
         }
     }
 }

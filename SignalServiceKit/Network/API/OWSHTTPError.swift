@@ -4,7 +4,6 @@
 //
 
 public enum OWSHTTPError: Error, CustomDebugStringConvertible, IsRetryableProvider, UserErrorDescriptionProvider {
-    case invalidRequest
     case wrappedFailure(any Error)
     /// Request failed without a response from the service.
     case networkFailure(NetworkErrorType)
@@ -13,7 +12,7 @@ public enum OWSHTTPError: Error, CustomDebugStringConvertible, IsRetryableProvid
 
     // MARK: -
 
-    public enum NetworkErrorType: Error, CustomDebugStringConvertible, IsRetryableProvider {
+    public enum NetworkErrorType: CustomDebugStringConvertible {
         case invalidResponseStatus
         case unknownNetworkFailure
         case genericTimeout
@@ -30,8 +29,6 @@ public enum OWSHTTPError: Error, CustomDebugStringConvertible, IsRetryableProvid
                 return true
             }
         }
-
-        public var isRetryableProvider: Bool { true }
 
         public var debugDescription: String {
             switch self {
@@ -75,28 +72,26 @@ public enum OWSHTTPError: Error, CustomDebugStringConvertible, IsRetryableProvid
 
     public var localizedDescription: String {
         switch self {
-        case .invalidRequest, .networkFailure:
+        case .networkFailure:
             OWSLocalizedString(
                 "ERROR_DESCRIPTION_REQUEST_FAILED",
-                comment: "Error indicating that a socket request failed."
+                comment: "Error indicating that a socket request failed.",
             )
         case .serviceResponse(let serviceResponse) where serviceResponse.responseStatus == 429:
             OWSLocalizedString(
                 "REGISTER_RATE_LIMITING_ERROR",
-                comment: ""
+                comment: "",
             )
         case .wrappedFailure, .serviceResponse:
             OWSLocalizedString(
                 "ERROR_DESCRIPTION_RESPONSE_FAILED",
-                comment: "Error indicating that a socket response failed."
+                comment: "Error indicating that a socket response failed.",
             )
         }
     }
 
     public var debugDescription: String {
         switch self {
-        case .invalidRequest:
-            return "invalidRequest"
         case .wrappedFailure(let error):
             return "wrappedFailure(\(error))"
         case .networkFailure:
@@ -109,12 +104,7 @@ public enum OWSHTTPError: Error, CustomDebugStringConvertible, IsRetryableProvid
     // MARK: - IsRetryableProvider
 
     public var isRetryableProvider: Bool {
-        if isNetworkFailureImpl || isTimeoutImpl {
-            return true
-        }
         switch self {
-        case .invalidRequest:
-            return false
         case .wrappedFailure:
             return true
         case .networkFailure:
@@ -128,7 +118,7 @@ public enum OWSHTTPError: Error, CustomDebugStringConvertible, IsRetryableProvid
 
     public var responseStatusCode: Int {
         switch self {
-        case .invalidRequest, .wrappedFailure, .networkFailure:
+        case .wrappedFailure, .networkFailure:
             return 0
         case .serviceResponse(let serviceResponse):
             return Int(serviceResponse.responseStatus)
@@ -137,7 +127,7 @@ public enum OWSHTTPError: Error, CustomDebugStringConvertible, IsRetryableProvid
 
     public var responseHeaders: HttpHeaders? {
         switch self {
-        case .invalidRequest, .wrappedFailure, .networkFailure:
+        case .wrappedFailure, .networkFailure:
             return nil
         case .serviceResponse(let serviceResponse):
             return serviceResponse.responseHeaders
@@ -146,7 +136,7 @@ public enum OWSHTTPError: Error, CustomDebugStringConvertible, IsRetryableProvid
 
     public var responseBodyData: Data? {
         switch self {
-        case .invalidRequest, .wrappedFailure, .networkFailure:
+        case .wrappedFailure, .networkFailure:
             return nil
         case .serviceResponse(let serviceResponse):
             return serviceResponse.responseData
@@ -155,7 +145,7 @@ public enum OWSHTTPError: Error, CustomDebugStringConvertible, IsRetryableProvid
 
     public var isNetworkFailureImpl: Bool {
         switch self {
-        case .invalidRequest, .wrappedFailure:
+        case .wrappedFailure:
             return false
         case .networkFailure(let wrappedError):
             switch wrappedError {
@@ -166,14 +156,14 @@ public enum OWSHTTPError: Error, CustomDebugStringConvertible, IsRetryableProvid
             case .wrappedFailure(let wrappedError):
                 return wrappedError.isNetworkFailure
             }
-        case .serviceResponse(_):
+        case .serviceResponse:
             return false
         }
     }
 
     public var isTimeoutImpl: Bool {
         switch self {
-        case .invalidRequest, .wrappedFailure:
+        case .wrappedFailure:
             return false
         case .networkFailure(let wrappedError):
             switch wrappedError {
@@ -184,7 +174,7 @@ public enum OWSHTTPError: Error, CustomDebugStringConvertible, IsRetryableProvid
             case .wrappedFailure(let wrappedError):
                 return wrappedError.isTimeout
             }
-        case .serviceResponse(_):
+        case .serviceResponse:
             return false
         }
     }

@@ -9,23 +9,23 @@ public protocol RegistrationSessionManager {
 
     /// Restore any existing registration session that has not been completed and validate it with the server.
     /// If there is no session, or if the session is invalid, returns nil.
-    func restoreSession() async -> RegistrationSession?
+    func restoreSession(logger: PrefixedLogger) async -> RegistrationSession?
 
     /// Begins a new session, first attempting to restore any existing valid session for the same number.
     /// See `Registration.BeginSessionResponse` for possible responses, including errors.
-    func beginOrRestoreSession(e164: E164, apnsToken: String?) async -> Registration.BeginSessionResponse
+    func beginOrRestoreSession(e164: E164, apnsToken: String?, logger: PrefixedLogger) async throws -> RegistrationSession
 
     /// Fulfill a challenge for the session (e.g. a captcha).
     /// See `Registration.UpdateSessionResponse` for possible responses, including errors.
-    func fulfillChallenge(for session: RegistrationSession, fulfillment: Registration.ChallengeFulfillment) async -> Registration.UpdateSessionResponse
+    func fulfillChallenge(for session: inout RegistrationSession, fulfillment: Registration.ChallengeFulfillment, logger: PrefixedLogger) async throws
 
     /// Request a verification code be sent to the session's phone number, for some transport.
     /// See `Registration.UpdateSessionResponse` for possible responses, including errors.
-    func requestVerificationCode(for session: RegistrationSession, transport: Registration.CodeTransport) async -> Registration.UpdateSessionResponse
+    func requestVerificationCode(for session: RegistrationSession, transport: Registration.CodeTransport, logger: PrefixedLogger) async -> Registration.UpdateSessionResponse
 
     /// Submit a verification code that was previously requested.
     /// See `Registration.UpdateSessionResponse` for possible responses, including errors.
-    func submitVerificationCode(for session: RegistrationSession, code: String) async -> Registration.UpdateSessionResponse
+    func submitVerificationCode(for session: RegistrationSession, code: String, logger: PrefixedLogger) async -> Registration.UpdateSessionResponse
 
     /// Completes a session, wiping it from future restoration.
     /// Typically called once the session is verified and is used to complete registration.
@@ -36,7 +36,7 @@ public protocol RegistrationSessionManager {
 
 public enum Registration {
 
-    public enum CodeTransport: String, Equatable {
+    public enum CodeTransport: String {
         case sms
         case voice
     }
@@ -46,17 +46,9 @@ public enum Registration {
         case pushChallenge(String)
     }
 
-    public enum BeginSessionResponse: Equatable {
-        case success(RegistrationSession)
-        /// Typically, invalid e164.
-        case invalidArgument
-        /// The server indicated the client should retry after at least this much time has passed.
-        case retryAfter(TimeInterval)
-        /// A network failure.
-        case networkFailure
-        /// Some other generic unknown error.
-        case genericError
-    }
+    public static let challengeRejectedErrorCode = 403
+
+    public struct MissingSessionError: Error {}
 
     /// Collapses a few different error responses possible from the server down to only those
     /// relevant to the registration flow, in other words those that should have distinct error behaviors.
@@ -80,7 +72,7 @@ public enum Registration {
         case transportError(RegistrationSession)
         /// The request was made before the required timeout; it should be
         /// made again after the time specified in the `RegistrationSession`.
-        case retryAfterTimeout(RegistrationSession)
+        case retryAfterTimeout(RegistrationSession, retryAfterHeader: TimeInterval?)
         /// The provided session has timed out or is otherwise invalid, and a new
         /// session needs to be started, throwing away all current session state.
         case invalidSession

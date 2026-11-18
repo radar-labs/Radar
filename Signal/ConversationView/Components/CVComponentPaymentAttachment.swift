@@ -9,12 +9,12 @@
 
 import Foundation
 import SignalServiceKit
-public import SignalUI
+import SignalUI
 
 @objc
-public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
+class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
 
-    public var componentKey: CVComponentKey { .paymentAttachment }
+    var componentKey: CVComponentKey { .paymentAttachment }
 
     private let paymentAttachment: CVComponentState.PaymentAttachment
     private let paymentModel: TSPaymentModel?
@@ -30,7 +30,7 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
         contactName: String,
         paymentAmount: UInt64?,
         messageStatus: MessageReceiptStatus?,
-        footerState: CVComponentFooter.State?
+        footerState: CVComponentFooter.State?,
     ) {
         self.paymentAttachment = paymentAttachment
         self.paymentModel = paymentModel
@@ -63,7 +63,7 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
         guard let mob = paymentAmount else {
             return OWSLocalizedString(
                 "PAYMENTS_INFO_UNAVAILABLE_MESSAGE",
-                comment: "Status indicator for invalid payments which could not be processed."
+                comment: "Status indicator for invalid payments which could not be processed.",
             )
         }
         if PaymentsDisplayPreferences.shared.isSatoshiEnabled {
@@ -83,38 +83,38 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
         case (_, _, .sending):
             return OWSLocalizedString(
                 "PAYMENTS_PAYMENT_STATUS_IN_CHAT_PROCESSING",
-                comment: "Payment status context while sending"
+                comment: "Payment status context while sending",
             )
         case (_, .incomingMessage, _),
-            (.incomingPayment, _, _),
-            (.incomingUnidentified, _, _):
+             (.incomingPayment, _, _),
+             (.incomingUnidentified, _, _):
             return OWSLocalizedString(
                 "PAYMENTS_PAYMENT_STATUS_RECEIVED",
-                comment: "Badge label shown on received payment bubbles in chat"
+                comment: "Badge label shown on received payment bubbles in chat",
             )
         case (_, .outgoingMessage, .failed):
             return OWSLocalizedString(
                 "PAYMENTS_PAYMENT_STATUS_FAILED",
-                comment: "Badge label shown on failed payment bubbles in chat"
+                comment: "Badge label shown on failed payment bubbles in chat",
             )
         default:
             return OWSLocalizedString(
                 "PAYMENTS_PAYMENT_STATUS_SENT",
-                comment: "Badge label shown on sent payment bubbles in chat"
+                comment: "Badge label shown on sent payment bubbles in chat",
             )
         }
     }
 
     // MARK: - Build component view
 
-    public func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
+    func buildComponentView(componentDelegate: CVComponentDelegate) -> CVComponentView {
         CVComponentViewPaymentAttachment()
     }
 
-    public func configureForRendering(
+    func configureForRendering(
         componentView componentViewParam: CVComponentView,
         cellMeasurement: CVCellMeasurement,
-        componentDelegate: CVComponentDelegate
+        componentDelegate: CVComponentDelegate,
     ) {
         guard let componentView = componentViewParam as? CVComponentViewPaymentAttachment else {
             owsFailDebug("Unexpected componentView.")
@@ -182,7 +182,7 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
                 componentView.noteStatusView,
                 widthConstraint: componentView.noteStatusWidthConstraint,
                 heightConstraint: componentView.noteStatusHeightConstraint,
-                tintColor: statusTextColor
+                tintColor: statusTextColor,
             )
             componentView.noteFooterStack.isHidden = false
         } else {
@@ -195,7 +195,7 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
                 componentView.topStatusView,
                 widthConstraint: componentView.topStatusWidthConstraint,
                 heightConstraint: componentView.topStatusHeightConstraint,
-                tintColor: statusTextColor
+                tintColor: statusTextColor,
             )
             componentView.topFooterStack.isHidden = false
         }
@@ -205,13 +205,13 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
         _ statusView: UIImageView,
         widthConstraint: NSLayoutConstraint?,
         heightConstraint: NSLayoutConstraint?,
-        tintColor: UIColor
+        tintColor: UIColor,
     ) {
         if let si = footerState?.statusIndicator, let icon = UIImage(named: si.imageName) {
             statusView.image = icon.withRenderingMode(.alwaysTemplate)
             statusView.tintColor = tintColor
-            widthConstraint?.constant = si.imageSize.width
-            heightConstraint?.constant = si.imageSize.height
+            widthConstraint?.constant = CVComponentFooter.StatusIndicator.size.width
+            heightConstraint?.constant = CVComponentFooter.StatusIndicator.size.height
             statusView.isHidden = false
         } else {
             statusView.isHidden = true
@@ -220,9 +220,9 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
 
     // MARK: - Measurement
 
-    public func measure(
+    func measure(
         maxWidth: CGFloat,
-        measurementBuilder: CVCellMeasurement.Builder
+        measurementBuilder: CVCellMeasurement.Builder,
     ) -> CGSize {
         owsAssertDebug(maxWidth > 0)
         return CVComponentArchivedPayment.measurePaymentBubble(
@@ -230,13 +230,13 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
             badgeText: badgeText,
             amountNumberText: amountNumberText,
             amountUnitText: amountUnitText,
-            maxWidth: maxWidth
+            maxWidth: maxWidth,
         )
     }
 
     // MARK: - CVComponentView
 
-    public class CVComponentViewPaymentAttachment: NSObject, CVComponentView {
+    class CVComponentViewPaymentAttachment: NSObject, CVComponentView {
 
         private let containerView = UIView()
 
@@ -271,9 +271,9 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
         var noteStatusWidthConstraint: NSLayoutConstraint?
         var noteStatusHeightConstraint: NSLayoutConstraint?
 
-        public var isDedicatedCellView = true
+        var isDedicatedCellView = true
 
-        public var rootView: UIView { containerView }
+        var rootView: UIView { containerView }
 
         override init() {
             super.init()
@@ -293,7 +293,7 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
             badgeIconView.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
                 badgeIconView.widthAnchor.constraint(equalToConstant: 16),
-                badgeIconView.heightAnchor.constraint(equalToConstant: 16)
+                badgeIconView.heightAnchor.constraint(equalToConstant: 16),
             ])
 
             badgePillStack.axis = .horizontal
@@ -308,7 +308,7 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
                 badgePillStack.topAnchor.constraint(equalTo: badgePillView.topAnchor, constant: 3),
                 badgePillStack.bottomAnchor.constraint(equalTo: badgePillView.bottomAnchor, constant: -3),
                 badgePillStack.leadingAnchor.constraint(equalTo: badgePillView.leadingAnchor, constant: 8),
-                badgePillStack.trailingAnchor.constraint(equalTo: badgePillView.trailingAnchor, constant: -8)
+                badgePillStack.trailingAnchor.constraint(equalTo: badgePillView.trailingAnchor, constant: -8),
             ])
 
             badgePillView.heightAnchor.constraint(greaterThanOrEqualToConstant: 22).isActive = true
@@ -320,7 +320,7 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
             NSLayoutConstraint.activate([
                 badgePillView.topAnchor.constraint(equalTo: badgeWrapperView.topAnchor),
                 badgePillView.leadingAnchor.constraint(equalTo: badgeWrapperView.leadingAnchor),
-                badgePillView.bottomAnchor.constraint(equalTo: badgeWrapperView.bottomAnchor)
+                badgePillView.bottomAnchor.constraint(equalTo: badgeWrapperView.bottomAnchor),
                 // No trailing — pill hugs its content width
             ])
 
@@ -420,7 +420,7 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
                 noteLabel.bottomAnchor.constraint(equalTo: noteFooterStack.topAnchor, constant: -4),
                 noteFooterStack.leadingAnchor.constraint(equalTo: noteSectionView.leadingAnchor, constant: 12),
                 noteFooterStack.trailingAnchor.constraint(equalTo: noteSectionView.trailingAnchor, constant: -12),
-                noteFooterStack.bottomAnchor.constraint(equalTo: noteSectionView.bottomAnchor, constant: -12)
+                noteFooterStack.bottomAnchor.constraint(equalTo: noteSectionView.bottomAnchor, constant: -12),
             ])
 
             // Main layout
@@ -435,13 +435,13 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
                 mainStack.topAnchor.constraint(equalTo: containerView.topAnchor),
                 mainStack.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
                 mainStack.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-                mainStack.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+                mainStack.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
             ])
         }
 
-        public func setIsCellVisible(_ isCellVisible: Bool) {}
+        func setIsCellVisible(_ isCellVisible: Bool) {}
 
-        public func reset() {
+        func reset() {
             badgeLabel.text = nil
             badgeIconView.image = nil
             amountNumberLabel.text = nil
@@ -465,16 +465,16 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
 
     // MARK: - Tap handler
 
-    public override func handleTap(
+    override func handleTap(
         sender: UIGestureRecognizer,
         componentDelegate: CVComponentDelegate,
         componentView: CVComponentView,
-        renderItem: CVRenderItem
+        renderItem: CVRenderItem,
     ) -> Bool {
-        guard let paymentModel = paymentModel else { return false }
+        guard let paymentModel else { return false }
         let paymentHistoryItem = PaymentsHistoryModelItem(
             paymentModel: paymentModel,
-            displayName: contactName
+            displayName: contactName,
         )
         componentDelegate.didTapPayment(paymentHistoryItem)
         return true
@@ -484,7 +484,7 @@ public class CVComponentPaymentAttachment: CVComponentBase, CVComponent {
 // MARK: - Accessibility
 
 extension CVComponentPaymentAttachment: CVAccessibilityComponent {
-    public var accessibilityDescription: String {
+    var accessibilityDescription: String {
         let amount = amountNumberText + amountUnitText
         if let note = noteText {
             return amount + ". " + note
