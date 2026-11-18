@@ -21,6 +21,8 @@ env:
 
 jobs:
   build:
+    # Radar: upstream Signal workflow, gated to signalapp repositories.
+    if: ${{ github.repository_owner == 'signalapp' }}
     name: build
     timeout-minutes: 5
     runs-on: macos-26

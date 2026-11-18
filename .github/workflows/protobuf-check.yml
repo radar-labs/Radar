@@ -34,6 +34,8 @@ env:
 
 jobs:
   check-protobuf:
+    # Radar: upstream Signal workflow, gated to signalapp repositories.
+    if: ${{ github.repository_owner == 'signalapp' }}
     name: check protobufs
 
     timeout-minutes: 10

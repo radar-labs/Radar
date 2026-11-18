@@ -18,6 +18,8 @@ concurrency:
 
 jobs:
   build_and_test:
+    # Radar: upstream Signal workflow, gated to signalapp repositories.
+    if: ${{ github.repository_owner == 'signalapp' }}
     name: Build and Test
     timeout-minutes: 20
     runs-on: ${{matrix.os}}
@@ -88,7 +90,8 @@ jobs:
 
     runs-on: macos-26
 
-    if: github.event_name == 'pull_request'
+    # Radar: upstream Signal workflow, gated to signalapp repositories.
+    if: github.repository_owner == 'signalapp' && github.event_name == 'pull_request'
 
     steps:
       - name: Set Xcode version

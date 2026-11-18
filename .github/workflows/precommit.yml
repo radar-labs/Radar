@@ -40,6 +40,8 @@ env:
 
 jobs:
   precommit:
+    # Radar: upstream Signal workflow, gated to signalapp repositories.
+    if: ${{ github.repository_owner == 'signalapp' }}
     name: precommit
 
     timeout-minutes: 10

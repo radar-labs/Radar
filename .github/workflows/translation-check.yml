@@ -11,6 +11,8 @@ env:
 
 jobs:
   check-strings:
+    # Radar: upstream Signal workflow, gated to signalapp repositories.
+    if: ${{ github.repository_owner == 'signalapp' }}
     name: check .strings
 
     timeout-minutes: 5
